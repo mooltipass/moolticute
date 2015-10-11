@@ -15,14 +15,24 @@ public:
     }
     ~UsbMonitor_linux();
 
+    void stop();
+
 signals:
-    void usbDeviceAdded(const QUuid &guid, const QString &dev_path);
-    void usbDeviceRemoved(const QUuid &guid, const QString &dev_path);
+    void usbDeviceAdded();
+    void usbDeviceRemoved();
 
 private:
     UsbMonitor_linux();
 
-    libusb_device_handle *handle = NULL;
+    libusb_device_handle *handle = nullptr;
+    libusb_hotplug_callback_handle cbaddhandle;
+    libusb_hotplug_callback_handle cbdelhandle;
+
+    QMutex mutex;
+    bool run = true;
+
+    friend int libusb_device_add_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
+    friend int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
 };
 
 #endif // USBMONITOR_LINUX_H

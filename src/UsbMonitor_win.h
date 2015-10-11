@@ -19,8 +19,8 @@ public:
     ~UsbMonitor_win();
 
 signals:
-    void usbDeviceAdded(const QUuid &guid, const QString &dev_path);
-    void usbDeviceRemoved(const QUuid &guid, const QString &dev_path);
+    void usbDeviceAdded();
+    void usbDeviceRemoved();
 
 private:
     UsbMonitor_win();

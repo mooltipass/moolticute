@@ -40,9 +40,15 @@ bool UsbMonitor_win::nativeEvent(const QByteArray &eventType, void *message, lon
         QUuid guid(db->dbcc_classguid);
 
         if (msg->wParam == DBT_DEVICEARRIVAL)
-            emit usbDeviceAdded(guid, dev_path);
+        {
+            qDebug() << "Device added: " << guid.toString() << " - " << dev_path;
+            emit usbDeviceAdded(/*guid, dev_path*/);
+        }
         else if (msg->wParam == DBT_DEVICEREMOVECOMPLETE)
-            emit usbDeviceRemoved(guid, dev_path);
+        {
+            qDebug() << "Device removed: " << guid.toString() << " - " << dev_path;
+            emit usbDeviceRemoved(/*guid, dev_path*/);
+        }
     }
 
     return false;
