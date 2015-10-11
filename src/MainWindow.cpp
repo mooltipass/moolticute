@@ -34,7 +34,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+#ifndef Q_OS_WIN
     UsbMonitor_linux::Instance()->stop();
+#endif
     libusb_exit(nullptr);
     delete ui;
 }
