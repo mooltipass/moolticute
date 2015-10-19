@@ -29,7 +29,10 @@ win32 {
 }
 
 SOURCES += src/main.cpp\
-        src/MainWindow.cpp
+        src/MainWindow.cpp \
+    src/MPDevice.cpp \
+    src/MPManager.cpp \
+    src/Common.cpp
 
 win32 {
     SOURCES += src/UsbMonitor_win.cpp
@@ -39,6 +42,9 @@ win32 {
     HEADERS += src/UsbMonitor_linux.h
 }
 
-HEADERS  += src/MainWindow.h
+HEADERS  += src/MainWindow.h \
+    src/Common.h \
+    src/MPDevice.h \
+    src/MPManager.h
 
 FORMS    += src/MainWindow.ui

@@ -1,3 +1,21 @@
+/******************************************************************************
+ **  Copyright (c) Raoul Hecky. All Rights Reserved.
+ **
+ **  Calaos is free software; you can redistribute it and/or modify
+ **  it under the terms of the GNU General Public License as published by
+ **  the Free Software Foundation; either version 3 of the License, or
+ **  (at your option) any later version.
+ **
+ **  Calaos is distributed in the hope that it will be useful,
+ **  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ **  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ **  GNU General Public License for more details.
+ **
+ **  You should have received a copy of the GNU General Public License
+ **  along with Foobar; if not, write to the Free Software
+ **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ **
+ ******************************************************************************/
 #include "UsbMonitor_linux.h"
 #include <QtConcurrent/QtConcurrent>
 
@@ -43,12 +61,16 @@ int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug
 
 UsbMonitor_linux::UsbMonitor_linux()
 {
+}
+
+void UsbMonitor_linux::start()
+{
     int err;
     err = libusb_hotplug_register_callback(nullptr,
                                            LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
                                            (libusb_hotplug_flag)0,
-                                           LIBUSB_HOTPLUG_MATCH_ANY,
-                                           LIBUSB_HOTPLUG_MATCH_ANY,
+                                           vendorId,
+                                           productId,
                                            LIBUSB_HOTPLUG_MATCH_ANY,
                                            libusb_device_add_cb,
                                            this,
@@ -59,8 +81,8 @@ UsbMonitor_linux::UsbMonitor_linux()
     err = libusb_hotplug_register_callback(nullptr,
                                            LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
                                            (libusb_hotplug_flag)0,
-                                           LIBUSB_HOTPLUG_MATCH_ANY,
-                                           LIBUSB_HOTPLUG_MATCH_ANY,
+                                           vendorId,
+                                           productId,
                                            LIBUSB_HOTPLUG_MATCH_ANY,
                                            libusb_device_del_cb,
                                            this,

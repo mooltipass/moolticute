@@ -1,12 +1,23 @@
+/******************************************************************************
+ **  Copyright (c) Raoul Hecky. All Rights Reserved.
+ **
+ **  Calaos is free software; you can redistribute it and/or modify
+ **  it under the terms of the GNU General Public License as published by
+ **  the Free Software Foundation; either version 3 of the License, or
+ **  (at your option) any later version.
+ **
+ **  Calaos is distributed in the hope that it will be useful,
+ **  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ **  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ **  GNU General Public License for more details.
+ **
+ **  You should have received a copy of the GNU General Public License
+ **  along with Foobar; if not, write to the Free Software
+ **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ **
+ ******************************************************************************/
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include <libusb.h>
-
-#ifdef Q_OS_WIN
-#include "UsbMonitor_win.h"
-#else
-#include "UsbMonitor_linux.h"
-#endif
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,39 +25,22 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    int err;
-
-    err = libusb_init(nullptr);
-    if (err < 0)
-        QMessageBox::warning(this, tr("Error"), tr("Failed to initialise libusb:\n%1").arg(libusb_error_name(err)));
-
-    if (!libusb_has_capability (LIBUSB_CAP_HAS_HOTPLUG))
-        qDebug() << "libusb Hotplug capabilites are not supported on this platform";
-
-#ifdef Q_OS_WIN
-    connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
-    connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
-#else
-    connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
-    connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
-#endif
+    connect(MPManager::Instance(), SIGNAL(mpConnected()), this, SLOT(mpAdded()));
+    connect(MPManager::Instance(), SIGNAL(mpDisconnected()), this, SLOT(mpRemoved()));
 }
 
 MainWindow::~MainWindow()
 {
-#ifndef Q_OS_WIN
-    UsbMonitor_linux::Instance()->stop();
-#endif
-    libusb_exit(nullptr);
+    MPManager::Instance()->stop();
     delete ui;
 }
 
-void MainWindow::usbDeviceAdded()
+void MainWindow::mpAdded()
 {
-    ui->plainTextEdit->appendPlainText("New usb device");
+    ui->plainTextEdit->appendPlainText("Mooltipass connected");
 }
 
-void MainWindow::usbDeviceRemoved()
+void MainWindow::mpRemoved()
 {
-    ui->plainTextEdit->appendPlainText("Removed usb device");
+    ui->plainTextEdit->appendPlainText("Mooltipass disconnected");
 }

@@ -16,30 +16,40 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MPMANAGER_H
+#define MPMANAGER_H
 
-#include <QtWidgets>
-#include "MPManager.h"
+#include <QtCore>
+#include <libusb.h>
+#include "MPDevice.h"
 
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+class MPManager: public QObject
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    static MPManager *Instance()
+    {
+        static MPManager inst;
+        return &inst;
+    }
+    virtual ~MPManager();
+
+    void stop();
+    MPDevice *getDevice();
+
+signals:
+    void mpConnected();
+    void mpDisconnected();
 
 private slots:
-    void mpAdded();
-    void mpRemoved();
+    void usbDeviceAdded();
+    void usbDeviceRemoved();
 
 private:
-    Ui::MainWindow *ui;
+    MPManager();
+
+    libusb_context *usb_ctx = nullptr;
+    MPDevice *currentDev = nullptr;
 };
 
-#endif // MAINWINDOW_H
+#endif // MPMANAGER_H

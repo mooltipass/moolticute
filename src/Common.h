@@ -16,30 +16,22 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef COMMON_H
+#define COMMON_H
 
-#include <QtWidgets>
-#include "MPManager.h"
+#include <QtCore>
 
-namespace Ui {
-class MainWindow;
-}
+#define MOOLTIPASS_VENDORID     0x16D0
+#define MOOLTIPASS_PRODUCTID    0x09A0
 
-class MainWindow : public QMainWindow
+#define qToChar(s) s.toLocal8Bit().constData()
+#define qToUtf8(s) s.toUtf8().constData()
+
+class Common
 {
-    Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-private slots:
-    void mpAdded();
-    void mpRemoved();
-
-private:
-    Ui::MainWindow *ui;
+    static void installMessageOutputHandler();
 };
 
-#endif // MAINWINDOW_H
+#endif // COMMON_H
+

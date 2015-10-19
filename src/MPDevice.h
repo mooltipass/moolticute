@@ -16,30 +16,19 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MPDEVICE_H
+#define MPDEVICE_H
 
-#include <QtWidgets>
-#include "MPManager.h"
+#include <QObject>
+#include "Common.h"
 
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+class MPDevice: public QObject
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    MPDevice(QObject *parent);
+    virtual ~MPDevice();
 
-private slots:
-    void mpAdded();
-    void mpRemoved();
-
-private:
-    Ui::MainWindow *ui;
 };
 
-#endif // MAINWINDOW_H
+#endif // MPDEVICE_H
