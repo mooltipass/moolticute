@@ -21,13 +21,18 @@
 
 #include <QObject>
 #include "Common.h"
+#include <libusb.h>
 
 class MPDevice: public QObject
 {
     Q_OBJECT
 public:
-    MPDevice(QObject *parent);
+    MPDevice(QObject *parent, libusb_context *ctx, libusb_device *dev);
     virtual ~MPDevice();
+
+private:
+    libusb_context *usb_ctx;
+    libusb_device *device;
 
 };
 

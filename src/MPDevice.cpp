@@ -18,11 +18,15 @@
  ******************************************************************************/
 #include "MPDevice.h"
 
-MPDevice::MPDevice(QObject *parent):
-    QObject(parent)
+MPDevice::MPDevice(QObject *parent, libusb_context *ctx, libusb_device *dev):
+    QObject(parent),
+    usb_ctx(ctx),
+    device(dev)
 {
+    libusb_ref_device(device);
 }
 
 MPDevice::~MPDevice()
 {
+    libusb_unref_device(device);
 }

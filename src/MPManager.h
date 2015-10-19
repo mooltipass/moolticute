@@ -37,7 +37,7 @@ public:
     void stop();
     MPDevice *getDevice(int at);
     int getDeviceCount() { return devices.count(); }
-    QList<MPDevice *> getDevices() { return devices; }
+    QList<MPDevice *> getDevices();
 
 signals:
     void mpConnected(MPDevice *device);
@@ -50,9 +50,10 @@ private slots:
 private:
     MPManager();
 
-    libusb_context *usb_ctx = nullptr;
+    void checkUsbDevices();
 
-    QList<MPDevice *> devices;
+    libusb_context *usb_ctx = nullptr;
+    QHash<libusb_device *, MPDevice *> devices;
 };
 
 #endif // MPMANAGER_H
