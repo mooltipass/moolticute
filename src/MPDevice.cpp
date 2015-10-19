@@ -30,3 +30,139 @@ MPDevice::~MPDevice()
 {
     libusb_unref_device(device);
 }
+
+/* Helper class to handle transfer and detach/reattach kernel driver
+ */
+class USBTransfer: public QObject
+{
+public:
+    USBTransfer(libusb_device_handle *_fd, int intf, MPDevice *parent):
+        QObject(parent), fd(_fd), interface(intf), device(parent)
+    {
+        if (libusb_kernel_driver_active(fd, interface))
+        {
+            detached_kernel = true;
+            libusb_detach_kernel_driver(fd, interface);
+        }
+        recvData.resize(64);
+    }
+    ~USBTransfer()
+    {
+        if (detached_kernel)
+            libusb_attach_kernel_driver(fd, interface);
+    }
+
+    libusb_device_handle *fd;
+    int interface = 0;
+    bool detached_kernel = false;
+    MPDevice *device;
+    QByteArray recvData;
+};
+
+//Called when a send transfer has completed
+void _usbSendCallback(struct libusb_transfer *trf)
+{
+    // /!\ every libusb callbacks are running on the libusb thread!
+    USBTransfer *t = reinterpret_cast<USBTransfer *>(trf->user_data);
+    QMetaObject::invokeMethod(t->device, SLOT(usbSendCb(libusb_transfer*)),
+                              Qt::QueuedConnection,
+                              Q_ARG(struct libusb_transfer *, trf));
+}
+
+//Start a send request, _usbSendCallback will be called after completion
+void MPDevice::usbSendData(unsigned char cmd, const QByteArray &data)
+{
+    QByteArray ba;
+    ba.append(data.size());
+    ba.append(cmd);
+    ba.append(data);
+
+    struct libusb_transfer *trf = libusb_alloc_transfer(1);
+
+    //Our qobject wrapper to maintain data and pass over threads
+    USBTransfer *transfer = new USBTransfer(devicefd, 0, this);
+
+    //Send data
+    libusb_fill_interrupt_transfer(trf,
+                                   devicefd,
+                                   LIBUSB_ENDPOINT_OUT | 2,
+                                   (unsigned char *)ba.data(),
+                                   ba.size(),
+                                   _usbSendCallback,
+                                   transfer,
+                                   1000);
+
+    int err = libusb_submit_transfer(trf);
+    if (err)
+        qWarning() << "Error sending data: " << libusb_strerror((enum libusb_error)err);
+}
+
+void MPDevice::usbSendCb(libusb_transfer *trf)
+{
+    USBTransfer *transfer = reinterpret_cast<USBTransfer *>(trf->user_data);
+
+    if (trf->status != LIBUSB_TRANSFER_COMPLETED)
+    {
+        qWarning() << "Failed to transfer data to usb endpoint (OUT)";
+        libusb_free_transfer(trf);
+        transfer->deleteLater();
+        return;
+    }
+
+    libusb_free_transfer(trf);
+
+    //Ask for a request
+    usbRequestReceive(transfer);
+}
+
+//Called when a receive transfer has completed
+void _usbReceiveCallback(struct libusb_transfer *trf)
+{
+    // /!\ every libusb callbacks are running on the libusb thread!
+    USBTransfer *t = reinterpret_cast<USBTransfer *>(trf->user_data);
+    QMetaObject::invokeMethod(t->device, SLOT(usbReceiveCb(libusb_transfer*)),
+                              Qt::QueuedConnection,
+                              Q_ARG(struct libusb_transfer *, trf));
+}
+
+void MPDevice::usbRequestReceive(USBTransfer *transfer)
+{
+    struct libusb_transfer *trf = libusb_alloc_transfer(1);
+
+    //Receive data
+    libusb_fill_interrupt_transfer(trf,
+                                   devicefd,
+                                   LIBUSB_ENDPOINT_IN | 1,
+                                   (unsigned char *)transfer->recvData.data(),
+                                   transfer->recvData.size(),
+                                   _usbReceiveCallback,
+                                   transfer,
+                                   1000);
+
+    int err = libusb_submit_transfer(trf);
+    if (err)
+        qWarning() << "Error receiving data: " << libusb_strerror((enum libusb_error)err);
+}
+
+void MPDevice::usbReceiveCb(libusb_transfer *trf)
+{
+    USBTransfer *transfer = reinterpret_cast<USBTransfer *>(trf->user_data);
+    transfer->deleteLater();
+
+    if (trf->status != LIBUSB_TRANSFER_COMPLETED)
+    {
+        qWarning() << "Failed to transfer data to usb endpoint (IN)";
+        libusb_free_transfer(trf);
+        return;
+    }
+    libusb_free_transfer(trf);
+
+    switch ((unsigned char)transfer->recvData.at(0))
+    {
+    case MP_MOOLTIPASS_STATUS:
+        set_status((Common::MPStatus)transfer->recvData.at(2));
+        break;
+
+    default: break;
+    }
+}

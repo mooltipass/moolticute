@@ -16,41 +16,28 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef QTHELPER
+#define QTHELPER
 
-#include <QtCore>
+#include <QObject>
 
-#define MOOLTIPASS_VENDORID     0x16D0
-#define MOOLTIPASS_PRODUCTID    0x09A0
+#define QT_WRITABLE_PROPERTY(type, name) \
+    protected: \
+        Q_PROPERTY (type name READ get_##name WRITE set_##name NOTIFY name##Changed) \
+    private: \
+        type m_##name; \
+    public: \
+        type get_##name () const { return m_##name; } \
+    public Q_SLOTS: \
+        void set_##name (type name) { \
+            if (m_##name != name) { \
+                m_##name = name; \
+                emit name##Changed (m_##name); \
+            } \
+        } \
+    Q_SIGNALS: \
+        void name##Changed (type name); \
+    private:
 
-#define qToChar(s) s.toLocal8Bit().constData()
-#define qToUtf8(s) s.toUtf8().constData()
-
-class Common
-{
-public:
-    static void installMessageOutputHandler();
-
-    Q_ENUMS(MPStatus)
-    typedef enum
-    {
-        NoCardInserted = 0,
-        Locked = 1,
-        LockedScreen = 3,
-        Unlocked = 5,
-        UnkownSmartcad = 9,
-    } MPStatus;
-    QHash<MPStatus, QString> MPStatusString = {
-        { NoCardInserted, QObject::tr("No card inserted") },
-        { Locked, QObject::tr("Mooltipass locked") },
-        { LockedScreen, QObject::tr("Mooltipass locked, unlocking screen") },
-        { Unlocked, QObject::tr("Mooltipass unlocked") },
-        { UnkownSmartcad, QObject::tr("Unknown smartcard inserted") }
-    };
-};
-
-Q_DECLARE_METATYPE(Common::MPStatus)
-
-#endif // COMMON_H
+#endif // QTHELPER
 

@@ -22,18 +22,36 @@
 #include <QObject>
 #include "Common.h"
 #include <libusb.h>
+#include "MooltipassCmds.h"
+#include "QtHelper.h"
+
+class USBTransfer;
 
 class MPDevice: public QObject
 {
     Q_OBJECT
+    QT_WRITABLE_PROPERTY(Common::MPStatus, status)
+
 public:
     MPDevice(QObject *parent, libusb_context *ctx, libusb_device *dev);
     virtual ~MPDevice();
 
+private slots:
+    void usbSendCb(struct libusb_transfer *trf);
+    void usbReceiveCb(struct libusb_transfer *trf);
+
 private:
     libusb_context *usb_ctx;
     libusb_device *device;
+    libusb_device_handle *devicefd;
 
+    void usbSendData(unsigned char cmd, const QByteArray &data = QByteArray());
+    void usbRequestReceive(USBTransfer *transfer);
+
+    friend void _usbSendCallback(struct libusb_transfer *trf);
+    friend void _usbReceiveCallback(struct libusb_transfer *trf);
 };
+
+Q_DECLARE_METATYPE(struct libusb_transfer *)
 
 #endif // MPDEVICE_H

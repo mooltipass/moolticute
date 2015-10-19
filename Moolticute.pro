@@ -45,6 +45,8 @@ win32 {
 HEADERS  += src/MainWindow.h \
     src/Common.h \
     src/MPDevice.h \
-    src/MPManager.h
+    src/MPManager.h \
+    src/MooltipassCmds.h \
+    src/QtHelper.h
 
 FORMS    += src/MainWindow.ui

@@ -90,6 +90,10 @@ void UsbMonitor_linux::start()
     if (err != LIBUSB_SUCCESS)
         qWarning() << "Failed to register LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT callback";
 
+    //Using poll fd does not work on windows,
+    //so running in a thread is the only viable solution
+    //This also means all callbacks from libusb will be called from the thread.
+    //Need to be carefull with that.
     QtConcurrent::run([=]()
     {
         bool r;

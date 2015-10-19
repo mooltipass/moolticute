@@ -27,6 +27,8 @@
 MPManager::MPManager():
     QObject(nullptr)
 {
+    qRegisterMetaType<struct libusb_transfer *>();
+
     int err;
 
     err = libusb_init(&usb_ctx);
