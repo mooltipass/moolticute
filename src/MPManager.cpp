@@ -80,7 +80,7 @@ MPDevice *MPManager::getDevice(int at)
     if (at < 0 || at >= devices.count())
         return nullptr;
     auto it = devices.begin();
-    while (it != devices.end() && at > 0) at--;
+    while (it != devices.end() && at > 0) { at--; it++; }
     return it.value();
 }
 
@@ -89,7 +89,10 @@ QList<MPDevice *> MPManager::getDevices()
     QList<MPDevice *> devs;
     auto it = devices.begin();
     while (it != devices.end())
+    {
         devs.append(it.value());
+        it++;
+    }
     return devs;
 }
 
@@ -110,6 +113,7 @@ void MPManager::checkUsbDevices()
         {
             emit mpDisconnected(it.value());
             it.value()->deleteLater();
+            it++;
         }
         devices.clear();
         return;
@@ -198,6 +202,8 @@ void MPManager::checkUsbDevices()
             devices.remove(it.key());
             it = devices.begin();
         }
+        else
+            it++;
     }
     return;
 }
