@@ -70,3 +70,10 @@ void MPManager::usbDeviceRemoved()
 {
 
 }
+
+MPDevice *MPManager::getDevice(int at)
+{
+    if (at < 0 || at >= devices.count())
+        return nullptr;
+    return devices.at(at);
+}

@@ -35,11 +35,13 @@ public:
     virtual ~MPManager();
 
     void stop();
-    MPDevice *getDevice();
+    MPDevice *getDevice(int at);
+    int getDeviceCount() { return devices.count(); }
+    QList<MPDevice *> getDevices() { return devices; }
 
 signals:
-    void mpConnected();
-    void mpDisconnected();
+    void mpConnected(MPDevice *device);
+    void mpDisconnected(MPDevice *device);
 
 private slots:
     void usbDeviceAdded();
@@ -49,7 +51,8 @@ private:
     MPManager();
 
     libusb_context *usb_ctx = nullptr;
-    MPDevice *currentDev = nullptr;
+
+    QList<MPDevice *> devices;
 };
 
 #endif // MPMANAGER_H

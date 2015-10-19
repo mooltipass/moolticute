@@ -35,8 +35,8 @@ public:
     ~MainWindow();
 
 private slots:
-    void mpAdded();
-    void mpRemoved();
+    void mpAdded(MPDevice *device);
+    void mpRemoved(MPDevice *device);
 
 private:
     Ui::MainWindow *ui;
