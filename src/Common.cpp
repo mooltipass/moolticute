@@ -18,6 +18,20 @@
  ******************************************************************************/
 #include "Common.h"
 
+QHash<Common::MPStatus, QString> Common::MPStatusString = {
+    { Common::UnknownStatus, QObject::tr("Unknown status") },
+    { Common::NoCardInserted, QObject::tr("No card inserted") },
+    { Common::Locked, QObject::tr("Mooltipass locked") },
+    { Common::Error2, QObject::tr("Error 2 (should not happen)") },
+    { Common::LockedScreen, QObject::tr("Mooltipass locked, unlocking screen") },
+    { Common::Error4, QObject::tr("Error 4 (should not happen)") },
+    { Common::Unlocked, QObject::tr("Mooltipass unlocked") },
+    { Common::Error6, QObject::tr("Error 6 (should not happen)") },
+    { Common::Error7, QObject::tr("Error 7 (should not happen)") },
+    { Common::Error8, QObject::tr("Error 8 (should not happen)") },
+    { Common::UnkownSmartcad, QObject::tr("Unknown smartcard inserted") }
+};
+
 static QFile debugLogFile;
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {

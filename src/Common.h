@@ -35,6 +35,7 @@ public:
     Q_ENUMS(MPStatus)
     typedef enum
     {
+        UnknownStatus = -1,
         NoCardInserted = 0,
         Locked = 1,
         Error2 = 2,
@@ -46,18 +47,7 @@ public:
         Error8 = 8,
         UnkownSmartcad = 9,
     } MPStatus;
-    QHash<MPStatus, QString> MPStatusString = {
-        { NoCardInserted, QObject::tr("No card inserted") },
-        { Locked, QObject::tr("Mooltipass locked") },
-        { Error2, QObject::tr("Error 2 (should not happen)") },
-        { LockedScreen, QObject::tr("Mooltipass locked, unlocking screen") },
-        { Error4, QObject::tr("Error 4 (should not happen)") },
-        { Unlocked, QObject::tr("Mooltipass unlocked") },
-        { Error6, QObject::tr("Error 6 (should not happen)") },
-        { Error7, QObject::tr("Error 7 (should not happen)") },
-        { Error8, QObject::tr("Error 8 (should not happen)") },
-        { UnkownSmartcad, QObject::tr("Unknown smartcard inserted") }
-    };
+    static QHash<MPStatus, QString> MPStatusString;
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)

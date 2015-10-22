@@ -27,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(MPManager::Instance(), SIGNAL(mpConnected(MPDevice*)), this, SLOT(mpAdded(MPDevice*)));
     connect(MPManager::Instance(), SIGNAL(mpDisconnected(MPDevice*)), this, SLOT(mpRemoved(MPDevice*)));
+
+    if (MPManager::Instance()->getDeviceCount() > 0)
+        mpAdded(MPManager::Instance()->getDevice(0));
 }
 
 MainWindow::~MainWindow()
@@ -35,12 +38,24 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::mpAdded(MPDevice *device)
+void MainWindow::mpAdded(MPDevice *dev)
 {
     ui->plainTextEdit->appendPlainText("Mooltipass connected");
+    device = dev;
+
+    connect(device, &MPDevice::statusChanged, [=]()
+    {
+        ui->plainTextEdit->appendPlainText(QString("Status: %1").arg(Common::MPStatusString[device->get_status()]));
+    });
 }
 
-void MainWindow::mpRemoved(MPDevice *device)
+void MainWindow::mpRemoved(MPDevice *)
 {
     ui->plainTextEdit->appendPlainText("Mooltipass disconnected");
+    device = nullptr;
+}
+
+void MainWindow::on_pushButtonStatus_clicked()
+{
+
 }

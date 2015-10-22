@@ -36,10 +36,14 @@ public:
 
 private slots:
     void mpAdded(MPDevice *device);
-    void mpRemoved(MPDevice *device);
+    void mpRemoved(MPDevice *);
+
+    void on_pushButtonStatus_clicked();
 
 private:
     Ui::MainWindow *ui;
+
+    MPDevice *device = nullptr;
 };
 
 #endif // MAINWINDOW_H
