@@ -21,11 +21,8 @@
 
 #include <QObject>
 #include "Common.h"
-#include <libusb.h>
 #include "MooltipassCmds.h"
 #include "QtHelper.h"
-
-class USBTransfer;
 
 class MPDevice: public QObject
 {
@@ -33,25 +30,29 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(Common::MPStatus, status)
 
 public:
-    MPDevice(QObject *parent, libusb_context *ctx, libusb_device *dev);
+    MPDevice(QObject *parent);
     virtual ~MPDevice();
 
+    /* Send a command with data to the device */
+    void sendData(unsigned char cmd, const QByteArray &data = QByteArray());
+
+signals:
+    /* Signal emited by platform code when new data comes from MP */
+    /* A signal is used for platform code that uses a dedicated thread */
+    void platformDataRead(const QByteArray &data);
+
 private slots:
-    void usbSendCb(struct libusb_transfer *trf);
-    void usbReceiveCb(struct libusb_transfer *trf);
+    void newDataRead(const QByteArray &data);
 
 private:
-    libusb_context *usb_ctx;
-    libusb_device *device;
-    libusb_device_handle *devicefd;
+    /* Platform function for starting a read, should be implemented in platform class */
+    virtual void platformRead() {}
 
-    void usbSendData(unsigned char cmd, const QByteArray &data = QByteArray());
-    void usbRequestReceive(USBTransfer *transfer);
+    /* Platform function for writing data, should be implemented in platform class */
+    virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
 
-    friend void _usbSendCallback(struct libusb_transfer *trf);
-    friend void _usbReceiveCallback(struct libusb_transfer *trf);
+    //timer that asks status
+    QTimer *statusTimer = nullptr;
 };
-
-Q_DECLARE_METATYPE(struct libusb_transfer *)
 
 #endif // MPDEVICE_H

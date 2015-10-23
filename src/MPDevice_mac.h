@@ -16,49 +16,29 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef MPMANAGER_H
-#define MPMANAGER_H
+#ifndef MPDEVICE_MAC_H
+#define MPDEVICE_MAC_H
 
-#include <QtCore>
+#include "MPDevice.h"
 
-#if defined(Q_OS_WIN)
-#include "MPDevice_win.h"
-#elif defined(Q_OS_MAC)
-#include "MPDevice_mac.h"
-#elif defined(Q_OS_LINUX)
-#include "MPDevice_linux.h"
-#endif
+class MPPlatformDef
+{
+public:
+    QString id; //unique id for all platform
 
-class MPManager: public QObject
+};
+
+inline bool operator==(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return lhs.id == rhs.id; }
+inline bool operator!=(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return !(lhs == rhs); }
+
+class MPDevice_mac: public MPDevice
 {
     Q_OBJECT
 public:
-    static MPManager *Instance()
-    {
-        static MPManager inst;
-        return &inst;
-    }
-    virtual ~MPManager();
+    MPDevice_mac();
 
-    void stop();
-    MPDevice *getDevice(int at);
-    int getDeviceCount() { return devices.count(); }
-    QList<MPDevice *> getDevices();
-
-signals:
-    void mpConnected(MPDevice *device);
-    void mpDisconnected(MPDevice *device);
-
-private slots:
-    void usbDeviceAdded();
-    void usbDeviceRemoved();
-
-private:
-    MPManager();
-
-    void checkUsbDevices();
-
-    QHash<QString, MPDevice *> devices;
+    //Static function for enumerating devices on platform
+    static QList<MPPlatformDef> enumerateDevices();
 };
 
-#endif // MPMANAGER_H
+#endif // MPDEVICE_MAC_H

@@ -16,49 +16,20 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef MPMANAGER_H
-#define MPMANAGER_H
+#ifndef HID_DLL_H
+#define HID_DLL_H
 
-#include <QtCore>
+/* This header contains definitions from hid.h from microsoft
+ * It's declared here for loading at runtime
+ */
 
-#if defined(Q_OS_WIN)
-#include "MPDevice_win.h"
-#elif defined(Q_OS_MAC)
-#include "MPDevice_mac.h"
-#elif defined(Q_OS_LINUX)
-#include "MPDevice_linux.h"
-#endif
+#include <windows.h>
+#include <hidpi.h>
 
-class MPManager: public QObject
-{
-    Q_OBJECT
-public:
-    static MPManager *Instance()
-    {
-        static MPManager inst;
-        return &inst;
-    }
-    virtual ~MPManager();
+typedef BOOLEAN (__stdcall *_HidD_GetAttributes)(HANDLE device, PHIDD_ATTRIBUTES attrib);
+typedef NTSTATUS (__stdcall *_HidP_GetCaps)(PHIDP_PREPARSED_DATA preparsed_data, HIDP_CAPS *caps);
+typedef BOOLEAN (__stdcall *_HidD_GetPreparsedData)(HANDLE handle, PHIDP_PREPARSED_DATA *preparsed_data);
+typedef BOOLEAN (__stdcall *_HidD_FreePreparsedData)(PHIDP_PREPARSED_DATA preparsed_data);
 
-    void stop();
-    MPDevice *getDevice(int at);
-    int getDeviceCount() { return devices.count(); }
-    QList<MPDevice *> getDevices();
+#endif // HID_DLL_H
 
-signals:
-    void mpConnected(MPDevice *device);
-    void mpDisconnected(MPDevice *device);
-
-private slots:
-    void usbDeviceAdded();
-    void usbDeviceRemoved();
-
-private:
-    MPManager();
-
-    void checkUsbDevices();
-
-    QHash<QString, MPDevice *> devices;
-};
-
-#endif // MPMANAGER_H

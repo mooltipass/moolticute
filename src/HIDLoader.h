@@ -16,49 +16,39 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef MPMANAGER_H
-#define MPMANAGER_H
+#ifndef HIDLOADER_H
+#define HIDLOADER_H
 
 #include <QtCore>
+#include "hid_dll.h"
 
-#if defined(Q_OS_WIN)
-#include "MPDevice_win.h"
-#elif defined(Q_OS_MAC)
-#include "MPDevice_mac.h"
-#elif defined(Q_OS_LINUX)
-#include "MPDevice_linux.h"
-#endif
+/*
+ * Helper class to load hid.dll dynamically and provide the functions
+ * It does all the checks and does not crash if accessing unloaded dll/func
+ */
 
-class MPManager: public QObject
+#define HID    HIDLoader::Instance()
+
+class HIDLoader
 {
-    Q_OBJECT
-public:
-    static MPManager *Instance()
-    {
-        static MPManager inst;
-        return &inst;
-    }
-    virtual ~MPManager();
-
-    void stop();
-    MPDevice *getDevice(int at);
-    int getDeviceCount() { return devices.count(); }
-    QList<MPDevice *> getDevices();
-
-signals:
-    void mpConnected(MPDevice *device);
-    void mpDisconnected(MPDevice *device);
-
-private slots:
-    void usbDeviceAdded();
-    void usbDeviceRemoved();
-
 private:
-    MPManager();
+    QScopedPointer<QLibrary> lib;
+    HIDLoader() {}
 
-    void checkUsbDevices();
+public:
+    static HIDLoader &Instance()
+    {
+        static HIDLoader inst;
+        return inst;
+    }
 
-    QHash<QString, MPDevice *> devices;
+    bool load();
+    bool isLoaded();
+
+    BOOLEAN HidD_GetAttributes(HANDLE device, PHIDD_ATTRIBUTES attrib);
+    NTSTATUS HidP_GetCaps(PHIDP_PREPARSED_DATA preparsed_data, HIDP_CAPS *caps);
+    BOOLEAN HidD_GetPreparsedData(HANDLE handle, PHIDP_PREPARSED_DATA *preparsed_data);
+    BOOLEAN HidD_FreePreparsedData(PHIDP_PREPARSED_DATA preparsed_data);
 };
 
-#endif // MPMANAGER_H
+#endif // HIDLOADER_H

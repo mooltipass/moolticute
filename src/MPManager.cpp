@@ -27,6 +27,10 @@
 MPManager::MPManager():
     QObject(nullptr)
 {
+#if defined(Q_OS_WIN)
+    connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
+    connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
+#elif defined(Q_OS_LINUX)
     qRegisterMetaType<struct libusb_transfer *>();
 
     int err;
@@ -38,10 +42,6 @@ MPManager::MPManager():
     if (!libusb_has_capability (LIBUSB_CAP_HAS_HOTPLUG))
         qDebug() << "libusb Hotplug capabilites are not supported on this platform";
 
-#ifdef Q_OS_WIN
-    connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
-    connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
-#else
     UsbMonitor_linux::Instance()->filterVendorId(MOOLTIPASS_VENDORID);
     UsbMonitor_linux::Instance()->filterProductId(MOOLTIPASS_PRODUCTID);
     UsbMonitor_linux::Instance()->start();
@@ -54,13 +54,15 @@ MPManager::MPManager():
 
 MPManager::~MPManager()
 {
+#if defined(Q_OS_LINUX)
     stop();
     libusb_exit(usb_ctx);
+#endif
 }
 
 void MPManager::stop()
 {
-#ifndef Q_OS_WIN
+#if defined(Q_OS_LINUX)
     UsbMonitor_linux::Instance()->stop();
 #endif
 }
@@ -99,13 +101,20 @@ QList<MPDevice *> MPManager::getDevices()
 void MPManager::checkUsbDevices()
 {
     // discover devices
-    libusb_device **list;
-    QList<libusb_device *> detectedDevs;
+    QList<MPPlatformDef> devlist;
+    QList<QString> detectedDevs;
 
     qDebug() << "List usb devices...";
 
-    ssize_t cnt = libusb_get_device_list(usb_ctx, &list);
-    if (cnt < 0)
+#if defined(Q_OS_WIN)
+    devlist = MPDevice_win::enumerateDevices();
+#elif defined(Q_OS_MAC)
+    devlist = MPDevice_mac::enumerateDevices();
+#elif defined(Q_OS_LINUX)
+    devlist = MPDevice_linux::enumerateDevices();
+#endif
+
+    if (devlist.isEmpty())
     {
         //No USB devices found, means all MPs are gone disconnected
         auto it = devices.begin();
@@ -119,77 +128,27 @@ void MPManager::checkUsbDevices()
         return;
     }
 
-    for (ssize_t i = 0; i < cnt; i++)
+    foreach (const MPPlatformDef &def, devlist)
     {
-        libusb_device *dev = list[i];
-
-        struct libusb_device_descriptor desc;
-        struct libusb_config_descriptor *conf_desc = nullptr;
-        int res;
-
-        res = libusb_get_device_descriptor(dev, &desc);
-        res = libusb_get_active_config_descriptor(dev, &conf_desc);
-        if (res < 0)
-            libusb_get_config_descriptor(dev, 0, &conf_desc);
-
-        libusb_device_handle *devfd;
-        res = libusb_open(dev, &devfd);
-        if (res < 0)
+        //This is a new connected mooltipass
+        if (!devices.contains(def.id))
         {
-            qWarning() << "Error opening usb device: " << libusb_strerror((enum libusb_error)res);
-            continue;
+            MPDevice *device;
+
+            //Create our platform device object
+#if defined(Q_OS_WIN)
+            device = new MPDevice_win(this, def);
+#elif defined(Q_OS_MAC)
+            device = new MPDevice_mac(this, def);
+#elif defined(Q_OS_LINUX)
+            device = new MPDevice_linux(this, def);
+#endif
+
+            devices[def.id] = device;
+            emit mpConnected(device);
         }
-
-        auto getUsbString = [](libusb_device_handle *fd, uint8_t idx)
-        {
-            char buf[512];
-            int len = libusb_get_string_descriptor_ascii(fd, idx, (unsigned char *)buf, sizeof(buf));
-            if (len < 0)
-                return QString();
-            else
-                return QString(buf);
-        };
-
-        qDebug() << "Found device vid(" <<
-                    QString("0x%1").arg(desc.idVendor, 4, 16, QChar('0')) <<
-                    ") pid(" <<
-                    QString("0x%1").arg(desc.idProduct, 4, 16, QChar('0')) <<
-                    ") Manufacturer(" <<
-                    getUsbString(devfd, desc.iManufacturer) <<
-                    ") Product(" <<
-                    getUsbString(devfd, desc.iProduct) <<
-                    ") Serial(" <<
-                    getUsbString(devfd, desc.iSerialNumber) <<
-                    ")";
-
-        if (conf_desc)
-        {
-            for (int j = 0;j < conf_desc->bNumInterfaces;j++)
-            {
-                const struct libusb_interface *intf = &conf_desc->interface[j];
-                for (int k = 0;k < intf->num_altsetting;k++)
-                {
-                    const struct libusb_interface_descriptor *intf_desc = &intf->altsetting[k];
-                    if (intf_desc->bInterfaceClass == LIBUSB_CLASS_HID)
-                    {
-                        if (desc.idVendor == MOOLTIPASS_VENDORID &&
-                            desc.idProduct == MOOLTIPASS_PRODUCTID)
-                        {
-                            //This is a new connected mooltipass
-                            if (!devices.contains(dev))
-                            {
-                                devices[dev] = new MPDevice(this, usb_ctx, dev);
-                                emit mpConnected(devices[dev]);
-                            }
-
-                            detectedDevs.append(dev);
-                        }
-                    }
-                }
-            }
-        }
+        detectedDevs.append(def.id);
     }
-    libusb_free_device_list(list, 1);
 
     //Clear disconnected devices
     auto it = devices.begin();
@@ -205,5 +164,4 @@ void MPManager::checkUsbDevices()
         else
             it++;
     }
-    return;
 }

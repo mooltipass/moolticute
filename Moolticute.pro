@@ -6,6 +6,9 @@
 
 QT       += core gui
 
+#Wee need that for qwinoverlappedionotifier class which is private
+win32: QT += core-private
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Moolticute
@@ -13,19 +16,14 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-#Add "CONFIG+=DEV" in command line
 win32 {
-    DEV {
-        LIBS += -LC:/libusb/MinGW32/dll -lusb-1.0
-        INCLUDEPATH += C:/libusb/include/libusb-1.0
-    } else {
-        LIBS += -L/opt/windows_32/bin -lusb-1.0
-        INCLUDEPATH += /opt/windows_32/include/libusb-1.0
-    }
-} else:unix {
+    LIBS += -lSetupApi
+} else:linux {
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
     PKGCONFIG += libusb-1.0
+} else:mac {
+    QMAKE_LFLAGS += -framework IOKit -framework CoreFoundation
 }
 
 SOURCES += src/main.cpp\
@@ -35,11 +33,25 @@ SOURCES += src/main.cpp\
     src/Common.cpp
 
 win32 {
-    SOURCES += src/UsbMonitor_win.cpp
-    HEADERS += src/UsbMonitor_win.h
-} else:unix {
-    SOURCES += src/UsbMonitor_linux.cpp
-    HEADERS += src/UsbMonitor_linux.h
+    SOURCES += src/UsbMonitor_win.cpp \
+               src/MPDevice_win.cpp \
+               src/HIDLoader.cpp
+    HEADERS += src/UsbMonitor_win.h \
+               src/MPDevice_win.h \
+               src/HIDLoader.h \
+               src/hid_dll.h
+}
+linux {
+    SOURCES += src/UsbMonitor_linux.cpp \
+               src/MPDevice_linux.cpp
+    HEADERS += src/UsbMonitor_linux.h \
+               src/MPDevice_linux.h
+}
+mac {
+    SOURCES += src/UsbMonitor_mac.cpp \
+               src/MPDevice_mac.cpp
+    HEADERS += src/UsbMonitor_mac.h \
+               src/MPDevice_mac.h
 }
 
 HEADERS  += src/MainWindow.h \
