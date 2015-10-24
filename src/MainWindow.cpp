@@ -54,8 +54,3 @@ void MainWindow::mpRemoved(MPDevice *)
     ui->plainTextEdit->appendPlainText("Mooltipass disconnected");
     device = nullptr;
 }
-
-void MainWindow::on_pushButtonStatus_clicked()
-{
-
-}

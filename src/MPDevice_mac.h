@@ -43,6 +43,16 @@ public:
 
     //Static function for enumerating devices on platform
     static QList<MPPlatformDef> enumerateDevices();
+
+private:
+    virtual void platformRead();
+    virtual void platformWrite(const QByteArray &data);
+
+    IOHIDDeviceRef hidref;
+    qint32 maxInReportLen = 0;
+    QByteArray readBuf;
+
+    friend void _read_report_callback(void *context, IOReturn result, void *sender, IOHIDReportType report_type, uint32_t report_id, uint8_t *report, CFIndex report_length);
 };
 
 #endif // MPDEVICE_MAC_H

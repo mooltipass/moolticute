@@ -38,8 +38,6 @@ private slots:
     void mpAdded(MPDevice *device);
     void mpRemoved(MPDevice *);
 
-    void on_pushButtonStatus_clicked();
-
 private:
     Ui::MainWindow *ui;
 
