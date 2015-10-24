@@ -129,7 +129,7 @@ void MPManager::checkUsbDevices()
         while (it != devices.end())
         {
             emit mpDisconnected(it.value());
-            it.value()->deleteLater();
+            delete it.value();
             it++;
         }
         devices.clear();
@@ -165,7 +165,7 @@ void MPManager::checkUsbDevices()
         if (!detectedDevs.contains(it.key()))
         {
             emit mpDisconnected(it.value());
-            it.value()->deleteLater();
+            delete it.value();
             devices.remove(it.key());
             it = devices.begin();
         }
