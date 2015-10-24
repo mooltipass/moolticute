@@ -26,12 +26,6 @@ win32 {
     QMAKE_LFLAGS += -framework IOKit -framework CoreFoundation
 }
 
-SOURCES += src/main.cpp\
-        src/MainWindow.cpp \
-    src/MPDevice.cpp \
-    src/MPManager.cpp \
-    src/Common.cpp
-
 win32 {
     SOURCES += src/UsbMonitor_win.cpp \
                src/MPDevice_win.cpp \
@@ -53,6 +47,12 @@ mac {
     HEADERS += src/UsbMonitor_mac.h \
                src/MPDevice_mac.h
 }
+
+SOURCES += src/main.cpp\
+        src/MainWindow.cpp \
+    src/MPDevice.cpp \
+    src/MPManager.cpp \
+    src/Common.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \

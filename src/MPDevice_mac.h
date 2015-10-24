@@ -35,7 +35,8 @@ class MPDevice_mac: public MPDevice
 {
     Q_OBJECT
 public:
-    MPDevice_mac();
+    MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef);
+    virtual ~MPDevice_mac();
 
     //Static function for enumerating devices on platform
     static QList<MPPlatformDef> enumerateDevices();

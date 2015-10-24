@@ -18,10 +18,11 @@
  ******************************************************************************/
 #include "MPManager.h"
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 #include "UsbMonitor_win.h"
-#else
+#elif defined(Q_OS_LINUX)
 #include "UsbMonitor_linux.h"
+#elif defined(Q_OS_MAC)
 #endif
 
 MPManager::MPManager():
