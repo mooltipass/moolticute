@@ -28,6 +28,7 @@ class MPPlatformDef
 public:
     QString id; //unique id for all platform
 
+    IOHIDDeviceRef hidref;
 };
 
 inline bool operator==(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return lhs.id == rhs.id; }

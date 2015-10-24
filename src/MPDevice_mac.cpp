@@ -17,6 +17,7 @@
  **
  ******************************************************************************/
 #include "MPDevice_mac.h"
+#include "UsbMonitor_mac.h"
 
 MPDevice_mac::MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef):
     MPDevice(parent)
@@ -29,8 +30,5 @@ MPDevice_mac::~MPDevice_mac()
 
 QList<MPPlatformDef> MPDevice_mac::enumerateDevices()
 {
-    QList<MPPlatformDef> devlist;
-
-
-    return devlist;
+    return UsbMonitor_mac::Instance()->getDeviceList();
 }

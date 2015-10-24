@@ -54,7 +54,10 @@ MPManager::MPManager():
     connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
 #endif
 
+#if !defined(Q_OS_MAC)
+    //This is not needed on osx, the list is updated at startup by UsbMonitor
     checkUsbDevices();
+#endif
 }
 
 MPManager::~MPManager()

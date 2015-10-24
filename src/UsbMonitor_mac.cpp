@@ -25,11 +25,18 @@ void _device_matching_callback(void *user_data,
 {
     Q_UNUSED(inResult);
     Q_UNUSED(inSender);
-    Q_UNUSED(inIOHIDDeviceRef);
     UsbMonitor_mac *um = reinterpret_cast<UsbMonitor_mac *>(user_data);
 
-    emit um->usbDeviceAdded();
-    qDebug() << "Device added";
+    MPPlatformDef def;
+    def.hidref = inIOHIDDeviceRef;
+    def.id = QString("%1").arg((quint64)def.hidref);
+
+    if (!um->deviceHash.contains(def.hidref))
+    {
+        um->deviceHash[def.hidref] = def;
+        emit um->usbDeviceAdded();
+        qDebug() << "Device added: " << def.id;
+    }
 }
 
 void _device_removal_callback(void *user_data,
@@ -39,18 +46,22 @@ void _device_removal_callback(void *user_data,
 {
     Q_UNUSED(inResult);
     Q_UNUSED(inSender);
-    Q_UNUSED(inIOHIDDeviceRef);
     UsbMonitor_mac *um = reinterpret_cast<UsbMonitor_mac *>(user_data);
 
-    emit um->usbDeviceRemoved();
-    qDebug() << "Device removed";
+    if (um->deviceHash.contains(inIOHIDDeviceRef))
+    {
+        MPPlatformDef def = um->deviceHash[inIOHIDDeviceRef];
+        um->deviceHash.remove(inIOHIDDeviceRef);
+        emit um->usbDeviceRemoved();
+        qDebug() << "Device removed: " << def.id;
+    }
 }
 
 UsbMonitor_mac::UsbMonitor_mac():
     QObject()
 {
     // Create an HID Manager
-    IOHIDManagerRef hidmanager = IOHIDManagerCreate(kCFAllocatorDefault,
+    hidmanager = IOHIDManagerCreate(kCFAllocatorDefault,
                                                     kIOHIDOptionsTypeNone);
 
     // Create a Matching Dictionary for filtering HID devices
@@ -79,7 +90,7 @@ UsbMonitor_mac::UsbMonitor_mac():
     CFDictionarySetValue(matchDict, CFSTR(kIOHIDDeviceUsageKey), usage);
     CFRelease(usage);
 
-    //Usage
+    //Usage Page
     val = MOOLTIPASS_USAGE_PAGE;
     CFNumberRef usagep = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &val);
     CFDictionarySetValue(matchDict, CFSTR(kIOHIDDeviceUsagePageKey), usagep);
@@ -106,4 +117,16 @@ UsbMonitor_mac::UsbMonitor_mac():
 
 UsbMonitor_mac::~UsbMonitor_mac()
 {
+    IOHIDManagerClose(hidmanager, kIOHIDOptionsTypeNone);
+    CFRelease(hidmanager);
+}
+
+QList<MPPlatformDef> UsbMonitor_mac::getDeviceList()
+{
+    QList<MPPlatformDef> deviceList;
+
+    for (auto it = deviceHash.begin();it != deviceHash.end();it++)
+        deviceList << it.value();
+
+    return deviceList;
 }
