@@ -23,6 +23,7 @@
 #elif defined(Q_OS_LINUX)
 #include "UsbMonitor_linux.h"
 #elif defined(Q_OS_MAC)
+#include "UsbMonitor_mac.h"
 #endif
 
 MPManager::MPManager():
@@ -31,6 +32,9 @@ MPManager::MPManager():
 #if defined(Q_OS_WIN)
     connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
     connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
+#elif defined(Q_OS_MAC)
+    connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
+    connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
 #elif defined(Q_OS_LINUX)
     qRegisterMetaType<struct libusb_transfer *>();
 

@@ -21,6 +21,8 @@
 
 #include "MPDevice.h"
 
+#include <IOKit/hid/IOHIDLib.h>
+
 class MPPlatformDef
 {
 public:

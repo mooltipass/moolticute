@@ -23,6 +23,8 @@
 
 #define MOOLTIPASS_VENDORID     0x16D0
 #define MOOLTIPASS_PRODUCTID    0x09A0
+#define MOOLTIPASS_USAGE_PAGE   0xFF31
+#define MOOLTIPASS_USAGE        0x74
 
 #define qToChar(s) s.toLocal8Bit().constData()
 #define qToUtf8(s) s.toUtf8().constData()

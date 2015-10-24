@@ -31,5 +31,6 @@ QList<MPPlatformDef> MPDevice_mac::enumerateDevices()
 {
     QList<MPPlatformDef> devlist;
 
+
     return devlist;
 }
