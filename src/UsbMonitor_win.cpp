@@ -23,11 +23,9 @@ UsbMonitor_win::UsbMonitor_win():
 {
     qDebug() << "Registering device events";
 
-    DEV_BROADCAST_DEVICEINTERFACE db =
-    {
-        sizeof(DEV_BROADCAST_DEVICEINTERFACE),
-        DBT_DEVTYP_DEVICEINTERFACE
-    };
+    DEV_BROADCAST_DEVICEINTERFACE db;
+    db.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
+    db.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
 
     notifyHandle = RegisterDeviceNotification((HWND)winId(),
                                               &db,
