@@ -66,6 +66,4 @@ private:
     friend void _usbReceiveCallback(struct libusb_transfer *trf);
 };
 
-Q_DECLARE_METATYPE(struct libusb_transfer *)
-
 #endif // MPDEVICE_LINUX_H

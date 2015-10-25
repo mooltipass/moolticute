@@ -17,6 +17,7 @@
  **
  ******************************************************************************/
 #include "MPDevice_linux.h"
+#include "UsbMonitor_linux.h"
 
 MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef):
     MPDevice(parent),
@@ -26,6 +27,8 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
     int res = libusb_open(device, &devicefd);
     if (res < 0)
         qWarning() << "Error opening usb device: " << libusb_strerror((enum libusb_error)res);
+    else
+        platformRead();
 }
 
 MPDevice_linux::~MPDevice_linux()
@@ -108,7 +111,7 @@ void MPDevice_linux::usbSendCb(libusb_transfer *trf)
         qWarning() << "Failed to transfer data to usb endpoint (OUT)";
 
     libusb_free_transfer(trf);
-    transfer->deleteLater();
+    delete transfer;
 }
 
 //Called when a receive transfer has completed
@@ -146,19 +149,12 @@ void MPDevice_linux::platformRead()
 void MPDevice_linux::usbReceiveCb(libusb_transfer *trf)
 {
     USBTransfer *transfer = reinterpret_cast<USBTransfer *>(trf->user_data);
-    transfer->deleteLater();
 
-    qDebug() << "Received answer done, " << trf->length << " : " << transfer->recvData;
-
-    if (trf->status != LIBUSB_TRANSFER_COMPLETED)
-    {
-        qWarning() << "Failed to transfer data to usb endpoint (IN)";
-        libusb_free_transfer(trf);
-        return;
-    }
+    if (trf->status == LIBUSB_TRANSFER_COMPLETED)
+        emit platformDataRead(transfer->recvData);
+    delete transfer;
     libusb_free_transfer(trf);
-
-    emit platformDataRead(transfer->recvData);
+    platformRead();
 }
 
 QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
@@ -168,7 +164,7 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
     // discover devices
     libusb_device **list;
 
-    ssize_t cnt = libusb_get_device_list(usb_ctx, &list);
+    ssize_t cnt = libusb_get_device_list(UsbMonitor_linux::Instance()->getUsbContext(), &list);
     for (ssize_t i = 0; i < cnt; i++)
     {
         libusb_device *dev = list[i];
@@ -226,9 +222,9 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
                             desc.idProduct == MOOLTIPASS_PRODUCTID)
                         {
                             MPPlatformDef def;
-                            def.ctx = usb_ctx;
+                            def.ctx = UsbMonitor_linux::Instance()->getUsbContext();
                             def.dev = dev;
-                            def.id = QString("%1").arg(dev); //use dev pointer for ID
+                            def.id = QString("%1").arg((quint64)dev); //use dev pointer for ID
                             devlist << def;
                         }
                     }

@@ -34,8 +34,8 @@ MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
 
     if (!openPath())
         qWarning() << "Error opening device";
-
-    platformRead();
+    else
+        platformRead();
 }
 
 MPDevice_win::~MPDevice_win()

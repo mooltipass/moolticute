@@ -38,6 +38,8 @@ public:
     void start();
     void stop();
 
+    libusb_context *getUsbContext() { return usb_ctx; }
+
 signals:
     void usbDeviceAdded();
     void usbDeviceRemoved();
@@ -45,6 +47,7 @@ signals:
 private:
     UsbMonitor_linux();
 
+    libusb_context *usb_ctx = nullptr;
     libusb_device_handle *handle = nullptr;
     libusb_hotplug_callback_handle cbaddhandle;
     libusb_hotplug_callback_handle cbdelhandle;
@@ -58,5 +61,7 @@ private:
     friend int libusb_device_add_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
     friend int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
 };
+
+Q_DECLARE_METATYPE(struct libusb_transfer *)
 
 #endif // USBMONITOR_LINUX_H

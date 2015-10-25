@@ -36,17 +36,6 @@ MPManager::MPManager():
     connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
     connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
 #elif defined(Q_OS_LINUX)
-    qRegisterMetaType<struct libusb_transfer *>();
-
-    int err;
-
-    err = libusb_init(&usb_ctx);
-    if (err < 0 || !usb_ctx)
-        qWarning() << "Failed to initialise libusb: " << libusb_error_name(err);
-
-    if (!libusb_has_capability (LIBUSB_CAP_HAS_HOTPLUG))
-        qDebug() << "libusb Hotplug capabilites are not supported on this platform";
-
     UsbMonitor_linux::Instance()->filterVendorId(MOOLTIPASS_VENDORID);
     UsbMonitor_linux::Instance()->filterProductId(MOOLTIPASS_PRODUCTID);
     UsbMonitor_linux::Instance()->start();
@@ -64,7 +53,6 @@ MPManager::~MPManager()
 {
 #if defined(Q_OS_LINUX)
     stop();
-    libusb_exit(usb_ctx);
 #endif
 }
 

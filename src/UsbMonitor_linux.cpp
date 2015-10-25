@@ -61,12 +61,20 @@ int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug
 
 UsbMonitor_linux::UsbMonitor_linux()
 {
+    qRegisterMetaType<struct libusb_transfer *>();
+
+    int err = libusb_init(&usb_ctx);
+    if (err < 0 || !usb_ctx)
+        qWarning() << "Failed to initialise libusb: " << libusb_error_name(err);
+
+    if (!libusb_has_capability (LIBUSB_CAP_HAS_HOTPLUG))
+        qDebug() << "libusb Hotplug capabilites are not supported on this platform";
 }
 
 void UsbMonitor_linux::start()
 {
     int err;
-    err = libusb_hotplug_register_callback(nullptr,
+    err = libusb_hotplug_register_callback(usb_ctx,
                                            LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
                                            (libusb_hotplug_flag)0,
                                            vendorId,
@@ -78,7 +86,7 @@ void UsbMonitor_linux::start()
     if (err != LIBUSB_SUCCESS)
         qWarning() << "Failed to register LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED callback";
 
-    err = libusb_hotplug_register_callback(nullptr,
+    err = libusb_hotplug_register_callback(usb_ctx,
                                            LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
                                            (libusb_hotplug_flag)0,
                                            vendorId,
@@ -113,11 +121,12 @@ void UsbMonitor_linux::stop()
         QMutexLocker l(&mutex);
         run = false;
     }
-    libusb_hotplug_deregister_callback(nullptr, cbaddhandle);
-    libusb_hotplug_deregister_callback(nullptr, cbdelhandle);
+    libusb_hotplug_deregister_callback(usb_ctx, cbaddhandle);
+    libusb_hotplug_deregister_callback(usb_ctx, cbdelhandle);
 }
 
 UsbMonitor_linux::~UsbMonitor_linux()
 {
     stop();
+    libusb_exit(usb_ctx);
 }
