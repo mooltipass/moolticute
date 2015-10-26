@@ -24,5 +24,10 @@ int main(int argc, char **argv)
     Common::installMessageOutputHandler();
 
     AppDaemon app(argc, argv);
+
+    QCoreApplication::setOrganizationName("Raoulh");
+    QCoreApplication::setOrganizationDomain("raoulh.org");
+    QCoreApplication::setApplicationName("Moolticute");
+
     return app.exec();
 }

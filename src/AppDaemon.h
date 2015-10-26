@@ -19,7 +19,7 @@
 #ifndef APPDAEMON_H
 #define APPDAEMON_H
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QObject>
 #include <QSettings>
 
@@ -27,7 +27,7 @@
 #include "MPManager.h"
 #include "WSServer.h"
 
-class AppDaemon: public QCoreApplication
+class AppDaemon: public QApplication
 {
     Q_OBJECT
 public:

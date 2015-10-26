@@ -19,12 +19,8 @@
 #include "AppDaemon.h"
 
 AppDaemon::AppDaemon(int & argc, char ** argv):
-    QCoreApplication(argc, argv)
+    QApplication(argc, argv)
 {
-    QCoreApplication::setOrganizationName("Raoulh");
-    QCoreApplication::setOrganizationDomain("raoulh.org");
-    QCoreApplication::setApplicationName("Moolticute");
-
     //Install and start mp manager instance
     MPManager::Instance();
 
