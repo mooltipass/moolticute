@@ -1,4 +1,4 @@
-QT       += core network websockets
+QT       += core network websockets widgets
 QT       -= gui
 
 #Wee need that for qwinoverlappedionotifier class which is private
