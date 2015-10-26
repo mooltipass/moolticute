@@ -30,3 +30,38 @@ void WSServerCon::processMessage(const QString &message)
 
     //TODO
 }
+
+void WSServerCon::resetDevice(MPDevice *dev)
+{
+    mpdevice = dev;
+
+    if (!mpdevice)
+    {
+        sendJsonMessage({{ "msg", "mp_disconnected" }});
+        return;
+    }
+
+    sendJsonMessage({{ "msg", "mp_connected" }});
+
+    //Whenever mp status changes, send state update to client
+    connect(mpdevice, &MPDevice::statusChanged, [=]()
+    {
+        sendJsonMessage({{ "msg", "status_changed" },
+                         { "data", Common::MPStatusString[mpdevice->get_status()] }});
+    });
+}
+
+void WSServerCon::sendInitialStatus()
+{
+    //Sends initial status to any new connected client
+    //is any mp connected? and if true send mp state too
+
+    if (!mpdevice)
+        sendJsonMessage({{ "msg", "mp_disconnected" }});
+    else
+    {
+        sendJsonMessage({{ "msg", "mp_connected" }});
+        sendJsonMessage({{ "msg", "status_changed" },
+                         { "data", Common::MPStatusString[mpdevice->get_status()] }});
+    }
+}

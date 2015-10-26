@@ -8,10 +8,12 @@ CONFIG += c++11
 
 SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \
-    src/Common.cpp
+    src/Common.cpp \
+    src/WSClient.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
-    src/QtHelper.h
+    src/QtHelper.h \
+    src/WSClient.h
 
 FORMS    += src/MainWindow.ui

@@ -31,6 +31,8 @@ public:
     virtual ~WSServerCon();
 
     void sendJsonMessage(const QJsonObject &data);
+    void resetDevice(MPDevice *dev);
+    void sendInitialStatus();
 
 signals:
     void notifyAllClients(const QJsonObject &obj);
@@ -40,6 +42,8 @@ private slots:
 
 private:
     QWebSocket *wsClient;
+
+    MPDevice *mpdevice = nullptr;
 };
 
 #endif // WSSERVERCON_H

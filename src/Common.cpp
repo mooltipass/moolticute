@@ -31,7 +31,7 @@
 #define COLOR_RESET     "\033[0m"
 #define COLOR_HIGH      "\033[1m"
 
-QHash<Common::MPStatus, QString> Common::MPStatusString = {
+QHash<Common::MPStatus, QString> Common::MPStatusUserString = {
     { Common::UnknownStatus, QObject::tr("Unknown status") },
     { Common::NoCardInserted, QObject::tr("No card inserted") },
     { Common::Locked, QObject::tr("Mooltipass locked") },
@@ -44,6 +44,31 @@ QHash<Common::MPStatus, QString> Common::MPStatusString = {
     { Common::Error8, QObject::tr("Error 8 (should not happen)") },
     { Common::UnkownSmartcad, QObject::tr("Unknown smartcard inserted") }
 };
+
+QHash<Common::MPStatus, QString> Common::MPStatusString = {
+    { Common::UnknownStatus, "UnknownStatus" },
+    { Common::NoCardInserted, "NoCardInserted" },
+    { Common::Locked, "Locked" },
+    { Common::Error2, "Error2" },
+    { Common::LockedScreen, "LockedScreen" },
+    { Common::Error4, "Error4" },
+    { Common::Unlocked, "Unlocked" },
+    { Common::Error6, "Error6" },
+    { Common::Error7, "Error7" },
+    { Common::Error8, "Error8" },
+    { Common::UnkownSmartcad, "UnkownSmartcad" }
+};
+
+Common::MPStatus Common::statusFromString(const QString &st)
+{
+    for (auto it = MPStatusString.begin();it != MPStatusString.end();it++)
+    {
+        if (it.value() == st)
+            return it.key();
+    }
+
+    return Common::UnknownStatus;
+}
 
 static QFile debugLogFile;
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)

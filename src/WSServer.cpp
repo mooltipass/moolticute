@@ -28,6 +28,7 @@ WSServer::WSServer(QObject *parent):
     if (wsServer->listen(QHostAddress::Any, MOOLTICUTE_DAEMON_PORT))
     {
         qDebug() << "Todo server listening on port " << MOOLTICUTE_DAEMON_PORT;
+        connect(wsServer, &QWebSocketServer::newConnection, this, &WSServer::onNewConnection);
     }
     else
     {
@@ -53,7 +54,10 @@ void WSServer::onNewConnection()
     QWebSocket *wsocket = wsServer->nextPendingConnection();
 
     connect(wsocket, &QWebSocket::disconnected, this, &WSServer::socketDisconnected);
-    wsClients[wsocket] = new WSServerCon(wsocket);
+    WSServerCon *c = new WSServerCon(wsocket);
+    c->resetDevice(device);
+    c->sendInitialStatus();
+    wsClients[wsocket] = c;
 
     qDebug() << "New connection";
 }
@@ -80,6 +84,9 @@ void WSServer::notifyClients(const QJsonObject &obj)
 
 void WSServer::mpAdded(MPDevice *dev)
 {
+    if (device == dev)
+        return;
+
     //tell clients that current mp is not connected anymore
     //and use new connected mp instead
     if (device && device != dev)
@@ -88,10 +95,10 @@ void WSServer::mpAdded(MPDevice *dev)
     qDebug() << "Mooltipass connected";
     device = dev;
 
-//    connect(device, &MPDevice::statusChanged, [=]()
-//    {
-//        ui->plainTextEdit->appendPlainText(QString("Status: %1").arg(Common::MPStatusString[device->get_status()]));
-//    });
+    for (auto it = wsClients.begin();it != wsClients.end();it++)
+    {
+        it.value()->resetDevice(device);
+    }
 }
 
 void WSServer::mpRemoved(MPDevice *dev)
@@ -100,5 +107,10 @@ void WSServer::mpRemoved(MPDevice *dev)
     {
         qDebug() << "Mooltipass disconnected";
         device = nullptr;
+
+        for (auto it = wsClients.begin();it != wsClients.end();it++)
+        {
+            it.value()->resetDevice(device);
+        }
     }
 }

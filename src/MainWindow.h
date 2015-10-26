@@ -20,6 +20,7 @@
 #define MAINWINDOW_H
 
 #include <QtWidgets>
+#include "WSClient.h"
 
 namespace Ui {
 class MainWindow;
@@ -40,7 +41,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-//    MPDevice *device = nullptr;
+    WSClient *wsClient;
 };
 
 #endif // MAINWINDOW_H

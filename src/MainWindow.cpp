@@ -24,6 +24,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    wsClient = new WSClient(this);
+    connect(wsClient, &WSClient::connectedChanged, [=]()
+    {
+        if (wsClient->get_connected())
+            ui->plainTextEdit->appendPlainText("Mooltipass connected");
+        else
+            ui->plainTextEdit->appendPlainText("Mooltipass disconnected");
+    });
+    connect(wsClient, &WSClient::statusChanged, [=]()
+    {
+        ui->plainTextEdit->appendPlainText(QString("Status: %1").arg(Common::MPStatusString[wsClient->get_status()]));
+    });
 }
 
 MainWindow::~MainWindow()

@@ -51,7 +51,9 @@ public:
         Error8 = 8,
         UnkownSmartcad = 9,
     } MPStatus;
-    static QHash<MPStatus, QString> MPStatusString;
+    static QHash<MPStatus, QString> MPStatusUserString, MPStatusString;
+
+    static Common::MPStatus statusFromString(const QString &st);
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)
