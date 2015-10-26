@@ -16,28 +16,30 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#include <QApplication>
+#ifndef WSSERVERCON_H
+#define WSSERVERCON_H
+
+#include <QtCore>
+#include <QWebSocket>
 #include "Common.h"
-#include "MainWindow.h"
 #include "MPManager.h"
 
-int main(int argc, char *argv[])
+class WSServerCon: public QObject
 {
-    QApplication a(argc, argv);
+public:
+    WSServerCon(QWebSocket *conn);
+    virtual ~WSServerCon();
 
-    QCoreApplication::setOrganizationName("Raoulh");
-    QCoreApplication::setOrganizationDomain("raoulh.org");
-    QCoreApplication::setApplicationName("Moolticute");
+    void sendJsonMessage(const QJsonObject &data);
 
-    QApplication::setStyle("fusion");
+signals:
+    void notifyAllClients(const QJsonObject &obj);
 
-    Common::installMessageOutputHandler();
+private slots:
+    void processMessage(const QString &msg);
 
-    //Install and start mp manager instance
-    MPManager::Instance();
+private:
+    QWebSocket *wsClient;
+};
 
-    MainWindow win;
-    win.show();
-
-    return a.exec();
-}
+#endif // WSSERVERCON_H

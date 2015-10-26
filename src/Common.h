@@ -26,6 +26,8 @@
 #define MOOLTIPASS_USAGE_PAGE   0xFF31
 #define MOOLTIPASS_USAGE        0x74
 
+#define MOOLTICUTE_DAEMON_PORT  30035
+
 #define qToChar(s) s.toLocal8Bit().constData()
 #define qToUtf8(s) s.toUtf8().constData()
 

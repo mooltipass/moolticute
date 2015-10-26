@@ -16,31 +16,13 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include "Common.h"
+#include "AppDaemon.h"
 
-#include <QtWidgets>
-
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+int main(int argc, char **argv)
 {
-    Q_OBJECT
+    Common::installMessageOutputHandler();
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-private slots:
-//    void mpAdded(MPDevice *device);
-//    void mpRemoved(MPDevice *);
-
-private:
-    Ui::MainWindow *ui;
-
-//    MPDevice *device = nullptr;
-};
-
-#endif // MAINWINDOW_H
+    AppDaemon app(argc, argv);
+    return app.exec();
+}

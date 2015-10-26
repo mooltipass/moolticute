@@ -16,31 +16,40 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef WSSERVER_H
+#define WSSERVER_H
 
-#include <QtWidgets>
+#include <QtCore>
+#include <QWebSocket>
+#include <QWebSocketServer>
+#include <QJsonDocument>
+#include "Common.h"
+#include "MPManager.h"
+#include "WSServerCon.h"
 
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+class WSServer: public QObject
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit WSServer(QObject *parent = nullptr);
+    ~WSServer();
 
 private slots:
-//    void mpAdded(MPDevice *device);
-//    void mpRemoved(MPDevice *);
+    void onNewConnection();
+    void socketDisconnected();
+    void notifyClients(const QJsonObject &obj);
+
+    void mpAdded(MPDevice *device);
+    void mpRemoved(MPDevice *device);
 
 private:
-    Ui::MainWindow *ui;
+    QWebSocketServer *wsServer = nullptr;
+    QHash<QWebSocket *, WSServerCon *> wsClients;
 
-//    MPDevice *device = nullptr;
+    //Current MP
+    //For now only one MP is supported. maybe add multi support
+    // one day (but it's not really useful anyway)
+    MPDevice *device = nullptr;
 };
 
-#endif // MAINWINDOW_H
+#endif // WSSERVER_H

@@ -18,6 +18,19 @@
  ******************************************************************************/
 #include "Common.h"
 
+#define COLOR_LIGHTRED  "\033[31;1m"
+#define COLOR_RED       "\033[31m"
+#define COLOR_LIGHTBLUE "\033[34;1m"
+#define COLOR_BLUE      "\033[34m"
+#define COLOR_GREEN     "\033[32;1m"
+#define COLOR_YELLOW    "\033[33;1m"
+#define COLOR_ORANGE    "\033[0;33m"
+#define COLOR_WHITE     "\033[37;1m"
+#define COLOR_LIGHTCYAN "\033[36;1m"
+#define COLOR_CYAN      "\033[36m"
+#define COLOR_RESET     "\033[0m"
+#define COLOR_HIGH      "\033[1m"
+
 QHash<Common::MPStatus, QString> Common::MPStatusString = {
     { Common::UnknownStatus, QObject::tr("Unknown status") },
     { Common::NoCardInserted, QObject::tr("No card inserted") },
@@ -42,28 +55,28 @@ static void _messageOutput(QtMsgType type, const QMessageLogContext &context, co
     default:
     case QtDebugMsg:
     {
-        QString s = QString("DEBUG: %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        QString s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         printf("%s", qPrintable(s));
         if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
         break;
     }
     case QtWarningMsg:
     {
-        QString s = QString("WARNING: %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        QString s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         printf("%s", qPrintable(s));
         if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
         break;
     }
     case QtCriticalMsg:
     {
-        QString s = QString("CRITICAL: %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        QString s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         printf("%s", qPrintable(s));
         if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
         break;
     }
     case QtFatalMsg:
     {
-        QString s = QString("FATAL: %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        QString s = QString(COLOR_RED "FATAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         printf("%s", qPrintable(s));
         if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
         break;

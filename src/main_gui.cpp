@@ -16,31 +16,22 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include <QApplication>
+#include "Common.h"
+#include "MainWindow.h"
 
-#include <QtWidgets>
-
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+int main(int argc, char *argv[])
 {
-    Q_OBJECT
+    QApplication a(argc, argv);
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    QCoreApplication::setOrganizationName("Raoulh");
+    QCoreApplication::setOrganizationDomain("raoulh.org");
+    QCoreApplication::setApplicationName("Moolticute");
 
-private slots:
-//    void mpAdded(MPDevice *device);
-//    void mpRemoved(MPDevice *);
+    Common::installMessageOutputHandler();
 
-private:
-    Ui::MainWindow *ui;
+    MainWindow win;
+    win.show();
 
-//    MPDevice *device = nullptr;
-};
-
-#endif // MAINWINDOW_H
+    return a.exec();
+}
