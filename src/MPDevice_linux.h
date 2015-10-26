@@ -55,6 +55,7 @@ private:
     virtual void platformRead();
     virtual void platformWrite(const QByteArray &data);
 
+    bool detached_kernel = false;
     libusb_context *usb_ctx;
     libusb_device *device;
     libusb_device_handle *devicefd;

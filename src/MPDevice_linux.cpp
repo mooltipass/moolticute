@@ -28,15 +28,25 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
     if (res < 0)
         qWarning() << "Error opening usb device: " << libusb_strerror((enum libusb_error)res);
     else
+    {
+        if (libusb_kernel_driver_active(devicefd, 0))
+        {
+            detached_kernel = true;
+            libusb_detach_kernel_driver(devicefd, 0);
+        }
+
         platformRead();
+    }
 }
 
 MPDevice_linux::~MPDevice_linux()
 {
+    if (detached_kernel)
+        libusb_attach_kernel_driver(devicefd, 0);
     libusb_close(devicefd);
 }
 
-/* Helper class to handle transfer and detach/reattach kernel driver
+/* Helper class to handle transfer
  */
 class USBTransfer: public QObject
 {
@@ -44,24 +54,16 @@ public:
     USBTransfer(libusb_device_handle *_fd, int intf, MPDevice *parent):
         QObject(parent), fd(_fd), interface(intf), device(parent)
     {
-        if (libusb_kernel_driver_active(fd, interface))
-        {
-            detached_kernel = true;
-            libusb_detach_kernel_driver(fd, interface);
-        }
         libusb_claim_interface(fd, interface);
         recvData.resize(64);
     }
     ~USBTransfer()
     {
         libusb_release_interface(fd, interface);
-        if (detached_kernel)
-            libusb_attach_kernel_driver(fd, interface);
     }
 
     libusb_device_handle *fd;
     int interface = 0;
-    bool detached_kernel = false;
     MPDevice *device;
     QByteArray recvData;
 };
