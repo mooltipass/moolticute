@@ -61,5 +61,3 @@ HEADERS  += \
     src/WSServer.h \
     src/WSServerCon.h \
     src/AppDaemon.h
-
-FORMS    += src/MainWindow.ui
