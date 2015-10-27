@@ -254,5 +254,15 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
 
 void MainWindow::on_pushButtonSettingsSave_clicked()
 {
+    QJsonObject o = {{ "keyboard_layout", ui->comboBoxLang->currentData().toInt() },
+                     { "lock_timeout_enabled", ui->checkBoxLock->isChecked() },
+                     { "lock_timeout", ui->spinBoxLock->value() * 60 },
+                     { "screensaver", ui->checkBoxScreensaver->isChecked() },
+                     { "user_request_cancel", ui->checkBoxInput->isChecked() },
+                     { "user_interaction_timeout", ui->spinBoxInput->value() },
+                     { "flash_screen", ui->checkBoxFlash->isChecked() },
+                     { "offline_mode", ui->checkBoxBoot->isChecked() },
+                     { "tutorial_enabled", ui->checkBoxTuto->isChecked() }};
 
+    wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
 }

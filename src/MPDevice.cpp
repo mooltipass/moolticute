@@ -111,7 +111,7 @@ void MPDevice::loadParameters()
     {
         if (!success) return;
         qDebug() << "received lock timeout: " << (quint8)data.at(2);
-        set_lockTimeout((int)data.at(2));
+        set_lockTimeout((quint8)data.at(2));
     });
 
     ba[0] = (char)SCREENSAVER_PARAM;
@@ -135,7 +135,7 @@ void MPDevice::loadParameters()
     {
         if (!success) return;
         qDebug() << "received userInteractionTimeout: " << (quint8)data.at(2);
-        set_userInteractionTimeout((int)data.at(2));
+        set_userInteractionTimeout((quint8)data.at(2));
     });
 
     ba[0] = (char)FLASH_SCREEN_PARAM;
@@ -182,4 +182,82 @@ void MPDevice::newDataRead(const QByteArray &data)
     commandQueue.dequeue();
 
     sendDataDequeue();
+}
+
+void MPDevice::updateKeyboardLayout(int lang)
+{
+    QByteArray ba;
+    ba.append((quint8)KEYBOARD_LAYOUT_PARAM);
+    ba.append((quint8)lang);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateLockTimeoutEnabled(bool en)
+{
+    QByteArray ba;
+    ba.append((quint8)LOCK_TIMEOUT_ENABLE_PARAM);
+    ba.append((quint8)en);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateLockTimeout(int timeout)
+{
+    if (timeout < 0) timeout = 0;
+    if (timeout > 0xFF) timeout = 0xFF;
+
+    QByteArray ba;
+    ba.append((quint8)LOCK_TIMEOUT_PARAM);
+    ba.append((quint8)timeout);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateScreensaver(bool en)
+{
+    QByteArray ba;
+    ba.append((quint8)SCREENSAVER_PARAM);
+    ba.append((quint8)en);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateUserRequestCancel(bool en)
+{
+    QByteArray ba;
+    ba.append((quint8)USER_REQ_CANCEL_PARAM);
+    ba.append((quint8)en);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateUserInteractionTimeout(int timeout)
+{
+    if (timeout < 0) timeout = 0;
+    if (timeout > 0xFF) timeout = 0xFF;
+
+    QByteArray ba;
+    ba.append((quint8)USER_INTER_TIMEOUT_PARAM);
+    ba.append((quint8)timeout);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateFlashScreen(bool en)
+{
+    QByteArray ba;
+    ba.append((quint8)FLASH_SCREEN_PARAM);
+    ba.append((quint8)en);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateOfflineMode(bool en)
+{
+    QByteArray ba;
+    ba.append((quint8)OFFLINE_MODE_PARAM);
+    ba.append((quint8)en);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateTutorialEnabled(bool en)
+{
+    QByteArray ba;
+    ba.append((quint8)TUTORIAL_BOOL_PARAM);
+    ba.append((quint8)en);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
 }

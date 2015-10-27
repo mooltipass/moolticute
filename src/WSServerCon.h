@@ -26,6 +26,7 @@
 
 class WSServerCon: public QObject
 {
+    Q_OBJECT
 public:
     WSServerCon(QWebSocket *conn);
     virtual ~WSServerCon();
@@ -55,6 +56,8 @@ private:
     QWebSocket *wsClient;
 
     MPDevice *mpdevice = nullptr;
+
+    void processParametersSet(const QJsonObject &data);
 };
 
 #endif // WSSERVERCON_H

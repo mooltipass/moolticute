@@ -28,7 +28,12 @@ void WSServerCon::processMessage(const QString &message)
         return;
     }
 
-    //TODO
+    QJsonObject root = jdoc.object();
+
+    if (root["msg"] == "param_set")
+    {
+        processParametersSet(root["data"].toObject());
+    }
 }
 
 void WSServerCon::resetDevice(MPDevice *dev)
@@ -145,4 +150,30 @@ void WSServerCon::sendTutorialEnabled()
     QJsonObject data = {{ "parameter", "tutorial_enabled" },
                         { "value", mpdevice->get_tutorialEnabled() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::processParametersSet(const QJsonObject &data)
+{
+    if (data.contains("keyboard_layout"))
+        mpdevice->updateKeyboardLayout(data["keyboard_layout"].toInt());
+    if (data.contains("lock_timeout_enabled"))
+        mpdevice->updateLockTimeoutEnabled(data["lock_timeout_enabled"].toBool());
+    if (data.contains("lock_timeout"))
+        mpdevice->updateLockTimeout(data["lock_timeout"].toInt());
+    if (data.contains("screensaver"))
+        mpdevice->updateScreensaver(data["screensaver"].toBool());
+    if (data.contains("user_request_cancel"))
+        mpdevice->updateUserRequestCancel(data["user_request_cancel"].toBool());
+    if (data.contains("user_interaction_timeout"))
+        mpdevice->updateUserInteractionTimeout(data["user_interaction_timeout"].toInt());
+    if (data.contains("flash_screen"))
+        mpdevice->updateFlashScreen(data["flash_screen"].toBool());
+    if (data.contains("offline_mode"))
+        mpdevice->updateOfflineMode(data["offline_mode"].toBool());
+    if (data.contains("tutorial_enabled"))
+        mpdevice->updateTutorialEnabled(data["tutorial_enabled"].toBool());
+
+    //reload parameters from device after changed all params, this will trigger
+    //websocket update of clients too
+    mpdevice->loadParameters();
 }

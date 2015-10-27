@@ -56,6 +56,19 @@ public:
     void sendData(unsigned char cmd, const QByteArray &data = QByteArray(), MPCommandCb cb = [](bool, const QByteArray &){});
     void sendData(unsigned char cmd, MPCommandCb cb = [](bool, const QByteArray &){});
 
+    void updateKeyboardLayout(int lang);
+    void updateLockTimeoutEnabled(bool en);
+    void updateLockTimeout(int timeout);
+    void updateScreensaver(bool en);
+    void updateUserRequestCancel(bool en);
+    void updateUserInteractionTimeout(int timeout);
+    void updateFlashScreen(bool en);
+    void updateOfflineMode(bool en);
+    void updateTutorialEnabled(bool en);
+
+    //reload parameters from MP
+    void loadParameters();
+
 signals:
     /* Signal emited by platform code when new data comes from MP */
     /* A signal is used for platform code that uses a dedicated thread */
@@ -81,9 +94,6 @@ private:
 
     //command queue
     QQueue<MPCommand> commandQueue;
-
-    //reload parameters from MP
-    void loadParameters();
 };
 
 #endif // MPDEVICE_H

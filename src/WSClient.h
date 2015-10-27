@@ -31,12 +31,14 @@ signals:
     void wsConnected();
     void wsDisconnected();
 
+public slots:
+    void sendJsonData(const QJsonObject &data);
+
 private slots:
     void onWsConnected();
     void onWsDisconnected();
     void onWsError();
     void onTextMessageReceived(const QString &message);
-    void sendJsonData(const QJsonObject &data);
 
 private:
     void openWebsocket();
