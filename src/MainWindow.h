@@ -36,7 +36,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void updatedPage();
+    void updatePage();
 
 
 //    void mpAdded(MPDevice *device);
@@ -47,6 +47,17 @@ private:
     QtAwesome* awesome;
 
     WSClient *wsClient;
+
+    enum
+    {
+        PAGE_NO_CONNECTION = 0,
+        PAGE_SETTINGS = 1,
+        PAGE_CREDENTIALS_ENABLE = 2,
+        PAGE_SYNC = 3,
+        PAGE_NO_CARD = 4,
+        PAGE_LOCKED = 5,
+        PAGE_CREDENTIALS = 100,
+    };
 };
 
 #endif // MAINWINDOW_H

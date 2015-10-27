@@ -45,28 +45,26 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaled(500, ui->widgetHeader->sizeHint().height() - 8, Qt::KeepAspectRatio));
 
     wsClient = new WSClient(this);
-//    connect(wsClient, &WSClient::connectedChanged, [=]()
-//    {
-//        if (wsClient->get_connected())
-//            ui->plainTextEdit->appendPlainText("Mooltipass connected");
-//        else
-//            ui->plainTextEdit->appendPlainText("Mooltipass disconnected");
-//    });
-//    connect(wsClient, &WSClient::statusChanged, [=]()
-//    {
-//        ui->plainTextEdit->appendPlainText(QString("Status: %1").arg(Common::MPStatusString[wsClient->get_status()]));
-//    });
+    connect(wsClient, &WSClient::connectedChanged, [=]()
+    {
+        updatePage();
+    });
+    connect(wsClient, &WSClient::statusChanged, [=]()
+    {
+        updatePage();
+        //ui->plainTextEdit->appendPlainText(QString("Status: %1").arg(Common::MPStatusString[wsClient->get_status()]));
+    });
 
     ui->pushButtonMemMode->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonImportFile->setStyleSheet(CSS_BLUE_BUTTON);
 
-    connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatedPage()));
-    connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatedPage()));
-    connect(ui->pushButtonSync, SIGNAL(clicked(bool)), this, SLOT(updatedPage()));
+    connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonSync, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
 
-    ui->pushButtonDevSettings->setChecked(true);
-    ui->stackedWidget->setCurrentIndex(0);
+    ui->pushButtonDevSettings->setChecked(false);
+    ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
 }
 
 MainWindow::~MainWindow()
@@ -74,12 +72,31 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::updatedPage()
+void MainWindow::updatePage()
 {
+    if (!wsClient->get_connected())
+    {
+        ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
+        return;
+    }
+
+    if (wsClient->get_status() == Common::NoCardInserted)
+    {
+        ui->stackedWidget->setCurrentIndex(PAGE_NO_CARD);
+        return;
+    }
+
+    if (wsClient->get_status() == Common::Locked ||
+        wsClient->get_status() == Common::LockedScreen)
+    {
+        ui->stackedWidget->setCurrentIndex(PAGE_LOCKED);
+        return;
+    }
+
     if (ui->pushButtonDevSettings->isChecked())
-        ui->stackedWidget->setCurrentIndex(0);
+        ui->stackedWidget->setCurrentIndex(PAGE_SETTINGS);
     else if (ui->pushButtonCred->isChecked())
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS_ENABLE);
     else if (ui->pushButtonSync->isChecked())
-        ui->stackedWidget->setCurrentIndex(2);
+        ui->stackedWidget->setCurrentIndex(PAGE_SYNC);
 }
