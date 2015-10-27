@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>AppIcon_19.png</file>
+        <file>AppIcon_32.png</file>
+        <file>AppIcon_128.png</file>
+        <file>images.qrc</file>
+        <file>integrity-check.png</file>
+        <file>management-mode.png</file>
+        <file>message_alert.png</file>
+        <file>message_error.png</file>
+        <file>message_success.png</file>
+        <file>mp-logo.png</file>
+        <file>new-card.png</file>
+        <file>no-card.png</file>
+        <file>no-connection.png</file>
+        <file>noun_18878_cc.png</file>
+        <file>Plain_128.png</file>
+        <file>unlock.png</file>
+    </qresource>
+</RCC>

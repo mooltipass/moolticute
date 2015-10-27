@@ -21,6 +21,7 @@
 
 #include <QtWidgets>
 #include "WSClient.h"
+#include <QtAwesome.h>
 
 namespace Ui {
 class MainWindow;
@@ -35,11 +36,15 @@ public:
     ~MainWindow();
 
 private slots:
+    void updatedPage();
+
+
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
 
 private:
     Ui::MainWindow *ui;
+    QtAwesome* awesome;
 
     WSClient *wsClient;
 };

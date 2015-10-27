@@ -6,6 +6,8 @@ TARGET = MoolticuteApp
 
 CONFIG += c++11
 
+include(src/QtAwesome/QtAwesome.pri)
+
 SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \
     src/Common.cpp \
@@ -17,3 +19,10 @@ HEADERS  += src/MainWindow.h \
     src/WSClient.h
 
 FORMS    += src/MainWindow.ui
+
+RESOURCES += \
+    img/images.qrc
+
+win32 {
+    RC_FILE = win/windows_res.rc
+}
