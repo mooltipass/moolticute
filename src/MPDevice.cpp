@@ -27,27 +27,149 @@ MPDevice::MPDevice(QObject *parent):
     statusTimer->start(500);
     connect(statusTimer, &QTimer::timeout, [=]()
     {
-        sendData(MP_MOOLTIPASS_STATUS);
+        sendData(MP_MOOLTIPASS_STATUS, [=](bool success, const QByteArray &data)
+        {
+            if (!success)
+                return;
+            if ((quint8)data.at(1) == MP_MOOLTIPASS_STATUS)
+            {
+                Common::MPStatus s = (Common::MPStatus)data.at(2);
+                qDebug() << "received MP_MOOLTIPASS_STATUS: " << (int)data.at(2);
+                if (s != get_status())
+                {
+                    if (s == Common::Unlocked)
+                        QTimer::singleShot(10, [=]() { loadParameters(); });
+                }
+                set_status(s);
+            }
+        });
     });
 
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
+//    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
 }
 
 MPDevice::~MPDevice()
 {
 }
 
-void MPDevice::sendData(unsigned char cmd, const QByteArray &data)
+void MPDevice::sendData(unsigned char c, const QByteArray &data, MPCommandCb cb)
 {
+    MPCommand cmd;
+
     // Prepare MP packet
-    qDebug() << "Send command: " << QString("0x%1").arg(cmd, 2, 16, QChar('0'));
-    QByteArray ba;
-    ba.append(data.size());
-    ba.append(cmd);
-    ba.append(data);
+    cmd.data.append(data.size());
+    cmd.data.append(c);
+    cmd.data.append(data);
+    cmd.cb = std::move(cb);
+
+    commandQueue.enqueue(cmd);
+
+    if (!commandQueue.head().running)
+        sendDataDequeue();
+}
+
+void MPDevice::sendData(unsigned char cmd, MPCommandCb cb)
+{
+    sendData(cmd, QByteArray(), std::move(cb));
+}
+
+void MPDevice::sendDataDequeue()
+{
+    if (commandQueue.isEmpty())
+        return;
+
+    MPCommand &currentCmd = commandQueue.head();
+    currentCmd.running = true;
 
     // send data with platform code
-    platformWrite(ba);
+    qDebug() << "Platform send command: " << QString("0x%1").arg((quint8)currentCmd.data[1], 2, 16, QChar('0'));
+    platformWrite(currentCmd.data);
+}
+
+void MPDevice::loadParameters()
+{
+    QByteArray ba;
+    ba.append((char)KEYBOARD_LAYOUT_PARAM);
+    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received language: " << (quint8)data.at(2);
+        set_keyboardLayout((quint8)data.at(2));
+    });
+
+    ba[0] = (char)LOCK_TIMEOUT_ENABLE_PARAM;
+    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received lock timeout enable: " << (quint8)data.at(2);
+        set_lockTimeoutEnabled(data.at(2) != 0);
+    });
+
+    ba[0] = (char)LOCK_TIMEOUT_PARAM;
+    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received lock timeout: " << (quint8)data.at(2);
+        set_lockTimeout((int)data.at(2));
+    });
+
+    ba[0] = (char)SCREENSAVER_PARAM;
+    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received screensaver: " << (quint8)data.at(2);
+        set_screensaver(data.at(2) != 0);
+    });
+
+    ba[0] = (char)USER_REQ_CANCEL_PARAM;
+    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received userRequestCancel: " << (quint8)data.at(2);
+        set_userRequestCancel(data.at(2) != 0);
+    });
+
+    ba[0] = (char)USER_INTER_TIMEOUT_PARAM;
+    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received userInteractionTimeout: " << (quint8)data.at(2);
+        set_userInteractionTimeout((int)data.at(2));
+    });
+
+    ba[0] = (char)FLASH_SCREEN_PARAM;
+    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received flashScreen: " << (quint8)data.at(2);
+        set_flashScreen(data.at(2) != 0);
+    });
+
+    ba[0] = (char)OFFLINE_MODE_PARAM;
+    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received offlineMode: " << (quint8)data.at(2);
+        set_offlineMode(data.at(2) != 0);
+    });
+
+    ba[0] = (char)TUTORIAL_BOOL_PARAM;
+    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received tutorialEnabled: " << (quint8)data.at(2);
+        set_tutorialEnabled(data.at(2) != 0);
+    });
+}
+
+void MPDevice::commandFailed()
+{
+//    MPCommand currentCmd = commandQueue.head();
+//    currentCmd.cb(false, QByteArray());
+//    commandQueue.dequeue();
+
+//    QTimer::singleShot(150, this, SLOT(sendDataDequeue()));
 }
 
 void MPDevice::newDataRead(const QByteArray &data)
@@ -55,13 +177,9 @@ void MPDevice::newDataRead(const QByteArray &data)
     //we assume that the QByteArray size is at least 64 bytes
     //this should be done by the platform code
 
-    switch ((unsigned char)data.at(1))
-    {
-    case MP_MOOLTIPASS_STATUS:
-        qDebug() << "received MP_MOOLTIPASS_STATUS: " << (int)data.at(2);
-        set_status((Common::MPStatus)data.at(2));
-        break;
+    MPCommand currentCmd = commandQueue.head();
+    currentCmd.cb(true, data);
+    commandQueue.dequeue();
 
-    default: break;
-    }
+    sendDataDequeue();
 }

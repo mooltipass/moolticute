@@ -34,6 +34,7 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
             detached_kernel = true;
             libusb_detach_kernel_driver(devicefd, 0);
         }
+        libusb_claim_interface(devicefd, 0);
 
         platformRead();
     }
@@ -41,6 +42,7 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
 
 MPDevice_linux::~MPDevice_linux()
 {
+    libusb_release_interface(devicefd, 0);
     if (detached_kernel)
         libusb_attach_kernel_driver(devicefd, 0);
     libusb_close(devicefd);
@@ -54,12 +56,10 @@ public:
     USBTransfer(libusb_device_handle *_fd, int intf, MPDevice *parent):
         QObject(parent), fd(_fd), interface(intf), device(parent)
     {
-        libusb_claim_interface(fd, interface);
         recvData.resize(64);
     }
     ~USBTransfer()
     {
-        libusb_release_interface(fd, interface);
     }
 
     libusb_device_handle *fd;
@@ -96,7 +96,7 @@ void MPDevice_linux::platformWrite(const QByteArray &ba)
                                    ba.size(),
                                    _usbSendCallback,
                                    transfer,
-                                   1000);
+                                   50);
 
     int err = libusb_submit_transfer(trf);
     if (err)
@@ -109,11 +109,18 @@ void MPDevice_linux::usbSendCb(libusb_transfer *trf)
 
     USBTransfer *transfer = reinterpret_cast<USBTransfer *>(trf->user_data);
 
+    bool error = false;
     if (trf->status != LIBUSB_TRANSFER_COMPLETED)
-        qWarning() << "Failed to transfer data to usb endpoint (OUT)";
+    {
+        qWarning() << "Failed to transfer data to usb endpoint (OUT): " << trf->status << ":" << libusb_strerror((enum libusb_error)trf->status);
+        error = true;
+    }
 
     libusb_free_transfer(trf);
     delete transfer;
+
+    if (error)
+        emit platformFailed();
 }
 
 //Called when a receive transfer has completed
@@ -154,6 +161,9 @@ void MPDevice_linux::usbReceiveCb(libusb_transfer *trf)
 
     if (trf->status == LIBUSB_TRANSFER_COMPLETED)
         emit platformDataRead(transfer->recvData);
+    else
+        emit platformFailed();
+
     delete transfer;
     libusb_free_transfer(trf);
     platformRead();

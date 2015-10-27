@@ -90,5 +90,18 @@
 #define MP_SET_DN_START_PARENT   0xD2
 #define MP_END_MEMORYMGMT        0xD3
 
+
+//Parameters for MP_GET_MOOLTIPASS_PARM
+#define KEYBOARD_LAYOUT_PARAM       1
+#define LOCK_TIMEOUT_ENABLE_PARAM   3
+#define LOCK_TIMEOUT_PARAM          4
+#define SCREENSAVER_PARAM           9
+#define USER_REQ_CANCEL_PARAM      15
+#define USER_INTER_TIMEOUT_PARAM    2
+#define FLASH_SCREEN_PARAM         14
+#define OFFLINE_MODE_PARAM          8
+#define TUTORIAL_BOOL_PARAM        16
+
+
 #endif // MOOLTIPASSCMDS_H
 

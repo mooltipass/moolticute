@@ -13,6 +13,15 @@ class WSClient: public QObject
 
     QT_WRITABLE_PROPERTY(bool, connected)
     QT_WRITABLE_PROPERTY(Common::MPStatus, status)
+    QT_WRITABLE_PROPERTY(int, keyboardLayout)
+    QT_WRITABLE_PROPERTY(bool, lockTimeoutEnabled)
+    QT_WRITABLE_PROPERTY(int, lockTimeout)
+    QT_WRITABLE_PROPERTY(bool, screensaver)
+    QT_WRITABLE_PROPERTY(bool, userRequestCancel)
+    QT_WRITABLE_PROPERTY(int, userInteractionTimeout)
+    QT_WRITABLE_PROPERTY(bool, flashScreen)
+    QT_WRITABLE_PROPERTY(bool, offlineMode)
+    QT_WRITABLE_PROPERTY(bool, tutorialEnabled)
 
 public:
     explicit WSClient(QObject *parent = nullptr);
@@ -32,6 +41,8 @@ private slots:
 private:
     void openWebsocket();
     void closeWebsocket();
+
+    void udateParameters(const QJsonObject &data);
 
     QWebSocket *wsocket = nullptr;
 };

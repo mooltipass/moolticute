@@ -70,7 +70,7 @@ UsbMonitor_linux::UsbMonitor_linux()
     if (!libusb_has_capability (LIBUSB_CAP_HAS_HOTPLUG))
         qDebug() << "libusb Hotplug capabilites are not supported on this platform";
 
-    //libusb_set_debug(usb_ctx, LIBUSB_LOG_LEVEL_DEBUG);
+    libusb_set_debug(usb_ctx, LIBUSB_LOG_LEVEL_INFO);
 }
 
 void UsbMonitor_linux::start()

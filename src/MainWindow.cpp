@@ -65,6 +65,74 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->pushButtonDevSettings->setChecked(false);
     ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
+
+    //Add languages to combobox
+    ui->comboBoxLang->addItem("cz_CZ", 155);
+    ui->comboBoxLang->addItem("da_DK", 156);
+    ui->comboBoxLang->addItem("de_DE", 149);
+    ui->comboBoxLang->addItem("en_AU", 151);
+    ui->comboBoxLang->addItem("en_CA", 154);
+    ui->comboBoxLang->addItem("en_UK", 167);
+    ui->comboBoxLang->addItem("en_US", 146);
+    ui->comboBoxLang->addItem("es_AR", 150);
+    ui->comboBoxLang->addItem("es_ES", 148);
+    ui->comboBoxLang->addItem("fi_FI", 157);
+    ui->comboBoxLang->addItem("fr_BE", 152);
+    ui->comboBoxLang->addItem("fr_FR", 147);
+    ui->comboBoxLang->addItem("frde_CH", 166);
+    ui->comboBoxLang->addItem("hu_HU", 158);
+    ui->comboBoxLang->addItem("is_IS", 159);
+    ui->comboBoxLang->addItem("it_IT", 160);
+    ui->comboBoxLang->addItem("nl_NL", 161);
+    ui->comboBoxLang->addItem("no_NO", 162);
+    ui->comboBoxLang->addItem("po_BR", 153);
+    ui->comboBoxLang->addItem("po_PO", 163);
+    ui->comboBoxLang->addItem("ro_RO", 164);
+    ui->comboBoxLang->addItem("sl_SL", 165);
+
+    connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
+    {
+        for (int i = 0;i < ui->comboBoxLang->count();i++)
+        {
+            if (ui->comboBoxLang->itemData(i).toInt() == wsClient->get_keyboardLayout())
+            {
+                ui->comboBoxLang->setCurrentIndex(i);
+                break;
+            }
+        }
+    });
+    connect(wsClient, &WSClient::lockTimeoutEnabledChanged, [=]()
+    {
+        ui->checkBoxLock->setChecked(wsClient->get_lockTimeoutEnabled());
+    });
+    connect(wsClient, &WSClient::lockTimeoutChanged, [=]()
+    {
+        ui->spinBoxLock->setValue(wsClient->get_lockTimeout());
+    });
+    connect(wsClient, &WSClient::screensaverChanged, [=]()
+    {
+        ui->checkBoxScreensaver->setChecked(wsClient->get_screensaver());
+    });
+    connect(wsClient, &WSClient::userRequestCancelChanged, [=]()
+    {
+        ui->checkBoxInput->setChecked(wsClient->get_userRequestCancel());
+    });
+    connect(wsClient, &WSClient::userInteractionTimeoutChanged, [=]()
+    {
+        ui->spinBoxInput->setValue(wsClient->get_userInteractionTimeout());
+    });
+    connect(wsClient, &WSClient::flashScreenChanged, [=]()
+    {
+        ui->checkBoxFlash->setChecked(wsClient->get_flashScreen());
+    });
+    connect(wsClient, &WSClient::offlineModeChanged, [=]()
+    {
+        ui->checkBoxBoot->setChecked(wsClient->get_offlineMode());
+    });
+    connect(wsClient, &WSClient::tutorialEnabledChanged, [=]()
+    {
+        ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
+    });
 }
 
 MainWindow::~MainWindow()

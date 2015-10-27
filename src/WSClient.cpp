@@ -100,4 +100,32 @@ void WSClient::onTextMessageReceived(const QString &message)
         QString st = rootobj["data"].toString();
         set_status(Common::statusFromString(st));
     }
+    else if (rootobj["msg"] == "param_changed")
+    {
+        udateParameters(rootobj["data"].toObject());
+    }
+}
+
+void WSClient::udateParameters(const QJsonObject &data)
+{
+    QString param = data["parameter"].toString();
+
+    if (param == "keyboard_layout")
+        set_keyboardLayout(data["value"].toInt());
+    else if (param == "lock_timeout_enabled")
+        set_lockTimeoutEnabled(data["value"].toBool());
+    else if (param == "lock_timeout")
+        set_lockTimeout(data["value"].toInt() / 60);
+    else if (param == "screensaver")
+        set_screensaver(data["value"].toBool());
+    else if (param == "user_request_cancel")
+        set_userRequestCancel(data["value"].toBool());
+    else if (param == "user_interaction_timeout")
+        set_userInteractionTimeout(data["value"].toInt());
+    else if (param == "flash_screen")
+        set_flashScreen(data["value"].toBool());
+    else if (param == "offline_mode")
+        set_offlineMode(data["value"].toBool());
+    else if (param == "tutorial_enabled")
+        set_tutorialEnabled(data["value"].toBool());
 }

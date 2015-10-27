@@ -20,6 +20,7 @@
 #define COMMON_H
 
 #include <QtCore>
+#include <functional>
 
 #define MOOLTIPASS_VENDORID     0x16D0
 #define MOOLTIPASS_PRODUCTID    0x09A0

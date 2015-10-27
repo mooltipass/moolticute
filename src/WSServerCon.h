@@ -40,6 +40,17 @@ signals:
 private slots:
     void processMessage(const QString &msg);
 
+    //parameters slots that sends json to websocket
+    void sendKeyboardLayout();
+    void sendLockTimeoutEnabled();
+    void sendLockTimeout();
+    void sendScreensaver();
+    void sendUserRequestCancel();
+    void sendUserInteractionTimeout();
+    void sendFlashScreen();
+    void sendOfflineMode();
+    void sendTutorialEnabled();
+
 private:
     QWebSocket *wsClient;
 
