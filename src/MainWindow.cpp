@@ -27,6 +27,9 @@
                         "}" \
                         "QPushButton:hover {" \
                             "background-color: #3d96af;" \
+                        "}" \
+                        "QPushButton:pressed {" \
+                            "background-color: #237C95;" \
                         "}"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -45,19 +48,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaled(500, ui->widgetHeader->sizeHint().height() - 8, Qt::KeepAspectRatio));
 
     wsClient = new WSClient(this);
-    connect(wsClient, &WSClient::connectedChanged, [=]()
-    {
-        updatePage();
-    });
-    connect(wsClient, &WSClient::statusChanged, [=]()
-    {
-        updatePage();
-        //ui->plainTextEdit->appendPlainText(QString("Status: %1").arg(Common::MPStatusString[wsClient->get_status()]));
-    });
+    connect(wsClient, &WSClient::connectedChanged, [=]() { updatePage(); });
+    connect(wsClient, &WSClient::statusChanged, [=]() { updatePage(); });
 
     ui->pushButtonMemMode->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonImportFile->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonSettingsReset->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonSettingsSave->setStyleSheet(CSS_BLUE_BUTTON);
+
+    ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, {{ "color", QColor(Qt::white) }}));
+    ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, {{ "color", QColor(Qt::white) }}));
+    ui->pushButtonSettingsSave->setVisible(false);
+    ui->pushButtonSettingsReset->setVisible(false);
 
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
@@ -90,6 +93,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBoxLang->addItem("ro_RO", 164);
     ui->comboBoxLang->addItem("sl_SL", 165);
 
+    //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
     {
         for (int i = 0;i < ui->comboBoxLang->count();i++)
@@ -97,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
             if (ui->comboBoxLang->itemData(i).toInt() == wsClient->get_keyboardLayout())
             {
                 ui->comboBoxLang->setCurrentIndex(i);
+                checkSettingsChanged();
                 break;
             }
         }
@@ -104,35 +109,54 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(wsClient, &WSClient::lockTimeoutEnabledChanged, [=]()
     {
         ui->checkBoxLock->setChecked(wsClient->get_lockTimeoutEnabled());
+        checkSettingsChanged();
     });
     connect(wsClient, &WSClient::lockTimeoutChanged, [=]()
     {
         ui->spinBoxLock->setValue(wsClient->get_lockTimeout());
+        checkSettingsChanged();
     });
     connect(wsClient, &WSClient::screensaverChanged, [=]()
     {
         ui->checkBoxScreensaver->setChecked(wsClient->get_screensaver());
+        checkSettingsChanged();
     });
     connect(wsClient, &WSClient::userRequestCancelChanged, [=]()
     {
         ui->checkBoxInput->setChecked(wsClient->get_userRequestCancel());
+        checkSettingsChanged();
     });
     connect(wsClient, &WSClient::userInteractionTimeoutChanged, [=]()
     {
         ui->spinBoxInput->setValue(wsClient->get_userInteractionTimeout());
+        checkSettingsChanged();
     });
     connect(wsClient, &WSClient::flashScreenChanged, [=]()
     {
         ui->checkBoxFlash->setChecked(wsClient->get_flashScreen());
+        checkSettingsChanged();
     });
     connect(wsClient, &WSClient::offlineModeChanged, [=]()
     {
         ui->checkBoxBoot->setChecked(wsClient->get_offlineMode());
+        checkSettingsChanged();
     });
     connect(wsClient, &WSClient::tutorialEnabledChanged, [=]()
     {
         ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
+        checkSettingsChanged();
     });
+
+    //When something changed in GUI, show save/reset buttons
+    connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxLock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->spinBoxLock, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxScreensaver, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxInput, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->spinBoxInput, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxFlash, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxBoot, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxTuto, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
 }
 
 MainWindow::~MainWindow()
@@ -167,4 +191,68 @@ void MainWindow::updatePage()
         ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS_ENABLE);
     else if (ui->pushButtonSync->isChecked())
         ui->stackedWidget->setCurrentIndex(PAGE_SYNC);
+}
+
+void MainWindow::checkSettingsChanged()
+{
+    //lang combobox
+    bool uichanged = false;
+    if (ui->comboBoxLang->currentData().toInt() != wsClient->get_keyboardLayout())
+        uichanged = true;
+    if (ui->checkBoxLock->isChecked() != wsClient->get_lockTimeoutEnabled())
+        uichanged = true;
+    if (ui->spinBoxLock->value() != wsClient->get_lockTimeout())
+        uichanged = true;
+    if (ui->checkBoxScreensaver->isChecked() != wsClient->get_screensaver())
+        uichanged = true;
+    if (ui->checkBoxInput->isChecked() != wsClient->get_userRequestCancel())
+        uichanged = true;
+    if (ui->spinBoxInput->value() != wsClient->get_userInteractionTimeout())
+        uichanged = true;
+    if (ui->checkBoxFlash->isChecked() != wsClient->get_flashScreen())
+        uichanged = true;
+    if (ui->checkBoxBoot->isChecked() != wsClient->get_offlineMode())
+        uichanged = true;
+    if (ui->checkBoxTuto->isChecked() != wsClient->get_tutorialEnabled())
+        uichanged = true;
+
+    if (uichanged)
+    {
+        ui->pushButtonSettingsReset->setVisible(true);
+        ui->pushButtonSettingsSave->setVisible(true);
+    }
+    else
+    {
+        ui->pushButtonSettingsReset->setVisible(false);
+        ui->pushButtonSettingsSave->setVisible(false);
+    }
+}
+
+void MainWindow::on_pushButtonSettingsReset_clicked()
+{
+    for (int i = 0;i < ui->comboBoxLang->count();i++)
+    {
+        if (ui->comboBoxLang->itemData(i).toInt() == wsClient->get_keyboardLayout())
+        {
+            ui->comboBoxLang->setCurrentIndex(i);
+            checkSettingsChanged();
+            break;
+        }
+    }
+    ui->checkBoxLock->setChecked(wsClient->get_lockTimeoutEnabled());
+    ui->spinBoxLock->setValue(wsClient->get_lockTimeout());
+    ui->checkBoxScreensaver->setChecked(wsClient->get_screensaver());
+    ui->checkBoxInput->setChecked(wsClient->get_userRequestCancel());
+    ui->spinBoxInput->setValue(wsClient->get_userInteractionTimeout());
+    ui->checkBoxFlash->setChecked(wsClient->get_flashScreen());
+    ui->checkBoxBoot->setChecked(wsClient->get_offlineMode());
+    ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
+
+    ui->pushButtonSettingsReset->setVisible(false);
+    ui->pushButtonSettingsSave->setVisible(false);
+}
+
+void MainWindow::on_pushButtonSettingsSave_clicked()
+{
+
 }

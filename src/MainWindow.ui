@@ -150,7 +150,7 @@ QWidget {background-color: #EFEFEF;}</string>
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="pageNoConnect">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -254,9 +254,6 @@ QWidget {background-color: #EFEFEF;}</string>
       </widget>
       <widget class="QWidget" name="pageSettings">
        <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="spacing">
-         <number>15</number>
-        </property>
         <property name="leftMargin">
          <number>30</number>
         </property>
@@ -264,7 +261,10 @@ QWidget {background-color: #EFEFEF;}</string>
          <number>30</number>
         </property>
         <property name="rightMargin">
-         <number>100</number>
+         <number>50</number>
+        </property>
+        <property name="bottomMargin">
+         <number>30</number>
         </property>
         <item>
          <widget class="QLabel" name="label">
@@ -410,6 +410,52 @@ QWidget {background-color: #EFEFEF;}</string>
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <property name="spacing">
+           <number>30</number>
+          </property>
+          <item>
+           <spacer name="horizontalSpacer_11">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonSettingsReset">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Reset</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonSettingsSave">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Save to device</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>

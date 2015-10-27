@@ -37,10 +37,14 @@ public:
 
 private slots:
     void updatePage();
-
+    void checkSettingsChanged();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
+
+    void on_pushButtonSettingsReset_clicked();
+
+    void on_pushButtonSettingsSave_clicked();
 
 private:
     Ui::MainWindow *ui;
