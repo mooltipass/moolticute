@@ -41,6 +41,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
+    //Disable this option for now, firmware does not support it
+    ui->checkBoxInput->setEnabled(false);
+    ui->spinBoxInput->setEnabled(false);
+
     ui->pushButtonDevSettings->setIcon(awesome->icon(fa::wrench));
     ui->pushButtonCred->setIcon(awesome->icon(fa::key));
     ui->pushButtonSync->setIcon(awesome->icon(fa::refresh));
