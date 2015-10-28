@@ -18,6 +18,20 @@
  ******************************************************************************/
 #include "Common.h"
 
+#ifdef Q_OS_WIN
+#define COLOR_LIGHTRED
+#define COLOR_RED
+#define COLOR_LIGHTBLUE
+#define COLOR_BLUE
+#define COLOR_GREEN
+#define COLOR_YELLOW
+#define COLOR_ORANGE
+#define COLOR_WHITE
+#define COLOR_LIGHTCYAN
+#define COLOR_CYAN
+#define COLOR_RESET
+#define COLOR_HIGH
+#else
 #define COLOR_LIGHTRED  "\033[31;1m"
 #define COLOR_RED       "\033[31m"
 #define COLOR_LIGHTBLUE "\033[34;1m"
@@ -30,6 +44,7 @@
 #define COLOR_CYAN      "\033[36m"
 #define COLOR_RESET     "\033[0m"
 #define COLOR_HIGH      "\033[1m"
+#endif
 
 QHash<Common::MPStatus, QString> Common::MPStatusUserString = {
     { Common::UnknownStatus, QObject::tr("Unknown status") },

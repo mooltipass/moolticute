@@ -40,6 +40,8 @@ MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
 
 MPDevice_win::~MPDevice_win()
 {
+    oNotifier->setEnabled(false);
+    delete oNotifier;
     CancelIo(platformDef.devHandle);
     CloseHandle(platformDef.devHandle);
 }

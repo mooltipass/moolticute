@@ -254,6 +254,9 @@ QWidget {background-color: #EFEFEF;}</string>
       </widget>
       <widget class="QWidget" name="pageSettings">
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>20</number>
+        </property>
         <property name="leftMargin">
          <number>30</number>
         </property>
@@ -261,7 +264,7 @@ QWidget {background-color: #EFEFEF;}</string>
          <number>30</number>
         </property>
         <property name="rightMargin">
-         <number>50</number>
+         <number>140</number>
         </property>
         <property name="bottomMargin">
          <number>30</number>
@@ -303,7 +306,14 @@ QWidget {background-color: #EFEFEF;}</string>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="comboBoxLang"/>
+           <widget class="QComboBox" name="comboBoxLang">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_4">
@@ -322,7 +332,14 @@ QWidget {background-color: #EFEFEF;}</string>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBoxLock"/>
+             <widget class="QSpinBox" name="spinBoxLock">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_5">
@@ -330,6 +347,19 @@ QWidget {background-color: #EFEFEF;}</string>
                <string>minutes inactivity</string>
               </property>
              </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </item>
@@ -350,7 +380,14 @@ QWidget {background-color: #EFEFEF;}</string>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBoxInput"/>
+             <widget class="QSpinBox" name="spinBoxInput">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_8">
@@ -358,6 +395,19 @@ QWidget {background-color: #EFEFEF;}</string>
                <string>seconds</string>
               </property>
              </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_13">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </item>
