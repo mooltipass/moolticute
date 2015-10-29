@@ -60,9 +60,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButtonImportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsReset->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsSave->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonCredAdd->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonCredDel->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonShowPass->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonExitMMM->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, {{ "color", QColor(Qt::white) }}));
     ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, {{ "color", QColor(Qt::white) }}));
+    ui->pushButtonCredAdd->setIcon(awesome->icon(fa::plus, {{ "color", QColor(Qt::white) }}));
+    ui->pushButtonCredDel->setIcon(awesome->icon(fa::trash, {{ "color", QColor(Qt::white) }}));
+    ui->pushButtonShowPass->setIcon(awesome->icon(fa::eye, {{ "color", QColor(Qt::white) }}));
+    ui->pushButtonExitMMM->setIcon(awesome->icon(fa::signout, {{ "color", QColor(Qt::white) }}));
     ui->pushButtonSettingsSave->setVisible(false);
     ui->pushButtonSettingsReset->setVisible(false);
 
@@ -161,6 +169,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->checkBoxFlash, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxBoot, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxTuto, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+
+    //Setup the confirm view
+    ui->widgetSpin->setPixmap(awesome->icon(fa::circleonotch).pixmap(QSize(80, 80)));
+
+    connect(wsClient, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(memMgmtMode()));
 }
 
 MainWindow::~MainWindow()
@@ -269,4 +282,28 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
                      { "tutorial_enabled", ui->checkBoxTuto->isChecked() }};
 
     wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
+}
+
+void MainWindow::on_pushButtonMemMode_clicked()
+{
+    wsClient->sendJsonData({{ "msg", "start_memorymgmt" }});
+    ui->widgetHeader->setEnabled(false);
+    ui->stackedWidget->setCurrentIndex(PAGE_WAIT_CONFIRM);
+}
+
+void MainWindow::memMgmtMode()
+{
+    qDebug() << "MMM changed";
+    if (wsClient->get_memMgmtMode())
+        ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS);
+    else
+    {
+        updatePage();
+        ui->widgetHeader->setEnabled(true);
+    }
+}
+
+void MainWindow::on_pushButtonExitMMM_clicked()
+{
+    wsClient->sendJsonData({{ "msg", "exit_memorymgmt" }});
 }

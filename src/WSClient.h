@@ -22,6 +22,7 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(bool, flashScreen)
     QT_WRITABLE_PROPERTY(bool, offlineMode)
     QT_WRITABLE_PROPERTY(bool, tutorialEnabled)
+    QT_WRITABLE_PROPERTY(bool, memMgmtMode)
 
 public:
     explicit WSClient(QObject *parent = nullptr);

@@ -11,12 +11,16 @@ include(src/QtAwesome/QtAwesome.pri)
 SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \
     src/Common.cpp \
-    src/WSClient.cpp
+    src/WSClient.cpp \
+    src/RotateSpinner.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
     src/QtHelper.h \
-    src/WSClient.h
+    src/WSClient.h \
+    src/RotateSpinner.h
+
+INCLUDEPATH += src
 
 FORMS    += src/MainWindow.ui
 

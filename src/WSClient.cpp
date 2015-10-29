@@ -104,6 +104,10 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         udateParameters(rootobj["data"].toObject());
     }
+    else if (rootobj["msg"] == "memorymgmt_changed")
+    {
+        force_memMgmtMode(rootobj["data"].toBool());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)

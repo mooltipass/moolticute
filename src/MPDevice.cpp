@@ -22,6 +22,7 @@ MPDevice::MPDevice(QObject *parent):
     QObject(parent)
 {
     set_status(Common::UnknownStatus);
+    set_memMgmtMode(false); //by default device is not in MMM
 
     statusTimer = new QTimer(this);
     statusTimer->start(500);
@@ -261,3 +262,51 @@ void MPDevice::updateTutorialEnabled(bool en)
     ba.append((quint8)en);
     sendData(MP_SET_MOOLTIPASS_PARM, ba);
 }
+
+void MPDevice::startMemMgmtMode()
+{
+    if (get_memMgmtMode()) return;
+
+    sendData(MP_START_MEMORYMGMT, [=](bool success, const QByteArray &data)
+    {
+        if (success)
+        {
+            qDebug() << "received MP_START_MEMORYMGMT: " << (quint8)data.at(1) << " - " << (quint8)data.at(2);
+            if ((quint8)data.at(1) == MP_START_MEMORYMGMT &&
+                (quint8)data.at(2) == 0x01)
+            {
+                qDebug() << "Mem management mode enabled";
+                force_memMgmtMode(true);
+            }
+            else
+                force_memMgmtMode(false);
+        }
+        else
+            //force clients to update their status
+            force_memMgmtMode(false);
+    });
+}
+
+void MPDevice::exitMemMgmtMode()
+{
+    if (!get_memMgmtMode()) return;
+
+    sendData(MP_END_MEMORYMGMT, [=](bool success, const QByteArray &data)
+    {
+        if (success)
+        {
+            qDebug() << "received MP_END_MEMORYMGMT: " << (quint8)data.at(1) << " - " << (quint8)data.at(2);
+            if ((quint8)data.at(1) == MP_END_MEMORYMGMT &&
+                (quint8)data.at(2) == 0x01)
+                qDebug() << "Mem management mode disabled";
+            else
+                qWarning() << "Mem management mode disable was not ack by the device!";
+
+            force_memMgmtMode(false);
+        }
+        else
+            //force clients to update their status
+            force_memMgmtMode(false);
+    });
+}
+

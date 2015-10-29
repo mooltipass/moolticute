@@ -35,6 +35,10 @@
                 emit name##Changed (m_##name); \
             } \
         } \
+        void force_##name (type name) { \
+            m_##name = name; \
+            emit name##Changed (m_##name); \
+        } \
     Q_SIGNALS: \
         void name##Changed (type name); \
     private:

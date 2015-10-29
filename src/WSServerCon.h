@@ -51,6 +51,7 @@ private slots:
     void sendFlashScreen();
     void sendOfflineMode();
     void sendTutorialEnabled();
+    void sendMemMgmtMode();
 
 private:
     QWebSocket *wsClient;

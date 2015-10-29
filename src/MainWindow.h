@@ -38,13 +38,16 @@ public:
 private slots:
     void updatePage();
     void checkSettingsChanged();
+    void memMgmtMode();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
 
     void on_pushButtonSettingsReset_clicked();
-
     void on_pushButtonSettingsSave_clicked();
+    void on_pushButtonMemMode_clicked();
+
+    void on_pushButtonExitMMM_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -60,7 +63,8 @@ private:
         PAGE_SYNC = 3,
         PAGE_NO_CARD = 4,
         PAGE_LOCKED = 5,
-        PAGE_CREDENTIALS = 100,
+        PAGE_CREDENTIALS = 6,
+        PAGE_WAIT_CONFIRM = 7,
     };
 };
 

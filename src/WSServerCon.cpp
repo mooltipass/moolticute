@@ -34,6 +34,16 @@ void WSServerCon::processMessage(const QString &message)
     {
         processParametersSet(root["data"].toObject());
     }
+    else if (root["msg"] == "start_memorymgmt")
+    {
+        //send command to start MMM
+        mpdevice->startMemMgmtMode();
+    }
+    else if (root["msg"] == "exit_memorymgmt")
+    {
+        //send command to exit MMM
+        mpdevice->exitMemMgmtMode();
+    }
 }
 
 void WSServerCon::resetDevice(MPDevice *dev)
@@ -63,6 +73,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(flashScreenChanged(bool)), this, SLOT(sendFlashScreen()));
     connect(mpdevice, SIGNAL(offlineModeChanged(bool)), this, SLOT(sendOfflineMode()));
     connect(mpdevice, SIGNAL(tutorialEnabledChanged(bool)), this, SLOT(sendTutorialEnabled()));
+    connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
 }
 
 void WSServerCon::sendInitialStatus()
@@ -86,6 +97,7 @@ void WSServerCon::sendInitialStatus()
         sendFlashScreen();
         sendOfflineMode();
         sendTutorialEnabled();
+        sendMemMgmtMode();
     }
 }
 
@@ -150,6 +162,12 @@ void WSServerCon::sendTutorialEnabled()
     QJsonObject data = {{ "parameter", "tutorial_enabled" },
                         { "value", mpdevice->get_tutorialEnabled() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendMemMgmtMode()
+{
+    sendJsonMessage({{ "msg", "memorymgmt_changed" },
+                     { "data", mpdevice->get_memMgmtMode() }});
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

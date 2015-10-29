@@ -47,6 +47,7 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(bool, flashScreen)
     QT_WRITABLE_PROPERTY(bool, offlineMode)
     QT_WRITABLE_PROPERTY(bool, tutorialEnabled)
+    QT_WRITABLE_PROPERTY(bool, memMgmtMode)
 
 public:
     MPDevice(QObject *parent);
@@ -65,6 +66,10 @@ public:
     void updateFlashScreen(bool en);
     void updateOfflineMode(bool en);
     void updateTutorialEnabled(bool en);
+
+    //mem mgmt mode
+    void startMemMgmtMode();
+    void exitMemMgmtMode();
 
     //reload parameters from MP
     void loadParameters();
