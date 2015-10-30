@@ -162,6 +162,16 @@ void MPDevice::loadParameters()
         qDebug() << "received tutorialEnabled: " << (quint8)data.at(2);
         set_tutorialEnabled(data.at(2) != 0);
     });
+
+    sendData(MP_VERSION, [=](bool success, const QByteArray &data)
+    {
+        if (!success) return;
+        qDebug() << "received MP version FLASH size: " << (quint8)data.at(2) << "Mb";
+        QString hw = QString(data.mid(3, (quint8)data.at(0) - 2));
+        qDebug() << "received MP version hw: " << hw;
+        set_flashMbSize((quint8)data.at(2));
+        set_hwVersion(hw);
+    });
 }
 
 void MPDevice::commandFailed()

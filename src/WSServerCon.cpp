@@ -74,6 +74,8 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(offlineModeChanged(bool)), this, SLOT(sendOfflineMode()));
     connect(mpdevice, SIGNAL(tutorialEnabledChanged(bool)), this, SLOT(sendTutorialEnabled()));
     connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
+    connect(mpdevice, SIGNAL(flashMbSize(int)), this, SLOT(sendVersion()));
+    connect(mpdevice, SIGNAL(hwVersion(QString)), this, SLOT(sendVersion()));
 }
 
 void WSServerCon::sendInitialStatus()
@@ -98,6 +100,7 @@ void WSServerCon::sendInitialStatus()
         sendOfflineMode();
         sendTutorialEnabled();
         sendMemMgmtMode();
+        sendVersion();
     }
 }
 
@@ -168,6 +171,13 @@ void WSServerCon::sendMemMgmtMode()
 {
     sendJsonMessage({{ "msg", "memorymgmt_changed" },
                      { "data", mpdevice->get_memMgmtMode() }});
+}
+
+void WSServerCon::sendVersion()
+{
+    QJsonObject data = {{ "hw_version", mpdevice->get_hwVersion() },
+                        { "flash_size", mpdevice->get_flashMbSize() }};
+    sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

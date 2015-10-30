@@ -48,6 +48,8 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(bool, offlineMode)
     QT_WRITABLE_PROPERTY(bool, tutorialEnabled)
     QT_WRITABLE_PROPERTY(bool, memMgmtMode)
+    QT_WRITABLE_PROPERTY(int, flashMbSize)
+    QT_WRITABLE_PROPERTY(QString, hwVersion)
 
 public:
     MPDevice(QObject *parent);
