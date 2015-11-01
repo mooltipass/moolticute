@@ -74,8 +74,8 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(offlineModeChanged(bool)), this, SLOT(sendOfflineMode()));
     connect(mpdevice, SIGNAL(tutorialEnabledChanged(bool)), this, SLOT(sendTutorialEnabled()));
     connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
-    connect(mpdevice, SIGNAL(flashMbSize(int)), this, SLOT(sendVersion()));
-    connect(mpdevice, SIGNAL(hwVersion(QString)), this, SLOT(sendVersion()));
+    connect(mpdevice, SIGNAL(flashMbSizeChanged(int)), this, SLOT(sendVersion()));
+    connect(mpdevice, SIGNAL(hwVersionChanged(QString)), this, SLOT(sendVersion()));
 }
 
 void WSServerCon::sendInitialStatus()

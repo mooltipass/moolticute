@@ -90,92 +90,182 @@ void MPDevice::sendDataDequeue()
 
 void MPDevice::loadParameters()
 {
-    QByteArray ba;
-    ba.append((char)KEYBOARD_LAYOUT_PARAM);
-    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    AsyncJobs *jobs = new AsyncJobs(this);
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_VERSION,
+                                  [=](const QByteArray &data) -> bool
     {
-        if (!success) return;
-        qDebug() << "received language: " << (quint8)data.at(2);
-        set_keyboardLayout((quint8)data.at(2));
+        if ((quint8)data.at(1) == MP_VERSION)
+        {
+            qDebug() << "received MP version FLASH size: " << (quint8)data.at(2) << "Mb";
+            QString hw = QString(data.mid(3, (quint8)data.at(0) - 2));
+            qDebug() << "received MP version hw: " << hw;
+            set_flashMbSize((quint8)data.at(2));
+            set_hwVersion(hw);
+            return true;
+        }
+
+        return false;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, KEYBOARD_LAYOUT_PARAM),
+                                  [=](const QByteArray &data) -> bool
+    {
+        if ((quint8)data.at(1) == MP_GET_MOOLTIPASS_PARM)
+        {
+            qDebug() << "received language: " << (quint8)data.at(2);
+            set_keyboardLayout((quint8)data.at(2));
+            return true;
+        }
+
+        return false;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, LOCK_TIMEOUT_ENABLE_PARAM),
+                                  [=](const QByteArray &data) -> bool
+    {
+        if ((quint8)data.at(1) == MP_GET_MOOLTIPASS_PARM)
+        {
+            qDebug() << "received lock timeout enable: " << (quint8)data.at(2);
+            set_lockTimeoutEnabled(data.at(2) != 0);
+            return true;
+        }
+
+        return false;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, LOCK_TIMEOUT_PARAM),
+                                  [=](const QByteArray &data) -> bool
+    {
+        if ((quint8)data.at(1) == MP_GET_MOOLTIPASS_PARM)
+        {
+            qDebug() << "received lock timeout: " << (quint8)data.at(2);
+            set_lockTimeout((quint8)data.at(2));
+            return true;
+        }
+
+        return false;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, SCREENSAVER_PARAM),
+                                  [=](const QByteArray &data) -> bool
+    {
+        if ((quint8)data.at(1) == MP_GET_MOOLTIPASS_PARM)
+        {
+            qDebug() << "received screensaver: " << (quint8)data.at(2);
+            set_screensaver(data.at(2) != 0);
+            return true;
+        }
+
+        return false;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, USER_REQ_CANCEL_PARAM),
+                                  [=](const QByteArray &data) -> bool
+    {
+        if ((quint8)data.at(1) == MP_GET_MOOLTIPASS_PARM)
+        {
+            qDebug() << "received userRequestCancel: " << (quint8)data.at(2);
+            set_userRequestCancel(data.at(2) != 0);
+            return true;
+        }
+
+        return false;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, USER_INTER_TIMEOUT_PARAM),
+                                  [=](const QByteArray &data) -> bool
+    {
+        if ((quint8)data.at(1) == MP_GET_MOOLTIPASS_PARM)
+        {
+            qDebug() << "received userInteractionTimeout: " << (quint8)data.at(2);
+            set_userInteractionTimeout((quint8)data.at(2));
+            return true;
+        }
+
+        return false;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, FLASH_SCREEN_PARAM),
+                                  [=](const QByteArray &data) -> bool
+    {
+        if ((quint8)data.at(1) == MP_GET_MOOLTIPASS_PARM)
+        {
+            qDebug() << "received flashScreen: " << (quint8)data.at(2);
+            set_flashScreen(data.at(2) != 0);
+            return true;
+        }
+
+        return false;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, OFFLINE_MODE_PARAM),
+                                  [=](const QByteArray &data) -> bool
+    {
+        if ((quint8)data.at(1) == MP_GET_MOOLTIPASS_PARM)
+        {
+            qDebug() << "received offlineMode: " << (quint8)data.at(2);
+            set_offlineMode(data.at(2) != 0);
+            return true;
+        }
+
+        return false;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, TUTORIAL_BOOL_PARAM),
+                                  [=](const QByteArray &data) -> bool
+    {
+        if ((quint8)data.at(1) == MP_GET_MOOLTIPASS_PARM)
+        {
+            qDebug() << "received tutorialEnabled: " << (quint8)data.at(2);
+            set_tutorialEnabled(data.at(2) != 0);
+            return true;
+        }
+
+        return false;
+    }));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+        //data is last result
+        //all jobs finished success
+        qWarning() << "Finished loading device options";
     });
 
-    ba[0] = (char)LOCK_TIMEOUT_ENABLE_PARAM;
-    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
-        if (!success) return;
-        qDebug() << "received lock timeout enable: " << (quint8)data.at(2);
-        set_lockTimeoutEnabled(data.at(2) != 0);
+        Q_UNUSED(failedJob);
+        qWarning() << "Loading option failed";
     });
 
-    ba[0] = (char)LOCK_TIMEOUT_PARAM;
-    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
-    {
-        if (!success) return;
-        qDebug() << "received lock timeout: " << (quint8)data.at(2);
-        set_lockTimeout((quint8)data.at(2));
-    });
-
-    ba[0] = (char)SCREENSAVER_PARAM;
-    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
-    {
-        if (!success) return;
-        qDebug() << "received screensaver: " << (quint8)data.at(2);
-        set_screensaver(data.at(2) != 0);
-    });
-
-    ba[0] = (char)USER_REQ_CANCEL_PARAM;
-    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
-    {
-        if (!success) return;
-        qDebug() << "received userRequestCancel: " << (quint8)data.at(2);
-        set_userRequestCancel(data.at(2) != 0);
-    });
-
-    ba[0] = (char)USER_INTER_TIMEOUT_PARAM;
-    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
-    {
-        if (!success) return;
-        qDebug() << "received userInteractionTimeout: " << (quint8)data.at(2);
-        set_userInteractionTimeout((quint8)data.at(2));
-    });
-
-    ba[0] = (char)FLASH_SCREEN_PARAM;
-    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
-    {
-        if (!success) return;
-        qDebug() << "received flashScreen: " << (quint8)data.at(2);
-        set_flashScreen(data.at(2) != 0);
-    });
-
-    ba[0] = (char)OFFLINE_MODE_PARAM;
-    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
-    {
-        if (!success) return;
-        qDebug() << "received offlineMode: " << (quint8)data.at(2);
-        set_offlineMode(data.at(2) != 0);
-    });
-
-    ba[0] = (char)TUTORIAL_BOOL_PARAM;
-    sendData(MP_GET_MOOLTIPASS_PARM, ba, [=](bool success, const QByteArray &data)
-    {
-        if (!success) return;
-        qDebug() << "received tutorialEnabled: " << (quint8)data.at(2);
-        set_tutorialEnabled(data.at(2) != 0);
-    });
-
-    sendData(MP_VERSION, [=](bool success, const QByteArray &data)
-    {
-        if (!success) return;
-        qDebug() << "received MP version FLASH size: " << (quint8)data.at(2) << "Mb";
-        QString hw = QString(data.mid(3, (quint8)data.at(0) - 2));
-        qDebug() << "received MP version hw: " << hw;
-        set_flashMbSize((quint8)data.at(2));
-        set_hwVersion(hw);
-    });
+    jobs->start();
 }
 
 void MPDevice::commandFailed()
 {
+    //TODO: fix this to work as it should on all platforms
+    //this must be only called once when something went wrong
+    //with the current command
 //    MPCommand currentCmd = commandQueue.head();
 //    currentCmd.cb(false, QByteArray());
 //    commandQueue.dequeue();

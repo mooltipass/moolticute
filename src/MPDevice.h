@@ -23,6 +23,7 @@
 #include "Common.h"
 #include "MooltipassCmds.h"
 #include "QtHelper.h"
+#include "AsyncJobs.h"
 
 typedef std::function<void(bool success, const QByteArray &data)> MPCommandCb;
 

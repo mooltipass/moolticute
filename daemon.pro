@@ -50,7 +50,8 @@ SOURCES += src/main_daemon.cpp \
     src/Common.cpp \
     src/WSServer.cpp \
     src/WSServerCon.cpp \
-    src/AppDaemon.cpp
+    src/AppDaemon.cpp \
+    src/AsyncJobs.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -60,4 +61,5 @@ HEADERS  += \
     src/QtHelper.h \
     src/WSServer.h \
     src/WSServerCon.h \
-    src/AppDaemon.h
+    src/AppDaemon.h \
+    src/AsyncJobs.h

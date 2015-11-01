@@ -43,7 +43,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Disable this option for now, firmware does not support it
     ui->checkBoxInput->setEnabled(false);
-    ui->spinBoxInput->setEnabled(false);
 
     ui->pushButtonDevSettings->setIcon(awesome->icon(fa::wrench));
     ui->pushButtonCred->setIcon(awesome->icon(fa::key));
