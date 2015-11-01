@@ -47,7 +47,7 @@ Qt needs to be installed correctly (see you Linux distribution for that)
 ```
 mkdir build
 cd build
-qmake
+qmake ../Moolticute.pro
 make
 ```
 
