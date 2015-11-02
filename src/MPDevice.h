@@ -77,6 +77,8 @@ public:
     //reload parameters from MP
     void loadParameters();
 
+    void setCurrentDate();
+
 signals:
     /* Signal emited by platform code when new data comes from MP */
     /* A signal is used for platform code that uses a dedicated thread */

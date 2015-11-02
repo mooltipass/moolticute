@@ -39,7 +39,11 @@ MPDevice::MPDevice(QObject *parent):
                 if (s != get_status())
                 {
                     if (s == Common::Unlocked)
-                        QTimer::singleShot(10, [=]() { loadParameters(); });
+                        QTimer::singleShot(10, [=]()
+                        {
+                            setCurrentDate();
+                            loadParameters();
+                        });
                 }
                 set_status(s);
             }
@@ -410,3 +414,21 @@ void MPDevice::exitMemMgmtMode()
     });
 }
 
+void MPDevice::setCurrentDate()
+{
+    //build current date payload and send to device
+    QByteArray d;
+    d.resize(2);
+    QDate dt = QDate::currentDate();
+    d[0] = (quint8)(((dt.year() - 2010) << 1) & 0xFE);
+    if(dt.month() >= 8)
+        d[0] = (quint8)((quint8)d[0] | 0x01);
+    d[1] = (quint8)(((dt.month() % 8) << 5) & 0xE0);
+    d[1] = (quint8)((quint8)d[1] | dt.day());
+
+    qDebug() << "Sending current date: " <<
+                QString("0x%1").arg((quint8)d[0], 2, 16, QChar('0')) <<
+                QString("0x%1").arg((quint8)d[1], 2, 16, QChar('0'));
+
+    sendData(MP_SET_DATE, d);
+}
