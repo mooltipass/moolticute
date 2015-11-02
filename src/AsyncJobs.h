@@ -42,6 +42,7 @@
  */
 
 typedef std::function<bool(const QByteArray &data)> AsyncFunc;
+typedef std::function<bool(const QByteArray &data, bool &done)> AsyncFuncDone;
 
 class AsyncJob: public QObject
 {
@@ -67,7 +68,7 @@ class MPCommandJob: public AsyncJob
 public:
     MPCommandJob(MPDevice *dev, quint8 c, const QByteArray &d,
                  AsyncFunc beforefn,
-                 AsyncFunc afterfn):
+                 AsyncFuncDone afterfn):
         AsyncJob(),
         device(dev),
         cmd(c),
@@ -76,7 +77,7 @@ public:
         afterFunc(std::move(afterfn))
     {}
     MPCommandJob(MPDevice *dev, quint8 c, const QByteArray &d = QByteArray(),
-                 AsyncFunc afterfn = [](const QByteArray &) -> bool { return true; }):
+                 AsyncFuncDone afterfn = [](const QByteArray &, bool &) -> bool { return true; }):
         AsyncJob(),
         device(dev),
         cmd(c),
@@ -85,7 +86,7 @@ public:
     {}
     MPCommandJob(MPDevice *dev, quint8 c,
                  AsyncFunc beforefn,
-                 AsyncFunc afterfn):
+                 AsyncFuncDone afterfn):
         AsyncJob(),
         device(dev),
         cmd(c),
@@ -93,7 +94,7 @@ public:
         afterFunc(std::move(afterfn))
     {}
     MPCommandJob(MPDevice *dev, quint8 c,
-                 AsyncFunc afterfn = [](const QByteArray &) -> bool { return true; }):
+                 AsyncFuncDone afterfn = [](const QByteArray &, bool &) -> bool { return true; }):
         AsyncJob(),
         device(dev),
         cmd(c),
@@ -112,7 +113,7 @@ private:
     AsyncFunc beforeFunc = [](const QByteArray &) -> bool { return true; };
 
     //calback with data from this job before it finishes
-    AsyncFunc afterFunc = [](const QByteArray &) -> bool { return true; };
+    AsyncFuncDone afterFunc = [](const QByteArray &, bool &) -> bool { return true; };
 };
 
 class AsyncJobs: public QObject

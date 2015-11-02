@@ -27,13 +27,19 @@ void MPCommandJob::start(const QByteArray &previous_data)
         return;
     }
 
-    device->sendData(cmd, data, [=](bool success, const QByteArray &resdata)
+    device->sendData(cmd, data, [=](bool success, const QByteArray &resdata, bool &done_recv)
     {
         if (!success)
             emit error();
         else
         {
-            if (!afterFunc(resdata))
+            bool ret = afterFunc(resdata, done_recv);
+            if (!done_recv)
+            {
+                qDebug() << "packet not finished, continue receiving...";
+                return; //all data are not received yet. keep waiting
+            }
+            if (!ret)
                 emit error();
             else
                 emit done(resdata);
@@ -48,7 +54,6 @@ AsyncJobs::AsyncJobs(QObject *parent):
 
 AsyncJobs::~AsyncJobs()
 {
-    qDebug() << "~AsyncJobs()";
 }
 
 void AsyncJobs::append(AsyncJob *j)

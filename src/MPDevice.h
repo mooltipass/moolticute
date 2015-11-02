@@ -25,7 +25,7 @@
 #include "QtHelper.h"
 #include "AsyncJobs.h"
 
-typedef std::function<void(bool success, const QByteArray &data)> MPCommandCb;
+typedef std::function<void(bool success, const QByteArray &data, bool &done)> MPCommandCb;
 
 class MPCommand
 {
@@ -57,8 +57,8 @@ public:
     virtual ~MPDevice();
 
     /* Send a command with data to the device */
-    void sendData(unsigned char cmd, const QByteArray &data = QByteArray(), MPCommandCb cb = [](bool, const QByteArray &){});
-    void sendData(unsigned char cmd, MPCommandCb cb = [](bool, const QByteArray &){});
+    void sendData(unsigned char cmd, const QByteArray &data = QByteArray(), MPCommandCb cb = [](bool, const QByteArray &, bool &){});
+    void sendData(unsigned char cmd, MPCommandCb cb = [](bool, const QByteArray &, bool &){});
 
     void updateKeyboardLayout(int lang);
     void updateLockTimeoutEnabled(bool en);
@@ -99,11 +99,22 @@ private:
     /* Platform function for writing data, should be implemented in platform class */
     virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
 
+    void loadNode(AsyncJobs *jobs, const QByteArray &address);
+
     //timer that asks status
     QTimer *statusTimer = nullptr;
 
     //command queue
     QQueue<MPCommand> commandQueue;
+
+    //Values loaded when needed (e.g. mem mgmt mode)
+    QByteArray ctrValue;
+    QList<QByteArray> cpzCtrValue;
+    QByteArray startAddrParent;
+    QByteArray startAddrDataParent;
+    QList<QByteArray> favoritesAddrs;
+
+    QByteArray node;
 };
 
 #endif // MPDEVICE_H

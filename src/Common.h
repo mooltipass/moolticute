@@ -27,6 +27,11 @@
 #define MOOLTIPASS_USAGE_PAGE   0xFF31
 #define MOOLTIPASS_USAGE        0x74
 
+#define MOOLTIPASS_FAV_MAX       14
+#define MP_NODE_SIZE            132
+#define MP_NODE_PARENT_SIZE      66
+#define MP_NODE_CHILD_SIZE      132
+
 #define MOOLTICUTE_DAEMON_PORT  30035
 
 #define qToChar(s) s.toLocal8Bit().constData()

@@ -18,7 +18,7 @@
  ******************************************************************************/
 #include "Common.h"
 
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN_DISABLE_FOR_NOW
 #define COLOR_LIGHTRED
 #define COLOR_RED
 #define COLOR_LIGHTBLUE
@@ -96,6 +96,13 @@ static void _messageOutput(QtMsgType type, const QMessageLogContext &context, co
     case QtDebugMsg:
     {
         QString s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        printf("%s", qPrintable(s));
+        if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
+        break;
+    }
+    case QtInfoMsg:
+    {
+        QString s = QString(COLOR_GREEN "INFO" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         printf("%s", qPrintable(s));
         if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
         break;
