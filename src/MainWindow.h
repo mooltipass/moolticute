@@ -52,6 +52,10 @@ private slots:
 
     void on_pushButtonShowPass_clicked();
 
+    void on_pushButtonCredAdd_clicked();
+
+    void on_pushButtonCredEdit_clicked();
+
 private:
     Ui::MainWindow *ui;
     QtAwesome* awesome;

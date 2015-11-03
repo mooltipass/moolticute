@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+#include "DialogEdit.h"
 
 #define CSS_BLUE_BUTTON "QPushButton {" \
                             "color: #fff;" \
@@ -384,4 +385,50 @@ void MainWindow::on_pushButtonShowPass_clicked()
                             { "data", d }});
 
     setEnabled(false);
+}
+
+void MainWindow::on_pushButtonCredAdd_clicked()
+{
+    if (!wsClient->get_memMgmtMode()) return;
+
+    DialogEdit d(credModel);
+    if (d.exec())
+    {
+
+    }
+}
+
+void MainWindow::on_pushButtonCredEdit_clicked()
+{
+    if (!wsClient->get_memMgmtMode()) return;
+
+    QItemSelectionModel *selection = ui->treeViewCred->selectionModel();
+    QModelIndexList indexes = selection->selectedIndexes();
+
+    if (indexes.size() < 1)
+        return;
+
+    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
+
+    if (!idx.parent().isValid())
+        return;
+
+    DialogEdit d(credModel);
+
+    QStandardItem *pit = credModel->item(idx.parent().row());
+    d.setService(pit->text());
+
+    QStandardItem *it = pit->child(idx.row(), 1);
+    d.setLogin(it->text());
+
+    it = pit->child(idx.row(), 2);
+    d.setPassword(it->text());
+
+    it = pit->child(idx.row(), 3);
+    d.setDescription(it->text());
+
+    if (d.exec())
+    {
+
+    }
 }
