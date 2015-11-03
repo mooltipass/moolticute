@@ -171,6 +171,25 @@ void WSServerCon::sendMemMgmtMode()
 {
     sendJsonMessage({{ "msg", "memorymgmt_changed" },
                      { "data", mpdevice->get_memMgmtMode() }});
+
+    QJsonArray logins;
+    foreach (MPNode *n, mpdevice->getLoginNodes())
+    {
+        logins.append(n->toJson());
+    }
+
+    QJsonArray datas;
+    foreach (MPNode *n, mpdevice->getDataNodes())
+    {
+        datas.append(n->toJson());
+    }
+
+    QJsonObject jdata;
+    jdata["login_nodes"] = logins;
+    jdata["data_nodes"] = datas;
+
+    sendJsonMessage({{ "msg", "memorymgmt_data" },
+                     { "data", jdata }});
 }
 
 void WSServerCon::sendVersion()

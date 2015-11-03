@@ -78,7 +78,12 @@ public:
     //reload parameters from MP
     void loadParameters();
 
+    //Send current date to MP
     void setCurrentDate();
+
+    //After successfull mem mgmt mode, clients can query data
+    QList<MPNode *> &getLoginNodes() { return loginNodes; }
+    QList<MPNode *> &getDataNodes() { return dataNodes; }
 
 signals:
     /* Signal emited by platform code when new data comes from MP */
@@ -114,8 +119,6 @@ private:
     //Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
     QList<QByteArray> cpzCtrValue;
-    QByteArray startAddrParent;
-    QByteArray startAddrDataParent;
     QList<QByteArray> favoritesAddrs;
 
     QList<MPNode *> loginNodes; //list of all parent nodes for credentials

@@ -397,13 +397,13 @@ void MPDevice::startMemMgmtMode()
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if (data[0] == 1) return false;
-        startAddrParent = data.mid(2, data[0]);
+        QByteArray addr = data.mid(2, data[0]);
 
         //if parent address is not null, load nodes
-        if (startAddrParent != MPNode::EmptyAddress)
+        if (addr != MPNode::EmptyAddress)
         {
             qInfo() << "Loading parent nodes...";
-            loadLoginNode(jobs, startAddrParent);
+            loadLoginNode(jobs, addr);
         }
         else
             qInfo() << "No parent nodes to load.";
@@ -419,12 +419,12 @@ void MPDevice::startMemMgmtMode()
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if (data[0] == 1) return false;
-        startAddrDataParent = data.mid(2, data[0]);
+        QByteArray addr = data.mid(2, data[0]);
 
-        if (startAddrParent != MPNode::EmptyAddress)
+        if (addr != MPNode::EmptyAddress)
         {
             qInfo() << "Loading parent data nodes...";
-            loadDataNode(jobs, startAddrParent);
+            loadDataNode(jobs, addr);
         }
         else
             qInfo() << "No parent data nodes to load.";
@@ -589,6 +589,12 @@ void MPDevice::exitMemMgmtMode()
     if (!get_memMgmtMode()) return;
 
     ctrValue.clear();
+    cpzCtrValue.clear();
+    qDeleteAll(loginNodes);
+    loginNodes.clear();
+    qDeleteAll(dataNodes);
+    dataNodes.clear();
+    favoritesAddrs.clear();
 
     sendData(MP_END_MEMORYMGMT, [=](bool success, const QByteArray &data, bool &)
     {

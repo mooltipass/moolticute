@@ -74,6 +74,8 @@ public:
 
     static QByteArray EmptyAddress;
 
+    QJsonObject toJson();
+
 private:
     QByteArray data;
 

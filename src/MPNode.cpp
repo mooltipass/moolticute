@@ -139,3 +139,49 @@ QByteArray MPNode::getChildData()
     if (!isValid()) return QByteArray();
     return data.mid(4);
 }
+
+QJsonObject MPNode::toJson()
+{
+    QJsonObject obj;
+
+    if (getType() == NodeParent)
+    {
+        obj["service"] = getService();
+
+        QJsonArray childs;
+        foreach (MPNode *cnode, childNodes)
+        {
+            QJsonObject cobj = cnode->toJson();
+            childs.append(cobj);
+        }
+
+        obj["childs"] = childs;
+    }
+    else if (getType() == NodeParentData)
+    {
+        obj["service"] = getService();
+
+        QJsonArray childs;
+        foreach (MPNode *cnode, childDataNodes)
+        {
+            QJsonObject cobj = cnode->toJson();
+            childs.append(cobj);
+        }
+
+        obj["childs"] = childs;
+    }
+    else if (getType() == NodeChild)
+    {
+        obj["login"] = getLogin();
+        obj["description"] = getDescription();
+        obj["password_enc"] = Common::bytesToJson(getPasswordEnc());
+        obj["date_created"] = getDateCreated().toString(Qt::ISODate);
+        obj["date_last_used"] = getDateLastUsed().toString(Qt::ISODate);
+    }
+    else if (getType() == NodeChildData)
+    {
+        obj["data"] = Common::bytesToJson(getChildData());
+    }
+
+    return obj;
+}

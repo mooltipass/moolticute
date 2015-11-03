@@ -180,3 +180,11 @@ QByteArray Common::dateToBytes(const QDate &dt)
 
     return data;
 }
+
+QJsonArray Common::bytesToJson(const QByteArray &data)
+{
+    QJsonArray arr;
+    for (int i = 0;i < data.size();i++)
+        arr.append((quint8)data.at(i));
+    return arr;
+}

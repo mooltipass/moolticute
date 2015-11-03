@@ -61,6 +61,8 @@ public:
 
     static QDate bytesToDate(const QByteArray &d);
     static QByteArray dateToBytes(const QDate &dt);
+
+    static QJsonArray bytesToJson(const QByteArray &data);
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)
