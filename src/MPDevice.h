@@ -24,6 +24,7 @@
 #include "MooltipassCmds.h"
 #include "QtHelper.h"
 #include "AsyncJobs.h"
+#include "MPNode.h"
 
 typedef std::function<void(bool success, const QByteArray &data, bool &done)> MPCommandCb;
 
@@ -99,7 +100,10 @@ private:
     /* Platform function for writing data, should be implemented in platform class */
     virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
 
-    void loadNode(AsyncJobs *jobs, const QByteArray &address);
+    void loadLoginNode(AsyncJobs *jobs, const QByteArray &address);
+    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
+    void loadDataNode(AsyncJobs *jobs, const QByteArray &address);
+    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
@@ -114,7 +118,8 @@ private:
     QByteArray startAddrDataParent;
     QList<QByteArray> favoritesAddrs;
 
-    QByteArray node;
+    QList<MPNode *> loginNodes; //list of all parent nodes for credentials
+    QList<MPNode *> dataNodes; //list of all parent nodes for data nodes
 };
 
 #endif // MPDEVICE_H

@@ -389,6 +389,9 @@ void MPDevice::startMemMgmtMode()
         }));
     }
 
+    qDeleteAll(loginNodes);
+    loginNodes.clear();
+
     //Get parent node start address
     jobs->append(new MPCommandJob(this, MP_GET_STARTING_PARENT,
                                   [=](const QByteArray &data, bool &) -> bool
@@ -397,11 +400,19 @@ void MPDevice::startMemMgmtMode()
         startAddrParent = data.mid(2, data[0]);
 
         //if parent address is not null, load nodes
-        if (startAddrParent != QByteArray(2, 0))
-            loadNode(jobs, startAddrParent);
+        if (startAddrParent != MPNode::EmptyAddress)
+        {
+            qInfo() << "Loading parent nodes...";
+            loadLoginNode(jobs, startAddrParent);
+        }
+        else
+            qInfo() << "No parent nodes to load.";
 
         return true;
     }));
+
+    qDeleteAll(dataNodes);
+    dataNodes.clear();
 
     //Get parent data node start address
     jobs->append(new MPCommandJob(this, MP_GET_DN_START_PARENT,
@@ -410,8 +421,13 @@ void MPDevice::startMemMgmtMode()
         if (data[0] == 1) return false;
         startAddrDataParent = data.mid(2, data[0]);
 
-//        if (startAddrDataParent != QByteArray(2, 0))
-//            loadNodes();
+        if (startAddrParent != MPNode::EmptyAddress)
+        {
+            qInfo() << "Loading parent data nodes...";
+            loadDataNode(jobs, startAddrParent);
+        }
+        else
+            qInfo() << "No parent data nodes to load.";
 
         return true;
     }));
@@ -436,25 +452,133 @@ void MPDevice::startMemMgmtMode()
     jobs->start();
 }
 
-void MPDevice::loadNode(AsyncJobs *jobs, const QByteArray &address)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
 {
+    MPNode *pnode = new MPNode(this);
+    loginNodes.append(pnode);
+
     jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
         if ((quint8)data[0] <= 1) return false;
 
-        node.append(data.mid(2, data[0]));
+        pnode->appendData(data.mid(2, data[0]));
 
         //Continue to read data until the node is fully received
-        if (node.size() < MP_NODE_SIZE)
+        if (!pnode->isValid())
             done = false;
+        else
+        {
+            //Node is loaded
+            qDebug() << "Parent node loaded: " << pnode->getService();
+            if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
+            {
+                qDebug() << "Loading child nodes...";
+                loadLoginChildNode(jobs, pnode, pnode->getStartChildAddress());
+            }
+            else
+                qDebug() << "Parent does not have childs.";
 
-        //startAddrDataParent = data.mid(2, data[0]);
-        qDebug() << "Packet data " << " size:" << (quint8)data[0] << " data:" << data;
+            //Load next parent
+            if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
+                loadLoginNode(jobs, pnode->getNextParentAddress());
+        }
 
-//        if (startAddrDataParent != QByteArray(2, 0))
-//            loadNodes();
+        return true;
+    }));
+}
+
+void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address)
+{
+    MPNode *cnode = new MPNode(this);
+    parent->appendChild(cnode);
+
+    jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
+                                  address,
+                                  [=](const QByteArray &data, bool &done) -> bool
+    {
+        if ((quint8)data[0] <= 1) return false;
+
+        cnode->appendData(data.mid(2, data[0]));
+
+        //Continue to read data until the node is fully received
+        if (!cnode->isValid())
+            done = false;
+        else
+        {
+            //Node is loaded
+            qDebug() << "Child node loaded: " << cnode->getLogin();
+
+            //Load next child
+            if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
+                loadLoginChildNode(jobs, parent, cnode->getNextChildAddress());
+        }
+
+        return true;
+    }));
+}
+
+void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
+{
+    MPNode *pnode = new MPNode(this);
+    dataNodes.append(pnode);
+
+    jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
+                                  address,
+                                  [=](const QByteArray &data, bool &done) -> bool
+    {
+        if ((quint8)data[0] <= 1) return false;
+
+        pnode->appendData(data.mid(2, data[0]));
+
+        //Continue to read data until the node is fully received
+        if (!pnode->isValid())
+            done = false;
+        else
+        {
+            //Node is loaded
+            qDebug() << "Parent data node loaded";
+
+            //Load next parent
+            if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
+            {
+                qDebug() << "Loading data child nodes...";
+                loadDataNode(jobs, pnode->getNextParentAddress());
+            }
+            else
+                qDebug() << "Parent data node does not have childs.";
+        }
+
+        return true;
+    }));
+}
+
+void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address)
+{
+    MPNode *cnode = new MPNode(this);
+    parent->appendChildData(cnode);
+
+    jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
+                                  address,
+                                  [=](const QByteArray &data, bool &done) -> bool
+    {
+        if ((quint8)data[0] <= 1) return false;
+
+        cnode->appendData(data.mid(2, data[0]));
+
+        //Continue to read data until the node is fully received
+        if (!cnode->isValid())
+            done = false;
+        else
+        {
+            //Node is loaded
+            qDebug() << "Child data node loaded";
+
+            //Load next child
+            if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
+                loadDataChildNode(jobs, parent, cnode->getNextChildAddress());
+        }
 
         return true;
     }));
@@ -488,14 +612,7 @@ void MPDevice::exitMemMgmtMode()
 void MPDevice::setCurrentDate()
 {
     //build current date payload and send to device
-    QByteArray d;
-    d.resize(2);
-    QDate dt = QDate::currentDate();
-    d[0] = (quint8)(((dt.year() - 2010) << 1) & 0xFE);
-    if(dt.month() >= 8)
-        d[0] = (quint8)((quint8)d[0] | 0x01);
-    d[1] = (quint8)(((dt.month() % 8) << 5) & 0xE0);
-    d[1] = (quint8)((quint8)d[1] | dt.day());
+    QByteArray d = Common::dateToBytes(QDate::currentDate());
 
     qDebug() << "Sending current date: " <<
                 QString("0x%1").arg((quint8)d[0], 2, 16, QChar('0')) <<

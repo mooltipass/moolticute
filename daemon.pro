@@ -51,7 +51,8 @@ SOURCES += src/main_daemon.cpp \
     src/WSServer.cpp \
     src/WSServerCon.cpp \
     src/AppDaemon.cpp \
-    src/AsyncJobs.cpp
+    src/AsyncJobs.cpp \
+    src/MPNode.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -62,4 +63,5 @@ HEADERS  += \
     src/WSServer.h \
     src/WSServerCon.h \
     src/AppDaemon.h \
-    src/AsyncJobs.h
+    src/AsyncJobs.h \
+    src/MPNode.h

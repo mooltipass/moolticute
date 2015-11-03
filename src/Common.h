@@ -29,8 +29,6 @@
 
 #define MOOLTIPASS_FAV_MAX       14
 #define MP_NODE_SIZE            132
-#define MP_NODE_PARENT_SIZE      66
-#define MP_NODE_CHILD_SIZE      132
 
 #define MOOLTICUTE_DAEMON_PORT  30035
 
@@ -60,6 +58,9 @@ public:
     static QHash<MPStatus, QString> MPStatusUserString, MPStatusString;
 
     static Common::MPStatus statusFromString(const QString &st);
+
+    static QDate bytesToDate(const QByteArray &d);
+    static QByteArray dateToBytes(const QDate &dt);
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)
