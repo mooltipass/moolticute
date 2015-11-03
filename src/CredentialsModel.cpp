@@ -103,6 +103,7 @@ void CredentialsModel::reloadData()
         QJsonObject pnode = credentials.at(i).toObject();
 
         QStandardItem *pitem = new QStandardItem(pnode["service"].toString());
+        pitem->setData(TypeService, RoleType);
 
         QJsonArray jchilds = pnode["childs"].toArray();
         for (int j = 0;j < jchilds.size();j++)
@@ -111,13 +112,24 @@ void CredentialsModel::reloadData()
             QList<QStandardItem *> rowData;
 
             rowData << new QStandardItem();
+            rowData.last()->setData(TypeLogin, RoleType);
+
             rowData << new QStandardItem(cnode["login"].toString());
+            rowData.last()->setData(TypeLogin, RoleType);
+
             rowData << new QStandardItem("******");
+            rowData.last()->setData(TypeLogin, RoleType);
+
             rowData << new QStandardItem(cnode["description"].toString());
+            rowData.last()->setData(TypeLogin, RoleType);
+
             QDate dcrea = QDate::fromString(cnode["date_created"].toString(), Qt::ISODate);
             rowData << new QStandardItem(dcrea.toString(Qt::SystemLocaleShortDate));
+            rowData.last()->setData(TypeLogin, RoleType);
+
             QDate dlast = QDate::fromString(cnode["date_last_used"].toString(), Qt::ISODate);
             rowData << new QStandardItem(dlast.toString(Qt::SystemLocaleShortDate));
+            rowData.last()->setData(TypeLogin, RoleType);
 
             pitem->appendRow(rowData);
         }

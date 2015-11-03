@@ -167,10 +167,27 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         credModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
         ui->lineEditFilterCred->clear();
+        ui->treeViewCred->expandAll();
+        for (int i = 0;i < credModel->columnCount();i++)
+            ui->treeViewCred->resizeColumnToContents(i);
     });
     connect(ui->lineEditFilterCred, &QLineEdit::textChanged, [=](const QString &t)
     {
         credFilterModel->setFilter(t);
+    });
+    connect(wsClient, &WSClient::askPasswordDone, [=](bool success, const QString &pass)
+    {
+        setEnabled(true);
+        if (!success)
+        {
+            QMessageBox::warning(this, tr("Failure"), tr("Unable to query password!"));
+            passItem = nullptr;
+        }
+        else
+        {
+            if (passItem)
+                passItem->setText(pass);
+        }
     });
 
     //When something changed in GUI, show save/reset buttons
@@ -219,7 +236,12 @@ void MainWindow::updatePage()
     if (ui->pushButtonDevSettings->isChecked())
         ui->stackedWidget->setCurrentIndex(PAGE_SETTINGS);
     else if (ui->pushButtonCred->isChecked())
-        ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS_ENABLE);
+    {
+        if (wsClient->get_memMgmtMode())
+            ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS);
+        else
+            ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS_ENABLE);
+    }
     else if (ui->pushButtonSync->isChecked())
         ui->stackedWidget->setCurrentIndex(PAGE_SYNC);
 }
@@ -309,15 +331,51 @@ void MainWindow::memMgmtMode()
 {
     qDebug() << "MMM changed";
     if (wsClient->get_memMgmtMode())
+    {
+        ui->widgetHeader->setEnabled(false);
+        ui->pushButtonCred->setChecked(true); //force
         ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS);
+    }
     else
     {
         updatePage();
         ui->widgetHeader->setEnabled(true);
+        passItem = nullptr;
     }
 }
 
 void MainWindow::on_pushButtonExitMMM_clicked()
 {
     wsClient->sendJsonData({{ "msg", "exit_memorymgmt" }});
+}
+
+void MainWindow::on_pushButtonShowPass_clicked()
+{
+    if (!wsClient->get_memMgmtMode()) return;
+
+    QItemSelectionModel *selection = ui->treeViewCred->selectionModel();
+    QModelIndexList indexes = selection->selectedIndexes();
+
+    if (indexes.size() < 1)
+        return;
+
+    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
+
+    if (!idx.parent().isValid())
+        return;
+
+    QStandardItem *pit = credModel->item(idx.parent().row());
+    QString service = pit->text();
+
+    QStandardItem *it = pit->child(idx.row(), 1);
+    QString login = it->text();
+
+    passItem = pit->child(idx.row(), 2);
+
+    QJsonObject d = {{ "service", service },
+                     { "login", login }};
+    wsClient->sendJsonData({{ "msg", "ask_password" },
+                            { "data", d }});
+
+    setEnabled(false);
 }

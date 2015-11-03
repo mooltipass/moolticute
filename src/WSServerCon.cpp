@@ -44,6 +44,27 @@ void WSServerCon::processMessage(const QString &message)
         //send command to exit MMM
         mpdevice->exitMemMgmtMode();
     }
+    else if (root["msg"] == "ask_password")
+    {
+        QJsonObject o = root["data"].toObject();
+        mpdevice->askPassword(o["service"].toString(), o["login"].toString(),
+                [=](bool success, const QString &pass)
+        {
+            QJsonObject ores = o;
+            if (success)
+            {
+                ores["password"] = pass;
+                sendJsonMessage({{ "msg", "ask_password" },
+                                 { "data", ores } });
+            }
+            else
+            {
+                ores["failed"] = true;
+                sendJsonMessage({{ "msg", "ask_password" },
+                                 { "data", ores } });
+            }
+        });
+    }
 }
 
 void WSServerCon::resetDevice(MPDevice *dev)

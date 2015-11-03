@@ -50,6 +50,18 @@ public:
     void load(const QJsonArray &creds);
     void reloadData();
 
+    enum
+    {
+        RoleType = Qt::UserRole + 1,
+    };
+
+    enum
+    {
+        TypeService,
+        TypeLogin,
+        TypeData,
+    };
+
 private:
     QJsonArray credentials;
 };

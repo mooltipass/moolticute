@@ -626,3 +626,63 @@ void MPDevice::setCurrentDate()
 
     sendData(MP_SET_DATE, d);
 }
+
+void MPDevice::askPassword(const QString &service, const QString &login,
+                        std::function<void(bool success, const QString &pass)> cb)
+{
+    AsyncJobs *jobs = new AsyncJobs(this);
+
+    QByteArray sdata = service.toUtf8();
+    sdata.append((char)0);
+
+    jobs->append(new MPCommandJob(this, MP_CONTEXT,
+                                  sdata,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] != 1)
+        {
+            qWarning() << "Error setting context: " << (quint8)data[2];
+            return false;
+        }
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this, MP_GET_LOGIN,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] == 0 && !login.isEmpty()) return false;
+
+        QString l = data.mid(2, data[0]);
+        if (l != login)
+            return false;
+
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this, MP_GET_PASSWORD,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] == 0) return false;
+        return true;
+    }));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    {
+        //data is last result
+        //all jobs finished success
+
+        qInfo() << "Password retreived ok";
+        QString pass = data.mid(2, data[0]);
+
+        cb(true, pass);
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Failed getting password";
+        cb(false, QString());
+    });
+
+    jobs->start();
+}

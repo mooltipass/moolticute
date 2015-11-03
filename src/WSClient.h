@@ -34,6 +34,7 @@ signals:
     void wsConnected();
     void wsDisconnected();
     void memoryDataChanged();
+    void askPasswordDone(bool success, const QString &pass);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

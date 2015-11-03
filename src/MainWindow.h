@@ -50,6 +50,8 @@ private slots:
 
     void on_pushButtonExitMMM_clicked();
 
+    void on_pushButtonShowPass_clicked();
+
 private:
     Ui::MainWindow *ui;
     QtAwesome* awesome;
@@ -58,6 +60,8 @@ private:
 
     CredentialsModel *credModel;
     CredentialsFilterModel *credFilterModel;
+
+    QStandardItem *passItem = nullptr;
 
     enum
     {

@@ -46,6 +46,7 @@ void WSClient::closeWebsocket()
 void WSClient::sendJsonData(const QJsonObject &data)
 {
     QJsonDocument jdoc(data);
+//    qDebug().noquote() << jdoc.toJson();
     wsocket->sendTextMessage(jdoc.toJson());
 }
 
@@ -116,6 +117,14 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         memData = rootobj["data"].toObject();
         emit memoryDataChanged();
+    }
+    else if (rootobj["msg"] == "ask_password")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        if (o.contains("failed") && o["failed"].toBool())
+            emit askPasswordDone(false, QString());
+        else
+            emit askPasswordDone(true, o["password"].toString());
     }
 }
 
