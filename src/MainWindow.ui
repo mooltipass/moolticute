@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>780</width>
-    <height>457</height>
+    <width>819</width>
+    <height>479</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1045,6 +1045,19 @@ QWidget {background-color: #EFEFEF;}</string>
             </property>
             <property name="text">
              <string>Remove</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonCredEdit">
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Edit</string>
             </property>
            </widget>
           </item>

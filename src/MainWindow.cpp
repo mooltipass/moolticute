@@ -39,6 +39,10 @@ MainWindow::MainWindow(QWidget *parent) :
     awesome = new QtAwesome(this);
     awesome->initFontAwesome();
 
+    QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
+                                { "color-selected", QColor(Qt::white) },
+                                { "color-active", QColor(Qt::white) }};
+
     ui->setupUi(this);
 
     credModel = new CredentialsModel(this);
@@ -69,13 +73,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButtonCredDel->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonShowPass->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExitMMM->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonCredEdit->setStyleSheet(CSS_BLUE_BUTTON);
 
-    ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, {{ "color", QColor(Qt::white) }}));
-    ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, {{ "color", QColor(Qt::white) }}));
-    ui->pushButtonCredAdd->setIcon(awesome->icon(fa::plus, {{ "color", QColor(Qt::white) }}));
-    ui->pushButtonCredDel->setIcon(awesome->icon(fa::trash, {{ "color", QColor(Qt::white) }}));
-    ui->pushButtonShowPass->setIcon(awesome->icon(fa::eye, {{ "color", QColor(Qt::white) }}));
-    ui->pushButtonExitMMM->setIcon(awesome->icon(fa::signout, {{ "color", QColor(Qt::white) }}));
+    ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, whiteButtons));
+    ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, whiteButtons));
+    ui->pushButtonCredAdd->setIcon(awesome->icon(fa::plus, whiteButtons));
+    ui->pushButtonCredDel->setIcon(awesome->icon(fa::trash, whiteButtons));
+    ui->pushButtonShowPass->setIcon(awesome->icon(fa::eye, whiteButtons));
+    ui->pushButtonExitMMM->setIcon(awesome->icon(fa::signout, whiteButtons));
+    ui->pushButtonCredEdit->setIcon(awesome->icon(fa::pencilsquareo, whiteButtons));
     ui->pushButtonSettingsSave->setVisible(false);
     ui->pushButtonSettingsReset->setVisible(false);
 
