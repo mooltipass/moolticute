@@ -219,6 +219,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    wsClient->closeWebsocket();
+    event->accept();
+}
+
 void MainWindow::updatePage()
 {
     if (!wsClient->get_connected())

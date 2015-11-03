@@ -28,6 +28,8 @@ public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();
 
+    void closeWebsocket();
+
     QJsonObject &getMemoryData() { return memData; }
 
 signals:
@@ -47,7 +49,6 @@ private slots:
 
 private:
     void openWebsocket();
-    void closeWebsocket();
 
     void udateParameters(const QJsonObject &data);
 

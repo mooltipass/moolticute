@@ -57,6 +57,9 @@ private slots:
     void on_pushButtonCredEdit_clicked();
 
 private:
+
+    virtual void closeEvent(QCloseEvent *event);
+
     Ui::MainWindow *ui;
     QtAwesome* awesome;
 
