@@ -71,7 +71,7 @@ public:
 //Called when a send transfer has completed
 void _usbSendCallback(struct libusb_transfer *trf)
 {
-    qDebug() << "Send callback";
+//    qDebug() << "Send callback";
 
     // /!\ every libusb callbacks are running on the libusb thread!
     USBTransfer *t = reinterpret_cast<USBTransfer *>(trf->user_data);
@@ -105,7 +105,7 @@ void MPDevice_linux::platformWrite(const QByteArray &ba)
 
 void MPDevice_linux::usbSendCb(libusb_transfer *trf)
 {
-    qDebug() << "Send callback main thread";
+//    qDebug() << "Send callback main thread";
 
     USBTransfer *transfer = reinterpret_cast<USBTransfer *>(trf->user_data);
 
