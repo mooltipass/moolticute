@@ -58,6 +58,7 @@ void WSClient::onWsConnected()
 void WSClient::onWsDisconnected()
 {
     qDebug() << "Websocket disconnect";
+    force_connected(false);
 }
 
 void WSClient::onWsError()
@@ -107,6 +108,14 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "memorymgmt_changed")
     {
         force_memMgmtMode(rootobj["data"].toBool());
+
+        memData = QJsonObject();
+        emit memoryDataChanged();
+    }
+    else if (rootobj["msg"] == "memorymgmt_data")
+    {
+        memData = rootobj["data"].toObject();
+        emit memoryDataChanged();
     }
 }
 

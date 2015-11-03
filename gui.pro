@@ -12,13 +12,15 @@ SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \
     src/Common.cpp \
     src/WSClient.cpp \
-    src/RotateSpinner.cpp
+    src/RotateSpinner.cpp \
+    src/CredentialsModel.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
     src/QtHelper.h \
     src/WSClient.h \
-    src/RotateSpinner.h
+    src/RotateSpinner.h \
+    src/CredentialsModel.h
 
 INCLUDEPATH += src
 

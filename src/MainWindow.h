@@ -22,6 +22,7 @@
 #include <QtWidgets>
 #include "WSClient.h"
 #include <QtAwesome.h>
+#include "CredentialsModel.h"
 
 namespace Ui {
 class MainWindow;
@@ -54,6 +55,9 @@ private:
     QtAwesome* awesome;
 
     WSClient *wsClient;
+
+    CredentialsModel *credModel;
+    CredentialsFilterModel *credFilterModel;
 
     enum
     {

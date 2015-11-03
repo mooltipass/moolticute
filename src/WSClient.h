@@ -28,9 +28,12 @@ public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();
 
+    QJsonObject &getMemoryData() { return memData; }
+
 signals:
     void wsConnected();
     void wsDisconnected();
+    void memoryDataChanged();
 
 public slots:
     void sendJsonData(const QJsonObject &data);
@@ -48,6 +51,8 @@ private:
     void udateParameters(const QJsonObject &data);
 
     QWebSocket *wsocket = nullptr;
+
+    QJsonObject memData;
 };
 
 #endif // WSCLIENT_H

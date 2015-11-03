@@ -41,6 +41,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
+    credModel = new CredentialsModel(this);
+    credFilterModel = new CredentialsFilterModel(this);
+
+    credFilterModel->setSourceModel(credModel);
+    ui->treeViewCred->setModel(credFilterModel);
+
     //Disable this option for now, firmware does not support it
     ui->checkBoxInput->setEnabled(false);
 
@@ -156,6 +162,15 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
         checkSettingsChanged();
+    });
+    connect(wsClient, &WSClient::memoryDataChanged, [=]()
+    {
+        credModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
+        ui->lineEditFilterCred->clear();
+    });
+    connect(ui->lineEditFilterCred, &QLineEdit::textChanged, [=](const QString &t)
+    {
+        credFilterModel->setFilter(t);
     });
 
     //When something changed in GUI, show save/reset buttons
