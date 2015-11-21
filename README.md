@@ -21,6 +21,8 @@ It is completely cross platform, and runs on Linux (using libusb), OS X (native 
 
 ##### Windows, Linux, OSX
  - Requires Qt 5.4 or higher.
+ - Those Qt5 modules are required:
+  - qt-base, qt-widgets, qt-gui, qt-network, qt-websockets
 
 ##### Linux
  - Requires libusb
@@ -49,6 +51,18 @@ mkdir build
 cd build
 qmake ../Moolticute.pro
 make
+```
+
+Be careful to use the Qt5 qmake. You can check if you are using the correct qmake by using the command
+```
+➜  ~  qmake --version
+QMake version 3.0
+Using Qt version 5.5.1 in /usr/lib
+```
+
+On Gentoo, a wrapper is created for qmake, so this command should be used:
+```
+qmake -qt=5 ../Moolticute.pro
 ```
 
 ### Licensing
