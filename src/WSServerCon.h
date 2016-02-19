@@ -41,6 +41,8 @@ signals:
 private slots:
     void processMessage(const QString &msg);
 
+    void statusChanged();
+
     //parameters slots that sends json to websocket
     void sendKeyboardLayout();
     void sendLockTimeoutEnabled();

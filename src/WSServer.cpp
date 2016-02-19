@@ -21,7 +21,7 @@
 WSServer::WSServer(QObject *parent):
     QObject(parent)
 {
-    wsServer = new QWebSocketServer(QStringLiteral("Emcp Deploy Tool Server"),
+    wsServer = new QWebSocketServer(QStringLiteral("Moolticute Server"),
                                     QWebSocketServer::NonSecureMode,
                                     this);
 
@@ -67,11 +67,10 @@ void WSServer::socketDisconnected()
     QWebSocket *wsocket = qobject_cast<QWebSocket *>(sender());
     if (wsocket && wsClients.contains(wsocket))
     {
+        qDebug() << "Connection closed " << wsClients[wsocket];
         wsClients[wsocket]->deleteLater();
         wsClients.remove(wsocket);
     }
-
-    qDebug() << "Connection closed";
 }
 
 void WSServer::notifyClients(const QJsonObject &obj)

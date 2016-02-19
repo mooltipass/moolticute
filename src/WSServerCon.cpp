@@ -80,11 +80,8 @@ void WSServerCon::resetDevice(MPDevice *dev)
     sendJsonMessage({{ "msg", "mp_connected" }});
 
     //Whenever mp status changes, send state update to client
-    connect(mpdevice, &MPDevice::statusChanged, [=]()
-    {
-        sendJsonMessage({{ "msg", "status_changed" },
-                         { "data", Common::MPStatusString[mpdevice->get_status()] }});
-    });
+    connect(mpdevice, &MPDevice::statusChanged, this, &WSServerCon::statusChanged);
+
     connect(mpdevice, SIGNAL(keyboardLayoutChanged(int)), this, SLOT(sendKeyboardLayout()));
     connect(mpdevice, SIGNAL(lockTimeoutEnabledChanged(bool)), this, SLOT(sendLockTimeoutEnabled()));
     connect(mpdevice, SIGNAL(lockTimeoutChanged(int)), this, SLOT(sendLockTimeout()));
@@ -97,6 +94,13 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
     connect(mpdevice, SIGNAL(flashMbSizeChanged(int)), this, SLOT(sendVersion()));
     connect(mpdevice, SIGNAL(hwVersionChanged(QString)), this, SLOT(sendVersion()));
+}
+
+void WSServerCon::statusChanged()
+{
+    qDebug() << "Update client status changed: " << this;
+    sendJsonMessage({{ "msg", "status_changed" },
+                     { "data", Common::MPStatusString[mpdevice->get_status()] }});
 }
 
 void WSServerCon::sendInitialStatus()
