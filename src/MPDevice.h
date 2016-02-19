@@ -82,7 +82,8 @@ public:
     void setCurrentDate();
 
     //Ask a password for specified service/login to MP
-    void askPassword(const QString &service, const QString &login, std::function<void(bool success, const QString &pass)> cb);
+    void askPassword(const QString &service, const QString &login,
+                     std::function<void(bool success, const QString &login, const QString &pass)> cb);
 
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }

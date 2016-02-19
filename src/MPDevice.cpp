@@ -628,7 +628,7 @@ void MPDevice::setCurrentDate()
 }
 
 void MPDevice::askPassword(const QString &service, const QString &login,
-                        std::function<void(bool success, const QString &pass)> cb)
+                        std::function<void(bool success, const QString &login, const QString &pass)> cb)
 {
     AsyncJobs *jobs = new AsyncJobs(this);
 
@@ -653,8 +653,10 @@ void MPDevice::askPassword(const QString &service, const QString &login,
         if (data[2] == 0 && !login.isEmpty()) return false;
 
         QString l = data.mid(2, data[0]);
-        if (l != login)
+        if (!login.isEmpty() && l != login)
             return false;
+
+        jobs->user_data = l;
 
         return true;
     }));
@@ -674,14 +676,14 @@ void MPDevice::askPassword(const QString &service, const QString &login,
         qInfo() << "Password retreived ok";
         QString pass = data.mid(2, data[0]);
 
-        cb(true, pass);
+        cb(true, jobs->user_data.toString(), pass);
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Failed getting password";
-        cb(false, QString());
+        cb(false, QString(), QString());
     });
 
     jobs->start();

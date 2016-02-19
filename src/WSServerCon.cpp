@@ -48,11 +48,12 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
         mpdevice->askPassword(o["service"].toString(), o["login"].toString(),
-                [=](bool success, const QString &pass)
+                [=](bool success, const QString &login, const QString &pass)
         {
             QJsonObject ores = o;
             if (success)
             {
+                ores["login"] = login;
                 ores["password"] = pass;
                 sendJsonMessage({{ "msg", "ask_password" },
                                  { "data", ores } });

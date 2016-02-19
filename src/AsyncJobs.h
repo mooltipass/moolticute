@@ -20,6 +20,7 @@
 #define ASYNCJOBS_H
 
 #include <QObject>
+#include <QVariant>
 #include <QByteArray>
 #include <QQueue>
 #include <functional>
@@ -124,6 +125,9 @@ public:
     virtual ~AsyncJobs();
 
     void append(AsyncJob *j);
+
+    //user data attached to this job queue
+    QVariant user_data;
 
 public slots:
     void start();
