@@ -51,18 +51,19 @@ void WSServerCon::processMessage(const QString &message)
                 [=](bool success, const QString &login, const QString &pass)
         {
             QJsonObject ores = o;
+            QJsonObject oroot = root;
             if (success)
             {
                 ores["login"] = login;
                 ores["password"] = pass;
-                sendJsonMessage({{ "msg", "ask_password" },
-                                 { "data", ores } });
+                oroot["data"] = ores;
+                sendJsonMessage(oroot);
             }
             else
             {
                 ores["failed"] = true;
-                sendJsonMessage({{ "msg", "ask_password" },
-                                 { "data", ores } });
+                oroot["data"] = ores;
+                sendJsonMessage(oroot);
             }
         });
     }
