@@ -50,23 +50,46 @@ void WSServerCon::processMessage(const QString &message)
         mpdevice->askPassword(o["service"].toString(), o["login"].toString(),
                 [=](bool success, const QString &login, const QString &pass)
         {
+            if (!success)
+            {
+                sendFailedJson(root);
+                return;
+            }
+
             QJsonObject ores = o;
             QJsonObject oroot = root;
-            if (success)
-            {
-                ores["login"] = login;
-                ores["password"] = pass;
-                oroot["data"] = ores;
-                sendJsonMessage(oroot);
-            }
-            else
-            {
-                ores["failed"] = true;
-                oroot["data"] = ores;
-                sendJsonMessage(oroot);
-            }
+            ores["login"] = login;
+            ores["password"] = pass;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "get_random_numbers")
+    {
+        mpdevice->getRandomNumber([=](bool success, const QByteArray &rndNums)
+        {
+            if (!success)
+            {
+                sendFailedJson(root);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            QJsonArray arr;
+            for (int i = 0;i < rndNums.size();i++)
+                arr.append((quint8)rndNums.at(i));
+            oroot["data"] = arr;
+            sendJsonMessage(oroot);
+        });
+    }
+}
+
+void WSServerCon::sendFailedJson(QJsonObject obj)
+{
+    QJsonObject odata;
+    odata["failed"] = true;
+    obj["data"] = odata;
+    sendJsonMessage(obj);
 }
 
 void WSServerCon::resetDevice(MPDevice *dev)

@@ -85,6 +85,9 @@ public:
     void askPassword(const QString &service, const QString &login,
                      std::function<void(bool success, const QString &login, const QString &pass)> cb);
 
+    //get 32 random bytes from device
+    void getRandomNumber(std::function<void(bool success, const QByteArray &nums)> cb);
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }

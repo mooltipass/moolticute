@@ -688,3 +688,28 @@ void MPDevice::askPassword(const QString &service, const QString &login,
 
     jobs->start();
 }
+
+void MPDevice::getRandomNumber(std::function<void(bool success, const QByteArray &nums)> cb)
+{
+    AsyncJobs *jobs = new AsyncJobs(this);
+
+    jobs->append(new MPCommandJob(this, MP_GET_RANDOM_NUMBER, QByteArray()));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    {
+        //data is last result
+        //all jobs finished success
+
+        qInfo() << "Random numbers generated ok";
+        cb(true, data);
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Failed getting password";
+        cb(false, QByteArray());
+    });
+
+    jobs->start();
+}
