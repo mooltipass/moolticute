@@ -27,6 +27,11 @@ It is completely cross platform, and runs on Linux (using libusb), OS X (native 
 ##### Linux
  - Requires libusb
 
+##### Ubuntu 16.04
+```bash
+sudo apt-get install libqt5websockets5-dev libusb-dev libusb-1.0-0-dev qt-sdk qt5-qmake qt5-default
+```
+
 ### How to build
 
 For now, no binary releases are out yet. You will need to build the software by following the next step.
