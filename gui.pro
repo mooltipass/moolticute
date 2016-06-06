@@ -6,7 +6,7 @@ TARGET = MoolticuteApp
 
 CONFIG += c++11
 
-include(src/QtAwesome/QtAwesome.pri)
+include(src/QtAwesome/QtAwesome/QtAwesome.pri)
 
 SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \
