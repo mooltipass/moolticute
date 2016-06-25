@@ -26,10 +26,20 @@ It is completely cross platform, and runs on Linux (using libusb), OS X (native 
 
 ##### Linux
  - Requires libusb
+ - Requires a [udev rule for libusb](https://www.themooltipass.com/udev_rule.txt)
 
 ##### Ubuntu 16.04
 ```bash
 sudo apt-get install libqt5websockets5-dev libusb-dev libusb-1.0-0-dev qt-sdk qt5-qmake qt5-default
+echo "ATTRS{idVendor}==\"16d0\", ATTRS{idProduct}==\"09a0\", SYMLINK+=\"mooltipass\", MODE=\"0664\", GROUP=\"plugdev\"" | sudo tee /etc/udev/rules.d/50-mooltipass.rules
+sudo udevadm control --reload-rules
+```
+
+##### Arch Linux
+```bash
+sudo pacman -S --needed qt5-websockets libusb qt5-base
+echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
+sudo udevadm control --reload-rules
 ```
 
 ### How to build
