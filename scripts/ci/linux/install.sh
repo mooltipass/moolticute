@@ -9,4 +9,5 @@ unset `env | \
        cut -d '=' -f1 | tr '\n' ' '`
 
 export PATH=$(pwd)/mxe/usr/bin:$PATH
+export MXE_BASE=$(pwd)/mxe
 
