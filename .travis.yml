@@ -13,5 +13,5 @@ deploy:
   user: raoulh
   key:
     secure: OaxsIAntMIjA2GywdCabPMfUL6KvmaZeHM/LFmnRWFh7gx7sfeSzO8ES+98UM9YB6xJaihb47BCZ5qPKDGJ6yj66X98S5V1JTVDFMNV7cL8GwrOLkNJ/Fa+GFZs6wjNUzWTaurHtwKsi0HLw07Cx+MI7CdMHd/qFmMshU3phAIknzplvCz+cfKAijmpzucxcFbttUVmL7zbt8/G9i/iESn1t62E/gP0Wzgo00Gu8XytgYzLGR8J/j82OSUfzxWKu6a2eVEC0J/Rsu8grNM14AS8kqfhEwidRqmjZskUkIbdhHsARBeboRitdqNzWs+ATvV5jcvnw/Aj7UdqPY6qB2AMLk4eT+j5tNDgHt1QRPw6PKYRV/mg0z3tlFarbhz/y07DEmT7ZvJLMje2/yg3seQXLG1AMO20O9qL/50/D8bMabkW4XQf/6xVtLjFSgMBAuunpcDwU7kPpgbRDf7eWc0gA1e6psDLHbhs44EQTd0JtSFxSPeuiI04GnmhbM7EV3AcyBfynYbcuEu5IfJqvElidGbCfqOmzEB5ArMlpo4e38MkamCe9NpVx39a71L/zIEowzv/nGNTWGQcGzejScnjBzM05mVESeRqWE83yrgyIGkKMw1gonmSynAbEJZnQ05wmObHsOJxPWVElgrsWCv/fL8vDOpU+oLY1KK8S450=
-  dry-run: true
-  on: master
+  on:
+    branch: master
