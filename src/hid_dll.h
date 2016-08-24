@@ -24,6 +24,7 @@
  */
 
 #include <windows.h>
+#include <hidsdi.h>
 #include <hidpi.h>
 
 typedef BOOLEAN (__stdcall *_HidD_GetAttributes)(HANDLE device, PHIDD_ATTRIBUTES attrib);
@@ -32,4 +33,3 @@ typedef BOOLEAN (__stdcall *_HidD_GetPreparsedData)(HANDLE handle, PHIDP_PREPARS
 typedef BOOLEAN (__stdcall *_HidD_FreePreparsedData)(PHIDP_PREPARSED_DATA preparsed_data);
 
 #endif // HID_DLL_H
-

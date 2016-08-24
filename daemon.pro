@@ -13,7 +13,7 @@ CONFIG -= app_bundle
 CONFIG += c++11
 
 win32 {
-    LIBS += -lSetupApi
+    LIBS += -lsetupapi
 } else:linux {
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
