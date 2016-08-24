@@ -37,5 +37,3 @@ done
 
 mv $HOME/$FILENAME.zip .
 
-sed -i "s/{VERSION}/$VERSION/g" scripts/ci/bintray.conf
-sed -i "s/{VERS_DATE}/$(date +%Y-%d-%m)/g" scripts/ci/bintray.conf
