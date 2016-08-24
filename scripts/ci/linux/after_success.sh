@@ -9,7 +9,8 @@ WDIR=$HOME/Moolticute_win32
 
 VERSION="$(get_version .)"
 
-FILENAME=Moolticute_win32_$VERSION
+#FILENAME=Moolticute_win32_$VERSION
+FILENAME=Moolticute_win32
 
 mkdir -p $WDIR
 
