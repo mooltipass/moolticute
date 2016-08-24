@@ -18,10 +18,16 @@
  ******************************************************************************/
 #include "Common.h"
 #include "AppDaemon.h"
+#include "version.h"
 
 int main(int argc, char **argv)
 {
     Common::installMessageOutputHandler();
+
+    qDebug() << "Moolticute Daemon version: " << APP_VERSION;
+    qDebug() << "(c) 2016 Raoul Hecky";
+    qDebug() << "https://github.com/raoulh/moolticute";
+    qDebug() << "------------------------------------";
 
     AppDaemon app(argc, argv);
 

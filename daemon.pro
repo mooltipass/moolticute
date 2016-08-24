@@ -64,4 +64,5 @@ HEADERS  += \
     src/WSServerCon.h \
     src/AppDaemon.h \
     src/AsyncJobs.h \
-    src/MPNode.h
+    src/MPNode.h \
+    src/version.h

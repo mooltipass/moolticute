@@ -22,7 +22,8 @@ HEADERS  += src/MainWindow.h \
     src/WSClient.h \
     src/RotateSpinner.h \
     src/CredentialsModel.h \
-    src/DialogEdit.h
+    src/DialogEdit.h \
+    src/version.h
 
 INCLUDEPATH += src
 

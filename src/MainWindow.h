@@ -47,13 +47,9 @@ private slots:
     void on_pushButtonSettingsReset_clicked();
     void on_pushButtonSettingsSave_clicked();
     void on_pushButtonMemMode_clicked();
-
     void on_pushButtonExitMMM_clicked();
-
     void on_pushButtonShowPass_clicked();
-
     void on_pushButtonCredAdd_clicked();
-
     void on_pushButtonCredEdit_clicked();
 
 private:
@@ -80,6 +76,7 @@ private:
         PAGE_LOCKED = 5,
         PAGE_CREDENTIALS = 6,
         PAGE_WAIT_CONFIRM = 7,
+        PAGE_ABOUT = 8,
     };
 };
 

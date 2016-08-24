@@ -21,6 +21,8 @@
 AppDaemon::AppDaemon(int & argc, char ** argv):
     QApplication(argc, argv)
 {
+
+
     //Install and start mp manager instance
     MPManager::Instance();
 

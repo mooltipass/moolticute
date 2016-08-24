@@ -19,6 +19,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "DialogEdit.h"
+#include "version.h"
 
 #define CSS_BLUE_BUTTON "QPushButton {" \
                             "color: #fff;" \
@@ -45,6 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
                                 { "color-active", QColor(Qt::white) }};
 
     ui->setupUi(this);
+
+    ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
 
     credModel = new CredentialsModel(this);
     credFilterModel = new CredentialsFilterModel(this);
@@ -89,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonSync, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonAbout, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
 
     ui->pushButtonDevSettings->setChecked(false);
     ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
@@ -227,6 +231,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::updatePage()
 {
+    if (ui->pushButtonAbout->isChecked())
+    {
+        ui->stackedWidget->setCurrentIndex(PAGE_ABOUT);
+        return;
+    }
+
     if (!wsClient->get_connected())
     {
         ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
