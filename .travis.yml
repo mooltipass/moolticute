@@ -2,8 +2,13 @@ sudo: required
 dist: trusty
 os:
 - linux
+- osx
 language: cpp
-before_install: ". scripts/ci/$TRAVIS_OS_NAME/before_install.sh"
+before_install:
+- openssl aes-256-cbc -K $encrypted_7917762619ed_key -iv $encrypted_7917762619ed_iv
+  -in scripts/ci/osx/developerID_application.cer.enc -out scripts/ci/osx/developerID_application.cer
+  -d
+- ". scripts/ci/$TRAVIS_OS_NAME/before_install.sh"
 install: ". scripts/ci/$TRAVIS_OS_NAME/install.sh"
 script: ". scripts/ci/$TRAVIS_OS_NAME/script.sh"
 after_success: ". scripts/ci/$TRAVIS_OS_NAME/after_success.sh"
@@ -12,9 +17,8 @@ deploy:
   file: Moolticute_win32.zip
   prerelease: true
   api_key:
-    secure: "WiTbLswO2xD0axqieYJlOI+qdfOnWrnmo0a7pDNf7CXX/y6nKmiBXlqRskZU+rAAfobCg8WNPq8NaC1g3q+bKvqqX7IP4FospwHZUzRZnE9VU/bxfFt7RgDkY1AhXz1+/7EroZfUapvnDt/++hUAavqzB8G7NvwZQuKCJOpeUffydiEna1X5XnMcwA0wOIM5Ux/917O00PSnwCwycU/kdktPZv6PBkVwTvf3w9tvOoRQxh/xSzqa4bRC04hepeuTbcQQSVcqGEOHV+QmpXOqMJu+d/T/NYto4L/OzbeR5CExYolEggVyllLn1TkaiyiWFJU+ae9RXx9kiTIFdh2aSHaObO7lJRLCGdr3yelytEhBfd8k/VxLK9Vrhc3chdpatj/XIwj0QCpBErUqrcNBYBgnLs//R8o8itvMrRmqcxRu317WxxvfKE3Os7oAmJJYF+giEkYmUd9dx/MyLS40j0px6S57cboxC1z2nZ2Gzl+UdI3ofsgsjWuwVW/yFaiDW7HKKImYZ4AP8/qi5ipd9SwUOAq9K3qNqm0vhWE4qwKZpfjy09tOTqbOf7gqSpd+/shH9sC+kAOYVcvQErPmsYEBMSm/M8LuWFqIaj3kLc3XZJWbHyz61Whv0OnueIhQ5yhmVfcXLEKNIgZzW9tQFkEry+O6J0hbp4C6ufICiAo="
+    secure: WiTbLswO2xD0axqieYJlOI+qdfOnWrnmo0a7pDNf7CXX/y6nKmiBXlqRskZU+rAAfobCg8WNPq8NaC1g3q+bKvqqX7IP4FospwHZUzRZnE9VU/bxfFt7RgDkY1AhXz1+/7EroZfUapvnDt/++hUAavqzB8G7NvwZQuKCJOpeUffydiEna1X5XnMcwA0wOIM5Ux/917O00PSnwCwycU/kdktPZv6PBkVwTvf3w9tvOoRQxh/xSzqa4bRC04hepeuTbcQQSVcqGEOHV+QmpXOqMJu+d/T/NYto4L/OzbeR5CExYolEggVyllLn1TkaiyiWFJU+ae9RXx9kiTIFdh2aSHaObO7lJRLCGdr3yelytEhBfd8k/VxLK9Vrhc3chdpatj/XIwj0QCpBErUqrcNBYBgnLs//R8o8itvMrRmqcxRu317WxxvfKE3Os7oAmJJYF+giEkYmUd9dx/MyLS40j0px6S57cboxC1z2nZ2Gzl+UdI3ofsgsjWuwVW/yFaiDW7HKKImYZ4AP8/qi5ipd9SwUOAq9K3qNqm0vhWE4qwKZpfjy09tOTqbOf7gqSpd+/shH9sC+kAOYVcvQErPmsYEBMSm/M8LuWFqIaj3kLc3XZJWbHyz61Whv0OnueIhQ5yhmVfcXLEKNIgZzW9tQFkEry+O6J0hbp4C6ufICiAo=
   skip_cleanup: true
   on:
     tags: true
     all_branches: true
-
