@@ -1,4 +1,4 @@
-#ifndef VERSION__H
-#define VERSION__H
-#define APP_VERSION "0.2-2-g61ad4e5"
-#endif
+#ifndef VERSION_H
+#define VERSION_H
+#define APP_VERSION "git"
+#endif // VERSION_H
