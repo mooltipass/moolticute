@@ -3,6 +3,8 @@ Moolticute
 
 [![License](https://img.shields.io/badge/license-GPLv3%2B-blue.svg)](http://www.gnu.org/licenses/gpl.html)
 
+https://travis-ci.org/naguirre/moolticute.svg?branch=master
+
 This project aims to be an easy companion to your [Mooltipass](http://www.themooltipass.com) device and extend
 the power of the device to more platform/tools.
 With it you can manage your Mooltipass with a crossplatform app, as well as provide a daemon service that
