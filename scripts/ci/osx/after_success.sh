@@ -22,7 +22,7 @@ sed -i -e 's/com.yourcompany.Moolticute/com.Mooltipass.Moolticute/g' build/$APP.
 rm -f build/$APP.app/Contents/Info.plist-e
 
 # copy translation files to app
-cp languages/*.qm build/$APP.app/Contents/Resources
+# cp languages/*.qm build/$APP.app/Contents/Resources
 
 echo "Adding keys"
 # add the keys for OSX code signing
