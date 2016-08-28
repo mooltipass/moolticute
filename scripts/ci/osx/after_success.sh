@@ -16,6 +16,8 @@ if [ "$NAME" != "Darwin" ]; then
     exit 1
 fi
 
+cat build/$APP.app/Contents/Info.plist
+
 echo "Changing bundle identifier"
 sed -i -e 's/com.yourcompany.Moolticute/com.Mooltipass.Moolticute/g' build/$APP.app/Contents/Info.plist
 # removing backup plist
@@ -28,10 +30,12 @@ echo "Adding keys"
 # add the keys for OSX code signing
 security create-keychain -p travis osx-build.keychain
 #security import ../travis/osx/apple.cer -k ~/Library/Keychains/osx-build.keychain -T /usr/bin/codesign
-security import scripts/ci/osx/developerID_application.cer -k ~/Library/Keychains/osx-build.keychain -T /usr/bin/codesign
+security import scripts/ci/osx/developerID_application.cer -k osx-build.keychain -T /usr/bin/codesign
 #security import ../travis/osx/dist.p12 -k ~/Library/Keychains/osx-build.keychain -P $KEY_PASSWORD -T /usr/bin/codesign
 security default-keychain -s osx-build.keychain
 security unlock-keychain -p travis osx-build.keychain
+
+security find-identity -v
 
 # use macdeployqt to deploy the application
 #echo "Calling macdeployqt and code signing application"
@@ -48,7 +52,10 @@ fi
 #echo "Sign the code"
 ##This signs the code
 echo "Sign Code with $SIGNATURE"
-codesign --force --verify --verbose --sign "Developer ID Application: $SIGNATURE" build/$APP.app
+
+codesign --force --verbose --sign "Developer ID Application: Raoul Hecky" build/$APP.app/Contents/Frameworks/*
+find build/$APP.app/Contents/plugins -name "*dylib" --exec codesign codesign --force --verbose --sign "Developer ID Application: $SIGNATURE" {} \;
+codesign --force --verbose --sign "Developer ID Application: $SIGNATURE" build/$APP.app
 #codesign -s "$SIGNATURE" -f build/$APP.app
 if [ "$?" -ne "0" ]; then
     echo "Failed to sign app bundle"
