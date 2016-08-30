@@ -28,6 +28,7 @@
 #elif defined(Q_OS_LINUX)
 #include "MPDevice_linux.h"
 #endif
+#include "MPDevice_emul.h"
 
 class MPManager: public QObject
 {

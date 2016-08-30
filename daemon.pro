@@ -49,10 +49,11 @@ SOURCES += src/main_daemon.cpp \
     src/MPManager.cpp \
     src/Common.cpp \
     src/WSServer.cpp \
-    src/WSServerCon.cpp \
     src/AppDaemon.cpp \
     src/AsyncJobs.cpp \
-    src/MPNode.cpp
+    src/MPNode.cpp \
+    src/WSServerCon.cpp \
+    src/MPDevice_emul.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -61,8 +62,9 @@ HEADERS  += \
     src/MooltipassCmds.h \
     src/QtHelper.h \
     src/WSServer.h \
-    src/WSServerCon.h \
     src/AppDaemon.h \
     src/AsyncJobs.h \
     src/MPNode.h \
-    src/version.h
+    src/version.h \
+    src/WSServerCon.h \
+    src/MPDevice_emul.h

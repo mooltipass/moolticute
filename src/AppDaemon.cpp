@@ -18,10 +18,22 @@
  ******************************************************************************/
 #include "AppDaemon.h"
 
+bool g_bEmulationMode = false;
+
 AppDaemon::AppDaemon(int & argc, char ** argv):
     QApplication(argc, argv)
 {
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Moolticute Daemon");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
+
+    QCommandLineOption emulationMode(QStringList() << "e" << "emulation",
+               QCoreApplication::translate("main", "Activate emulation mode, all Websocket API function return emulated string, usefull if you want to try the API."));
+    parser.addOption(emulationMode);
+    parser.process(QApplication::arguments());
+    g_bEmulationMode = parser.isSet(emulationMode);
 
     //Install and start mp manager instance
     MPManager::Instance();

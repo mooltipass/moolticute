@@ -27,6 +27,8 @@
 #include "MPManager.h"
 #include "WSServer.h"
 
+extern bool g_bEmulationMode;
+
 class AppDaemon: public QApplication
 {
     Q_OBJECT
