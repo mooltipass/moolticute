@@ -11,6 +11,9 @@ private:
     virtual void platformRead();
     virtual void platformWrite(const QByteArray &data);
     QHash<quint8, quint8> mooltipassParam;
+    QHash<QString, QString> passwords;
+    QHash<QString, QString> logins;
+    QString context;
 };
 
 #endif // MPDEVICE_EMUL_H
