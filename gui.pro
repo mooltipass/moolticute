@@ -36,3 +36,5 @@ RESOURCES += \
 win32 {
     RC_FILE = win/windows_res.rc
 }
+
+ICON = img/AppIcon_128.icns
