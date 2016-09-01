@@ -17,6 +17,7 @@
  **
  ******************************************************************************/
 #include "WSServer.h"
+#include "WSServerCon.h"
 
 WSServer::WSServer(QObject *parent):
     QObject(parent)
@@ -27,7 +28,7 @@ WSServer::WSServer(QObject *parent):
 
     if (wsServer->listen(QHostAddress::Any, MOOLTICUTE_DAEMON_PORT))
     {
-        qDebug() << "Todo server listening on port " << MOOLTICUTE_DAEMON_PORT;
+        qDebug() << "Moolticute daemon websocket server listening on port " << MOOLTICUTE_DAEMON_PORT;
         connect(wsServer, &QWebSocketServer::newConnection, this, &WSServer::onNewConnection);
     }
     else
@@ -57,6 +58,7 @@ void WSServer::onNewConnection()
     WSServerCon *c = new WSServerCon(wsocket);
     c->resetDevice(device);
     c->sendInitialStatus();
+
     wsClients[wsocket] = c;
 
     qDebug() << "New connection";

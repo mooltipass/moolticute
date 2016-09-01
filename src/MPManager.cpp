@@ -17,6 +17,7 @@
  **
  ******************************************************************************/
 #include "MPManager.h"
+#include "AppDaemon.h"
 
 #if defined(Q_OS_WIN)
 #include "UsbMonitor_win.h"
@@ -47,6 +48,8 @@ MPManager::MPManager():
     //This is not needed on osx, the list is updated at startup by UsbMonitor
     checkUsbDevices();
 #endif
+    if (g_bEmulationMode)
+        checkUsbDevices();
 }
 
 MPManager::~MPManager()
@@ -110,7 +113,7 @@ void MPManager::checkUsbDevices()
     devlist = MPDevice_linux::enumerateDevices();
 #endif
 
-    if (devlist.isEmpty())
+    if (devlist.isEmpty() && !g_bEmulationMode)
     {
         //No USB devices found, means all MPs are gone disconnected
         auto it = devices.begin();
@@ -124,28 +127,39 @@ void MPManager::checkUsbDevices()
         return;
     }
 
-    foreach (const MPPlatformDef &def, devlist)
-    {
-        //This is a new connected mooltipass
-        if (!devices.contains(def.id))
-        {
-            MPDevice *device;
 
-            //Create our platform device object
+    if (g_bEmulationMode)
+    {
+        MPDevice *device;
+        device = new MPDevice_emul(this);
+        detectedDevs.append("EMULDEVICE_ID");
+        devices["EMULDEVICE_ID"] = device;
+        emit mpConnected(device);
+    }
+    else
+    {
+        foreach (const MPPlatformDef &def, devlist)
+        {
+            //This is a new connected mooltipass
+            if (!devices.contains(def.id))
+            {
+                MPDevice *device;
+
+                //Create our platform device object
 #if defined(Q_OS_WIN)
-            device = new MPDevice_win(this, def);
+                device = new MPDevice_win(this, def);
 #elif defined(Q_OS_MAC)
-            device = new MPDevice_mac(this, def);
+                device = new MPDevice_mac(this, def);
 #elif defined(Q_OS_LINUX)
-            device = new MPDevice_linux(this, def);
+                device = new MPDevice_linux(this, def);
 #endif
 
-            devices[def.id] = device;
-            emit mpConnected(device);
+                devices[def.id] = device;
+                emit mpConnected(device);
+            }
+            detectedDevs.append(def.id);
         }
-        detectedDevs.append(def.id);
     }
-
     //Clear disconnected devices
     auto it = devices.begin();
     while (it != devices.end())
