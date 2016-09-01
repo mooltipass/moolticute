@@ -7,7 +7,7 @@ function get_version()
 {
     repo=$1
     pushd $repo > /dev/null
-    git describe --long --tags --always
+    git describe --tags --abbrev=0 master
     popd > /dev/null
 }
 
