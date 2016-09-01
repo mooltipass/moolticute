@@ -53,7 +53,10 @@ SOURCES += src/main_daemon.cpp \
     src/AsyncJobs.cpp \
     src/MPNode.cpp \
     src/WSServerCon.cpp \
-    src/MPDevice_emul.cpp
+    src/MPDevice_emul.cpp \
+    src/http-parser/http_parser.c \
+    src/HttpClient.cpp \
+    src/HttpServer.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -67,4 +70,14 @@ HEADERS  += \
     src/MPNode.h \
     src/version.h \
     src/WSServerCon.h \
-    src/MPDevice_emul.h
+    src/MPDevice_emul.h \
+    src/http-parser/http_parser.h \
+    src/HttpClient.h \
+    src/HttpServer.h
+
+DISTFILES += \
+    src/http-parser/CONTRIBUTIONS \
+    src/http-parser/http_parser.gyp \
+    src/http-parser/LICENSE-MIT \
+    src/http-parser/AUTHORS \
+    src/http-parser/README.md

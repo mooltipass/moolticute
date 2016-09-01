@@ -26,6 +26,7 @@
 #include "Common.h"
 #include "MPManager.h"
 #include "WSServer.h"
+#include "HttpServer.h"
 
 extern bool g_bEmulationMode;
 
@@ -38,6 +39,8 @@ public:
 
 private:
     WSServer *wsServer;
+    HttpServer *httpServer = nullptr;
+
 };
 
 #endif // APPDAEMON_H
