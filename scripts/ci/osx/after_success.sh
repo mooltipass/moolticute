@@ -143,7 +143,7 @@ if [ "$?" -ne "0" ]; then
     exit 1
 fi
 
-upload_file $APP-$VERSION.dmg $(shasum -a 256 $APP-$VERSION.dmg | cut -d' ' -f1) "macos"
+upload_file build/$APP-$VERSION.dmg $(shasum -a 256 build/$APP-$VERSION.dmg | cut -d' ' -f1) "macos"
 
 exit 0
 
