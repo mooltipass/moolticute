@@ -11,7 +11,7 @@ source $SCRIPTDIR/../funcs.sh
 
 VERSION="$(get_version .)"
 
-if [ "git rev-list -n 1 $VERSION" != "git rev-list -n 1 master"  ]; then
+if [ "$(git rev-list -n 1 $VERSION)" != "$(git rev-list -n 1 master)"  ]; then
     echo "Not uploading package"
     return 0
 fi

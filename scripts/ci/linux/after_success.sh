@@ -15,7 +15,7 @@ echo "git rev-list -n 1 $VERSION = $(git rev-list -n 1 $VERSION)"
 echo "git rev-list -n 1 master = $(git rev-list -n 1 master)"
 echo "TRAVIS_TAG = $TRAVIS_TAG"
 
-if [ "git rev-list -n 1 $VERSION" != "git rev-list -n 1 master"  ]; then
+if [ "$(git rev-list -n 1 $VERSION)" != "$(git rev-list -n 1 master)"  ]; then
     echo "Not uploading package"
     return 0
 fi
