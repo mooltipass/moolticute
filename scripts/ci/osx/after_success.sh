@@ -1,10 +1,18 @@
 #!/bin/bash
 
+set -ev
+
 #
 # creating the Moolticute.dmg with Applications link
 #
 
-if [ -z "$TRAVIS_TAG"  ] ; then
+SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source $SCRIPTDIR/../funcs.sh
+
+VERSION="$(get_version .)"
+
+if [ "git rev-list -n 1 $VERSION" != "git rev-list -n 1 master"  ]; then
+    echo "Not uploading package"
     return 0
 fi
 
@@ -120,8 +128,8 @@ echo "Verifying code signed disk image"
 #codesign --verify --verbose=4 build/$APP.dmg
 #spctl --assess --verbose=4 --raw build/$APP.dmg
 
-echo "moving $APP.dmg to $APP-$VERSION_NUMBER.dmg"
-mv build/$APP.dmg build/$APP-$VERSION_NUMBER.dmg
+echo "moving $APP.dmg to $APP-$VERSION.dmg"
+mv build/$APP.dmg build/$APP-$VERSION.dmg
 
 echo "Removing keys"
 # remove keys
@@ -134,7 +142,7 @@ if [ "$?" -ne "0" ]; then
     exit 1
 fi
 
-upload_file $APP-$VERSION_NUMBER.dmg $(sha256sum $APP-$VERSION_NUMBER.dmg | cut -d' ' -f1) "macos"
+upload_file $APP-$VERSION.dmg $(sha256sum $APP-$VERSION.dmg | cut -d' ' -f1) "macos"
 
 exit 0
 

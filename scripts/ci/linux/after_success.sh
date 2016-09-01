@@ -2,11 +2,7 @@
 set -ev
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source $SCRIPTDIR/funcs.sh
-
-if [ -z "$TRAVIS_TAG" ] ; then
-    return 0
-fi
+source $SCRIPTDIR/../funcs.sh
 
 MXE_BIN=$HOME/mxe/usr/i686-w64-mingw32.shared
 WDIR=$HOME/Moolticute_win32
@@ -14,6 +10,11 @@ WDIR=$HOME/Moolticute_win32
 VERSION="$(get_version .)"
 
 FILENAME=Moolticute_win32_$VERSION
+
+if [ "git rev-list -n 1 $VERSION" != "git rev-list -n 1 master"  ]; then
+    echo "Not uploading package"
+    return 0
+fi
 
 mkdir -p $WDIR
 
