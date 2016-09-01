@@ -11,11 +11,8 @@ VERSION="$(get_version .)"
 
 FILENAME=Moolticute_win32_$VERSION
 
-#Only build if we are on master
-#travis does a git clone --branch=XXX
-#when doing a tag push build, travis check out with --branch=TAG and thus
-#the repo is either in a detached state or in an other branch.
-if [ "$(git symbolic-ref -q HEAD)" == "refs/heads/master"  ]; then
+#Only build if the commit we are building is for the last tag
+if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
     echo "Not uploading package"
     return 0
 fi
