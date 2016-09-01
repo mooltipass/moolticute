@@ -4,11 +4,7 @@ os:
 - linux
 - osx
 language: cpp
-before_install:
-- openssl aes-256-cbc -K $encrypted_7917762619ed_key -iv $encrypted_7917762619ed_iv
-  -in scripts/ci/osx/developerID_application.cer.enc -out scripts/ci/osx/developerID_application.cer
-  -d
-- ". scripts/ci/$TRAVIS_OS_NAME/before_install.sh"
+before_install: ". scripts/ci/$TRAVIS_OS_NAME/before_install.sh"
 install: ". scripts/ci/$TRAVIS_OS_NAME/install.sh"
 script: ". scripts/ci/$TRAVIS_OS_NAME/script.sh"
 after_success: ". scripts/ci/$TRAVIS_OS_NAME/after_success.sh"
