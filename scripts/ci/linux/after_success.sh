@@ -4,13 +4,16 @@ set -ev
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/funcs.sh
 
+if [ -z "$TRAVIS_TAG" ] ; then
+    return 0
+fi
+
 MXE_BIN=$HOME/mxe/usr/i686-w64-mingw32.shared
 WDIR=$HOME/Moolticute_win32
 
 VERSION="$(get_version .)"
 
-#FILENAME=Moolticute_win32_$VERSION
-FILENAME=Moolticute_win32
+FILENAME=Moolticute_win32_$VERSION
 
 mkdir -p $WDIR
 
@@ -38,3 +41,4 @@ done
 
 mv $HOME/$FILENAME.zip .
 
+upload_file $HOME/$FILENAME.zip $(sha256sum $HOME/$FILENAME.zip | cut -d' ' -f1) "windows"

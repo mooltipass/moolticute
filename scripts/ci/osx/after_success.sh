@@ -4,6 +4,10 @@
 # creating the Moolticute.dmg with Applications link
 #
 
+if [ -z "$TRAVIS_TAG"  ] ; then
+    return 0
+fi
+
 QTDIR="/usr/local/opt/qt5"
 APP=MoolticuteApp
 # this directory name will also be shown in the title when the DMG is mounted
@@ -28,14 +32,14 @@ rm -f build/$APP.app/Contents/Info.plist-e
 
 echo "Adding keys"
 # add the keys for OSX code signing
-security create-keychain -p travis osx-build.keychain
+#security create-keychain -p travis osx-build.keychain
 #security import ../travis/osx/apple.cer -k ~/Library/Keychains/osx-build.keychain -T /usr/bin/codesign
-security import scripts/ci/osx/developerID_application.cer -k osx-build.keychain -T /usr/bin/codesign
+#security import scripts/ci/osx/developerID_application.cer -k osx-build.keychain -T /usr/bin/codesign
 #security import ../travis/osx/dist.p12 -k ~/Library/Keychains/osx-build.keychain -P $KEY_PASSWORD -T /usr/bin/codesign
-security default-keychain -s osx-build.keychain
-security unlock-keychain -p travis osx-build.keychain
+#security default-keychain -s osx-build.keychain
+#security unlock-keychain -p travis osx-build.keychain
 
-security find-identity -v
+#security find-identity -v
 
 # use macdeployqt to deploy the application
 #echo "Calling macdeployqt and code signing application"
@@ -45,7 +49,7 @@ $QTDIR/bin/macdeployqt build/$APP.app
 if [ "$?" -ne "0" ]; then
     echo "Failed to run macdeployqt"
     # remove keys
-    security delete-keychain osx-build.keychain 
+ #   security delete-keychain osx-build.keychain 
     exit 1
 fi
 
@@ -53,20 +57,20 @@ fi
 ##This signs the code
 echo "Sign Code with $SIGNATURE"
 
-codesign --force --verbose --sign "Developer ID Application: Raoul Hecky" build/$APP.app/Contents/Frameworks/*
-find build/$APP.app/Contents/plugins -name "*dylib" --exec codesign codesign --force --verbose --sign "Developer ID Application: $SIGNATURE" {} \;
-codesign --force --verbose --sign "Developer ID Application: $SIGNATURE" build/$APP.app
+#codesign --force --verbose --sign "Developer ID Application: Raoul Hecky" build/$APP.app/Contents/Frameworks/*
+#find build/$APP.app/Contents/plugins -name "*dylib" --exec codesign codesign --force --verbose --sign "Developer ID Application: $SIGNATURE" {} \;
+#codesign --force --verbose --sign "Developer ID Application: $SIGNATURE" build/$APP.app
 #codesign -s "$SIGNATURE" -f build/$APP.app
-if [ "$?" -ne "0" ]; then
-    echo "Failed to sign app bundle"
-    exit 1
-fi
+#if [ "$?" -ne "0" ]; then
+#    echo "Failed to sign app bundle"
+#    exit 1
+#fi
 
 
 
 echo "Verifying code signed app"
-codesign --verify --verbose=4 build/$APP.app
-spctl --assess --verbose=4 --raw build/$APP.app
+#codesign --verify --verbose=4 build/$APP.app
+#spctl --assess --verbose=4 --raw build/$APP.app
 
 echo "Create $TEMPDIR"
 #Create a temporary directory if one doesn't exist
@@ -110,18 +114,18 @@ if [ "$?" -ne "0" ]; then
 fi
 
 #echo "Code signing disk image"
-codesign --force --verify --verbose --sign "$DEVELOPER_NAME" build/$APP.dmg
+#codesign --force --verify --verbose --sign "$DEVELOPER_NAME" build/$APP.dmg
 
 echo "Verifying code signed disk image"
-codesign --verify --verbose=4 build/$APP.dmg
-spctl --assess --verbose=4 --raw build/$APP.dmg
+#codesign --verify --verbose=4 build/$APP.dmg
+#spctl --assess --verbose=4 --raw build/$APP.dmg
 
 echo "moving $APP.dmg to $APP-$VERSION_NUMBER.dmg"
 mv build/$APP.dmg build/$APP-$VERSION_NUMBER.dmg
 
 echo "Removing keys"
 # remove keys
-security delete-keychain osx-build.keychain 
+#security delete-keychain osx-build.keychain 
 
 # delete the temporary directory
 rm -Rf ./$TEMPDIR/*
@@ -130,4 +134,7 @@ if [ "$?" -ne "0" ]; then
     exit 1
 fi
 
+upload_file $APP-$VERSION_NUMBER.dmg $(sha256sum $APP-$VERSION_NUMBER.dmg | cut -d' ' -f1) "macos"
+
 exit 0
+
