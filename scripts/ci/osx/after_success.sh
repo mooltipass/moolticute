@@ -11,7 +11,11 @@ source $SCRIPTDIR/../funcs.sh
 
 VERSION="$(get_version .)"
 
-if [ "$(git rev-list -n 1 $VERSION)" != "$(git rev-list -n 1 master)"  ]; then
+#Only build if we are on master
+#travis does a git clone --branch=XXX
+#when doing a tag push build, travis check out with --branch=TAG and thus
+#the repo is either in a detached state or in an other branch.
+if [ "$(git symbolic-ref -q HEAD)" == "refs/heads/master"  ]; then
     echo "Not uploading package"
     return 0
 fi

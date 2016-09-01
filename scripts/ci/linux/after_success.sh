@@ -11,11 +11,11 @@ VERSION="$(get_version .)"
 
 FILENAME=Moolticute_win32_$VERSION
 
-echo "git rev-list -n 1 $VERSION = $(git rev-list -n 1 $VERSION)"
-echo "git rev-list -n 1 master = $(git rev-list -n 1 master)"
-echo "TRAVIS_TAG = $TRAVIS_TAG"
-
-if [ "$(git rev-list -n 1 $VERSION)" != "$(git rev-list -n 1 master)"  ]; then
+#Only build if we are on master
+#travis does a git clone --branch=XXX
+#when doing a tag push build, travis check out with --branch=TAG and thus
+#the repo is either in a detached state or in an other branch.
+if [ "$(git symbolic-ref -q HEAD)" == "refs/heads/master"  ]; then
     echo "Not uploading package"
     return 0
 fi
@@ -43,7 +43,5 @@ done
 #create a zip
 ( cd $HOME;
   zip --compression-method deflate -r $FILENAME.zip $(basename $WDIR) )
-
-mv $HOME/$FILENAME.zip .
 
 upload_file $HOME/$FILENAME.zip $(sha256sum $HOME/$FILENAME.zip | cut -d' ' -f1) "windows"
