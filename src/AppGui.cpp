@@ -11,7 +11,7 @@ AppGui::AppGui(int & argc, char ** argv) :
 
     systray = new QSystemTrayIcon(this);
     //    sys->setIcon(QIcon("C:/Users/phyatt/Downloads/system-tray.png"));
-    systray->setIcon(QIcon(":/Plain_white.png"));
+    systray->setIcon(QIcon(":/systray.png"));
     systray->show();
 
     QAction* launchConfigApp = new QAction(tr("&Launch Mooltipass configurator"), this);
