@@ -36,6 +36,9 @@ sed -i -e 's/com.yourcompany.Moolticute/com.Mooltipass.Moolticute/g' build/$APP.
 # removing backup plist
 rm -f build/$APP.app/Contents/Info.plist-e
 
+# Copy daemon to bundle
+cp build/moolticuted build/$APP.app/Contents/MacOS/
+
 # copy translation files to app
 # cp languages/*.qm build/$APP.app/Contents/Resources
 
@@ -61,6 +64,11 @@ if [ "$?" -ne "0" ]; then
  #   security delete-keychain osx-build.keychain 
     exit 1
 fi
+
+#Call fix to change all rpath
+wget https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
+python macdeployqtfix.py build/$APP.app/Contents/MacOS/MoolticuteApp /usr/local/Cellar/qt5/5.*/
+python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /usr/local/Cellar/qt5/5.*/
 
 #echo "Sign the code"
 ##This signs the code
