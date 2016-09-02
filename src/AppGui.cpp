@@ -14,25 +14,21 @@ AppGui::AppGui(int & argc, char ** argv) :
     systray->setIcon(QIcon(":/systray.png"));
     systray->show();
 
-    QAction* launchConfigApp = new QAction(tr("&Launch Mooltipass configurator"), this);
-    connect(launchConfigApp, &QAction::triggered, [=](){
-        QString dir = QCoreApplication::applicationDirPath();
+    showConfigApp = new QAction(tr("&Hide Moolticute configurator"), this);
+    connect(showConfigApp, &QAction::triggered, [=](){
+        if (win.isHidden())
+            mainWindowShow();
+        else
+            mainWindowHide();
     });
 
-    QAction* maximizeAction = new QAction(tr("Ma&ximize"), this);
-    //connect(maximizeAction, &QAction::triggered, this, &QWidget::showMaximized);
-
-    QAction* restoreAction = new QAction(tr("&Restore"), this);
-    //connect(restoreAction, &QAction::triggered, this, &QWidget::showNormal);
 
     QAction* quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 
 
     QMenu * systrayMenu = new QMenu();
-    //systrayMenu->addAction(minimizeAction);
-    systrayMenu->addAction(maximizeAction);
-    systrayMenu->addAction(restoreAction);
+    systrayMenu->addAction(showConfigApp);
     systrayMenu->addSeparator();
     systrayMenu->addAction(quitAction);
 
@@ -49,11 +45,13 @@ AppGui::~AppGui()
 void AppGui::mainWindowShow()
 {
     win.show();
+    showConfigApp->setText(tr("&Hide Moolticute configurator"));
 }
 
 void AppGui::mainWindowHide()
 {
     win.hide();
+    showConfigApp->setText(tr("&Show Moolticute configurator"));
 }
 
 

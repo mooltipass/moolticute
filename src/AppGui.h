@@ -22,6 +22,8 @@ public:
 private:
      MainWindow win;
      QSystemTrayIcon * systray;
+
+     QAction* showConfigApp;
 };
 
 #endif // APPGUI_H
