@@ -1,5 +1,9 @@
 #include "AppGui.h"
 
+#ifdef Q_OS_MAC
+#include "MacUtils.h"
+#endif
+
 AppGui::AppGui(int & argc, char ** argv) :
     QApplication(argc, argv)
 {
@@ -65,6 +69,9 @@ void AppGui::mainWindowShow()
 
     win->show();
     showConfigApp->setText(tr("&Hide Moolticute configurator"));
+#ifdef Q_OS_MAC
+   utils::mac::hideDockIcon(false);
+#endif
 }
 
 void AppGui::mainWindowHide()
@@ -74,6 +81,9 @@ void AppGui::mainWindowHide()
 
     win->hide();
     showConfigApp->setText(tr("&Show Moolticute configurator"));
+#ifdef Q_OS_MAC
+   utils::mac::hideDockIcon(true);
+#endif
 }
 
 
