@@ -17,21 +17,15 @@
  **
  ******************************************************************************/
 #include <QApplication>
-#include "Common.h"
-#include "MainWindow.h"
+
+#include "AppGui.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    AppGui a(argc, argv);
 
-    QCoreApplication::setOrganizationName("Raoulh");
-    QCoreApplication::setOrganizationDomain("raoulh.org");
-    QCoreApplication::setApplicationName("Moolticute");
 
-    Common::installMessageOutputHandler();
-
-    MainWindow win;
-    win.show();
+    a.mainWindowShow();
 
     return a.exec();
 }

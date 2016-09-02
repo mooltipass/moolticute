@@ -14,7 +14,8 @@ SOURCES += src/main_gui.cpp \
     src/WSClient.cpp \
     src/RotateSpinner.cpp \
     src/CredentialsModel.cpp \
-    src/DialogEdit.cpp
+    src/DialogEdit.cpp \
+    src/AppGui.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -23,7 +24,8 @@ HEADERS  += src/MainWindow.h \
     src/RotateSpinner.h \
     src/CredentialsModel.h \
     src/DialogEdit.h \
-    src/version.h
+    src/version.h \
+    src/AppGui.h
 
 INCLUDEPATH += src
 
