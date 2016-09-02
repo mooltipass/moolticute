@@ -40,7 +40,7 @@ win32 {
 }
 
 mac {
-    ICON = img/AppIcon_128.icns
+    ICON = img/AppIcon.icns
 } else {
-    ICON = img/AppIcon_128.png
+    ICON = img/AppIcon.svg
 }

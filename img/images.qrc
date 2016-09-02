@@ -18,5 +18,7 @@
         <file>unlock.png</file>
         <file>systray.png</file>
         <file>systray_disconnected.png</file>
+        <file>AppIcon.svg</file>
+        <file>AppIcon.icns</file>
     </qresource>
 </RCC>
