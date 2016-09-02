@@ -41,6 +41,19 @@ AppGui::AppGui(int & argc, char ** argv) :
     connectedChanged();
     win = new MainWindow(wsClient);
 
+    QProcess *daemon = new QProcess(this);
+    QString program = QCoreApplication::applicationDirPath () + "/../bin/moolticuted";
+    QStringList arguments;
+    // TODO handle Debug arguments
+    //arguments << "-e" <<  "-s 8080";
+    qDebug() << "Running " << program << " " << arguments;
+    daemon->startDetached(program, arguments);
+
+    connect(daemon, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+        [=](int exitCode, QProcess::ExitStatus exitStatus){
+       qDebug() << "Daemon exits with error code " << exitCode << " Exit Status : " << exitStatus;
+    });
+
 }
 
 void AppGui::connectedChanged()
