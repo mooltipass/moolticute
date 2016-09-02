@@ -33,8 +33,22 @@ AppGui::AppGui(int & argc, char ** argv) :
     systray->setContextMenu(systrayMenu);
 
     wsClient = new WSClient(this);
+    connect(wsClient, &WSClient::connectedChanged, [=]() { connectedChanged(); });
+    connectedChanged();
     win = new MainWindow(wsClient);
 
+}
+
+void AppGui::connectedChanged()
+{
+    if (!wsClient->get_connected())
+    {
+        systray->setIcon(QIcon(":/systray_disconnected.png"));
+    }
+    else
+    {
+        systray->setIcon(QIcon(":/systray.png"));
+    }
 }
 
 AppGui::~AppGui()

@@ -17,5 +17,6 @@
         <file>Plain_128.png</file>
         <file>unlock.png</file>
         <file>systray.png</file>
+        <file>systray_disconnected.png</file>
     </qresource>
 </RCC>

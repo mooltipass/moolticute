@@ -19,7 +19,8 @@ public:
     void mainWindowHide();
     void enableDameon();
     void disableDaemon();
-
+private slots:
+    void connectedChanged();
 private:
      MainWindow *win;
      QSystemTrayIcon * systray;
