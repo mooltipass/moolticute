@@ -126,6 +126,14 @@ void WSClient::onTextMessageReceived(const QString &message)
         else
             emit askPasswordDone(true, o["password"].toString());
     }
+    else if (rootobj["msg"] == "version_changed")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        if (o["hw_version"].toString().contains("mini"))
+            set_mpHwVersion(Common::MP_Mini);
+        else
+            set_mpHwVersion(Common::MP_Classic);
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -150,4 +158,10 @@ void WSClient::udateParameters(const QJsonObject &data)
         set_offlineMode(data["value"].toBool());
     else if (param == "tutorial_enabled")
         set_tutorialEnabled(data["value"].toBool());
+    else if (param == "screen_brightness")
+        set_screenBrightness(data["value"].toInt());
+    else if (param == "knock_enabled")
+        set_knockEnabled(data["value"].toBool());
+    else if (param == "knock_sensitivity")
+        set_knockSensitivity(data["value"].toInt());
 }

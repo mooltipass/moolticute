@@ -198,6 +198,39 @@ void MPDevice::loadParameters()
         return true;
     }));
 
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, MINI_OLED_CONTRAST_CURRENT_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        qDebug() << "received screenBrightness: " << (quint8)data.at(2);
+        set_screenBrightness((quint8)data.at(2));
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, MINI_KNOCK_DETECT_ENABLE_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        qDebug() << "received set_knockEnabled: " << (quint8)data.at(2);
+        set_knockEnabled(data.at(2) != 0);
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, MINI_KNOCK_THRES_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        qDebug() << "received knockSensitivity: " << (quint8)data.at(2);
+        int v = 1;
+        if (data.at(2) == 11) v = 0;
+        else if (data.at(2) == 5) v = 2;
+        set_knockSensitivity(v);
+        return true;
+    }));
+
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
         Q_UNUSED(data);
@@ -326,6 +359,34 @@ void MPDevice::updateTutorialEnabled(bool en)
     QByteArray ba;
     ba.append((quint8)TUTORIAL_BOOL_PARAM);
     ba.append((quint8)en);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateScreenBrightness(int bval) //In percent
+{
+    QByteArray ba;
+    ba.append((quint8)MINI_OLED_CONTRAST_CURRENT_PARAM);
+    ba.append((quint8)(bval));
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateKnockEnabled(bool en)
+{
+    QByteArray ba;
+    ba.append((quint8)MINI_KNOCK_DETECT_ENABLE_PARAM);
+    ba.append((quint8)en);
+    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+}
+
+void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
+{
+    quint8 v = 8;
+    if (s == 0) v = 11;
+    else if (s == 2) v = 5;
+
+    QByteArray ba;
+    ba.append((quint8)MINI_KNOCK_THRES_PARAM);
+    ba.append(v);
     sendData(MP_SET_MOOLTIPASS_PARM, ba);
 }
 

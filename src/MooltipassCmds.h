@@ -102,6 +102,10 @@
 #define OFFLINE_MODE_PARAM          8
 #define TUTORIAL_BOOL_PARAM        16
 
+// MP Mini only
+#define MINI_OLED_CONTRAST_CURRENT_PARAM    26
+#define MINI_KNOCK_DETECT_ENABLE_PARAM      28
+#define MINI_KNOCK_THRES_PARAM              29
 
 #endif // MOOLTIPASSCMDS_H
 

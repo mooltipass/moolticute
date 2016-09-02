@@ -119,6 +119,9 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
     connect(mpdevice, SIGNAL(flashMbSizeChanged(int)), this, SLOT(sendVersion()));
     connect(mpdevice, SIGNAL(hwVersionChanged(QString)), this, SLOT(sendVersion()));
+    connect(mpdevice, SIGNAL(screenBrightnessChanged(int)), this, SLOT(sendScreenBrightness()));
+    connect(mpdevice, SIGNAL(knockEnabledChanged(bool)), this, SLOT(sendKnockEnabled()));
+    connect(mpdevice, SIGNAL(knockSensitivityChanged(int)), this, SLOT(sendKnockSensitivity()));
 }
 
 void WSServerCon::statusChanged()
@@ -151,6 +154,9 @@ void WSServerCon::sendInitialStatus()
         sendTutorialEnabled();
         sendMemMgmtMode();
         sendVersion();
+        sendScreenBrightness();
+        sendKnockEnabled();
+        sendKnockSensitivity();
     }
 }
 
@@ -217,6 +223,27 @@ void WSServerCon::sendTutorialEnabled()
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
 }
 
+void WSServerCon::sendScreenBrightness()
+{
+    QJsonObject data = {{ "parameter", "screen_brightness" },
+                        { "value", mpdevice->get_screenBrightness() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendKnockEnabled()
+{
+    QJsonObject data = {{ "parameter", "knock_enabled" },
+                        { "value", mpdevice->get_knockEnabled() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendKnockSensitivity()
+{
+    QJsonObject data = {{ "parameter", "knock_sensitivity" },
+                        { "value", mpdevice->get_knockSensitivity() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
 void WSServerCon::sendMemMgmtMode()
 {
     sendJsonMessage({{ "msg", "memorymgmt_changed" },
@@ -269,6 +296,12 @@ void WSServerCon::processParametersSet(const QJsonObject &data)
         mpdevice->updateOfflineMode(data["offline_mode"].toBool());
     if (data.contains("tutorial_enabled"))
         mpdevice->updateTutorialEnabled(data["tutorial_enabled"].toBool());
+    if (data.contains("screen_brightness"))
+        mpdevice->updateScreenBrightness(data["screen_brightness"].toInt());
+    if (data.contains("knock_enabled"))
+        mpdevice->updateKnockEnabled(data["knock_enabled"].toBool());
+    if (data.contains("knock_sensitivity"))
+        mpdevice->updateKnockSensitivity(data["knock_sensitivity"].toInt());
 
     //reload parameters from device after changed all params, this will trigger
     //websocket update of clients too

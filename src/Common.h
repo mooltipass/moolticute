@@ -63,9 +63,16 @@ public:
     static QByteArray dateToBytes(const QDate &dt);
 
     static QJsonArray bytesToJson(const QByteArray &data);
+
+    typedef enum
+    {
+        MP_Classic = 0,
+        MP_Mini = 1,
+    } MPHwVersion;
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)
+Q_DECLARE_METATYPE(Common::MPHwVersion)
 
 #endif // COMMON_H
 

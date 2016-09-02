@@ -121,7 +121,22 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->comboBoxLang->addItem("ro_RO", 164);
     ui->comboBoxLang->addItem("sl_SL", 165);
 
+    ui->widgetParamMini->setVisible(false);
+    ui->comboBoxScreenBrightness->addItem("20%", 51);
+    ui->comboBoxScreenBrightness->addItem("35%", 89);
+    ui->comboBoxScreenBrightness->addItem("50%", 128);
+    ui->comboBoxScreenBrightness->addItem("65%", 166);
+    ui->comboBoxScreenBrightness->addItem("80%", 204);
+    ui->comboBoxScreenBrightness->addItem("100%", 255);
+    ui->comboBoxKnock->addItem("Low", 0);
+    ui->comboBoxKnock->addItem("Medium", 1);
+    ui->comboBoxKnock->addItem("High", 2);
+
     //When device has new parameters, update the GUI
+    connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
+    {
+        ui->widgetParamMini->setVisible(wsClient->get_mpHwVersion() == Common::MP_Mini);
+    });
     connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
     {
         for (int i = 0;i < ui->comboBoxLang->count();i++)
@@ -174,6 +189,31 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
         checkSettingsChanged();
     });
+    connect(wsClient, &WSClient::screenBrightnessChanged, [=]()
+    {
+        switch (wsClient->get_screenBrightness())
+        {
+        default:
+        case 51: ui->comboBoxScreenBrightness->setCurrentIndex(0); break;
+        case 89: ui->comboBoxScreenBrightness->setCurrentIndex(1); break;
+        case 128: ui->comboBoxScreenBrightness->setCurrentIndex(2); break;
+        case 166: ui->comboBoxScreenBrightness->setCurrentIndex(3); break;
+        case 204: ui->comboBoxScreenBrightness->setCurrentIndex(4); break;
+        case 255: ui->comboBoxScreenBrightness->setCurrentIndex(5); break;
+        }
+        checkSettingsChanged();
+    });
+    connect(wsClient, &WSClient::knockEnabledChanged, [=]()
+    {
+        ui->checkBoxKnock->setChecked(wsClient->get_knockEnabled());
+        checkSettingsChanged();
+    });
+    connect(wsClient, &WSClient::knockSensitivityChanged, [=]()
+    {
+        ui->comboBoxKnock->setCurrentIndex(wsClient->get_knockSensitivity());
+        checkSettingsChanged();
+    });
+
     connect(wsClient, &WSClient::memoryDataChanged, [=]()
     {
         credModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
@@ -211,6 +251,10 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->checkBoxFlash, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxBoot, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxTuto, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+
+    connect(ui->comboBoxScreenBrightness, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxKnock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
 
     //Setup the confirm view
     ui->widgetSpin->setPixmap(awesome->icon(fa::circleonotch).pixmap(QSize(80, 80)));
@@ -291,6 +335,12 @@ void MainWindow::checkSettingsChanged()
         uichanged = true;
     if (ui->checkBoxTuto->isChecked() != wsClient->get_tutorialEnabled())
         uichanged = true;
+    if (ui->checkBoxKnock->isChecked() != wsClient->get_knockEnabled())
+        uichanged = true;
+    if (ui->comboBoxKnock->currentData().toInt() != wsClient->get_knockSensitivity())
+        uichanged = true;
+    if (ui->comboBoxScreenBrightness->currentData().toInt() != wsClient->get_screenBrightness())
+        uichanged = true;
 
     if (uichanged)
     {
@@ -323,6 +373,20 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
     ui->checkBoxFlash->setChecked(wsClient->get_flashScreen());
     ui->checkBoxBoot->setChecked(wsClient->get_offlineMode());
     ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
+    ui->checkBoxKnock->setChecked(wsClient->get_knockEnabled());
+
+    switch (wsClient->get_screenBrightness())
+    {
+    default:
+    case 20: ui->comboBoxScreenBrightness->setCurrentIndex(0); break;
+    case 35: ui->comboBoxScreenBrightness->setCurrentIndex(1); break;
+    case 50: ui->comboBoxScreenBrightness->setCurrentIndex(2); break;
+    case 65: ui->comboBoxScreenBrightness->setCurrentIndex(3); break;
+    case 80: ui->comboBoxScreenBrightness->setCurrentIndex(4); break;
+    case 100: ui->comboBoxScreenBrightness->setCurrentIndex(5); break;
+    }
+
+    ui->comboBoxKnock->setCurrentIndex(wsClient->get_knockSensitivity());
 
     ui->pushButtonSettingsReset->setVisible(false);
     ui->pushButtonSettingsSave->setVisible(false);
@@ -338,7 +402,10 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
                      { "user_interaction_timeout", ui->spinBoxInput->value() },
                      { "flash_screen", ui->checkBoxFlash->isChecked() },
                      { "offline_mode", ui->checkBoxBoot->isChecked() },
-                     { "tutorial_enabled", ui->checkBoxTuto->isChecked() }};
+                     { "tutorial_enabled", ui->checkBoxTuto->isChecked() },
+                     { "screen_brightness", ui->comboBoxScreenBrightness->currentData().toInt() },
+                     { "knock_enabled", ui->checkBoxKnock->isChecked() },
+                     { "knock_sensitivity", ui->comboBoxKnock->currentData().toInt() }};
 
     wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
 }

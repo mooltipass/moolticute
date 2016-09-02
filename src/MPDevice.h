@@ -53,6 +53,11 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(int, flashMbSize)
     QT_WRITABLE_PROPERTY(QString, hwVersion)
 
+    //MP Mini only
+    QT_WRITABLE_PROPERTY(int, screenBrightness) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
+    QT_WRITABLE_PROPERTY(bool, knockEnabled)
+    QT_WRITABLE_PROPERTY(int, knockSensitivity) // 0-low, 1-medium, 2-high
+
 public:
     MPDevice(QObject *parent);
     virtual ~MPDevice();
@@ -70,6 +75,11 @@ public:
     void updateFlashScreen(bool en);
     void updateOfflineMode(bool en);
     void updateTutorialEnabled(bool en);
+
+    //MP Mini only
+    void updateScreenBrightness(int bval); //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
+    void updateKnockEnabled(bool en);
+    void updateKnockSensitivity(int s); // 0-low, 1-medium, 2-high
 
     //mem mgmt mode
     void startMemMgmtMode();

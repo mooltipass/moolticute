@@ -55,6 +55,9 @@ private slots:
     void sendTutorialEnabled();
     void sendMemMgmtMode();
     void sendVersion();
+    void sendScreenBrightness();
+    void sendKnockEnabled();
+    void sendKnockSensitivity();
 
 private:
     QWebSocket *wsClient;
