@@ -19,11 +19,20 @@
 #include "AppDaemon.h"
 #include "HttpServer.h"
 
+#ifdef Q_OS_MAC
+#include "MacUtils.h"
+#endif
+
 bool g_bEmulationMode = false;
 
 AppDaemon::AppDaemon(int & argc, char ** argv):
     QApplication(argc, argv)
 {
+
+#ifdef Q_OS_MAC
+   utils::mac::hideDockIcon(true);
+#endif
+
     QCommandLineParser parser;
 
     parser.setApplicationDescription("Moolticute Daemon");
