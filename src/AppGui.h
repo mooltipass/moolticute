@@ -8,6 +8,7 @@
 
 #include "Common.h"
 #include "MainWindow.h"
+#include "WSClient.h"
 
 class AppGui : public QApplication
 {
@@ -20,9 +21,9 @@ public:
     void disableDaemon();
 
 private:
-     MainWindow win;
+     MainWindow *win;
      QSystemTrayIcon * systray;
-
+     WSClient *wsClient;
      QAction* showConfigApp;
 };
 

@@ -34,9 +34,10 @@
                             "background-color: #237C95;" \
                         "}"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    wsClient(client)
 {
     awesome = new QtAwesome(this);
     awesome->initFontAwesome();
@@ -64,7 +65,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaled(500, ui->widgetHeader->sizeHint().height() - 8, Qt::KeepAspectRatio));
 
-    wsClient = new WSClient(this);
     connect(wsClient, &WSClient::connectedChanged, [=]() { updatePage(); });
     connect(wsClient, &WSClient::statusChanged, [=]() { updatePage(); });
 
