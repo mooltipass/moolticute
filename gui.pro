@@ -6,6 +6,10 @@ TARGET = MoolticuteApp
 
 CONFIG += c++11
 
+mac {
+    QMAKE_LFLAGS += -framework ApplicationServices
+}
+
 include(src/QtAwesome/QtAwesome/QtAwesome.pri)
 
 SOURCES += src/main_gui.cpp \
@@ -26,6 +30,11 @@ HEADERS  += src/MainWindow.h \
     src/DialogEdit.h \
     src/version.h \
     src/AppGui.h
+
+mac {
+    HEADERS += src/MacUtils.h
+    SOURCES += src/MacUtils.mm
+}
 
 INCLUDEPATH += src
 

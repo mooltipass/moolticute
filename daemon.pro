@@ -19,7 +19,7 @@ win32 {
     CONFIG += link_pkgconfig
     PKGCONFIG += libusb-1.0
 } else:mac {
-    QMAKE_LFLAGS += -framework IOKit -framework CoreFoundation
+    QMAKE_LFLAGS += -framework ApplicationServices -framework IOKit -framework CoreFoundation
 }
 
 win32 {
@@ -42,6 +42,9 @@ mac {
                src/MPDevice_mac.cpp
     HEADERS += src/UsbMonitor_mac.h \
                src/MPDevice_mac.h
+
+    HEADERS += src/MacUtils.h
+    SOURCES += src/MacUtils.mm
 }
 
 SOURCES += src/main_daemon.cpp \
