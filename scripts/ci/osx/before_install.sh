@@ -4,7 +4,7 @@ rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~
 npm install npm
 mv node_modules npm
 npm/.bin/npm --version
-
+nvm install v6.4.0
 nvm use 6.4.0
 npm/.bin/npm --version
 node --version
