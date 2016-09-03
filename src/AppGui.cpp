@@ -15,7 +15,9 @@ AppGui::AppGui(int & argc, char ** argv) :
 
     systray = new QSystemTrayIcon(this);
     //    sys->setIcon(QIcon("C:/Users/phyatt/Downloads/system-tray.png"));
-    systray->setIcon(QIcon(":/systray.png"));
+     QIcon icon(":/systray_disconnected.png");
+    icon.setIsMask(true);
+    systray->setIcon(icon);
     systray->show();
 
     showConfigApp = new QAction(tr("&Hide Moolticute configurator"), this);
@@ -60,11 +62,15 @@ void AppGui::connectedChanged()
 {
     if (!wsClient->get_connected())
     {
-        systray->setIcon(QIcon(":/systray_disconnected.png"));
+        QIcon icon(":/systray_disconnected.png");
+        icon.setIsMask(true);
+        systray->setIcon(icon);
     }
     else
     {
-        systray->setIcon(QIcon(":/systray.png"));
+        QIcon icon(":/systray.png");
+        icon.setIsMask(true);
+        systray->setIcon(icon);
     }
 }
 
