@@ -1,5 +1,9 @@
 #!/bin/sh
 
+nvm use 6.4.0
+npm --version
+node --version
+
 #openssl aes-256-cbc \
 #    -K $encrypted_7917762619ed_key \
 #    -iv $encrypted_7917762619ed_iv \
