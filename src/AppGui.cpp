@@ -44,7 +44,7 @@ AppGui::AppGui(int & argc, char ** argv) :
     win = new MainWindow(wsClient);
 
     QProcess *daemon = new QProcess(this);
-    QString program = QCoreApplication::applicationDirPath () + "/../bin/moolticuted";
+    QString program = QCoreApplication::applicationDirPath () + "/moolticuted";
     QStringList arguments;
     // TODO handle Debug arguments
     //arguments << "-e" <<  "-s 8080";
