@@ -1,7 +1,12 @@
 #!/bin/sh
 
+rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install6
+npm install npm
+mv node_modules npm
+npm/.bin/npm --version
+
 nvm use 6.4.0
-npm --version
+npm/.bin/npm --version
 node --version
 
 #openssl aes-256-cbc \
