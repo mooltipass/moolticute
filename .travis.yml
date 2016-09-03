@@ -4,6 +4,8 @@ os:
 - linux
 - osx
 language: cpp
+node_js:
+- "6"
 before_install: ". scripts/ci/$TRAVIS_OS_NAME/before_install.sh"
 install: ". scripts/ci/$TRAVIS_OS_NAME/install.sh"
 script: ". scripts/ci/$TRAVIS_OS_NAME/script.sh"
