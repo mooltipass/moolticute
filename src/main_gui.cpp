@@ -24,8 +24,8 @@ int main(int argc, char *argv[])
 {
     AppGui a(argc, argv);
 
-
-    a.mainWindowShow();
+    if (!a.initialize())
+        return 1;
 
     return a.exec();
 }

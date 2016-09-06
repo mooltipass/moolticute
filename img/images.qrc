@@ -20,5 +20,7 @@
         <file>systray_disconnected.png</file>
         <file>AppIcon.svg</file>
         <file>AppIcon.icns</file>
+        <file>circle_green.png</file>
+        <file>circle_red.png</file>
     </qresource>
 </RCC>

@@ -36,6 +36,9 @@ public:
     explicit MainWindow(WSClient *client, QWidget *parent = 0);
     ~MainWindow();
 
+signals:
+    void windowCloseRequested();
+
 private slots:
     void updatePage();
     void checkSettingsChanged();
