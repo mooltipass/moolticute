@@ -18,6 +18,8 @@
  ******************************************************************************/
 #include "AppDaemon.h"
 #include "HttpServer.h"
+#include "Common.h"
+#include "version.h"
 
 #ifdef Q_OS_MAC
 #include "MacUtils.h"
@@ -25,9 +27,23 @@
 
 bool g_bEmulationMode = false;
 
-AppDaemon::AppDaemon(int & argc, char ** argv):
+AppDaemon::AppDaemon(int &argc, char **argv):
     QApplication(argc, argv)
 {
+}
+
+bool AppDaemon::initialize()
+{
+    Common::installMessageOutputHandler();
+
+    QCoreApplication::setOrganizationName("Raoulh");
+    QCoreApplication::setOrganizationDomain("raoulh.org");
+    QCoreApplication::setApplicationName("Moolticute");
+
+    qInfo() << "Moolticute Daemon version: " << APP_VERSION;
+    qInfo() << "(c) 2016 Raoul Hecky";
+    qInfo() << "https://github.com/raoulh/moolticute";
+    qInfo() << "------------------------------------";
 
 #ifdef Q_OS_MAC
    utils::mac::hideDockIcon(true);
@@ -56,14 +72,27 @@ AppDaemon::AppDaemon(int & argc, char ** argv):
     if (parser.isSet(debugHttpServer))
     {
         httpServer = new HttpServer(this);
-        httpServer->start(parser.value(debugHttpServer).toInt());
+        if (!httpServer->start(parser.value(debugHttpServer).toInt()))
+        {
+            qCritical() << "Fatal error: Failed to create HTTP server.";
+            return false;
+        }
     }
-
 
     //Install and start mp manager instance
     MPManager::Instance();
 
-    wsServer = new WSServer(this);
+    try
+    {
+        wsServer = new WSServer(this);
+    }
+    catch (const std::exception &e)
+    {
+        qCritical() << "Fatal error: " << e.what();
+        return false;
+    }
+
+    return true;
 }
 
 AppDaemon::~AppDaemon()

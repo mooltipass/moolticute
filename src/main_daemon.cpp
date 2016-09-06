@@ -16,24 +16,14 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#include "Common.h"
 #include "AppDaemon.h"
-#include "version.h"
 
 int main(int argc, char **argv)
 {
-    Common::installMessageOutputHandler();
-
-    qDebug() << "Moolticute Daemon version: " << APP_VERSION;
-    qDebug() << "(c) 2016 Raoul Hecky";
-    qDebug() << "https://github.com/raoulh/moolticute";
-    qDebug() << "------------------------------------";
-
     AppDaemon app(argc, argv);
 
-    QCoreApplication::setOrganizationName("Raoulh");
-    QCoreApplication::setOrganizationDomain("raoulh.org");
-    QCoreApplication::setApplicationName("Moolticute");
+    if (!app.initialize())
+        return 1;
 
     return app.exec();
 }

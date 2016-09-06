@@ -37,6 +37,8 @@ public:
     AppDaemon(int &argc, char **argv);
     virtual ~AppDaemon();
 
+    bool initialize();
+
 private:
     WSServer *wsServer;
     HttpServer *httpServer = nullptr;

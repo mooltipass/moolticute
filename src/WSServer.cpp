@@ -34,7 +34,7 @@ WSServer::WSServer(QObject *parent):
     else
     {
         qCritical() << "Failed to listen on port " << MOOLTICUTE_DAEMON_PORT;
-        throw 1;
+        throw std::runtime_error("Failed to listen on websocket port");
     }
 
     connect(MPManager::Instance(), SIGNAL(mpConnected(MPDevice*)), this, SLOT(mpAdded(MPDevice*)));
