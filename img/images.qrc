@@ -22,5 +22,9 @@
         <file>AppIcon.icns</file>
         <file>circle_green.png</file>
         <file>circle_red.png</file>
+        <file>circle_blue.png</file>
+        <file>circle_blue@2x.png</file>
+        <file>circle_green@2x.png</file>
+        <file>circle_red@2x.png</file>
     </qresource>
 </RCC>

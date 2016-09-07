@@ -26,6 +26,7 @@ public:
 
 private slots:
     void connectedChanged();
+    void stateChange(Qt::ApplicationState state);
 
 private:
      MainWindow *win;
@@ -38,6 +39,8 @@ private:
      bool dRunning = false;
      bool needRestart = false;
      bool aboutToQuit = false;
+
+     quint64 lastStateChange = 0;
 };
 
 #endif // APPGUI_H

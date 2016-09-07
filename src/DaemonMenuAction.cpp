@@ -32,15 +32,27 @@ void DaemonMenuAction::updateStatus(DaemonStatus status)
 {
     if (status == StatusRunning)
     {
-        iconLed->setPixmap(QPixmap(":/circle_green.png"));
+        QIcon ic(":/circle_green.png");
+        iconLed->setPixmap(ic.pixmap(16, 16));
         txtLabel->setText(tr("Daemon is running"));
         restartButton->setText(tr("Restart"));
+        restartButton->setEnabled(true);
     }
     else if (status == StatusStopped ||
              status == StatusUnknown)
     {
-        iconLed->setPixmap(QPixmap(":/circle_red.png"));
+        QIcon ic(":/circle_red.png");
+        iconLed->setPixmap(ic.pixmap(16, 16));
         txtLabel->setText(tr("Daemon is stopped"));
         restartButton->setText(tr("Start"));
+        restartButton->setEnabled(true);
+    }
+    else if (status == StatusRestarting)
+    {
+        QIcon ic(":/circle_blue.png");
+        iconLed->setPixmap(ic.pixmap(16, 16));
+        txtLabel->setText(tr("Daemon is starting"));
+        restartButton->setText(tr("Wait"));
+        restartButton->setEnabled(false);
     }
 }

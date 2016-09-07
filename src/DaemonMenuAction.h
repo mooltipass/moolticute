@@ -14,6 +14,7 @@ public:
         StatusUnknown = 0,
         StatusRunning = 1,
         StatusStopped = 2,
+        StatusRestarting = 3,
     } DaemonStatus;
 
     void forceRepaint();

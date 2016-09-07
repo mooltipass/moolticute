@@ -18,6 +18,7 @@ bool AppGui::initialize()
     Common::installMessageOutputHandler();
 
     setAttribute(Qt::AA_UseHighDpiPixmaps);
+	setQuitOnLastWindowClosed(false);
 
     systray = new QSystemTrayIcon(this);
     QIcon icon(":/systray_disconnected.png");
@@ -28,7 +29,8 @@ bool AppGui::initialize()
     systray->show();
 
     showConfigApp = new QAction(tr("&Show Moolticute configurator"), this);
-    connect(showConfigApp, &QAction::triggered, [=](){
+    connect(showConfigApp, &QAction::triggered, [=]()
+    {
         if (win->isHidden())
             mainWindowShow();
         else
@@ -55,6 +57,24 @@ bool AppGui::initialize()
 
     systray->setContextMenu(systrayMenu);
 
+    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
+
+    connect(systray, &QSystemTrayIcon::activated, [this](QSystemTrayIcon::ActivationReason reason)
+    {
+        // On Linux/Windows, hide/show the app when the tray icon is clicked
+        // On OSX this just shows the menu
+#ifndef Q_OS_MACX
+        if (reason == QSystemTrayIcon::DoubleClick ||
+            reason == QSystemTrayIcon::Trigger)
+        {
+            if (win->isHidden())
+                mainWindowShow();
+            else
+                mainWindowHide();
+        }
+#endif
+    });
+
     wsClient = new WSClient(this);
     connect(wsClient, &WSClient::connectedChanged, [=]() { connectedChanged(); });
     connectedChanged();
@@ -73,7 +93,6 @@ bool AppGui::initialize()
     // TODO handle Debug arguments
     //arguments << "-e" <<  "-s 8080";
     qDebug() << "Running " << program << " " << arguments;
-    daemonProcess->start(program, arguments);
 
     connect(daemonProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
         [=](int exitCode, QProcess::ExitStatus exitStatus)
@@ -88,19 +107,26 @@ bool AppGui::initialize()
 
         if (needRestart)
         {
-            daemonProcess->start(program, arguments);
+            daemonAction->updateStatus(DaemonMenuAction::StatusRestarting);
+            QTimer::singleShot(1500, [=]()
+            {
+                daemonProcess->start(program, arguments);
+            });
             needRestart = false;
         }
     });
 
     connect(daemonProcess, &QProcess::started, [=]()
     {
+        qDebug() << "Daemon started";
         if (aboutToQuit)
             return;
 
         daemonAction->updateStatus(DaemonMenuAction::StatusRunning);
         dRunning = true;
     });
+
+    daemonProcess->start(program, arguments);
 
     connect(daemonAction, &DaemonMenuAction::restartClicked, [=]()
     {
@@ -110,7 +136,13 @@ bool AppGui::initialize()
             needRestart = true;
         }
         else
-            daemonProcess->start(program, arguments);
+        {
+            daemonAction->updateStatus(DaemonMenuAction::StatusRestarting);
+            QTimer::singleShot(1500, [=]()
+            {
+                daemonProcess->start(program, arguments);
+            });
+        }
     });
 
     return true;
@@ -170,6 +202,23 @@ void AppGui::mainWindowHide()
 #endif
 }
 
+void AppGui::stateChange(Qt::ApplicationState state)
+{
+    // On OSX it's possible for the app to be brought to the foreground without the window actually reappearing.
+    // We want to make sure it's shown when this happens.
+#ifdef Q_OS_MAC
+    quint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (state == Qt::ApplicationActive)
+    {
+        // This happens once at startup so ignore it. Also don't allow it to be called more than once every 2s.
+        if(lastStateChange != 0 && now >= lastStateChange + 2 * 1000)
+            showWindow();
+        lastStateChange = now;
+    }
+#else
+    Q_UNUSED(state)
+#endif
+}
 
 void AppGui::enableDameon()
 {
