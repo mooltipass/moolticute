@@ -27,7 +27,6 @@ public:
 
 private slots:
     void connectedChanged();
-    void stateChange(Qt::ApplicationState state);
 
 private:
      MainWindow *win;

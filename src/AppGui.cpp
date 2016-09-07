@@ -57,9 +57,6 @@ bool AppGui::initialize()
 
     systray->setContextMenu(systrayMenu);
 
-    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)),
-            this, SLOT(stateChange(Qt::ApplicationState)));
-
     connect(systray, &QSystemTrayIcon::activated, [this](QSystemTrayIcon::ActivationReason reason)
     {
         // On Linux/Windows, hide/show the app when the tray icon is clicked
@@ -73,6 +70,8 @@ bool AppGui::initialize()
             else
                 mainWindowHide();
         }
+#else
+        Q_UNUSED(reason)
 #endif
     });
 
@@ -200,24 +199,6 @@ void AppGui::mainWindowHide()
     showConfigApp->setText(tr("&Show Moolticute configurator"));
 #ifdef Q_OS_MAC
    utils::mac::hideDockIcon(true);
-#endif
-}
-
-void AppGui::stateChange(Qt::ApplicationState state)
-{
-    // On OSX it's possible for the app to be brought to the foreground without the window actually reappearing.
-    // We want to make sure it's shown when this happens.
-#ifdef Q_OS_MAC
-    quint64 now = QDateTime::currentMSecsSinceEpoch();
-    if (state == Qt::ApplicationActive)
-    {
-        // This happens once at startup so ignore it. Also don't allow it to be called more than once every 2s.
-        if(lastStateChange != 0 && now >= lastStateChange + 2 * 1000)
-            showWindow();
-        lastStateChange = now;
-    }
-#else
-    Q_UNUSED(state)
 #endif
 }
 
