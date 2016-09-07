@@ -85,6 +85,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>comboBoxService</tabstop>
+  <tabstop>lineEditLogin</tabstop>
+  <tabstop>lineEditPass</tabstop>
+  <tabstop>lineEditDesc</tabstop>
+  <tabstop>pushButtonGen</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

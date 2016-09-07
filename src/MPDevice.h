@@ -95,6 +95,11 @@ public:
     void askPassword(const QString &service, const QString &login,
                      std::function<void(bool success, const QString &login, const QString &pass)> cb);
 
+    //Add or Set service/login/pass/desc in MP
+    void setCredential(const QString &service, const QString &login,
+                       const QString &pass, const QString &description,
+                       std::function<void(bool success)> cb);
+
     //get 32 random bytes from device
     void getRandomNumber(std::function<void(bool success, const QByteArray &nums)> cb);
 
@@ -126,6 +131,8 @@ private:
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
+
+    void createJobAddContext(const QString &service, AsyncJobs *jobs);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;

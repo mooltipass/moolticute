@@ -21,6 +21,7 @@
 
 #include <QtCore>
 #include <functional>
+#include <memory>
 
 #define MOOLTIPASS_VENDORID     0x16D0
 #define MOOLTIPASS_PRODUCTID    0x09A0

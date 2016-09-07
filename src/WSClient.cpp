@@ -134,6 +134,14 @@ void WSClient::onTextMessageReceived(const QString &message)
         else
             set_mpHwVersion(Common::MP_Classic);
     }
+    else if (rootobj["msg"] == "set_credential")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        if (o.contains("failed") && o["failed"].toBool())
+            emit addCredentialDone(false);
+        else
+            emit addCredentialDone(true);
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)

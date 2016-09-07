@@ -21,6 +21,11 @@ public:
     void setPassword(const QString &s);
     void setDescription(const QString &s);
 
+    QString getService();
+    QString getLogin();
+    QString getPassword();
+    QString getDescription();
+
 private:
     Ui::DialogEdit *ui;
 

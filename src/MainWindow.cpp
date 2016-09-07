@@ -78,6 +78,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonShowPass->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExitMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonCredEdit->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonQuickAddCred->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, whiteButtons));
@@ -88,6 +89,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonCredEdit->setIcon(awesome->icon(fa::pencilsquareo, whiteButtons));
     ui->pushButtonSettingsSave->setVisible(false);
     ui->pushButtonSettingsReset->setVisible(false);
+    ui->pushButtonMemMode->setIcon(awesome->icon(fa::database, whiteButtons));
+    ui->pushButtonQuickAddCred->setIcon(awesome->icon(fa::plussquare, whiteButtons));
 
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
@@ -473,13 +476,7 @@ void MainWindow::on_pushButtonShowPass_clicked()
 
 void MainWindow::on_pushButtonCredAdd_clicked()
 {
-    if (!wsClient->get_memMgmtMode()) return;
-
-    DialogEdit d(credModel);
-    if (d.exec())
-    {
-
-    }
+    on_pushButtonQuickAddCred_clicked();
 }
 
 void MainWindow::on_pushButtonCredEdit_clicked()
@@ -514,5 +511,35 @@ void MainWindow::on_pushButtonCredEdit_clicked()
     if (d.exec())
     {
 
+    }
+}
+
+void MainWindow::on_pushButtonQuickAddCred_clicked()
+{
+    DialogEdit d(credModel);
+    if (d.exec())
+    {
+        setEnabled(false);
+
+        QJsonObject o = {{ "service", d.getService() },
+                         { "login", d.getLogin() },
+                         { "password", d.getPassword() },
+                         { "description", d.getDescription() }};
+        wsClient->sendJsonData({{ "msg", "set_credential" },
+                                { "data", o }});
+
+        auto conn = std::make_shared<QMetaObject::Connection>();
+        *conn = connect(wsClient, &WSClient::addCredentialDone, [this, conn](bool success)
+        {
+            disconnect(*conn);
+            setEnabled(true);
+            if (!success)
+            {
+                QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential!"));
+                return;
+            }
+
+            QMessageBox::information(this, tr("Moolticute"), tr("New credential added successfully."));
+        });
     }
 }

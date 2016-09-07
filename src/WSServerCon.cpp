@@ -64,6 +64,26 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "set_credential")
+    {
+        QJsonObject o = root["data"].toObject();
+        mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
+                o["password"].toString(), o["description"].toString(),
+                [=](bool success)
+        {
+            if (!success)
+            {
+                sendFailedJson(root);
+                return;
+            }
+
+            QJsonObject ores = o;
+            QJsonObject oroot = root;
+            ores["password"] = "******";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else if (root["msg"] == "get_random_numbers")
     {
         mpdevice->getRandomNumber([=](bool success, const QByteArray &rndNums)

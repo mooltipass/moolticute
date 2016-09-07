@@ -13,6 +13,7 @@
 
 class AppGui : public QApplication
 {
+    Q_OBJECT
 public:
     AppGui(int &argc, char **argv);
     virtual ~AppGui();
@@ -21,7 +22,7 @@ public:
 
     void mainWindowShow();
     void mainWindowHide();
-    void enableDameon();
+    void enableDaemon();
     void disableDaemon();
 
 private slots:

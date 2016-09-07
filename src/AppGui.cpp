@@ -57,7 +57,8 @@ bool AppGui::initialize()
 
     systray->setContextMenu(systrayMenu);
 
-    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
+    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)),
+            this, SLOT(stateChange(Qt::ApplicationState)));
 
     connect(systray, &QSystemTrayIcon::activated, [this](QSystemTrayIcon::ActivationReason reason)
     {
@@ -220,7 +221,7 @@ void AppGui::stateChange(Qt::ApplicationState state)
 #endif
 }
 
-void AppGui::enableDameon()
+void AppGui::enableDaemon()
 {
 #if defined(Q_OS_MAC)
     QFileInfo file("~/Library/LaunchAgents/org.mooltipass.moolticute.plist");

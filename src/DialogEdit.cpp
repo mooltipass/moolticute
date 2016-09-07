@@ -7,6 +7,8 @@ DialogEdit::DialogEdit(CredentialsModel *creds, QWidget *parent) :
     ui(new Ui::DialogEdit),
     credentials(creds)
 {
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
     QtAwesome *awesome = new QtAwesome(this);
     awesome->initFontAwesome();
 
@@ -43,4 +45,24 @@ void DialogEdit::setPassword(const QString &s)
 void DialogEdit::setDescription(const QString &s)
 {
     ui->lineEditDesc->setText(s);
+}
+
+QString DialogEdit::getService()
+{
+    return ui->comboBoxService->currentText();
+}
+
+QString DialogEdit::getLogin()
+{
+    return ui->lineEditLogin->text();
+}
+
+QString DialogEdit::getPassword()
+{
+    return ui->lineEditPass->text();
+}
+
+QString DialogEdit::getDescription()
+{
+    return ui->lineEditDesc->text();
 }

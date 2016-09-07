@@ -774,3 +774,114 @@ void MPDevice::getRandomNumber(std::function<void(bool success, const QByteArray
 
     jobs->start();
 }
+
+void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs)
+{
+    QByteArray sdata = service.toUtf8();
+    sdata.append((char)0);
+
+    //Create context
+    jobs->prepend(new MPCommandJob(this, MP_ADD_CONTEXT,
+                  sdata,
+                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] != 1)
+        {
+            qWarning() << "Failed to add new context";
+            return false;
+        }
+        return true;
+    }));
+
+    //choose context
+    jobs->insertAfter(new MPCommandJob(this, MP_CONTEXT,
+                                  sdata,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] != 1)
+        {
+            qWarning() << "Failed to select new context";
+            return false;
+        }
+        return true;
+    }), 0);
+}
+
+void MPDevice::setCredential(const QString &service, const QString &login,
+                             const QString &pass, const QString &description,
+                             std::function<void(bool success)> cb)
+{
+    if (service.isEmpty() ||
+        pass.isEmpty())
+    {
+        qWarning() << "context or pass is empty.";
+        cb(false);
+        return;
+    }
+
+    AsyncJobs *jobs = new AsyncJobs(this);
+
+    QByteArray sdata = service.toUtf8();
+    sdata.append((char)0);
+
+    //First query if context exist
+    jobs->append(new MPCommandJob(this, MP_CONTEXT,
+                                  sdata,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] != 1)
+        {
+            //Context does not exists, create it
+            createJobAddContext(service, jobs);
+        }
+        return true;
+    }));
+
+    QByteArray ldata = login.toUtf8();
+    ldata.append((char)0);
+
+    jobs->append(new MPCommandJob(this, MP_SET_LOGIN,
+                                  ldata,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] == 0) return false;
+        return true;
+    }));
+
+    QByteArray pdata = pass.toUtf8();
+    pdata.append((char)0);
+
+    jobs->append(new MPCommandJob(this, MP_CHECK_PASSWORD,
+                                  pdata,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] != 1)
+        {
+            //Password does not match, update it
+            jobs->prepend(new MPCommandJob(this, MP_SET_PASSWORD,
+                                          pdata,
+                                          [=](const QByteArray &data, bool &) -> bool
+            {
+                if (data[2] == 0) return false;
+                return true;
+            }));
+        }
+
+        return true;
+    }));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        //all jobs finished success
+        cb(true);
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Failed adding new credential";
+        cb(false);
+    });
+
+    jobs->start();
+}

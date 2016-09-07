@@ -63,6 +63,20 @@ void AsyncJobs::append(AsyncJob *j)
     jobs.enqueue(j);
 }
 
+void AsyncJobs::prepend(AsyncJob *j)
+{
+    //reparent object to handle jobs memory from AsyncJobs
+    j->setParent(this);
+    jobs.prepend(j);
+}
+
+void AsyncJobs::insertAfter(AsyncJob *j, int pos)
+{
+    //reparent object to handle jobs memory from AsyncJobs
+    j->setParent(this);
+    jobs.insert(pos + 1, j);
+}
+
 void AsyncJobs::start()
 {
     if (running) return;

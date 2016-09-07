@@ -54,6 +54,7 @@ private slots:
     void on_pushButtonShowPass_clicked();
     void on_pushButtonCredAdd_clicked();
     void on_pushButtonCredEdit_clicked();
+    void on_pushButtonQuickAddCred_clicked();
 
 private:
 

@@ -125,6 +125,8 @@ public:
     virtual ~AsyncJobs();
 
     void append(AsyncJob *j);
+    void prepend(AsyncJob *j);
+    void insertAfter(AsyncJob *j, int pos);
 
     //user data attached to this job queue
     QVariant user_data;
