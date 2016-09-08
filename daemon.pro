@@ -83,4 +83,24 @@ DISTFILES += \
     src/http-parser/http_parser.gyp \
     src/http-parser/LICENSE-MIT \
     src/http-parser/AUTHORS \
-    src/http-parser/README.md
+    src/http-parser/README.md \
+    data/debug/app/scripts/main.js \
+    data/debug/dist/scripts/main.js \
+    data/debug/dist/scripts/plugins.js \
+    data/debug/dist/scripts/vendor.js \
+    data/debug/Gruntfile.js \
+    data/debug/bower.json \
+    data/debug/package.json \
+    data/debug/dist/fonts/glyphicons-halflings-regular.eot \
+    data/debug/dist/fonts/glyphicons-halflings-regular.woff \
+    data/debug/dist/fonts/glyphicons-halflings-regular.ttf \
+    data/debug/dist/fonts/glyphicons-halflings-regular.svg \
+    data/debug/app/styles/main.css \
+    data/debug/dist/styles/main.css \
+    data/debug/dist/styles/vendor.css \
+    data/debug/app/index.html \
+    data/debug/dist/index.html \
+    data/debug/dist/Makefile \
+    data/debug/dist/Makefile.am \
+    data/debug/dist/Makefile.in \
+    data/debug/README.md
