@@ -79,7 +79,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
     case MP_CONTEXT:
     {
         context = QString::fromUtf8(data.mid(2, data.length()));
-        qDebug() << "Contexte : " << context;
+        qDebug() << "Context : " << context;
         QByteArray d;
         d[0] = 1;
         d[1] = MP_CONTEXT;
@@ -120,12 +120,16 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = MP_ADD_CONTEXT;
 
         context = QString::fromUtf8(data.mid(2, data.length()));
-        qDebug() << "Contexte : " << context;
-        if (passwords.contains(context))
-            d[2] = 0x0;
+        qDebug() << "Context : " << context;
+        if (!passwords.contains(context))
+        {
+            passwords[context] = "";
+            logins[context] = "";
+            d[2] = 0x1;
+        }
         else
         {
-            d[2] = 0x01;
+            d[2] = 0x00;
         }
         emit platformDataRead(d);
         break;
