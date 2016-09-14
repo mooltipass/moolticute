@@ -60,6 +60,14 @@ void WSClient::onWsDisconnected()
 {
     qDebug() << "Websocket disconnect";
     force_connected(false);
+    closeWebsocket();
+
+    //Auto reconnect websocket connection on failure
+    QTimer::singleShot(500, [=]()
+    {
+        qDebug() << "Websocket open()";
+        openWebsocket();
+    });
 }
 
 void WSClient::onWsError()
