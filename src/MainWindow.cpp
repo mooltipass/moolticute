@@ -21,6 +21,39 @@
 #include "DialogEdit.h"
 #include "version.h"
 
+#define BITMAP_ID_OFFSET 128
+
+#define ID_KEYB_EN_US_LUT       BITMAP_ID_OFFSET+18
+#define ID_KEYB_FR_FR_LUT       BITMAP_ID_OFFSET+19
+#define ID_KEYB_ES_ES_LUT       BITMAP_ID_OFFSET+20
+#define ID_KEYB_DE_DE_LUT       BITMAP_ID_OFFSET+21
+#define ID_KEYB_ES_AR_LUT       BITMAP_ID_OFFSET+22
+#define ID_KEYB_EN_AU_LUT       BITMAP_ID_OFFSET+23
+#define ID_KEYB_FR_BE_LUT       BITMAP_ID_OFFSET+24
+#define ID_KEYB_PO_BR_LUT       BITMAP_ID_OFFSET+25
+#define ID_KEYB_EN_CA_LUT       BITMAP_ID_OFFSET+26
+#define ID_KEYB_CZ_CZ_LUT       BITMAP_ID_OFFSET+27
+#define ID_KEYB_DA_DK_LUT       BITMAP_ID_OFFSET+28
+#define ID_KEYB_FI_FI_LUT       BITMAP_ID_OFFSET+29
+#define ID_KEYB_HU_HU_LUT       BITMAP_ID_OFFSET+30
+#define ID_KEYB_IS_IS_LUT       BITMAP_ID_OFFSET+31
+#define ID_KEYB_IT_IT_LUT       BITMAP_ID_OFFSET+32  // So it seems Italian keyboards don't have ~`
+#define ID_KEYB_NL_NL_LUT       BITMAP_ID_OFFSET+33
+#define ID_KEYB_NO_NO_LUT       BITMAP_ID_OFFSET+34
+#define ID_KEYB_PO_PO_LUT       BITMAP_ID_OFFSET+35  // Polish programmer keyboard
+#define ID_KEYB_RO_RO_LUT       BITMAP_ID_OFFSET+36
+#define ID_KEYB_SL_SL_LUT       BITMAP_ID_OFFSET+37
+#define ID_KEYB_FRDE_CH_LUT     BITMAP_ID_OFFSET+38
+#define ID_KEYB_EN_UK_LUT       BITMAP_ID_OFFSET+39
+#define ID_KEYB_CZ_QWERTY_LUT   BITMAP_ID_OFFSET+51
+#define ID_KEYB_EN_DV_LUT       BITMAP_ID_OFFSET+52
+#define ID_KEYB_FR_MAC_LUT      BITMAP_ID_OFFSET+53
+#define ID_KEYB_FR_CH_MAC_LUT   BITMAP_ID_OFFSET+54
+#define ID_KEYB_DE_CH_MAC_LUT   BITMAP_ID_OFFSET+55
+#define ID_KEYB_DE_MAC_LUT      BITMAP_ID_OFFSET+56
+#define ID_KEYB_US_MAC_LUT BITMAP_ID_OFFSET+57
+
+
 #define CSS_BLUE_BUTTON "QPushButton {" \
                             "color: #fff;" \
                             "background-color: #60B1C7;" \
@@ -101,28 +134,41 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
 
     //Add languages to combobox
-    ui->comboBoxLang->addItem("cz_CZ", 155);
-    ui->comboBoxLang->addItem("da_DK", 156);
-    ui->comboBoxLang->addItem("de_DE", 149);
-    ui->comboBoxLang->addItem("en_AU", 151);
-    ui->comboBoxLang->addItem("en_CA", 154);
-    ui->comboBoxLang->addItem("en_UK", 167);
-    ui->comboBoxLang->addItem("en_US", 146);
-    ui->comboBoxLang->addItem("es_AR", 150);
-    ui->comboBoxLang->addItem("es_ES", 148);
-    ui->comboBoxLang->addItem("fi_FI", 157);
-    ui->comboBoxLang->addItem("fr_BE", 152);
-    ui->comboBoxLang->addItem("fr_FR", 147);
-    ui->comboBoxLang->addItem("frde_CH", 166);
-    ui->comboBoxLang->addItem("hu_HU", 158);
-    ui->comboBoxLang->addItem("is_IS", 159);
-    ui->comboBoxLang->addItem("it_IT", 160);
-    ui->comboBoxLang->addItem("nl_NL", 161);
-    ui->comboBoxLang->addItem("no_NO", 162);
-    ui->comboBoxLang->addItem("po_BR", 153);
-    ui->comboBoxLang->addItem("po_PO", 163);
-    ui->comboBoxLang->addItem("ro_RO", 164);
-    ui->comboBoxLang->addItem("sl_SL", 165);
+    ui->comboBoxLang->addItem("en_US", ID_KEYB_EN_US_LUT);
+    ui->comboBoxLang->addItem("fr_FR", ID_KEYB_FR_FR_LUT);
+    ui->comboBoxLang->addItem("es_ES", ID_KEYB_ES_ES_LUT);
+    ui->comboBoxLang->addItem("de_DE", ID_KEYB_DE_DE_LUT);
+    ui->comboBoxLang->addItem("es_AR", ID_KEYB_ES_AR_LUT);
+    ui->comboBoxLang->addItem("en_AU", ID_KEYB_EN_AU_LUT);
+    ui->comboBoxLang->addItem("fr_BE", ID_KEYB_FR_BE_LUT);
+    ui->comboBoxLang->addItem("po_BR", ID_KEYB_PO_BR_LUT);
+    ui->comboBoxLang->addItem("en_CA", ID_KEYB_EN_CA_LUT);
+    ui->comboBoxLang->addItem("cz_CZ", ID_KEYB_CZ_CZ_LUT);
+    ui->comboBoxLang->addItem("da_DK", ID_KEYB_DA_DK_LUT);
+    ui->comboBoxLang->addItem("fi_FI", ID_KEYB_FI_FI_LUT);
+    ui->comboBoxLang->addItem("hu_HU", ID_KEYB_HU_HU_LUT);
+    ui->comboBoxLang->addItem("is_IS", ID_KEYB_IS_IS_LUT);
+    ui->comboBoxLang->addItem("it_IT", ID_KEYB_IT_IT_LUT);
+    ui->comboBoxLang->addItem("nl_NL", ID_KEYB_NL_NL_LUT);
+    ui->comboBoxLang->addItem("no_NO", ID_KEYB_NO_NO_LUT);
+    ui->comboBoxLang->addItem("po_PO", ID_KEYB_PO_PO_LUT);
+    ui->comboBoxLang->addItem("ro_RO", ID_KEYB_RO_RO_LUT);
+    ui->comboBoxLang->addItem("sl_SL", ID_KEYB_SL_SL_LUT);
+    ui->comboBoxLang->addItem("frde_CH", ID_KEYB_FRDE_CH_LUT);
+    ui->comboBoxLang->addItem("en_UK", ID_KEYB_EN_UK_LUT);
+    ui->comboBoxLang->addItem("cs_QWERTY", ID_KEYB_CZ_QWERTY_LUT);
+    ui->comboBoxLang->addItem("en_DB", ID_KEYB_EN_DV_LUT);
+    ui->comboBoxLang->addItem("fr_MAC", ID_KEYB_FR_MAC_LUT);
+    ui->comboBoxLang->addItem("fr_CH_MAC", ID_KEYB_FR_CH_MAC_LUT);
+    ui->comboBoxLang->addItem("de_CH_MAC", ID_KEYB_DE_CH_MAC_LUT);
+    ui->comboBoxLang->addItem("de_MAC", ID_KEYB_DE_MAC_LUT);
+    ui->comboBoxLang->addItem("us_MAC", ID_KEYB_US_MAC_LUT);
+
+    QSortFilterProxyModel* proxy = new QSortFilterProxyModel(ui->comboBoxLang);
+    proxy->setSourceModel( ui->comboBoxLang->model());
+    ui->comboBoxLang->model()->setParent(proxy);
+    ui->comboBoxLang->setModel(proxy);
+    ui->comboBoxLang->model()->sort(0);
 
     ui->widgetParamMini->setVisible(false);
     ui->comboBoxScreenBrightness->addItem("20%", 51);
