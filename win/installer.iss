@@ -2,7 +2,7 @@
 #define MyAppID "{329B8184-21E7-463E-B1A6-789657616680}"
 #define MyAppPublisher "Moolticute"
 #define MyAppURL "http://themooltipass.com/"
-#define MyAppVersion "1.0"
+; #define MyAppVersion "1.0"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
