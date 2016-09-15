@@ -41,6 +41,8 @@ public:
     }
     virtual ~MPManager();
 
+    bool initialize();
+
     void stop();
     MPDevice *getDevice(int at);
     int getDeviceCount() { return devices.count(); }

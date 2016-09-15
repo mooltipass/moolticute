@@ -5,7 +5,8 @@
 #endif
 
 AppGui::AppGui(int & argc, char ** argv) :
-    QApplication(argc, argv)
+    QApplication(argc, argv),
+    sharedMem("moolticute")
 {
 }
 
@@ -19,6 +20,9 @@ bool AppGui::initialize()
 
     setAttribute(Qt::AA_UseHighDpiPixmaps);
 	setQuitOnLastWindowClosed(false);
+
+    if (!createSingleApplication())
+        return false;
 
     systray = new QSystemTrayIcon(this);
     QIcon icon(":/systray_disconnected.png");
@@ -102,12 +106,10 @@ bool AppGui::initialize()
         if (aboutToQuit)
             return;
 
-        daemonAction->updateStatus(DaemonMenuAction::StatusStopped);
         dRunning = false;
 
         if (needRestart)
         {
-            daemonAction->updateStatus(DaemonMenuAction::StatusRestarting);
             QTimer::singleShot(1500, [=]()
             {
                 daemonProcess->start(program, arguments);
@@ -122,14 +124,26 @@ bool AppGui::initialize()
         if (aboutToQuit)
             return;
 
-        daemonAction->updateStatus(DaemonMenuAction::StatusRunning);
         dRunning = true;
     });
 
-    daemonProcess->start(program, arguments);
+    //search for a potential daemon already running
+    searchDaemonTick();
+
+    //only start daemon if none are found
+    if (!foundDaemon)
+        daemonProcess->start(program, arguments);
 
     connect(daemonAction, &DaemonMenuAction::restartClicked, [=]()
     {
+        //We don't have control over daemon process, cannot restart it
+        if (daemonProcess->state() != QProcess::Running && foundDaemon)
+        {
+            QMessageBox::information(nullptr, "Moolticute",
+                                     tr("Can't restart daemon, it was started by hand and not using this App."));
+            return;
+        }
+
         if (dRunning)
         {
             daemonProcess->kill();
@@ -137,13 +151,16 @@ bool AppGui::initialize()
         }
         else
         {
-            daemonAction->updateStatus(DaemonMenuAction::StatusRestarting);
             QTimer::singleShot(1500, [=]()
             {
                 daemonProcess->start(program, arguments);
             });
         }
     });
+
+    timerDaemon = new QTimer(this);
+    connect(timerDaemon, SIGNAL(timeout()), SLOT(searchDaemonTick()));
+    timerDaemon->start(800);
 
     return true;
 }
@@ -184,7 +201,7 @@ void AppGui::mainWindowShow()
         return;
 
     win->show();
-    showConfigApp->setText(tr("&Hide Moolticute configurator"));
+    showConfigApp->setText(tr("&Hide Moolticute App"));
 #ifdef Q_OS_MAC
    utils::mac::hideDockIcon(false);
 #endif
@@ -196,7 +213,7 @@ void AppGui::mainWindowHide()
         return;
 
     win->hide();
-    showConfigApp->setText(tr("&Show Moolticute configurator"));
+    showConfigApp->setText(tr("&Show Moolticute App"));
 #ifdef Q_OS_MAC
    utils::mac::hideDockIcon(true);
 #endif
@@ -220,4 +237,97 @@ void AppGui::disableDaemon()
         QFile::remove("~/Library/LaunchAgents/org.mooltipass.moolticute.plist");
     }
 #endif
+}
+
+void AppGui::searchDaemonTick()
+{
+    //Search for the daemon from the shared mem segment
+    foundDaemon = false;
+
+    if (sharedMem.attach())
+    {
+        QJsonObject obj = Common::readSharedMemory(sharedMem);
+
+        //PID is stored as string to prevent double conversion in json
+        qint64 pid = obj["daemon_pid"].toString().toLongLong();
+
+        if (Common::isProcessRunning(pid))
+            foundDaemon = true;
+
+        sharedMem.detach();
+    }
+
+    if (foundDaemon)
+        daemonAction->updateStatus(DaemonMenuAction::StatusRunning);
+    else if (needRestart)
+        daemonAction->updateStatus(DaemonMenuAction::StatusRestarting);
+    else
+        daemonAction->updateStatus(DaemonMenuAction::StatusStopped);
+}
+
+bool AppGui::createSingleApplication()
+{
+    QString serverName = QApplication::organizationName() + QApplication::applicationName();
+    serverName.replace(QRegExp("[^\\w\\-. ]"), "");
+
+    // Attempt to connect to the LocalServer
+    QLocalSocket *localSocket = new QLocalSocket();
+    localSocket->connectToServer(serverName);
+    if(localSocket->waitForConnected(1000))
+    {
+        //App is already running. Send a "show" command to open the existing App
+
+        qInfo() << "AppGui already running.";
+        localSocket->write("show");
+        localSocket->waitForBytesWritten();
+        localSocket->close();
+        delete localSocket;
+
+        return false;
+    }
+    else
+    {
+        delete localSocket;
+
+        // If the connection is unsuccessful, this is the main process
+        // So we create a Local Server
+        localServer = new QLocalServer();
+        localServer->removeServer(serverName);
+        localServer->listen(serverName);
+        QObject::connect(localServer, SIGNAL(newConnection()), this, SLOT(slotConnectionEstablished()));
+    }
+
+    return true;
+}
+
+void AppGui::slotConnectionEstablished()
+{
+    //We have a new instance that wants to be opened
+    QLocalSocket *currSocket = localServer->nextPendingConnection();
+    connect(currSocket, &QLocalSocket::readyRead, [=]()
+    {
+        QString data(currSocket->readAll());
+
+        if (data == "show")
+        {
+            mainWindowShow();
+
+#ifdef Q_OS_WIN
+            //On windows the window is not forced at front sometimes. So force it
+            HWND hWnd = (HWND)win->winId();
+            ::ShowWindow(hWnd, SW_SHOW);
+            ::BringWindowToTop(hWnd);
+            ::SetForegroundWindow(hWnd);
+
+            //-- on Windows 7, this workaround brings window to top
+            ::SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+            ::SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+            ::SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
+#endif
+        }
+    });
+    connect(currSocket, &QLocalSocket::disconnected, [=]()
+    {
+        delete currSocket;
+    });
 }

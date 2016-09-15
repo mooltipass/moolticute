@@ -18,6 +18,18 @@
  ******************************************************************************/
 #include "Common.h"
 
+#ifndef Q_OS_WIN
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <errno.h>
+#else
+#include <qt_windows.h>
+#endif
+
 #ifdef Q_OS_WIN_DISABLE_FOR_NOW
 #define COLOR_LIGHTRED
 #define COLOR_RED
@@ -187,4 +199,80 @@ QJsonArray Common::bytesToJson(const QByteArray &data)
     for (int i = 0;i < data.size();i++)
         arr.append((quint8)data.at(i));
     return arr;
+}
+
+//Check if the process with <pid> is running
+bool Common::isProcessRunning(qint64 pid)
+{
+    if (pid == 0) return false;
+#if defined(Q_OS_WIN)
+    HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, pid);
+    if (!process) return false;
+    DWORD ret = WaitForSingleObject(process, 0);
+    CloseHandle(process);
+    return (ret == WAIT_TIMEOUT);
+#else
+    /* This code is portable on linux and macos (not tested on *BSD) */
+
+    pid_t p = (pid_t)pid;
+
+    //Wait for defunct process to end
+    while(waitpid(-1, 0, WNOHANG) > 0)
+    { /* wait for defunct... */ }
+
+    if (kill(pid, 0) == 0)
+        return true;
+
+    //For some process we do not have permission to send signal
+    //But this also means that the process exists
+    if (errno == EPERM)
+        return true;
+
+    return false;
+#endif
+}
+
+QJsonObject Common::readSharedMemory(QSharedMemory &sh)
+{
+    QJsonObject o;
+
+    if (!sh.lock())
+    {
+        qCritical() << "Unable to lock access to shared mem segment: " << sh.errorString();
+        return o;
+    }
+
+    QJsonParseError jerr;
+    QJsonDocument jdoc = QJsonDocument::fromJson((const char *)sh.constData(), &jerr);
+
+    if (jerr.error != QJsonParseError::NoError)
+    {
+        qCritical() << "Unable to parse shared mem JSON: " << jerr.errorString();
+        sh.detach();
+        sh.unlock();
+        return o;
+    }
+
+    o = jdoc.object();
+
+    sh.unlock();
+
+    return o;
+}
+
+bool Common::writeSharedMemory(QSharedMemory &sh, const QJsonObject &o)
+{
+    if (!sh.lock())
+    {
+        qCritical() << "Unable to lock access to shared mem segment: " << sh.errorString();
+        return false;
+    }
+
+    QJsonDocument jdoc(o);
+    QByteArray ba = jdoc.toJson(QJsonDocument::Compact);
+    memcpy(sh.data(), ba.constData(), ba.size());
+
+    sh.unlock();
+
+    return true;
 }

@@ -33,6 +33,9 @@
 
 #define MOOLTICUTE_DAEMON_PORT  30035
 
+//shared memory size
+#define SHMEM_SIZE      128 * 1024
+
 #define qToChar(s) s.toLocal8Bit().constData()
 #define qToUtf8(s) s.toUtf8().constData()
 
@@ -64,6 +67,11 @@ public:
     static QByteArray dateToBytes(const QDate &dt);
 
     static QJsonArray bytesToJson(const QByteArray &data);
+
+    static bool isProcessRunning(qint64 pid);
+
+    static QJsonObject readSharedMemory(QSharedMemory &sh);
+    static bool writeSharedMemory(QSharedMemory &sh, const QJsonObject &o);
 
     typedef enum
     {

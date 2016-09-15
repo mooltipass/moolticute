@@ -43,6 +43,8 @@ private:
     WSServer *wsServer;
     HttpServer *httpServer = nullptr;
 
+    //This is for communication between app/daemon
+    QSharedMemory sharedMem;
 };
 
 #endif // APPDAEMON_H

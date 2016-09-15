@@ -5,6 +5,8 @@
 #include <QObject>
 #include <QWidget>
 #include <QSystemTrayIcon>
+#include <QLocalServer>
+#include <QLocalSocket>
 
 #include "Common.h"
 #include "MainWindow.h"
@@ -27,20 +29,32 @@ public:
 
 private slots:
     void connectedChanged();
+    void searchDaemonTick();
+    void slotConnectionEstablished();
 
 private:
-     MainWindow *win;
-     QSystemTrayIcon * systray;
-     WSClient *wsClient;
-     QAction* showConfigApp;
-     DaemonMenuAction *daemonAction;
+     MainWindow *win = nullptr;
+     QSystemTrayIcon *systray = nullptr;
+     WSClient *wsClient = nullptr;
+     QAction *showConfigApp = nullptr;
+     DaemonMenuAction *daemonAction = nullptr;
 
-     QProcess *daemonProcess;
+     QProcess *daemonProcess = nullptr;
      bool dRunning = false;
      bool needRestart = false;
      bool aboutToQuit = false;
+     bool foundDaemon = false;
 
      quint64 lastStateChange = 0;
+
+     //This is for communication between app/daemon
+     QSharedMemory sharedMem;
+     QTimer *timerDaemon = nullptr;
+
+     //local server for single instance of the app
+     QLocalServer *localServer = nullptr;
+
+     bool createSingleApplication();
 };
 
 #endif // APPGUI_H
