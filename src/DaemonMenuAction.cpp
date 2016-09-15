@@ -11,6 +11,7 @@ DaemonMenuAction::DaemonMenuAction(QWidget *parent):
 
     txtLabel = new QLabel();
     layout->addWidget(txtLabel, 1);
+    txtLabel->setStyleSheet("QLabel { color : gray; }");
 
     restartButton = new QPushButton();
     layout->addWidget(restartButton);
