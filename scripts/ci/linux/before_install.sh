@@ -8,7 +8,7 @@ sudo apt-get -y install --install-recommends wine1.7
 wget https://calaos.fr/download/misc/InnoSetup5.zip -O $HOME/InnoSetup5.zip
 
 mkdir -p "$HOME/.wine/drive_c/Program Files/"
-pushd "$HOME/.wine/drive_c/Program\ Files/"
+pushd "$HOME/.wine/drive_c/Program Files/"
 unzip $HOME/InnoSetup5.zip
 popd
 
