@@ -318,7 +318,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    wsClient->closeWebsocket();
     event->accept();
     emit windowCloseRequested();
 }
