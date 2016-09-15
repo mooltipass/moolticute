@@ -44,6 +44,6 @@ cat installer.iss >> build.iss
 chmod +x iscc
 ./iscc build.iss
 
-upload_file build/$FILENAME.zip $(sha256sum build/$FILENAME.zip | cut -d' ' -f1) "windows"
+upload_file build/$FILENAME.exe $(sha256sum build/$FILENAME.exe | cut -d' ' -f1) "windows"
 
 popd
