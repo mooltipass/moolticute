@@ -24,6 +24,8 @@
 #include "Common.h"
 #include "MPManager.h"
 
+class WSServer;
+
 class WSServerCon: public QObject
 {
     Q_OBJECT
@@ -61,6 +63,7 @@ private slots:
 
 private:
     QWebSocket *wsClient;
+    WSServer *wsServer;
 
     MPDevice *mpdevice = nullptr;
 

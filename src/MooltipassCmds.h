@@ -74,6 +74,7 @@
 #define MP_ADD_DATA_SERVICE      0xBF
 #define MP_WRITE_32B_IN_DN       0xC0
 #define MP_READ_32B_IN_DN        0xC1
+#define MP_CANCEL_USER_REQUEST   0xC3
 #define MP_READ_FLASH_NODE       0xC5
 #define MP_WRITE_FLASH_NODE      0xC6
 #define MP_GET_FAVORITE          0xC7

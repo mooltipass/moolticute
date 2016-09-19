@@ -688,6 +688,11 @@ void MPDevice::setCurrentDate()
     sendData(MP_SET_DATE, d);
 }
 
+void MPDevice::cancelUserRequest()
+{
+    sendData(MP_CANCEL_USER_REQUEST, QByteArray());
+}
+
 void MPDevice::askPassword(const QString &service, const QString &login,
                         std::function<void(bool success, const QString &login, const QString &pass)> cb)
 {

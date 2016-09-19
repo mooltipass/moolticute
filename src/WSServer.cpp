@@ -19,8 +19,11 @@
 #include "WSServer.h"
 #include "WSServerCon.h"
 
-WSServer::WSServer(QObject *parent):
-    QObject(parent)
+WSServer::WSServer()
+{
+}
+
+bool WSServer::initialize()
 {
     wsServer = new QWebSocketServer(QStringLiteral("Moolticute Server"),
                                     QWebSocketServer::NonSecureMode,
@@ -34,7 +37,7 @@ WSServer::WSServer(QObject *parent):
     else
     {
         qCritical() << "Failed to listen on port " << MOOLTICUTE_DAEMON_PORT;
-        throw std::runtime_error("Failed to listen on websocket port");
+        return false;
     }
 
     connect(MPManager::Instance(), SIGNAL(mpConnected(MPDevice*)), this, SLOT(mpAdded(MPDevice*)));
@@ -42,6 +45,8 @@ WSServer::WSServer(QObject *parent):
 
     if (MPManager::Instance()->getDeviceCount() > 0)
         mpAdded(MPManager::Instance()->getDevice(0));
+
+    return true;
 }
 
 WSServer::~WSServer()
@@ -60,6 +65,7 @@ void WSServer::onNewConnection()
     c->sendInitialStatus();
 
     wsClients[wsocket] = c;
+    wsClientsReverse[c] = wsocket;
 
     qDebug() << "New connection";
 }
@@ -71,6 +77,7 @@ void WSServer::socketDisconnected()
     {
         qDebug() << "Connection closed " << wsClients[wsocket];
         wsClients[wsocket]->deleteLater();
+        wsClientsReverse.remove(wsClients[wsocket]);
         wsClients.remove(wsocket);
     }
 }
@@ -114,4 +121,18 @@ void WSServer::mpRemoved(MPDevice *dev)
             it.value()->resetDevice(device);
         }
     }
+}
+
+bool WSServer::checkClientExists(WSServerCon *wscon)
+{
+    if (!wsClientsReverse.contains(wscon))
+        return false;
+    return true;
+}
+
+bool WSServer::checkClientExists(QWebSocket *ws)
+{
+    if (!wsClients.contains(ws))
+        return false;
+    return true;
 }

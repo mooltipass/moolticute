@@ -33,8 +33,18 @@ class WSServer: public QObject
 {
     Q_OBJECT
 public:
-    explicit WSServer(QObject *parent = nullptr);
+    static WSServer *Instance()
+    {
+        static WSServer s;
+        return &s;
+    }
+    bool initialize();
+
     ~WSServer();
+
+    //check if a ws client still exists and has not been disconnected
+    bool checkClientExists(WSServerCon *wscon);
+    bool checkClientExists(QWebSocket *ws);
 
 private slots:
     void onNewConnection();
@@ -45,8 +55,10 @@ private slots:
     void mpRemoved(MPDevice *device);
 
 private:
+    WSServer();
     QWebSocketServer *wsServer = nullptr;
     QHash<QWebSocket *, WSServerCon *> wsClients;
+    QHash<WSServerCon *, QWebSocket *> wsClientsReverse; //reverse map for fast lookup
 
     //Current MP
     //For now only one MP is supported. maybe add multi support

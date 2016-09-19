@@ -93,7 +93,7 @@ bool AppDaemon::initialize()
 
     // An option with a value
     QCommandLineOption debugHttpServer(QStringList() << "s" << "debug-http-server",
-                                       QCoreApplication::translate("main", "Activate Http Server for debug mode. This mode is used to serve a web page on http://localhost:4789/debug in order to test/debug the webscoket API easyly."),
+                                       QCoreApplication::translate("main", "Activate Http Server for debug mode. This mode is used to serve a web page on http://localhost:XXXX/ in order to test/debug the webscoket API easyly."),
                                        QCoreApplication::translate("main", "port"));
     parser.addOption(debugHttpServer);
 
@@ -111,20 +111,11 @@ bool AppDaemon::initialize()
         }
     }
 
-    //Install and start mp manager instance
-    if (!MPManager::Instance()->initialize())
+    //Install and start mp manager instance and ws server
+    if (!MPManager::Instance()->initialize() ||
+        !WSServer::Instance()->initialize())
     {
         qCritical() << "Fatal error";
-        return false;
-    }
-
-    try
-    {
-        wsServer = new WSServer(this);
-    }
-    catch (const std::exception &e)
-    {
-        qCritical() << "Fatal error: " << e.what();
         return false;
     }
 

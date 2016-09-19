@@ -103,6 +103,9 @@ public:
     //get 32 random bytes from device
     void getRandomNumber(std::function<void(bool success, const QByteArray &nums)> cb);
 
+    //Send a cancel request to device
+    void cancelUserRequest();
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }
