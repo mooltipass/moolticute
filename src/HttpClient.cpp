@@ -99,14 +99,10 @@ int onMessageCompleteCb(http_parser *parser)
     return 0;
 }
 
-
-HttpClient::HttpClient(QTcpSocket *socket, QString cacheDirectory, QObject *parent) :
+HttpClient::HttpClient(QTcpSocket *socket, QObject *parent) :
     QObject(parent),
-    m_cacheDirectory(cacheDirectory),
     m_socket(socket)
 {
-
-
     m_httpParser = (http_parser*) calloc(1, sizeof(http_parser));
     http_parser_init(m_httpParser, HTTP_REQUEST);
     m_httpParser->data = this;
@@ -121,132 +117,44 @@ HttpClient::HttpClient(QTcpSocket *socket, QString cacheDirectory, QObject *pare
     m_httpParserSettings->on_body = onBodyCb;
     m_httpParserSettings->on_message_complete = onMessageCompleteCb;
 
-    connect(socket, &QTcpSocket::readyRead, [=]{
+    connect(socket, &QTcpSocket::readyRead, [=]
+    {
         parseRequest();
 
-        QString url(m_parseUrl);
-        QStringList arg = url.split('/');
-        QString localFilePath;
+        qDebug() << "Processing HTTP: " << m_parseUrl;
 
-        if (arg.size() > 1)
-        {
-            for (int i=1; i<arg.size(); i++)
-            {
-                if (i != 1)
-                {
-                    localFilePath += QDir::separator();
-                }
-                localFilePath += arg[i];
-            }
-        }
-        if (localFilePath.isEmpty() || localFilePath == "index.html")
-        {
-            QHash<QString, QString> headers;
-            QByteArray body("Hello Debug");
+        if (m_parseUrl == "/")
+            m_parseUrl = "/index.html";
 
-            int written = m_socket->write(buildHttpResponse(HTTP_200, headers, body));
-            if (written == -1)
-            {
+        QHash<QString, QString> headers;
+        headers["Connection"] = "Close";
+
+        QFile fp(QString(":/debug/dist%1").arg(QString(m_parseUrl)));
+
+        if (fp.exists() && fp.open(QIODevice::ReadOnly))
+        {
+            QString extension = QFileInfo(fp.fileName()).suffix().toLower();
+
+            if (extension == "js")
+                headers["Content-Type"] = "applicatiom/javascript";
+            else if (extension == "html")
+                headers["Content-Type"] = "text/html; charset=utf-8";
+            else if (extension == "css")
+                headers["Content-Type"] = "text/css; charset=utf-8";
+
+            if (m_socket->write(buildHttpResponse(HTTP_200, headers, fp.readAll())) == -1)
                 qCritical() << "HttpClient: writing error";
-            }
-
+            fp.close();
         }
         else
         {
-            int resize = -1;
-            if(localFilePath.contains('?'))
-            {
-                QStringList parameters = localFilePath.split('?');
-                localFilePath = parameters.first();
-                for (int i=1; i<parameters.size(); i++)
-                {
-                    QString parameter = parameters.at(i);
-                    if (parameter.startsWith("resize="))
-                    {
-                        parameter.remove("resize=");
-                        resize = parameter.toInt();
-                    }
-                }
-            }
-
-            localFilePath = m_cacheDirectory + QDir::separator() + localFilePath;
-
-            /* Check the file is inside the cache directory */
-            QDir dir;
-            dir.cd(QFileInfo(localFilePath).dir().path());
-            QString pwd = dir.path();
-            if (!pwd.startsWith(m_cacheDirectory))
-            {
-                qCritical() << "Don't serve path " << pwd << " as it is not in the cache.";
-            } else if (QFileInfo(localFilePath).isDir() || !QFileInfo(localFilePath).exists())
-            {
-                qCritical() << "Don't serve file " << localFilePath << " as it is not an existing file.";
-            }
-            else
-            {
-                QFile f(localFilePath);
-                if (f.open(QIODevice::ReadOnly))
-                {
-                    QString extension = QFileInfo(localFilePath).suffix().toLower();
-                    QHash<QString, QString> headers;
-                    QByteArray body;
-
-                    headers["Connection"] = "Close";
-                    headers["Content-Type"] = "image/" + extension;
-
-                    if (resize > 0)
-                    {
-                        /* In order not to have one image per size in the cache, we choose the
-                         * closest power of two (supperior)
-                         */
-                        for (int i=2; i<=2048; i*=2)
-                        {
-                            if (resize < i || i == 2048)
-                            {
-                                resize = i;
-                                break;
-                            }
-                        }
-
-                        f.close();
-                        f.setFileName(localFilePath+QString("_resized_%1px").arg(resize));
-                        if (!f.exists())
-                        {
-                            qDebug() << "Resize image to " << QString("%1 pixels").arg(resize);
-                            f.open(QIODevice::ReadWrite);
-                            QImage img(localFilePath);
-                            img = img.scaled(resize,resize,Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
-                            img.save(&f, extension.toStdString().c_str(), 100);
-                            f.seek(0);
-                        }
-                        else
-                        {
-                            f.open(QIODevice::ReadOnly);
-                        }
-                        body = f.readAll();
-                        f.close();
-                    }
-                    else
-                    {
-                        body = f.readAll();
-                    }
-
-                    int written = m_socket->write(buildHttpResponse(HTTP_200, headers, body));
-                    if (written == -1)
-                    {
-                        qCritical() << "HttpClient: writing error";
-                    }
-                    f.close();
-                }
-                else
-                {
-                    qCritical() << "Image '" << localFilePath << "' does not exist.";
-                }
-            }
+            headers["Content-Type"] = "text/html; charset=utf-8";
+            if (m_socket->write(buildHttpResponse(HTTP_404, headers, HTTP_404_BODY)) == -1)
+                qCritical() << "HttpClient: writing error";
         }
+
         socket->flush();
         CloseConnection();
-
     });
 }
 
@@ -274,7 +182,7 @@ void HttpClient::parseRequest()
     }
 }
 
-QByteArray HttpClient::buildHttpResponse(QString code, QHash<QString,QString> &headers, QByteArray &body)
+QByteArray HttpClient::buildHttpResponse(QString code, QHash<QString,QString> &headers, const QByteArray &body)
 {
     QByteArray res;
     res = code.toLatin1() + "\r\n";

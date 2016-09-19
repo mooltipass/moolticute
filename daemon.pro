@@ -104,3 +104,6 @@ DISTFILES += \
     data/debug/dist/Makefile.am \
     data/debug/dist/Makefile.in \
     data/debug/README.md
+
+RESOURCES += \
+    data/data_debug.qrc

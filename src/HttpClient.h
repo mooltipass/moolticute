@@ -16,7 +16,7 @@
     "<title>400 Bad Request</title>" \
     "</head>" \
     "<body>" \
-    "<h1>Calaos Server - Bad Request</h1>" \
+    "<h1>Moolticute Server - Bad Request</h1>" \
     "<p>The server received a request it could not understand.</p>" \
     "</body>" \
     "</html>"
@@ -25,7 +25,7 @@
     "<title>404 Not Found</title>" \
     "</head>" \
     "<body>" \
-    "<h1>Calaos Server - Page not found</h1>" \
+    "<h1>Moolticute Server - Page not found</h1>" \
     "<p>Document or file requested by the client was not found.</p>" \
     "</body>" \
     "</html>"
@@ -34,7 +34,7 @@
     "<title>500 Internal Server Error</title>" \
     "</head>" \
     "<body>" \
-    "<h1>Calaos Server - Internal Server Error</h1>" \
+    "<h1>Moolticute Server - Internal Server Error</h1>" \
     "<p>The server encountered an unexpected condition which prevented it from fulfilling the request.</p>" \
     "</body>" \
     "</html>"
@@ -44,11 +44,10 @@ class HttpClient : public QObject
 {
     Q_OBJECT
 public:
-    explicit HttpClient(QTcpSocket *socket, QString cacheDirectory, QObject *parent);
+    explicit HttpClient(QTcpSocket *socket, QObject *parent);
     ~HttpClient();
 
 private:
-    QString m_cacheDirectory;
     QTcpSocket *m_socket;
     http_parser *m_httpParser;
     http_parser_settings *m_httpParserSettings;
@@ -64,7 +63,7 @@ private:
 
     void parseRequest();
     void CloseConnection();
-    QByteArray buildHttpResponse(QString code, QHash<QString, QString> &headers, QByteArray &body);
+    QByteArray buildHttpResponse(QString code, QHash<QString, QString> &headers, const QByteArray &body);
 
     friend int onMessageBeginCb(http_parser *parser);
     friend int onUrlCb(http_parser *parser, const char *at, size_t length);

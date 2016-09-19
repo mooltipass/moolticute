@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>debug/dist/index.html</file>
+        <file>debug/dist/fonts/glyphicons-halflings-regular.eot</file>
+        <file>debug/dist/fonts/glyphicons-halflings-regular.svg</file>
+        <file>debug/dist/fonts/glyphicons-halflings-regular.ttf</file>
+        <file>debug/dist/fonts/glyphicons-halflings-regular.woff</file>
+        <file>debug/dist/scripts/main.js</file>
+        <file>debug/dist/scripts/plugins.js</file>
+        <file>debug/dist/scripts/vendor.js</file>
+        <file>debug/dist/styles/main.css</file>
+        <file>debug/dist/styles/vendor.css</file>
+    </qresource>
+</RCC>
