@@ -275,20 +275,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     {
         credFilterModel->setFilter(t);
     });
-    connect(wsClient, &WSClient::askPasswordDone, [=](bool success, const QString &pass)
-    {
-        setEnabled(true);
-        if (!success)
-        {
-            QMessageBox::warning(this, tr("Failure"), tr("Unable to query password!"));
-            passItem = nullptr;
-        }
-        else
-        {
-            if (passItem)
-                passItem->setText(pass);
-        }
-    });
+
+    connect(wsClient, &WSClient::askPasswordDone, this, &MainWindow::askPasswordDone);
 
     //When something changed in GUI, show save/reset buttons
     connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
@@ -539,23 +527,54 @@ void MainWindow::on_pushButtonCredEdit_clicked()
     if (!idx.parent().isValid())
         return;
 
+    QStandardItem *serviceIt = credModel->item(idx.parent().row());
+    QStandardItem *loginIt = serviceIt->child(idx.row(), 1);
+    QStandardItem *passIt = serviceIt->child(idx.row(), 2);
+    QStandardItem *descIt = serviceIt->child(idx.row(), 3);
+
+    //Password is unknown, ask first
+    if (!passIt->data(CredentialsModel::RoleHasPassword).toBool())
+    {
+        on_pushButtonShowPass_clicked();
+        editCredAsked = true;
+        return;
+    }
+
     DialogEdit d(credModel);
-
-    QStandardItem *pit = credModel->item(idx.parent().row());
-    d.setService(pit->text());
-
-    QStandardItem *it = pit->child(idx.row(), 1);
-    d.setLogin(it->text());
-
-    it = pit->child(idx.row(), 2);
-    d.setPassword(it->text());
-
-    it = pit->child(idx.row(), 3);
-    d.setDescription(it->text());
+    d.setService(serviceIt->text());
+    d.setLogin(loginIt->text());
+    d.setPassword(passIt->text());
+    d.setDescription(descIt->text());
 
     if (d.exec())
     {
+        setEnabled(false);
 
+        QJsonObject o = {{ "service", d.getService() },
+                         { "login", d.getLogin() },
+                         { "password", d.getPassword() },
+                         { "description", d.getDescription() }};
+        wsClient->sendJsonData({{ "msg", "set_credential" },
+                                { "data", o }});
+
+        auto conn = std::make_shared<QMetaObject::Connection>();
+        *conn = connect(wsClient, &WSClient::addCredentialDone, [=](bool success)
+        {
+            disconnect(*conn);
+            setEnabled(true);
+            if (!success)
+            {
+                QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential!"));
+                return;
+            }
+
+            serviceIt->setText(o["sevice"].toString());
+            loginIt->setText(o["login"].toString());
+            passIt->setText(o["password"].toString());
+            descIt->setText(o["description"].toString());
+
+            QMessageBox::information(this, tr("Moolticute"), tr("Update of credential done successfully."));
+        });
     }
 }
 
@@ -587,4 +606,25 @@ void MainWindow::on_pushButtonQuickAddCred_clicked()
             QMessageBox::information(this, tr("Moolticute"), tr("New credential added successfully."));
         });
     }
+}
+
+void MainWindow::askPasswordDone(bool success, const QString &pass)
+{
+    setEnabled(true);
+    if (!success)
+    {
+        QMessageBox::warning(this, tr("Failure"), tr("Unable to query password!"));
+        passItem = nullptr;
+    }
+    else
+    {
+        if (passItem)
+        {
+            passItem->setText(pass);
+            passItem->setData(true, CredentialsModel::RoleHasPassword);
+            if (editCredAsked)
+                QTimer::singleShot(1, this, SLOT(on_pushButtonCredEdit_clicked()));
+        }
+    }
+    editCredAsked = false;
 }

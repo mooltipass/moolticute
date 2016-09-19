@@ -848,6 +848,18 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         return true;
     }));
 
+    QByteArray ddata = description.toUtf8();
+    ddata.append((char)0);
+
+    //Set description should be done right after set login
+    jobs->append(new MPCommandJob(this, MP_SET_DESCRIPTION,
+                                  ddata,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] == 0) return false;
+        return true;
+    }));
+
     QByteArray pdata = pass.toUtf8();
     pdata.append((char)0);
 

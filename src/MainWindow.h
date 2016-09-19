@@ -47,6 +47,8 @@ private slots:
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
 
+    void askPasswordDone(bool success, const QString &pass);
+
     void on_pushButtonSettingsReset_clicked();
     void on_pushButtonSettingsSave_clicked();
     void on_pushButtonMemMode_clicked();
@@ -69,6 +71,8 @@ private:
     CredentialsFilterModel *credFilterModel;
 
     QStandardItem *passItem = nullptr;
+
+    bool editCredAsked = false;
 
     enum
     {

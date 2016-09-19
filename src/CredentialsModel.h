@@ -53,6 +53,7 @@ public:
     enum
     {
         RoleType = Qt::UserRole + 1,
+        RoleHasPassword,
     };
 
     enum

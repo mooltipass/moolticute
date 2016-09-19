@@ -119,6 +119,7 @@ void CredentialsModel::reloadData()
 
             rowData << new QStandardItem("******");
             rowData.last()->setData(TypeLogin, RoleType);
+            rowData.last()->setData(false, RoleHasPassword);
 
             rowData << new QStandardItem(cnode["description"].toString());
             rowData.last()->setData(TypeLogin, RoleType);
