@@ -72,7 +72,7 @@ void WSClient::onWsDisconnected()
 
 void WSClient::onWsError()
 {
-    qDebug() << "Websocket error: " << wsocket->errorString();
+    qDebug() << "Websocket error: " << (wsocket?wsocket->errorString():"No websocket object");
     closeWebsocket();
 
     //Auto reconnect websocket connection on failure

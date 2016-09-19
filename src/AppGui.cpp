@@ -169,7 +169,12 @@ void AppGui::connectedChanged()
 {
     if (!wsClient->get_connected())
     {
+#ifdef Q_OS_WIN
+        QIcon icon(":/systray_disconnected_white.png");
+#else
         QIcon icon(":/systray_disconnected.png");
+#endif
+
 #ifdef Q_OS_MAC
         icon.setIsMask(true);
 #endif
@@ -177,7 +182,12 @@ void AppGui::connectedChanged()
     }
     else
     {
+#ifdef Q_OS_WIN
+        QIcon icon(":/systray_white.png");
+#else
         QIcon icon(":/systray.png");
+#endif
+
 #ifdef Q_OS_MAC
         icon.setIsMask(true);
 #endif
