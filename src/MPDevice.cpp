@@ -39,13 +39,19 @@ MPDevice::MPDevice(QObject *parent):
                 if (s != get_status())
                 {
                     if (s == Common::Unlocked)
+                    {
                         QTimer::singleShot(10, [=]()
                         {
                             setCurrentDate();
                             loadParameters();
                         });
+                    }
                 }
                 set_status(s);
+            }
+            else if ((quint8)data.at(1) == MP_PLEASE_RETRY)
+            {
+                qDebug() << "Please retry received.";
             }
         });
     });
@@ -690,7 +696,17 @@ void MPDevice::setCurrentDate()
 
 void MPDevice::cancelUserRequest()
 {
-    sendData(MP_CANCEL_USER_REQUEST, QByteArray());
+    // send data with platform code
+    // This command is used to cancel a request.
+    // As the request may block the sending queue, we directly send the command
+    // and bypass the queue.
+
+    QByteArray ba;
+    ba.append((char)0);
+    ba.append(MP_CANCEL_USER_REQUEST);
+
+    qDebug() << "Platform send command: " << QString("0x%1").arg((quint8)ba[1], 2, 16, QChar('0'));
+    platformWrite(ba);
 }
 
 void MPDevice::askPassword(const QString &service, const QString &login,
