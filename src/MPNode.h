@@ -68,6 +68,10 @@ public:
     QDate getDateCreated();
     QDate getDateLastUsed();
 
+    //Data node address
+    //Address in data node is not at the same position as cred nodes
+    QByteArray getNextChildDataAddress();
+
     // NodeChildData properties
     QByteArray getNextDataAddress();
     QByteArray getChildData();

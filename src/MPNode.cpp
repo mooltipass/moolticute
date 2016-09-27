@@ -92,6 +92,14 @@ QByteArray MPNode::getPreviousChildAddress()
     return data.mid(2, 2);
 }
 
+QByteArray MPNode::getNextChildDataAddress()
+{
+    //in data nodes, there is no linked list
+    //the only address is the next one
+    //It is the same as previous for cred nodes
+    return getPreviousChildAddress();
+}
+
 QByteArray MPNode::getCTR()
 {
     if (!isValid()) return QByteArray();

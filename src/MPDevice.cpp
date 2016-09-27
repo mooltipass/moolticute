@@ -271,6 +271,10 @@ void MPDevice::newDataRead(const QByteArray &data)
     //we assume that the QByteArray size is at least 64 bytes
     //this should be done by the platform code
 
+    qWarning() << "---> Packet data " << " size:" << (quint8)data[0] << " data:" << QString("0x%1").arg((quint8)data[1], 2, 16, QChar('0'));
+    if ((quint8)data[1] == MP_DEBUG)
+        qWarning() << data;
+
     if (commandQueue.isEmpty())
     {
         qWarning() << "Command queue is empty!";
@@ -513,6 +517,16 @@ void MPDevice::startMemMgmtMode()
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
+
+        //Clear remaining data
+        ctrValue.clear();
+        cpzCtrValue.clear();
+        qDeleteAll(loginNodes);
+        loginNodes.clear();
+        qDeleteAll(dataNodes);
+        dataNodes.clear();
+        favoritesAddrs.clear();
+
         force_memMgmtMode(false);
     });
 
@@ -523,6 +537,8 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
 {
     MPNode *pnode = new MPNode(this);
     loginNodes.append(pnode);
+
+    qDebug() << "Loading cred parent node at address: " << address;
 
     jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
                                   address,
@@ -561,7 +577,9 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteAr
     MPNode *cnode = new MPNode(this);
     parent->appendChild(cnode);
 
-    jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
+    qDebug() << "Loading cred child node at address: " << address;
+
+    jobs->prepend(new MPCommandJob(this, MP_READ_FLASH_NODE,
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
@@ -591,6 +609,8 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
     MPNode *pnode = new MPNode(this);
     dataNodes.append(pnode);
 
+    qDebug() << "Loading data parent node at address: " << address;
+
     jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
@@ -605,16 +625,20 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
         else
         {
             //Node is loaded
-            qDebug() << "Parent data node loaded";
+            qDebug() << "Parent data node loaded: " << pnode->getService();
 
-            //Load next parent
-            if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
+            //Load data child
+            if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
             {
                 qDebug() << "Loading data child nodes...";
-                loadDataNode(jobs, pnode->getNextParentAddress());
+                loadDataChildNode(jobs, pnode, pnode->getStartChildAddress());
             }
             else
                 qDebug() << "Parent data node does not have childs.";
+
+            //Load next parent
+            if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
+                loadDataNode(jobs, pnode->getNextParentAddress());
         }
 
         return true;
@@ -626,7 +650,9 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
     MPNode *cnode = new MPNode(this);
     parent->appendChildData(cnode);
 
-    jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
+    qDebug() << "Loading data child node at address: " << address;
+
+    jobs->prepend(new MPCommandJob(this, MP_READ_FLASH_NODE,
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
@@ -643,8 +669,8 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
             qDebug() << "Child data node loaded";
 
             //Load next child
-            if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
-                loadDataChildNode(jobs, parent, cnode->getNextChildAddress());
+            if (cnode->getNextChildDataAddress() != MPNode::EmptyAddress)
+                loadDataChildNode(jobs, parent, cnode->getNextChildDataAddress());
         }
 
         return true;
