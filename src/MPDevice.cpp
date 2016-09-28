@@ -18,6 +18,8 @@
  ******************************************************************************/
 #include "MPDevice.h"
 
+const QRegularExpression regVersion("v([0-9]+)\.([0-9]+)(.*)");
+
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
 {
@@ -111,6 +113,17 @@ void MPDevice::loadParameters()
         qDebug() << "received MP version hw: " << hw;
         set_flashMbSize((quint8)data.at(2));
         set_hwVersion(hw);
+
+        QRegularExpressionMatchIterator i = regVersion.globalMatch(hw);
+        if (i.hasNext())
+        {
+            QRegularExpressionMatch match = i.next();
+            int v = match.captured(1).toInt() * 10 +
+                    match.captured(2).toInt();
+            isFw12 = v >= 12;
+            isMini = match.captured(3) == "_mini";
+        }
+
         return true;
     }));
 
@@ -727,6 +740,12 @@ void MPDevice::cancelUserRequest()
     // As the request may block the sending queue, we directly send the command
     // and bypass the queue.
 
+    if (!isFw12)
+    {
+        qDebug() << "cancelUserRequest not supported for fw < 1.2";
+        return;
+    }
+
     QByteArray ba;
     ba.append((char)0);
     ba.append(MP_CANCEL_USER_REQUEST);
@@ -912,21 +931,24 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         return true;
     }));
 
-    QByteArray ddata = description.toUtf8();
-    ddata.append((char)0);
-
-    //Set description should be done right after set login
-    jobs->append(new MPCommandJob(this, MP_SET_DESCRIPTION,
-                                  ddata,
-                                  [=](const QByteArray &data, bool &) -> bool
+    if (isFw12)
     {
-        if (data[2] == 0)
+        QByteArray ddata = description.toUtf8();
+        ddata.append((char)0);
+
+        //Set description should be done right after set login
+        jobs->append(new MPCommandJob(this, MP_SET_DESCRIPTION,
+                                      ddata,
+                                      [=](const QByteArray &data, bool &) -> bool
         {
-            jobs->setCurrentJobError("set_description failed on device");
-            return false;
-        }
-        return true;
-    }));
+            if (data[2] == 0)
+            {
+                jobs->setCurrentJobError("set_description failed on device");
+                return false;
+            }
+            return true;
+        }));
+    }
 
     QByteArray pdata = pass.toUtf8();
     pdata.append((char)0);

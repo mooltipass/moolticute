@@ -150,6 +150,9 @@ private:
 
     QList<MPNode *> loginNodes; //list of all parent nodes for credentials
     QList<MPNode *> dataNodes; //list of all parent nodes for data nodes
+
+    bool isMini = false; //true if fw is mini
+    bool isFw12 = false; //true if fw is at least v1.2
 };
 
 #endif // MPDEVICE_H
