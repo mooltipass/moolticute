@@ -18,7 +18,7 @@
  ******************************************************************************/
 #include "MPDevice.h"
 
-const QRegularExpression regVersion("v([0-9]+)\.([0-9]+)(.*)");
+const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)

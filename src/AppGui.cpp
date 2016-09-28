@@ -213,7 +213,8 @@ void AppGui::mainWindowShow()
     win->show();
     showConfigApp->setText(tr("&Hide Moolticute App"));
 #ifdef Q_OS_MAC
-   utils::mac::hideDockIcon(false);
+    utils::mac::hideDockIcon(false);
+    utils::mac::orderFrontRegardless(win->winId(), true);
 #endif
 }
 
@@ -225,7 +226,7 @@ void AppGui::mainWindowHide()
     win->hide();
     showConfigApp->setText(tr("&Show Moolticute App"));
 #ifdef Q_OS_MAC
-   utils::mac::hideDockIcon(true);
+    utils::mac::hideDockIcon(true);
 #endif
 }
 

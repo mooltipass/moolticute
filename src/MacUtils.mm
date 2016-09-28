@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <ServiceManagement/ServiceManagement.h>
+#import <Cocoa/Cocoa.h>
 #include <QDebug>
 
 namespace utils {
@@ -13,6 +14,14 @@ void hideDockIcon(bool hide)
         err = TransformProcessType(&psn, kProcessTransformToUIElementApplication);
     else
         err = TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+}
+
+void orderFrontRegardless(unsigned long long win_id, bool force)
+{
+  NSView *widget =  (__bridge NSView*)(void*)win_id;
+  NSWindow *window = [widget window];
+  if(force || [window isVisible])
+  [window performSelector:@selector(orderFrontRegardless) withObject:nil afterDelay:0.05];
 }
 
 /*

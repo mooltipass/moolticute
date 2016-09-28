@@ -19,7 +19,7 @@ win32 {
     CONFIG += link_pkgconfig
     PKGCONFIG += libusb-1.0
 } else:mac {
-    QMAKE_LFLAGS += -framework ApplicationServices -framework IOKit -framework CoreFoundation
+    LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation
 }
 
 win32 {

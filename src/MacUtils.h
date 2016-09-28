@@ -6,6 +6,7 @@ namespace utils {
 namespace mac {
 
 void hideDockIcon(bool hide);
+void orderFrontRegardless(unsigned long long win_id, bool force = false);
 
 } // namespace mac
 } // namespace utils

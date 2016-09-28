@@ -220,7 +220,7 @@ bool Common::isProcessRunning(qint64 pid)
     while(waitpid(-1, 0, WNOHANG) > 0)
     { /* wait for defunct... */ }
 
-    if (kill(pid, 0) == 0)
+    if (kill(p, 0) == 0)
         return true;
 
     //For some process we do not have permission to send signal
