@@ -20,6 +20,7 @@
 #include "ui_MainWindow.h"
 #include "DialogEdit.h"
 #include "version.h"
+#include "AutoStartup.h"
 
 #define BITMAP_ID_OFFSET 128
 
@@ -95,6 +96,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonDevSettings->setIcon(awesome->icon(fa::wrench));
     ui->pushButtonCred->setIcon(awesome->icon(fa::key));
     ui->pushButtonSync->setIcon(awesome->icon(fa::refresh));
+    ui->pushButtonAppSettings->setIcon(awesome->icon(fa::wrench));
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaled(500, ui->widgetHeader->sizeHint().height() - 8, Qt::KeepAspectRatio));
 
@@ -112,6 +114,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonExitMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonCredEdit->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonQuickAddCred->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, whiteButtons));
@@ -129,6 +133,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonSync, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonAbout, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonAppSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
 
     ui->pushButtonDevSettings->setChecked(false);
     ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
@@ -297,6 +302,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->widgetSpin->setPixmap(awesome->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
     connect(wsClient, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(memMgmtMode()));
+
+    checkAutoStart();
 }
 
 MainWindow::~MainWindow()
@@ -315,6 +322,12 @@ void MainWindow::updatePage()
     if (ui->pushButtonAbout->isChecked())
     {
         ui->stackedWidget->setCurrentIndex(PAGE_ABOUT);
+        return;
+    }
+
+    if (ui->pushButtonAppSettings->isChecked())
+    {
+        ui->stackedWidget->setCurrentIndex(PAGE_MC_SETTINGS);
         return;
     }
 
@@ -627,4 +640,44 @@ void MainWindow::askPasswordDone(bool success, const QString &pass)
         }
     }
     editCredAsked = false;
+}
+
+void MainWindow::on_pushButtonViewLogs_clicked()
+{
+
+}
+
+void MainWindow::on_pushButtonAutoStart_clicked()
+{
+    QSettings s;
+
+    bool en = s.value("settings/auto_start").toBool();
+
+    int ret;
+    if (en)
+        ret = QMessageBox::question(this, "Moolticute", tr("Disable autostart at boot?"));
+    else
+        ret = QMessageBox::question(this, "Moolticute", tr("Enable autostart at boot?"));
+
+    if (ret == QMessageBox::Yes)
+    {
+        s.setValue("settings/auto_start", !en);
+        s.sync();
+
+        checkAutoStart();
+    }
+}
+
+void MainWindow::checkAutoStart()
+{
+    QSettings s;
+
+    bool en = s.value("settings/auto_start").toBool();
+
+    AutoStartup::enableAutoStartup(en);
+    ui->labelAutoStart->setText(tr("Start Moolticute with the computer: %1").arg((en?"Enabled":"Disabled")));
+    if (en)
+        ui->pushButtonAutoStart->setText(tr("Disable"));
+    else
+        ui->pushButtonAutoStart->setText(tr("Enable"));
 }

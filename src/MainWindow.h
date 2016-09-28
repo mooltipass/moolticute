@@ -57,10 +57,14 @@ private slots:
     void on_pushButtonCredAdd_clicked();
     void on_pushButtonCredEdit_clicked();
     void on_pushButtonQuickAddCred_clicked();
+    void on_pushButtonViewLogs_clicked();
+    void on_pushButtonAutoStart_clicked();
 
 private:
 
     virtual void closeEvent(QCloseEvent *event);
+
+    void checkAutoStart();
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;
@@ -85,6 +89,7 @@ private:
         PAGE_CREDENTIALS = 6,
         PAGE_WAIT_CONFIRM = 7,
         PAGE_ABOUT = 8,
+        PAGE_MC_SETTINGS = 9,
     };
 };
 

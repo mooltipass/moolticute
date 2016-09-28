@@ -20,7 +20,8 @@ SOURCES += src/main_gui.cpp \
     src/CredentialsModel.cpp \
     src/DialogEdit.cpp \
     src/AppGui.cpp \
-    src/DaemonMenuAction.cpp
+    src/DaemonMenuAction.cpp \
+    src/AutoStartup.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -31,7 +32,8 @@ HEADERS  += src/MainWindow.h \
     src/DialogEdit.h \
     src/version.h \
     src/AppGui.h \
-    src/DaemonMenuAction.h
+    src/DaemonMenuAction.h \
+    src/AutoStartup.h
 
 mac {
     HEADERS += src/MacUtils.h
