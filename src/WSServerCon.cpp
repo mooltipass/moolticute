@@ -49,14 +49,14 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
         mpdevice->askPassword(o["service"].toString(), o["login"].toString(),
-                [=](bool success, const QString &login, const QString &pass)
+                [=](bool success, QString errstr, const QString &login, const QString &pass)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
             if (!success)
             {
-                sendFailedJson(root);
+                sendFailedJson(root, errstr);
                 return;
             }
 
@@ -73,14 +73,14 @@ void WSServerCon::processMessage(const QString &message)
         QJsonObject o = root["data"].toObject();
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(),
-                [=](bool success)
+                [=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
             if (!success)
             {
-                sendFailedJson(root);
+                sendFailedJson(root, errstr);
                 return;
             }
 
@@ -93,14 +93,14 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "get_random_numbers")
     {
-        mpdevice->getRandomNumber([=](bool success, const QByteArray &rndNums)
+        mpdevice->getRandomNumber([=](bool success, QString errstr, const QByteArray &rndNums)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
             if (!success)
             {
-                sendFailedJson(root);
+                sendFailedJson(root, errstr);
                 return;
             }
 
@@ -118,10 +118,12 @@ void WSServerCon::processMessage(const QString &message)
     }
 }
 
-void WSServerCon::sendFailedJson(QJsonObject obj)
+void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr)
 {
     QJsonObject odata;
     odata["failed"] = true;
+    if (!errstr.isEmpty())
+        odata["error_message"] = errstr;
     obj["data"] = odata;
     sendJsonMessage(obj);
 }

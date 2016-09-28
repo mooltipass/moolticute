@@ -93,15 +93,15 @@ public:
 
     //Ask a password for specified service/login to MP
     void askPassword(const QString &service, const QString &login,
-                     std::function<void(bool success, const QString &login, const QString &pass)> cb);
+                     std::function<void(bool success, QString errstr, const QString &login, const QString &pass)> cb);
 
     //Add or Set service/login/pass/desc in MP
     void setCredential(const QString &service, const QString &login,
                        const QString &pass, const QString &description,
-                       std::function<void(bool success)> cb);
+                       std::function<void(bool success, QString errstr)> cb);
 
     //get 32 random bytes from device
-    void getRandomNumber(std::function<void(bool success, const QByteArray &nums)> cb);
+    void getRandomNumber(std::function<void(bool success, QString errstr, const QByteArray &nums)> cb);
 
     //Send a cancel request to device
     void cancelUserRequest();

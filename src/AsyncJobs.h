@@ -53,12 +53,19 @@ public:
         QObject(parent)
     {}
 
+    void setErrorStr(QString err) { errorStr = err; }
+    QString getErrorStr() { return errorStr; }
+
 public slots:
     virtual void start(const QByteArray &data) = 0;
 
 signals:
     void done(const QByteArray &data);
     void error();
+
+protected:
+    //A potential error message to be set when a job failed
+    QString errorStr;
 };
 
 class MPDevice;
@@ -130,6 +137,8 @@ public:
 
     //user data attached to this job queue
     QVariant user_data;
+
+    void setCurrentJobError(QString err);
 
 public slots:
     void start();

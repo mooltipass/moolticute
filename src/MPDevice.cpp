@@ -736,7 +736,7 @@ void MPDevice::cancelUserRequest()
 }
 
 void MPDevice::askPassword(const QString &service, const QString &login,
-                        std::function<void(bool success, const QString &login, const QString &pass)> cb)
+                        std::function<void(bool success, QString errstr, const QString &login, const QString &pass)> cb)
 {
     AsyncJobs *jobs = new AsyncJobs(this);
 
@@ -750,6 +750,7 @@ void MPDevice::askPassword(const QString &service, const QString &login,
         if (data[2] != 1)
         {
             qWarning() << "Error setting context: " << (quint8)data[2];
+            jobs->setCurrentJobError("failed to select context on device");
             return false;
         }
         return true;
@@ -758,11 +759,18 @@ void MPDevice::askPassword(const QString &service, const QString &login,
     jobs->append(new MPCommandJob(this, MP_GET_LOGIN,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] == 0 && !login.isEmpty()) return false;
+        if (data[2] == 0 && !login.isEmpty())
+        {
+            jobs->setCurrentJobError("credential access refused by user");
+            return false;
+        }
 
         QString l = data.mid(2, data[0]);
         if (!login.isEmpty() && l != login)
+        {
+            jobs->setCurrentJobError("login mismatch");
             return false;
+        }
 
         jobs->user_data = l;
 
@@ -772,7 +780,11 @@ void MPDevice::askPassword(const QString &service, const QString &login,
     jobs->append(new MPCommandJob(this, MP_GET_PASSWORD,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] == 0) return false;
+        if (data[2] == 0)
+        {
+            jobs->setCurrentJobError("failed to query password on device");
+            return false;
+        }
         return true;
     }));
 
@@ -784,20 +796,19 @@ void MPDevice::askPassword(const QString &service, const QString &login,
         qInfo() << "Password retreived ok";
         QString pass = data.mid(2, data[0]);
 
-        cb(true, jobs->user_data.toString(), pass);
+        cb(true, QString(), jobs->user_data.toString(), pass);
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
-        Q_UNUSED(failedJob);
         qCritical() << "Failed getting password";
-        cb(false, QString(), QString());
+        cb(false, failedJob->getErrorStr(), QString(), QString());
     });
 
     jobs->start();
 }
 
-void MPDevice::getRandomNumber(std::function<void(bool success, const QByteArray &nums)> cb)
+void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, const QByteArray &nums)> cb)
 {
     AsyncJobs *jobs = new AsyncJobs(this);
 
@@ -809,14 +820,14 @@ void MPDevice::getRandomNumber(std::function<void(bool success, const QByteArray
         //all jobs finished success
 
         qInfo() << "Random numbers generated ok";
-        cb(true, data);
+        cb(true, QString(), data);
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
-        qCritical() << "Failed getting password";
-        cb(false, QByteArray());
+        qCritical() << "Failed generating rng";
+        cb(false, "failed to generate random numbers", QByteArray());
     });
 
     jobs->start();
@@ -835,6 +846,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs)
         if (data[2] != 1)
         {
             qWarning() << "Failed to add new context";
+            jobs->setCurrentJobError("add_context failed on device");
             return false;
         }
         return true;
@@ -848,6 +860,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs)
         if (data[2] != 1)
         {
             qWarning() << "Failed to select new context";
+            jobs->setCurrentJobError("unable to selected context on device");
             return false;
         }
         return true;
@@ -856,13 +869,13 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs)
 
 void MPDevice::setCredential(const QString &service, const QString &login,
                              const QString &pass, const QString &description,
-                             std::function<void(bool success)> cb)
+                             std::function<void(bool success, QString errstr)> cb)
 {
     if (service.isEmpty() ||
         pass.isEmpty())
     {
         qWarning() << "context or pass is empty.";
-        cb(false);
+        cb(false, "context or password is empty");
         return;
     }
 
@@ -891,7 +904,11 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                                   ldata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] == 0) return false;
+        if (data[2] == 0)
+        {
+            jobs->setCurrentJobError("set_login failed on device");
+            return false;
+        }
         return true;
     }));
 
@@ -903,7 +920,11 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                                   ddata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] == 0) return false;
+        if (data[2] == 0)
+        {
+            jobs->setCurrentJobError("set_description failed on device");
+            return false;
+        }
         return true;
     }));
 
@@ -921,7 +942,11 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                                           pdata,
                                           [=](const QByteArray &data, bool &) -> bool
             {
-                if (data[2] == 0) return false;
+                if (data[2] == 0)
+                {
+                    jobs->setCurrentJobError("set_password failed on device");
+                    return false;
+                }
                 return true;
             }));
         }
@@ -932,14 +957,13 @@ void MPDevice::setCredential(const QString &service, const QString &login,
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
         //all jobs finished success
-        cb(true);
+        cb(true, QString());
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
-        Q_UNUSED(failedJob);
         qCritical() << "Failed adding new credential";
-        cb(false);
+        cb(false, failedJob->getErrorStr());
     });
 
     jobs->start();

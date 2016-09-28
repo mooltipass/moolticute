@@ -113,3 +113,9 @@ void AsyncJobs::jobDone(const QByteArray &data)
 {
     dequeueStartJob(data);
 }
+
+void AsyncJobs::setCurrentJobError(QString err)
+{
+    if (currentJob)
+        currentJob->setErrorStr(err);
+}
