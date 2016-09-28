@@ -63,7 +63,6 @@ private slots:
 
 private:
     QWebSocket *wsClient;
-    WSServer *wsServer;
 
     MPDevice *mpdevice = nullptr;
 

@@ -75,7 +75,7 @@ void WSServerCon::processMessage(const QString &message)
                 o["password"].toString(), o["description"].toString(),
                 [=](bool success)
         {
-            if (!wsServer->checkClientExists(this))
+            if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
             if (!success)
@@ -95,7 +95,7 @@ void WSServerCon::processMessage(const QString &message)
     {
         mpdevice->getRandomNumber([=](bool success, const QByteArray &rndNums)
         {
-            if (!wsServer->checkClientExists(this))
+            if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
             if (!success)
