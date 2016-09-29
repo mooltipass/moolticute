@@ -51,7 +51,7 @@ void AutoStartup::enableAutoStartup(bool en)
     {
         if (f.open(QFile::WriteOnly | QFile::Truncate))
         {
-            f.write(desktopFileContents.toLocal8Bit());
+            f.write(desktopFile.toLocal8Bit());
             f.close();
         }
         f.setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner | QFile::ReadGroup | QFile::ReadGroup | QFile::WriteGroup | QFile::ReadOther);
