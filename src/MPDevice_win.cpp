@@ -284,7 +284,6 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
 
     if (overlapped == &writeOverlapped) //write op
     {
-        qDebug() << "ovlpNotified: write";
         if (fail)
         {
             qWarning() << "Failed to write data to device!";
@@ -294,7 +293,6 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
     }
     else if (overlapped == &readOverlapped) //read op
     {
-        qDebug() << "ovlpNotified: read";
         if (fail)
         {
             qWarning() << "Failed to read data from device!";

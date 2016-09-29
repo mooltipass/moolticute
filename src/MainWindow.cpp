@@ -642,11 +642,6 @@ void MainWindow::askPasswordDone(bool success, const QString &pass)
     editCredAsked = false;
 }
 
-void MainWindow::on_pushButtonViewLogs_clicked()
-{
-
-}
-
 void MainWindow::on_pushButtonAutoStart_clicked()
 {
     QSettings s;
@@ -680,4 +675,26 @@ void MainWindow::checkAutoStart()
         ui->pushButtonAutoStart->setText(tr("Disable"));
     else
         ui->pushButtonAutoStart->setText(tr("Enable"));
+}
+
+void MainWindow::daemonLogAppend(const QByteArray &logdata)
+{
+    if (dialogLog)
+        dialogLog->appendData(logdata);
+}
+
+void MainWindow::on_pushButtonViewLogs_clicked()
+{
+    if (dialogLog)
+    {
+        dialogLog->show();
+        return;
+    }
+
+    dialogLog = new DialogLog(this);
+    dialogLog->show();
+    connect(dialogLog, &DialogLog::rejected, [this]()
+    {
+        dialogLog = nullptr;
+    });
 }

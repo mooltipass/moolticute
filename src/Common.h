@@ -39,10 +39,14 @@
 #define qToChar(s) s.toLocal8Bit().constData()
 #define qToUtf8(s) s.toUtf8().constData()
 
+#define MOOLTICUTE_DAEMON_LOG_SOCK    "moolticuted_local_log_sock"
+
+class QLocalServer;
+
 class Common
 {
 public:
-    static void installMessageOutputHandler();
+    static void installMessageOutputHandler(QLocalServer *logServer = nullptr);
 
     Q_ENUMS(MPStatus)
     typedef enum

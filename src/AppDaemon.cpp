@@ -35,7 +35,10 @@ AppDaemon::AppDaemon(int &argc, char **argv):
 
 bool AppDaemon::initialize()
 {
-    Common::installMessageOutputHandler();
+    localLogServer = new QLocalServer(this);
+    localLogServer->removeServer(MOOLTICUTE_DAEMON_LOG_SOCK);
+    localLogServer->listen(MOOLTICUTE_DAEMON_LOG_SOCK);
+    Common::installMessageOutputHandler(localLogServer);
 
     QCoreApplication::setOrganizationName("Raoulh");
     QCoreApplication::setOrganizationDomain("raoulh.org");

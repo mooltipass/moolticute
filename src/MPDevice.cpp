@@ -37,9 +37,10 @@ MPDevice::MPDevice(QObject *parent):
             if ((quint8)data.at(1) == MP_MOOLTIPASS_STATUS)
             {
                 Common::MPStatus s = (Common::MPStatus)data.at(2);
-                qDebug() << "received MP_MOOLTIPASS_STATUS: " << (int)data.at(2);
                 if (s != get_status())
                 {
+                    qDebug() << "received MP_MOOLTIPASS_STATUS: " << (int)data.at(2);
+
                     if (s == Common::Unlocked)
                     {
                         QTimer::singleShot(10, [=]()
@@ -96,12 +97,14 @@ void MPDevice::sendDataDequeue()
     currentCmd.running = true;
 
     // send data with platform code
-    qDebug() << "Platform send command: " << QString("0x%1").arg((quint8)currentCmd.data[1], 2, 16, QChar('0'));
+    //qDebug() << "Platform send command: " << QString("0x%1").arg((quint8)currentCmd.data[1], 2, 16, QChar('0'));
     platformWrite(currentCmd.data);
 }
 
 void MPDevice::loadParameters()
 {
+    qInfo() << "Loading device parameters";
+
     AsyncJobs *jobs = new AsyncJobs(this);
 
     jobs->append(new MPCommandJob(this,
@@ -284,7 +287,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     //we assume that the QByteArray size is at least 64 bytes
     //this should be done by the platform code
 
-    qWarning() << "---> Packet data " << " size:" << (quint8)data[0] << " data:" << QString("0x%1").arg((quint8)data[1], 2, 16, QChar('0'));
+    //qWarning() << "---> Packet data " << " size:" << (quint8)data[0] << " data:" << QString("0x%1").arg((quint8)data[1], 2, 16, QChar('0'));
     if ((quint8)data[1] == MP_DEBUG)
         qWarning() << data;
 
@@ -309,6 +312,7 @@ void MPDevice::newDataRead(const QByteArray &data)
 
 void MPDevice::updateKeyboardLayout(int lang)
 {
+    qInfo() << "Updating keyboad layout: " << lang;
     QByteArray ba;
     ba.append((quint8)KEYBOARD_LAYOUT_PARAM);
     ba.append((quint8)lang);
@@ -317,6 +321,7 @@ void MPDevice::updateKeyboardLayout(int lang)
 
 void MPDevice::updateLockTimeoutEnabled(bool en)
 {
+    qInfo() << "Updating lock timeout enabled: " << en;
     QByteArray ba;
     ba.append((quint8)LOCK_TIMEOUT_ENABLE_PARAM);
     ba.append((quint8)en);
@@ -328,6 +333,8 @@ void MPDevice::updateLockTimeout(int timeout)
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
 
+    qInfo() << "Updating lock timeout: " << timeout;
+
     QByteArray ba;
     ba.append((quint8)LOCK_TIMEOUT_PARAM);
     ba.append((quint8)timeout);
@@ -336,6 +343,8 @@ void MPDevice::updateLockTimeout(int timeout)
 
 void MPDevice::updateScreensaver(bool en)
 {
+    qInfo() << "Updating screensaver enabled: " << en;
+
     QByteArray ba;
     ba.append((quint8)SCREENSAVER_PARAM);
     ba.append((quint8)en);
@@ -344,6 +353,8 @@ void MPDevice::updateScreensaver(bool en)
 
 void MPDevice::updateUserRequestCancel(bool en)
 {
+    qInfo() << "Updating user request cancel enabled: " << en;
+
     QByteArray ba;
     ba.append((quint8)USER_REQ_CANCEL_PARAM);
     ba.append((quint8)en);
@@ -355,6 +366,8 @@ void MPDevice::updateUserInteractionTimeout(int timeout)
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
 
+    qInfo() << "Updating user interaction timeout: " << timeout;
+
     QByteArray ba;
     ba.append((quint8)USER_INTER_TIMEOUT_PARAM);
     ba.append((quint8)timeout);
@@ -363,6 +376,8 @@ void MPDevice::updateUserInteractionTimeout(int timeout)
 
 void MPDevice::updateFlashScreen(bool en)
 {
+    qInfo() << "Updating flash screen enabled: " << en;
+
     QByteArray ba;
     ba.append((quint8)FLASH_SCREEN_PARAM);
     ba.append((quint8)en);
@@ -371,6 +386,8 @@ void MPDevice::updateFlashScreen(bool en)
 
 void MPDevice::updateOfflineMode(bool en)
 {
+    qInfo() << "Updating offline enabled: " << en;
+
     QByteArray ba;
     ba.append((quint8)OFFLINE_MODE_PARAM);
     ba.append((quint8)en);
@@ -379,6 +396,8 @@ void MPDevice::updateOfflineMode(bool en)
 
 void MPDevice::updateTutorialEnabled(bool en)
 {
+    qInfo() << "Updating tutorial enabled: " << en;
+
     QByteArray ba;
     ba.append((quint8)TUTORIAL_BOOL_PARAM);
     ba.append((quint8)en);
@@ -387,6 +406,8 @@ void MPDevice::updateTutorialEnabled(bool en)
 
 void MPDevice::updateScreenBrightness(int bval) //In percent
 {
+    qInfo() << "Updating screen brightness: " << bval;
+
     QByteArray ba;
     ba.append((quint8)MINI_OLED_CONTRAST_CURRENT_PARAM);
     ba.append((quint8)(bval));
@@ -395,6 +416,8 @@ void MPDevice::updateScreenBrightness(int bval) //In percent
 
 void MPDevice::updateKnockEnabled(bool en)
 {
+    qInfo() << "Updating knock enabled: " << en;
+
     QByteArray ba;
     ba.append((quint8)MINI_KNOCK_DETECT_ENABLE_PARAM);
     ba.append((quint8)en);
@@ -407,6 +430,8 @@ void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
     if (s == 0) v = 11;
     else if (s == 2) v = 5;
 
+    qInfo() << "Updating knock sensitivity: " << v;
+
     QByteArray ba;
     ba.append((quint8)MINI_KNOCK_THRES_PARAM);
     ba.append(v);
@@ -418,6 +443,8 @@ void MPDevice::startMemMgmtMode()
     /* Start MMM here, and load all memory data from the device
      * (favorites, nodes, etc...)
      */
+
+    qInfo() << "Starting MMM mode";
 
     if (get_memMgmtMode()) return;
 
@@ -694,6 +721,8 @@ void MPDevice::exitMemMgmtMode()
 {
     if (!get_memMgmtMode()) return;
 
+    qInfo() << "Exiting MMM";
+
     ctrValue.clear();
     cpzCtrValue.clear();
     qDeleteAll(loginNodes);
@@ -726,6 +755,8 @@ void MPDevice::setCurrentDate()
     //build current date payload and send to device
     QByteArray d = Common::dateToBytes(QDate::currentDate());
 
+    qInfo() << "send current date to device: " << d;
+
     qDebug() << "Sending current date: " <<
                 QString("0x%1").arg((quint8)d[0], 2, 16, QChar('0')) <<
                 QString("0x%1").arg((quint8)d[1], 2, 16, QChar('0'));
@@ -746,6 +777,8 @@ void MPDevice::cancelUserRequest()
         return;
     }
 
+    qInfo() << "cancel user request";
+
     QByteArray ba;
     ba.append((char)0);
     ba.append(MP_CANCEL_USER_REQUEST);
@@ -757,6 +790,8 @@ void MPDevice::cancelUserRequest()
 void MPDevice::askPassword(const QString &service, const QString &login,
                         std::function<void(bool success, QString errstr, const QString &login, const QString &pass)> cb)
 {
+    qInfo() << "Ask for password for service: " << service << " login: " << login;
+
     AsyncJobs *jobs = new AsyncJobs(this);
 
     QByteArray sdata = service.toUtf8();
@@ -831,6 +866,8 @@ void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, 
 {
     AsyncJobs *jobs = new AsyncJobs(this);
 
+    qInfo() << "Get random numbers from device";
+
     jobs->append(new MPCommandJob(this, MP_GET_RANDOM_NUMBER, QByteArray()));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
@@ -868,6 +905,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs)
             jobs->setCurrentJobError("add_context failed on device");
             return false;
         }
+        qDebug() << "context " << service << " added";
         return true;
     }));
 
@@ -882,6 +920,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs)
             jobs->setCurrentJobError("unable to selected context on device");
             return false;
         }
+        qDebug() << "set_context " << service;
         return true;
     }), 0);
 }
@@ -898,6 +937,8 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         return;
     }
 
+    qInfo() << "Adding/Changing credential for service: " << service << " login: " << login;
+
     AsyncJobs *jobs = new AsyncJobs(this);
 
     QByteArray sdata = service.toUtf8();
@@ -910,9 +951,12 @@ void MPDevice::setCredential(const QString &service, const QString &login,
     {
         if (data[2] != 1)
         {
+            qWarning() << "context " << service << " does not exist";
             //Context does not exists, create it
             createJobAddContext(service, jobs);
         }
+        else
+            qDebug() << "set_context " << service;
         return true;
     }));
 
@@ -926,8 +970,10 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         if (data[2] == 0)
         {
             jobs->setCurrentJobError("set_login failed on device");
+            qWarning() << "failed to set login to " << login;
             return false;
         }
+        qDebug() << "set_login " << login;
         return true;
     }));
 
@@ -944,8 +990,10 @@ void MPDevice::setCredential(const QString &service, const QString &login,
             if (data[2] == 0)
             {
                 jobs->setCurrentJobError("set_description failed on device");
+                qWarning() << "Failed to set description to: " << description;
                 return false;
             }
+            qDebug() << "set_description " << description;
             return true;
         }));
     }
@@ -967,11 +1015,15 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                 if (data[2] == 0)
                 {
                     jobs->setCurrentJobError("set_password failed on device");
+                    qWarning() << "failed to set_password";
                     return false;
                 }
+                qDebug() << "set_password ok";
                 return true;
             }));
         }
+        else
+            qDebug() << "password not changed";
 
         return true;
     }));
@@ -979,6 +1031,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
         //all jobs finished success
+        qInfo() << "set_credential success";
         cb(true, QString());
     });
 

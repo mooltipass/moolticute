@@ -274,6 +274,14 @@ void AppGui::searchDaemonTick()
         daemonAction->updateStatus(DaemonMenuAction::StatusRestarting);
     else
         daemonAction->updateStatus(DaemonMenuAction::StatusStopped);
+
+    if (foundDaemon)
+    {
+        delete logSocket;
+        logSocket = new QLocalSocket(this);
+        logSocket->connectToServer(MOOLTICUTE_DAEMON_LOG_SOCK);
+        connect(logSocket, SIGNAL(readyRead()), this, SLOT(daemonLogRead()));
+    }
 }
 
 bool AppGui::createSingleApplication()
@@ -341,4 +349,14 @@ void AppGui::slotConnectionEstablished()
     {
         delete currSocket;
     });
+}
+
+void AppGui::daemonLogRead()
+{
+    while (logSocket->canReadLine())
+    {
+        QByteArray out = logSocket->readLine();
+        win->daemonLogAppend(out);
+        //qDebug() << QString::fromUtf8(out);
+    }
 }

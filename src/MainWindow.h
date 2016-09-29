@@ -23,6 +23,7 @@
 #include "WSClient.h"
 #include <QtAwesome.h>
 #include "CredentialsModel.h"
+#include "DialogLog.h"
 
 namespace Ui {
 class MainWindow;
@@ -35,6 +36,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(WSClient *client, QWidget *parent = 0);
     ~MainWindow();
+
+    void daemonLogAppend(const QByteArray &logdata);
 
 signals:
     void windowCloseRequested();
@@ -77,6 +80,8 @@ private:
     QStandardItem *passItem = nullptr;
 
     bool editCredAsked = false;
+
+    DialogLog *dialogLog = nullptr;
 
     enum
     {

@@ -22,6 +22,7 @@
 #include <QApplication>
 #include <QObject>
 #include <QSettings>
+#include <QLocalServer>
 
 #include "Common.h"
 #include "MPManager.h"
@@ -45,6 +46,9 @@ private:
 
     //This is for communication between app/daemon
     QSharedMemory sharedMem;
+
+    //this is to send out logs to gui app
+    QLocalServer *localLogServer = nullptr;
 };
 
 #endif // APPDAEMON_H

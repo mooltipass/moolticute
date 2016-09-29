@@ -17,6 +17,8 @@
  **
  ******************************************************************************/
 #include "Common.h"
+#include <QLocalServer>
+#include <QLocalSocket>
 
 #ifndef Q_OS_WIN
 #include <stdio.h>
@@ -97,75 +99,68 @@ Common::MPStatus Common::statusFromString(const QString &st)
     return Common::UnknownStatus;
 }
 
-static QFile debugLogFile;
+static QLocalServer *debugLogServer = nullptr;
+static QList<QLocalSocket *> debugLogClients;
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QString fname = context.file;
     fname = fname.section('\\', -1, -1);
 
+    QString s;
     switch (type) {
     default:
     case QtDebugMsg:
     {
-        QString s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        printf("%s", qPrintable(s));
-        if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
+        s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtInfoMsg:
     {
-        QString s = QString(COLOR_GREEN "INFO" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        printf("%s", qPrintable(s));
-        if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
+        s = QString(COLOR_GREEN "INFO" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtWarningMsg:
     {
-        QString s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        printf("%s", qPrintable(s));
-        if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
+        s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtCriticalMsg:
     {
-        QString s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        printf("%s", qPrintable(s));
-        if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
+        s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtFatalMsg:
     {
-        QString s = QString(COLOR_RED "FATAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        printf("%s", qPrintable(s));
-        if (debugLogFile.isOpen()) debugLogFile.write(s.toLocal8Bit());
+        s = QString(COLOR_RED "FATAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
         break;
     }
     }
 
-    if (debugLogFile.isOpen())
-        debugLogFile.flush();
-    fflush(stdout);
+    if (!s.isEmpty())
+    {
+        printf("%s", qPrintable(s));
+        fflush(stdout);
+
+        for (QLocalSocket *sock: debugLogClients)
+        {
+            sock->write(s.toUtf8());
+            sock->flush();
+        }
+    }
 }
 
-void Common::installMessageOutputHandler()
+void Common::installMessageOutputHandler(QLocalServer *logServer)
 {
-    if (!debugLogFile.isOpen())
+    debugLogServer = logServer;
+    if (debugLogServer)
     {
-        //simple logrotate
-        QString f = QCoreApplication::applicationDirPath() + "/app.log";
-        QFileInfo fi(f);
-        if (fi.size() > 10 * 1024 * 1024) //10Mb max
+        QObject::connect(debugLogServer, &QLocalServer::newConnection, []()
         {
-            QFile::remove(f + ".5"); //remove really old
-            QFile::rename(f + ".4", f + ".5");
-            QFile::rename(f + ".3", f + ".4");
-            QFile::rename(f + ".2", f + ".3");
-            QFile::rename(f, f + ".2");
-        }
-
-        debugLogFile.setFileName(f);
-        //debugLogFile.open(QFile::ReadWrite | QFile::Append);
-        //debugLogFile.write(QString(DEBUG_START_LINE).arg(QDateTime::currentDateTime().toString()).toLocal8Bit());
+            //New clients gets added to the list
+            //and logs will be forwarded to them
+            if (debugLogServer->hasPendingConnections())
+                debugLogClients.append(debugLogServer->nextPendingConnection());
+        });
     }
     qInstallMessageHandler(_messageOutput);
 }

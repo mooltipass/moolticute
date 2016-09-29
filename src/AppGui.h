@@ -32,6 +32,8 @@ private slots:
     void searchDaemonTick();
     void slotConnectionEstablished();
 
+    void daemonLogRead();
+
 private:
      MainWindow *win = nullptr;
      QSystemTrayIcon *systray = nullptr;
@@ -53,6 +55,9 @@ private:
 
      //local server for single instance of the app
      QLocalServer *localServer = nullptr;
+
+     //This socket gives us access to the daemon log
+     QLocalSocket *logSocket = nullptr;
 
      bool createSingleApplication();
 };

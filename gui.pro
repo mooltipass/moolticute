@@ -21,7 +21,10 @@ SOURCES += src/main_gui.cpp \
     src/DialogEdit.cpp \
     src/AppGui.cpp \
     src/DaemonMenuAction.cpp \
-    src/AutoStartup.cpp
+    src/AutoStartup.cpp \
+    src/DialogLog.cpp \
+    src/OutputLog.cpp \
+    src/AnsiEscapeCodeHandler.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -33,7 +36,10 @@ HEADERS  += src/MainWindow.h \
     src/version.h \
     src/AppGui.h \
     src/DaemonMenuAction.h \
-    src/AutoStartup.h
+    src/AutoStartup.h \
+    src/DialogLog.h \
+    src/OutputLog.h \
+    src/AnsiEscapeCodeHandler.h
 
 mac {
     HEADERS += src/MacUtils.h
@@ -43,7 +49,8 @@ mac {
 INCLUDEPATH += src
 
 FORMS    += src/MainWindow.ui \
-    src/DialogEdit.ui
+    src/DialogEdit.ui \
+    src/DialogLog.ui
 
 RESOURCES += \
     img/images.qrc
