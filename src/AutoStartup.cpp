@@ -2,6 +2,10 @@
 
 #include <QtCore>
 
+#ifdef Q_OS_MAC
+#include "MacUtils.h"
+#endif
+
 void AutoStartup::enableAutoStartup(bool en)
 {
 #if defined(Q_OS_WIN)
@@ -57,5 +61,7 @@ void AutoStartup::enableAutoStartup(bool en)
         if (f.exists())
             f.remove();
     }
+#elif defined(Q_OS_MAC)
+    utils::mac::setAutoStartup(en);
 #endif
 }

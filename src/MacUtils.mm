@@ -30,21 +30,67 @@ void orderFrontRegardless(unsigned long long win_id, bool force)
  * https://developer.apple.com/library/content/documentation/Security/Conceptual/AppSandboxDesignGuide/AboutAppSandbox/AboutAppSandbox.html
  * https://github.com/olav-st/screencloud/tree/master/ScreenCloudHelper
  *
-void setAutoStartup(bool en)
+ * For now we can just add ourself to the login items list in System Preferences / Users/ Login Items
+ */
+
+LSSharedFileListItemRef FindLoginItemForCurrentBundle(CFArrayRef currentLoginItems)
 {
-    CFBundleRef mainBundle = CFBundleGetMainBundle();
-    NSURL *mainBundleURL = [[NSBundle mainBundle] bundleURL];
-    NSURL *url = [mainBundleURL URLByAppendingPathComponent: @"Contents/Library/LoginItems/MoolticuteHelper.app"];
-    if (LSRegisterURL((CFURLRef)url, true) != noErr)
+    CFURLRef mainBundleURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+
+    for (int i = 0, end = CFArrayGetCount(currentLoginItems);i < end;++i)
     {
-        WARNING("LSRegisterURL failed. URL: " + QString([[url absoluteString] UTF8String]));
+        LSSharedFileListItemRef item = (LSSharedFileListItemRef)CFArrayGetValueAtIndex(currentLoginItems, i);
+
+        UInt32 resolutionFlags = kLSSharedFileListNoUserInteraction | kLSSharedFileListDoNotMountVolumes;
+        CFURLRef url = NULL;
+        OSStatus err = LSSharedFileListItemResolve(item, resolutionFlags, &url, NULL);
+
+        if (err == noErr)
+        {
+            bool foundIt = CFEqual(url, mainBundleURL);
+            CFRelease(url);
+
+            if (foundIt)
+            {
+                CFRelease(mainBundleURL);
+                return item;
+            }
+        }
     }
 
-    NSString *ref = @"org.raoulh.moolticute";
-    if (!SMLoginItemSetEnabled((CFStringRef)ref, en))
-        qWarning() << "SMLoginItemSetEnabled failed.";
+    CFRelease(mainBundleURL);
+    return NULL;
 }
-*/
+
+void setAutoStartup(bool en)
+{
+    LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
+
+    if (!loginItems)
+    {
+        qWarning() << "LSSharedFileListCreate() failed";
+        return;
+    }
+
+    UInt32 seed = 0U;
+    CFArrayRef currentLoginItems = LSSharedFileListCopySnapshot(loginItems, &seed);
+    LSSharedFileListItemRef existingItem = FindLoginItemForCurrentBundle(currentLoginItems);
+
+    if (en && (existingItem == NULL))
+    {
+        CFURLRef mainBundleURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+        LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemBeforeFirst, NULL, NULL, mainBundleURL, NULL, NULL);
+        CFRelease(mainBundleURL);
+    }
+    else if (!en && (existingItem != NULL))
+    {
+        LSSharedFileListItemRemove(loginItems, existingItem);
+    }
+
+    CFRelease(currentLoginItems);
+    CFRelease(loginItems);
+
+}
 
 } // namespace mac
 } // namespace utils
