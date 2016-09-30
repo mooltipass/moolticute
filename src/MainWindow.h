@@ -82,6 +82,7 @@ private:
     bool editCredAsked = false;
 
     DialogLog *dialogLog = nullptr;
+    QByteArray logBuffer;
 
     enum
     {

@@ -37,7 +37,7 @@ void RotateSpinner::paintEvent(QPaintEvent *)
         p.save();
         p.rotate(rotation);
         QRect r = pix.rect();
-        r.moveCenter(QPoint(0, 0));
+        r.moveCenter(QPoint(-1, -1));
         p.drawPixmap(r, pix);
         p.restore();
     }

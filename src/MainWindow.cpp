@@ -96,7 +96,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonDevSettings->setIcon(awesome->icon(fa::wrench));
     ui->pushButtonCred->setIcon(awesome->icon(fa::key));
     ui->pushButtonSync->setIcon(awesome->icon(fa::refresh));
-    ui->pushButtonAppSettings->setIcon(awesome->icon(fa::wrench));
+    ui->pushButtonAppSettings->setIcon(awesome->icon(fa::cogs));
+    ui->pushButtonAbout->setIcon(awesome->icon(fa::info));
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaled(500, ui->widgetHeader->sizeHint().height() - 8, Qt::KeepAspectRatio));
 
@@ -681,6 +682,12 @@ void MainWindow::daemonLogAppend(const QByteArray &logdata)
 {
     if (dialogLog)
         dialogLog->appendData(logdata);
+    logBuffer.append(logdata);
+
+    const int maxsz = 100 * 1024;
+
+    if (logBuffer.size() > maxsz)
+        logBuffer = logBuffer.right(maxsz);
 }
 
 void MainWindow::on_pushButtonViewLogs_clicked()
@@ -692,6 +699,7 @@ void MainWindow::on_pushButtonViewLogs_clicked()
     }
 
     dialogLog = new DialogLog(this);
+    dialogLog->appendData(logBuffer);
     dialogLog->show();
     connect(dialogLog, &DialogLog::rejected, [this]()
     {
