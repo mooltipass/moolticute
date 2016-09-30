@@ -48,8 +48,8 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "ask_password")
     {
         QJsonObject o = root["data"].toObject();
-        mpdevice->askPassword(o["service"].toString(), o["login"].toString(),
-                [=](bool success, QString errstr, const QString &login, const QString &pass)
+        mpdevice->askPassword(o["service"].toString(), o["login"].toString(), o["fallback_service"].toString(),
+                [=](bool success, QString errstr, const QString &service, const QString &login, const QString &pass)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
@@ -60,8 +60,9 @@ void WSServerCon::processMessage(const QString &message)
                 return;
             }
 
-            QJsonObject ores = o;
+            QJsonObject ores;
             QJsonObject oroot = root;
+            ores["service"] = service;
             ores["login"] = login;
             ores["password"] = pass;
             oroot["data"] = ores;

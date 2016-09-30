@@ -5,7 +5,7 @@ var apiList = ['{"msg": ""}',
                '{"msg": "param_set", "data": {"flash_screen": false, "keyboard_layout": 155,"knock_enabled": false, "knock_sensitivity": 1,"lock_timeout": 0,"lock_timeout_enabled": false,"offline_mode": false,"screen_brightness": 51, "screensaver": false,"tutorial_enabled": false,"user_interaction_timeout": 0,"user_request_cancel": false}}',
                '{ "msg": "start_memorymgmt" }',
                '{ "msg": "exit_memorymgmt" }',
-               '{"msg": "ask_password", "data": {"service": "example.com", "login": "user@example.com"}}',
+               '{"msg": "ask_password", "data": {"service": "sub.example.com", "fallback_service": "example.com", "login": "user@example.com"}}',
 			   '{"msg": "set_credential", "data": {"service": "example.com", "login": "user@example.com", "password": "pwd", "description": "added by API"}}',
 			   '{"msg": "get_random_numbers"}',
 			   '{"msg": "cancel_request"}'

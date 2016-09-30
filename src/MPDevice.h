@@ -92,8 +92,8 @@ public:
     void setCurrentDate();
 
     //Ask a password for specified service/login to MP
-    void askPassword(const QString &service, const QString &login,
-                     std::function<void(bool success, QString errstr, const QString &login, const QString &pass)> cb);
+    void askPassword(const QString &service, const QString &login, const QString &fallback_service,
+                     std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass)> cb);
 
     //Add or Set service/login/pass/desc in MP
     void setCredential(const QString &service, const QString &login,

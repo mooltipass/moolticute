@@ -787,10 +787,10 @@ void MPDevice::cancelUserRequest()
     platformWrite(ba);
 }
 
-void MPDevice::askPassword(const QString &service, const QString &login,
-                        std::function<void(bool success, QString errstr, const QString &login, const QString &pass)> cb)
+void MPDevice::askPassword(const QString &service, const QString &login, const QString &fallback_service,
+                        std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass)> cb)
 {
-    qInfo() << "Ask for password for service: " << service << " login: " << login;
+    qInfo() << "Ask for password for service: " << service << " login: " << login << " fallback_service: " << fallback_service;
 
     AsyncJobs *jobs = new AsyncJobs(this);
 
@@ -803,10 +803,37 @@ void MPDevice::askPassword(const QString &service, const QString &login,
     {
         if (data[2] != 1)
         {
+            if (!fallback_service.isEmpty())
+            {
+                QByteArray fsdata = fallback_service.toUtf8();
+                fsdata.append((char)0);
+                jobs->prepend(new MPCommandJob(this, MP_CONTEXT,
+                                              fsdata,
+                                              [=](const QByteArray &data, bool &) -> bool
+                {
+                    if (data[2] != 1)
+                    {
+                        qWarning() << "Error setting context: " << (quint8)data[2];
+                        jobs->setCurrentJobError("failed to select context and fallback_context on device");
+                        return false;
+                    }
+
+                    QVariantMap m = {{ "service", fallback_service }};
+                    jobs->user_data = m;
+
+                    return true;
+                }));
+                return true;
+            }
+
             qWarning() << "Error setting context: " << (quint8)data[2];
             jobs->setCurrentJobError("failed to select context on device");
             return false;
         }
+
+        QVariantMap m = {{ "service", service }};
+        jobs->user_data = m;
+
         return true;
     }));
 
@@ -826,7 +853,9 @@ void MPDevice::askPassword(const QString &service, const QString &login,
             return false;
         }
 
-        jobs->user_data = l;
+        QVariantMap m = jobs->user_data.toMap();
+        m["login"] = l;
+        jobs->user_data = m;
 
         return true;
     }));
@@ -850,13 +879,14 @@ void MPDevice::askPassword(const QString &service, const QString &login,
         qInfo() << "Password retreived ok";
         QString pass = data.mid(2, data[0]);
 
-        cb(true, QString(), jobs->user_data.toString(), pass);
+        QVariantMap m = jobs->user_data.toMap();
+        cb(true, QString(), m["service"].toString(), m["login"].toString(), pass);
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
         qCritical() << "Failed getting password";
-        cb(false, failedJob->getErrorStr(), QString(), QString());
+        cb(false, failedJob->getErrorStr(), QString(), QString(), QString());
     });
 
     jobs->start();
