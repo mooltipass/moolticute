@@ -23,7 +23,7 @@
 #include "WSClient.h"
 #include <QtAwesome.h>
 #include "CredentialsModel.h"
-#include "DialogLog.h"
+#include "WindowLog.h"
 
 namespace Ui {
 class MainWindow;
@@ -83,7 +83,7 @@ private:
 
     bool editCredAsked = false;
 
-    DialogLog *dialogLog = nullptr;
+    WindowLog *dialogLog = nullptr;
     QByteArray logBuffer;
 
     enum

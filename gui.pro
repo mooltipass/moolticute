@@ -22,7 +22,7 @@ SOURCES += src/main_gui.cpp \
     src/AppGui.cpp \
     src/DaemonMenuAction.cpp \
     src/AutoStartup.cpp \
-    src/DialogLog.cpp \
+    src/WindowLog.cpp \
     src/OutputLog.cpp \
     src/AnsiEscapeCodeHandler.cpp
 
@@ -37,7 +37,7 @@ HEADERS  += src/MainWindow.h \
     src/AppGui.h \
     src/DaemonMenuAction.h \
     src/AutoStartup.h \
-    src/DialogLog.h \
+    src/WindowLog.h \
     src/OutputLog.h \
     src/AnsiEscapeCodeHandler.h
 
@@ -50,7 +50,7 @@ INCLUDEPATH += src
 
 FORMS    += src/MainWindow.ui \
     src/DialogEdit.ui \
-    src/DialogLog.ui
+    src/WindowLog.ui
 
 RESOURCES += \
     img/images.qrc

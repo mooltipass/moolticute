@@ -698,10 +698,10 @@ void MainWindow::on_pushButtonViewLogs_clicked()
         return;
     }
 
-    dialogLog = new DialogLog(this);
+    dialogLog = new WindowLog();
     dialogLog->appendData(logBuffer);
     dialogLog->show();
-    connect(dialogLog, &DialogLog::rejected, [this]()
+    connect(dialogLog, &WindowLog::destroyed, [this]()
     {
         dialogLog = nullptr;
     });
