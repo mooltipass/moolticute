@@ -112,7 +112,9 @@ bool AppGui::initialize()
         {
             QTimer::singleShot(1500, [=]()
             {
-                daemonProcess->start(program, arguments);
+                QStringList args = arguments;
+                args << "-s 8484";
+                daemonProcess->start(program, args);
             });
             needRestart = false;
         }
@@ -153,7 +155,9 @@ bool AppGui::initialize()
         {
             QTimer::singleShot(1500, [=]()
             {
-                daemonProcess->start(program, arguments);
+                QStringList args = arguments;
+                args << "-s 8484";
+                daemonProcess->start(program, args);
             });
         }
     });

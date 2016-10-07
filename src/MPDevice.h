@@ -121,7 +121,8 @@ signals:
 private slots:
     void newDataRead(const QByteArray &data);
     void commandFailed();
-    void sendDataDequeue();
+    void sendDataDequeue(); //execute commands from the command queue
+    void runAndDequeueJobs(); //execute AsyncJobs from the jobs queues
 
 private:
     /* Platform function for starting a read, should be implemented in platform class */
@@ -153,6 +154,15 @@ private:
 
     bool isMini = false; //true if fw is mini
     bool isFw12 = false; //true if fw is at least v1.2
+
+    //this queue is used to put jobs list in a wait
+    //queue. it prevents other clients to query something
+    //when an AsyncJobs is currently running.
+    //An AsyncJobs can also be removed if it was not started (using cancelUserRequest for example)
+    //All AsyncJobs does have an <id>
+    QQueue<AsyncJobs *> jobsQueue;
+    AsyncJobs *currentJobs = nullptr;
+    bool isJobsQueueBusy(); //helper to check if something is already running
 };
 
 #endif // MPDEVICE_H

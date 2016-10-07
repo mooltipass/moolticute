@@ -19,6 +19,7 @@
 #include "Common.h"
 #include <QLocalServer>
 #include <QLocalSocket>
+#include <time.h>
 
 #ifndef Q_OS_WIN
 #include <stdio.h>
@@ -270,4 +271,37 @@ bool Common::writeSharedMemory(QSharedMemory &sh, const QJsonObject &o)
     sh.unlock();
 
     return true;
+}
+
+static bool commonUidInit = false;
+static QHash<QString, bool> commonExistingUid;
+
+QString Common::createUid(QString prefix)
+{
+    if (!commonUidInit)
+    {
+        commonUidInit = true;
+        qsrand(time(NULL));
+    }
+
+    //try to generate a unique id based on
+    QString s;
+    do
+    {
+        s = QStringLiteral("%1%2%3%4%5%6")
+            .arg(prefix)
+            .arg(qrand())
+            .arg(qrand())
+            .arg(qrand())
+            .arg(qrand())
+            .arg(qrand());
+    } while (commonExistingUid.contains(s));
+
+    return s;
+}
+
+void Common::releaseUid(QString uid)
+{
+    //delete this id from the list so it could be used again
+    commonExistingUid.remove(uid);
 }

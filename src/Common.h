@@ -77,6 +77,11 @@ public:
     static QJsonObject readSharedMemory(QSharedMemory &sh);
     static bool writeSharedMemory(QSharedMemory &sh, const QJsonObject &o);
 
+    //create a unique identifier and save it into a list
+    static QString createUid(QString prefix = QString());
+    //release the unique id and remove it from the list
+    static void releaseUid(QString uid);
+
     typedef enum
     {
         MP_Classic = 0,

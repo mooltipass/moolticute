@@ -39,6 +39,8 @@ public:
 
     void daemonLogAppend(const QByteArray &logdata);
 
+    bool isHttpDebugChecked();
+
 signals:
     void windowCloseRequested();
 

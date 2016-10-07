@@ -706,3 +706,8 @@ void MainWindow::on_pushButtonViewLogs_clicked()
         dialogLog = nullptr;
     });
 }
+
+bool MainWindow::isHttpDebugChecked()
+{
+    return ui->checkBoxDebugHttp->isChecked();
+}

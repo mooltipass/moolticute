@@ -48,12 +48,14 @@ void MPCommandJob::start(const QByteArray &previous_data)
 }
 
 AsyncJobs::AsyncJobs(QObject *parent):
-    QObject(parent)
+    QObject(parent),
+    jobsid(Common::createUid("job-"))
 {
 }
 
 AsyncJobs::~AsyncJobs()
 {
+    Common::releaseUid(jobsid);
 }
 
 void AsyncJobs::append(AsyncJob *j)

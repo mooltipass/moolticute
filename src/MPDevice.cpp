@@ -101,6 +101,31 @@ void MPDevice::sendDataDequeue()
     platformWrite(currentCmd.data);
 }
 
+void MPDevice::runAndDequeueJobs()
+{
+    if (jobsQueue.isEmpty() || currentJobs)
+        return;
+
+    currentJobs = jobsQueue.dequeue();
+    currentJobs->start();
+
+    connect(currentJobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        currentJobs = nullptr;
+        runAndDequeueJobs();
+    });
+    connect(currentJobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        currentJobs = nullptr;
+        runAndDequeueJobs();
+    });
+}
+
+bool MPDevice::isJobsQueueBusy()
+{
+    return currentJobs;
+}
+
 void MPDevice::loadParameters()
 {
     qInfo() << "Loading device parameters";
@@ -267,7 +292,8 @@ void MPDevice::loadParameters()
         qCritical() << "Loading option failed";
     });
 
-    jobs->start();
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::commandFailed()
@@ -570,7 +596,8 @@ void MPDevice::startMemMgmtMode()
         force_memMgmtMode(false);
     });
 
-    jobs->start();
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
@@ -889,7 +916,8 @@ void MPDevice::askPassword(const QString &service, const QString &login, const Q
         cb(false, failedJob->getErrorStr(), QString(), QString(), QString());
     });
 
-    jobs->start();
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, const QByteArray &nums)> cb)
@@ -916,7 +944,8 @@ void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, 
         cb(false, "failed to generate random numbers", QByteArray());
     });
 
-    jobs->start();
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs)
@@ -1071,5 +1100,6 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         cb(false, failedJob->getErrorStr());
     });
 
-    jobs->start();
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }

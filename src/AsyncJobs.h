@@ -135,6 +135,8 @@ public:
     void prepend(AsyncJob *j);
     void insertAfter(AsyncJob *j, int pos);
 
+    QString getJobsId() { return jobsid; }
+
     //user data attached to this job queue
     QVariant user_data;
 
@@ -156,6 +158,8 @@ private:
     QQueue<AsyncJob *> jobs;
     bool running = false;
     AsyncJob *currentJob = nullptr;
+
+    QString jobsid;
 };
 
 #endif // ASYNCJOBS_H
