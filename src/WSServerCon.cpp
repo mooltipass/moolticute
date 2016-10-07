@@ -23,6 +23,8 @@ void WSServerCon::processMessage(const QString &message)
     QJsonParseError err;
     QJsonDocument jdoc = QJsonDocument::fromJson(message.toUtf8(), &err);
 
+    qDebug().noquote() << "JSON API recv:" << message;
+
     if (err.error != QJsonParseError::NoError)
     {
         qWarning() << "JSON parse error " << err.errorString();
