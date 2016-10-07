@@ -128,9 +128,9 @@ bool MPDevice::isJobsQueueBusy()
 
 void MPDevice::loadParameters()
 {
-    qInfo() << "Loading device parameters";
-
-    AsyncJobs *jobs = new AsyncJobs(this);
+    AsyncJobs *jobs = new AsyncJobs(
+                          "Loading device parameters",
+                          this);
 
     jobs->append(new MPCommandJob(this,
                                   MP_VERSION,
@@ -338,130 +338,312 @@ void MPDevice::newDataRead(const QByteArray &data)
 
 void MPDevice::updateKeyboardLayout(int lang)
 {
-    qInfo() << "Updating keyboad layout: " << lang;
+    QString logInf = QStringLiteral("Updating keyboad layout: %1").arg(lang);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
+
     QByteArray ba;
     ba.append((quint8)KEYBOARD_LAYOUT_PARAM);
     ba.append((quint8)lang);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "keyboad layout param set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set keyboad layout";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateLockTimeoutEnabled(bool en)
 {
-    qInfo() << "Updating lock timeout enabled: " << en;
+    QString logInf = QStringLiteral("Updating lock timeout enabled: %1").arg(en);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
+
     QByteArray ba;
     ba.append((quint8)LOCK_TIMEOUT_ENABLE_PARAM);
     ba.append((quint8)en);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "lock timeout param set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set lock timeout enabled";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateLockTimeout(int timeout)
 {
+    QString logInf = QStringLiteral("Updating lock timeout: %1").arg(timeout);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
+
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
-
-    qInfo() << "Updating lock timeout: " << timeout;
 
     QByteArray ba;
     ba.append((quint8)LOCK_TIMEOUT_PARAM);
     ba.append((quint8)timeout);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "lock timeout param set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set lock timeout";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateScreensaver(bool en)
 {
-    qInfo() << "Updating screensaver enabled: " << en;
+    QString logInf = QStringLiteral("Updating screensaver enabled: %1").arg(en);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
     ba.append((quint8)SCREENSAVER_PARAM);
     ba.append((quint8)en);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "screensaver param set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set screensaver enabled";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateUserRequestCancel(bool en)
-{
-    qInfo() << "Updating user request cancel enabled: " << en;
+{   
+    QString logInf = QStringLiteral("Updating user request cancel enabled: %1").arg(en);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
     ba.append((quint8)USER_REQ_CANCEL_PARAM);
     ba.append((quint8)en);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "user request cancel param set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set user request cancel enabled";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateUserInteractionTimeout(int timeout)
-{
+{   
+    QString logInf = QStringLiteral("Updating user interaction timeout: %1").arg(timeout);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
+
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
-
-    qInfo() << "Updating user interaction timeout: " << timeout;
 
     QByteArray ba;
     ba.append((quint8)USER_INTER_TIMEOUT_PARAM);
     ba.append((quint8)timeout);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "user interaction timeout param set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set user interaction timeout";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateFlashScreen(bool en)
 {
-    qInfo() << "Updating flash screen enabled: " << en;
+    QString logInf = QStringLiteral("Updating flash screen enabled: %1").arg(en);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
     ba.append((quint8)FLASH_SCREEN_PARAM);
     ba.append((quint8)en);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "flash screen param set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set flash screen enabled";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateOfflineMode(bool en)
 {
-    qInfo() << "Updating offline enabled: " << en;
+    QString logInf = QStringLiteral("Updating offline enabled: %1").arg(en);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
     ba.append((quint8)OFFLINE_MODE_PARAM);
     ba.append((quint8)en);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "Offline param set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set offline enabled";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateTutorialEnabled(bool en)
 {
-    qInfo() << "Updating tutorial enabled: " << en;
+    QString logInf = QStringLiteral("Updating tutorial enabled: %1").arg(en);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
     ba.append((quint8)TUTORIAL_BOOL_PARAM);
     ba.append((quint8)en);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "Tutorial param set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set tutorial enabled";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateScreenBrightness(int bval) //In percent
 {
-    qInfo() << "Updating screen brightness: " << bval;
+    QString logInf = QStringLiteral("Updating screen brightness: %1").arg(bval);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
     ba.append((quint8)MINI_OLED_CONTRAST_CURRENT_PARAM);
     ba.append((quint8)(bval));
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "Knock enabled set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set knock enabled";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateKnockEnabled(bool en)
 {
-    qInfo() << "Updating knock enabled: " << en;
+    QString logInf = QStringLiteral("Updating knock enabled: %1").arg(en);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
     ba.append((quint8)MINI_KNOCK_DETECT_ENABLE_PARAM);
-    ba.append((quint8)en);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+    ba.append(en);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "Knock enabled set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set knock enabled";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
 {
+    QString logInf = QStringLiteral("Update knock sensitivity: %1").arg(s);
+
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
+
     quint8 v = 8;
     if (s == 0) v = 11;
     else if (s == 2) v = 5;
 
-    qInfo() << "Updating knock sensitivity: " << v;
-
     QByteArray ba;
     ba.append((quint8)MINI_KNOCK_THRES_PARAM);
     ba.append(v);
-    sendData(MP_SET_MOOLTIPASS_PARM, ba);
+
+    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "Knock sensitivity set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set sensitivity";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::startMemMgmtMode()
@@ -470,18 +652,12 @@ void MPDevice::startMemMgmtMode()
      * (favorites, nodes, etc...)
      */
 
-    qInfo() << "Starting MMM mode";
-
     if (get_memMgmtMode()) return;
 
-    AsyncJobs *jobs = new AsyncJobs(this);
+    AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
 
     //Ask device to go into MMM first
-    jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT,
-                                  [=](const QByteArray &data, bool &) -> bool
-    {
-        return (quint8)data.at(2) == 0x01;
-    }));
+    jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     //Get CTR value
     jobs->append(new MPCommandJob(this, MP_GET_CTRVALUE,
@@ -513,7 +689,7 @@ void MPDevice::startMemMgmtMode()
     {
         jobs->append(new MPCommandJob(this, MP_GET_FAVORITE,
                                       QByteArray(1, (quint8)i),
-                                      [=](const QByteArray &) -> bool
+                                      [=](const QByteArray &, QByteArray &) -> bool
         {
             if (i == 0) qInfo() << "Loading favorites...";
             return true;
@@ -748,47 +924,76 @@ void MPDevice::exitMemMgmtMode()
 {
     if (!get_memMgmtMode()) return;
 
-    qInfo() << "Exiting MMM";
+    AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
-    ctrValue.clear();
-    cpzCtrValue.clear();
-    qDeleteAll(loginNodes);
-    loginNodes.clear();
-    qDeleteAll(dataNodes);
-    dataNodes.clear();
-    favoritesAddrs.clear();
+    jobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
-    sendData(MP_END_MEMORYMGMT, [=](bool success, const QByteArray &data, bool &)
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
-        if (success)
-        {
-            qDebug() << "received MP_END_MEMORYMGMT: " << (quint8)data.at(1) << " - " << (quint8)data.at(2);
-            if ((quint8)data.at(1) == MP_END_MEMORYMGMT &&
-                (quint8)data.at(2) == 0x01)
-                qDebug() << "Mem management mode disabled";
-            else
-                qWarning() << "Mem management mode disable was not ack by the device!";
+        //data is last result
+        //all jobs finished success
 
-            force_memMgmtMode(false);
-        }
-        else
-            //force clients to update their status
-            force_memMgmtMode(false);
+        qInfo() << "MMM exit ok";
+
+        ctrValue.clear();
+        cpzCtrValue.clear();
+        qDeleteAll(loginNodes);
+        loginNodes.clear();
+        qDeleteAll(dataNodes);
+        dataNodes.clear();
+        favoritesAddrs.clear();
+
+        force_memMgmtMode(false);
     });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qCritical() << "Failed to exit MMM";
+
+        ctrValue.clear();
+        cpzCtrValue.clear();
+        qDeleteAll(loginNodes);
+        loginNodes.clear();
+        qDeleteAll(dataNodes);
+        dataNodes.clear();
+        favoritesAddrs.clear();
+
+        force_memMgmtMode(false);
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::setCurrentDate()
 {
-    //build current date payload and send to device
-    QByteArray d = Common::dateToBytes(QDate::currentDate());
+    AsyncJobs *jobs = new AsyncJobs("Send date to device", this);
 
-    qInfo() << "send current date to device: " << d;
+    jobs->append(new MPCommandJob(this, MP_SET_DATE,
+                                  [=](const QByteArray &, QByteArray &data_to_send) -> bool
+    {
+        data_to_send.clear();
+        data_to_send.append(Common::dateToBytes(QDate::currentDate()));
 
-    qDebug() << "Sending current date: " <<
-                QString("0x%1").arg((quint8)d[0], 2, 16, QChar('0')) <<
-                QString("0x%1").arg((quint8)d[1], 2, 16, QChar('0'));
+        qDebug() << "Sending current date: " <<
+                    QString("0x%1").arg((quint8)data_to_send[0], 2, 16, QChar('0')) <<
+                    QString("0x%1").arg((quint8)data_to_send[1], 2, 16, QChar('0'));
 
-    sendData(MP_SET_DATE, d);
+        return true;
+    },
+                                  MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "Date set success";
+    });
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed to set date on device";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::cancelUserRequest()
@@ -817,9 +1022,12 @@ void MPDevice::cancelUserRequest()
 void MPDevice::askPassword(const QString &service, const QString &login, const QString &fallback_service,
                         std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass)> cb)
 {
-    qInfo() << "Ask for password for service: " << service << " login: " << login << " fallback_service: " << fallback_service;
+    QString logInf = QStringLiteral("Ask for password for service: %1 login: %2 fallback_service: %3")
+                     .arg(service)
+                     .arg(login)
+                     .arg(fallback_service);
 
-    AsyncJobs *jobs = new AsyncJobs(this);
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray sdata = service.toUtf8();
     sdata.append((char)0);
@@ -922,9 +1130,7 @@ void MPDevice::askPassword(const QString &service, const QString &login, const Q
 
 void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, const QByteArray &nums)> cb)
 {
-    AsyncJobs *jobs = new AsyncJobs(this);
-
-    qInfo() << "Get random numbers from device";
+    AsyncJobs *jobs = new AsyncJobs("Get random numbers from device", this);
 
     jobs->append(new MPCommandJob(this, MP_GET_RANDOM_NUMBER, QByteArray()));
 
@@ -996,9 +1202,11 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         return;
     }
 
-    qInfo() << "Adding/Changing credential for service: " << service << " login: " << login;
+    QString logInf = QStringLiteral("Adding/Changing credential for service: %1 login: %2")
+                     .arg(service)
+                     .arg(login);
 
-    AsyncJobs *jobs = new AsyncJobs(this);
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray sdata = service.toUtf8();
     sdata.append((char)0);

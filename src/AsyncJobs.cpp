@@ -19,9 +19,14 @@
 #include "AsyncJobs.h"
 #include "MPDevice.h"
 
+AsyncFuncDone MPCommandJob::defaultCheckRet = [](const QByteArray &data, bool &) -> bool
+{
+    return (quint8)data.at(2) == 0x01;
+};
+
 void MPCommandJob::start(const QByteArray &previous_data)
 {
-    if (!beforeFunc(previous_data))
+    if (!beforeFunc(previous_data, data))
     {
         emit error();
         return;
@@ -47,9 +52,10 @@ void MPCommandJob::start(const QByteArray &previous_data)
     });
 }
 
-AsyncJobs::AsyncJobs(QObject *parent):
+AsyncJobs::AsyncJobs(QString _log, QObject *parent):
     QObject(parent),
-    jobsid(Common::createUid("job-"))
+    jobsid(Common::createUid("job-")),
+    log(_log)
 {
 }
 
@@ -81,6 +87,8 @@ void AsyncJobs::insertAfter(AsyncJob *j, int pos)
 
 void AsyncJobs::start()
 {
+    qInfo() << log;
+
     if (running) return;
     running = true;
 
