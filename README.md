@@ -19,6 +19,9 @@ It is completely cross platform, and runs on Linux (using libusb), OS X (native 
 
 > Warning! This project is a work in progress!
 
+### Downloads
+Packages are build and available here: https://calaos.fr/mooltipass/
+
 ### Dependencies
 
 ##### Windows, Linux, OSX
