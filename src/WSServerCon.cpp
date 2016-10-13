@@ -2,7 +2,8 @@
 #include "WSServer.h"
 
 WSServerCon::WSServerCon(QWebSocket *conn):
-    wsClient(conn)
+    wsClient(conn),
+    clientUid(Common::createUid(QStringLiteral("ws-")))
 {
     connect(wsClient, &QWebSocket::textMessageReceived, this, &WSServerCon::processMessage);
 }
@@ -50,7 +51,13 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "ask_password")
     {
         QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
         mpdevice->askPassword(o["service"].toString(), o["login"].toString(), o["fallback_service"].toString(),
+                reqid,
                 [=](bool success, QString errstr, const QString &service, const QString &login, const QString &pass)
         {
             if (!WSServer::Instance()->checkClientExists(this))
@@ -117,7 +124,12 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "cancel_request")
     {
-        mpdevice->cancelUserRequest();
+        QJsonObject o = root["data"].toObject();
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->cancelUserRequest(reqid);
     }
 }
 
@@ -345,4 +357,11 @@ void WSServerCon::processParametersSet(const QJsonObject &data)
     //reload parameters from device after changed all params, this will trigger
     //websocket update of clients too
     mpdevice->loadParameters();
+}
+
+QString WSServerCon::getRequestId(const QJsonValue &v)
+{
+    if (v.isDouble())
+        return QString::number(v.toInt());
+    return v.toString();
 }

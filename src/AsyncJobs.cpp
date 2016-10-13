@@ -59,6 +59,13 @@ AsyncJobs::AsyncJobs(QString _log, QObject *parent):
 {
 }
 
+AsyncJobs::AsyncJobs(QString _log, QString jid, QObject *parent):
+    QObject(parent),
+    jobsid(jid),
+    log(_log)
+{
+}
+
 AsyncJobs::~AsyncJobs()
 {
     Common::releaseUid(jobsid);

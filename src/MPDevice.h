@@ -92,7 +92,7 @@ public:
     void setCurrentDate();
 
     //Ask a password for specified service/login to MP
-    void askPassword(const QString &service, const QString &login, const QString &fallback_service,
+    void askPassword(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
                      std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass)> cb);
 
     //Add or Set service/login/pass/desc in MP
@@ -104,7 +104,7 @@ public:
     void getRandomNumber(std::function<void(bool success, QString errstr, const QByteArray &nums)> cb);
 
     //Send a cancel request to device
-    void cancelUserRequest();
+    void cancelUserRequest(const QString &reqid);
 
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }

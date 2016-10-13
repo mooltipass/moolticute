@@ -132,6 +132,7 @@ class AsyncJobs: public QObject
     Q_OBJECT
 public:
     AsyncJobs(QString log = QString(), QObject *parent = nullptr);
+    AsyncJobs(QString log = QString(), QString jid = QString(), QObject *parent = nullptr);
     virtual ~AsyncJobs();
 
     void append(AsyncJob *j);

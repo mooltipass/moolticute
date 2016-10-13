@@ -996,7 +996,7 @@ void MPDevice::setCurrentDate()
     runAndDequeueJobs();
 }
 
-void MPDevice::cancelUserRequest()
+void MPDevice::cancelUserRequest(const QString &reqid)
 {
     // send data with platform code
     // This command is used to cancel a request.
@@ -1009,25 +1009,49 @@ void MPDevice::cancelUserRequest()
         return;
     }
 
-    qInfo() << "cancel user request";
+    qInfo() << "cancel user request (reqid: " << reqid << ")";
 
-    QByteArray ba;
-    ba.append((char)0);
-    ba.append(MP_CANCEL_USER_REQUEST);
+    if (currentJobs->getJobsId() == reqid)
+    {
+        qInfo() << "request_id match current one. Cancel current request";
 
-    qDebug() << "Platform send command: " << QString("0x%1").arg((quint8)ba[1], 2, 16, QChar('0'));
-    platformWrite(ba);
+        QByteArray ba;
+        ba.append((char)0);
+        ba.append(MP_CANCEL_USER_REQUEST);
+
+        qDebug() << "Platform send command: " << QString("0x%1").arg((quint8)ba[1], 2, 16, QChar('0'));
+        platformWrite(ba);
+        return;
+    }
+
+    //search for an existing jobid in the queue.
+    for (AsyncJobs *j: qAsConst(jobsQueue))
+    {
+        if (j->getJobsId() == reqid)
+        {
+            qInfo() << "Removing request from queue";
+            jobsQueue.removeAll(j);
+            return;
+        }
+    }
+
+    qWarning() << "No request found for reqid: " << reqid;
 }
 
-void MPDevice::askPassword(const QString &service, const QString &login, const QString &fallback_service,
+void MPDevice::askPassword(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
                         std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass)> cb)
 {
-    QString logInf = QStringLiteral("Ask for password for service: %1 login: %2 fallback_service: %3")
+    QString logInf = QStringLiteral("Ask for password for service: %1 login: %2 fallback_service: %3 reqid: %4")
                      .arg(service)
                      .arg(login)
-                     .arg(fallback_service);
+                     .arg(fallback_service)
+                     .arg(reqid);
 
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
+    AsyncJobs *jobs;
+    if (reqid.isEmpty())
+        jobs = new AsyncJobs(logInf, this);
+    else
+        jobs = new AsyncJobs(logInf, reqid, this);
 
     QByteArray sdata = service.toUtf8();
     sdata.append((char)0);

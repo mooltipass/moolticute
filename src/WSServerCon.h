@@ -66,8 +66,11 @@ private:
 
     MPDevice *mpdevice = nullptr;
 
+    QString clientUid;
+
     void processParametersSet(const QJsonObject &data);
     void sendFailedJson(QJsonObject obj, QString errstr = QString());
+    QString getRequestId(const QJsonValue &v);
 };
 
 #endif // WSSERVERCON_H
