@@ -107,3 +107,7 @@ DISTFILES += \
 
 RESOURCES += \
     data/data_debug.qrc
+
+win32 {
+    RC_FILE = win/windows_res.rc
+}
