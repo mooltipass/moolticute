@@ -22,6 +22,7 @@
 #include <QtCore>
 #include <functional>
 #include <memory>
+#include <type_traits>
 
 #define MOOLTIPASS_VENDORID     0x16D0
 #define MOOLTIPASS_PRODUCTID    0x09A0
@@ -42,6 +43,19 @@
 #define MOOLTICUTE_DAEMON_LOG_SOCK    "moolticuted_local_log_sock"
 
 class QLocalServer;
+
+#if QT_VERSION < 0x050700
+//This declares a qAsConst implementation if we build with Qt < 5.7
+
+template< class T >
+using mc_remove_reference_t = typename std::remove_reference<T>::type;
+template<class T>
+mc_remove_reference_t<T> const& qAsConst(T&&t){return t;}
+template<class T>
+T const qAsConst(T&&t){return std::forward<T>(t);}
+template<class T>
+T const& qAsConst(T&t){return t;}
+#endif
 
 class Common
 {
