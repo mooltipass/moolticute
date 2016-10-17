@@ -31,6 +31,15 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 
 PageantWin::PageantWin()
 {
+}
+
+PageantWin::~PageantWin()
+{
+    cleanWin();
+}
+
+void PageantWin::run()
+{
     qInfo() << "Starting Moolticute Pageant";
 
     if (pageantAlreadyRunning())
@@ -44,11 +53,8 @@ PageantWin::PageantWin()
         qCritical() << "Can't create pageant window";
         return;
     }
-}
 
-PageantWin::~PageantWin()
-{
-    cleanWin();
+    exec();
 }
 
 bool PageantWin::pageantAlreadyRunning()
@@ -178,7 +184,7 @@ void PageantWin::handleWmCopyMessage(COPYDATASTRUCT *data)
     qDebug() << "mapsize is: " << msgSize;
 
     SshAgent agent;
-    QByteArray res = agent.processRequest(sh.data());
+    QByteArray res = agent.processRequest(reinterpret_cast<quint8 *>(sh.data()) + 4, msgSize);
     memcpy(sh.data(), res.data(), res.size());
 }
 

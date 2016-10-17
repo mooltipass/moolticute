@@ -128,7 +128,7 @@ bool AppDaemon::initialize()
 
     //Start ssh-agent here
 #ifdef Q_OS_WIN
-    PageantWin::Instance();
+    PageantWin::Instance()->start();
 #endif
 
     return true;
