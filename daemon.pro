@@ -12,6 +12,8 @@ CONFIG -= app_bundle
 
 CONFIG += c++11
 
+include(src/ssh-agent/ssh-agent.pri)
+
 win32 {
     LIBS += -lsetupapi
 } else:linux {

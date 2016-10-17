@@ -25,6 +25,10 @@
 #include "MacUtils.h"
 #endif
 
+#ifdef Q_OS_WIN
+#include "ssh-agent/PageantWin.h"
+#endif
+
 bool g_bEmulationMode = false;
 
 AppDaemon::AppDaemon(int &argc, char **argv):
@@ -121,6 +125,11 @@ bool AppDaemon::initialize()
         qCritical() << "Fatal error";
         return false;
     }
+
+    //Start ssh-agent here
+#ifdef Q_OS_WIN
+    PageantWin::Instance();
+#endif
 
     return true;
 }
