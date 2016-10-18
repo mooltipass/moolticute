@@ -48,7 +48,8 @@ void WSServerCon::processMessage(const QString &message)
         //send command to exit MMM
         mpdevice->exitMemMgmtMode();
     }
-    else if (root["msg"] == "ask_password")
+    else if (root["msg"] == "ask_password" ||
+             root["msg"] == "get_credential")
     {
         QJsonObject o = root["data"].toObject();
 
@@ -130,6 +131,35 @@ void WSServerCon::processMessage(const QString &message)
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
         mpdevice->cancelUserRequest(reqid);
+    }
+    else if (root["msg"] == "get_data_node")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, const QByteArray &dataNode)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["node_data"] = QString(dataNode.toBase64());
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
     }
 }
 

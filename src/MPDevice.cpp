@@ -17,6 +17,7 @@
  **
  ******************************************************************************/
 #include "MPDevice.h"
+#include <functional>
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
@@ -1330,6 +1331,136 @@ void MPDevice::setCredential(const QString &service, const QString &login,
     {
         qCritical() << "Failed adding new credential";
         cb(false, failedJob->getErrorStr());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+bool MPDevice::getDataNodeCb(AsyncJobs *jobs, const QByteArray &data, bool &)
+{
+    using namespace std::placeholders;
+
+    qDebug() << "getDataNodeCb data size: " << ((quint8)data[0]) << "  " << ((quint8)data[1]) << "  " << ((quint8)data[2]);
+
+    if (data[0] == 1 && //data size is 1
+        data[2] == 0)   //value is 0 means end of data
+    {
+        QVariantMap m = jobs->user_data.toMap();
+        if (!m.contains("data"))
+        {
+            //if no data at all, report an error
+            jobs->setCurrentJobError("reading data failed or no data");
+            return false;
+        }
+        return true;
+    }
+
+    if (data[0] != 0)
+    {
+        QVariantMap m = jobs->user_data.toMap();
+        QByteArray ba = m["data"].toByteArray();
+        ba.append(data.mid(2, (int)data.at(0)));
+        m["data"] = ba;
+        jobs->user_data = m;
+
+        //ask for the next 32bytes packet
+        //bind to a member function of MPDevice, to be able to loop over until with got all the data
+        jobs->append(new MPCommandJob(this, MP_READ_32B_IN_DN,
+                                      std::bind(&MPDevice::getDataNodeCb, this, jobs, _1, _2)));
+    }
+    return true;
+}
+
+void MPDevice::getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
+                           std::function<void(bool success, QString errstr, QString serv, QByteArray rawData)> cb)
+{
+    if (service.isEmpty())
+    {
+        qWarning() << "context is empty.";
+        cb(false, "context is empty", QString(), QByteArray());
+        return;
+    }
+
+    QString logInf = QStringLiteral("Ask for data node for service: %1 fallback_service: %2 reqid: %3")
+                     .arg(service)
+                     .arg(fallback_service)
+                     .arg(reqid);
+
+    AsyncJobs *jobs;
+    if (reqid.isEmpty())
+        jobs = new AsyncJobs(logInf, this);
+    else
+        jobs = new AsyncJobs(logInf, reqid, this);
+
+    QByteArray sdata = service.toUtf8();
+    sdata.append((char)0);
+
+    jobs->append(new MPCommandJob(this, MP_SET_DATA_SERVICE,
+                                  sdata,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] != 1)
+        {
+            if (!fallback_service.isEmpty())
+            {
+                QByteArray fsdata = fallback_service.toUtf8();
+                fsdata.append((char)0);
+                jobs->prepend(new MPCommandJob(this, MP_SET_DATA_SERVICE,
+                                              fsdata,
+                                              [=](const QByteArray &data, bool &) -> bool
+                {
+                    if (data[2] != 1)
+                    {
+                        qWarning() << "Error setting context: " << (quint8)data[2];
+                        jobs->setCurrentJobError("failed to select context and fallback_context on device");
+                        return false;
+                    }
+
+                    QVariantMap m = {{ "service", fallback_service }};
+                    jobs->user_data = m;
+
+                    return true;
+                }));
+                return true;
+            }
+
+            qWarning() << "Error setting context: " << (quint8)data[2];
+            jobs->setCurrentJobError("failed to select context on device");
+            return false;
+        }
+
+        QVariantMap m = {{ "service", service }};
+        jobs->user_data = m;
+
+        return true;
+    }));
+
+    using namespace std::placeholders;
+
+    //ask for the first 32bytes packet
+    //bind to a member function of MPDevice, to be able to loop over until with got all the data
+    jobs->append(new MPCommandJob(this, MP_READ_32B_IN_DN,
+                                  std::bind(&MPDevice::getDataNodeCb, this, jobs, _1, _2)));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        //all jobs finished success
+        qInfo() << "get_data_node success";
+        QVariantMap m = jobs->user_data.toMap();
+        QByteArray ndata = m["data"].toByteArray();
+
+        //check data size
+        quint32 sz = qFromBigEndian<quint32>(ndata.data());
+        qDebug() << "Data size: " << sz;
+
+        cb(true, QString(), m["service"].toString(), ndata.mid(4, sz));
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed getting data node";
+        cb(false, failedJob->getErrorStr(), QString(), QByteArray());
     });
 
     jobsQueue.enqueue(jobs);

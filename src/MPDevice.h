@@ -106,6 +106,10 @@ public:
     //Send a cancel request to device
     void cancelUserRequest(const QString &reqid);
 
+    //Request for a raw data node from the device
+    void getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
+                     std::function<void(bool success, QString errstr, QString service, QByteArray rawData)> cb);
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }
@@ -137,6 +141,8 @@ private:
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
 
     void createJobAddContext(const QString &service, AsyncJobs *jobs);
+
+    bool getDataNodeCb(AsyncJobs *jobs, const QByteArray &data, bool &done);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
