@@ -147,7 +147,7 @@ private:
     void createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode = false);
 
     bool getDataNodeCb(AsyncJobs *jobs, const QByteArray &data, bool &done);
-    bool setDataNodeCb(AsyncJobs *jobs, const QByteArray &nodeData, int current, const QByteArray &data, bool &done);
+    bool setDataNodeCb(AsyncJobs *jobs, int current, const QByteArray &data, bool &done);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
@@ -174,6 +174,9 @@ private:
     QQueue<AsyncJobs *> jobsQueue;
     AsyncJobs *currentJobs = nullptr;
     bool isJobsQueueBusy(); //helper to check if something is already running
+
+    //this is a cache for data upload
+    QByteArray currentDataNode;
 };
 
 #endif // MPDEVICE_H
