@@ -1470,7 +1470,7 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
     runAndDequeueJobs();
 }
 
-bool MPDevice::setDataNodeCb(AsyncJobs *jobs, const QByteArray &nodeData, int current, const QByteArray &data, bool &)
+bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current, const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
 
@@ -1483,21 +1483,22 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, const QByteArray &nodeData, int cu
     }
 
     //sending finished
-    if (current >= nodeData.size())
+    if (current >= currentDataNode.size())
         return true;
 
     //prepare next block of data
-    char eod = (nodeData.size() - current <= MOOLTIPASS_BLOCK_SIZE)?1:0;
+    char eod = (currentDataNode.size() - current <= MOOLTIPASS_BLOCK_SIZE)?1:0;
 
     QByteArray packet;
     packet.append(eod);
-    packet.append(nodeData.mid(current, MOOLTIPASS_BLOCK_SIZE));
+    packet.append(currentDataNode.mid(current, MOOLTIPASS_BLOCK_SIZE));
+    packet.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
     //send 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
     jobs->append(new MPCommandJob(this, MP_WRITE_32B_IN_DN,
                                   packet,
-                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, nodeData, current + MOOLTIPASS_BLOCK_SIZE, _1, _2)));
+                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, current + MOOLTIPASS_BLOCK_SIZE, _1, _2)));
 
     return true;
 }
@@ -1542,23 +1543,24 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
 
     using namespace std::placeholders;
 
+    //set size of data
+    currentDataNode = QByteArray();
+    currentDataNode.resize(4);
+    qToBigEndian(nodeData.size(), currentDataNode.data());
+    currentDataNode.append(nodeData);
+
     //first packet
     QByteArray firstPacket;
     char eod = (nodeData.size() <= MOOLTIPASS_BLOCK_SIZE)?1:0;
     firstPacket.append(eod);
-
-    //set size of data
-    firstPacket.resize(5);
-    qToBigEndian(nodeData.size(), firstPacket.data() + 1);
-
-    //Add the data
-    firstPacket.append(nodeData.mid(0, MOOLTIPASS_BLOCK_SIZE));
+    firstPacket.append(currentDataNode.mid(0, MOOLTIPASS_BLOCK_SIZE));
+    firstPacket.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
     //send the first 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
     jobs->append(new MPCommandJob(this, MP_WRITE_32B_IN_DN,
                                   firstPacket,
-                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, nodeData, MOOLTIPASS_BLOCK_SIZE, _1, _2)));
+                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, MOOLTIPASS_BLOCK_SIZE, _1, _2)));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
