@@ -161,6 +161,41 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "set_data_node")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
+        if (data.isEmpty())
+        {
+            sendFailedJson(root, "node_data is empty");
+            return;
+        }
+
+        mpdevice->setDataNode(o["service"].toString(), data,
+                reqid,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["node_data"] = "********";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr)

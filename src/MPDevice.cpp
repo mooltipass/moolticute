@@ -1179,13 +1179,16 @@ void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, 
     runAndDequeueJobs();
 }
 
-void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs)
+void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode)
 {
     QByteArray sdata = service.toUtf8();
     sdata.append((char)0);
 
+    quint8 cmdAddCtx = isDataNode?MP_ADD_DATA_SERVICE:MP_ADD_CONTEXT;
+    quint8 cmdSelectCtx = isDataNode?MP_SET_DATA_SERVICE:MP_CONTEXT;
+
     //Create context
-    jobs->prepend(new MPCommandJob(this, MP_ADD_CONTEXT,
+    jobs->prepend(new MPCommandJob(this, cmdAddCtx,
                   sdata,
                   [=](const QByteArray &data, bool &) -> bool
     {
@@ -1200,7 +1203,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs)
     }));
 
     //choose context
-    jobs->insertAfter(new MPCommandJob(this, MP_CONTEXT,
+    jobs->insertAfter(new MPCommandJob(this, cmdSelectCtx,
                                   sdata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
@@ -1461,6 +1464,113 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
     {
         qCritical() << "Failed getting data node";
         cb(false, failedJob->getErrorStr(), QString(), QByteArray());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+bool MPDevice::setDataNodeCb(AsyncJobs *jobs, const QByteArray &nodeData, int current, const QByteArray &data, bool &)
+{
+    using namespace std::placeholders;
+
+    qDebug() << "setDataNodeCb data current: " << current;
+
+    if (data[2] == 0)
+    {
+        jobs->setCurrentJobError("writing data to device failed");
+        return false;
+    }
+
+    //sending finished
+    if (current >= nodeData.size())
+        return true;
+
+    //prepare next block of data
+    char eod = (nodeData.size() - current <= MOOLTIPASS_BLOCK_SIZE)?1:0;
+
+    QByteArray packet;
+    packet.append(eod);
+    packet.append(nodeData.mid(current, MOOLTIPASS_BLOCK_SIZE));
+
+    //send 32bytes packet
+    //bind to a member function of MPDevice, to be able to loop over until with got all the data
+    jobs->append(new MPCommandJob(this, MP_WRITE_32B_IN_DN,
+                                  packet,
+                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, nodeData, current + MOOLTIPASS_BLOCK_SIZE, _1, _2)));
+
+    return true;
+}
+
+void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, const QString &reqid,
+                           std::function<void(bool success, QString errstr)> cb)
+{
+    if (service.isEmpty())
+    {
+        qWarning() << "context is empty.";
+        cb(false, "context is empty");
+        return;
+    }
+
+    QString logInf = QStringLiteral("Set data node for service: %1 reqid: %2")
+                     .arg(service)
+                     .arg(reqid);
+
+    AsyncJobs *jobs;
+    if (reqid.isEmpty())
+        jobs = new AsyncJobs(logInf, this);
+    else
+        jobs = new AsyncJobs(logInf, reqid, this);
+
+    QByteArray sdata = service.toUtf8();
+    sdata.append((char)0);
+
+    jobs->append(new MPCommandJob(this, MP_SET_DATA_SERVICE,
+                                  sdata,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] != 1)
+        {
+            qWarning() << "context " << service << " does not exist";
+            //Context does not exists, create it
+            createJobAddContext(service, jobs, true);
+        }
+        else
+            qDebug() << "set_data_context " << service;
+        return true;
+    }));
+
+    using namespace std::placeholders;
+
+    //first packet
+    QByteArray firstPacket;
+    char eod = (nodeData.size() <= MOOLTIPASS_BLOCK_SIZE)?1:0;
+    firstPacket.append(eod);
+
+    //set size of data
+    firstPacket.resize(5);
+    qToBigEndian(nodeData.size(), firstPacket.data() + 1);
+
+    //Add the data
+    firstPacket.append(nodeData.mid(0, MOOLTIPASS_BLOCK_SIZE));
+
+    //send the first 32bytes packet
+    //bind to a member function of MPDevice, to be able to loop over until with got all the data
+    jobs->append(new MPCommandJob(this, MP_WRITE_32B_IN_DN,
+                                  firstPacket,
+                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, nodeData, MOOLTIPASS_BLOCK_SIZE, _1, _2)));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        //all jobs finished success
+        qInfo() << "set_data_node success";
+        cb(true, QString());
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed writing data node";
+        cb(false, failedJob->getErrorStr());
     });
 
     jobsQueue.enqueue(jobs);

@@ -110,6 +110,10 @@ public:
     void getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
                      std::function<void(bool success, QString errstr, QString service, QByteArray rawData)> cb);
 
+    //Set data to a context on the device
+    void setDataNode(const QString &service, const QByteArray &nodeData, const QString &reqid,
+                     std::function<void(bool success, QString errstr)> cb);
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }
@@ -140,9 +144,10 @@ private:
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
 
-    void createJobAddContext(const QString &service, AsyncJobs *jobs);
+    void createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode = false);
 
     bool getDataNodeCb(AsyncJobs *jobs, const QByteArray &data, bool &done);
+    bool setDataNodeCb(AsyncJobs *jobs, const QByteArray &nodeData, int current, const QByteArray &data, bool &done);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;

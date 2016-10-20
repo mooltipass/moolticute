@@ -32,6 +32,8 @@
 #define MOOLTIPASS_FAV_MAX       14
 #define MP_NODE_SIZE            132
 
+#define MOOLTIPASS_BLOCK_SIZE   32
+
 #define MOOLTICUTE_DAEMON_PORT  30035
 
 //shared memory size
