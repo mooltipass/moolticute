@@ -1,5 +1,10 @@
 #!/bin/sh
 
+#try to fix travis osx issue: https://github.com/travis-ci/travis-ci/issues/6522
+if [[ "${TRAVIS_OS_NAME}" == "osx"  ]]; then
+    rvm get head || true
+fi
+
 rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install6
 npm install npm
 mv node_modules npm
