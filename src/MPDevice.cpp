@@ -1454,7 +1454,7 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
         QByteArray ndata = m["data"].toByteArray();
 
         //check data size
-        quint32 sz = qFromBigEndian<quint32>(ndata.data());
+        quint32 sz = qFromBigEndian<quint32>((quint8 *)ndata.data());
         qDebug() << "Data size: " << sz;
 
         cb(true, QString(), m["service"].toString(), ndata.mid(4, sz));
@@ -1546,7 +1546,7 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
     //set size of data
     currentDataNode = QByteArray();
     currentDataNode.resize(4);
-    qToBigEndian(nodeData.size(), currentDataNode.data());
+    qToBigEndian(nodeData.size(), (quint8 *)currentDataNode.data());
     currentDataNode.append(nodeData);
 
     //first packet
