@@ -257,7 +257,7 @@ void AppGui::disableDaemon()
 void AppGui::searchDaemonTick()
 {
     //Search for the daemon from the shared mem segment
-    foundDaemon = false;
+    bool search = false;
 
     if (sharedMem.attach())
     {
@@ -267,10 +267,14 @@ void AppGui::searchDaemonTick()
         qint64 pid = obj["daemon_pid"].toString().toLongLong();
 
         if (Common::isProcessRunning(pid))
-            foundDaemon = true;
+            search = true;
 
         sharedMem.detach();
     }
+
+    if (search == foundDaemon)
+        return;
+    foundDaemon = search;
 
     if (foundDaemon)
         daemonAction->updateStatus(DaemonMenuAction::StatusRunning);

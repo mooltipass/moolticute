@@ -157,12 +157,14 @@ void Common::installMessageOutputHandler(QLocalServer *logServer)
     {
         QObject::connect(debugLogServer, &QLocalServer::newConnection, []()
         {
+            if (!debugLogServer->hasPendingConnections())
+                return;
+
             QLocalSocket *s = debugLogServer->nextPendingConnection();
 
             //New clients gets added to the list
             //and logs will be forwarded to them
-            if (debugLogServer->hasPendingConnections())
-                debugLogClients.append(s);
+            debugLogClients.append(s);
 
             QObject::connect(s, &QLocalSocket::disconnected, [s]()
             {

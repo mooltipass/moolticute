@@ -7,7 +7,6 @@ win32: QT += core-private
 TEMPLATE = app
 
 TARGET = moolticuted
-CONFIG += console
 CONFIG -= app_bundle
 
 CONFIG += c++11
