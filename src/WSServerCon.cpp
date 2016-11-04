@@ -161,6 +161,23 @@ void WSServerCon::processMessage(const QString &message)
             ores["node_data"] = QString(dataNode.toBase64());
             oroot["data"] = ores;
             sendJsonMessage(oroot);
+        },
+        //progress callback handling
+        [=](int total, int current)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (current > total)
+                current = total;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["progress_total"] = total;
+            ores["progress_current"] = current;
+            oroot["data"] = ores;
+            oroot["msg"] = "progress"; //change msg to avoid breaking of client waiting of the response
+            sendJsonMessage(oroot);
         });
     }
     else if (root["msg"] == "set_data_node")
@@ -195,6 +212,23 @@ void WSServerCon::processMessage(const QString &message)
             QJsonObject oroot = root;
             ores["node_data"] = "********";
             oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        //progress callback handling
+        [=](int total, int current)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (current > total)
+                current = total;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["progress_total"] = total;
+            ores["progress_current"] = current;
+            oroot["data"] = ores;
+            oroot["msg"] = "progress"; //change msg to avoid breaking of client waiting of the response
             sendJsonMessage(oroot);
         });
     }

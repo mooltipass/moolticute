@@ -108,11 +108,13 @@ public:
 
     //Request for a raw data node from the device
     void getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
-                     std::function<void(bool success, QString errstr, QString service, QByteArray rawData)> cb);
+                     std::function<void(bool success, QString errstr, QString service, QByteArray rawData)> cb,
+                     std::function<void(int total, int current)> cbProgress);
 
     //Set data to a context on the device
     void setDataNode(const QString &service, const QByteArray &nodeData, const QString &reqid,
-                     std::function<void(bool success, QString errstr)> cb);
+                     std::function<void(bool success, QString errstr)> cb,
+                     std::function<void(int total, int current)> cbProgress);
 
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
@@ -151,8 +153,12 @@ private:
 
     void createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode = false);
 
-    bool getDataNodeCb(AsyncJobs *jobs, const QByteArray &data, bool &done);
-    bool setDataNodeCb(AsyncJobs *jobs, int current, const QByteArray &data, bool &done);
+    bool getDataNodeCb(AsyncJobs *jobs,
+                       std::function<void(int total, int current)> cbProgress,
+                       const QByteArray &data, bool &done);
+    bool setDataNodeCb(AsyncJobs *jobs, int current,
+                       std::function<void(int total, int current)> cbProgress,
+                       const QByteArray &data, bool &done);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;

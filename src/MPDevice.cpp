@@ -1360,11 +1360,13 @@ void MPDevice::setCredential(const QString &service, const QString &login,
     runAndDequeueJobs();
 }
 
-bool MPDevice::getDataNodeCb(AsyncJobs *jobs, const QByteArray &data, bool &)
+bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
+                             std::function<void(int total, int current)> cbProgress,
+                             const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
 
-    qDebug() << "getDataNodeCb data size: " << ((quint8)data[0]) << "  " << ((quint8)data[1]) << "  " << ((quint8)data[2]);
+    //qDebug() << "getDataNodeCb data size: " << ((quint8)data[0]) << "  " << ((quint8)data[1]) << "  " << ((quint8)data[2]);
 
     if (data[0] == 1 && //data size is 1
         data[2] == 0)   //value is 0 means end of data
@@ -1383,20 +1385,35 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs, const QByteArray &data, bool &)
     {
         QVariantMap m = jobs->user_data.toMap();
         QByteArray ba = m["data"].toByteArray();
-        ba.append(data.mid(2, (int)data.at(0)));
+
+        //first packet, we can read the file size
+        if (ba.isEmpty())
+        {
+            ba.append(data.mid(2, (int)data.at(0)));
+            quint32 sz = qFromBigEndian<quint32>((quint8 *)ba.data());
+            m["progress_total"] = sz;
+            cbProgress((int)sz, ba.size() - 4);
+        }
+        else
+        {
+            ba.append(data.mid(2, (int)data.at(0)));
+            cbProgress(m["progress_total"].toInt(), ba.size() - 4);
+        }
+
         m["data"] = ba;
         jobs->user_data = m;
 
         //ask for the next 32bytes packet
         //bind to a member function of MPDevice, to be able to loop over until with got all the data
         jobs->append(new MPCommandJob(this, MP_READ_32B_IN_DN,
-                                      std::bind(&MPDevice::getDataNodeCb, this, jobs, _1, _2)));
+                                      std::bind(&MPDevice::getDataNodeCb, this, jobs, std::move(cbProgress), _1, _2)));
     }
     return true;
 }
 
 void MPDevice::getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
-                           std::function<void(bool success, QString errstr, QString serv, QByteArray rawData)> cb)
+                           std::function<void(bool success, QString errstr, QString serv, QByteArray rawData)> cb,
+                           std::function<void(int total, int current)> cbProgress)
 {
     if (service.isEmpty())
     {
@@ -1464,7 +1481,7 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
     //ask for the first 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
     jobs->append(new MPCommandJob(this, MP_READ_32B_IN_DN,
-                                  std::bind(&MPDevice::getDataNodeCb, this, jobs, _1, _2)));
+                                  std::bind(&MPDevice::getDataNodeCb, this, jobs, std::move(cbProgress), _1, _2)));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
@@ -1490,7 +1507,9 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
     runAndDequeueJobs();
 }
 
-bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current, const QByteArray &data, bool &)
+bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
+                             std::function<void(int total, int current)> cbProgress,
+                             const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
 
@@ -1514,17 +1533,21 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current, const QByteArray &dat
     packet.append(currentDataNode.mid(current, MOOLTIPASS_BLOCK_SIZE));
     packet.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
+    cbProgress(currentDataNode.size() - 4, current + MOOLTIPASS_BLOCK_SIZE);
+
     //send 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
     jobs->append(new MPCommandJob(this, MP_WRITE_32B_IN_DN,
                                   packet,
-                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, current + MOOLTIPASS_BLOCK_SIZE, _1, _2)));
+                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, current + MOOLTIPASS_BLOCK_SIZE,
+                                            std::move(cbProgress), _1, _2)));
 
     return true;
 }
 
 void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, const QString &reqid,
-                           std::function<void(bool success, QString errstr)> cb)
+                           std::function<void(bool success, QString errstr)> cb,
+                           std::function<void(int total, int current)> cbProgress)
 {
     if (service.isEmpty())
     {
@@ -1576,11 +1599,14 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
     firstPacket.append(currentDataNode.mid(0, MOOLTIPASS_BLOCK_SIZE));
     firstPacket.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
+    cbProgress(currentDataNode.size() - 4, MOOLTIPASS_BLOCK_SIZE);
+
     //send the first 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
     jobs->append(new MPCommandJob(this, MP_WRITE_32B_IN_DN,
                                   firstPacket,
-                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, MOOLTIPASS_BLOCK_SIZE, _1, _2)));
+                                  std::bind(&MPDevice::setDataNodeCb, this, jobs, MOOLTIPASS_BLOCK_SIZE,
+                                            std::move(cbProgress), _1, _2)));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
