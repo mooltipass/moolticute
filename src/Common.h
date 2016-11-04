@@ -33,6 +33,7 @@
 #define MP_NODE_SIZE            132
 
 #define MOOLTIPASS_BLOCK_SIZE   32
+#define MOOLTIPASS_DESC_SIZE    23 //max size allowed for description
 
 #define MOOLTICUTE_DAEMON_PORT  30035
 

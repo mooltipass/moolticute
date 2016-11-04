@@ -149,8 +149,8 @@ void MPDevice::loadParameters()
             QRegularExpressionMatch match = i.next();
             int v = match.captured(1).toInt() * 10 +
                     match.captured(2).toInt();
-            isFw12 = v >= 12;
-            isMini = match.captured(3) == "_mini";
+            isFw12Flag = v >= 12;
+            isMiniFlag = match.captured(3) == "_mini";
         }
 
         return true;
@@ -1004,7 +1004,7 @@ void MPDevice::cancelUserRequest(const QString &reqid)
     // As the request may block the sending queue, we directly send the command
     // and bypass the queue.
 
-    if (!isFw12)
+    if (!isFw12())
     {
         qDebug() << "cancelUserRequest not supported for fw < 1.2";
         return;
@@ -1039,8 +1039,8 @@ void MPDevice::cancelUserRequest(const QString &reqid)
     qWarning() << "No request found for reqid: " << reqid;
 }
 
-void MPDevice::askPassword(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
-                        std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass)> cb)
+void MPDevice::getCredential(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
+                             std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass, const QString &desc)> cb)
 {
     QString logInf = QStringLiteral("Ask for password for service: %1 login: %2 fallback_service: %3 reqid: %4")
                      .arg(service)
@@ -1120,6 +1120,20 @@ void MPDevice::askPassword(const QString &service, const QString &login, const Q
         return true;
     }));
 
+    jobs->append(new MPCommandJob(this, MP_GET_DESCRIPTION,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[2] == 0)
+        {
+            jobs->setCurrentJobError("failed to query description on device");
+            return false;
+        }
+        QVariantMap m = jobs->user_data.toMap();
+        m["description"] = data.mid(2, data[0]);
+        jobs->user_data = m;
+        return true;
+    }));
+
     jobs->append(new MPCommandJob(this, MP_GET_PASSWORD,
                                   [=](const QByteArray &data, bool &) -> bool
     {
@@ -1140,13 +1154,13 @@ void MPDevice::askPassword(const QString &service, const QString &login, const Q
         QString pass = data.mid(2, data[0]);
 
         QVariantMap m = jobs->user_data.toMap();
-        cb(true, QString(), m["service"].toString(), m["login"].toString(), pass);
+        cb(true, QString(), m["service"].toString(), m["login"].toString(), pass, m["description"].toString());
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
         qCritical() << "Failed getting password";
-        cb(false, failedJob->getErrorStr(), QString(), QString(), QString());
+        cb(false, failedJob->getErrorStr(), QString(), QString(), QString(), QString());
     });
 
     jobsQueue.enqueue(jobs);
@@ -1219,7 +1233,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
 }
 
 void MPDevice::setCredential(const QString &service, const QString &login,
-                             const QString &pass, const QString &description,
+                             const QString &pass, const QString &description, bool setDesc,
                              std::function<void(bool success, QString errstr)> cb)
 {
     if (service.isEmpty() ||
@@ -1272,7 +1286,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         return true;
     }));
 
-    if (isFw12)
+    if (isFw12() && setDesc)
     {
         QByteArray ddata = description.toUtf8();
         ddata.append((char)0);
@@ -1284,7 +1298,13 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         {
             if (data[2] == 0)
             {
-                jobs->setCurrentJobError("set_description failed on device");
+                if (description.size() > MOOLTIPASS_DESC_SIZE)
+                {
+                    qWarning() << "description text is more that " << MOOLTIPASS_DESC_SIZE << " chars";
+                    jobs->setCurrentJobError(QString("set_description failed on device, max text length allowed is %1 characters").arg(MOOLTIPASS_DESC_SIZE));
+                }
+                else
+                    jobs->setCurrentJobError("set_description failed on device");
                 qWarning() << "Failed to set description to: " << description;
                 return false;
             }

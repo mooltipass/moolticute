@@ -57,9 +57,9 @@ void WSServerCon::processMessage(const QString &message)
         if (o.contains("request_id"))
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
-        mpdevice->askPassword(o["service"].toString(), o["login"].toString(), o["fallback_service"].toString(),
+        mpdevice->getCredential(o["service"].toString(), o["login"].toString(), o["fallback_service"].toString(),
                 reqid,
-                [=](bool success, QString errstr, const QString &service, const QString &login, const QString &pass)
+                [=](bool success, QString errstr, const QString &service, const QString &login, const QString &pass, const QString &desc)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
@@ -75,6 +75,8 @@ void WSServerCon::processMessage(const QString &message)
             ores["service"] = service;
             ores["login"] = login;
             ores["password"] = pass;
+            if (mpdevice->isFw12()) //only add description for fw > 1.2
+                ores["description"] = desc;
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });
@@ -83,7 +85,7 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
-                o["password"].toString(), o["description"].toString(),
+                o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))

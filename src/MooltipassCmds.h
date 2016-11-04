@@ -91,6 +91,7 @@
 #define MP_GET_DN_START_PARENT   0xD1
 #define MP_SET_DN_START_PARENT   0xD2
 #define MP_END_MEMORYMGMT        0xD3
+#define MP_GET_DESCRIPTION       0xD5
 #define MP_SET_DESCRIPTION       0xD8
 
 

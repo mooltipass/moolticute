@@ -92,12 +92,12 @@ public:
     void setCurrentDate();
 
     //Ask a password for specified service/login to MP
-    void askPassword(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
-                     std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass)> cb);
+    void getCredential(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
+                       std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass, const QString &desc)> cb);
 
     //Add or Set service/login/pass/desc in MP
     void setCredential(const QString &service, const QString &login,
-                       const QString &pass, const QString &description,
+                       const QString &pass, const QString &description, bool setDesc,
                        std::function<void(bool success, QString errstr)> cb);
 
     //get 32 random bytes from device
@@ -117,6 +117,11 @@ public:
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }
+
+    //true if device is a mini
+    bool isMini() { return isMiniFlag; }
+    //true if device fw version is at least 1.2
+    bool isFw12() { return isFw12Flag; }
 
 signals:
     /* Signal emited by platform code when new data comes from MP */
@@ -163,8 +168,8 @@ private:
     QList<MPNode *> loginNodes; //list of all parent nodes for credentials
     QList<MPNode *> dataNodes; //list of all parent nodes for data nodes
 
-    bool isMini = false; //true if fw is mini
-    bool isFw12 = false; //true if fw is at least v1.2
+    bool isMiniFlag = false; //true if fw is mini
+    bool isFw12Flag = false; //true if fw is at least v1.2
 
     //this queue is used to put jobs list in a wait
     //queue. it prevents other clients to query something
