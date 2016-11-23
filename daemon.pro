@@ -106,3 +106,16 @@ DISTFILES += \
 
 RESOURCES += \
     data/data_debug.qrc
+
+unix {
+    # INSTALL RULES
+    #
+    isEmpty(PREFIX) {
+        PREFIX = /usr/local
+    }
+    DEFINES += MC_INSTALL_PREFIX=\\\"$$PREFIX\\\"
+
+    # install the binary
+    target.path = $$PREFIX/bin
+    INSTALLS += target
+}

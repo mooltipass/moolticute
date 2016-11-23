@@ -64,3 +64,27 @@ mac {
 } else {
     ICON = img/AppIcon.svg
 }
+
+unix {
+    # INSTALL RULES
+    #
+    isEmpty(PREFIX) {
+        PREFIX = /usr/local
+    }
+    DEFINES += MC_INSTALL_PREFIX=\\\"$$PREFIX\\\"
+
+    # install the binary
+    target.path = $$PREFIX/bin
+    INSTALLS += target
+
+    # install the desktop files
+    xdgdesktop.path = $$PREFIX/share/applications
+    xdgdesktop.files += $$PWD/linux/moolticute.desktop
+    INSTALLS += xdgdesktop
+
+    # install icon
+    ico.path = $$PREFIX/share/icons
+    ico.files += $$PWD/linux/moolticute.png
+    INSTALLS += ico
+}
+
