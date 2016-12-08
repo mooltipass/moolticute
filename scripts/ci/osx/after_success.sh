@@ -39,6 +39,10 @@ rm -f build/$APP.app/Contents/Info.plist-e
 # Copy daemon to bundle
 cp build/moolticuted build/$APP.app/Contents/MacOS/
 
+#Get 3rd party tools
+curl https://calaos.fr/mooltipass/tools/macos/moolticute_ssh-agent -o build/$APP.app/Contents/MacOS/moolticute_ssh-agent
+curl https://calaos.fr/mooltipass/tools/macos/moolticute-cli -o build/$APP.app/Contents/MacOS/moolticute-cli
+
 # use macdeployqt to deploy the application
 #echo "Calling macdeployqt and code signing application"
 #$QTDIR/bin/macdeployqt ./$APP.app -codesign="$DEVELOPER_NAME"
