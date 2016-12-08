@@ -169,6 +169,36 @@ bool AppGui::initialize()
     return true;
 }
 
+void AppGui::startSSHAgent()
+{
+    //Start ssh agent if needed
+    QSettings s;
+    if (s.value("settings/auto_start_ssh").toBool())
+    {
+        sshAgentProcess = new QProcess(this);
+        QString program = QCoreApplication::applicationDirPath () + "/moolticute_ssh-agent";
+        QStringList arguments;
+#ifndef Q_OS_WIN
+        arguments << "--no-fork";
+#endif
+        qDebug() << "Running " << program << " " << arguments;
+
+        connect(sshAgentProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+                [=](int exitCode, QProcess::ExitStatus exitStatus)
+        {
+            qDebug() << "SSH agent exits with error code " << exitCode << " Exit Status : " << exitStatus;
+
+            //Restart agent
+            QTimer::singleShot(500, [=]()
+            {
+                startSSHAgent();
+            });
+        });
+
+        sshAgentProcess->start(program, arguments);
+    }
+}
+
 void AppGui::connectedChanged()
 {
     if (!wsClient->get_connected())

@@ -42,6 +42,7 @@ private:
      DaemonMenuAction *daemonAction = nullptr;
 
      QProcess *daemonProcess = nullptr;
+     QProcess *sshAgentProcess = nullptr;
      bool dRunning = false;
      bool needRestart = false;
      bool aboutToQuit = false;
@@ -60,6 +61,7 @@ private:
      QLocalSocket *logSocket = nullptr;
 
      bool createSingleApplication();
+     void startSSHAgent();
 };
 
 #endif // APPGUI_H

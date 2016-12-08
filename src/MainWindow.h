@@ -65,6 +65,8 @@ private slots:
     void on_pushButtonViewLogs_clicked();
     void on_pushButtonAutoStart_clicked();
 
+    void on_checkBoxSSHAgent_stateChanged(int arg1);
+
 private:
 
     virtual void closeEvent(QCloseEvent *event);

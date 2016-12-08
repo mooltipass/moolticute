@@ -305,6 +305,10 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(memMgmtMode()));
 
     checkAutoStart();
+
+    //Check is ssh agent opt has to be checked
+    QSettings s;
+    ui->checkBoxSSHAgent->setChecked(s.value("settings/auto_start_ssh").toBool());
 }
 
 MainWindow::~MainWindow()
@@ -710,4 +714,10 @@ void MainWindow::on_pushButtonViewLogs_clicked()
 bool MainWindow::isHttpDebugChecked()
 {
     return ui->checkBoxDebugHttp->isChecked();
+}
+
+void MainWindow::on_checkBoxSSHAgent_stateChanged(int)
+{
+    QSettings s;
+    s.setValue("settings/auto_start_ssh", ui->checkBoxSSHAgent->isChecked());
 }
