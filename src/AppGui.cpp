@@ -166,6 +166,8 @@ bool AppGui::initialize()
     connect(timerDaemon, SIGNAL(timeout()), SLOT(searchDaemonTick()));
     timerDaemon->start(800);
 
+    startSSHAgent();
+
     return true;
 }
 
