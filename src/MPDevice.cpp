@@ -1126,7 +1126,8 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
         if (data[2] == 0)
         {
             jobs->setCurrentJobError("failed to query description on device");
-            return false;
+            qWarning() << "failed to query description on device";
+            return true; //Do not fail if description is not available for this node
         }
         QVariantMap m = jobs->user_data.toMap();
         m["description"] = data.mid(2, data[0]);
@@ -1159,7 +1160,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
-        qCritical() << "Failed getting password";
+        qCritical() << "Failed getting password: " << failedJob->getErrorStr();
         cb(false, failedJob->getErrorStr(), QString(), QString(), QString(), QString());
     });
 
