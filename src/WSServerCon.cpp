@@ -41,12 +41,14 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "start_memorymgmt")
     {
         //send command to start MMM
-        mpdevice->startMemMgmtMode();
+        if (mpdevice)
+            mpdevice->startMemMgmtMode();
     }
     else if (root["msg"] == "exit_memorymgmt")
     {
         //send command to exit MMM
-        mpdevice->exitMemMgmtMode();
+        if (mpdevice)
+            mpdevice->exitMemMgmtMode();
     }
     else if (root["msg"] == "ask_password" ||
              root["msg"] == "get_credential")
@@ -56,6 +58,9 @@ void WSServerCon::processMessage(const QString &message)
         QString reqid;
         if (o.contains("request_id"))
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        if (!mpdevice)
+            return;
 
         mpdevice->getCredential(o["service"].toString(), o["login"].toString(), o["fallback_service"].toString(),
                 reqid,
@@ -75,7 +80,7 @@ void WSServerCon::processMessage(const QString &message)
             ores["service"] = service;
             ores["login"] = login;
             ores["password"] = pass;
-            if (mpdevice->isFw12()) //only add description for fw > 1.2
+            if (mpdevice && mpdevice->isFw12()) //only add description for fw > 1.2
                 ores["description"] = desc;
             oroot["data"] = ores;
             sendJsonMessage(oroot);
@@ -84,6 +89,9 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "set_credential")
     {
         QJsonObject o = root["data"].toObject();
+        if (!mpdevice)
+            return;
+
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)
@@ -106,6 +114,9 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "get_random_numbers")
     {
+        if (!mpdevice)
+            return;
+
         mpdevice->getRandomNumber([=](bool success, QString errstr, const QByteArray &rndNums)
         {
             if (!WSServer::Instance()->checkClientExists(this))
@@ -132,6 +143,9 @@ void WSServerCon::processMessage(const QString &message)
         if (o.contains("request_id"))
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
+        if (!mpdevice)
+            return;
+
         mpdevice->cancelUserRequest(reqid);
     }
     else if (root["msg"] == "get_data_node")
@@ -141,6 +155,9 @@ void WSServerCon::processMessage(const QString &message)
         QString reqid;
         if (o.contains("request_id"))
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        if (!mpdevice)
+            return;
 
         mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
                 reqid,
@@ -194,6 +211,9 @@ void WSServerCon::processMessage(const QString &message)
             sendFailedJson(root, "node_data is empty");
             return;
         }
+
+        if (!mpdevice)
+            return;
 
         mpdevice->setDataNode(o["service"].toString(), data,
                 reqid,
@@ -279,6 +299,8 @@ void WSServerCon::resetDevice(MPDevice *dev)
 void WSServerCon::statusChanged()
 {
     qDebug() << "Update client status changed: " << this;
+    if (!mpdevice)
+        return;
     sendJsonMessage({{ "msg", "status_changed" },
                      { "data", Common::MPStatusString[mpdevice->get_status()] }});
 }
@@ -314,6 +336,8 @@ void WSServerCon::sendInitialStatus()
 
 void WSServerCon::sendKeyboardLayout()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "keyboard_layout" },
                         { "value", mpdevice->get_keyboardLayout() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -321,6 +345,8 @@ void WSServerCon::sendKeyboardLayout()
 
 void WSServerCon::sendLockTimeoutEnabled()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "lock_timeout_enabled" },
                         { "value", mpdevice->get_lockTimeoutEnabled() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -328,6 +354,8 @@ void WSServerCon::sendLockTimeoutEnabled()
 
 void WSServerCon::sendLockTimeout()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "lock_timeout" },
                         { "value", mpdevice->get_lockTimeout() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -335,6 +363,8 @@ void WSServerCon::sendLockTimeout()
 
 void WSServerCon::sendScreensaver()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "screensaver" },
                         { "value", mpdevice->get_screensaver() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -342,6 +372,8 @@ void WSServerCon::sendScreensaver()
 
 void WSServerCon::sendUserRequestCancel()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "user_request_cancel" },
                         { "value", mpdevice->get_userRequestCancel() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -349,6 +381,8 @@ void WSServerCon::sendUserRequestCancel()
 
 void WSServerCon::sendUserInteractionTimeout()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "user_interaction_timeout" },
                         { "value", mpdevice->get_userInteractionTimeout() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -356,6 +390,8 @@ void WSServerCon::sendUserInteractionTimeout()
 
 void WSServerCon::sendFlashScreen()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "flash_screen" },
                         { "value", mpdevice->get_flashScreen() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -363,6 +399,8 @@ void WSServerCon::sendFlashScreen()
 
 void WSServerCon::sendOfflineMode()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "offline_mode" },
                         { "value", mpdevice->get_offlineMode() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -370,6 +408,8 @@ void WSServerCon::sendOfflineMode()
 
 void WSServerCon::sendTutorialEnabled()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "tutorial_enabled" },
                         { "value", mpdevice->get_tutorialEnabled() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -377,6 +417,8 @@ void WSServerCon::sendTutorialEnabled()
 
 void WSServerCon::sendScreenBrightness()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "screen_brightness" },
                         { "value", mpdevice->get_screenBrightness() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -384,6 +426,8 @@ void WSServerCon::sendScreenBrightness()
 
 void WSServerCon::sendKnockEnabled()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "knock_enabled" },
                         { "value", mpdevice->get_knockEnabled() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -391,6 +435,8 @@ void WSServerCon::sendKnockEnabled()
 
 void WSServerCon::sendKnockSensitivity()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "parameter", "knock_sensitivity" },
                         { "value", mpdevice->get_knockSensitivity() }};
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
@@ -398,6 +444,8 @@ void WSServerCon::sendKnockSensitivity()
 
 void WSServerCon::sendMemMgmtMode()
 {
+    if (!mpdevice)
+        return;
     sendJsonMessage({{ "msg", "memorymgmt_changed" },
                      { "data", mpdevice->get_memMgmtMode() }});
 
@@ -423,6 +471,8 @@ void WSServerCon::sendMemMgmtMode()
 
 void WSServerCon::sendVersion()
 {
+    if (!mpdevice)
+        return;
     QJsonObject data = {{ "hw_version", mpdevice->get_hwVersion() },
                         { "flash_size", mpdevice->get_flashMbSize() }};
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
@@ -430,6 +480,8 @@ void WSServerCon::sendVersion()
 
 void WSServerCon::processParametersSet(const QJsonObject &data)
 {
+    if (!mpdevice)
+        return;
     if (data.contains("keyboard_layout"))
         mpdevice->updateKeyboardLayout(data["keyboard_layout"].toInt());
     if (data.contains("lock_timeout_enabled"))
