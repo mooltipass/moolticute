@@ -43,6 +43,8 @@ void WSServerCon::processMessage(const QString &message)
         //send command to start MMM
         if (mpdevice)
             mpdevice->startMemMgmtMode();
+        else
+            sendFailedJson(root, "No device connected");
     }
     else if (root["msg"] == "exit_memorymgmt")
     {
@@ -60,7 +62,10 @@ void WSServerCon::processMessage(const QString &message)
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
         if (!mpdevice)
+        {
+            sendFailedJson(root, "No device connected");
             return;
+        }
 
         mpdevice->getCredential(o["service"].toString(), o["login"].toString(), o["fallback_service"].toString(),
                 reqid,
@@ -115,7 +120,10 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "get_random_numbers")
     {
         if (!mpdevice)
+        {
+            sendFailedJson(root, "No device connected");
             return;
+        }
 
         mpdevice->getRandomNumber([=](bool success, QString errstr, const QByteArray &rndNums)
         {
@@ -157,7 +165,10 @@ void WSServerCon::processMessage(const QString &message)
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
         if (!mpdevice)
+        {
+            sendFailedJson(root, "No device connected");
             return;
+        }
 
         mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
                 reqid,
