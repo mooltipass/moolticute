@@ -25,7 +25,7 @@ Packages are build and available here: https://calaos.fr/mooltipass/
 ### Dependencies
 
 ##### Windows, Linux, OSX
- - Requires Qt 5.4 or higher.
+ - Requires Qt 5.6 or higher.
  - Those Qt5 modules are required:
   - qt-base, qt-widgets, qt-gui, qt-network, qt-websockets
 
