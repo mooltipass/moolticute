@@ -680,25 +680,42 @@ void MPDevice::startMemMgmtMode()
             return false;
         }
         ctrValue = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-        qDebug() << "CTR value is: " << ctrValue;
+        qDebug() << "CTR value:" << ctrValue.toHex();
         return true;
     }));
 
-    //Get CPZ and CTR value
+    /* Get CPZ and CTR values */
     jobs->append(new MPCommandJob(this, MP_GET_CARD_CPZ_CTR,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
+        /* The Mooltipass answers with CPZ CTR packets containing the CPZ_CTR values, and then a final MP_GET_CARD_CPZ_CTR packet */
         if ((quint8)data[1] == MP_CARD_CPZ_CTR_PACKET)
         {
-            done = false;
             QByteArray cpz = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-            qDebug() << "CPZ packet: " << cpz;
-            cpzCtrValue.append(cpz);
+            if(cpzCtrValue.contains(cpz))
+            {
+                qDebug() << "Duplicate CPZ CTR value:" << cpz.toHex();
+            }
+            else
+            {
+                qDebug() << "CPZ CTR value:" << cpz.toHex();
+                cpzCtrValue.append(cpz);
+            }
+            done = false;
         }
-        return true;
+        else if((quint8)data[1] == MP_GET_CARD_CPZ_CTR)
+        {
+            /* Received packet indicating we received all CPZ CTR packets */
+            return true;
+        }
+        else
+        {
+            qCritical() << "Get CPZ CTR: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
     }));
 
-    //Add jobs for favorites
+    /* Get favorites */
     favoritesAddrs.clear();
     for (int i = 0;i < MOOLTIPASS_FAV_MAX;i++)
     {
