@@ -115,12 +115,17 @@ bool AppDaemon::initialize()
     }
 
     //Install and start mp manager instance and ws server
-    if (!MPManager::Instance()->initialize() ||
-        !WSServer::Instance()->initialize())
+    if (!WSServer::Instance()->initialize())
     {
-        qCritical() << "Fatal error";
+        qCritical() << "WSServer Fatal error";
         return false;
     }
+
+    QTimer::singleShot(500, []()
+    {
+        if (!MPManager::Instance()->initialize())
+            qCritical() << "USBManager Fatal error";
+    });
 
     return true;
 }

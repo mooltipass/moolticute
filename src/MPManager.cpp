@@ -34,6 +34,8 @@ MPManager::MPManager():
 
 bool MPManager::initialize()
 {
+    qInfo() << "Starting MPManager";
+
 #if defined(Q_OS_WIN)
     connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
     connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
