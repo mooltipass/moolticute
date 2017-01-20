@@ -19,6 +19,13 @@
 #ifndef MOOLTIPASSCMDS_H
 #define MOOLTIPASSCMDS_H
 
+//USB packet defines
+// Indexes
+#define MP_LEN_FIELD_INDEX      0x00
+#define MP_CMD_FIELD_INDEX      0x01
+#define MP_PAYLOAD_FIELD_INDEX  0x02
+//
+
 //Mooltipass commands
 #define MP_EXPORT_FLASH_START    0x8A
 #define MP_EXPORT_FLASH          0x8B

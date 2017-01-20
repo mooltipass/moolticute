@@ -649,23 +649,37 @@ void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
 
 void MPDevice::startMemMgmtMode()
 {
-    /* Start MMM here, and load all memory data from the device
-     * (favorites, nodes, etc...)
-     */
+    /* Start MMM here, and load all memory data from the device */
 
-    if (get_memMgmtMode()) return;
+    /* If we're already in MMM, return */
+    if (get_memMgmtMode())
+    {
+        return;
+    }
 
+    /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
 
-    //Ask device to go into MMM first
+    /* Ask device to go into MMM first */
     jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
-    //Get CTR value
+    /* Get CTR value */
     jobs->append(new MPCommandJob(this, MP_GET_CTRVALUE,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[0] == 1) return false;
-        ctrValue = data.mid(2, data[0]);
+        /* Wrong packet received */
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_CTRVALUE)
+        {
+            qCritical() << "Get CTR value: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        /* Received one byte as answer: command fail */
+        if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            qCritical() << "Get CTR value: couldn't get answer";
+            return false;
+        }
+        ctrValue = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
         qDebug() << "CTR value is: " << ctrValue;
         return true;
     }));
@@ -677,7 +691,7 @@ void MPDevice::startMemMgmtMode()
         if ((quint8)data[1] == MP_CARD_CPZ_CTR_PACKET)
         {
             done = false;
-            QByteArray cpz = data.mid(2, data[0]);
+            QByteArray cpz = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             qDebug() << "CPZ packet: " << cpz;
             cpzCtrValue.append(cpz);
         }
@@ -711,7 +725,7 @@ void MPDevice::startMemMgmtMode()
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if (data[0] == 1) return false;
-        QByteArray addr = data.mid(2, data[0]);
+        QByteArray addr = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
 
         //if parent address is not null, load nodes
         if (addr != MPNode::EmptyAddress)
@@ -733,7 +747,7 @@ void MPDevice::startMemMgmtMode()
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if (data[0] == 1) return false;
-        QByteArray addr = data.mid(2, data[0]);
+        QByteArray addr = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
 
         if (addr != MPNode::EmptyAddress)
         {
@@ -770,6 +784,7 @@ void MPDevice::startMemMgmtMode()
         dataNodes.clear();
         favoritesAddrs.clear();
 
+        exitMemMgmtMode();
         force_memMgmtMode(false);
     });
 
@@ -923,8 +938,6 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
 
 void MPDevice::exitMemMgmtMode()
 {
-    if (!get_memMgmtMode()) return;
-
     AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
     jobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
@@ -1106,7 +1119,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
             return false;
         }
 
-        QString l = data.mid(2, data[0]);
+        QString l = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
         if (!login.isEmpty() && l != login)
         {
             jobs->setCurrentJobError("login mismatch");
@@ -1130,7 +1143,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
             return true; //Do not fail if description is not available for this node
         }
         QVariantMap m = jobs->user_data.toMap();
-        m["description"] = data.mid(2, data[0]);
+        m["description"] = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
         jobs->user_data = m;
         return true;
     }));
@@ -1152,7 +1165,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
         //all jobs finished success
 
         qInfo() << "Password retreived ok";
-        QString pass = data.mid(2, data[0]);
+        QString pass = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
 
         QVariantMap m = jobs->user_data.toMap();
         cb(true, QString(), m["service"].toString(), m["login"].toString(), pass, m["description"].toString());
