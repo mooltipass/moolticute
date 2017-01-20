@@ -46,8 +46,8 @@ MPDevice::MPDevice(QObject *parent):
                     {
                         QTimer::singleShot(10, [=]()
                         {
-                            setCurrentDate();
                             loadParameters();
+                            setCurrentDate();
                         });
                     }
                 }
@@ -285,6 +285,39 @@ void MPDevice::loadParameters()
         //data is last result
         //all jobs finished success
         qInfo() << "Finished loading device options";
+
+        if (isFw12())
+        {
+            qInfo() << "Firmware above v1.2, requesting serial number";
+
+            AsyncJobs* v12jobs = new AsyncJobs("Loading device serial number", this);
+
+            /* Query serial number */
+            v12jobs->append(new MPCommandJob(this,
+                                          MP_GET_SERIAL,
+                                          [=](const QByteArray &data, bool &) -> bool
+            {
+                serialNumber = ((quint8)data[MP_PAYLOAD_FIELD_INDEX+3]) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]) << 8) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]) << 16) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+0]) << 24);
+                qDebug() << "Mooltipass serial number:" << serialNumber;
+                return true;
+            }));
+
+            connect(v12jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+            {
+                Q_UNUSED(data);
+                //data is last result
+                //all jobs finished success
+                qInfo() << "Finished loading serial number";
+            });
+
+            connect(v12jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+            {
+                Q_UNUSED(failedJob);
+                qCritical() << "Loading serial number";
+            });
+            jobsQueue.enqueue(v12jobs);
+            runAndDequeueJobs();
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -667,21 +700,24 @@ void MPDevice::startMemMgmtMode()
     jobs->append(new MPCommandJob(this, MP_GET_CTRVALUE,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        /* Wrong packet received */
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_CTRVALUE)
         {
+            /* Wrong packet received */
             qCritical() << "Get CTR value: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
             return false;
         }
-        /* Received one byte as answer: command fail */
-        if (data[MP_LEN_FIELD_INDEX] == 1)
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
         {
+            /* Received one byte as answer: command fail */
             qCritical() << "Get CTR value: couldn't get answer";
             return false;
         }
-        ctrValue = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-        qDebug() << "CTR value:" << ctrValue.toHex();
-        return true;
+        else
+        {
+            ctrValue = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            qDebug() << "CTR value:" << ctrValue.toHex();
+            return true;
+        }
     }));
 
     /* Get CPZ and CTR values */
@@ -702,6 +738,7 @@ void MPDevice::startMemMgmtMode()
                 cpzCtrValue.append(cpz);
             }
             done = false;
+            return true;
         }
         else if((quint8)data[1] == MP_GET_CARD_CPZ_CTR)
         {
@@ -717,31 +754,51 @@ void MPDevice::startMemMgmtMode()
 
     /* Get favorites */
     favoritesAddrs.clear();
-    for (int i = 0;i < MOOLTIPASS_FAV_MAX;i++)
+    for (int i = 0; i<MOOLTIPASS_FAV_MAX; i++)
     {
         jobs->append(new MPCommandJob(this, MP_GET_FAVORITE,
                                       QByteArray(1, (quint8)i),
                                       [=](const QByteArray &, QByteArray &) -> bool
         {
-            if (i == 0) qInfo() << "Loading favorites...";
+            if (i == 0)
+            {
+                qInfo() << "Loading favorites...";
+            }
             return true;
         },
                                       [=](const QByteArray &data, bool &) -> bool
         {
-            if (data[0] == 1) return false;
-            favoritesAddrs.append(data.mid(2, 4));
-            return true;
+            if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_FAVORITE)
+            {
+                /* Wrong packet received */
+                qCritical() << "Get favorite: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+                return false;
+            }
+            else if (data[MP_LEN_FIELD_INDEX] == 1)
+            {
+                /* Received one byte as answer: command fail */
+                qCritical() << "Get favorite: couldn't get answer";
+                return false;
+            }
+            else
+            {
+                /* Append favorite to list */
+                qDebug() << "Favorite" << i << ": parent address:" << data.mid(MP_PAYLOAD_FIELD_INDEX, 2).toHex() << ", child address:" << data.mid(MP_PAYLOAD_FIELD_INDEX+2, 2).toHex();
+                favoritesAddrs.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
+                return true;
+            }
         }));
     }
 
+    /* Delete node list */
     qDeleteAll(loginNodes);
     loginNodes.clear();
 
-    //Get parent node start address
+    /* Get parent node start address */
     jobs->append(new MPCommandJob(this, MP_GET_STARTING_PARENT,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[0] == 1) return false;
+        if(data[MP_LEN_FIELD_INDEX] == 1) return false;
         QByteArray addr = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
 
         //if parent address is not null, load nodes
@@ -763,7 +820,7 @@ void MPDevice::startMemMgmtMode()
     jobs->append(new MPCommandJob(this, MP_GET_DN_START_PARENT,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[0] == 1) return false;
+        if(data[MP_LEN_FIELD_INDEX] == 1) return false;
         QByteArray addr = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
 
         if (addr != MPNode::EmptyAddress)
@@ -1017,6 +1074,13 @@ void MPDevice::setCurrentDate()
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
         qInfo() << "Date set success";
+
+        /* If v1.2 firmware, query user change number */
+        if (isFw12())
+        {
+            qInfo() << "Firmware above v1.2, requesting change numbers";
+            getChangeNumbers();
+        }
     });
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
@@ -1024,6 +1088,47 @@ void MPDevice::setCurrentDate()
     });
 
     jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+void MPDevice::getChangeNumbers()
+{
+    AsyncJobs* v12jobs = new AsyncJobs("Loading device db change numbers", this);
+
+    /* Query change number */
+    v12jobs->append(new MPCommandJob(this,
+                                  MP_GET_USER_CHANGE_NB,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+        {
+            qDebug() << "Couldn't request change numbers";
+        }
+        else
+        {
+            credentialsDbChangeNumber = (quint8)data[MP_PAYLOAD_FIELD_INDEX+1];
+            dataDbChangeNumber = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
+            qDebug() << "Credentials change number:" << credentialsDbChangeNumber;
+            qDebug() << "Data change number:" << dataDbChangeNumber;
+        }
+        return true;
+    }));
+
+    connect(v12jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+        //data is last result
+        //all jobs finished success
+        qInfo() << "Finished loading change numbers";
+    });
+
+    connect(v12jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Loading change numbers failed";
+    });
+
+    jobsQueue.enqueue(v12jobs);
     runAndDequeueJobs();
 }
 

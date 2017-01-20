@@ -98,8 +98,12 @@
 #define MP_GET_DN_START_PARENT   0xD1
 #define MP_SET_DN_START_PARENT   0xD2
 #define MP_END_MEMORYMGMT        0xD3
+#define MP_SET_USER_CHANGE_NB    0xD4
 #define MP_GET_DESCRIPTION       0xD5
+#define MP_GET_USER_CHANGE_NB    0xD6
 #define MP_SET_DESCRIPTION       0xD8
+#define MP_LOCK_DEVICE           0xD9
+#define MP_GET_SERIAL            0xDA
 
 
 //Parameters for MP_GET_MOOLTIPASS_PARM

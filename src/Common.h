@@ -29,7 +29,8 @@
 #define MOOLTIPASS_USAGE_PAGE   0xFF31
 #define MOOLTIPASS_USAGE        0x74
 
-#define MOOLTIPASS_FAV_MAX       14
+#define MOOLTIPASS_FAV_MAX      14
+#define MOOLTIPASS_ADDRESS_SIZE 4
 #define MP_NODE_SIZE            132
 
 #define MOOLTIPASS_BLOCK_SIZE   32

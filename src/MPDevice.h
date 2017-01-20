@@ -91,6 +91,9 @@ public:
     //Send current date to MP
     void setCurrentDate();
 
+    //Get database change numbers
+    void getChangeNumbers();
+
     //Ask a password for specified service/login to MP
     void getCredential(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
                        std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass, const QString &desc)> cb);
@@ -174,8 +177,11 @@ private:
     QList<MPNode *> loginNodes; //list of all parent nodes for credentials
     QList<MPNode *> dataNodes; //list of all parent nodes for data nodes
 
-    bool isMiniFlag = false; //true if fw is mini
-    bool isFw12Flag = false; //true if fw is at least v1.2
+    bool isMiniFlag = false;            // true if fw is mini
+    bool isFw12Flag = false;            // true if fw is at least v1.2
+    quint32 serialNumber;               // serial number if firmware is above 1.2
+    quint8 credentialsDbChangeNumber;   // credentials db change number
+    quint8 dataDbChangeNumber;          // data db change number
 
     //this queue is used to put jobs list in a wait
     //queue. it prevents other clients to query something
