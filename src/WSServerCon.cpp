@@ -263,6 +263,11 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "show_app")
+    {
+        //broadcast the message to all clients
+        emit notifyAllClients(root);
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr)

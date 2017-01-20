@@ -63,6 +63,8 @@ void WSServer::onNewConnection()
     WSServerCon *c = new WSServerCon(wsocket);
     c->resetDevice(device);
     c->sendInitialStatus();
+    //let clients send broadcast messages
+    connect(c, &WSServerCon::notifyAllClients, this, &WSServer::notifyClients);
 
     wsClients[wsocket] = c;
     wsClientsReverse[c] = wsocket;

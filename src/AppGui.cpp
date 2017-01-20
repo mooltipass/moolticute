@@ -91,6 +91,11 @@ bool AppGui::initialize()
     //start hidden
     mainWindowHide();
 
+    connect(wsClient, &WSClient::showAppRequested, [=]()
+    {
+        mainWindowShow();
+    });
+
     daemonProcess = new QProcess(this);
     QString program = QCoreApplication::applicationDirPath () + "/moolticuted";
     QStringList arguments;

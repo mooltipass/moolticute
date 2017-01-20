@@ -150,6 +150,10 @@ void WSClient::onTextMessageReceived(const QString &message)
         else
             emit addCredentialDone(true);
     }
+    else if (rootobj["msg"] == "show_app")
+    {
+        emit showAppRequested();
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
