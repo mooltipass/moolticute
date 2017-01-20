@@ -286,9 +286,9 @@ void MPDevice::loadParameters()
         //all jobs finished success
         qInfo() << "Finished loading device options";
 
-        if (isFw12())
+        if (isFw12() && isMini())
         {
-            qInfo() << "Firmware above v1.2, requesting serial number";
+            qInfo() << "Mini firmware above v1.2, requesting serial number";
 
             AsyncJobs* v12jobs = new AsyncJobs("Loading device serial number", this);
 
@@ -298,7 +298,7 @@ void MPDevice::loadParameters()
                                           [=](const QByteArray &data, bool &) -> bool
             {
                 serialNumber = ((quint8)data[MP_PAYLOAD_FIELD_INDEX+3]) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]) << 8) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]) << 16) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+0]) << 24);
-                qDebug() << "Mooltipass serial number:" << serialNumber;
+                qDebug() << "Mooltipass Mini serial number:" << serialNumber;
                 return true;
             }));
 
@@ -307,13 +307,13 @@ void MPDevice::loadParameters()
                 Q_UNUSED(data);
                 //data is last result
                 //all jobs finished success
-                qInfo() << "Finished loading serial number";
+                qInfo() << "Finished loading Mini serial number";
             });
 
             connect(v12jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
             {
                 Q_UNUSED(failedJob);
-                qCritical() << "Loading serial number";
+                qCritical() << "Loading Mini serial number";
             });
             jobsQueue.enqueue(v12jobs);
             runAndDequeueJobs();
