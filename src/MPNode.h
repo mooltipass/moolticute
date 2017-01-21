@@ -38,6 +38,7 @@ public:
 
     //Fill node container with data
     void appendData(const QByteArray &d);
+    bool isDataLengthValid();
     bool isValid();
 
     /* accessors for node properties */

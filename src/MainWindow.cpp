@@ -483,7 +483,7 @@ void MainWindow::memMgmtMode()
     }
     else
     {
-        qDebug() << "MMM excited";
+        qDebug() << "MMM exitted";
         updatePage();
         ui->widgetHeader->setEnabled(true);
         passItem = nullptr;

@@ -743,6 +743,7 @@ void MPDevice::startMemMgmtMode()
         else if((quint8)data[1] == MP_GET_CARD_CPZ_CTR)
         {
             /* Received packet indicating we received all CPZ CTR packets */
+            qDebug() << "All CPZ CTR packets received";
             return true;
         }
         else
@@ -798,21 +799,39 @@ void MPDevice::startMemMgmtMode()
     jobs->append(new MPCommandJob(this, MP_GET_STARTING_PARENT,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if(data[MP_LEN_FIELD_INDEX] == 1) return false;
-        QByteArray addr = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-
-        //if parent address is not null, load nodes
-        if (addr != MPNode::EmptyAddress)
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_STARTING_PARENT)
         {
-            qInfo() << "Loading parent nodes...";
-            loadLoginNode(jobs, addr);
+            /* Wrong packet received */
+            qCritical() << "Get start node addr: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            qCritical() << "Get start node addr: couldn't get answer";
+            return false;
         }
         else
-            qInfo() << "No parent nodes to load.";
+        {
+            startNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            qInfo() << "Start node addr:" << startNode.toHex();
 
-        return true;
+            //if parent address is not null, load nodes
+            if (startNode != MPNode::EmptyAddress)
+            {
+                qInfo() << "Loading parent nodes...";
+                loadLoginNode(jobs, startNode);
+            }
+            else
+            {
+                qInfo() << "No parent nodes to load.";
+            }
+
+            return true;
+        }
     }));
 
+    /* Delete data node list */
     qDeleteAll(dataNodes);
     dataNodes.clear();
 
@@ -820,18 +839,37 @@ void MPDevice::startMemMgmtMode()
     jobs->append(new MPCommandJob(this, MP_GET_DN_START_PARENT,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if(data[MP_LEN_FIELD_INDEX] == 1) return false;
-        QByteArray addr = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
 
-        if (addr != MPNode::EmptyAddress)
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_DN_START_PARENT)
         {
-            qInfo() << "Loading parent data nodes...";
-            loadDataNode(jobs, addr);
+            /* Wrong packet received */
+            qCritical() << "Get data start node addr: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            qCritical() << "Get data start node addr: couldn't get answer";
+            return false;
         }
         else
-            qInfo() << "No parent data nodes to load.";
+        {
+            startDataNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            qInfo() << "Start data node addr:" << startDataNode.toHex();
 
-        return true;
+            //if parent address is not null, load nodes
+            if (startDataNode != MPNode::EmptyAddress)
+            {
+                qInfo() << "Loading data parent nodes...";
+                loadDataNode(jobs, startDataNode);
+            }
+            else
+            {
+                qInfo() << "No parent data nodes to load.";
+            }
+
+            return true;
+        }
     }));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
@@ -867,73 +905,116 @@ void MPDevice::startMemMgmtMode()
 }
 
 void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
-{
+{    
+    qDebug() << "Loading cred parent node at address: " << address.toHex();
+
+    /* Create new parent node, append to list */
     MPNode *pnode = new MPNode(this);
     loginNodes.append(pnode);
 
-    qDebug() << "Loading cred parent node at address: " << address;
-
+    /* Send read node command, expecting 3 packets */
     jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[0] <= 1) return false;
-
-        pnode->appendData(data.mid(2, data[0]));
-
-        //Continue to read data until the node is fully received
-        if (!pnode->isValid())
-            done = false;
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_READ_FLASH_NODE)
+        {
+            /* Wrong packet received */
+            qCritical() << "Get node: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            qCritical() << "Get node: couldn't get answer";
+            return false;
+        }
         else
         {
-            //Node is loaded
-            qDebug() << "Parent node loaded: " << pnode->getService();
-            if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
+            /* Append received data to node data */
+            pnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+
+            //Continue to read data until the node is fully received
+            if (!pnode->isDataLengthValid())
             {
-                qDebug() << "Loading child nodes...";
-                loadLoginChildNode(jobs, pnode, pnode->getStartChildAddress());
+                done = false;
             }
             else
-                qDebug() << "Parent does not have childs.";
+            {
+                //Node is loaded
+                qDebug() << address.toHex() << ": parent node loaded:" << pnode->getService();
 
-            //Load next parent
-            if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
-                loadLoginNode(jobs, pnode->getNextParentAddress());
+                if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
+                {
+                    qDebug() << pnode->getService() << ": loading child nodes...";
+                    loadLoginChildNode(jobs, pnode, pnode->getStartChildAddress());
+                }
+                else
+                {
+                    qDebug() << "Parent does not have childs.";
+                }
+
+                //Load next parent
+                if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
+                {
+                    loadLoginNode(jobs, pnode->getNextParentAddress());
+                }
+            }
+
+            return true;
         }
-
-        return true;
     }));
 }
 
 void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address)
 {
+    qDebug() << "Loading cred child node at address:" << address.toHex();
+
+    /* Create empty child node and add it to the list */
     MPNode *cnode = new MPNode(this);
     parent->appendChild(cnode);
 
-    qDebug() << "Loading cred child node at address: " << address;
-
+    /* Query node */
     jobs->prepend(new MPCommandJob(this, MP_READ_FLASH_NODE,
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[0] <= 1) return false;
-
-        cnode->appendData(data.mid(2, data[0]));
-
-        //Continue to read data until the node is fully received
-        if (!cnode->isValid())
-            done = false;
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_READ_FLASH_NODE)
+        {
+            /* Wrong packet received */
+            qCritical() << "Get child node: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            qCritical() << "Get child node: couldn't get answer";
+            return false;
+        }
         else
         {
-            //Node is loaded
-            qDebug() << "Child node loaded: " << cnode->getLogin();
+            /* Append received data to node data */
+            cnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
 
-            //Load next child
-            if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
-                loadLoginChildNode(jobs, parent, cnode->getNextChildAddress());
+            //Continue to read data until the node is fully received
+            if (!cnode->isDataLengthValid())
+            {
+                done = false;
+            }
+            else
+            {
+                //Node is loaded
+                qDebug() << address.toHex() << ": child node loaded:" << cnode->getLogin();
+
+                //Load next child
+                if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
+                {
+                    loadLoginChildNode(jobs, parent, cnode->getNextChildAddress());
+                }
+            }
+
+            return true;
         }
-
-        return true;
     }));
 }
 

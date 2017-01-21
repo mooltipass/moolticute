@@ -45,6 +45,11 @@ bool MPNode::isValid()
            ((quint8)data[1] & 0x20) == 0;
 }
 
+bool MPNode::isDataLengthValid()
+{
+    return data.size() == MP_NODE_SIZE;
+}
+
 void MPNode::appendData(const QByteArray &d)
 {
     data.append(d);

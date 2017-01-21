@@ -171,6 +171,8 @@ private:
 
     //Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
+    QByteArray startNode;
+    QByteArray startDataNode;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
 

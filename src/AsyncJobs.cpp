@@ -41,7 +41,7 @@ void MPCommandJob::start(const QByteArray &previous_data)
             bool ret = afterFunc(resdata, done_recv);
             if (!done_recv)
             {
-                qDebug() << "Waiting for other packet...";
+                //qDebug() << "Waiting for other packet...";
                 return; //all data are not received yet. keep waiting
             }
             if (!ret)
