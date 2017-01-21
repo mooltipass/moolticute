@@ -24,8 +24,8 @@
 class MPNode: public QObject
 {
 public:
-    MPNode(const QByteArray &d, QObject *parent = nullptr);
-    MPNode(QObject *parent = nullptr);
+    MPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0));
+    MPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0));
 
     enum
     {
@@ -42,7 +42,7 @@ public:
     bool isValid();
 
     /* accessors for node properties */
-
+    QByteArray getAddress();
     int getType();
 
     // NodeParent / NodeParentData properties
@@ -83,6 +83,7 @@ public:
 
 private:
     QByteArray data;
+    QByteArray address;
 
     QList<MPNode *> childNodes;
     QList<MPNode *> childDataNodes;

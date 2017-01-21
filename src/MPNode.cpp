@@ -20,14 +20,16 @@
 
 QByteArray MPNode::EmptyAddress = QByteArray(2, 0);
 
-MPNode::MPNode(const QByteArray &d, QObject *parent):
+MPNode::MPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress):
     QObject(parent),
-    data(std::move(d))
+    data(std::move(d)),
+    address(std::move(nodeAddress))
 {
 }
 
-MPNode::MPNode(QObject *parent):
-    QObject(parent)
+MPNode::MPNode(QObject *parent, const QByteArray &nodeAddress):
+    QObject(parent),
+    address(std::move(nodeAddress))
 {
 }
 
@@ -53,6 +55,11 @@ bool MPNode::isDataLengthValid()
 void MPNode::appendData(const QByteArray &d)
 {
     data.append(d);
+}
+
+QByteArray MPNode::getAddress()
+{
+    return address;
 }
 
 QByteArray MPNode::getPreviousParentAddress()

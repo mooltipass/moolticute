@@ -794,6 +794,8 @@ void MPDevice::startMemMgmtMode()
     /* Delete node list */
     qDeleteAll(loginNodes);
     loginNodes.clear();
+    qDeleteAll(loginChildNodes);
+    loginChildNodes.clear();
 
     /* Get parent node start address */
     jobs->append(new MPCommandJob(this, MP_GET_STARTING_PARENT,
@@ -814,7 +816,7 @@ void MPDevice::startMemMgmtMode()
         else
         {
             startNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-            qInfo() << "Start node addr:" << startNode.toHex();
+            qDebug() << "Start node addr:" << startNode.toHex();
 
             //if parent address is not null, load nodes
             if (startNode != MPNode::EmptyAddress)
@@ -855,7 +857,7 @@ void MPDevice::startMemMgmtMode()
         else
         {
             startDataNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-            qInfo() << "Start data node addr:" << startDataNode.toHex();
+            qDebug() << "Start data node addr:" << startDataNode.toHex();
 
             //if parent address is not null, load nodes
             if (startDataNode != MPNode::EmptyAddress)
@@ -892,6 +894,8 @@ void MPDevice::startMemMgmtMode()
         cpzCtrValue.clear();
         qDeleteAll(loginNodes);
         loginNodes.clear();
+        qDeleteAll(loginChildNodes);
+        loginChildNodes.clear();
         qDeleteAll(dataNodes);
         dataNodes.clear();
         favoritesAddrs.clear();
@@ -909,7 +913,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
     /* Create new parent node, append to list */
-    MPNode *pnode = new MPNode(this);
+    MPNode *pnode = new MPNode(this, address);
     loginNodes.append(pnode);
 
     /* Send read node command, expecting 3 packets */
@@ -971,7 +975,8 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteAr
     qDebug() << "Loading cred child node at address:" << address.toHex();
 
     /* Create empty child node and add it to the list */
-    MPNode *cnode = new MPNode(this);
+    MPNode *cnode = new MPNode(this, address);
+    loginChildNodes.append(cnode);
     parent->appendChild(cnode);
 
     /* Query node */
@@ -1020,7 +1025,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteAr
 
 void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
 {
-    MPNode *pnode = new MPNode(this);
+    MPNode *pnode = new MPNode(this, address);
     dataNodes.append(pnode);
 
     qDebug() << "Loading data parent node at address: " << address;
@@ -1061,7 +1066,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
 
 void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address)
 {
-    MPNode *cnode = new MPNode(this);
+    MPNode *cnode = new MPNode(this, address);
     parent->appendChildData(cnode);
 
     qDebug() << "Loading data child node at address: " << address;
@@ -1091,8 +1096,34 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
     }));
 }
 
+bool MPDevice::checkLoadedNodes()
+{
+    qInfo() << "Checking database...";
+    QList<MPNode *>::iterator i;
+
+    /* Check for start node */
+    bool startNodeFound = false;
+    for (i = loginNodes.begin(); i != loginNodes.end(); i++)
+    {
+        if ((*i)->getAddress() == startNode)
+        {
+            qDebug() << "Start node found";
+            startNodeFound = true;
+        }
+    }
+    if(!startNodeFound)
+    {
+        qCritical()  << "Start node not found!";
+    }
+
+    qInfo() << "Database check OK";
+    return true;
+}
+
 void MPDevice::exitMemMgmtMode()
 {
+    checkLoadedNodes();
+
     AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
     jobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));

@@ -84,6 +84,7 @@ public:
     //mem mgmt mode
     void startMemMgmtMode();
     void exitMemMgmtMode();
+    bool checkLoadedNodes();
 
     //reload parameters from MP
     void loadParameters();
@@ -176,8 +177,9 @@ private:
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
 
-    QList<MPNode *> loginNodes; //list of all parent nodes for credentials
-    QList<MPNode *> dataNodes; //list of all parent nodes for data nodes
+    QList<MPNode *> loginNodes;         //list of all parent nodes for credentials
+    QList<MPNode *> loginChildNodes;    //list of all parent nodes for credentials
+    QList<MPNode *> dataNodes;          //list of all parent nodes for data nodes
 
     bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2
