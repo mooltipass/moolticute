@@ -151,7 +151,7 @@ private:
     virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
 
     void loadLoginNode(AsyncJobs *jobs, const QByteArray &address);
-    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
+    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
 
@@ -164,22 +164,33 @@ private:
                        std::function<void(int total, int current)> cbProgress,
                        const QByteArray &data, bool &done);
 
+    // Generate save packets
+    bool generateSavePackets();
+
     //timer that asks status
     QTimer *statusTimer = nullptr;
 
     //command queue
     QQueue<MPCommand> commandQueue;
 
-    //Values loaded when needed (e.g. mem mgmt mode)
+    // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
     QByteArray startNode;
     QByteArray startDataNode;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
-
     QList<MPNode *> loginNodes;         //list of all parent nodes for credentials
     QList<MPNode *> loginChildNodes;    //list of all parent nodes for credentials
     QList<MPNode *> dataNodes;          //list of all parent nodes for data nodes
+
+    // Clones of these values, used when modifying them in MMM
+    QByteArray ctrValueClone;
+    QByteArray startNodeClone;
+    QList<QByteArray> cpzCtrValueClone;
+    QList<QByteArray> favoritesAddrsClone;
+    QList<MPNode *> loginNodesClone;         //list of all parent nodes for credentials
+    QList<MPNode *> loginChildNodesClone;    //list of all parent nodes for credentials
+    QList<MPNode *> dataNodesClone;          //list of all parent nodes for data nodes
 
     bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2

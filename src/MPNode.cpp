@@ -62,6 +62,16 @@ QByteArray MPNode::getAddress()
     return address;
 }
 
+void MPNode::setPointedToCheck()
+{
+    pointedToCheck = true;
+}
+
+bool MPNode::getPointedToCheck()
+{
+    return pointedToCheck;
+}
+
 QByteArray MPNode::getPreviousParentAddress()
 {
     if (!isValid()) return QByteArray();

@@ -77,6 +77,10 @@ public:
     QByteArray getNextDataAddress();
     QByteArray getChildData();
 
+    // Pointedto access/write
+    void setPointedToCheck();
+    bool getPointedToCheck();
+
     static QByteArray EmptyAddress;
 
     QJsonObject toJson();
@@ -84,6 +88,7 @@ public:
 private:
     QByteArray data;
     QByteArray address;
+    bool pointedToCheck = false;
 
     QList<MPNode *> childNodes;
     QList<MPNode *> childDataNodes;

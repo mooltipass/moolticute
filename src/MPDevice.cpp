@@ -715,6 +715,7 @@ void MPDevice::startMemMgmtMode()
         else
         {
             ctrValue = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            ctrValueClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             qDebug() << "CTR value:" << ctrValue.toHex();
             return true;
         }
@@ -736,6 +737,7 @@ void MPDevice::startMemMgmtMode()
             {
                 qDebug() << "CPZ CTR value:" << cpz.toHex();
                 cpzCtrValue.append(cpz);
+                cpzCtrValueClone.append(cpz);
             }
             done = false;
             return true;
@@ -755,6 +757,7 @@ void MPDevice::startMemMgmtMode()
 
     /* Get favorites */
     favoritesAddrs.clear();
+    favoritesAddrsClone.clear();
     for (int i = 0; i<MOOLTIPASS_FAV_MAX; i++)
     {
         jobs->append(new MPCommandJob(this, MP_GET_FAVORITE,
@@ -786,6 +789,7 @@ void MPDevice::startMemMgmtMode()
                 /* Append favorite to list */
                 qDebug() << "Favorite" << i << ": parent address:" << data.mid(MP_PAYLOAD_FIELD_INDEX, 2).toHex() << ", child address:" << data.mid(MP_PAYLOAD_FIELD_INDEX+2, 2).toHex();
                 favoritesAddrs.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
+                favoritesAddrsClone.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
                 return true;
             }
         }));
@@ -794,8 +798,8 @@ void MPDevice::startMemMgmtMode()
     /* Delete node list */
     qDeleteAll(loginNodes);
     loginNodes.clear();
-    qDeleteAll(loginChildNodes);
-    loginChildNodes.clear();
+    qDeleteAll(loginNodesClone);
+    loginNodesClone.clear();
 
     /* Get parent node start address */
     jobs->append(new MPCommandJob(this, MP_GET_STARTING_PARENT,
@@ -816,6 +820,7 @@ void MPDevice::startMemMgmtMode()
         else
         {
             startNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            startNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             qDebug() << "Start node addr:" << startNode.toHex();
 
             //if parent address is not null, load nodes
@@ -836,6 +841,8 @@ void MPDevice::startMemMgmtMode()
     /* Delete data node list */
     qDeleteAll(dataNodes);
     dataNodes.clear();
+    qDeleteAll(dataNodesClone);
+    dataNodesClone.clear();
 
     //Get parent data node start address
     jobs->append(new MPCommandJob(this, MP_GET_DN_START_PARENT,
@@ -889,16 +896,23 @@ void MPDevice::startMemMgmtMode()
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
 
-        //Clear remaining data
+
+        /* Cleaning all temp values */
         ctrValue.clear();
         cpzCtrValue.clear();
         qDeleteAll(loginNodes);
         loginNodes.clear();
-        qDeleteAll(loginChildNodes);
-        loginChildNodes.clear();
         qDeleteAll(dataNodes);
         dataNodes.clear();
         favoritesAddrs.clear();
+        /* Cleaning the clones as well */
+        ctrValueClone.clear();
+        cpzCtrValueClone.clear();
+        qDeleteAll(loginNodesClone);
+        loginNodesClone.clear();
+        qDeleteAll(dataNodesClone);
+        dataNodesClone.clear();
+        favoritesAddrsClone.clear();
 
         exitMemMgmtMode();
         force_memMgmtMode(false);
@@ -915,6 +929,8 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
     /* Create new parent node, append to list */
     MPNode *pnode = new MPNode(this, address);
     loginNodes.append(pnode);
+    MPNode *pnodeClone = new MPNode(this, address);
+    loginNodesClone.append(pnodeClone);
 
     /* Send read node command, expecting 3 packets */
     jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
@@ -937,6 +953,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
         {
             /* Append received data to node data */
             pnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            pnodeClone->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
 
             //Continue to read data until the node is fully received
             if (!pnode->isDataLengthValid())
@@ -951,7 +968,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
                 if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
                 {
                     qDebug() << pnode->getService() << ": loading child nodes...";
-                    loadLoginChildNode(jobs, pnode, pnode->getStartChildAddress());
+                    loadLoginChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress());
                 }
                 else
                 {
@@ -970,7 +987,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
     }));
 }
 
-void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address)
+void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address)
 {
     qDebug() << "Loading cred child node at address:" << address.toHex();
 
@@ -978,6 +995,9 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteAr
     MPNode *cnode = new MPNode(this, address);
     loginChildNodes.append(cnode);
     parent->appendChild(cnode);
+    MPNode *cnodeClone = new MPNode(this, address);
+    loginChildNodesClone.append(cnodeClone);
+    parentClone->appendChild(cnodeClone);
 
     /* Query node */
     jobs->prepend(new MPCommandJob(this, MP_READ_FLASH_NODE,
@@ -1000,6 +1020,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteAr
         {
             /* Append received data to node data */
             cnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            cnodeClone->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
 
             //Continue to read data until the node is fully received
             if (!cnode->isDataLengthValid())
@@ -1014,7 +1035,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteAr
                 //Load next child
                 if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
                 {
-                    loadLoginChildNode(jobs, parent, cnode->getNextChildAddress());
+                    loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress());
                 }
             }
 
@@ -1108,6 +1129,7 @@ bool MPDevice::checkLoadedNodes()
         if ((*i)->getAddress() == startNode)
         {
             qDebug() << "Start node found";
+            (*i)->setPointedToCheck();
             startNodeFound = true;
         }
     }
@@ -1117,6 +1139,11 @@ bool MPDevice::checkLoadedNodes()
     }
 
     qInfo() << "Database check OK";
+    return true;
+}
+
+bool MPDevice::generateSavePackets()
+{
     return true;
 }
 
@@ -1135,6 +1162,23 @@ void MPDevice::exitMemMgmtMode()
 
         qInfo() << "MMM exit ok";
 
+        /* Debug */
+        /*qDebug() << ctrValue;
+        qDebug() << ctrValueClone;
+        qDebug() << startNode;
+        qDebug() << startNodeClone;
+        qDebug() << cpzCtrValue;
+        qDebug() << cpzCtrValueClone;
+        qDebug() << favoritesAddrs;
+        qDebug() << favoritesAddrsClone;
+        qDebug() << loginNodes;         //list of all parent nodes for credentials
+        qDebug() << loginNodesClone;         //list of all parent nodes for credentials
+        qDebug() << loginChildNodes;    //list of all parent nodes for credentials
+        qDebug() << loginChildNodesClone;    //list of all parent nodes for credentials
+        qDebug() << dataNodes;          //list of all parent nodes for data nodes
+        qDebug() << dataNodesClone;          //list of all parent nodes for data nodes*/
+
+        /* Cleaning all temp values */
         ctrValue.clear();
         cpzCtrValue.clear();
         qDeleteAll(loginNodes);
@@ -1142,6 +1186,14 @@ void MPDevice::exitMemMgmtMode()
         qDeleteAll(dataNodes);
         dataNodes.clear();
         favoritesAddrs.clear();
+        /* Cleaning the clones as well */
+        ctrValueClone.clear();
+        cpzCtrValueClone.clear();
+        qDeleteAll(loginNodesClone);
+        loginNodesClone.clear();
+        qDeleteAll(dataNodesClone);
+        dataNodesClone.clear();
+        favoritesAddrsClone.clear();
 
         force_memMgmtMode(false);
     });
@@ -1150,6 +1202,7 @@ void MPDevice::exitMemMgmtMode()
     {
         qCritical() << "Failed to exit MMM";
 
+        /* Cleaning all temp values */
         ctrValue.clear();
         cpzCtrValue.clear();
         qDeleteAll(loginNodes);
@@ -1157,6 +1210,14 @@ void MPDevice::exitMemMgmtMode()
         qDeleteAll(dataNodes);
         dataNodes.clear();
         favoritesAddrs.clear();
+        /* Cleaning the clones as well */
+        ctrValueClone.clear();
+        cpzCtrValueClone.clear();
+        qDeleteAll(loginNodesClone);
+        loginNodesClone.clear();
+        qDeleteAll(dataNodesClone);
+        dataNodesClone.clear();
+        favoritesAddrsClone.clear();
 
         force_memMgmtMode(false);
     });
