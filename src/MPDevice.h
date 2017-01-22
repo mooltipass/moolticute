@@ -164,6 +164,10 @@ private:
                        std::function<void(int total, int current)> cbProgress,
                        const QByteArray &data, bool &done);
 
+    // Functions added by mathieu for MMM
+    MPNode* findNodeWithAddressInList(QList<MPNode*> list, QByteArray address);
+    void tagPointedNodes();
+
     // Generate save packets
     bool generateSavePackets();
 

@@ -1117,26 +1117,176 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
     }));
 }
 
-bool MPDevice::checkLoadedNodes()
+/* Find a node inside a given list given his address */
+MPNode* MPDevice::findNodeWithAddressInList(QList<MPNode*> list, QByteArray address)
 {
-    qInfo() << "Checking database...";
     QList<MPNode *>::iterator i;
-
-    /* Check for start node */
-    bool startNodeFound = false;
-    for (i = loginNodes.begin(); i != loginNodes.end(); i++)
+    for (i = list.begin(); i != list.end(); i++)
     {
-        if ((*i)->getAddress() == startNode)
+        if ((*i)->getAddress() == address)
         {
-            qDebug() << "Start node found";
-            (*i)->setPointedToCheck();
-            startNodeFound = true;
+            return (*i);
         }
     }
-    if(!startNodeFound)
+    return 0;
+}
+
+/* Follow the chain to tag pointed node (useful when doing integrity check when we are getting everything we can) */
+void MPDevice::tagPointedNodes()
+{
+    QByteArray tempParentAddress;
+    QByteArray tempChildAddress;
+    MPNode* tempNextParentNodePt;
+    MPNode* tempParentNodePt;
+    MPNode* tempNextChildNodePt;
+    MPNode* tempChildNodePt;
+
+    /* start with start node (duh) */
+    tempParentAddress = startNode;
+
+    /* Loop through the parent nodes */
+    while (tempParentAddress != MPNode::EmptyAddress)
     {
-        qCritical()  << "Start node not found!";
+        /* Get pointer to next parent node */
+        tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress);
+
+        /* Check that we could actually find it */
+        if (tempNextParentNodePt == 0)
+        {
+            qCritical() << "tagPointedNodes: couldn't find parent node with address" << tempParentAddress.toHex() << "in our list";
+
+            /* TODO: fix this node */
+            if (tempParentAddress == startNode)
+            {
+                /* start node is incorrect */
+            }
+            else
+            {
+            }
+
+            /* Stop looping */
+            return;
+        }
+        else
+        {
+            /* check previous node address */
+            if (tempParentAddress == startNode)
+            {
+                /* first parent node: previous address should be an empty one */
+                if (tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress)
+                {
+                    qWarning() << "tagPointedNodes: parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
+                }
+            }
+            else
+            {
+                /* normal linked chain */
+                if (tempNextParentNodePt->getPreviousParentAddress() != tempParentNodePt->getAddress())
+                {
+                    qWarning() << "tagPointedNodes: parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << tempParentNodePt->getAddress().toHex();
+                }
+            }
+
+            /* Set correct pointed node */
+            tempParentNodePt = tempNextParentNodePt;
+
+            /* tag parent */
+            tempParentNodePt->setPointedToCheck();
+
+            /* get first child */
+            tempChildAddress = tempParentNodePt->getStartChildAddress();
+
+            /* browse through all the children */
+            while (tempChildAddress != MPNode::EmptyAddress)
+            {
+                /* Get pointer to the child node */
+                tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress);
+
+                /* Check we could find child pointer */
+                if (tempNextChildNodePt == 0)
+                {
+                    qWarning() << "tagPointedNodes: couldn't find child node with address" << tempChildAddress.toHex() << "in our list";
+
+                    /* TODO: fix prev child / parent node */
+                    if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                    {
+                        // first child
+                    }
+                    else
+                    {
+                        // fix prev child
+                    }
+
+                    /* Loop to next parent */
+                    tempChildAddress = MPNode::EmptyAddress;
+                }
+                else
+                {
+                    /* check previous node address */
+                    if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                    {
+                        /* first child node in given parent: previous address should be an empty one */
+                        if (tempNextChildNodePt->getPreviousChildAddress() != MPNode::EmptyAddress)
+                        {
+                            qWarning() << "tagPointedNodes: child node" << tempNextChildNodePt->getLogin() <<  "at address" << tempChildAddress.toHex() << "has incorrect previous address:" << tempNextChildNodePt->getPreviousChildAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
+                        }
+                    }
+                    else
+                    {
+                        /* normal linked chain */
+                        if (tempNextChildNodePt->getPreviousChildAddress() != tempChildNodePt->getAddress())
+                        {
+                            qWarning() << "tagPointedNodes: child node" << tempNextChildNodePt->getLogin() <<  "at address" << tempChildAddress.toHex() << "has incorrect previous address:" << tempNextChildNodePt->getPreviousChildAddress().toHex() << "instead of" << tempChildNodePt->getAddress().toHex();
+                        }
+                    }
+
+                    /* Set correct pointed node */
+                    tempChildNodePt = tempNextChildNodePt;
+
+                    /* Tag child */
+                    tempChildNodePt->setPointedToCheck();
+
+                    /* Loop to next possible child */
+                    tempChildAddress = tempChildNodePt->getNextChildAddress();
+                }
+            }
+
+            /* get next parent address */
+            tempParentAddress = tempParentNodePt->getNextParentAddress();
+        }
     }
+}
+
+bool MPDevice::checkLoadedNodes()
+{
+    QList<MPNode *>::iterator i;
+
+    qInfo() << "Checking database...";
+
+    /* Tag pointed nodes */
+    tagPointedNodes();
+
+    /* Scan for orphan nodes */
+    quint32 nbOrphanParents = 0;
+    quint32 nbOrphanChildren = 0;
+    for (i = loginNodes.begin(); i != loginNodes.end(); i++)
+    {
+        if ((*i)->getPointedToCheck() == false)
+        {
+            qWarning() << "Orphan parent found:" << (*i)->getService() << "at address:" << (*i)->getAddress();
+            nbOrphanParents++;
+        }
+    }
+    for (i = loginChildNodes.begin(); i != loginChildNodes.end(); i++)
+    {
+        if ((*i)->getPointedToCheck() == false)
+        {
+            qWarning() << "Orphan child found:" << (*i)->getLogin() << "at address:" << (*i)->getAddress();
+            nbOrphanParents++;
+        }
+    }
+    qInfo() << "Number of parent orphans:" << nbOrphanParents;
+    qInfo() << "Number of children orphans:" << nbOrphanChildren;
 
     qInfo() << "Database check OK";
     return true;
