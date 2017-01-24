@@ -186,6 +186,12 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->comboBoxKnock->addItem("Low", 0);
     ui->comboBoxKnock->addItem("Medium", 1);
     ui->comboBoxKnock->addItem("High", 2);
+    ui->comboBoxLoginOutput->addItem(tr("Tab"), 0);
+    ui->comboBoxLoginOutput->addItem(tr("Enter"), 0);
+    ui->comboBoxLoginOutput->addItem(tr("Space"), 0);
+    ui->comboBoxPasswordOutput->addItem(tr("Tab"), 0);
+    ui->comboBoxPasswordOutput->addItem(tr("Enter"), 0);
+    ui->comboBoxPasswordOutput->addItem(tr("Space"), 0);
 
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
@@ -266,6 +272,41 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::knockSensitivityChanged, [=]()
     {
         ui->comboBoxKnock->setCurrentIndex(wsClient->get_knockSensitivity());
+        checkSettingsChanged();
+    });
+    connect(wsClient, &WSClient::keyAfterLoginSendEnableChanged, [=]()
+    {
+        ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
+        checkSettingsChanged();
+    });
+
+    connect(wsClient, &WSClient::keyAfterLoginSendChanged, [=]()
+    {
+        ui->comboBoxLoginOutput->setCurrentIndex(wsClient->get_keyAfterLoginSend());
+        checkSettingsChanged();
+    });
+
+    connect(wsClient, &WSClient::keyAfterPassSendEnableChanged, [=]()
+    {
+        ui->checkBoxSendAfterPassword->setChecked(wsClient->get_keyAfterPassSendEnable());
+        checkSettingsChanged();
+    });
+
+    connect(wsClient, &WSClient::keyAfterPassSendChanged, [=]()
+    {
+        ui->comboBoxPasswordOutput->setCurrentIndex(wsClient->get_keyAfterPassSend());
+        checkSettingsChanged();
+    });
+
+    connect(wsClient, &WSClient::delayAfterKeyEntryEnableChanged, [=]()
+    {
+        ui->checkBoxSlowHost->setChecked(wsClient->get_delayAfterKeyEntryEnable());
+        checkSettingsChanged();
+    });
+
+    connect(wsClient, &WSClient::delayAfterKeyEntryChanged, [=]()
+    {
+        ui->spinBoxInputDelayAfterKeyPressed->setValue(wsClient->get_delayAfterKeyEntry());
         checkSettingsChanged();
     });
 

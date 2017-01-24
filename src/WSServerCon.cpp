@@ -458,6 +458,61 @@ void WSServerCon::sendKnockSensitivity()
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
 }
 
+
+void WSServerCon::sendKeyAfterLoginSendEnable()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "key_after_login_enabled" },
+                        { "value", mpdevice->get_keyAfterLoginSendEnable() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendKeyAfterLoginSend()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "key_after_login" },
+                        { "value", mpdevice->get_keyAfterLoginSend() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendKeyAfterPassSendEnable()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "key_after_pass_enabled" },
+                        { "value", mpdevice->get_keyAfterPassSendEnable() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendKeyAfterPassSend()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "key_after_pass" },
+                        { "value", mpdevice->get_keyAfterPassSend() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendDelayAfterKeyEntryEnable()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "delay_after_key_enabled" },
+                        { "value", mpdevice->get_delayAfterKeyEntryEnable() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendDelayAfterKeyEntry()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "delay_after_key" },
+                        { "value", mpdevice->get_delayAfterKeyEntry() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
 void WSServerCon::sendMemMgmtMode()
 {
     if (!mpdevice)
@@ -522,6 +577,18 @@ void WSServerCon::processParametersSet(const QJsonObject &data)
         mpdevice->updateKnockEnabled(data["knock_enabled"].toBool());
     if (data.contains("knock_sensitivity"))
         mpdevice->updateKnockSensitivity(data["knock_sensitivity"].toInt());
+    if (data.contains("key_after_login_enabled"))
+         mpdevice->updateKeyAfterLoginSendEnable(data["key_after_login_enabled"].toBool());
+    if (data.contains("key_after_login"))
+         mpdevice->updateKeyAfterLoginSend(data["key_after_login"].toInt());
+    if (data.contains("key_after_pass_enabled"))
+         mpdevice->updateKeyAfterPassSendEnable(data["key_after_pass_enabled"].toBool());
+    if (data.contains("key_after_pass"))
+         mpdevice->updateKeyAfterPassSend(data["key_after_pass"].toInt());
+    if (data.contains("delay_after_key_enabled"))
+         mpdevice->updateDelayAfterKeyEntryEnable( data["delay_after_key_enabled"].toBool());
+    if (data.contains("delay_after_key"))
+         mpdevice->updateDelayAfterKeyEntry(data["delay_after_key"].toInt());
 
     //reload parameters from device after changed all params, this will trigger
     //websocket update of clients too

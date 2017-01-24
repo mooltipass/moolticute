@@ -39,6 +39,7 @@ public:
 class MPDevice: public QObject
 {
     Q_OBJECT
+
     QT_WRITABLE_PROPERTY(Common::MPStatus, status, Common::UnknownStatus)
     QT_WRITABLE_PROPERTY(int, keyboardLayout, 0)
     QT_WRITABLE_PROPERTY(bool, lockTimeoutEnabled, false)
@@ -52,6 +53,13 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(bool, memMgmtMode, false)
     QT_WRITABLE_PROPERTY(int, flashMbSize, 0)
     QT_WRITABLE_PROPERTY(QString, hwVersion, QString())
+
+    QT_WRITABLE_PROPERTY(bool, keyAfterLoginSendEnable, false)
+    QT_WRITABLE_PROPERTY(int, keyAfterLoginSend, 0)
+    QT_WRITABLE_PROPERTY(bool, keyAfterPassSendEnable, false)
+    QT_WRITABLE_PROPERTY(int, keyAfterPassSend, 0)
+    QT_WRITABLE_PROPERTY(bool, delayAfterKeyEntryEnable, false)
+    QT_WRITABLE_PROPERTY(int, delayAfterKeyEntry, 0)
 
     //MP Mini only
     QT_WRITABLE_PROPERTY(int, screenBrightness, 0) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
@@ -75,6 +83,12 @@ public:
     void updateFlashScreen(bool en);
     void updateOfflineMode(bool en);
     void updateTutorialEnabled(bool en);
+    void updateKeyAfterLoginSendEnable(bool en);
+    void updateKeyAfterLoginSend(int value);
+    void updateKeyAfterPassSendEnable(bool en);
+    void updateKeyAfterPassSend(int value);
+    void updateDelayAfterKeyEntryEnable(bool en);
+    void updateDelayAfterKeyEntry(int val);
 
     //MP Mini only
     void updateScreenBrightness(int bval); //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%

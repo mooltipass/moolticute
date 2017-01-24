@@ -60,6 +60,12 @@ private slots:
     void sendScreenBrightness();
     void sendKnockEnabled();
     void sendKnockSensitivity();
+    void sendKeyAfterLoginSendEnable();
+    void sendKeyAfterLoginSend();
+    void sendKeyAfterPassSendEnable();
+    void sendKeyAfterPassSend();
+    void sendDelayAfterKeyEntryEnable();
+    void sendDelayAfterKeyEntry();
 
 private:
     QWebSocket *wsClient;

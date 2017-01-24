@@ -29,6 +29,13 @@ class WSClient: public QObject
 
     QT_WRITABLE_PROPERTY(Common::MPHwVersion, mpHwVersion, Common::MP_Classic)
 
+    QT_WRITABLE_PROPERTY(bool, keyAfterLoginSendEnable, false)
+    QT_WRITABLE_PROPERTY(int, keyAfterLoginSend, 0)
+    QT_WRITABLE_PROPERTY(bool, keyAfterPassSendEnable, false)
+    QT_WRITABLE_PROPERTY(int, keyAfterPassSend, 0)
+    QT_WRITABLE_PROPERTY(bool, delayAfterKeyEntryEnable, false)
+    QT_WRITABLE_PROPERTY(int, delayAfterKeyEntry, 0)
+
 public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();

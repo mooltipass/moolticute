@@ -380,6 +380,66 @@ void MPDevice::loadParameters()
         return true;
     }));
 
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, KEY_AFTER_LOGIN_SEND_BOOL_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        qDebug() << "received key after login send enabled: " << (quint8)data.at(2);
+        set_keyAfterLoginSendEnable(data.at(2) != 0);
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, KEY_AFTER_LOGIN_SEND_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        qDebug() << "received key after login send " << (quint8)data.at(2);
+        set_keyAfterLoginSend(data.at(2));
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, KEY_AFTER_PASS_SEND_BOOL_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        qDebug() << "received key after pass send enabled: " << (quint8)data.at(2);
+        set_keyAfterPassSendEnable(data.at(2) != 0);
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, KEY_AFTER_PASS_SEND_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        qDebug() << "received key after pass send " << (quint8)data.at(2);
+        set_keyAfterPassSend(data.at(2));
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, DELAY_AFTER_KEY_ENTRY_BOOL_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        qDebug() << "received delay after key entry enabled: " << (quint8)data.at(2);
+        set_delayAfterKeyEntryEnable(data.at(2) != 0);
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, DELAY_AFTER_KEY_ENTRY_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        qDebug() << "received delay after key entry " << (quint8)data.at(2);
+        set_delayAfterKeyEntry(data.at(2));
+        return true;
+    }));
+
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
         Q_UNUSED(data);
@@ -585,6 +645,36 @@ void MPDevice::updateScreenBrightness(int bval) //In percent
 void MPDevice::updateKnockEnabled(bool en)
 {
     updateParam(MINI_KNOCK_DETECT_ENABLE_PARAM, en);
+}
+
+void MPDevice::updateKeyAfterLoginSendEnable(bool en)
+{
+    updateParam(KEY_AFTER_LOGIN_SEND_BOOL_PARAM, en);
+}
+
+void MPDevice::updateKeyAfterLoginSend(int value)
+{
+    updateParam(KEY_AFTER_LOGIN_SEND_PARAM, value);
+}
+
+void MPDevice::updateKeyAfterPassSendEnable(bool en)
+{
+     updateParam(KEY_AFTER_PASS_SEND_BOOL_PARAM, en);
+}
+
+void MPDevice::updateKeyAfterPassSend(int value)
+{
+    updateParam(KEY_AFTER_PASS_SEND_PARAM, value);
+}
+
+void MPDevice::updateDelayAfterKeyEntryEnable(bool en)
+{
+    updateParam(DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, en);
+}
+
+void MPDevice::updateDelayAfterKeyEntry(int val)
+{
+    updateParam(DELAY_AFTER_KEY_ENTRY_PARAM, val);
 }
 
 void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
