@@ -19,6 +19,42 @@
 #include "MPDevice.h"
 #include <functional>
 
+const char *mooltipassParamString[] = {
+    "USER_PARAM_INIT_KEY_PARAM",
+    "KEYBOARD_LAYOUT_PARAM",
+    "USER_INTER_TIMEOUT_PARAM",
+    "LOCK_TIMEOUT_ENABLE_PARAM",
+    "LOCK_TIMEOUT_PARAM",
+    "TOUCH_DI_PARAM",
+    "TOUCH_WHEEL_OS_PARAM_OLD",
+    "TOUCH_PROX_OS_PARAM",
+    "OFFLINE_MODE_PARAM",
+    "SCREENSAVER_PARAM",
+    "TOUCH_CHARGE_TIME_PARAM",
+    "TOUCH_WHEEL_OS_PARAM0",
+    "TOUCH_WHEEL_OS_PARAM1",
+    "TOUCH_WHEEL_OS_PARAM2"
+    "FLASH_SCREEN_PARAM",
+    "USER_REQ_CANCEL_PARAM",
+    "TUTORIAL_BOOL_PARAM",
+    "SCREEN_SAVER_SPEED_PARAM",
+    "LUT_BOOT_POPULATING_PARAM",
+    "KEY_AFTER_LOGIN_SEND_BOOL_PARAM",
+    "KEY_AFTER_LOGIN_SEND_PARAM",
+    "KEY_AFTER_PASS_SEND_BOOL_PARAM",
+    "KEY_AFTER_PASS_SEND_PARAM",
+    "DELAY_AFTER_KEY_ENTRY_BOOL_PARAM",
+    "DELAY_AFTER_KEY_ENTRY_PARAM",
+    "INVERTED_SCREEN_AT_BOOT_PARAM",
+    "MINI_OLED_CONTRAST_CURRENT_PARAM",
+    "MINI_LED_ANIM_MASK_PARAM",
+    "MINI_KNOCK_DETECT_ENABLE_PARAM",
+    "MINI_KNOCK_THRES_PARAM",
+    "LOCK_UNLOCK_FEATURE_PARAM",
+    "HASH_DISPLAY_FEATURE_PARAM",
+    "RANDOM_INIT_PIN_PARAM",
+};
+
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
 MPDevice::MPDevice(QObject *parent):
@@ -444,37 +480,42 @@ void MPDevice::newDataRead(const QByteArray &data)
 
 void MPDevice::updateKeyboardLayout(int lang)
 {
-    QString logInf = QStringLiteral("Updating keyboad layout: %1").arg(lang);
+    updateParam(KEYBOARD_LAYOUT_PARAM, lang);
+}
+
+void MPDevice::updateParam(quint8 param, int val)
+{
+    QString logInf = QStringLiteral("Updating %1 param: %2").arg(mooltipassParamString[param]).arg(val);
 
     AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
-    ba.append((quint8)KEYBOARD_LAYOUT_PARAM);
-    ba.append((quint8)lang);
+    ba.append((quint8)param);
+    ba.append((quint8)val);
 
     jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
-        qInfo() << "keyboad layout param set success";
+        qInfo() << mooltipassParamString[param] << " param updating with success";
     });
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
-        qWarning() << "Failed to set keyboad layout";
+        qWarning() << "Failed to change " << mooltipassParamString[param];
     });
 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
 
-void MPDevice::updateLockTimeoutEnabled(bool en)
+void MPDevice::updateParam(quint8 param, bool en)
 {
     QString logInf = QStringLiteral("Updating lock timeout enabled: %1").arg(en);
 
     AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
-    ba.append((quint8)LOCK_TIMEOUT_ENABLE_PARAM);
+    ba.append((quint8)param);
     ba.append((quint8)en);
 
     jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
@@ -492,264 +533,66 @@ void MPDevice::updateLockTimeoutEnabled(bool en)
     runAndDequeueJobs();
 }
 
+void MPDevice::updateLockTimeoutEnabled(bool en)
+{
+    updateParam(LOCK_TIMEOUT_ENABLE_PARAM, en);
+}
+
 void MPDevice::updateLockTimeout(int timeout)
 {
-    QString logInf = QStringLiteral("Updating lock timeout: %1").arg(timeout);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
-
-    QByteArray ba;
-    ba.append((quint8)LOCK_TIMEOUT_PARAM);
-    ba.append((quint8)timeout);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "lock timeout param set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set lock timeout";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+    updateParam(LOCK_TIMEOUT_PARAM, timeout);
 }
 
 void MPDevice::updateScreensaver(bool en)
 {
-    QString logInf = QStringLiteral("Updating screensaver enabled: %1").arg(en);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
-    QByteArray ba;
-    ba.append((quint8)SCREENSAVER_PARAM);
-    ba.append((quint8)en);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "screensaver param set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set screensaver enabled";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
-}
+    updateParam(SCREENSAVER_PARAM, en);
+  }
 
 void MPDevice::updateUserRequestCancel(bool en)
 {   
-    QString logInf = QStringLiteral("Updating user request cancel enabled: %1").arg(en);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
-    QByteArray ba;
-    ba.append((quint8)USER_REQ_CANCEL_PARAM);
-    ba.append((quint8)en);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "user request cancel param set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set user request cancel enabled";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+    updateParam(USER_REQ_CANCEL_PARAM, en);
 }
 
 void MPDevice::updateUserInteractionTimeout(int timeout)
 {   
-    QString logInf = QStringLiteral("Updating user interaction timeout: %1").arg(timeout);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
-
-    QByteArray ba;
-    ba.append((quint8)USER_INTER_TIMEOUT_PARAM);
-    ba.append((quint8)timeout);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "user interaction timeout param set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set user interaction timeout";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+    updateParam(USER_INTER_TIMEOUT_PARAM, timeout);
 }
 
 void MPDevice::updateFlashScreen(bool en)
 {
-    QString logInf = QStringLiteral("Updating flash screen enabled: %1").arg(en);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
-    QByteArray ba;
-    ba.append((quint8)FLASH_SCREEN_PARAM);
-    ba.append((quint8)en);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "flash screen param set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set flash screen enabled";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+    updateParam(FLASH_SCREEN_PARAM, en);
 }
 
 void MPDevice::updateOfflineMode(bool en)
 {
-    QString logInf = QStringLiteral("Updating offline enabled: %1").arg(en);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
-    QByteArray ba;
-    ba.append((quint8)OFFLINE_MODE_PARAM);
-    ba.append((quint8)en);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "Offline param set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set offline enabled";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+    updateParam(OFFLINE_MODE_PARAM, en);
 }
 
 void MPDevice::updateTutorialEnabled(bool en)
 {
-    QString logInf = QStringLiteral("Updating tutorial enabled: %1").arg(en);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
-    QByteArray ba;
-    ba.append((quint8)TUTORIAL_BOOL_PARAM);
-    ba.append((quint8)en);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "Tutorial param set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set tutorial enabled";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+    updateParam(TUTORIAL_BOOL_PARAM, en);
 }
 
 void MPDevice::updateScreenBrightness(int bval) //In percent
 {
-    QString logInf = QStringLiteral("Updating screen brightness: %1").arg(bval);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
-    QByteArray ba;
-    ba.append((quint8)MINI_OLED_CONTRAST_CURRENT_PARAM);
-    ba.append((quint8)(bval));
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "Knock enabled set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set knock enabled";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+    updateParam(MINI_OLED_CONTRAST_CURRENT_PARAM, bval);
 }
 
 void MPDevice::updateKnockEnabled(bool en)
 {
-    QString logInf = QStringLiteral("Updating knock enabled: %1").arg(en);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
-    QByteArray ba;
-    ba.append((quint8)MINI_KNOCK_DETECT_ENABLE_PARAM);
-    ba.append(en);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "Knock enabled set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set knock enabled";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+    updateParam(MINI_KNOCK_DETECT_ENABLE_PARAM, en);
 }
 
 void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
 {
-    QString logInf = QStringLiteral("Update knock sensitivity: %1").arg(s);
-
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
     quint8 v = 8;
     if (s == 0) v = 11;
     else if (s == 2) v = 5;
-
-    QByteArray ba;
-    ba.append((quint8)MINI_KNOCK_THRES_PARAM);
-    ba.append(v);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << "Knock sensitivity set success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to set sensitivity";
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+    updateParam(MINI_KNOCK_THRES_PARAM, s);
 }
 
 void MPDevice::startMemMgmtMode()
