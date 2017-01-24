@@ -106,21 +106,41 @@
 #define MP_GET_SERIAL            0xDA
 
 
-//Parameters for MP_GET_MOOLTIPASS_PARM
-#define KEYBOARD_LAYOUT_PARAM       1
-#define LOCK_TIMEOUT_ENABLE_PARAM   3
-#define LOCK_TIMEOUT_PARAM          4
-#define SCREENSAVER_PARAM           9
-#define USER_REQ_CANCEL_PARAM      15
-#define USER_INTER_TIMEOUT_PARAM    2
-#define FLASH_SCREEN_PARAM         14
-#define OFFLINE_MODE_PARAM          8
-#define TUTORIAL_BOOL_PARAM        16
-
-// MP Mini only
+#define USER_PARAM_INIT_KEY_PARAM           0
+#define KEYBOARD_LAYOUT_PARAM               1
+#define USER_INTER_TIMEOUT_PARAM            2
+#define LOCK_TIMEOUT_ENABLE_PARAM           3
+#define LOCK_TIMEOUT_PARAM                  4
+#define TOUCH_DI_PARAM                      5
+#define TOUCH_WHEEL_OS_PARAM_OLD            6
+#define TOUCH_PROX_OS_PARAM                 7
+#define OFFLINE_MODE_PARAM                  8
+#define SCREENSAVER_PARAM                   9
+#define TOUCH_CHARGE_TIME_PARAM             10
+#define TOUCH_WHEEL_OS_PARAM0               11
+#define TOUCH_WHEEL_OS_PARAM1               12
+#define TOUCH_WHEEL_OS_PARAM2               13
+#define FLASH_SCREEN_PARAM                  14
+#define USER_REQ_CANCEL_PARAM               15
+#define TUTORIAL_BOOL_PARAM                 16
+#define SCREEN_SAVER_SPEED_PARAM            17
+#define LUT_BOOT_POPULATING_PARAM           18
+#define KEY_AFTER_LOGIN_SEND_BOOL_PARAM     19
+#define KEY_AFTER_LOGIN_SEND_PARAM          20
+#define KEY_AFTER_PASS_SEND_BOOL_PARAM      21
+#define KEY_AFTER_PASS_SEND_PARAM           22
+#define DELAY_AFTER_KEY_ENTRY_BOOL_PARAM    23
+#define DELAY_AFTER_KEY_ENTRY_PARAM         24
+#define INVERTED_SCREEN_AT_BOOT_PARAM       25
 #define MINI_OLED_CONTRAST_CURRENT_PARAM    26
+#define MINI_LED_ANIM_MASK_PARAM            27
 #define MINI_KNOCK_DETECT_ENABLE_PARAM      28
 #define MINI_KNOCK_THRES_PARAM              29
+#define LOCK_UNLOCK_FEATURE_PARAM           30
+#define HASH_DISPLAY_FEATURE_PARAM          31
+#define RANDOM_INIT_PIN_PARAM               32
+// we are full.
+#define FIRST_USER_PARAM KEYBOARD_LAYOUT_PARAM
 
 #endif // MOOLTIPASSCMDS_H
 
