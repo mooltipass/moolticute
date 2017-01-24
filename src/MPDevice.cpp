@@ -137,6 +137,11 @@ void MPDevice::loadParameters()
                                   MP_VERSION,
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_VERSION)
+        {
+            qWarning() << "Get version: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received MP version FLASH size: " << (quint8)data.at(2) << "Mb";
         QString hw = QString(data.mid(3, (quint8)data.at(0) - 2));
         qDebug() << "received MP version hw: " << hw;
@@ -161,6 +166,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, KEYBOARD_LAYOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received language: " << (quint8)data.at(2);
         set_keyboardLayout((quint8)data.at(2));
         return true;
@@ -171,6 +181,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, LOCK_TIMEOUT_ENABLE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received lock timeout enable: " << (quint8)data.at(2);
         set_lockTimeoutEnabled(data.at(2) != 0);
         return true;
@@ -181,6 +196,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, LOCK_TIMEOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received lock timeout: " << (quint8)data.at(2);
         set_lockTimeout((quint8)data.at(2));
         return true;
@@ -191,6 +211,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, SCREENSAVER_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received screensaver: " << (quint8)data.at(2);
         set_screensaver(data.at(2) != 0);
         return true;
@@ -201,6 +226,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, USER_REQ_CANCEL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received userRequestCancel: " << (quint8)data.at(2);
         set_userRequestCancel(data.at(2) != 0);
         return true;
@@ -211,6 +241,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, USER_INTER_TIMEOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received userInteractionTimeout: " << (quint8)data.at(2);
         set_userInteractionTimeout((quint8)data.at(2));
         return true;
@@ -221,6 +256,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, FLASH_SCREEN_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received flashScreen: " << (quint8)data.at(2);
         set_flashScreen(data.at(2) != 0);
         return true;
@@ -231,6 +271,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, OFFLINE_MODE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received offlineMode: " << (quint8)data.at(2);
         set_offlineMode(data.at(2) != 0);
         return true;
@@ -241,6 +286,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, TUTORIAL_BOOL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received tutorialEnabled: " << (quint8)data.at(2);
         set_tutorialEnabled(data.at(2) != 0);
         return true;
@@ -251,6 +301,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MINI_OLED_CONTRAST_CURRENT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received screenBrightness: " << (quint8)data.at(2);
         set_screenBrightness((quint8)data.at(2));
         return true;
@@ -261,6 +316,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MINI_KNOCK_DETECT_ENABLE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received set_knockEnabled: " << (quint8)data.at(2);
         set_knockEnabled(data.at(2) != 0);
         return true;
@@ -271,6 +331,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MINI_KNOCK_THRES_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received knockSensitivity: " << (quint8)data.at(2);
         int v = 1;
         if (data.at(2) == 11) v = 0;
@@ -297,6 +362,11 @@ void MPDevice::loadParameters()
                                           MP_GET_SERIAL,
                                           [=](const QByteArray &data, bool &) -> bool
             {
+                if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_SERIAL)
+                {
+                    qWarning() << "Get serial: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+                    return false;
+                }
                 serialNumber = ((quint8)data[MP_PAYLOAD_FIELD_INDEX+3]) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]) << 8) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]) << 16) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+0]) << 24);
                 qDebug() << "Mooltipass Mini serial number:" << serialNumber;
                 return true;
@@ -313,7 +383,8 @@ void MPDevice::loadParameters()
             connect(v12jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
             {
                 Q_UNUSED(failedJob);
-                qCritical() << "Loading Mini serial number";
+                qCritical() << "Loading Mini serial number failed";
+                loadParameters(); // memory: does it get "piled on?"
             });
             jobsQueue.enqueue(v12jobs);
             runAndDequeueJobs();
@@ -324,6 +395,7 @@ void MPDevice::loadParameters()
     {
         Q_UNUSED(failedJob);
         qCritical() << "Loading option failed";
+        loadParameters(); // memory: does it get "piled on?"
     });
 
     jobsQueue.enqueue(jobs);
@@ -1392,7 +1464,18 @@ void MPDevice::setCurrentDate()
 
         return true;
     },
-                                  MPCommandJob::defaultCheckRet));
+                                [=](const QByteArray &data, bool &) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_SET_DATE)
+        {
+            qWarning() << "Set date: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
@@ -1408,6 +1491,7 @@ void MPDevice::setCurrentDate()
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
         qWarning() << "Failed to set date on device";
+        setCurrentDate(); // memory: does it get piled on?
     });
 
     jobsQueue.enqueue(jobs);
@@ -1425,7 +1509,7 @@ void MPDevice::getChangeNumbers()
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
-            qDebug() << "Couldn't request change numbers";
+            qWarning() << "Couldn't request change numbers";
         }
         else
         {
@@ -1449,6 +1533,7 @@ void MPDevice::getChangeNumbers()
     {
         Q_UNUSED(failedJob);
         qCritical() << "Loading change numbers failed";
+        getChangeNumbers(); // memory: does it get piled on?
     });
 
     jobsQueue.enqueue(v12jobs);
