@@ -1197,7 +1197,7 @@ MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArr
         return node->getAddress() == address;
     });
 
-    return *it;
+    return it == list.end()?nullptr:*it;
 }
 
 /* Follow the chain to tag pointed node (useful when doing integrity check when we are getting everything we can) */
