@@ -84,12 +84,16 @@ public:
     //mem mgmt mode
     void startMemMgmtMode();
     void exitMemMgmtMode();
+    bool checkLoadedNodes();
 
     //reload parameters from MP
     void loadParameters();
 
     //Send current date to MP
     void setCurrentDate();
+
+    //Get database change numbers
+    void getChangeNumbers();
 
     //Ask a password for specified service/login to MP
     void getCredential(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
@@ -147,7 +151,7 @@ private:
     virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
 
     void loadLoginNode(AsyncJobs *jobs, const QByteArray &address);
-    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
+    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
 
@@ -160,22 +164,43 @@ private:
                        std::function<void(int total, int current)> cbProgress,
                        const QByteArray &data, bool &done);
 
+    // Functions added by mathieu for MMM
+    MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address);
+    void tagPointedNodes();
+
+    // Generate save packets
+    bool generateSavePackets();
+
     //timer that asks status
     QTimer *statusTimer = nullptr;
 
     //command queue
     QQueue<MPCommand> commandQueue;
 
-    //Values loaded when needed (e.g. mem mgmt mode)
+    // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
+    QByteArray startNode;
+    QByteArray startDataNode;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
+    QList<MPNode *> loginNodes;         //list of all parent nodes for credentials
+    QList<MPNode *> loginChildNodes;    //list of all parent nodes for credentials
+    QList<MPNode *> dataNodes;          //list of all parent nodes for data nodes
 
-    QList<MPNode *> loginNodes; //list of all parent nodes for credentials
-    QList<MPNode *> dataNodes; //list of all parent nodes for data nodes
+    // Clones of these values, used when modifying them in MMM
+    QByteArray ctrValueClone;
+    QByteArray startNodeClone;
+    QList<QByteArray> cpzCtrValueClone;
+    QList<QByteArray> favoritesAddrsClone;
+    QList<MPNode *> loginNodesClone;         //list of all parent nodes for credentials
+    QList<MPNode *> loginChildNodesClone;    //list of all parent nodes for credentials
+    QList<MPNode *> dataNodesClone;          //list of all parent nodes for data nodes
 
-    bool isMiniFlag = false; //true if fw is mini
-    bool isFw12Flag = false; //true if fw is at least v1.2
+    bool isMiniFlag = false;            // true if fw is mini
+    bool isFw12Flag = false;            // true if fw is at least v1.2
+    quint32 serialNumber;               // serial number if firmware is above 1.2
+    quint8 credentialsDbChangeNumber;   // credentials db change number
+    quint8 dataDbChangeNumber;          // data db change number
 
     //this queue is used to put jobs list in a wait
     //queue. it prevents other clients to query something

@@ -473,16 +473,17 @@ void MainWindow::on_pushButtonMemMode_clicked()
 }
 
 void MainWindow::memMgmtMode()
-{
-    qDebug() << "MMM changed";
+{    
     if (wsClient->get_memMgmtMode())
     {
+        qDebug() << "MMM entered";
         ui->widgetHeader->setEnabled(false);
         ui->pushButtonCred->setChecked(true); //force
         ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS);
     }
     else
     {
+        qDebug() << "MMM exitted";
         updatePage();
         ui->widgetHeader->setEnabled(true);
         passItem = nullptr;

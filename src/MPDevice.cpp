@@ -46,8 +46,8 @@ MPDevice::MPDevice(QObject *parent):
                     {
                         QTimer::singleShot(10, [=]()
                         {
-                            setCurrentDate();
                             loadParameters();
+                            setCurrentDate();
                         });
                     }
                 }
@@ -137,6 +137,11 @@ void MPDevice::loadParameters()
                                   MP_VERSION,
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_VERSION)
+        {
+            qWarning() << "Get version: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received MP version FLASH size: " << (quint8)data.at(2) << "Mb";
         QString hw = QString(data.mid(3, (quint8)data.at(0) - 2));
         qDebug() << "received MP version hw: " << hw;
@@ -161,6 +166,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, KEYBOARD_LAYOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received language: " << (quint8)data.at(2);
         set_keyboardLayout((quint8)data.at(2));
         return true;
@@ -171,6 +181,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, LOCK_TIMEOUT_ENABLE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received lock timeout enable: " << (quint8)data.at(2);
         set_lockTimeoutEnabled(data.at(2) != 0);
         return true;
@@ -181,6 +196,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, LOCK_TIMEOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received lock timeout: " << (quint8)data.at(2);
         set_lockTimeout((quint8)data.at(2));
         return true;
@@ -191,6 +211,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, SCREENSAVER_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received screensaver: " << (quint8)data.at(2);
         set_screensaver(data.at(2) != 0);
         return true;
@@ -201,6 +226,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, USER_REQ_CANCEL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received userRequestCancel: " << (quint8)data.at(2);
         set_userRequestCancel(data.at(2) != 0);
         return true;
@@ -211,6 +241,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, USER_INTER_TIMEOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received userInteractionTimeout: " << (quint8)data.at(2);
         set_userInteractionTimeout((quint8)data.at(2));
         return true;
@@ -221,6 +256,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, FLASH_SCREEN_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received flashScreen: " << (quint8)data.at(2);
         set_flashScreen(data.at(2) != 0);
         return true;
@@ -231,6 +271,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, OFFLINE_MODE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received offlineMode: " << (quint8)data.at(2);
         set_offlineMode(data.at(2) != 0);
         return true;
@@ -241,6 +286,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, TUTORIAL_BOOL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received tutorialEnabled: " << (quint8)data.at(2);
         set_tutorialEnabled(data.at(2) != 0);
         return true;
@@ -251,6 +301,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MINI_OLED_CONTRAST_CURRENT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received screenBrightness: " << (quint8)data.at(2);
         set_screenBrightness((quint8)data.at(2));
         return true;
@@ -261,6 +316,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MINI_KNOCK_DETECT_ENABLE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received set_knockEnabled: " << (quint8)data.at(2);
         set_knockEnabled(data.at(2) != 0);
         return true;
@@ -271,6 +331,11 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MINI_KNOCK_THRES_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
         qDebug() << "received knockSensitivity: " << (quint8)data.at(2);
         int v = 1;
         if (data.at(2) == 11) v = 0;
@@ -285,12 +350,52 @@ void MPDevice::loadParameters()
         //data is last result
         //all jobs finished success
         qInfo() << "Finished loading device options";
+
+        if (isFw12() && isMini())
+        {
+            qInfo() << "Mini firmware above v1.2, requesting serial number";
+
+            AsyncJobs* v12jobs = new AsyncJobs("Loading device serial number", this);
+
+            /* Query serial number */
+            v12jobs->append(new MPCommandJob(this,
+                                          MP_GET_SERIAL,
+                                          [=](const QByteArray &data, bool &) -> bool
+            {
+                if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_SERIAL)
+                {
+                    qWarning() << "Get serial: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+                    return false;
+                }
+                serialNumber = ((quint8)data[MP_PAYLOAD_FIELD_INDEX+3]) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]) << 8) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]) << 16) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+0]) << 24);
+                qDebug() << "Mooltipass Mini serial number:" << serialNumber;
+                return true;
+            }));
+
+            connect(v12jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+            {
+                Q_UNUSED(data);
+                //data is last result
+                //all jobs finished success
+                qInfo() << "Finished loading Mini serial number";
+            });
+
+            connect(v12jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+            {
+                Q_UNUSED(failedJob);
+                qCritical() << "Loading Mini serial number failed";
+                loadParameters(); // memory: does it get "piled on?"
+            });
+            jobsQueue.enqueue(v12jobs);
+            runAndDequeueJobs();
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Loading option failed";
+        loadParameters(); // memory: does it get "piled on?"
     });
 
     jobsQueue.enqueue(jobs);
@@ -649,101 +754,203 @@ void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
 
 void MPDevice::startMemMgmtMode()
 {
-    /* Start MMM here, and load all memory data from the device
-     * (favorites, nodes, etc...)
-     */
+    /* Start MMM here, and load all memory data from the device */
 
-    if (get_memMgmtMode()) return;
+    /* If we're already in MMM, return */
+    if (get_memMgmtMode())
+    {
+        return;
+    }
 
+    /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
 
-    //Ask device to go into MMM first
+    /* Ask device to go into MMM first */
     jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
-    //Get CTR value
+    /* Get CTR value */
     jobs->append(new MPCommandJob(this, MP_GET_CTRVALUE,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[0] == 1) return false;
-        ctrValue = data.mid(2, data[0]);
-        qDebug() << "CTR value is: " << ctrValue;
-        return true;
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_CTRVALUE)
+        {
+            /* Wrong packet received */
+            qCritical() << "Get CTR value: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            qCritical() << "Get CTR value: couldn't get answer";
+            return false;
+        }
+        else
+        {
+            ctrValue = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            ctrValueClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            qDebug() << "CTR value:" << ctrValue.toHex();
+            return true;
+        }
     }));
 
-    //Get CPZ and CTR value
+    /* Get CPZ and CTR values */
     jobs->append(new MPCommandJob(this, MP_GET_CARD_CPZ_CTR,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
+        /* The Mooltipass answers with CPZ CTR packets containing the CPZ_CTR values, and then a final MP_GET_CARD_CPZ_CTR packet */
         if ((quint8)data[1] == MP_CARD_CPZ_CTR_PACKET)
         {
+            QByteArray cpz = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            if(cpzCtrValue.contains(cpz))
+            {
+                qDebug() << "Duplicate CPZ CTR value:" << cpz.toHex();
+            }
+            else
+            {
+                qDebug() << "CPZ CTR value:" << cpz.toHex();
+                cpzCtrValue.append(cpz);
+                cpzCtrValueClone.append(cpz);
+            }
             done = false;
-            QByteArray cpz = data.mid(2, data[0]);
-            qDebug() << "CPZ packet: " << cpz;
-            cpzCtrValue.append(cpz);
+            return true;
         }
-        return true;
+        else if((quint8)data[1] == MP_GET_CARD_CPZ_CTR)
+        {
+            /* Received packet indicating we received all CPZ CTR packets */
+            qDebug() << "All CPZ CTR packets received";
+            return true;
+        }
+        else
+        {
+            qCritical() << "Get CPZ CTR: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
     }));
 
-    //Add jobs for favorites
+    /* Get favorites */
     favoritesAddrs.clear();
-    for (int i = 0;i < MOOLTIPASS_FAV_MAX;i++)
+    favoritesAddrsClone.clear();
+    for (int i = 0; i<MOOLTIPASS_FAV_MAX; i++)
     {
         jobs->append(new MPCommandJob(this, MP_GET_FAVORITE,
                                       QByteArray(1, (quint8)i),
                                       [=](const QByteArray &, QByteArray &) -> bool
         {
-            if (i == 0) qInfo() << "Loading favorites...";
+            if (i == 0)
+            {
+                qInfo() << "Loading favorites...";
+            }
             return true;
         },
                                       [=](const QByteArray &data, bool &) -> bool
         {
-            if (data[0] == 1) return false;
-            favoritesAddrs.append(data.mid(2, 4));
-            return true;
+            if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_FAVORITE)
+            {
+                /* Wrong packet received */
+                qCritical() << "Get favorite: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+                return false;
+            }
+            else if (data[MP_LEN_FIELD_INDEX] == 1)
+            {
+                /* Received one byte as answer: command fail */
+                qCritical() << "Get favorite: couldn't get answer";
+                return false;
+            }
+            else
+            {
+                /* Append favorite to list */
+                qDebug() << "Favorite" << i << ": parent address:" << data.mid(MP_PAYLOAD_FIELD_INDEX, 2).toHex() << ", child address:" << data.mid(MP_PAYLOAD_FIELD_INDEX+2, 2).toHex();
+                favoritesAddrs.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
+                favoritesAddrsClone.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
+                return true;
+            }
         }));
     }
 
+    /* Delete node list */
     qDeleteAll(loginNodes);
     loginNodes.clear();
+    qDeleteAll(loginNodesClone);
+    loginNodesClone.clear();
 
-    //Get parent node start address
+    /* Get parent node start address */
     jobs->append(new MPCommandJob(this, MP_GET_STARTING_PARENT,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[0] == 1) return false;
-        QByteArray addr = data.mid(2, data[0]);
-
-        //if parent address is not null, load nodes
-        if (addr != MPNode::EmptyAddress)
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_STARTING_PARENT)
         {
-            qInfo() << "Loading parent nodes...";
-            loadLoginNode(jobs, addr);
+            /* Wrong packet received */
+            qCritical() << "Get start node addr: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            qCritical() << "Get start node addr: couldn't get answer";
+            return false;
         }
         else
-            qInfo() << "No parent nodes to load.";
+        {
+            startNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            startNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            qDebug() << "Start node addr:" << startNode.toHex();
 
-        return true;
+            //if parent address is not null, load nodes
+            if (startNode != MPNode::EmptyAddress)
+            {
+                qInfo() << "Loading parent nodes...";
+                loadLoginNode(jobs, startNode);
+            }
+            else
+            {
+                qInfo() << "No parent nodes to load.";
+            }
+
+            return true;
+        }
     }));
 
+    /* Delete data node list */
     qDeleteAll(dataNodes);
     dataNodes.clear();
+    qDeleteAll(dataNodesClone);
+    dataNodesClone.clear();
 
     //Get parent data node start address
     jobs->append(new MPCommandJob(this, MP_GET_DN_START_PARENT,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[0] == 1) return false;
-        QByteArray addr = data.mid(2, data[0]);
 
-        if (addr != MPNode::EmptyAddress)
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_DN_START_PARENT)
         {
-            qInfo() << "Loading parent data nodes...";
-            loadDataNode(jobs, addr);
+            /* Wrong packet received */
+            qCritical() << "Get data start node addr: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            qCritical() << "Get data start node addr: couldn't get answer";
+            return false;
         }
         else
-            qInfo() << "No parent data nodes to load.";
+        {
+            startDataNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            qDebug() << "Start data node addr:" << startDataNode.toHex();
 
-        return true;
+            //if parent address is not null, load nodes
+            if (startDataNode != MPNode::EmptyAddress)
+            {
+                qInfo() << "Loading data parent nodes...";
+                loadDataNode(jobs, startDataNode);
+            }
+            else
+            {
+                qInfo() << "No parent data nodes to load.";
+            }
+
+            return true;
+        }
     }));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
@@ -761,7 +968,8 @@ void MPDevice::startMemMgmtMode()
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
 
-        //Clear remaining data
+
+        /* Cleaning all temp values */
         ctrValue.clear();
         cpzCtrValue.clear();
         qDeleteAll(loginNodes);
@@ -769,7 +977,16 @@ void MPDevice::startMemMgmtMode()
         qDeleteAll(dataNodes);
         dataNodes.clear();
         favoritesAddrs.clear();
+        /* Cleaning the clones as well */
+        ctrValueClone.clear();
+        cpzCtrValueClone.clear();
+        qDeleteAll(loginNodesClone);
+        loginNodesClone.clear();
+        qDeleteAll(dataNodesClone);
+        dataNodesClone.clear();
+        favoritesAddrsClone.clear();
 
+        exitMemMgmtMode();
         force_memMgmtMode(false);
     });
 
@@ -778,79 +995,130 @@ void MPDevice::startMemMgmtMode()
 }
 
 void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
-{
-    MPNode *pnode = new MPNode(this);
+{    
+    qDebug() << "Loading cred parent node at address: " << address.toHex();
+
+    /* Create new parent node, append to list */
+    MPNode *pnode = new MPNode(this, address);
     loginNodes.append(pnode);
+    MPNode *pnodeClone = new MPNode(this, address);
+    loginNodesClone.append(pnodeClone);
 
-    qDebug() << "Loading cred parent node at address: " << address;
-
+    /* Send read node command, expecting 3 packets */
     jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[0] <= 1) return false;
-
-        pnode->appendData(data.mid(2, data[0]));
-
-        //Continue to read data until the node is fully received
-        if (!pnode->isValid())
-            done = false;
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_READ_FLASH_NODE)
+        {
+            /* Wrong packet received */
+            qCritical() << "Get node: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            qCritical() << "Get node: couldn't get answer";
+            return false;
+        }
         else
         {
-            //Node is loaded
-            qDebug() << "Parent node loaded: " << pnode->getService();
-            if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
+            /* Append received data to node data */
+            pnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            pnodeClone->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+
+            //Continue to read data until the node is fully received
+            if (!pnode->isDataLengthValid())
             {
-                qDebug() << "Loading child nodes...";
-                loadLoginChildNode(jobs, pnode, pnode->getStartChildAddress());
+                done = false;
             }
             else
-                qDebug() << "Parent does not have childs.";
+            {
+                //Node is loaded
+                qDebug() << address.toHex() << ": parent node loaded:" << pnode->getService();
 
-            //Load next parent
-            if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
-                loadLoginNode(jobs, pnode->getNextParentAddress());
+                if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
+                {
+                    qDebug() << pnode->getService() << ": loading child nodes...";
+                    loadLoginChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress());
+                }
+                else
+                {
+                    qDebug() << "Parent does not have childs.";
+                }
+
+                //Load next parent
+                if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
+                {
+                    loadLoginNode(jobs, pnode->getNextParentAddress());
+                }
+            }
+
+            return true;
         }
-
-        return true;
     }));
 }
 
-void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address)
+void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address)
 {
-    MPNode *cnode = new MPNode(this);
+    qDebug() << "Loading cred child node at address:" << address.toHex();
+
+    /* Create empty child node and add it to the list */
+    MPNode *cnode = new MPNode(this, address);
+    loginChildNodes.append(cnode);
     parent->appendChild(cnode);
+    MPNode *cnodeClone = new MPNode(this, address);
+    loginChildNodesClone.append(cnodeClone);
+    parentClone->appendChild(cnodeClone);
 
-    qDebug() << "Loading cred child node at address: " << address;
-
+    /* Query node */
     jobs->prepend(new MPCommandJob(this, MP_READ_FLASH_NODE,
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[0] <= 1) return false;
-
-        cnode->appendData(data.mid(2, data[0]));
-
-        //Continue to read data until the node is fully received
-        if (!cnode->isValid())
-            done = false;
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_READ_FLASH_NODE)
+        {
+            /* Wrong packet received */
+            qCritical() << "Get child node: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            qCritical() << "Get child node: couldn't get answer";
+            return false;
+        }
         else
         {
-            //Node is loaded
-            qDebug() << "Child node loaded: " << cnode->getLogin();
+            /* Append received data to node data */
+            cnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            cnodeClone->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
 
-            //Load next child
-            if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
-                loadLoginChildNode(jobs, parent, cnode->getNextChildAddress());
+            //Continue to read data until the node is fully received
+            if (!cnode->isDataLengthValid())
+            {
+                done = false;
+            }
+            else
+            {
+                //Node is loaded
+                qDebug() << address.toHex() << ": child node loaded:" << cnode->getLogin();
+
+                //Load next child
+                if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
+                {
+                    loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress());
+                }
+            }
+
+            return true;
         }
-
-        return true;
     }));
 }
 
 void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
 {
-    MPNode *pnode = new MPNode(this);
+    MPNode *pnode = new MPNode(this, address);
     dataNodes.append(pnode);
 
     qDebug() << "Loading data parent node at address: " << address;
@@ -891,7 +1159,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
 
 void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address)
 {
-    MPNode *cnode = new MPNode(this);
+    MPNode *cnode = new MPNode(this, address);
     parent->appendChildData(cnode);
 
     qDebug() << "Loading data child node at address: " << address;
@@ -921,9 +1189,186 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
     }));
 }
 
+/* Find a node inside a given list given his address */
+MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address)
+{
+    auto it = std::find_if(list.begin(), list.end(), [&address](const MPNode *const node)
+    {
+        return node->getAddress() == address;
+    });
+
+    return *it;
+}
+
+/* Follow the chain to tag pointed node (useful when doing integrity check when we are getting everything we can) */
+void MPDevice::tagPointedNodes()
+{
+    QByteArray tempParentAddress;
+    QByteArray tempChildAddress;
+    MPNode* tempNextParentNodePt;
+    MPNode* tempParentNodePt;
+    MPNode* tempNextChildNodePt;
+    MPNode* tempChildNodePt;
+
+    /* start with start node (duh) */
+    tempParentAddress = startNode;
+
+    /* Loop through the parent nodes */
+    while (tempParentAddress != MPNode::EmptyAddress)
+    {
+        /* Get pointer to next parent node */
+        tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress);
+
+        /* Check that we could actually find it */
+        if (tempNextParentNodePt == 0)
+        {
+            qCritical() << "tagPointedNodes: couldn't find parent node with address" << tempParentAddress.toHex() << "in our list";
+
+            /* TODO: fix this node */
+            if (tempParentAddress == startNode)
+            {
+                /* start node is incorrect */
+            }
+            else
+            {
+            }
+
+            /* Stop looping */
+            return;
+        }
+        else
+        {
+            /* check previous node address */
+            if (tempParentAddress == startNode)
+            {
+                /* first parent node: previous address should be an empty one */
+                if (tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress)
+                {
+                    qWarning() << "tagPointedNodes: parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
+                }
+            }
+            else
+            {
+                /* normal linked chain */
+                if (tempNextParentNodePt->getPreviousParentAddress() != tempParentNodePt->getAddress())
+                {
+                    qWarning() << "tagPointedNodes: parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << tempParentNodePt->getAddress().toHex();
+                }
+            }
+
+            /* Set correct pointed node */
+            tempParentNodePt = tempNextParentNodePt;
+
+            /* tag parent */
+            tempParentNodePt->setPointedToCheck();
+
+            /* get first child */
+            tempChildAddress = tempParentNodePt->getStartChildAddress();
+
+            /* browse through all the children */
+            while (tempChildAddress != MPNode::EmptyAddress)
+            {
+                /* Get pointer to the child node */
+                tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress);
+
+                /* Check we could find child pointer */
+                if (tempNextChildNodePt == 0)
+                {
+                    qWarning() << "tagPointedNodes: couldn't find child node with address" << tempChildAddress.toHex() << "in our list";
+
+                    /* TODO: fix prev child / parent node */
+                    if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                    {
+                        // first child
+                    }
+                    else
+                    {
+                        // fix prev child
+                    }
+
+                    /* Loop to next parent */
+                    tempChildAddress = MPNode::EmptyAddress;
+                }
+                else
+                {
+                    /* check previous node address */
+                    if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                    {
+                        /* first child node in given parent: previous address should be an empty one */
+                        if (tempNextChildNodePt->getPreviousChildAddress() != MPNode::EmptyAddress)
+                        {
+                            qWarning() << "tagPointedNodes: child node" << tempNextChildNodePt->getLogin() <<  "at address" << tempChildAddress.toHex() << "has incorrect previous address:" << tempNextChildNodePt->getPreviousChildAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
+                        }
+                    }
+                    else
+                    {
+                        /* normal linked chain */
+                        if (tempNextChildNodePt->getPreviousChildAddress() != tempChildNodePt->getAddress())
+                        {
+                            qWarning() << "tagPointedNodes: child node" << tempNextChildNodePt->getLogin() <<  "at address" << tempChildAddress.toHex() << "has incorrect previous address:" << tempNextChildNodePt->getPreviousChildAddress().toHex() << "instead of" << tempChildNodePt->getAddress().toHex();
+                        }
+                    }
+
+                    /* Set correct pointed node */
+                    tempChildNodePt = tempNextChildNodePt;
+
+                    /* Tag child */
+                    tempChildNodePt->setPointedToCheck();
+
+                    /* Loop to next possible child */
+                    tempChildAddress = tempChildNodePt->getNextChildAddress();
+                }
+            }
+
+            /* get next parent address */
+            tempParentAddress = tempParentNodePt->getNextParentAddress();
+        }
+    }
+}
+
+bool MPDevice::checkLoadedNodes()
+{
+    QList<MPNode *>::iterator i;
+
+    qInfo() << "Checking database...";
+
+    /* Tag pointed nodes */
+    tagPointedNodes();
+
+    /* Scan for orphan nodes */
+    quint32 nbOrphanParents = 0;
+    quint32 nbOrphanChildren = 0;
+    for (i = loginNodes.begin(); i != loginNodes.end(); i++)
+    {
+        if ((*i)->getPointedToCheck() == false)
+        {
+            qWarning() << "Orphan parent found:" << (*i)->getService() << "at address:" << (*i)->getAddress();
+            nbOrphanParents++;
+        }
+    }
+    for (i = loginChildNodes.begin(); i != loginChildNodes.end(); i++)
+    {
+        if ((*i)->getPointedToCheck() == false)
+        {
+            qWarning() << "Orphan child found:" << (*i)->getLogin() << "at address:" << (*i)->getAddress();
+            nbOrphanParents++;
+        }
+    }
+    qInfo() << "Number of parent orphans:" << nbOrphanParents;
+    qInfo() << "Number of children orphans:" << nbOrphanChildren;
+
+    qInfo() << "Database check OK";
+    return true;
+}
+
+bool MPDevice::generateSavePackets()
+{
+    return true;
+}
+
 void MPDevice::exitMemMgmtMode()
 {
-    if (!get_memMgmtMode()) return;
+    checkLoadedNodes();
 
     AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
@@ -936,6 +1381,23 @@ void MPDevice::exitMemMgmtMode()
 
         qInfo() << "MMM exit ok";
 
+        /* Debug */
+        /*qDebug() << ctrValue;
+        qDebug() << ctrValueClone;
+        qDebug() << startNode;
+        qDebug() << startNodeClone;
+        qDebug() << cpzCtrValue;
+        qDebug() << cpzCtrValueClone;
+        qDebug() << favoritesAddrs;
+        qDebug() << favoritesAddrsClone;
+        qDebug() << loginNodes;         //list of all parent nodes for credentials
+        qDebug() << loginNodesClone;         //list of all parent nodes for credentials
+        qDebug() << loginChildNodes;    //list of all parent nodes for credentials
+        qDebug() << loginChildNodesClone;    //list of all parent nodes for credentials
+        qDebug() << dataNodes;          //list of all parent nodes for data nodes
+        qDebug() << dataNodesClone;          //list of all parent nodes for data nodes*/
+
+        /* Cleaning all temp values */
         ctrValue.clear();
         cpzCtrValue.clear();
         qDeleteAll(loginNodes);
@@ -943,6 +1405,14 @@ void MPDevice::exitMemMgmtMode()
         qDeleteAll(dataNodes);
         dataNodes.clear();
         favoritesAddrs.clear();
+        /* Cleaning the clones as well */
+        ctrValueClone.clear();
+        cpzCtrValueClone.clear();
+        qDeleteAll(loginNodesClone);
+        loginNodesClone.clear();
+        qDeleteAll(dataNodesClone);
+        dataNodesClone.clear();
+        favoritesAddrsClone.clear();
 
         force_memMgmtMode(false);
     });
@@ -951,6 +1421,7 @@ void MPDevice::exitMemMgmtMode()
     {
         qCritical() << "Failed to exit MMM";
 
+        /* Cleaning all temp values */
         ctrValue.clear();
         cpzCtrValue.clear();
         qDeleteAll(loginNodes);
@@ -958,6 +1429,14 @@ void MPDevice::exitMemMgmtMode()
         qDeleteAll(dataNodes);
         dataNodes.clear();
         favoritesAddrs.clear();
+        /* Cleaning the clones as well */
+        ctrValueClone.clear();
+        cpzCtrValueClone.clear();
+        qDeleteAll(loginNodesClone);
+        loginNodesClone.clear();
+        qDeleteAll(dataNodesClone);
+        dataNodesClone.clear();
+        favoritesAddrsClone.clear();
 
         force_memMgmtMode(false);
     });
@@ -982,18 +1461,79 @@ void MPDevice::setCurrentDate()
 
         return true;
     },
-                                  MPCommandJob::defaultCheckRet));
+                                [=](const QByteArray &data, bool &) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_SET_DATE)
+        {
+            qWarning() << "Set date: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
         qInfo() << "Date set success";
+
+        /* If v1.2 firmware, query user change number */
+        if (isFw12())
+        {
+            qInfo() << "Firmware above v1.2, requesting change numbers";
+            getChangeNumbers();
+        }
     });
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
         qWarning() << "Failed to set date on device";
+        setCurrentDate(); // memory: does it get piled on?
     });
 
     jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+void MPDevice::getChangeNumbers()
+{
+    AsyncJobs* v12jobs = new AsyncJobs("Loading device db change numbers", this);
+
+    /* Query change number */
+    v12jobs->append(new MPCommandJob(this,
+                                  MP_GET_USER_CHANGE_NB,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+        {
+            qWarning() << "Couldn't request change numbers";
+        }
+        else
+        {
+            credentialsDbChangeNumber = (quint8)data[MP_PAYLOAD_FIELD_INDEX+1];
+            dataDbChangeNumber = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
+            qDebug() << "Credentials change number:" << credentialsDbChangeNumber;
+            qDebug() << "Data change number:" << dataDbChangeNumber;
+        }
+        return true;
+    }));
+
+    connect(v12jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+        //data is last result
+        //all jobs finished success
+        qInfo() << "Finished loading change numbers";
+    });
+
+    connect(v12jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Loading change numbers failed";
+        getChangeNumbers(); // memory: does it get piled on?
+    });
+
+    jobsQueue.enqueue(v12jobs);
     runAndDequeueJobs();
 }
 
@@ -1106,7 +1646,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
             return false;
         }
 
-        QString l = data.mid(2, data[0]);
+        QString l = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
         if (!login.isEmpty() && l != login)
         {
             jobs->setCurrentJobError("login mismatch");
@@ -1130,7 +1670,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
             return true; //Do not fail if description is not available for this node
         }
         QVariantMap m = jobs->user_data.toMap();
-        m["description"] = data.mid(2, data[0]);
+        m["description"] = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
         jobs->user_data = m;
         return true;
     }));
@@ -1152,7 +1692,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
         //all jobs finished success
 
         qInfo() << "Password retreived ok";
-        QString pass = data.mid(2, data[0]);
+        QString pass = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
 
         QVariantMap m = jobs->user_data.toMap();
         cb(true, QString(), m["service"].toString(), m["login"].toString(), pass, m["description"].toString());

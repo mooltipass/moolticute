@@ -24,8 +24,8 @@
 class MPNode: public QObject
 {
 public:
-    MPNode(const QByteArray &d, QObject *parent = nullptr);
-    MPNode(QObject *parent = nullptr);
+    MPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0));
+    MPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0));
 
     enum
     {
@@ -38,19 +38,20 @@ public:
 
     //Fill node container with data
     void appendData(const QByteArray &d);
-    bool isValid();
+    bool isDataLengthValid() const;
+    bool isValid() const;
 
     /* accessors for node properties */
-
-    int getType();
+    QByteArray getAddress() const;
+    int getType() const;
 
     // NodeParent / NodeParentData properties
-    QByteArray getPreviousParentAddress();
-    QByteArray getNextParentAddress();
-    QByteArray getStartChildAddress();
-    QString getService();
+    QByteArray getPreviousParentAddress() const;
+    QByteArray getNextParentAddress() const;
+    QByteArray getStartChildAddress() const;
+    QString getService() const;
 
-    QByteArray getStartDataCtr();
+    QByteArray getStartDataCtr() const;
 
     QList<MPNode *> &getChildNodes() { return childNodes; }
     void appendChild(MPNode *node) { node->setParent(this); childNodes.append(node); }
@@ -59,29 +60,35 @@ public:
     void appendChildData(MPNode *node) { node->setParent(this); childDataNodes.append(node); }
 
     // NodeChild properties
-    QByteArray getNextChildAddress();
-    QByteArray getPreviousChildAddress();
-    QByteArray getCTR();
-    QString getDescription();
-    QString getLogin();
-    QByteArray getPasswordEnc();
-    QDate getDateCreated();
-    QDate getDateLastUsed();
+    QByteArray getNextChildAddress() const;
+    QByteArray getPreviousChildAddress() const;
+    QByteArray getCTR() const;
+    QString getDescription() const;
+    QString getLogin() const;
+    QByteArray getPasswordEnc() const;
+    QDate getDateCreated() const;
+    QDate getDateLastUsed() const;
 
     //Data node address
     //Address in data node is not at the same position as cred nodes
-    QByteArray getNextChildDataAddress();
+    QByteArray getNextChildDataAddress() const;
 
     // NodeChildData properties
-    QByteArray getNextDataAddress();
-    QByteArray getChildData();
+    QByteArray getNextDataAddress() const;
+    QByteArray getChildData() const;
+
+    // Pointedto access/write
+    void setPointedToCheck();
+    bool getPointedToCheck() const;
 
     static QByteArray EmptyAddress;
 
-    QJsonObject toJson();
+    QJsonObject toJson() const;
 
 private:
     QByteArray data;
+    QByteArray address;
+    bool pointedToCheck = false;
 
     QList<MPNode *> childNodes;
     QList<MPNode *> childDataNodes;
