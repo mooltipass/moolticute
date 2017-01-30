@@ -165,7 +165,7 @@ private:
                        const QByteArray &data, bool &done);
 
     // Functions added by mathieu for MMM
-    MPNode* findNodeWithAddressInList(QList<MPNode*> list, QByteArray address);
+    MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address);
     void tagPointedNodes();
 
     // Generate save packets

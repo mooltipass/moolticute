@@ -33,21 +33,21 @@ MPNode::MPNode(QObject *parent, const QByteArray &nodeAddress):
 {
 }
 
-int MPNode::getType()
+int MPNode::getType() const
 {
     if (data.size() > 1)
         return ((quint8)data[1] >> 6) & 0x03;
     return -1;
 }
 
-bool MPNode::isValid()
+bool MPNode::isValid() const
 {
     return getType() != NodeUnknown &&
            data.size() == MP_NODE_SIZE &&
            ((quint8)data[1] & 0x20) == 0;
 }
 
-bool MPNode::isDataLengthValid()
+bool MPNode::isDataLengthValid() const
 {
     return data.size() == MP_NODE_SIZE;
 }
@@ -57,7 +57,7 @@ void MPNode::appendData(const QByteArray &d)
     data.append(d);
 }
 
-QByteArray MPNode::getAddress()
+QByteArray MPNode::getAddress() const
 {
     return address;
 }
@@ -67,54 +67,54 @@ void MPNode::setPointedToCheck()
     pointedToCheck = true;
 }
 
-bool MPNode::getPointedToCheck()
+bool MPNode::getPointedToCheck() const
 {
     return pointedToCheck;
 }
 
-QByteArray MPNode::getPreviousParentAddress()
+QByteArray MPNode::getPreviousParentAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(2, 2);
 }
 
-QByteArray MPNode::getNextParentAddress()
+QByteArray MPNode::getNextParentAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(4, 2);
 }
 
-QByteArray MPNode::getStartChildAddress()
+QByteArray MPNode::getStartChildAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(6, 2);
 }
 
-QString MPNode::getService()
+QString MPNode::getService() const
 {
     if (!isValid()) return QString();
     return QString::fromUtf8(data.mid(8, MP_NODE_SIZE - 8 - 3));
 }
 
-QByteArray MPNode::getStartDataCtr()
+QByteArray MPNode::getStartDataCtr() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(129, 3);
 }
 
-QByteArray MPNode::getNextChildAddress()
+QByteArray MPNode::getNextChildAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(4, 2);
 }
 
-QByteArray MPNode::getPreviousChildAddress()
+QByteArray MPNode::getPreviousChildAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(2, 2);
 }
 
-QByteArray MPNode::getNextChildDataAddress()
+QByteArray MPNode::getNextChildDataAddress() const
 {
     //in data nodes, there is no linked list
     //the only address is the next one
@@ -122,55 +122,55 @@ QByteArray MPNode::getNextChildDataAddress()
     return getPreviousChildAddress();
 }
 
-QByteArray MPNode::getCTR()
+QByteArray MPNode::getCTR() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(34, 3);
 }
 
-QString MPNode::getDescription()
+QString MPNode::getDescription() const
 {
     if (!isValid()) return QString();
     return QString::fromUtf8(data.mid(6, 24));
 }
 
-QString MPNode::getLogin()
+QString MPNode::getLogin() const
 {
     if (!isValid()) return QString();
     return QString::fromUtf8(data.mid(37, 63));
 }
 
-QByteArray MPNode::getPasswordEnc()
+QByteArray MPNode::getPasswordEnc() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(100, 32);
 }
 
-QDate MPNode::getDateCreated()
+QDate MPNode::getDateCreated() const
 {
     if (!isValid()) return QDate();
     return Common::bytesToDate(data.mid(30, 2));
 }
 
-QDate MPNode::getDateLastUsed()
+QDate MPNode::getDateLastUsed() const
 {
     if (!isValid()) return QDate();
     return Common::bytesToDate(data.mid(32, 2));
 }
 
-QByteArray MPNode::getNextDataAddress()
+QByteArray MPNode::getNextDataAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(2, 2);
 }
 
-QByteArray MPNode::getChildData()
+QByteArray MPNode::getChildData() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(4);
 }
 
-QJsonObject MPNode::toJson()
+QJsonObject MPNode::toJson() const
 {
     QJsonObject obj;
 

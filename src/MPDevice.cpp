@@ -1190,17 +1190,14 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
 }
 
 /* Find a node inside a given list given his address */
-MPNode* MPDevice::findNodeWithAddressInList(QList<MPNode*> list, QByteArray address)
+MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address)
 {
-    QList<MPNode *>::iterator i;
-    for (i = list.begin(); i != list.end(); i++)
+    auto it = std::find_if(list.begin(), list.end(), [&address](const MPNode *const node)
     {
-        if ((*i)->getAddress() == address)
-        {
-            return (*i);
-        }
-    }
-    return 0;
+        return node->getAddress() == address;
+    });
+
+    return *it;
 }
 
 /* Follow the chain to tag pointed node (useful when doing integrity check when we are getting everything we can) */
