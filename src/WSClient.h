@@ -11,23 +11,23 @@ class WSClient: public QObject
 {
     Q_OBJECT
 
-    QT_WRITABLE_PROPERTY(bool, connected)
-    QT_WRITABLE_PROPERTY(Common::MPStatus, status)
-    QT_WRITABLE_PROPERTY(int, keyboardLayout)
-    QT_WRITABLE_PROPERTY(bool, lockTimeoutEnabled)
-    QT_WRITABLE_PROPERTY(int, lockTimeout)
-    QT_WRITABLE_PROPERTY(bool, screensaver)
-    QT_WRITABLE_PROPERTY(bool, userRequestCancel)
-    QT_WRITABLE_PROPERTY(int, userInteractionTimeout)
-    QT_WRITABLE_PROPERTY(bool, flashScreen)
-    QT_WRITABLE_PROPERTY(bool, offlineMode)
-    QT_WRITABLE_PROPERTY(bool, tutorialEnabled)
-    QT_WRITABLE_PROPERTY(int, screenBrightness)
-    QT_WRITABLE_PROPERTY(bool, knockEnabled)
-    QT_WRITABLE_PROPERTY(int, knockSensitivity)
-    QT_WRITABLE_PROPERTY(bool, memMgmtMode)
+    QT_WRITABLE_PROPERTY(bool, connected, false)
+    QT_WRITABLE_PROPERTY(Common::MPStatus, status, Common::UnknownStatus)
+    QT_WRITABLE_PROPERTY(int, keyboardLayout, 0)
+    QT_WRITABLE_PROPERTY(bool, lockTimeoutEnabled, false)
+    QT_WRITABLE_PROPERTY(int, lockTimeout, 0)
+    QT_WRITABLE_PROPERTY(bool, screensaver, false)
+    QT_WRITABLE_PROPERTY(bool, userRequestCancel, false)
+    QT_WRITABLE_PROPERTY(int, userInteractionTimeout, 0)
+    QT_WRITABLE_PROPERTY(bool, flashScreen, false)
+    QT_WRITABLE_PROPERTY(bool, offlineMode, false)
+    QT_WRITABLE_PROPERTY(bool, tutorialEnabled, false)
+    QT_WRITABLE_PROPERTY(int, screenBrightness, 0)
+    QT_WRITABLE_PROPERTY(bool, knockEnabled, false)
+    QT_WRITABLE_PROPERTY(int, knockSensitivity, 0)
+    QT_WRITABLE_PROPERTY(bool, memMgmtMode, false)
 
-    QT_WRITABLE_PROPERTY(Common::MPHwVersion, mpHwVersion)
+    QT_WRITABLE_PROPERTY(Common::MPHwVersion, mpHwVersion, Common::MP_Classic)
 
 public:
     explicit WSClient(QObject *parent = nullptr);

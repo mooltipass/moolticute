@@ -21,11 +21,11 @@
 
 #include <QObject>
 
-#define QT_WRITABLE_PROPERTY(type, name) \
+#define QT_WRITABLE_PROPERTY(type, name, def) \
     protected: \
         Q_PROPERTY (type name READ get_##name WRITE set_##name NOTIFY name##Changed) \
     private: \
-        type m_##name; \
+        type m_##name = def; \
     public: \
         type get_##name () const { return m_##name; } \
     public Q_SLOTS: \
