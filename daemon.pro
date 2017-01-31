@@ -17,6 +17,7 @@ win32 {
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
     PKGCONFIG += libusb-1.0
+    QT -= widgets
 } else:mac {
     LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation
 }
@@ -118,4 +119,14 @@ unix {
     # install the binary
     target.path = $$PREFIX/bin
     INSTALLS += target
+
+    # systemd service files
+    systemd_user.path = $$PREFIX/lib/systemd/user/
+    systemd_user.files += $$PWD/systemd/moolticuted.service
+    INSTALLS += systemd_user
+
+    # udev rules
+    udev_rules.path = $$PREFIX/lib/udev/rules.d/
+    udev_rules.files += $$PWD/udev/69-mooltipass.rules
+    INSTALLS += udev_rules
 }

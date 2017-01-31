@@ -19,7 +19,13 @@
 #ifndef APPDAEMON_H
 #define APPDAEMON_H
 
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
 #include <QApplication>
+#define QAPP QApplication
+#else
+#include <QCoreApplication>
+#define QAPP QCoreApplication
+#endif
 #include <QObject>
 #include <QSettings>
 #include <QLocalServer>
@@ -31,7 +37,7 @@
 
 extern bool g_bEmulationMode;
 
-class AppDaemon: public QApplication
+class AppDaemon: public QAPP
 {
     Q_OBJECT
 public:
