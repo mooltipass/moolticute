@@ -28,11 +28,7 @@
 bool g_bEmulationMode = false;
 
 AppDaemon::AppDaemon(int &argc, char **argv):
-#ifdef Q_OS_LINUX
-    QCoreApplication(argc, argv),
-#else
-    QApplication(argc, argv),
-#endif
+    QAPP(argc, argv),
     sharedMem("moolticute")
 {
 }
@@ -104,7 +100,7 @@ bool AppDaemon::initialize()
                                        QCoreApplication::translate("main", "port"));
     parser.addOption(debugHttpServer);
 
-    parser.process(QAPP::arguments());
+    parser.process(qApp->arguments());
 
     g_bEmulationMode = parser.isSet(emulationMode);
 
