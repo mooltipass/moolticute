@@ -35,7 +35,7 @@ Packages are build and available here: https://calaos.fr/mooltipass/
 
 ##### Ubuntu 16.04
 ```bash
-sudo apt-get install libqt5websockets5-dev libusb-dev libusb-1.0-0-dev qt-sdk qt5-qmake qt5-default
+sudo apt install libqt5websockets5-dev libusb-dev libusb-1.0-0-dev qt-sdk qt5-qmake qt5-default
 echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
 sudo udevadm control --reload-rules
 ```
