@@ -118,4 +118,9 @@ unix {
     # install the binary
     target.path = $$PREFIX/bin
     INSTALLS += target
+
+    # systemd service files
+    systemd_user.path = $$PREFIX/lib/systemd/user/
+    systemd_user.files += $$PWD/systemd/moolticuted.service
+    INSTALLS += systemd_user
 }
