@@ -17,6 +17,7 @@ win32 {
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
     PKGCONFIG += libusb-1.0
+    QT -= widgets
 } else:mac {
     LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation
 }
