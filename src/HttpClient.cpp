@@ -1,5 +1,5 @@
 #include <QFile>
-#include <QImage>
+/* #include <QImage> */
 #include "HttpClient.h"
 #include <QDir>
 
