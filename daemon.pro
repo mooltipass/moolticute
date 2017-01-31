@@ -124,4 +124,9 @@ unix {
     systemd_user.path = $$PREFIX/lib/systemd/user/
     systemd_user.files += $$PWD/systemd/moolticuted.service
     INSTALLS += systemd_user
+
+    # udev rules
+    udev_rules.path = $$PREFIX/lib/udev/rules.d/
+    udev_rules.files += $$PWD/udev/69-mooltipass.rules
+    INSTALLS += udev_rules
 }
