@@ -19,12 +19,12 @@
 #ifndef APPDAEMON_H
 #define APPDAEMON_H
 
-#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
-#include <QApplication>
-#define QAPP QApplication
-#else
+#ifdef Q_OS_LINUX
 #include <QCoreApplication>
 #define QAPP QCoreApplication
+#else
+#include <QApplication>
+#define QAPP QApplication
 #endif
 #include <QObject>
 #include <QSettings>
