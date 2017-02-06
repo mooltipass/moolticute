@@ -19,16 +19,17 @@
 #ifndef APPDAEMON_H
 #define APPDAEMON_H
 
-#ifdef Q_OS_LINUX
-#include <QCoreApplication>
-#define QAPP QCoreApplication
-#else
-#include <QApplication>
-#define QAPP QApplication
-#endif
 #include <QObject>
 #include <QSettings>
 #include <QLocalServer>
+
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
+#include <QApplication>
+#define QAPP QApplication
+#else
+#include <QCoreApplication>
+#define QAPP QCoreApplication
+#endif
 
 #include "Common.h"
 #include "MPManager.h"
