@@ -682,7 +682,7 @@ void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
     quint8 v = 8;
     if (s == 0) v = 11;
     else if (s == 2) v = 5;
-    updateParam(MINI_KNOCK_THRES_PARAM, s);
+    updateParam(MINI_KNOCK_THRES_PARAM, v);
 }
 
 void MPDevice::startMemMgmtMode()

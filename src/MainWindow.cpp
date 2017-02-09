@@ -21,39 +21,7 @@
 #include "DialogEdit.h"
 #include "version.h"
 #include "AutoStartup.h"
-
-#define BITMAP_ID_OFFSET 128
-
-#define ID_KEYB_EN_US_LUT       BITMAP_ID_OFFSET+18
-#define ID_KEYB_FR_FR_LUT       BITMAP_ID_OFFSET+19
-#define ID_KEYB_ES_ES_LUT       BITMAP_ID_OFFSET+20
-#define ID_KEYB_DE_DE_LUT       BITMAP_ID_OFFSET+21
-#define ID_KEYB_ES_AR_LUT       BITMAP_ID_OFFSET+22
-#define ID_KEYB_EN_AU_LUT       BITMAP_ID_OFFSET+23
-#define ID_KEYB_FR_BE_LUT       BITMAP_ID_OFFSET+24
-#define ID_KEYB_PO_BR_LUT       BITMAP_ID_OFFSET+25
-#define ID_KEYB_EN_CA_LUT       BITMAP_ID_OFFSET+26
-#define ID_KEYB_CZ_CZ_LUT       BITMAP_ID_OFFSET+27
-#define ID_KEYB_DA_DK_LUT       BITMAP_ID_OFFSET+28
-#define ID_KEYB_FI_FI_LUT       BITMAP_ID_OFFSET+29
-#define ID_KEYB_HU_HU_LUT       BITMAP_ID_OFFSET+30
-#define ID_KEYB_IS_IS_LUT       BITMAP_ID_OFFSET+31
-#define ID_KEYB_IT_IT_LUT       BITMAP_ID_OFFSET+32  // So it seems Italian keyboards don't have ~`
-#define ID_KEYB_NL_NL_LUT       BITMAP_ID_OFFSET+33
-#define ID_KEYB_NO_NO_LUT       BITMAP_ID_OFFSET+34
-#define ID_KEYB_PO_PO_LUT       BITMAP_ID_OFFSET+35  // Polish programmer keyboard
-#define ID_KEYB_RO_RO_LUT       BITMAP_ID_OFFSET+36
-#define ID_KEYB_SL_SL_LUT       BITMAP_ID_OFFSET+37
-#define ID_KEYB_FRDE_CH_LUT     BITMAP_ID_OFFSET+38
-#define ID_KEYB_EN_UK_LUT       BITMAP_ID_OFFSET+39
-#define ID_KEYB_CZ_QWERTY_LUT   BITMAP_ID_OFFSET+51
-#define ID_KEYB_EN_DV_LUT       BITMAP_ID_OFFSET+52
-#define ID_KEYB_FR_MAC_LUT      BITMAP_ID_OFFSET+53
-#define ID_KEYB_FR_CH_MAC_LUT   BITMAP_ID_OFFSET+54
-#define ID_KEYB_DE_CH_MAC_LUT   BITMAP_ID_OFFSET+55
-#define ID_KEYB_DE_MAC_LUT      BITMAP_ID_OFFSET+56
-#define ID_KEYB_US_MAC_LUT BITMAP_ID_OFFSET+57
-
+#include "Common.h"
 
 #define CSS_BLUE_BUTTON "QPushButton {" \
                             "color: #fff;" \
@@ -186,12 +154,12 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->comboBoxKnock->addItem("Low", 0);
     ui->comboBoxKnock->addItem("Medium", 1);
     ui->comboBoxKnock->addItem("High", 2);
-    ui->comboBoxLoginOutput->addItem(tr("Tab"), 0);
-    ui->comboBoxLoginOutput->addItem(tr("Enter"), 0);
-    ui->comboBoxLoginOutput->addItem(tr("Space"), 0);
-    ui->comboBoxPasswordOutput->addItem(tr("Tab"), 0);
-    ui->comboBoxPasswordOutput->addItem(tr("Enter"), 0);
-    ui->comboBoxPasswordOutput->addItem(tr("Space"), 0);
+    ui->comboBoxLoginOutput->addItem(tr("Tab"), 43);
+    ui->comboBoxLoginOutput->addItem(tr("Enter"), 40);
+    ui->comboBoxLoginOutput->addItem(tr("Space"), 44);
+    ui->comboBoxPasswordOutput->addItem(tr("Tab"), 43);
+    ui->comboBoxPasswordOutput->addItem(tr("Enter"), 40);
+    ui->comboBoxPasswordOutput->addItem(tr("Space"), 44);
 
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
@@ -282,7 +250,13 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::keyAfterLoginSendChanged, [=]()
     {
-        ui->comboBoxLoginOutput->setCurrentIndex(wsClient->get_keyAfterLoginSend());
+        switch (wsClient->get_keyAfterLoginSend())
+        {
+        default:
+        case 43: ui->comboBoxLoginOutput->setCurrentIndex(0); break;
+        case 40: ui->comboBoxLoginOutput->setCurrentIndex(1); break;
+        case 44: ui->comboBoxLoginOutput->setCurrentIndex(2); break;
+        }
         checkSettingsChanged();
     });
 
@@ -294,7 +268,13 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::keyAfterPassSendChanged, [=]()
     {
-        ui->comboBoxPasswordOutput->setCurrentIndex(wsClient->get_keyAfterPassSend());
+        switch (wsClient->get_keyAfterPassSend())
+        {
+        default:
+        case 43: ui->comboBoxPasswordOutput->setCurrentIndex(0); break;
+        case 40: ui->comboBoxPasswordOutput->setCurrentIndex(1); break;
+        case 44: ui->comboBoxPasswordOutput->setCurrentIndex(2); break;
+        }
         checkSettingsChanged();
     });
 
@@ -340,6 +320,13 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->checkBoxKnock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
 
+    connect(ui->checkBoxSendAfterLogin, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->comboBoxLoginOutput, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxSendAfterPassword, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->comboBoxPasswordOutput, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxSlowHost, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->spinBoxInputDelayAfterKeyPressed, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
+
     //Setup the confirm view
     ui->widgetSpin->setPixmap(awesome->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
@@ -350,6 +337,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     //Check is ssh agent opt has to be checked
     QSettings s;
     ui->checkBoxSSHAgent->setChecked(s.value("settings/auto_start_ssh").toBool());
+
+    ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
+    ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
 }
 
 MainWindow::~MainWindow()
@@ -437,6 +427,18 @@ void MainWindow::checkSettingsChanged()
         uichanged = true;
     if (ui->comboBoxScreenBrightness->currentData().toInt() != wsClient->get_screenBrightness())
         uichanged = true;
+    if (ui->checkBoxSendAfterLogin->isChecked() != wsClient->get_keyAfterLoginSendEnable())
+        uichanged = true;
+    if (ui->comboBoxLoginOutput->currentData().toInt() != wsClient->get_keyAfterLoginSend())
+        uichanged = true;
+    if (ui->checkBoxSendAfterPassword->isChecked() != wsClient->get_keyAfterPassSendEnable())
+        uichanged = true;
+    if (ui->comboBoxPasswordOutput->currentData().toInt() != wsClient->get_keyAfterPassSend())
+        uichanged = true;
+    if (ui->checkBoxSlowHost->isChecked() != wsClient->get_delayAfterKeyEntryEnable())
+        uichanged = true;
+    if (ui->spinBoxInputDelayAfterKeyPressed->value() != wsClient->get_delayAfterKeyEntry())
+        uichanged = true;
 
     if (uichanged)
     {
@@ -470,6 +472,26 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
     ui->checkBoxBoot->setChecked(wsClient->get_offlineMode());
     ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
     ui->checkBoxKnock->setChecked(wsClient->get_knockEnabled());
+    ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
+    ui->checkBoxSendAfterPassword->setChecked(wsClient->get_keyAfterPassSendEnable());
+    ui->checkBoxSlowHost->setChecked(wsClient->get_delayAfterKeyEntryEnable());
+    ui->spinBoxInputDelayAfterKeyPressed->setValue(wsClient->get_delayAfterKeyEntry());
+
+    switch (wsClient->get_keyAfterLoginSend())
+    {
+    default:
+    case 43: ui->comboBoxLoginOutput->setCurrentIndex(0); break;
+    case 40: ui->comboBoxLoginOutput->setCurrentIndex(1); break;
+    case 44: ui->comboBoxLoginOutput->setCurrentIndex(2); break;
+    }
+
+    switch (wsClient->get_keyAfterPassSend())
+    {
+    default:
+    case 43: ui->comboBoxPasswordOutput->setCurrentIndex(0); break;
+    case 40: ui->comboBoxPasswordOutput->setCurrentIndex(1); break;
+    case 44: ui->comboBoxPasswordOutput->setCurrentIndex(2); break;
+    }
 
     switch (wsClient->get_screenBrightness())
     {

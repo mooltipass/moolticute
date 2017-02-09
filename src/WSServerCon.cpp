@@ -310,6 +310,12 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(screenBrightnessChanged(int)), this, SLOT(sendScreenBrightness()));
     connect(mpdevice, SIGNAL(knockEnabledChanged(bool)), this, SLOT(sendKnockEnabled()));
     connect(mpdevice, SIGNAL(knockSensitivityChanged(int)), this, SLOT(sendKnockSensitivity()));
+    connect(mpdevice, SIGNAL(keyAfterLoginSendEnable(bool)), this, SLOT(sendKeyAfterLoginSendEnable));
+    connect(mpdevice, SIGNAL(keyAfterLoginSend(int)), this, SLOT(sendKeyAfterLoginSend));
+    connect(mpdevice, SIGNAL(keyAfterPassSendEnable(bool)), this, SLOT(sendKeyAfterPassSendEnable));
+    connect(mpdevice, SIGNAL(keyAfterPassSend(int)), this, SLOT(sendKeyAfterPassSend));
+    connect(mpdevice, SIGNAL(delayAfterKeyEntryEnable(bool)), this, SLOT(sendDelayAfterKeyEntryEnable));
+    connect(mpdevice, SIGNAL(delayAfterKeyEntry(int)), this, SLOT(sendDelayAfterKeyEntry));
 }
 
 void WSServerCon::statusChanged()
@@ -347,6 +353,12 @@ void WSServerCon::sendInitialStatus()
         sendScreenBrightness();
         sendKnockEnabled();
         sendKnockSensitivity();
+        sendKeyAfterLoginSendEnable();
+        sendKeyAfterLoginSend();
+        sendKeyAfterPassSendEnable();
+        sendKeyAfterPassSend();
+        sendDelayAfterKeyEntryEnable();
+        sendDelayAfterKeyEntry();
     }
 }
 
