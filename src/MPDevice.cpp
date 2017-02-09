@@ -2074,7 +2074,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
     packet.append(currentDataNode.mid(current, MOOLTIPASS_BLOCK_SIZE));
     packet.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
-    cbProgress(currentDataNode.size() - 4, current + MOOLTIPASS_BLOCK_SIZE);
+    cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, current + MOOLTIPASS_BLOCK_SIZE);
 
     //send 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
@@ -2129,18 +2129,18 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
 
     //set size of data
     currentDataNode = QByteArray();
-    currentDataNode.resize(4);
+    currentDataNode.resize(MP_DATA_HEADER_SIZE);
     qToBigEndian(nodeData.size(), (quint8 *)currentDataNode.data());
     currentDataNode.append(nodeData);
 
     //first packet
     QByteArray firstPacket;
-    char eod = (nodeData.size() <= MOOLTIPASS_BLOCK_SIZE)?1:0;
+    char eod = (nodeData.size() + MP_DATA_HEADER_SIZE <= MOOLTIPASS_BLOCK_SIZE)?1:0;
     firstPacket.append(eod);
     firstPacket.append(currentDataNode.mid(0, MOOLTIPASS_BLOCK_SIZE));
     firstPacket.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
-    cbProgress(currentDataNode.size() - 4, MOOLTIPASS_BLOCK_SIZE);
+    cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, MOOLTIPASS_BLOCK_SIZE);
 
     //send the first 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data

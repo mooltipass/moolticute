@@ -36,6 +36,9 @@
 #define MOOLTIPASS_BLOCK_SIZE   32
 #define MOOLTIPASS_DESC_SIZE    23 //max size allowed for description
 
+//Data node header size. It contains the size of data in 4 bytes Big endian
+#define MP_DATA_HEADER_SIZE      4
+
 #define MOOLTICUTE_DAEMON_PORT  30035
 
 //shared memory size
