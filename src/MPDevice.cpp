@@ -1485,7 +1485,7 @@ void MPDevice::cancelUserRequest(const QString &reqid)
 
     qInfo() << "cancel user request (reqid: " << reqid << ")";
 
-    if (currentJobs->getJobsId() == reqid)
+    if (currentJobs && currentJobs->getJobsId() == reqid)
     {
         qInfo() << "request_id match current one. Cancel current request";
 
