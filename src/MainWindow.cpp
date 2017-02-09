@@ -785,3 +785,13 @@ void MainWindow::on_checkBoxSSHAgent_stateChanged(int)
     QSettings s;
     s.setValue("settings/auto_start_ssh", ui->checkBoxSSHAgent->isChecked());
 }
+
+void MainWindow::on_pushButtonExportFile_clicked()
+{
+    QMessageBox::information(this, "Moolticute", "Not yet implemented.");
+}
+
+void MainWindow::on_pushButtonImportFile_clicked()
+{
+    QMessageBox::information(this, "Moolticute", "Not yet implemented.");
+}

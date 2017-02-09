@@ -67,6 +67,10 @@ private slots:
 
     void on_checkBoxSSHAgent_stateChanged(int arg1);
 
+    void on_pushButtonExportFile_clicked();
+
+    void on_pushButtonImportFile_clicked();
+
 private:
 
     virtual void closeEvent(QCloseEvent *event);

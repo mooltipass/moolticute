@@ -176,7 +176,7 @@ QWidget {background-color: #EFEFEF;}</string>
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="pageNoConnect">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
