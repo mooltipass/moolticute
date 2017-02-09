@@ -176,7 +176,7 @@ QWidget {background-color: #EFEFEF;}</string>
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>8</number>
       </property>
       <widget class="QWidget" name="pageNoConnect">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -1451,6 +1451,18 @@ QWidget {background-color: #EFEFEF;}</string>
           </property>
           <property name="text">
            <string>Version: %1</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelAboutFwVers">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Device Firmware version: %1</string>
           </property>
          </widget>
         </item>

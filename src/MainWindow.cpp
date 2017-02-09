@@ -69,7 +69,11 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaled(500, ui->widgetHeader->sizeHint().height() - 8, Qt::KeepAspectRatio));
 
-    connect(wsClient, &WSClient::connectedChanged, [=]() { updatePage(); });
+    connect(wsClient, &WSClient::connectedChanged, [=]()
+    {
+        updatePage();
+        ui->labelAboutFwVers->setVisible(wsClient->get_connected());
+    });
     connect(wsClient, &WSClient::statusChanged, [=]() { updatePage(); });
 
     ui->pushButtonMemMode->setStyleSheet(CSS_BLUE_BUTTON);
@@ -165,6 +169,10 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
     {
         ui->widgetParamMini->setVisible(wsClient->get_mpHwVersion() == Common::MP_Mini);
+    });
+    connect(wsClient, &WSClient::fwVersionChanged, [=]()
+    {
+        ui->labelAboutFwVers->setText(QStringLiteral("Device Firmware version: %1").arg(wsClient->get_fwVersion()));
     });
     connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
     {

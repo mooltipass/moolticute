@@ -141,6 +141,7 @@ void WSClient::onTextMessageReceived(const QString &message)
             set_mpHwVersion(Common::MP_Mini);
         else
             set_mpHwVersion(Common::MP_Classic);
+        set_fwVersion(o["hw_version"].toString());
     }
     else if (rootobj["msg"] == "set_credential")
     {

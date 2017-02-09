@@ -28,6 +28,7 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(bool, memMgmtMode, false)
 
     QT_WRITABLE_PROPERTY(Common::MPHwVersion, mpHwVersion, Common::MP_Classic)
+    QT_WRITABLE_PROPERTY(QString, fwVersion, QString())
 
     QT_WRITABLE_PROPERTY(bool, keyAfterLoginSendEnable, false)
     QT_WRITABLE_PROPERTY(int, keyAfterLoginSend, 0)
