@@ -24,6 +24,7 @@
 #include <QByteArray>
 #include <QQueue>
 #include <functional>
+#include <QTimer>
 
 /*
  * Classes for running jobs (aka a command sent to the device and a result coming from it)
@@ -66,6 +67,51 @@ signals:
 protected:
     //A potential error message to be set when a job failed
     QString errorStr;
+};
+
+class CustomJob: public AsyncJob
+{
+    Q_OBJECT
+public:
+    CustomJob(QObject *parent = nullptr):
+        AsyncJob(parent)
+    {}
+
+    void setWork(std::function<void()> fn)
+    {
+        work = std::move(fn);
+    }
+
+public slots:
+    virtual void start(const QByteArray &)
+    {
+        work();
+    }
+
+private:
+    std::function<void()> work = [](){};
+};
+
+class TimerJob: public AsyncJob
+{
+    Q_OBJECT
+public:
+    TimerJob(int ms, QObject *parent = nullptr):
+        AsyncJob(parent)
+    {
+        timer = new QTimer(this);
+        timer->setInterval(ms);
+        connect(timer, &QTimer::timeout, [this](){ emit this->done(QByteArray()); });
+    }
+
+public slots:
+    virtual void start(const QByteArray &)
+    {
+        timer->start();
+    }
+
+private:
+    QTimer *timer = nullptr;
 };
 
 class MPDevice;

@@ -2042,3 +2042,51 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
+
+void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
+                                   std::function<void(int total, int current)> cbProgress)
+{
+    /* Start integrity check in MMM mode */
+
+    /* New job for starting MMM */
+    AsyncJobs *jobs = new AsyncJobs("Starting integrity check", this);
+
+    /* Ask device to go into MMM first */
+    jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+
+    /////////
+    //TODO: Simulation here. limpkin can implement the core work here.
+    //When you stay in this AsyncJobs, the main queue is blocked from other
+    //query.
+    for (int i = 0;i < 10;i++)
+    {
+        jobs->append(new TimerJob(1000));
+        CustomJob *c = new CustomJob();
+        c->setWork([i, cbProgress, c]()
+        {
+            cbProgress(100, (i + 1) * 10);
+            emit c->done(QByteArray());
+        });
+        jobs->append(c);
+    }
+    /////////
+
+    /* Exit MMM at the end */
+    jobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        //all jobs finished success
+        qInfo() << "memcheck success";
+        cb(true, QString());
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed checking memory";
+        cb(false, failedJob->getErrorStr());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}

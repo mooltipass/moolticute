@@ -52,6 +52,9 @@ private slots:
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
 
+    void integrityProgress(int total, int current);
+    void integrityFinished(bool success);
+
     void askPasswordDone(bool success, const QString &pass);
 
     void on_pushButtonSettingsReset_clicked();
@@ -69,6 +72,7 @@ private slots:
 
     void on_pushButtonExportFile_clicked();
     void on_pushButtonImportFile_clicked();
+    void on_pushButtonIntegrity_clicked();
 
 private:
 
@@ -103,6 +107,7 @@ private:
         PAGE_WAIT_CONFIRM = 7,
         PAGE_ABOUT = 8,
         PAGE_MC_SETTINGS = 9,
+        PAGE_MC_INTEGRITY_CHECK = 10,
     };
 };
 

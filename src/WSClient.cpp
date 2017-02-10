@@ -155,6 +155,19 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         emit showAppRequested();
     }
+    else if (rootobj["msg"] == "memcheck")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        if (o.value("failed").toBool())
+            emit memcheckFinished(false);
+        else
+            emit memcheckFinished(true);
+    }
+    else if (rootobj["msg"] == "progress")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)

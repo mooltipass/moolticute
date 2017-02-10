@@ -54,6 +54,8 @@ signals:
     void askPasswordDone(bool success, const QString &pass);
     void addCredentialDone(bool success);
     void showAppRequested();
+    void progressChanged(int total, int current);
+    void memcheckFinished(bool success);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

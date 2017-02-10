@@ -52,6 +52,50 @@ void WSServerCon::processMessage(const QString &message)
         if (mpdevice)
             mpdevice->exitMemMgmtMode();
     }
+    else if (root["msg"] == "start_memcheck")
+    {
+        //start integrity check
+        if (!mpdevice)
+            return;
+
+        mpdevice->startIntegrityCheck(
+                    [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject oroot = root;
+            oroot["msg"] = "memcheck";
+
+            if (!success)
+            {
+                sendFailedJson(oroot, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            ores["memcheck_status"] = "done"; //TODO: add return info here about the result of memcheck?
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        //progress callback handling
+        [=](int total, int current)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (current > total)
+                current = total;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["progress_total"] = total;
+            ores["progress_current"] = current;
+            oroot["data"] = ores;
+            oroot["msg"] = "progress";
+            sendJsonMessage(oroot);
+        });
+    }
     else if (root["msg"] == "ask_password" ||
              root["msg"] == "get_credential")
     {

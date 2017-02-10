@@ -89,6 +89,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonQuickAddCred->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, whiteButtons));
@@ -828,4 +829,40 @@ void MainWindow::on_pushButtonExportFile_clicked()
 void MainWindow::on_pushButtonImportFile_clicked()
 {
     QMessageBox::information(this, "Moolticute", "Not yet implemented.");
+}
+
+void MainWindow::on_pushButtonIntegrity_clicked()
+{
+    int r = QMessageBox::question(this, "Moolticute", tr("Do you want to start the integrity check of your device?"));
+    if (r == QMessageBox::Yes)
+    {
+        wsClient->sendJsonData({{ "msg", "start_memcheck" }});
+        ui->widgetHeader->setEnabled(false);
+        ui->stackedWidget->setCurrentIndex(PAGE_MC_INTEGRITY_CHECK);
+        ui->progressBarIntegrity->setMinimum(0);
+        ui->progressBarIntegrity->setMaximum(0);
+        ui->progressBarIntegrity->setValue(0);
+
+        connect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
+        connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(integrityProgress(int,int)));
+    }
+}
+
+void MainWindow::integrityProgress(int total, int current)
+{
+    ui->progressBarIntegrity->setMaximum(total);
+    ui->progressBarIntegrity->setValue(current);
+}
+
+void MainWindow::integrityFinished(bool success)
+{
+    disconnect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
+    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(integrityProgress(int,int)));
+
+    if (!success)
+        QMessageBox::warning(this, "Moolticute", tr("Memory integrity check failed!"));
+    else
+        QMessageBox::information(this, "Moolticute", "Memory integrity check done successfully");
+    ui->stackedWidget->setCurrentIndex(PAGE_SYNC);
+    ui->widgetHeader->setEnabled(true);
 }

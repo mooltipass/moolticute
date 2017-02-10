@@ -99,6 +99,8 @@ public:
     void startMemMgmtMode();
     void exitMemMgmtMode();
     bool checkLoadedNodes();
+    void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
+                             std::function<void(int total, int current)> cbProgress);
 
     //reload parameters from MP
     void loadParameters();
