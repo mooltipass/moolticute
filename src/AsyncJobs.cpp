@@ -122,12 +122,16 @@ void AsyncJobs::dequeueStartJob(const QByteArray &data)
 
 void AsyncJobs::jobFailed()
 {
+    disconnect(currentJob, SIGNAL(done(QByteArray)), this, SLOT(jobDone(QByteArray)));
+    disconnect(currentJob, SIGNAL(error()), this, SLOT(jobFailed()));
     emit failed(currentJob);
     deleteLater();
 }
 
 void AsyncJobs::jobDone(const QByteArray &data)
 {
+    disconnect(currentJob, SIGNAL(done(QByteArray)), this, SLOT(jobDone(QByteArray)));
+    disconnect(currentJob, SIGNAL(error()), this, SLOT(jobFailed()));
     dequeueStartJob(data);
 }
 
