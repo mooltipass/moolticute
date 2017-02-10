@@ -502,11 +502,6 @@ void MPDevice::newDataRead(const QByteArray &data)
     }
 }
 
-void MPDevice::updateKeyboardLayout(int lang)
-{
-    updateParam(MPParams::KEYBOARD_LAYOUT_PARAM, lang);
-}
-
 void MPDevice::updateParam(MPParams::Param param, int val)
 {
     QString logInf = QStringLiteral("Updating %1 param: %2").arg(param).arg(val);
@@ -534,27 +529,12 @@ void MPDevice::updateParam(MPParams::Param param, int val)
 
 void MPDevice::updateParam(MPParams::Param param, bool en)
 {
-    QString logInf = QStringLiteral("Updating %1 param: %2").arg(param).arg(en);
+    updateParam(param, (int)en);
+}
 
-    AsyncJobs *jobs = new AsyncJobs(logInf, this);
-
-    QByteArray ba;
-    ba.append((quint8)param);
-    ba.append((quint8)en);
-
-    jobs->append(new MPCommandJob(this, MP_SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
-    {
-        qInfo() << param << " param updated with success";
-    });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
-    {
-        qWarning() << "Failed to change " << param;
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+void MPDevice::updateKeyboardLayout(int lang)
+{
+    updateParam(MPParams::KEYBOARD_LAYOUT_PARAM, lang);
 }
 
 void MPDevice::updateLockTimeoutEnabled(bool en)
