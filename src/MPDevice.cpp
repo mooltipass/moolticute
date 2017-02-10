@@ -19,42 +19,6 @@
 #include "MPDevice.h"
 #include <functional>
 
-const char *mooltipassParamString[] = {
-    "USER_PARAM_INIT_KEY_PARAM",
-    "KEYBOARD_LAYOUT_PARAM",
-    "USER_INTER_TIMEOUT_PARAM",
-    "LOCK_TIMEOUT_ENABLE_PARAM",
-    "LOCK_TIMEOUT_PARAM",
-    "TOUCH_DI_PARAM",
-    "TOUCH_WHEEL_OS_PARAM_OLD",
-    "TOUCH_PROX_OS_PARAM",
-    "OFFLINE_MODE_PARAM",
-    "SCREENSAVER_PARAM",
-    "TOUCH_CHARGE_TIME_PARAM",
-    "TOUCH_WHEEL_OS_PARAM0",
-    "TOUCH_WHEEL_OS_PARAM1",
-    "TOUCH_WHEEL_OS_PARAM2"
-    "FLASH_SCREEN_PARAM",
-    "USER_REQ_CANCEL_PARAM",
-    "TUTORIAL_BOOL_PARAM",
-    "SCREEN_SAVER_SPEED_PARAM",
-    "LUT_BOOT_POPULATING_PARAM",
-    "KEY_AFTER_LOGIN_SEND_BOOL_PARAM",
-    "KEY_AFTER_LOGIN_SEND_PARAM",
-    "KEY_AFTER_PASS_SEND_BOOL_PARAM",
-    "KEY_AFTER_PASS_SEND_PARAM",
-    "DELAY_AFTER_KEY_ENTRY_BOOL_PARAM",
-    "DELAY_AFTER_KEY_ENTRY_PARAM",
-    "INVERTED_SCREEN_AT_BOOT_PARAM",
-    "MINI_OLED_CONTRAST_CURRENT_PARAM",
-    "MINI_LED_ANIM_MASK_PARAM",
-    "MINI_KNOCK_DETECT_ENABLE_PARAM",
-    "MINI_KNOCK_THRES_PARAM",
-    "LOCK_UNLOCK_FEATURE_PARAM",
-    "HASH_DISPLAY_FEATURE_PARAM",
-    "RANDOM_INIT_PIN_PARAM",
-};
-
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
 MPDevice::MPDevice(QObject *parent):
@@ -199,7 +163,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, KEYBOARD_LAYOUT_PARAM),
+                                  QByteArray(1, MPParams::KEYBOARD_LAYOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -214,7 +178,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, LOCK_TIMEOUT_ENABLE_PARAM),
+                                  QByteArray(1, MPParams::LOCK_TIMEOUT_ENABLE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -229,7 +193,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, LOCK_TIMEOUT_PARAM),
+                                  QByteArray(1, MPParams::LOCK_TIMEOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -244,7 +208,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, SCREENSAVER_PARAM),
+                                  QByteArray(1, MPParams::SCREENSAVER_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -259,7 +223,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, USER_REQ_CANCEL_PARAM),
+                                  QByteArray(1, MPParams::USER_REQ_CANCEL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -274,7 +238,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, USER_INTER_TIMEOUT_PARAM),
+                                  QByteArray(1, MPParams::USER_INTER_TIMEOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -289,7 +253,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, FLASH_SCREEN_PARAM),
+                                  QByteArray(1, MPParams::FLASH_SCREEN_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -304,7 +268,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, OFFLINE_MODE_PARAM),
+                                  QByteArray(1, MPParams::OFFLINE_MODE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -319,7 +283,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, TUTORIAL_BOOL_PARAM),
+                                  QByteArray(1, MPParams::TUTORIAL_BOOL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -334,7 +298,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MINI_OLED_CONTRAST_CURRENT_PARAM),
+                                  QByteArray(1, MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -349,7 +313,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MINI_KNOCK_DETECT_ENABLE_PARAM),
+                                  QByteArray(1, MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -364,7 +328,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MINI_KNOCK_THRES_PARAM),
+                                  QByteArray(1, MPParams::MINI_KNOCK_THRES_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
@@ -382,7 +346,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, KEY_AFTER_LOGIN_SEND_BOOL_PARAM),
+                                  QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received key after login send enabled: " << (quint8)data.at(2);
@@ -392,7 +356,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, KEY_AFTER_LOGIN_SEND_PARAM),
+                                  QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received key after login send " << (quint8)data.at(2);
@@ -402,7 +366,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, KEY_AFTER_PASS_SEND_BOOL_PARAM),
+                                  QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received key after pass send enabled: " << (quint8)data.at(2);
@@ -412,7 +376,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, KEY_AFTER_PASS_SEND_PARAM),
+                                  QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received key after pass send " << (quint8)data.at(2);
@@ -422,7 +386,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, DELAY_AFTER_KEY_ENTRY_BOOL_PARAM),
+                                  QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received delay after key entry enabled: " << (quint8)data.at(2);
@@ -432,7 +396,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, DELAY_AFTER_KEY_ENTRY_PARAM),
+                                  QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received delay after key entry " << (quint8)data.at(2);
@@ -540,12 +504,12 @@ void MPDevice::newDataRead(const QByteArray &data)
 
 void MPDevice::updateKeyboardLayout(int lang)
 {
-    updateParam(KEYBOARD_LAYOUT_PARAM, lang);
+    updateParam(MPParams::KEYBOARD_LAYOUT_PARAM, lang);
 }
 
-void MPDevice::updateParam(quint8 param, int val)
+void MPDevice::updateParam(MPParams::Param param, int val)
 {
-    QString logInf = QStringLiteral("Updating %1 param: %2").arg(mooltipassParamString[param]).arg(val);
+    QString logInf = QStringLiteral("Updating %1 param: %2").arg(param).arg(val);
 
     AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
@@ -557,20 +521,20 @@ void MPDevice::updateParam(quint8 param, int val)
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
-        qInfo() << mooltipassParamString[param] << " param updating with success";
+        qInfo() << param << " param updated with success";
     });
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
-        qWarning() << "Failed to change " << mooltipassParamString[param];
+        qWarning() << "Failed to change " << param;
     });
 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
 
-void MPDevice::updateParam(quint8 param, bool en)
+void MPDevice::updateParam(MPParams::Param param, bool en)
 {
-    QString logInf = QStringLiteral("Updating lock timeout enabled: %1").arg(en);
+    QString logInf = QStringLiteral("Updating %1 param: %2").arg(param).arg(en);
 
     AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
@@ -582,11 +546,11 @@ void MPDevice::updateParam(quint8 param, bool en)
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
-        qInfo() << "lock timeout param set success";
+        qInfo() << param << " param updated with success";
     });
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
-        qWarning() << "Failed to set lock timeout enabled";
+        qWarning() << "Failed to change " << param;
     });
 
     jobsQueue.enqueue(jobs);
@@ -595,86 +559,86 @@ void MPDevice::updateParam(quint8 param, bool en)
 
 void MPDevice::updateLockTimeoutEnabled(bool en)
 {
-    updateParam(LOCK_TIMEOUT_ENABLE_PARAM, en);
+    updateParam(MPParams::LOCK_TIMEOUT_ENABLE_PARAM, en);
 }
 
 void MPDevice::updateLockTimeout(int timeout)
 {
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
-    updateParam(LOCK_TIMEOUT_PARAM, timeout);
+    updateParam(MPParams::LOCK_TIMEOUT_PARAM, timeout);
 }
 
 void MPDevice::updateScreensaver(bool en)
 {
-    updateParam(SCREENSAVER_PARAM, en);
+    updateParam(MPParams::SCREENSAVER_PARAM, en);
   }
 
 void MPDevice::updateUserRequestCancel(bool en)
 {   
-    updateParam(USER_REQ_CANCEL_PARAM, en);
+    updateParam(MPParams::USER_REQ_CANCEL_PARAM, en);
 }
 
 void MPDevice::updateUserInteractionTimeout(int timeout)
 {   
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
-    updateParam(USER_INTER_TIMEOUT_PARAM, timeout);
+    updateParam(MPParams::USER_INTER_TIMEOUT_PARAM, timeout);
 }
 
 void MPDevice::updateFlashScreen(bool en)
 {
-    updateParam(FLASH_SCREEN_PARAM, en);
+    updateParam(MPParams::FLASH_SCREEN_PARAM, en);
 }
 
 void MPDevice::updateOfflineMode(bool en)
 {
-    updateParam(OFFLINE_MODE_PARAM, en);
+    updateParam(MPParams::OFFLINE_MODE_PARAM, en);
 }
 
 void MPDevice::updateTutorialEnabled(bool en)
 {
-    updateParam(TUTORIAL_BOOL_PARAM, en);
+    updateParam(MPParams::TUTORIAL_BOOL_PARAM, en);
 }
 
 void MPDevice::updateScreenBrightness(int bval) //In percent
 {
-    updateParam(MINI_OLED_CONTRAST_CURRENT_PARAM, bval);
+    updateParam(MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM, bval);
 }
 
 void MPDevice::updateKnockEnabled(bool en)
 {
-    updateParam(MINI_KNOCK_DETECT_ENABLE_PARAM, en);
+    updateParam(MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM, en);
 }
 
 void MPDevice::updateKeyAfterLoginSendEnable(bool en)
 {
-    updateParam(KEY_AFTER_LOGIN_SEND_BOOL_PARAM, en);
+    updateParam(MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM, en);
 }
 
 void MPDevice::updateKeyAfterLoginSend(int value)
 {
-    updateParam(KEY_AFTER_LOGIN_SEND_PARAM, value);
+    updateParam(MPParams::KEY_AFTER_LOGIN_SEND_PARAM, value);
 }
 
 void MPDevice::updateKeyAfterPassSendEnable(bool en)
 {
-     updateParam(KEY_AFTER_PASS_SEND_BOOL_PARAM, en);
+     updateParam(MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM, en);
 }
 
 void MPDevice::updateKeyAfterPassSend(int value)
 {
-    updateParam(KEY_AFTER_PASS_SEND_PARAM, value);
+    updateParam(MPParams::KEY_AFTER_PASS_SEND_PARAM, value);
 }
 
 void MPDevice::updateDelayAfterKeyEntryEnable(bool en)
 {
-    updateParam(DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, en);
+    updateParam(MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, en);
 }
 
 void MPDevice::updateDelayAfterKeyEntry(int val)
 {
-    updateParam(DELAY_AFTER_KEY_ENTRY_PARAM, val);
+    updateParam(MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, val);
 }
 
 void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
@@ -682,7 +646,7 @@ void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
     quint8 v = 8;
     if (s == 0) v = 11;
     else if (s == 2) v = 5;
-    updateParam(MINI_KNOCK_THRES_PARAM, v);
+    updateParam(MPParams::MINI_KNOCK_THRES_PARAM, v);
 }
 
 void MPDevice::startMemMgmtMode()

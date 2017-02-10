@@ -520,18 +520,44 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
 
 void MainWindow::on_pushButtonSettingsSave_clicked()
 {
-    QJsonObject o = {{ "keyboard_layout", ui->comboBoxLang->currentData().toInt() },
-                     { "lock_timeout_enabled", ui->checkBoxLock->isChecked() },
-                     { "lock_timeout", ui->spinBoxLock->value() * 60 },
-                     { "screensaver", ui->checkBoxScreensaver->isChecked() },
-                     { "user_request_cancel", ui->checkBoxInput->isChecked() },
-                     { "user_interaction_timeout", ui->spinBoxInput->value() },
-                     { "flash_screen", ui->checkBoxFlash->isChecked() },
-                     { "offline_mode", ui->checkBoxBoot->isChecked() },
-                     { "tutorial_enabled", ui->checkBoxTuto->isChecked() },
-                     { "screen_brightness", ui->comboBoxScreenBrightness->currentData().toInt() },
-                     { "knock_enabled", ui->checkBoxKnock->isChecked() },
-                     { "knock_sensitivity", ui->comboBoxKnock->currentData().toInt() }};
+    QJsonObject o;
+
+    if (ui->comboBoxLang->currentData().toInt() != wsClient->get_keyboardLayout())
+        o["keyboard_layout"] = ui->comboBoxLang->currentData().toInt();
+    if (ui->checkBoxLock->isChecked() != wsClient->get_lockTimeoutEnabled())
+        o["lock_timeout_enabled"] = ui->checkBoxLock->isChecked();
+    if (ui->spinBoxLock->value() != wsClient->get_lockTimeout())
+        o["lock_timeout"] = ui->spinBoxLock->value() * 60;
+    if (ui->checkBoxScreensaver->isChecked() != wsClient->get_screensaver())
+        o["screensaver"] = ui->checkBoxScreensaver->isChecked();
+    if (ui->checkBoxInput->isChecked() != wsClient->get_userRequestCancel())
+        o["user_request_cancel"] = ui->checkBoxInput->isChecked();
+    if (ui->spinBoxInput->value() != wsClient->get_userInteractionTimeout())
+        o["user_interaction_timeout"] = ui->spinBoxInput->value();
+    if (ui->checkBoxFlash->isChecked() != wsClient->get_flashScreen())
+        o["flash_screen"] = ui->checkBoxFlash->isChecked();
+    if (ui->checkBoxBoot->isChecked() != wsClient->get_offlineMode())
+        o["offline_mode"] = ui->checkBoxBoot->isChecked();
+    if (ui->checkBoxTuto->isChecked() != wsClient->get_tutorialEnabled())
+        o["tutorial_enabled"] = ui->checkBoxTuto->isChecked();
+    if (ui->comboBoxScreenBrightness->currentData().toInt() != wsClient->get_screenBrightness())
+        o["screen_brightness"] = ui->comboBoxScreenBrightness->currentData().toInt();
+    if (ui->checkBoxKnock->isChecked() != wsClient->get_knockEnabled())
+        o["knock_enabled"] = ui->checkBoxKnock->isChecked(); //TODO: cannot be done with a smartcard inserted
+    if (ui->comboBoxKnock->currentData().toInt() != wsClient->get_knockSensitivity())
+        o["knock_sensitivity"] = ui->comboBoxKnock->currentData().toInt();
+    if (ui->checkBoxSendAfterLogin->isChecked() != wsClient->get_keyAfterLoginSendEnable())
+        o["key_after_login_enabled"] = ui->checkBoxSendAfterLogin->isChecked();
+    if (ui->comboBoxLoginOutput->currentData().toInt() != wsClient->get_keyAfterLoginSend())
+        o["key_after_login"] = ui->comboBoxLoginOutput->currentData().toInt();
+    if (ui->checkBoxSendAfterPassword->isChecked() != wsClient->get_keyAfterPassSendEnable())
+        o["key_after_pass_enabled"] = ui->checkBoxSendAfterPassword->isChecked();
+    if (ui->comboBoxPasswordOutput->currentData().toInt() != wsClient->get_keyAfterPassSend())
+        o["key_after_pass"] = ui->comboBoxPasswordOutput->currentData().toInt();
+    if (ui->checkBoxSlowHost->isChecked() != wsClient->get_delayAfterKeyEntryEnable())
+        o["delay_after_key_enabled"] = ui->checkBoxSlowHost->isChecked();
+    if (ui->spinBoxInputDelayAfterKeyPressed->value() != wsClient->get_delayAfterKeyEntry())
+        o["delay_after_key"] = ui->spinBoxInputDelayAfterKeyPressed->value();
 
     wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
 }

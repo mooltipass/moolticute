@@ -185,8 +185,8 @@ private:
     // Generate save packets
     bool generateSavePackets();
 
-    void updateParam(quint8 param, bool en);
-    void updateParam(quint8 param, int val);
+    void updateParam(MPParams::Param param, bool en);
+    void updateParam(MPParams::Param param, int val);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
