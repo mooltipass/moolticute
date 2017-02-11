@@ -771,8 +771,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                 }
                 else
                 {
-                    /* Launch the scan */
-                    loadSingleNodeAndScan(jobs, getMemoryFirstNodeAddress(), cbProgress);
+                    /* Full scan will be triggered once the answer from get data start node is received */
                 }
             }
             else
@@ -822,14 +821,17 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                 {
                     loadDataNode(jobs, startDataNode);
                 }
-                else
-                {
-                    // No need to read nodes as we have just browsed through the complete memory!
-                }
             }
             else
             {
                 qInfo() << "No parent data nodes to load.";
+            }
+
+            //once we received start node address and data start node, trigger full scan
+            if (fullScan != false)
+            {
+                /* Launch the scan */
+                loadSingleNodeAndScan(jobs, getMemoryFirstNodeAddress(), cbProgress);
             }
 
             return true;
