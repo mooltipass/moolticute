@@ -98,7 +98,6 @@ public:
     //mem mgmt mode
     void startMemMgmtMode();
     void exitMemMgmtMode();
-    bool checkLoadedNodes();
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);
 
@@ -191,7 +190,9 @@ private:
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
 
-    void tagPointedNodes();
+    // Functions added by mathieu for MMM : checks
+    bool checkLoadedNodes(bool repairAllowed);
+    void tagPointedNodes(bool repairAllowed);
 
     // Generate save packets
     bool generateSavePackets();
@@ -218,6 +219,7 @@ private:
     QList<MPNode *> loginNodes;         //list of all parent nodes for credentials
     QList<MPNode *> loginChildNodes;    //list of all parent nodes for credentials
     QList<MPNode *> dataNodes;          //list of all parent nodes for data nodes
+    QList<MPNode *> dataChildNodes;     //list of all parent nodes for data nodes
 
     // Clones of these values, used when modifying them in MMM
     QByteArray ctrValueClone;
@@ -227,6 +229,7 @@ private:
     QList<MPNode *> loginNodesClone;         //list of all parent nodes for credentials
     QList<MPNode *> loginChildNodesClone;    //list of all parent nodes for credentials
     QList<MPNode *> dataNodesClone;          //list of all parent nodes for data nodes
+    QList<MPNode *> dataChildNodesClone;     //list of all parent nodes for data nodes
 
     bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2
