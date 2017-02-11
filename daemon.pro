@@ -121,7 +121,7 @@ unix {
     INSTALLS += target
 
     # systemd service files
-    systemd_user.path = $$PREFIX/lib/systemd/user/
+    systemd_user.path = $$PREFIX/lib/systemd/system/
     systemd_user.files += $$PWD/systemd/moolticuted.service
     INSTALLS += systemd_user
 }
