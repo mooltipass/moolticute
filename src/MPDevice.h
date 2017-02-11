@@ -170,6 +170,7 @@ private:
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
+    void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, std::function<void(int total, int current)> cbProgress);
 
     void createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode = false);
 
@@ -181,7 +182,15 @@ private:
                        const QByteArray &data, bool &done);
 
     // Functions added by mathieu for MMM
+    void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address);
+    QByteArray getNextNodeAddressInMemory(const QByteArray &address);
+    quint16 getFlashPageFromAddress(const QByteArray &address);
+    quint8 getNodeIdFromAddress(const QByteArray &address);
+    QByteArray getMemoryFirstNodeAddress(void);
+    quint16 getNumberOfPages(void);
+    quint16 getNodesPerPage(void);
+
     void tagPointedNodes();
 
     // Generate save packets

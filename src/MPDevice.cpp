@@ -629,22 +629,8 @@ void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
     updateParam(MPParams::MINI_KNOCK_THRES_PARAM, v);
 }
 
-void MPDevice::startMemMgmtMode()
+void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress)
 {
-    /* Start MMM here, and load all memory data from the device */
-
-    /* If we're already in MMM, return */
-    if (get_memMgmtMode())
-    {
-        return;
-    }
-
-    /* New job for starting MMM */
-    AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
-
-    /* Ask device to go into MMM first */
-    jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
-
     /* Get CTR value */
     jobs->append(new MPCommandJob(this, MP_GET_CTRVALUE,
                                   [=](const QByteArray &data, bool &) -> bool
@@ -776,7 +762,16 @@ void MPDevice::startMemMgmtMode()
             if (startNode != MPNode::EmptyAddress)
             {
                 qInfo() << "Loading parent nodes...";
-                loadLoginNode(jobs, startNode);
+                if (fullScan == false)
+                {
+                    /* Traverse the flash by following the linked list */
+                    loadLoginNode(jobs, startNode);
+                }
+                else
+                {
+                    /* Launch the scan */
+                    loadSingleNodeAndScan(jobs, getMemoryFirstNodeAddress(), cbProgress);
+                }
             }
             else
             {
@@ -815,11 +810,18 @@ void MPDevice::startMemMgmtMode()
             startDataNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             qDebug() << "Start data node addr:" << startDataNode.toHex();
 
-            //if parent address is not null, load nodes
+            //if data parent address is not null, load nodes
             if (startDataNode != MPNode::EmptyAddress)
             {
                 qInfo() << "Loading data parent nodes...";
-                loadDataNode(jobs, startDataNode);
+                if (fullScan == false)
+                {
+                    loadDataNode(jobs, startDataNode);
+                }
+                else
+                {
+                    //
+                }
             }
             else
             {
@@ -829,6 +831,26 @@ void MPDevice::startMemMgmtMode()
             return true;
         }
     }));
+}
+
+void MPDevice::startMemMgmtMode()
+{
+    /* Start MMM here, and load all memory data from the device */
+
+    /* If we're already in MMM, return */
+    if (get_memMgmtMode())
+    {
+        return;
+    }
+
+    /* New job for starting MMM */
+    AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
+
+    /* Ask device to go into MMM first */
+    jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+
+    /* Load flash contents the usual way */
+    memMgmtModeReadFlash(jobs, false, [](int, int){});
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -844,7 +866,6 @@ void MPDevice::startMemMgmtMode()
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
-
 
         /* Cleaning all temp values */
         ctrValue.clear();
@@ -869,6 +890,177 @@ void MPDevice::startMemMgmtMode()
 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
+}
+
+QByteArray MPDevice::getMemoryFirstNodeAddress(void)
+{
+    /* Address format is 2 bytes little endian. last 3 bits are node number and first 13 bits are page address */
+    switch(get_flashMbSize())
+    {
+        case(1): /* 128 pages for graphics */ return QByteArray::fromHex("0004");
+        case(2): /* 128 pages for graphics */ return QByteArray::fromHex("0004");
+        case(4): /* 256 pages for graphics */ return QByteArray::fromHex("0008");
+        case(8): /* 256 pages for graphics */ return QByteArray::fromHex("0008");
+        case(16): /* 256 pages for graphics */ return QByteArray::fromHex("0008");
+        case(32): /* 128 pages for graphics */ return QByteArray::fromHex("0004");
+        default: /* 256 pages for graphics */ return QByteArray::fromHex("0008");
+    }
+}
+
+quint16 MPDevice::getNodesPerPage(void)
+{
+    if(get_flashMbSize() >= 16)
+    {
+        return 4;
+    }
+    else
+    {
+        return 2;
+    }
+}
+
+quint16 MPDevice::getNumberOfPages(void)
+{
+    if(get_flashMbSize() >= 16)
+    {
+        return 256*get_flashMbSize();
+    }
+    else
+    {
+        return 512*get_flashMbSize();
+    }
+}
+
+quint16 MPDevice::getFlashPageFromAddress(const QByteArray &address)
+{
+    return (((quint16)address[1] << 5) & 0x1FE0) | (((quint16)address[0] >> 3) & 0x001F);
+}
+
+quint8 MPDevice::getNodeIdFromAddress(const QByteArray &address)
+{
+    return (quint8)address[0] & 0x07;
+}
+
+QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
+{
+    /* Address format is 2 bytes little endian. last 3 bits are node number and first 13 bits are page address */
+    quint8 curNodeInPage = address[0] & 0x07;
+    quint16 curPage = getFlashPageFromAddress(address);
+
+    // Do the incrementation
+    if(++curNodeInPage == getNodesPerPage())
+    {
+        curNodeInPage = 0;
+        curPage++;
+    }
+
+    // Reconstruct the address
+    QByteArray return_data(address);
+    return_data[0] = curNodeInPage | (((quint8)(curPage << 3)) & 0xF8);
+    return_data[1] = (quint8)(curPage >> 5);
+    return return_data;
+}
+
+void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, std::function<void(int total, int current)> cbProgress)
+{
+    /* Because of recursive calls, make sure we haven't reached the end of the memory */
+    if (getFlashPageFromAddress(address) == getNumberOfPages())
+    {
+        qDebug() << "Reached the end of flash memory";
+        jobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+        return;
+    }
+
+    //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address);
+    Q_UNUSED(cbProgress);
+
+    /* Create pointers to the nodes we are going to fill */
+    MPNode *pnodeClone = new MPNode(this, address);
+    MPNode *pnode = new MPNode(this, address);
+
+    /* Send read node command, expecting 3 packets or 1 depending on if we're allowed to read a block*/
+    jobs->append(new MPCommandJob(this, MP_READ_FLASH_NODE,
+                                  address,
+                                  [=](const QByteArray &data, bool &done) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_READ_FLASH_NODE)
+        {
+            /* Wrong packet received */
+            qCritical() << "Get node: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: we are not allowed to read */
+            //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address) << ": we are not allowed to read there";
+
+            /* No point in keeping these nodes, simply delete them */
+            delete(pnodeClone);
+            delete(pnode);
+
+            /* Load next node */
+            loadSingleNodeAndScan(jobs, getNextNodeAddressInMemory(address), cbProgress);
+            return true;
+        }
+        else
+        {
+            /* Append received data to node data */
+            pnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            pnodeClone->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+
+            // Continue to read data until the node is fully received
+            if (!pnode->isDataLengthValid())
+            {
+                done = false;
+            }
+            else
+            {
+                // Node is loaded
+                if (pnode->isValid() == false)
+                {
+                    //qDebug() << address.toHex() << ": empty node loaded";
+
+                    /* No point in keeping these nodes, simply delete them */
+                    delete(pnodeClone);
+                    delete(pnode);
+                }
+                else
+                {
+                    switch(pnode->getType())
+                    {
+                        case MPNode::NodeParent :
+                        {
+                            qDebug() << address.toHex() << ": parent node loaded:" << pnode->getService();
+                            loginNodes.append(pnodeClone);
+                            loginNodes.append(pnode);
+                            break;
+                        }
+                        case MPNode::NodeChild :
+                        {
+                            qDebug() << address.toHex() << ": child node loaded:" << pnode->getLogin();
+                            loginChildNodes.append(pnodeClone);
+                            loginChildNodes.append(pnode);
+                            break;
+                        }
+                        case MPNode::NodeParentData :
+                        {
+                            break;
+                        }
+                        case MPNode::NodeChildData :
+                        {
+                            break;
+                        }
+                        default : break;
+                    }
+                }
+
+                /* Load next node */
+                loadSingleNodeAndScan(jobs, getNextNodeAddressInMemory(address), cbProgress);
+            }
+
+            return true;
+        }
+    }));
 }
 
 void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
@@ -2054,11 +2246,14 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     /* Ask device to go into MMM first */
     jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
+    /* Load CTR, favorites... */
+    memMgmtModeReadFlash(jobs, true, cbProgress);
+
     /////////
     //TODO: Simulation here. limpkin can implement the core work here.
     //When you stay in this AsyncJobs, the main queue is blocked from other
     //query.
-    for (int i = 0;i < 10;i++)
+    /*for (int i = 0;i < 10;i++)
     {
         jobs->append(new TimerJob(1000));
         CustomJob *c = new CustomJob();
@@ -2068,11 +2263,11 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
             emit c->done(QByteArray());
         });
         jobs->append(c);
-    }
+    }*/
     /////////
 
     /* Exit MMM at the end */
-    jobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+    //jobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
