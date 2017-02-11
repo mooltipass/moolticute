@@ -202,6 +202,10 @@ private:
     //timer that asks status
     QTimer *statusTimer = nullptr;
 
+    //local vars for performance diagnostics
+    qint64 diagLastSecs;
+    quint32 diagNbBytesRec;
+
     //command queue
     QQueue<MPCommand> commandQueue;
 

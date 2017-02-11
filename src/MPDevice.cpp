@@ -820,7 +820,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                 }
                 else
                 {
-                    //
+                    // No need to read nodes as we have just browsed through the complete memory!
                 }
             }
             else
@@ -974,6 +974,14 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address);
     Q_UNUSED(cbProgress);
 
+    /* For performance diagnostics */
+    if (diagLastSecs != QDateTime::currentSecsSinceEpoch())
+    {
+        qInfo() << "Current transfer speed:" << diagNbBytesRec << "B/s";
+        diagLastSecs = QDateTime::currentSecsSinceEpoch();
+        diagNbBytesRec = 0;
+    }
+
     /* Create pointers to the nodes we are going to fill */
     MPNode *pnodeClone = new MPNode(this, address);
     MPNode *pnode = new MPNode(this, address);
@@ -1000,6 +1008,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
 
             /* Load next node */
             loadSingleNodeAndScan(jobs, getNextNodeAddressInMemory(address), cbProgress);
+            diagNbBytesRec += 64;
             return true;
         }
         else
@@ -1056,6 +1065,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
 
                 /* Load next node */
                 loadSingleNodeAndScan(jobs, getNextNodeAddressInMemory(address), cbProgress);
+                diagNbBytesRec += 64*3;
             }
 
             return true;
@@ -2247,6 +2257,8 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     /* Load CTR, favorites... */
+    diagNbBytesRec = 0;
+    diagLastSecs = QDateTime::currentSecsSinceEpoch();
     memMgmtModeReadFlash(jobs, true, cbProgress);
 
     /////////
