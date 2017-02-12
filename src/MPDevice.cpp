@@ -1591,6 +1591,10 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
 
 bool MPDevice::checkLoadedNodes(bool repairAllowed)
 {
+    QList<QByteArray>::iterator addresslist_iterator;
+    QByteArray temp_pnode_address, temp_cnode_address;
+    MPNode* temp_pnode_pointer;
+    MPNode* temp_cnode_pointer;
     QList<MPNode *>::iterator i;
     bool return_bool;
 
@@ -1640,6 +1644,28 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
     qInfo() << "Number of children orphans:" << nbOrphanChildren;
     qInfo() << "Number of data parent orphans:" << nbOrphanDataParents;
     qInfo() << "Number of data children orphans:" << nbOrphanDataChildren;
+
+    /* Last step : check favorites */
+    for (addresslist_iterator = favoritesAddrs.begin(); addresslist_iterator != favoritesAddrs.end(); addresslist_iterator++)
+    {
+        /* Extract parent & child addresses */
+        temp_pnode_address = (*addresslist_iterator).mid(0, 2);
+        temp_cnode_address = (*addresslist_iterator).mid(2, 2);
+
+        /* Check if favorite is set */
+        if ((temp_pnode_address != MPNode::EmptyAddress) || (temp_pnode_address != MPNode::EmptyAddress))
+        {
+            /* Find the nodes in memory */
+            temp_pnode_pointer = findNodeWithAddressInList(loginNodes, temp_pnode_address);
+            temp_cnode_pointer = findNodeWithAddressInList(loginChildNodes, temp_cnode_address);
+
+            if ((temp_cnode_pointer == nullptr) || (temp_pnode_pointer == nullptr))
+            {
+                qCritical() << "Favorite is pointing to incorrect node!";
+            }
+        }
+    }
+
 
     /* Set return bool */
     if (nbOrphanParents+nbOrphanChildren+nbOrphanDataParents+nbOrphanDataChildren)
