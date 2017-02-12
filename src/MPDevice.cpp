@@ -827,7 +827,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                 qInfo() << "No parent data nodes to load.";
             }
 
-            //once we received start node address and data start node, trigger full scan
+            //once we received start node address and data start node address, trigger full scan
             if (fullScan != false)
             {
                 /* Launch the scan */
@@ -977,9 +977,14 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     if (getFlashPageFromAddress(address) == getNumberOfPages())
     {
         qDebug() << "Reached the end of flash memory";
-        checkLoadedNodes(true);
-        jobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
         return;
+    }
+
+    /* Progress bar */
+    if (getFlashPageFromAddress(address) != lastFlashPageScanned)
+    {
+        lastFlashPageScanned = getFlashPageFromAddress(address);
+        cbProgress(getNumberOfPages(), lastFlashPageScanned);
     }
 
     //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address);
@@ -1302,14 +1307,16 @@ MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArr
 }
 
 /* Follow the chain to tag pointed nodes (useful when doing integrity check when we are getting everything we can) */
-void MPDevice::tagPointedNodes(bool repairAllowed)
+bool MPDevice::tagPointedNodes(bool repairAllowed)
 {
+    Q_UNUSED(repairAllowed);
     QByteArray tempParentAddress;
     QByteArray tempChildAddress;
     MPNode* tempNextParentNodePt;
     MPNode* tempParentNodePt;
     MPNode* tempNextChildNodePt;
     MPNode* tempChildNodePt;
+    bool return_bool = true;
 
     /* start with start node (duh) */
     tempParentAddress = startNode;
@@ -1335,7 +1342,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
             }
 
             /* Stop looping */
-            return;
+            return false;
         }
         else if (tempNextParentNodePt->getPointedToCheck() == true)
         {
@@ -1343,7 +1350,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
             qCritical() << "tagPointedNodes: parent node loop has been detected: parent node with address" << tempParentNodePt->getAddress().toHex() << " points to parent node with address" << tempParentAddress.toHex();
 
             /* Stop looping */
-            return;
+            return false;
         }
         else
         {
@@ -1354,6 +1361,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                 if (tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress)
                 {
                     qWarning() << "tagPointedNodes: parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
+                    return_bool = false;
                 }
             }
             else
@@ -1362,6 +1370,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                 if (tempNextParentNodePt->getPreviousParentAddress() != tempParentNodePt->getAddress())
                 {
                     qWarning() << "tagPointedNodes: parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << tempParentNodePt->getAddress().toHex();
+                    return_bool = false;
                 }
             }
 
@@ -1384,6 +1393,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                 if (tempNextChildNodePt == nullptr)
                 {
                     qWarning() << "tagPointedNodes: couldn't find child node with address" << tempChildAddress.toHex() << "in our list";
+                    return_bool = false;
 
                     /* TODO: fix prev child / parent node */
                     if (tempChildAddress == tempParentNodePt->getStartChildAddress())
@@ -1411,7 +1421,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                     }
 
                     /* Stop looping */
-                    return;
+                    return false;
                 }
                 else
                 {
@@ -1422,6 +1432,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                         if (tempNextChildNodePt->getPreviousChildAddress() != MPNode::EmptyAddress)
                         {
                             qWarning() << "tagPointedNodes: child node" << tempNextChildNodePt->getLogin() <<  "at address" << tempChildAddress.toHex() << "has incorrect previous address:" << tempNextChildNodePt->getPreviousChildAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
+                            return_bool = false;
                         }
                     }
                     else
@@ -1430,6 +1441,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                         if (tempNextChildNodePt->getPreviousChildAddress() != tempChildNodePt->getAddress())
                         {
                             qWarning() << "tagPointedNodes: child node" << tempNextChildNodePt->getLogin() <<  "at address" << tempChildAddress.toHex() << "has incorrect previous address:" << tempNextChildNodePt->getPreviousChildAddress().toHex() << "instead of" << tempChildNodePt->getAddress().toHex();
+                            return_bool = false;
                         }
                     }
 
@@ -1475,7 +1487,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
             }
 
             /* Stop looping */
-            return;
+            return false;
         }
         else if (tempNextParentNodePt->getPointedToCheck() == true)
         {
@@ -1483,7 +1495,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
             qCritical() << "tagPointedNodes: data parent node loop has been detected: parent node with address" << tempParentNodePt->getAddress().toHex() << " points to parent node with address" << tempParentAddress.toHex();
 
             /* Stop looping */
-            return;
+            return false;
         }
         else
         {
@@ -1494,6 +1506,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                 if (tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress)
                 {
                     qWarning() << "tagPointedNodes: data parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
+                    return_bool = false;
                 }
             }
             else
@@ -1502,6 +1515,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                 if (tempNextParentNodePt->getPreviousParentAddress() != tempParentNodePt->getAddress())
                 {
                     qWarning() << "tagPointedNodes: data parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << tempParentNodePt->getAddress().toHex();
+                    return_bool = false;
                 }
             }
 
@@ -1524,6 +1538,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                 if (tempNextChildNodePt == nullptr)
                 {
                     qWarning() << "tagPointedNodes: couldn't find data child node with address" << tempChildAddress.toHex() << "in our list";
+                    return_bool = false;
 
                     /* TODO: fix prev child / parent node */
                     if (tempChildAddress == tempParentNodePt->getStartChildAddress())
@@ -1551,7 +1566,7 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
                     }
 
                     /* Stop looping */
-                    return;
+                    return false;
                 }
                 else
                 {
@@ -1570,16 +1585,19 @@ void MPDevice::tagPointedNodes(bool repairAllowed)
             tempParentAddress = tempParentNodePt->getNextParentAddress();
         }
     }
+
+    return return_bool;
 }
 
 bool MPDevice::checkLoadedNodes(bool repairAllowed)
 {
     QList<MPNode *>::iterator i;
+    bool return_bool;
 
     qInfo() << "Checking database...";
 
-    /* Tag pointed nodes */
-    tagPointedNodes(repairAllowed);
+    /* Tag pointed nodes, also detects DB errors */
+    return_bool = tagPointedNodes(repairAllowed);
 
     /* Scan for orphan nodes */
     quint32 nbOrphanParents = 0;
@@ -1623,8 +1641,29 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
     qInfo() << "Number of data parent orphans:" << nbOrphanDataParents;
     qInfo() << "Number of data children orphans:" << nbOrphanDataChildren;
 
-    qInfo() << "Database check OK";
-    return true;
+    /* Set return bool */
+    if (nbOrphanParents+nbOrphanChildren+nbOrphanDataParents+nbOrphanDataChildren)
+    {
+        return_bool = false;
+    }
+
+    if (return_bool)
+    {
+        qInfo() << "Database check OK";
+    }
+    else
+    {
+        if (repairAllowed)
+        {
+            qInfo() << "Errors were found in the database";
+        }
+        else
+        {
+            qInfo() << "Errors were found and corrected in the database";
+        }
+    }
+
+    return return_bool;
 }
 
 bool MPDevice::generateSavePackets()
@@ -2453,6 +2492,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
 
     /* Load CTR, favorites... */
     diagNbBytesRec = 0;
+    lastFlashPageScanned = 0;
     diagLastSecs = QDateTime::currentSecsSinceEpoch();
     memMgmtModeReadFlash(jobs, true, cbProgress);
 
@@ -2473,19 +2513,43 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     }*/
     /////////
 
-    /* Exit MMM at the end */
-    //jobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
-
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
-        //all jobs finished success
-        qInfo() << "memcheck success";
-        cb(true, QString());
+        qInfo() << "Finished loading the nodes in memory";
+
+        /* We finished loading the nodes in memory */
+        AsyncJobs* repairJobs = new AsyncJobs("Checking and repairing memory contents...", this);
+
+        /* Check loaded nodes, set boot to repair */
+        checkLoadedNodes(true);
+
+        /* Leave MMM */
+        repairJobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+
+        connect(repairJobs, &AsyncJobs::finished, [=](const QByteArray &data)
+        {
+            Q_UNUSED(data);
+            //data is last result
+
+            qInfo() << "Finished checking memory contents";
+            cb(true, QString());
+        });
+
+        connect(repairJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+        {
+            Q_UNUSED(failedJob);
+
+            qCritical() << "Couldn't check memory contents";
+            cb(false, failedJob->getErrorStr());
+        });
+
+        jobsQueue.enqueue(repairJobs);
+        runAndDequeueJobs();
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
-        qCritical() << "Failed checking memory";
+        qCritical() << "Failed scanning the flash memory";
         cb(false, failedJob->getErrorStr());
     });
 

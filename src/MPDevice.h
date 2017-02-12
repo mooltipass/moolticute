@@ -192,10 +192,13 @@ private:
 
     // Functions added by mathieu for MMM : checks
     bool checkLoadedNodes(bool repairAllowed);
-    void tagPointedNodes(bool repairAllowed);
+    bool tagPointedNodes(bool repairAllowed);
 
     // Generate save packets
     bool generateSavePackets();
+
+    // Last page scanned
+    quint16 lastFlashPageScanned = 0;
 
     void updateParam(MPParams::Param param, bool en);
     void updateParam(MPParams::Param param, int val);
