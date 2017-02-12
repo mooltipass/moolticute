@@ -764,7 +764,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
             if (startNode != MPNode::EmptyAddress)
             {
                 qInfo() << "Loading parent nodes...";
-                if (fullScan == false)
+                if (!fullScan)
                 {
                     /* Traverse the flash by following the linked list */
                     loadLoginNode(jobs, startNode);
@@ -818,7 +818,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
             if (startDataNode != MPNode::EmptyAddress)
             {
                 qInfo() << "Loading data parent nodes...";
-                if (fullScan == false)
+                if (!fullScan)
                 {
                     loadDataNode(jobs, startDataNode);
                 }
@@ -829,7 +829,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
             }
 
             //once we received start node address and data start node address, trigger full scan
-            if (fullScan != false)
+            if (fullScan)
             {
                 /* Launch the scan */
                 loadSingleNodeAndScan(jobs, getMemoryFirstNodeAddress(), cbProgress);
@@ -992,10 +992,10 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     Q_UNUSED(cbProgress);
 
     /* For performance diagnostics */
-    if (diagLastSecs != QDateTime::currentSecsSinceEpoch())
+    if (diagLastSecs != QTime::currentTime().second())
     {
         qInfo() << "Current transfer speed:" << diagNbBytesRec << "B/s";
-        diagLastSecs = QDateTime::currentSecsSinceEpoch();
+        diagLastSecs = QTime::currentTime().second();
         diagNbBytesRec = 0;
     }
 
@@ -1020,8 +1020,8 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
             //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address) << ": we are not allowed to read there";
 
             /* No point in keeping these nodes, simply delete them */
-            delete(pnodeClone);
-            delete(pnode);
+            delete pnodeClone;
+            delete pnode;
 
             /* Load next node */
             loadSingleNodeAndScan(jobs, getNextNodeAddressInMemory(address), cbProgress);
@@ -1042,13 +1042,13 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
             else
             {
                 // Node is loaded
-                if (pnode->isValid() == false)
+                if (!pnode->isValid())
                 {
                     //qDebug() << address.toHex() << ": empty node loaded";
 
                     /* No point in keeping these nodes, simply delete them */
-                    delete(pnodeClone);
-                    delete(pnode);
+                    delete pnodeClone;
+                    delete pnode;
                 }
                 else
                 {
@@ -1329,23 +1329,30 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
         tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress);
 
         /* Check that we could actually find it */
-        if (tempNextParentNodePt == nullptr)
+        if (!tempNextParentNodePt)
         {
             qCritical() << "tagPointedNodes: couldn't find parent node with address" << tempParentAddress.toHex() << "in our list";
 
-            /* TODO: fix this node */
             if (tempParentAddress == startNode)
             {
                 /* start node is incorrect */
+                if (repairAllowed != false)
+                {
+                    startNode = QByteArray(MPNode::EmptyAddress);
+                }
             }
             else
             {
+                if (repairAllowed != false)
+                {
+                    //tempParentNodePt->
+                }
             }
 
             /* Stop looping */
             return false;
         }
-        else if (tempNextParentNodePt->getPointedToCheck() == true)
+        else if (tempNextParentNodePt->getPointedToCheck())
         {
             /* Linked chain loop detected */
             qCritical() << "tagPointedNodes: parent node loop has been detected: parent node with address" << tempParentNodePt->getAddress().toHex() << " points to parent node with address" << tempParentAddress.toHex();
@@ -1391,7 +1398,7 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
                 tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress);
 
                 /* Check we could find child pointer */
-                if (tempNextChildNodePt == nullptr)
+                if (!tempNextChildNodePt)
                 {
                     qWarning() << "tagPointedNodes: couldn't find child node with address" << tempChildAddress.toHex() << "in our list";
                     return_bool = false;
@@ -1409,7 +1416,7 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
                     /* Loop to next parent */
                     tempChildAddress = MPNode::EmptyAddress;
                 }
-                else if (tempNextChildNodePt->getPointedToCheck() == true)
+                else if (tempNextChildNodePt->getPointedToCheck())
                 {
                     /* Linked chain loop detected */
                     if (tempChildAddress == tempParentNodePt->getStartChildAddress())
@@ -1474,7 +1481,7 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
         tempNextParentNodePt = findNodeWithAddressInList(dataNodes, tempParentAddress);
 
         /* Check that we could actually find it */
-        if (tempNextParentNodePt == nullptr)
+        if (!tempNextParentNodePt)
         {
             qCritical() << "tagPointedNodes: couldn't find data parent node with address" << tempParentAddress.toHex() << "in our list";
 
@@ -1490,7 +1497,7 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
             /* Stop looping */
             return false;
         }
-        else if (tempNextParentNodePt->getPointedToCheck() == true)
+        else if (tempNextParentNodePt->getPointedToCheck())
         {
             /* Linked chain loop detected */
             qCritical() << "tagPointedNodes: data parent node loop has been detected: parent node with address" << tempParentNodePt->getAddress().toHex() << " points to parent node with address" << tempParentAddress.toHex();
@@ -1536,7 +1543,7 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
                 tempNextChildNodePt = findNodeWithAddressInList(dataChildNodes, tempChildAddress);
 
                 /* Check we could find child pointer */
-                if (tempNextChildNodePt == nullptr)
+                if (!tempNextChildNodePt)
                 {
                     qWarning() << "tagPointedNodes: couldn't find data child node with address" << tempChildAddress.toHex() << "in our list";
                     return_bool = false;
@@ -1554,7 +1561,7 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
                     /* Loop to next parent */
                     tempChildAddress = MPNode::EmptyAddress;
                 }
-                else if (tempNextChildNodePt->getPointedToCheck() == true)
+                else if (tempNextChildNodePt->getPointedToCheck())
                 {
                     /* Linked chain loop detected */
                     if (tempChildAddress == tempParentNodePt->getStartChildAddress())
@@ -1596,7 +1603,6 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
     QByteArray temp_pnode_address, temp_cnode_address;
     MPNode* temp_pnode_pointer;
     MPNode* temp_cnode_pointer;
-    QList<MPNode *>::iterator i;
     bool return_bool;
 
     qInfo() << "Checking database...";
@@ -1609,35 +1615,35 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
     quint32 nbOrphanChildren = 0;
     quint32 nbOrphanDataParents = 0;
     quint32 nbOrphanDataChildren = 0;
-    for (i = loginNodes.begin(); i != loginNodes.end(); i++)
+    for (auto &i: loginNodes)
     {
-        if ((*i)->getPointedToCheck() == false)
+        if (!i->getPointedToCheck())
         {
-            qWarning() << "Orphan parent found:" << (*i)->getService() << "at address:" << (*i)->getAddress().toHex();
+            qWarning() << "Orphan parent found:" << i->getService() << "at address:" << i->getAddress().toHex();
             nbOrphanParents++;
         }
     }
-    for (i = loginChildNodes.begin(); i != loginChildNodes.end(); i++)
+    for (auto &i: loginChildNodes)
     {
-        if ((*i)->getPointedToCheck() == false)
+        if (!i->getPointedToCheck())
         {
-            qWarning() << "Orphan child found:" << (*i)->getLogin() << "at address:" << (*i)->getAddress().toHex();
+            qWarning() << "Orphan child found:" << i->getLogin() << "at address:" << i->getAddress().toHex();
             nbOrphanChildren++;
         }
     }
-    for (i = dataNodes.begin(); i != dataNodes.end(); i++)
+    for (auto &i: dataNodes)
     {
-        if ((*i)->getPointedToCheck() == false)
+        if (!i->getPointedToCheck())
         {
-            qWarning() << "Orphan data parent found:" << (*i)->getService() << "at address:" << (*i)->getAddress().toHex();
+            qWarning() << "Orphan data parent found:" << i->getService() << "at address:" << i->getAddress().toHex();
             nbOrphanDataParents++;
         }
     }
-    for (i = dataChildNodes.begin(); i != dataChildNodes.end(); i++)
+    for (auto &i: dataChildNodes)
     {
-        if ((*i)->getPointedToCheck() == false)
+        if (!i->getPointedToCheck())
         {
-            qWarning() << "data child found at address:" << (*i)->getAddress().toHex();
+            qWarning() << "data child found at address:" << i->getAddress().toHex();
             nbOrphanDataChildren++;
         }
     }
@@ -1660,7 +1666,7 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
             temp_pnode_pointer = findNodeWithAddressInList(loginNodes, temp_pnode_address);
             temp_cnode_pointer = findNodeWithAddressInList(loginChildNodes, temp_cnode_address);
 
-            if ((temp_cnode_pointer == nullptr) || (temp_pnode_pointer == nullptr))
+            if ((!temp_cnode_pointer) || (!temp_pnode_pointer))
             {
                 qCritical() << "Favorite is pointing to incorrect node!";
             }
@@ -1695,104 +1701,103 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
 bool MPDevice::generateSavePackets(AsyncJobs *jobs)
 {
     Q_UNUSED(jobs);
-    QList<MPNode *>::iterator nodelist_iterator;
     MPNode* temp_node_pointer;
 
     /* First pass: check the nodes that changed or were added */
-    for (nodelist_iterator = loginNodes.begin(); nodelist_iterator != loginNodes.end(); nodelist_iterator++)
+    for (auto &nodelist_iterator: loginNodes)
     {
         /* See if we can find the same node in the clone list */
-        temp_node_pointer = findNodeWithAddressInList(loginNodesClone, (*nodelist_iterator)->getAddress());
+        temp_node_pointer = findNodeWithAddressInList(loginNodesClone, nodelist_iterator->getAddress());
 
-        if (temp_node_pointer == nullptr)
+        if (!temp_node_pointer)
         {
-            qInfo() << "Generating save packet for new service" << (*nodelist_iterator)->getService();
+            qInfo() << "Generating save packet for new service" << nodelist_iterator->getService();
         }
-        else if ((*nodelist_iterator)->getNodeData() != temp_node_pointer->getNodeData())
+        else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
         {
-            qInfo() << "Generating save packet for updated service" << (*nodelist_iterator)->getService();
+            qInfo() << "Generating save packet for updated service" << nodelist_iterator->getService();
         }
     }
-    for (nodelist_iterator = loginChildNodes.begin(); nodelist_iterator != loginChildNodes.end(); nodelist_iterator++)
+    for (auto &nodelist_iterator: loginChildNodes)
     {
         /* See if we can find the same node in the clone list */
-        temp_node_pointer = findNodeWithAddressInList(loginChildNodesClone, (*nodelist_iterator)->getAddress());
+        temp_node_pointer = findNodeWithAddressInList(loginChildNodesClone, nodelist_iterator->getAddress());
 
-        if (temp_node_pointer == nullptr)
+        if (!temp_node_pointer)
         {
-            qInfo() << "Generating save packet for new login" << (*nodelist_iterator)->getLogin();
+            qInfo() << "Generating save packet for new login" << nodelist_iterator->getLogin();
         }
-        else if ((*nodelist_iterator)->getNodeData() != (*nodelist_iterator)->getNodeData())
+        else if (nodelist_iterator->getNodeData() != nodelist_iterator->getNodeData())
         {
-            qInfo() << "Generating save packet for updated login" << (*nodelist_iterator)->getLogin();
+            qInfo() << "Generating save packet for updated login" << nodelist_iterator->getLogin();
         }
     }
-    for (nodelist_iterator = dataNodes.begin(); nodelist_iterator != dataNodes.end(); nodelist_iterator++)
+    for (auto &nodelist_iterator: dataNodes)
     {
         /* See if we can find the same node in the clone list */
-        temp_node_pointer = findNodeWithAddressInList(dataNodesClone, (*nodelist_iterator)->getAddress());
+        temp_node_pointer = findNodeWithAddressInList(dataNodesClone, nodelist_iterator->getAddress());
 
-        if (temp_node_pointer == nullptr)
+        if (!temp_node_pointer)
         {
-            qInfo() << "Generating save packet for new data service" << (*nodelist_iterator)->getService();
+            qInfo() << "Generating save packet for new data service" << nodelist_iterator->getService();
         }
-        else if ((*nodelist_iterator)->getNodeData() != temp_node_pointer->getNodeData())
+        else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
         {
-            qInfo() << "Generating save packet for updated data service" << (*nodelist_iterator)->getService();
+            qInfo() << "Generating save packet for updated data service" << nodelist_iterator->getService();
         }
     }
-    for (nodelist_iterator = dataChildNodes.begin(); nodelist_iterator != dataChildNodes.end(); nodelist_iterator++)
+    for (auto &nodelist_iterator: dataChildNodes)
     {
         /* See if we can find the same node in the clone list */
-        temp_node_pointer = findNodeWithAddressInList(dataChildNodesClone, (*nodelist_iterator)->getAddress());
+        temp_node_pointer = findNodeWithAddressInList(dataChildNodesClone, nodelist_iterator->getAddress());
 
-        if (temp_node_pointer == nullptr)
+        if (!temp_node_pointer)
         {
             qInfo() << "Generating save packet for new data child node";
         }
-        else if ((*nodelist_iterator)->getNodeData() != temp_node_pointer->getNodeData())
+        else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
         {
             qInfo() << "Generating save packet for updated data child node";
         }
     }
 
     /* Second pass: check the nodes that were removed */
-    for (nodelist_iterator = loginNodesClone.begin(); nodelist_iterator != loginNodesClone.end(); nodelist_iterator++)
+    for (auto &nodelist_iterator: loginNodesClone)
     {
         /* See if we can find the same node in the clone list */
-        temp_node_pointer = findNodeWithAddressInList(loginNodes, (*nodelist_iterator)->getAddress());
+        temp_node_pointer = findNodeWithAddressInList(loginNodes, nodelist_iterator->getAddress());
 
-        if (temp_node_pointer == nullptr)
+        if (!temp_node_pointer)
         {
-            qInfo() << "Generating delete packet for deleted service" << (*nodelist_iterator)->getService();
+            qInfo() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
         }
     }
-    for (nodelist_iterator = loginChildNodesClone.begin(); nodelist_iterator != loginChildNodesClone.end(); nodelist_iterator++)
+    for (auto &nodelist_iterator: loginChildNodesClone)
     {
         /* See if we can find the same node in the clone list */
-        temp_node_pointer = findNodeWithAddressInList(loginChildNodes, (*nodelist_iterator)->getAddress());
+        temp_node_pointer = findNodeWithAddressInList(loginChildNodes, nodelist_iterator->getAddress());
 
-        if (temp_node_pointer == nullptr)
+        if (!temp_node_pointer)
         {
-            qInfo() << "Generating delete packet for deleted login" << (*nodelist_iterator)->getLogin();
+            qInfo() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
         }
     }
-    for (nodelist_iterator = dataNodesClone.begin(); nodelist_iterator != dataNodesClone.end(); nodelist_iterator++)
+    for (auto &nodelist_iterator: dataNodesClone)
     {
         /* See if we can find the same node in the clone list */
-        temp_node_pointer = findNodeWithAddressInList(dataNodes, (*nodelist_iterator)->getAddress());
+        temp_node_pointer = findNodeWithAddressInList(dataNodes, nodelist_iterator->getAddress());
 
-        if (temp_node_pointer == nullptr)
+        if (!temp_node_pointer)
         {
-            qInfo() << "Generating delete packet for deleted data service" << (*nodelist_iterator)->getService();
+            qInfo() << "Generating delete packet for deleted data service" << nodelist_iterator->getService();
         }
     }
-    for (nodelist_iterator = dataChildNodesClone.begin(); nodelist_iterator != dataChildNodesClone.end(); nodelist_iterator++)
+    for (auto &nodelist_iterator: dataChildNodesClone)
     {
         /* See if we can find the same node in the clone list */
-        temp_node_pointer = findNodeWithAddressInList(dataChildNodes, (*nodelist_iterator)->getAddress());
+        temp_node_pointer = findNodeWithAddressInList(dataChildNodes, nodelist_iterator->getAddress());
 
-        if (temp_node_pointer == nullptr)
+        if (!temp_node_pointer)
         {
             qInfo() << "Generating delete packet for deleted data child node";
         }
@@ -1826,6 +1831,23 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
     }
 
     /* We need to diff cpz ctr values for firmwares running < v1.2 */
+    /* Diff: cpzctr values can only be added by design */
+    for (qint32 i = 0; i < cpzCtrValue.length(); i++)
+    {
+        bool cpzCtrFound = false;
+        for (qint32 j = 0; j < cpzCtrValueClone.length(); j++)
+        {
+            if (cpzCtrValue[i] == cpzCtrValueClone[j])
+            {
+                cpzCtrFound = true;
+                break;
+            }
+        }
+        if (!cpzCtrFound)
+        {
+            qInfo() << "Adding missing cpzctr";
+        }
+    }
 
     return true;
 }
@@ -2652,7 +2674,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     /* Load CTR, favorites... */
     diagNbBytesRec = 0;
     lastFlashPageScanned = 0;
-    diagLastSecs = QDateTime::currentSecsSinceEpoch();
+    diagLastSecs = QTime::currentTime().second();
     memMgmtModeReadFlash(jobs, true, cbProgress);
 
     /////////
