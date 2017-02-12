@@ -77,6 +77,9 @@ public:
     QByteArray getNextDataAddress() const;
     QByteArray getChildData() const;
 
+    // Node properties
+    QByteArray getNodeData() const;
+
     // Pointedto access/write
     void setPointedToCheck();
     bool getPointedToCheck() const;

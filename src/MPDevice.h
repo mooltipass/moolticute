@@ -195,7 +195,7 @@ private:
     bool tagPointedNodes(bool repairAllowed);
 
     // Generate save packets
-    bool generateSavePackets();
+    bool generateSavePackets(AsyncJobs *jobs);
 
     // Last page scanned
     quint16 lastFlashPageScanned = 0;

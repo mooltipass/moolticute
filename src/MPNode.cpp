@@ -164,6 +164,12 @@ QByteArray MPNode::getNextDataAddress() const
     return data.mid(2, 2);
 }
 
+QByteArray MPNode::getNodeData() const
+{
+    if (!isValid()) return QByteArray();
+    return data;
+}
+
 QByteArray MPNode::getChildData() const
 {
     if (!isValid()) return QByteArray();

@@ -1692,8 +1692,113 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
     return return_bool;
 }
 
-bool MPDevice::generateSavePackets()
+bool MPDevice::generateSavePackets(AsyncJobs *jobs)
 {
+    Q_UNUSED(jobs);
+    QList<QByteArray>::iterator addresslist_iterator;
+    QList<MPNode *>::iterator nodelist_iterator;
+    MPNode* temp_node_pointer;
+
+    /* First pass: check the nodes that changed or were added */
+    for (nodelist_iterator = loginNodes.begin(); nodelist_iterator != loginNodes.end(); nodelist_iterator++)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(loginNodesClone, (*nodelist_iterator)->getAddress());
+
+        if (temp_node_pointer == nullptr)
+        {
+            qInfo() << "Generating save packet for new service" << (*nodelist_iterator)->getService();
+        }
+        else if ((*nodelist_iterator)->getNodeData() != temp_node_pointer->getNodeData())
+        {
+            qInfo() << "Generating save packet for updated service" << (*nodelist_iterator)->getService();
+        }
+    }
+    for (nodelist_iterator = loginChildNodes.begin(); nodelist_iterator != loginChildNodes.end(); nodelist_iterator++)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(loginChildNodesClone, (*nodelist_iterator)->getAddress());
+
+        if (temp_node_pointer == nullptr)
+        {
+            qInfo() << "Generating save packet for new login" << (*nodelist_iterator)->getLogin();
+        }
+        else if ((*nodelist_iterator)->getNodeData() != (*nodelist_iterator)->getNodeData())
+        {
+            qInfo() << "Generating save packet for updated login" << (*nodelist_iterator)->getLogin();
+        }
+    }
+    for (nodelist_iterator = dataNodes.begin(); nodelist_iterator != dataNodes.end(); nodelist_iterator++)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(dataNodesClone, (*nodelist_iterator)->getAddress());
+
+        if (temp_node_pointer == nullptr)
+        {
+            qInfo() << "Generating save packet for new data service" << (*nodelist_iterator)->getService();
+        }
+        else if ((*nodelist_iterator)->getNodeData() != temp_node_pointer->getNodeData())
+        {
+            qInfo() << "Generating save packet for updated data service" << (*nodelist_iterator)->getService();
+        }
+    }
+    for (nodelist_iterator = dataChildNodes.begin(); nodelist_iterator != dataChildNodes.end(); nodelist_iterator++)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(dataChildNodesClone, (*nodelist_iterator)->getAddress());
+
+        if (temp_node_pointer == nullptr)
+        {
+            qInfo() << "Generating save packet for new data child node";
+        }
+        else if ((*nodelist_iterator)->getNodeData() != temp_node_pointer->getNodeData())
+        {
+            qInfo() << "Generating save packet for updated data child node";
+        }
+    }
+
+    /* Second pass: check the nodes that were removed */
+    for (nodelist_iterator = loginNodesClone.begin(); nodelist_iterator != loginNodesClone.end(); nodelist_iterator++)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(loginNodes, (*nodelist_iterator)->getAddress());
+
+        if (temp_node_pointer == nullptr)
+        {
+            qInfo() << "Generating delete packet for deleted service" << (*nodelist_iterator)->getService();
+        }
+    }
+    for (nodelist_iterator = loginChildNodesClone.begin(); nodelist_iterator != loginChildNodesClone.end(); nodelist_iterator++)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(loginChildNodes, (*nodelist_iterator)->getAddress());
+
+        if (temp_node_pointer == nullptr)
+        {
+            qInfo() << "Generating delete packet for deleted login" << (*nodelist_iterator)->getLogin();
+        }
+    }
+    for (nodelist_iterator = dataNodesClone.begin(); nodelist_iterator != dataNodesClone.end(); nodelist_iterator++)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(dataNodes, (*nodelist_iterator)->getAddress());
+
+        if (temp_node_pointer == nullptr)
+        {
+            qInfo() << "Generating delete packet for deleted data service" << (*nodelist_iterator)->getService();
+        }
+    }
+    for (nodelist_iterator = dataChildNodesClone.begin(); nodelist_iterator != dataChildNodesClone.end(); nodelist_iterator++)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(dataChildNodes, (*nodelist_iterator)->getAddress());
+
+        if (temp_node_pointer == nullptr)
+        {
+            qInfo() << "Generating delete packet for deleted data child node";
+        }
+    }
+
     return true;
 }
 
@@ -2548,6 +2653,9 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
 
         /* Check loaded nodes, set boot to repair */
         checkLoadedNodes(true);
+
+        /* Generate save packets */
+        generateSavePackets(repairJobs);
 
         /* Leave MMM */
         repairJobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
