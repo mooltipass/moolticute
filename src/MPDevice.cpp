@@ -992,10 +992,10 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     Q_UNUSED(cbProgress);
 
     /* For performance diagnostics */
-    if (diagLastSecs != QTime::currentTime().second())
+    if (diagLastSecs != QDateTime::currentMSecsSinceEpoch()/1000)
     {
         qInfo() << "Current transfer speed:" << diagNbBytesRec << "B/s";
-        diagLastSecs = QTime::currentTime().second();
+        diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
         diagNbBytesRec = 0;
     }
 
@@ -2764,7 +2764,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     /* Load CTR, favorites... */
     diagNbBytesRec = 0;
     lastFlashPageScanned = 0;
-    diagLastSecs = QTime::currentTime().second();
+    diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
     memMgmtModeReadFlash(jobs, true, cbProgress);
 
     /////////
