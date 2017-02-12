@@ -46,8 +46,11 @@ public:
     int getType() const;
 
     // NodeParent / NodeParentData properties
+    void setPreviousParentAddress(const QByteArray &d);
     QByteArray getPreviousParentAddress() const;
+    void setNextParentAddress(const QByteArray &d);
     QByteArray getNextParentAddress() const;
+    void setStartChildAddress(const QByteArray &d);
     QByteArray getStartChildAddress() const;
     QString getService() const;
 
@@ -60,7 +63,9 @@ public:
     void appendChildData(MPNode *node) { node->setParent(this); childDataNodes.append(node); }
 
     // NodeChild properties
+    void setNextChildAddress(const QByteArray &d);
     QByteArray getNextChildAddress() const;
+    void setPreviousChildAddress(const QByteArray &d);
     QByteArray getPreviousChildAddress() const;
     QByteArray getCTR() const;
     QString getDescription() const;
@@ -71,9 +76,11 @@ public:
 
     //Data node address
     //Address in data node is not at the same position as cred nodes
+    void setNextChildDataAddress(const QByteArray &d);
     QByteArray getNextChildDataAddress() const;
 
     // NodeChildData properties
+    void setNextDataAddress(const QByteArray &d);
     QByteArray getNextDataAddress() const;
     QByteArray getChildData() const;
 
