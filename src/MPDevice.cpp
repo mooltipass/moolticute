@@ -811,6 +811,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
         else
         {
             startDataNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            startDataNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             qDebug() << "Start data node addr:" << startDataNode.toHex();
 
             //if data parent address is not null, load nodes
@@ -1666,7 +1667,6 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
         }
     }
 
-
     /* Set return bool */
     if (nbOrphanParents+nbOrphanChildren+nbOrphanDataParents+nbOrphanDataChildren)
     {
@@ -1695,7 +1695,6 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
 bool MPDevice::generateSavePackets(AsyncJobs *jobs)
 {
     Q_UNUSED(jobs);
-    QList<QByteArray>::iterator addresslist_iterator;
     QList<MPNode *>::iterator nodelist_iterator;
     MPNode* temp_node_pointer;
 
@@ -1798,6 +1797,35 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
             qInfo() << "Generating delete packet for deleted data child node";
         }
     }
+
+    /* Diff favorites */
+    for (qint32 i = 0; i < favoritesAddrs.length(); i++)
+    {
+        if (favoritesAddrs[i] != favoritesAddrsClone[i])
+        {
+            qInfo() << "Generating favorite" << i << "update packet";
+        }
+    }
+
+    /* Diff ctr */
+    if (ctrValue != ctrValueClone)
+    {
+        qInfo() << "Updating CTR value";
+    }
+
+    /* Diff start node */
+    if (startNode != startNodeClone)
+    {
+        qInfo() << "Updating start node";
+    }
+
+    /* Diff start data node */
+    if (startDataNode != startDataNodeClone)
+    {
+        qInfo() << "Updating start data node";
+    }
+
+    /* We need to diff cpz ctr values for firmwares running < v1.2 */
 
     return true;
 }

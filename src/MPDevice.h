@@ -227,6 +227,7 @@ private:
     // Clones of these values, used when modifying them in MMM
     QByteArray ctrValueClone;
     QByteArray startNodeClone;
+    QByteArray startDataNodeClone;
     QList<QByteArray> cpzCtrValueClone;
     QList<QByteArray> favoritesAddrsClone;
     QList<MPNode *> loginNodesClone;         //list of all parent nodes for credentials
