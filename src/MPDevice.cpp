@@ -1764,12 +1764,23 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
     }
     else
     {
-        if (repairAllowed)
+        if (!repairAllowed)
         {
             qInfo() << "Errors were found in the database";
         }
         else
         {
+            qInfo() << "Modifications made to the db, double checking them...";
+
+            if (!checkLoadedNodes(false))
+            {
+                qCritical() << "Double checking repairs failed... Mathieu, you s*ck!";
+            }
+            else
+            {
+                qInfo() << "DB corrections were successfully checked";
+            }
+
             qInfo() << "Errors were found and corrected in the database";
         }
     }
