@@ -78,16 +78,34 @@ QByteArray MPNode::getPreviousParentAddress() const
     return data.mid(2, 2);
 }
 
+void MPNode::setPreviousParentAddress(const QByteArray &d)
+{
+    data[2] = d[0];
+    data[3] = d[1];
+}
+
 QByteArray MPNode::getNextParentAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(4, 2);
 }
 
+void MPNode::setNextParentAddress(const QByteArray &d)
+{
+    data[4] = d[0];
+    data[5] = d[1];
+}
+
 QByteArray MPNode::getStartChildAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(6, 2);
+}
+
+void MPNode::setStartChildAddress(const QByteArray &d)
+{
+    data[6] = d[0];
+    data[7] = d[1];
 }
 
 QString MPNode::getService() const
@@ -108,10 +126,22 @@ QByteArray MPNode::getNextChildAddress() const
     return data.mid(4, 2);
 }
 
+void MPNode::setNextChildAddress(const QByteArray &d)
+{
+    data[4] = d[0];
+    data[5] = d[1];
+}
+
 QByteArray MPNode::getPreviousChildAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(2, 2);
+}
+
+void MPNode::setPreviousChildAddress(const QByteArray &d)
+{
+    data[2] = d[0];
+    data[3] = d[1];
 }
 
 QByteArray MPNode::getNextChildDataAddress() const
@@ -120,6 +150,12 @@ QByteArray MPNode::getNextChildDataAddress() const
     //the only address is the next one
     //It is the same as previous for cred nodes
     return getPreviousChildAddress();
+}
+
+void MPNode::setNextChildDataAddress(const QByteArray &d)
+{
+    data[2] = d[0];
+    data[3] = d[1];
 }
 
 QByteArray MPNode::getCTR() const
@@ -162,6 +198,18 @@ QByteArray MPNode::getNextDataAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(2, 2);
+}
+
+void MPNode::setNextDataAddress(const QByteArray &d)
+{
+    data[2] = d[0];
+    data[3] = d[1];
+}
+
+QByteArray MPNode::getNodeData() const
+{
+    if (!isValid()) return QByteArray();
+    return data;
 }
 
 QByteArray MPNode::getChildData() const

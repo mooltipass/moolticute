@@ -98,7 +98,6 @@ public:
     //mem mgmt mode
     void startMemMgmtMode();
     void exitMemMgmtMode();
-    bool checkLoadedNodes();
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);
 
@@ -170,6 +169,7 @@ private:
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
+    void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, std::function<void(int total, int current)> cbProgress);
 
     void createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode = false);
 
@@ -181,17 +181,34 @@ private:
                        const QByteArray &data, bool &done);
 
     // Functions added by mathieu for MMM
+    void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address);
-    void tagPointedNodes();
+    QByteArray getNextNodeAddressInMemory(const QByteArray &address);
+    quint16 getFlashPageFromAddress(const QByteArray &address);
+    quint8 getNodeIdFromAddress(const QByteArray &address);
+    QByteArray getMemoryFirstNodeAddress(void);
+    quint16 getNumberOfPages(void);
+    quint16 getNodesPerPage(void);
+
+    // Functions added by mathieu for MMM : checks
+    bool checkLoadedNodes(bool repairAllowed);
+    bool tagPointedNodes(bool repairAllowed);
 
     // Generate save packets
-    bool generateSavePackets();
+    bool generateSavePackets(AsyncJobs *jobs);
+
+    // Last page scanned
+    quint16 lastFlashPageScanned = 0;
 
     void updateParam(MPParams::Param param, bool en);
     void updateParam(MPParams::Param param, int val);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
+
+    //local vars for performance diagnostics
+    qint64 diagLastSecs;
+    quint32 diagNbBytesRec;
 
     //command queue
     QQueue<MPCommand> commandQueue;
@@ -205,15 +222,18 @@ private:
     QList<MPNode *> loginNodes;         //list of all parent nodes for credentials
     QList<MPNode *> loginChildNodes;    //list of all parent nodes for credentials
     QList<MPNode *> dataNodes;          //list of all parent nodes for data nodes
+    QList<MPNode *> dataChildNodes;     //list of all parent nodes for data nodes
 
     // Clones of these values, used when modifying them in MMM
     QByteArray ctrValueClone;
     QByteArray startNodeClone;
+    QByteArray startDataNodeClone;
     QList<QByteArray> cpzCtrValueClone;
     QList<QByteArray> favoritesAddrsClone;
     QList<MPNode *> loginNodesClone;         //list of all parent nodes for credentials
     QList<MPNode *> loginChildNodesClone;    //list of all parent nodes for credentials
     QList<MPNode *> dataNodesClone;          //list of all parent nodes for data nodes
+    QList<MPNode *> dataChildNodesClone;     //list of all parent nodes for data nodes
 
     bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2

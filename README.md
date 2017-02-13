@@ -31,7 +31,7 @@ Packages are build and available here: https://calaos.fr/mooltipass/
 
 ##### Linux
  - Requires libusb
- - Requires a [udev rule for libusb](https://www.themooltipass.com/udev_rule.txt)
+ - Requires a [udev rule for libusb](https://github.com/bobsaintcool/mooltipass-udev)
 
 ##### Ubuntu 16.04
 ```bash
