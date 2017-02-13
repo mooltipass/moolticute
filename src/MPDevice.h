@@ -189,8 +189,10 @@ private:
     QByteArray getMemoryFirstNodeAddress(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
+    void detagPointedNodes(void);
 
-    // Functions added by mathieu for MMM : checks
+    // Functions added by mathieu for MMM : checks & repairs
+    bool addOrphanParentToDB(MPNode *parentNodePt);
     bool checkLoadedNodes(bool repairAllowed);
     bool tagPointedNodes(bool repairAllowed);
 

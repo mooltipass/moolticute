@@ -1346,10 +1346,29 @@ MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArr
     return it == list.end()?nullptr:*it;
 }
 
+void MPDevice::detagPointedNodes(void)
+{
+    for (auto &i: loginNodes)
+    {
+        i->removePointedToCheck();
+    }
+    for (auto &i: loginChildNodes)
+    {
+        i->removePointedToCheck();
+    }
+    for (auto &i: dataNodes)
+    {
+        i->removePointedToCheck();
+    }
+    for (auto &i: dataChildNodes)
+    {
+        i->removePointedToCheck();
+    }
+}
+
 /* Follow the chain to tag pointed nodes (useful when doing integrity check when we are getting everything we can) */
 bool MPDevice::tagPointedNodes(bool repairAllowed)
 {
-    Q_UNUSED(repairAllowed);
     QByteArray tempParentAddress;
     QByteArray tempChildAddress;
     MPNode* tempNextParentNodePt;
@@ -1715,6 +1734,95 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
     return return_bool;
 }
 
+/* Return success status (false would mean a coding error on our side) */
+bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt)
+{
+    MPNode *prevNodePt = nullptr;
+    QByteArray prevNodeAddr;
+
+    qInfo() << "Adding parent node" << parentNodePt->getService();
+
+    if (parentNodePt->getPointedToCheck())
+    {
+        qCritical() << "addOrphan: parent node" << parentNodePt->getService() << "is already pointed to";
+        return true;
+    }
+    else
+    {
+        /* It is important to note that this function is called with a valid linked chain (due to tagcheck) */
+        for (auto &i: loginNodes)
+        {
+            /* Keep a trace of the last pointed node if we exit this for loop */
+            prevNodePt = i;
+
+            /* Browse through the login list and find where we should fit (giggity) */
+            if (i->getService().compare(parentNodePt->getService()) > 0)
+            {
+                /* We went one slot too far, i is the next parent Node */
+                qInfo() << "Adding parent node before" << i->getService();
+
+                /* Get the previous node address & pointer */
+                prevNodeAddr = i->getPreviousParentAddress();
+                if (prevNodeAddr == MPNode::EmptyAddress)
+                {
+                    /* We have a new start node! */
+                    qInfo() << "Parent node is the new start node";
+                    startNode = parentNodePt->getAddress();
+                    parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress);
+                }
+                else
+                {
+                    /* Something before our node */
+                    prevNodePt = findNodeWithAddressInList(loginNodes, prevNodeAddr);
+
+                    /* Update its and our pointer */
+                    if (!prevNodePt)
+                    {
+                        qCritical() << "addOrphanParent: invalid pointer to previous element even though linked chain is valid";
+                        return false;
+                    }
+                    else
+                    {
+                        qInfo() << "... and after" << prevNodePt->getService();
+                        prevNodePt->setNextParentAddress(parentNodePt->getAddress());
+                        parentNodePt->setPreviousChildAddress(prevNodePt->getAddress());
+                    }
+                }
+
+                /* Update our next node pointers */
+                i->setPreviousParentAddress(parentNodePt->getAddress());
+                parentNodePt->setNextParentAddress(i->getAddress());
+
+                /* Re-tag pointed nodes as we want to tag the possible children */
+                detagPointedNodes();
+                qInfo() << "Re-running tagPointedNodes...";
+                tagPointedNodes(true);
+                return true;
+            }
+        }
+
+        /* If we are here it means we need to take the last spot */
+        if (!prevNodePt)
+        {
+            /* Empty DB */
+            startNode = parentNodePt->getAddress();
+            parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress);
+            parentNodePt->setNextParentAddress(MPNode::EmptyAddress);
+        }
+        else
+        {
+            prevNodePt->setNextParentAddress(parentNodePt->getAddress());
+            parentNodePt->setPreviousParentAddress(prevNodePt->getAddress());
+            parentNodePt->setNextParentAddress(MPNode::EmptyAddress);
+        }
+
+        /* Re-tag pointed nodes as we want to tag the possible children */
+        detagPointedNodes();
+        tagPointedNodes(true);
+        return true;
+    }
+}
+
 bool MPDevice::checkLoadedNodes(bool repairAllowed)
 {
     QByteArray temp_pnode_address, temp_cnode_address;
@@ -1725,6 +1833,7 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
     qInfo() << "Checking database...";
 
     /* Tag pointed nodes, also detects DB errors */
+    detagPointedNodes();
     return_bool = tagPointedNodes(repairAllowed);
 
     /* Scan for orphan nodes */
@@ -1737,6 +1846,10 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
         if (!i->getPointedToCheck())
         {
             qWarning() << "Orphan parent found:" << i->getService() << "at address:" << i->getAddress().toHex();
+            if (repairAllowed)
+            {
+                addOrphanParentToDB(i);
+            }
             nbOrphanParents++;
         }
     }
@@ -2830,7 +2943,11 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         /* We finished loading the nodes in memory */
         AsyncJobs* repairJobs = new AsyncJobs("Checking and repairing memory contents...", this);
 
-        /* Check loaded nodes, set boot to repair */
+        /* Let's corrupt the DB for fun */
+        /*loginNodes[1]->setNextParentAddress(loginNodes[3]->getAddress());
+        loginNodes[3]->setPreviousParentAddress(loginNodes[1]->getAddress());*/
+
+        /* Check loaded nodes, set bool to repair */
         checkLoadedNodes(true);
 
         /* Generate save packets */

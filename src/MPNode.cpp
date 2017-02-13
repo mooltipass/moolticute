@@ -67,6 +67,11 @@ void MPNode::setPointedToCheck()
     pointedToCheck = true;
 }
 
+void MPNode::removePointedToCheck()
+{
+    pointedToCheck = false;
+}
+
 bool MPNode::getPointedToCheck() const
 {
     return pointedToCheck;

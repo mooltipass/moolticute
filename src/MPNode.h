@@ -89,6 +89,7 @@ public:
 
     // Pointedto access/write
     void setPointedToCheck();
+    void removePointedToCheck();
     bool getPointedToCheck() const;
 
     static QByteArray EmptyAddress;
