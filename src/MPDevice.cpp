@@ -639,11 +639,13 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
         {
             /* Wrong packet received */
             qCritical() << "Get CTR value: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            jobs->setCurrentJobError("Get CTR: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
         else if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
+            jobs->setCurrentJobError("Mooltipass refused to send us a CTR packet");
             qCritical() << "Get CTR value: couldn't get answer";
             return false;
         }
@@ -686,6 +688,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
         else
         {
             qCritical() << "Get CPZ CTR: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            jobs->setCurrentJobError("Get CPZ/CTR: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
     }));
@@ -711,11 +714,13 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
             {
                 /* Wrong packet received */
                 qCritical() << "Get favorite: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+                jobs->setCurrentJobError("Get Favorite: Mooltipass sent an answer packet with a different command ID");
                 return false;
             }
             else if (data[MP_LEN_FIELD_INDEX] == 1)
             {
                 /* Received one byte as answer: command fail */
+                jobs->setCurrentJobError("Mooltipass refused to send us favorites");
                 qCritical() << "Get favorite: couldn't get answer";
                 return false;
             }
@@ -746,11 +751,13 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
         {
             /* Wrong packet received */
             qCritical() << "Get start node addr: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            jobs->setCurrentJobError("Get Start Node: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
         else if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
+            jobs->setCurrentJobError("Mooltipass refused to send us starting parent");
             qCritical() << "Get start node addr: couldn't get answer";
             return false;
         }
@@ -800,11 +807,13 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
         {
             /* Wrong packet received */
             qCritical() << "Get data start node addr: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            jobs->setCurrentJobError("Get Data Starting Parent: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
         else if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
+            jobs->setCurrentJobError("Mooltipass refused to send us data starting parent");
             qCritical() << "Get data start node addr: couldn't get answer";
             return false;
         }
@@ -1115,11 +1124,13 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
         {
             /* Wrong packet received */
             qCritical() << "Get node: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            jobs->setCurrentJobError("Get Parent Node: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
         else if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
+            jobs->setCurrentJobError("Couldn't read parent node, card removed or database corrupted");
             qCritical() << "Get node: couldn't get answer";
             return false;
         }
@@ -1182,11 +1193,13 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
         {
             /* Wrong packet received */
             qCritical() << "Get child node: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            jobs->setCurrentJobError("Get Child Node: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
         else if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
+            jobs->setCurrentJobError("Couldn't read child node, card removed or database corrupted");
             qCritical() << "Get child node: couldn't get answer";
             return false;
         }
@@ -1231,7 +1244,20 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[0] <= 1) return false;
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_READ_FLASH_NODE)
+        {
+            /* Wrong packet received */
+            qCritical() << "Get data node: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            jobs->setCurrentJobError("Get Data Node: Mooltipass sent an answer packet with a different command ID");
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            jobs->setCurrentJobError("Couldn't read data node, card removed or database corrupted");
+            qCritical() << "Get data node: couldn't get answer";
+            return false;
+        }
 
         pnode->appendData(data.mid(2, data[0]));
         pnodeClone->appendData(data.mid(2, data[0]));
@@ -1275,7 +1301,20 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[0] <= 1) return false;
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_READ_FLASH_NODE)
+        {
+            /* Wrong packet received */
+            qCritical() << "Get data child node: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            jobs->setCurrentJobError("Get Data Child Node: Mooltipass sent an answer packet with a different command ID");
+            return false;
+        }
+        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        {
+            /* Received one byte as answer: command fail */
+            jobs->setCurrentJobError("Couldn't read data child node, card removed or database corrupted");
+            qCritical() << "Get data child node: couldn't get answer";
+            return false;
+        }
 
         cnode->appendData(data.mid(2, data[0]));
 
@@ -2753,18 +2792,18 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
 void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                                    std::function<void(int total, int current)> cbProgress)
 {
-    /* Start integrity check in MMM mode */
-
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting integrity check", this);
 
     /* Ask device to go into MMM first */
     jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
-    /* Load CTR, favorites... */
+    /* Setup global vars dedicated to speed diagnostics */
     diagNbBytesRec = 0;
     lastFlashPageScanned = 0;
-    diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
+    diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;    
+
+    /* Load CTR, favorites, nodes... */
     memMgmtModeReadFlash(jobs, true, cbProgress);
 
     /////////
