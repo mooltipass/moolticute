@@ -504,7 +504,8 @@ void MPDevice::newDataRead(const QByteArray &data)
 
 void MPDevice::updateParam(MPParams::Param param, int val)
 {
-    QString logInf = QStringLiteral("Updating %1 param: %2").arg(param).arg(val);
+    QMetaEnum m = QMetaEnum::fromType<MPParams::Param>();
+    QString logInf = QStringLiteral("Updating %1 param: %2").arg(m.valueToKey(param)).arg(val);
 
     AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
