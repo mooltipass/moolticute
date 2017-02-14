@@ -182,9 +182,10 @@ private:
 
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
-    MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address);
+    MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
+    MPNode *findNodeWithServiceInList(const QString &service);
     quint8 getNodeIdFromAddress(const QByteArray &address);
     QByteArray getMemoryFirstNodeAddress(void);
     quint16 getNumberOfPages(void);
@@ -192,7 +193,9 @@ private:
     void detagPointedNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
+    MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanParentToDB(MPNode *parentNodePt);
+    bool addOrphanChildToDB(MPNode* childNodePt);
     bool checkLoadedNodes(bool repairAllowed);
     bool tagPointedNodes(bool repairAllowed);
 
@@ -221,9 +224,13 @@ private:
     //command queue
     QQueue<MPCommand> commandQueue;
 
+    // Number of new addresses we need
+    quint32 newAddressesNeededCounter = 0;
+
     // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
     QByteArray startNode;
+    quint32 virtualStartNode;
     QByteArray startDataNode;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;

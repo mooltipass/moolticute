@@ -631,6 +631,9 @@ void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
 
 void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress)
 {
+    /* For when the MMM is left */
+    newAddressesNeededCounter = 0;
+
     /* Get CTR value */
     jobs->append(new MPCommandJob(this, MP_GET_CTRVALUE,
                                   [=](const QByteArray &data, bool &) -> bool
@@ -1336,14 +1339,25 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
 }
 
 /* Find a node inside a given list given his address */
-MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address)
+MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr)
 {
-    auto it = std::find_if(list.begin(), list.end(), [&address](const MPNode *const node)
+    auto it = std::find_if(list.begin(), list.end(), [&address, virt_addr](const MPNode *const node)
     {
-        return node->getAddress() == address;
+        return (node->getAddress() == address) && (node->getVirtualAddress() == virt_addr);
     });
 
     return it == list.end()?nullptr:*it;
+}
+
+/* Find a node inside the parent list given his service */
+MPNode *MPDevice::findNodeWithServiceInList(const QString &service)
+{
+    auto it = std::find_if(loginNodes.begin(), loginNodes.end(), [&service](const MPNode *const node)
+    {
+        return node->getService() == service;
+    });
+
+    return it == loginNodes.end()?nullptr:*it;
 }
 
 void MPDevice::detagPointedNodes(void)
@@ -1376,6 +1390,9 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
     MPNode* tempNextChildNodePt;
     MPNode* tempChildNodePt;
     bool return_bool = true;
+
+    /* first, detag all nodes */
+    detagPointedNodes();
 
     /* start with start node (duh) */
     tempParentAddress = startNode;
@@ -1738,6 +1755,7 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
 bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt)
 {
     MPNode *prevNodePt = nullptr;
+    quint32 prevNodeAddrVirtual;
     QByteArray prevNodeAddr;
 
     qInfo() << "Adding parent node" << parentNodePt->getService();
@@ -1765,17 +1783,19 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt)
 
                     /* Get the previous node address & pointer */
                     prevNodeAddr = i->getPreviousParentAddress();
+                    prevNodeAddrVirtual = i->getPrevVirtualAddress();
                     if (prevNodeAddr == MPNode::EmptyAddress)
                     {
                         /* We have a new start node! */
                         qInfo() << "Parent node is the new start node";
                         startNode = parentNodePt->getAddress();
+                        virtualStartNode = parentNodePt->getVirtualAddress();
                         parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress);
                     }
                     else
                     {
                         /* Something before our node */
-                        prevNodePt = findNodeWithAddressInList(loginNodes, prevNodeAddr);
+                        prevNodePt = findNodeWithAddressInList(loginNodes, prevNodeAddr, prevNodeAddrVirtual);
 
                         /* Update its and our pointer */
                         if (!prevNodePt)
@@ -1786,17 +1806,16 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt)
                         else
                         {
                             qInfo() << "... and after" << prevNodePt->getService();
-                            prevNodePt->setNextParentAddress(parentNodePt->getAddress());
-                            parentNodePt->setPreviousChildAddress(prevNodePt->getAddress());
+                            prevNodePt->setNextParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
+                            parentNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
                         }
                     }
 
                     /* Update our next node pointers */
-                    i->setPreviousParentAddress(parentNodePt->getAddress());
-                    parentNodePt->setNextParentAddress(i->getAddress());
+                    i->setPreviousParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
+                    parentNodePt->setNextParentAddress(i->getAddress(), i->getVirtualAddress());
 
                     /* Re-tag pointed nodes as we want to tag the possible children */
-                    detagPointedNodes();
                     qInfo() << "Re-running tagPointedNodes...";
                     tagPointedNodes(true);
                     return true;
@@ -1810,23 +1829,68 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt)
             /* Empty DB */
             qInfo() << "Empty DB, adding single parent node";
             startNode = parentNodePt->getAddress();
+            virtualStartNode = parentNodePt->getVirtualAddress();
             parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress);
             parentNodePt->setNextParentAddress(MPNode::EmptyAddress);
         }
         else
         {
             qInfo() << "Adding parent node after" << prevNodePt->getService();
-            prevNodePt->setNextParentAddress(parentNodePt->getAddress());
-            parentNodePt->setPreviousParentAddress(prevNodePt->getAddress());
+            prevNodePt->setNextParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
+            parentNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
             parentNodePt->setNextParentAddress(MPNode::EmptyAddress);
         }
 
         /* Re-tag pointed nodes as we want to tag the possible children */
-        detagPointedNodes();
         qInfo() << "Re-running tagPointedNodes...";
         tagPointedNodes(true);
         return true;
     }
+}
+
+MPNode* MPDevice::addNewServiceToDB(const QString &service)
+{
+    MPNode* tempNodePt;
+    MPNode* newNodePt;
+
+    qDebug() << "Create new service" << service << "in DB";
+
+    /* Does the service actually exist? */
+    tempNodePt = findNodeWithServiceInList(service);
+    if (tempNodePt)
+    {
+        qCritical() << "Service already exists.... dumbass!";
+        return nullptr;
+    }
+
+    /* Create new node with null address and virtual address set to our counter value */
+    newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+    newNodePt->setService(service);
+
+    /* Increment new addresses counter, add node to list */
+    newAddressesNeededCounter += 1;
+    loginNodes.append(newNodePt);
+    addOrphanParentToDB(newNodePt);
+
+    return newNodePt;
+}
+
+bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
+{
+    QString recovered_service_name = "_recovered_";
+    MPNode* tempNodePt;
+
+    qInfo() << "Adding orphan child" << childNodePt->getLogin() << "to DB";
+
+    /* Create a "_recovered_" service */
+    tempNodePt = findNodeWithServiceInList(recovered_service_name);
+    if (!tempNodePt)
+    {
+        qInfo() << "No" << recovered_service_name << "service in DB, adding it...";
+
+    }
+
+    return true;
 }
 
 bool MPDevice::checkLoadedNodes(bool repairAllowed)
@@ -1839,7 +1903,6 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
     qInfo() << "Checking database...";
 
     /* Tag pointed nodes, also detects DB errors */
-    detagPointedNodes();
     return_bool = tagPointedNodes(repairAllowed);
 
     /* Scan for orphan nodes */
@@ -1864,6 +1927,10 @@ bool MPDevice::checkLoadedNodes(bool repairAllowed)
         if (!i->getPointedToCheck())
         {
             qWarning() << "Orphan child found:" << i->getLogin() << "at address:" << i->getAddress().toHex();
+            if (repairAllowed)
+            {
+                addOrphanChildToDB(i);
+            }
             nbOrphanChildren++;
         }
     }
@@ -2961,6 +3028,31 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     generateSavePackets(jobs);
     if (diagSavePacketsGenerated) {qCritical() << "Setting invalid startNode: test failed!";return false;} else qInfo() << "Setting invalid startNode: passed!";
 
+    diagSavePacketsGenerated = false;
+    qInfo() << "testCodeAgainstCleanDBChanges: Setting parent node loop";
+    loginNodes[10]->setPreviousParentAddress(loginNodes[2]->getAddress());
+    checkLoadedNodes(true);
+    generateSavePackets(jobs);
+    if (diagSavePacketsGenerated) {qCritical() << "Setting parent node loop: test failed!";return false;} else qInfo() << "Setting parent node loop: passed!";
+
+    diagSavePacketsGenerated = false;
+    qInfo() << "testCodeAgainstCleanDBChanges: Breaking linked list";
+    loginNodes[10]->setPreviousParentAddress(invalidAddress);
+    loginNodes[10]->setNextParentAddress(invalidAddress);
+    checkLoadedNodes(true);
+    generateSavePackets(jobs);
+    if (diagSavePacketsGenerated) {qCritical() << "Breaking parent linked list: test failed!";return false;} else qInfo() << "Breaking parent linked list: passed!";
+
+    qInfo() << "Parent node corruption tests passed...";
+    qInfo() << "Starting child node corruption tests";
+
+    diagSavePacketsGenerated = false;
+    qInfo() << "testCodeAgainstCleanDBChanges: Creating orphan nodes";
+    loginNodes[0]->setStartChildAddress(MPNode::EmptyAddress);
+    checkLoadedNodes(true);
+    generateSavePackets(jobs);
+    if (diagSavePacketsGenerated) {qCritical() << "Creating orphan nodes: test failed!";return false;} else qInfo() << "Creating orphan nodes: passed!";
+
     return true;
 }
 
@@ -3021,13 +3113,13 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         }*/
 
         /* Let's corrupt the DB for fun */
-        //testCodeAgainstCleanDBChanges(repairJobs);
+        testCodeAgainstCleanDBChanges(repairJobs);
 
         /* Check loaded nodes, set bool to repair */
-        checkLoadedNodes(true);
+        //checkLoadedNodes(true);
 
         /* Generate save packets */
-        generateSavePackets(repairJobs);
+        //generateSavePackets(repairJobs);
 
         /* Leave MMM */
         repairJobs->append(new MPCommandJob(this, MP_END_MEMORYMGMT, MPCommandJob::defaultCheckRet));

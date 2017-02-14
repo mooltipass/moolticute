@@ -24,8 +24,8 @@
 class MPNode: public QObject
 {
 public:
-    MPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0));
-    MPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0));
+    MPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
+    MPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
 
     enum
     {
@@ -42,16 +42,22 @@ public:
     bool isValid() const;
 
     /* accessors for node properties */
+    quint32 getVirtualAddress(void) const;
+    void setVirtualAddress(quint32 addr);
     QByteArray getAddress() const;
     int getType() const;
 
     // NodeParent / NodeParentData properties
-    void setPreviousParentAddress(const QByteArray &d);
+    void setPreviousParentAddress(const QByteArray &d, const quint32 virt_addr = 0);
     QByteArray getPreviousParentAddress() const;
-    void setNextParentAddress(const QByteArray &d);
+    quint32 getPrevVirtualAddress() const;
+    void setNextParentAddress(const QByteArray &d, const quint32 virt_addr = 0);
     QByteArray getNextParentAddress() const;
-    void setStartChildAddress(const QByteArray &d);
+    quint32 getNextVirtualAddress() const;
+    void setStartChildAddress(const QByteArray &d, const quint32 virt_addr = 0);
+    quint32 getFirstChildVirtualAddress() const;
     QByteArray getStartChildAddress() const;
+    void setService(const QString &service);
     QString getService() const;
 
     QByteArray getStartDataCtr() const;
@@ -100,6 +106,10 @@ private:
     QByteArray data;
     QByteArray address;
     bool pointedToCheck = false;
+    quint32 firstChildVirtualAddress = 0;
+    quint32 nextVirtualAddress = 0;
+    quint32 prevVirtualAddress = 0;
+    quint32 virtualAddress = 0;
 
     QList<MPNode *> childNodes;
     QList<MPNode *> childDataNodes;
