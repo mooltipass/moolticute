@@ -17,6 +17,7 @@
  **
  ******************************************************************************/
 #include "MPNode.h"
+#include "MooltipassCmds.h"
 
 QByteArray MPNode::EmptyAddress = QByteArray(2, 0);
 
@@ -153,7 +154,9 @@ void MPNode::setService(const QString &service)
 {
     if (isValid())
     {
-        data.replace(8, service.toUtf8());
+        QByteArray serviceArray = service.toUtf8();
+        serviceArray.truncate(MP_MAX_SERVICE_LENGTH - 1);
+        data.replace(8, serviceArray.size(), serviceArray);
     }
 }
 

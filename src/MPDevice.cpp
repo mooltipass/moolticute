@@ -3050,15 +3050,18 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     generateSavePackets(jobs);
     if (diagSavePacketsGenerated) {qCritical() << "Breaking parent linked list: test failed!";return false;} else qInfo() << "Breaking parent linked list: passed!";
 
+    /* TODO : set some addresses to virtual */
+
+
     qInfo() << "Parent node corruption tests passed...";
     qInfo() << "Starting child node corruption tests";
 
-    diagSavePacketsGenerated = false;
+    /*diagSavePacketsGenerated = false;
     qInfo() << "testCodeAgainstCleanDBChanges: Creating orphan nodes";
     loginNodes[0]->setStartChildAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true);
     generateSavePackets(jobs);
-    if (diagSavePacketsGenerated) {qCritical() << "Creating orphan nodes: test failed!";return false;} else qInfo() << "Creating orphan nodes: passed!";
+    if (diagSavePacketsGenerated) {qCritical() << "Creating orphan nodes: test failed!";return false;} else qInfo() << "Creating orphan nodes: passed!";*/
 
     return true;
 }
