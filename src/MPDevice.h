@@ -196,6 +196,9 @@ private:
     bool checkLoadedNodes(bool repairAllowed);
     bool tagPointedNodes(bool repairAllowed);
 
+    // Functions added by mathieu for unit testing
+    bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
+
     // Generate save packets
     bool generateSavePackets(AsyncJobs *jobs);
 
@@ -211,6 +214,9 @@ private:
     //local vars for performance diagnostics
     qint64 diagLastSecs;
     quint32 diagNbBytesRec;
+
+    //local vars for tests
+    bool diagSavePacketsGenerated;
 
     //command queue
     QQueue<MPCommand> commandQueue;
