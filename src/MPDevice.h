@@ -232,6 +232,7 @@ private:
     QByteArray startNode;
     quint32 virtualStartNode;
     QByteArray startDataNode;
+    quint32 virtualDataStartNode;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
     QList<MPNode *> loginNodes;         //list of all parent nodes for credentials

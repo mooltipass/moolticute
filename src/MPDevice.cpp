@@ -1383,6 +1383,7 @@ void MPDevice::detagPointedNodes(void)
 /* Follow the chain to tag pointed nodes (useful when doing integrity check when we are getting everything we can) */
 bool MPDevice::tagPointedNodes(bool repairAllowed)
 {
+    quint32 tempVirtualParentAddress;
     QByteArray tempParentAddress;
     QByteArray tempChildAddress;
     MPNode* tempNextParentNodePt;
@@ -1396,12 +1397,13 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
 
     /* start with start node (duh) */
     tempParentAddress = startNode;
+    tempVirtualParentAddress = virtualStartNode;
 
     /* Loop through the parent nodes */
     while (tempParentAddress != MPNode::EmptyAddress)
     {
         /* Get pointer to next parent node */
-        tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress);
+        tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress, tempVirtualParentAddress);
 
         /* Check that we could actually find it */
         if (!tempNextParentNodePt)
@@ -1581,6 +1583,7 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
 
             /* get next parent address */
             tempParentAddress = tempParentNodePt->getNextParentAddress();
+            tempVirtualParentAddress = tempParentNodePt->getNextParentVirtualAddress();
         }
     }
 
@@ -1588,12 +1591,13 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
 
     /* start with start node (duh) */
     tempParentAddress = startDataNode;
+    tempVirtualParentAddress = virtualStartNode;;
 
     /* Loop through the parent nodes */
     while (tempParentAddress != MPNode::EmptyAddress)
     {
         /* Get pointer to next parent node */
-        tempNextParentNodePt = findNodeWithAddressInList(dataNodes, tempParentAddress);
+        tempNextParentNodePt = findNodeWithAddressInList(dataNodes, tempParentAddress, tempVirtualParentAddress);
 
         /* Check that we could actually find it */
         if (!tempNextParentNodePt)
@@ -1745,6 +1749,7 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
 
             /* get next parent address */
             tempParentAddress = tempParentNodePt->getNextParentAddress();
+            tempVirtualParentAddress = tempParentNodePt->getNextParentVirtualAddress();
         }
     }
 
@@ -1783,7 +1788,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt)
 
                     /* Get the previous node address & pointer */
                     prevNodeAddr = i->getPreviousParentAddress();
-                    prevNodeAddrVirtual = i->getPrevVirtualAddress();
+                    prevNodeAddrVirtual = i->getPrevParentVirtualAddress();
                     if (prevNodeAddr == MPNode::EmptyAddress)
                     {
                         /* We have a new start node! */
@@ -1853,7 +1858,7 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     MPNode* tempNodePt;
     MPNode* newNodePt;
 
-    qDebug() << "Create new service" << service << "in DB";
+    qDebug() << "Creating new service" << service << "in DB";
 
     /* Does the service actually exist? */
     tempNodePt = findNodeWithServiceInList(service);
@@ -1889,6 +1894,8 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
         qInfo() << "No" << recovered_service_name << "service in DB, adding it...";
 
     }
+
+    // TODO
 
     return true;
 }
