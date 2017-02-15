@@ -42,6 +42,7 @@ public:
     bool isValid() const;
 
     /* accessors for node properties */
+    void setAddress(const QByteArray &d, const quint32 virt_addr = 0);
     quint32 getVirtualAddress(void) const;
     void setVirtualAddress(quint32 addr);
     QByteArray getAddress() const;
@@ -69,9 +70,11 @@ public:
     void appendChildData(MPNode *node) { node->setParent(this); childDataNodes.append(node); }
 
     // NodeChild properties
-    void setNextChildAddress(const QByteArray &d);
+    void setNextChildAddress(const QByteArray &d, const quint32 virt_addr = 0);
+    quint32 getNextChildVirtualAddress(void) const;
     QByteArray getNextChildAddress() const;
-    void setPreviousChildAddress(const QByteArray &d);
+    void setPreviousChildAddress(const QByteArray &d, const quint32 virt_addr = 0);
+    quint32 getPreviousChildVirtualAddress(void) const;
     QByteArray getPreviousChildAddress() const;
     QByteArray getCTR() const;
     QString getDescription() const;
@@ -82,7 +85,7 @@ public:
 
     //Data node address
     //Address in data node is not at the same position as cred nodes
-    void setNextChildDataAddress(const QByteArray &d);
+    void setNextChildDataAddress(const QByteArray &d, const quint32 virt_addr = 0);
     QByteArray getNextChildDataAddress() const;
 
     // NodeChildData properties
@@ -106,8 +109,11 @@ private:
     QByteArray data;
     QByteArray address;
     bool pointedToCheck = false;
+    bool firstChildVirtualAddressSet = false;
     quint32 firstChildVirtualAddress = 0;
+    bool nextVirtualAddressSet = false;
     quint32 nextVirtualAddress = 0;
+    bool prevVirtualAddressSet = false;
     quint32 prevVirtualAddress = 0;
     quint32 virtualAddress = 0;
 

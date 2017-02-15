@@ -65,6 +65,12 @@ QByteArray MPNode::getAddress() const
     return address;
 }
 
+void MPNode::setAddress(const QByteArray &d, const quint32 virt_addr)
+{
+    address = d;
+    virtualAddress = virt_addr;
+}
+
 void MPNode::setVirtualAddress(quint32 addr)
 {
     virtualAddress = addr;
@@ -93,6 +99,7 @@ bool MPNode::getPointedToCheck() const
 QByteArray MPNode::getPreviousParentAddress() const
 {
     if (!isValid()) return QByteArray();
+    if (prevVirtualAddressSet) return QByteArray();
     return data.mid(2, 2);
 }
 
@@ -103,14 +110,23 @@ quint32 MPNode::getPrevParentVirtualAddress() const
 
 void MPNode::setPreviousParentAddress(const QByteArray &d, const quint32 virt_addr)
 {
-    prevVirtualAddress = virt_addr;
-    data[2] = d[0];
-    data[3] = d[1];
+    if (d.isNull())
+    {
+        prevVirtualAddress = virt_addr;
+        prevVirtualAddressSet = true;
+    }
+    else
+    {
+        prevVirtualAddressSet = false;
+        data[2] = d[0];
+        data[3] = d[1];
+    }
 }
 
 QByteArray MPNode::getNextParentAddress() const
 {
     if (!isValid()) return QByteArray();
+    if (nextVirtualAddressSet) return QByteArray();
     return data.mid(4, 2);
 }
 
@@ -121,14 +137,23 @@ quint32 MPNode::getNextParentVirtualAddress() const
 
 void MPNode::setNextParentAddress(const QByteArray &d, const quint32 virt_addr)
 {
-    nextVirtualAddress = virt_addr;
-    data[4] = d[0];
-    data[5] = d[1];
+    if (d.isNull())
+    {
+        nextVirtualAddress = virt_addr;
+        nextVirtualAddressSet = true;
+    }
+    else
+    {
+        nextVirtualAddressSet = false;
+        data[4] = d[0];
+        data[5] = d[1];
+    }
 }
 
 QByteArray MPNode::getStartChildAddress() const
 {
     if (!isValid()) return QByteArray();
+    if (firstChildVirtualAddressSet) return QByteArray();
     return data.mid(6, 2);
 }
 
@@ -139,9 +164,17 @@ quint32 MPNode::getFirstChildVirtualAddress() const
 
 void MPNode::setStartChildAddress(const QByteArray &d, const quint32 virt_addr)
 {
-    firstChildVirtualAddress = virt_addr;
-    data[6] = d[0];
-    data[7] = d[1];
+    if (d.isNull())
+    {
+        firstChildVirtualAddress = virt_addr;
+        firstChildVirtualAddressSet = true;
+    }
+    else
+    {
+        firstChildVirtualAddressSet = false;
+        data[6] = d[0];
+        data[7] = d[1];
+    }
 }
 
 QString MPNode::getService() const
@@ -169,39 +202,77 @@ QByteArray MPNode::getStartDataCtr() const
 QByteArray MPNode::getNextChildAddress() const
 {
     if (!isValid()) return QByteArray();
+    if (nextVirtualAddressSet) return QByteArray();
     return data.mid(4, 2);
 }
 
-void MPNode::setNextChildAddress(const QByteArray &d)
+quint32 MPNode::getNextChildVirtualAddress(void) const
 {
-    data[4] = d[0];
-    data[5] = d[1];
+    return nextVirtualAddress;
+}
+
+void MPNode::setNextChildAddress(const QByteArray &d, const quint32 virt_addr)
+{
+    if (d.isNull())
+    {
+        nextVirtualAddress = virt_addr;
+        nextVirtualAddressSet = true;
+    }
+    else
+    {
+        nextVirtualAddressSet = false;
+        data[4] = d[0];
+        data[5] = d[1];
+    }
+}
+
+quint32  MPNode::getPreviousChildVirtualAddress(void) const
+{
+    return prevVirtualAddress;
 }
 
 QByteArray MPNode::getPreviousChildAddress() const
 {
     if (!isValid()) return QByteArray();
+    if (prevVirtualAddressSet) return QByteArray();
     return data.mid(2, 2);
 }
 
-void MPNode::setPreviousChildAddress(const QByteArray &d)
+void MPNode::setPreviousChildAddress(const QByteArray &d, const quint32 virt_addr)
 {
-    data[2] = d[0];
-    data[3] = d[1];
+    if (d.isNull())
+    {
+        prevVirtualAddress = virt_addr;
+        prevVirtualAddressSet = true;
+    }
+    else
+    {
+        prevVirtualAddressSet = false;
+        data[2] = d[0];
+        data[3] = d[1];
+    }
 }
 
 QByteArray MPNode::getNextChildDataAddress() const
 {
-    //in data nodes, there is no linked list
-    //the only address is the next one
-    //It is the same as previous for cred nodes
-    return getPreviousChildAddress();
+    if (!isValid()) return QByteArray();
+    if (nextVirtualAddressSet) return QByteArray();
+    return data.mid(2, 2);
 }
 
-void MPNode::setNextChildDataAddress(const QByteArray &d)
+void MPNode::setNextChildDataAddress(const QByteArray &d, const quint32 virt_addr)
 {
-    data[2] = d[0];
-    data[3] = d[1];
+    if (d.isNull())
+    {
+        nextVirtualAddress = virt_addr;
+        nextVirtualAddressSet = true;
+    }
+    else
+    {
+        nextVirtualAddressSet = false;
+        data[2] = d[0];
+        data[3] = d[1];
+    }
 }
 
 QByteArray MPNode::getCTR() const

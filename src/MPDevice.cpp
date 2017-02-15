@@ -2999,6 +2999,35 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
     runAndDequeueJobs();
 }
 
+void MPDevice::changeVirtualAddressesToFreeAddresses(void)
+{
+    for (auto &i: loginNodes)
+    {
+        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
+        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousChildAddress(freeAddresses[i->getPrevParentVirtualAddress()]);
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getFirstChildVirtualAddress()]);
+    }
+    for (auto &i: loginChildNodes)
+    {
+        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
+        if (i->getNextChildAddress().isNull()) i->setNextChildAddress(freeAddresses[i->getNextChildVirtualAddress()]);
+        if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(freeAddresses[i->getPreviousChildVirtualAddress()]);
+    }
+    for (auto &i: dataNodes)
+    {
+        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
+        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousChildAddress(freeAddresses[i->getPrevParentVirtualAddress()]);
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getFirstChildVirtualAddress()]);
+    }
+    for (auto &i: dataChildNodes)
+    {
+        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
+        if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(freeAddresses[i->getNextChildVirtualAddress()]);
+    }
+}
+
 bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 {
     QByteArray invalidAddress = QByteArray::fromHex("0200");    // Invalid because in the graphics zone
@@ -3050,7 +3079,17 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     generateSavePackets(jobs);
     if (diagSavePacketsGenerated) {qCritical() << "Breaking parent linked list: test failed!";return false;} else qInfo() << "Breaking parent linked list: passed!";
 
-    /* TODO : set some addresses to virtual */
+    diagSavePacketsGenerated = false;
+    qInfo() << "testCodeAgainstCleanDBChanges: Changing valid address for virtual address";
+    freeAddresses.append(QByteArray());
+    freeAddresses.append(loginNodes[1]->getAddress());
+    loginNodes[1]->setAddress(QByteArray(), 1);
+    loginNodes[0]->setNextParentAddress(QByteArray(), 1);
+    loginNodes[2]->setPreviousParentAddress(QByteArray(), 1);
+    changeVirtualAddressesToFreeAddresses();
+    checkLoadedNodes(true);
+    generateSavePackets(jobs);
+    if (diagSavePacketsGenerated) {qCritical() << "Changing valid address for virtual address: test failed!";return false;} else qInfo() << "Changing valid address for virtual address: passed!";
 
 
     qInfo() << "Parent node corruption tests passed...";

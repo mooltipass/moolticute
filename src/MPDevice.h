@@ -205,6 +205,9 @@ private:
     // Generate save packets
     bool generateSavePackets(AsyncJobs *jobs);
 
+    // once we fetched free addresses, this function is called
+    void changeVirtualAddressesToFreeAddresses(void);
+
     // Last page scanned
     quint16 lastFlashPageScanned = 0;
 
@@ -226,6 +229,9 @@ private:
 
     // Number of new addresses we need
     quint32 newAddressesNeededCounter = 0;
+
+    // Buffer containing the free addresses we will need
+    QList<QByteArray> freeAddresses;
 
     // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
