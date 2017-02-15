@@ -193,8 +193,8 @@ private:
     void detagPointedNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
+    bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent);
     MPNode* addNewServiceToDB(const QString &service);
-    bool addOrphanParentToDB(MPNode *parentNodePt);
     bool addOrphanChildToDB(MPNode* childNodePt);
     bool checkLoadedNodes(bool repairAllowed);
     bool tagPointedNodes(bool repairAllowed);
