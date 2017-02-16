@@ -1393,10 +1393,10 @@ bool MPDevice::tagPointedNodes(bool repairAllowed)
     quint32 tempVirtualParentAddress;
     QByteArray tempParentAddress;
     QByteArray tempChildAddress;
-    MPNode* tempNextParentNodePt;
-    MPNode* tempParentNodePt;
-    MPNode* tempNextChildNodePt;
-    MPNode* tempChildNodePt;
+    MPNode* tempNextParentNodePt = nullptr;
+    MPNode* tempParentNodePt = nullptr;
+    MPNode* tempNextChildNodePt = nullptr;
+    MPNode* tempChildNodePt = nullptr;
     bool return_bool = true;
 
     /* first, detag all nodes */
@@ -1768,17 +1768,17 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
 {
     MPNode *prevNodePt = nullptr;
     quint32 prevNodeAddrVirtual;
+    QList<MPNode *> parentList;
     QByteArray prevNodeAddr;
-    QList<MPNode *> list;
 
     /* Which list do we want to browse ? */
     if (isDataParent)
     {
-        list = dataNodes;
+        parentList = dataNodes;
     }
     else
     {
-        list = loginNodes;
+        parentList = loginNodes;
     }
 
     qInfo() << "Adding parent node" << parentNodePt->getService();
@@ -1791,7 +1791,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
     else
     {
         /* It is important to note that this function is called with a valid linked chain (due to tagcheck) */
-        for (auto &i: list)
+        for (auto &i: parentList)
         {
             if (i->getPointedToCheck())
             {
@@ -1826,7 +1826,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
                     else
                     {
                         /* Something before our node */
-                        prevNodePt = findNodeWithAddressInList(list, prevNodeAddr, prevNodeAddrVirtual);
+                        prevNodePt = findNodeWithAddressInList(parentList, prevNodeAddr, prevNodeAddrVirtual);
 
                         /* Update its and our pointer */
                         if (!prevNodePt)
