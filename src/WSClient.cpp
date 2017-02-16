@@ -179,7 +179,7 @@ void WSClient::udateParameters(const QJsonObject &data)
     else if (param == "lock_timeout_enabled")
         set_lockTimeoutEnabled(data["value"].toBool());
     else if (param == "lock_timeout")
-        set_lockTimeout(data["value"].toInt() / 60);
+        set_lockTimeout(data["value"].toInt());
     else if (param == "screensaver")
         set_screensaver(data["value"].toBool());
     else if (param == "user_request_cancel")
@@ -206,7 +206,7 @@ void WSClient::udateParameters(const QJsonObject &data)
         set_keyAfterPassSendEnable(data["value"].toBool());
     else if (param == "key_after_pass")
         set_keyAfterPassSend(data["value"].toInt());
-    else if (param == "delay_after_key_enable")
+    else if (param == "delay_after_key_enabled")
         set_delayAfterKeyEntryEnable(data["value"].toBool());
     else if (param == "delay_after_key")
         set_delayAfterKeyEntry(data["value"].toInt());

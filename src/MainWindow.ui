@@ -176,7 +176,7 @@ QWidget {background-color: #EFEFEF;}</string>
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="pageNoConnect">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -330,7 +330,7 @@ QWidget {background-color: #EFEFEF;}</string>
              <x>0</x>
              <y>0</y>
              <width>633</width>
-             <height>458</height>
+             <height>478</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -582,6 +582,12 @@ QWidget {background-color: #EFEFEF;}</string>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="minimum">
+                    <number>1</number>
+                   </property>
+                   <property name="maximum">
+                    <number>120</number>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -714,10 +720,24 @@ QWidget {background-color: #EFEFEF;}</string>
               </layout>
              </widget>
             </item>
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
            <zorder>groupBox_3</zorder>
            <zorder>groupBox</zorder>
            <zorder>groupBox_2</zorder>
+           <zorder>verticalSpacer_3</zorder>
           </widget>
          </widget>
         </item>

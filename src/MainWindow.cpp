@@ -505,12 +505,12 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
     switch (wsClient->get_screenBrightness())
     {
     default:
-    case 20: ui->comboBoxScreenBrightness->setCurrentIndex(0); break;
-    case 35: ui->comboBoxScreenBrightness->setCurrentIndex(1); break;
-    case 50: ui->comboBoxScreenBrightness->setCurrentIndex(2); break;
-    case 65: ui->comboBoxScreenBrightness->setCurrentIndex(3); break;
-    case 80: ui->comboBoxScreenBrightness->setCurrentIndex(4); break;
-    case 100: ui->comboBoxScreenBrightness->setCurrentIndex(5); break;
+    case 51: ui->comboBoxScreenBrightness->setCurrentIndex(0); break;
+    case 89: ui->comboBoxScreenBrightness->setCurrentIndex(1); break;
+    case 128: ui->comboBoxScreenBrightness->setCurrentIndex(2); break;
+    case 166: ui->comboBoxScreenBrightness->setCurrentIndex(3); break;
+    case 204: ui->comboBoxScreenBrightness->setCurrentIndex(4); break;
+    case 255: ui->comboBoxScreenBrightness->setCurrentIndex(5); break;
     }
 
     ui->comboBoxKnock->setCurrentIndex(wsClient->get_knockSensitivity());
@@ -528,7 +528,7 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
     if (ui->checkBoxLock->isChecked() != wsClient->get_lockTimeoutEnabled())
         o["lock_timeout_enabled"] = ui->checkBoxLock->isChecked();
     if (ui->spinBoxLock->value() != wsClient->get_lockTimeout())
-        o["lock_timeout"] = ui->spinBoxLock->value() * 60;
+        o["lock_timeout"] = ui->spinBoxLock->value();
     if (ui->checkBoxScreensaver->isChecked() != wsClient->get_screensaver())
         o["screensaver"] = ui->checkBoxScreensaver->isChecked();
     if (ui->checkBoxInput->isChecked() != wsClient->get_userRequestCancel())
