@@ -170,10 +170,15 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
     {
         ui->widgetParamMini->setVisible(wsClient->get_mpHwVersion() == Common::MP_Mini);
+        ui->labelAbouHwSerial->setVisible(wsClient->get_mpHwVersion() == Common::MP_Mini);
     });
     connect(wsClient, &WSClient::fwVersionChanged, [=]()
     {
         ui->labelAboutFwVers->setText(QStringLiteral("Device Firmware version: %1").arg(wsClient->get_fwVersion()));
+    });
+    connect(wsClient, &WSClient::hwSerialChanged, [=]()
+    {
+        ui->labelAbouHwSerial->setText(tr("Device Serial: %1").arg(wsClient->get_hwSerial()));
     });
     connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
     {

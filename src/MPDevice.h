@@ -66,6 +66,10 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(bool, knockEnabled, false)
     QT_WRITABLE_PROPERTY(int, knockSensitivity, 0) // 0-low, 1-medium, 2-high
 
+    QT_WRITABLE_PROPERTY(quint32, serialNumber, 0) // serial number if firmware is above 1.2
+    QT_WRITABLE_PROPERTY(quint8, credentialsDbChangeNumber, 0) // credentials db change number
+    QT_WRITABLE_PROPERTY(quint8, dataDbChangeNumber, 0) // data db change number
+
 public:
     MPDevice(QObject *parent);
     virtual ~MPDevice();
@@ -237,9 +241,6 @@ private:
 
     bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2
-    quint32 serialNumber;               // serial number if firmware is above 1.2
-    quint8 credentialsDbChangeNumber;   // credentials db change number
-    quint8 dataDbChangeNumber;          // data db change number
 
     //this queue is used to put jobs list in a wait
     //queue. it prevents other clients to query something

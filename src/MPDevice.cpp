@@ -427,8 +427,11 @@ void MPDevice::loadParameters()
                     qWarning() << "Get serial: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
                     return false;
                 }
-                serialNumber = ((quint8)data[MP_PAYLOAD_FIELD_INDEX+3]) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]) << 8) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]) << 16) + ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+0]) << 24);
-                qDebug() << "Mooltipass Mini serial number:" << serialNumber;
+                set_serialNumber(((quint8)data[MP_PAYLOAD_FIELD_INDEX+3]) +
+                        ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]) << 8) +
+                        ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]) << 16) +
+                        ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+0]) << 24));
+                qDebug() << "Mooltipass Mini serial number:" << get_serialNumber();
                 return true;
             }));
 
@@ -2095,10 +2098,10 @@ void MPDevice::getChangeNumbers()
         }
         else
         {
-            credentialsDbChangeNumber = (quint8)data[MP_PAYLOAD_FIELD_INDEX+1];
-            dataDbChangeNumber = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
-            qDebug() << "Credentials change number:" << credentialsDbChangeNumber;
-            qDebug() << "Data change number:" << dataDbChangeNumber;
+            set_credentialsDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]);
+            set_dataDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]);
+            qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
+            qDebug() << "Data change number:" << get_dataDbChangeNumber();
         }
         return true;
     }));
