@@ -10,7 +10,7 @@ mac {
     LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation
 }
 win32 {
-    LIBS += -lUser32
+    LIBS += -luser32
 }
 
 include(src/QtAwesome/QtAwesome/QtAwesome.pri)
