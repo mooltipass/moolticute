@@ -17,7 +17,11 @@
  **
  ******************************************************************************/
 #include "UsbMonitor_linux.h"
-#include <QtConcurrent/QtConcurrent>
+#include <QSocketNotifier>
+
+static inline QString fmtId(int id) {
+    return QString("0x%1").arg(id, 1, 16);
+}
 
 int libusb_device_add_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data)
 {
@@ -25,15 +29,15 @@ int libusb_device_add_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug
     Q_UNUSED(ctx);
     UsbMonitor_linux *um = reinterpret_cast<UsbMonitor_linux *>(user_data);
     struct libusb_device_descriptor desc;
-    int rc;
 
-    rc = libusb_get_device_descriptor(dev, &desc);
+    int rc = libusb_get_device_descriptor(dev, &desc);
+
     if (rc != LIBUSB_SUCCESS)
         qWarning() << "Error getting device descriptor";
     else
     {
         emit um->usbDeviceAdded();
-        qDebug() << "Device added: " << desc.idVendor << "-" << desc.idProduct;
+        qDebug().noquote() << "Device added: " << fmtId(desc.idVendor) << "-" << fmtId(desc.idProduct);
     }
 
     return 0;
@@ -48,15 +52,25 @@ int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug
     int rc;
 
     rc = libusb_get_device_descriptor(dev, &desc);
+    qDebug() << rc;
     if (rc != LIBUSB_SUCCESS)
         qWarning() << "Error getting device descriptor";
     else
     {
-        qDebug() << "Device removed: " << desc.idVendor << "-" << desc.idProduct;
+        qDebug().noquote() << "Device removed: " << fmtId(desc.idVendor) << "-" << fmtId(desc.idProduct);
         emit um->usbDeviceRemoved();
     }
-
     return 0;
+}
+
+void libusb_fd_add_cb(int fd, short, void *user_data) {
+    UsbMonitor_linux * um = reinterpret_cast<UsbMonitor_linux *>(user_data);
+    um->startMonitoringFd(fd);
+}
+
+void libusb_fd_del_cb(int fd, void *user_data) {
+     UsbMonitor_linux * um = reinterpret_cast<UsbMonitor_linux *>(user_data);
+     um->stopMonitoringFd(fd);
 }
 
 UsbMonitor_linux::UsbMonitor_linux()
@@ -100,20 +114,18 @@ void UsbMonitor_linux::start()
     if (err != LIBUSB_SUCCESS)
         qWarning() << "Failed to register LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT callback";
 
-    //Using poll fd does not work on windows,
-    //so running in a thread is the only viable solution
-    //This also means all callbacks from libusb will be called from the thread.
-    //Need to be carefull with that.
-    QtConcurrent::run([=]()
-    {
-        bool r;
-        do
-        {
-            libusb_handle_events(nullptr);
-            QMutexLocker l(&mutex);
-            r = run;
-        } while (r);
-    });
+
+    libusb_set_pollfd_notifiers(usb_ctx, libusb_fd_add_cb, libusb_fd_del_cb, this);
+
+    auto fds = libusb_get_pollfds(usb_ctx);
+    while(fds && *fds) {
+        startMonitoringFd((*fds++)->fd);
+    }
+}
+
+void UsbMonitor_linux::handleEvents() {
+    timeval tv = {};
+    libusb_handle_events_timeout(usb_ctx, &tv);
 }
 
 void UsbMonitor_linux::stop()
@@ -123,8 +135,27 @@ void UsbMonitor_linux::stop()
         QMutexLocker l(&mutex);
         run = false;
     }
+    qDeleteAll(monitoredFds);
+    monitoredFds.clear();
     libusb_hotplug_deregister_callback(usb_ctx, cbaddhandle);
     libusb_hotplug_deregister_callback(usb_ctx, cbdelhandle);
+}
+
+void UsbMonitor_linux::startMonitoringFd(int fd) {
+    const auto begin = std::begin(monitoredFds);
+    const auto end = std::end(monitoredFds);
+
+    if (end == std::find_if(begin, end, [fd](QSocketNotifier* sn) { return sn->socket() == fd; })) {
+        QSocketNotifier* sn = new QSocketNotifier(fd, QSocketNotifier::Read);
+        connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents);
+        this->monitoredFds << sn;
+    }
+}
+
+void UsbMonitor_linux::stopMonitoringFd(int fd) {
+    const auto begin = std::begin(monitoredFds);
+    const auto end = std::end(monitoredFds);
+    monitoredFds.erase(std::remove_if(begin, end, [fd](QSocketNotifier* sn) { return sn->socket() == fd; }), end);
 }
 
 UsbMonitor_linux::~UsbMonitor_linux()
