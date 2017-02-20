@@ -21,8 +21,7 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
-#include <windows.h>
-#include <ntdef.h>
+#include <qt_windows.h>
 #include <winbase.h>
 #include <setupapi.h>
 #include <winioctl.h>

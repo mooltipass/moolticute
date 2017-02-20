@@ -9,6 +9,9 @@ CONFIG += c++11
 mac {
     LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation
 }
+win32 {
+    LIBS += -lUser32
+}
 
 include(src/QtAwesome/QtAwesome/QtAwesome.pri)
 
