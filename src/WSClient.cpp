@@ -212,3 +212,8 @@ void WSClient::udateParameters(const QJsonObject &data)
     else if (param == "delay_after_key")
         set_delayAfterKeyEntry(data["value"].toInt());
 }
+
+
+bool WSClient::isMPMini() const {
+    return  get_mpHwVersion() == Common::MP_Mini;
+}

@@ -46,7 +46,7 @@ public:
 
     QJsonObject &getMemoryData() { return memData; }
 
-    bool isMPMini();
+    bool isMPMini() const;
 
 signals:
     void wsConnected();

@@ -29,9 +29,9 @@ public:
 
 private slots:
     void connectedChanged();
+    void updateSystrayTooltip();
     void searchDaemonTick();
     void slotConnectionEstablished();
-
     void daemonLogRead();
 
 private:
