@@ -66,9 +66,12 @@ bool AppGui::initialize()
         // On Linux/Windows, hide/show the app when the tray icon is clicked
         // On OSX this just shows the menu
 #ifndef Q_OS_MACX
-        if (reason == QSystemTrayIcon::DoubleClick ||
-            reason == QSystemTrayIcon::Trigger)
-        {
+        if (reason ==  QSystemTrayIcon::DoubleClick
+#ifndef Q_OS_WIN
+         //On linux, some Desktop environnements such as KDE won't let the user emit a double click
+         || reason == QSystemTrayIcon::Trigger
+#endif
+       ) {
             if (win->isHidden())
                 mainWindowShow();
             else
