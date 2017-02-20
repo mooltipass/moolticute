@@ -202,10 +202,10 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
         {
             char buf[512];
             int len = libusb_get_string_descriptor_ascii(fd, idx, (unsigned char *)buf, sizeof(buf));
-            if (len < 0)
+            if (len <= 0)
                 return QString();
             else
-                return QString(buf);
+                return QString::fromLocal8Bit(buf, len);
         };
 
         qDebug() << "Found device vid(" <<
