@@ -351,6 +351,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
     connect(mpdevice, SIGNAL(flashMbSizeChanged(int)), this, SLOT(sendVersion()));
     connect(mpdevice, SIGNAL(hwVersionChanged(QString)), this, SLOT(sendVersion()));
+    connect(mpdevice, SIGNAL(serialNumberChanged(quint32)), this, SLOT(sendVersion()));
     connect(mpdevice, SIGNAL(screenBrightnessChanged(int)), this, SLOT(sendScreenBrightness()));
     connect(mpdevice, SIGNAL(knockEnabledChanged(bool)), this, SLOT(sendKnockEnabled()));
     connect(mpdevice, SIGNAL(knockSensitivityChanged(int)), this, SLOT(sendKnockSensitivity()));
@@ -603,6 +604,10 @@ void WSServerCon::sendVersion()
         return;
     QJsonObject data = {{ "hw_version", mpdevice->get_hwVersion() },
                         { "flash_size", mpdevice->get_flashMbSize() }};
+    if (mpdevice->isMini())
+    {
+        data["hw_serial"] = (qint64)mpdevice->get_serialNumber();
+    }
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
 }
 
