@@ -441,7 +441,7 @@ void MainWindow::updateSerialInfos() {
     const bool connected = wsClient->get_connected();
 
     ui->labelAboutFwVers->setVisible(connected);
-    ui->labelAbouHwSerial->setVisible(connected);
+    ui->labelAbouHwSerial->setVisible(connected && wsClient->get_hwSerial() > 0);
 }
 
 void MainWindow::checkSettingsChanged()
