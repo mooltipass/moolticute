@@ -99,8 +99,8 @@ private:
 
     enum
     {
-        PAGE_NO_CONNECTION = 0,
-        PAGE_NO_DAEMON = 1,
+        PAGE_NO_DAEMON = 0,
+        PAGE_NO_CONNECTION,
         PAGE_SETTINGS,
         PAGE_CREDENTIALS_ENABLE,
         PAGE_SYNC,
