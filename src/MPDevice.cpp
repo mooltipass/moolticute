@@ -61,6 +61,12 @@ MPDevice::MPDevice(QObject *parent):
     });
 
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
+
+    QTimer::singleShot(100, [=]()
+    {
+        loadParameters();
+    });
+
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
 }
 
