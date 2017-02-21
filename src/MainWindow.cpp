@@ -385,14 +385,14 @@ void MainWindow::updatePage()
         return;
     }
 
-    if (ui->pushButtonDevSettings->isChecked()) {
-        ui->stackedWidget->setCurrentIndex(PAGE_SETTINGS);
-        return;
-    }
-
     if (!wsClient->get_connected())
     {
         ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
+        return;
+    }
+
+    if (ui->pushButtonDevSettings->isChecked()) {
+        ui->stackedWidget->setCurrentIndex(PAGE_SETTINGS);
         return;
     }
 
