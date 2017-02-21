@@ -67,7 +67,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAppSettings->setIcon(awesome->icon(fa::cogs));
     ui->pushButtonAbout->setIcon(awesome->icon(fa::info));
 
-    ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaled(500, ui->widgetHeader->sizeHint().height() - 8, Qt::KeepAspectRatio));
+    ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
 
     connect(wsClient, &WSClient::connectedChanged, [=]()
     {
