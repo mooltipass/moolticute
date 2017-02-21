@@ -69,11 +69,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
 
-    connect(wsClient, &WSClient::connectedChanged, [=]()
-    {
-        updatePage();
-        ui->labelAboutFwVers->setVisible(wsClient->get_connected());
-    });
+    connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
 
     connect(wsClient, &WSClient::statusChanged, [this]() {
@@ -176,14 +172,12 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         ui->widgetParamMini->setVisible(wsClient->get_mpHwVersion() == Common::MP_Mini);
         ui->labelAbouHwSerial->setVisible(wsClient->get_mpHwVersion() == Common::MP_Mini);
     });
-    connect(wsClient, &WSClient::fwVersionChanged, [=]()
-    {
-        ui->labelAboutFwVers->setText(QStringLiteral("Device Firmware version: %1").arg(wsClient->get_fwVersion()));
-    });
-    connect(wsClient, &WSClient::hwSerialChanged, [=]()
-    {
-        ui->labelAbouHwSerial->setText(tr("Device Serial: %1").arg(wsClient->get_hwSerial()));
-    });
+
+    connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updateSerialInfos);
+    connect(wsClient, &WSClient::fwVersionChanged, this, &MainWindow::updateSerialInfos);
+    connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
+
+
     connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
     {
         for (int i = 0;i < ui->comboBoxLang->count();i++)
@@ -437,6 +431,16 @@ void MainWindow::enableKnockSettings(bool enable)
                                                QPalette::Active : QPalette::Disabled, QPalette::ButtonText).name();
 
     ui->knockSettingsSuffixLabel->setStyleSheet(QStringLiteral("color: %1") .arg(color));
+}
+
+void MainWindow::updateSerialInfos() {
+    ui->labelAbouHwSerial->setText(tr("Device Serial: %1").arg(wsClient->get_hwSerial()));
+    ui->labelAboutFwVers->setText(QStringLiteral("Device Firmware version: %1").arg(wsClient->get_fwVersion()));
+
+    const bool connected = wsClient->get_connected();
+
+    ui->labelAboutFwVers->setVisible(connected);
+    ui->labelAbouHwSerial->setVisible(connected);
 }
 
 void MainWindow::checkSettingsChanged()

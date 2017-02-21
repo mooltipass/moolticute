@@ -49,6 +49,7 @@ private slots:
     void checkSettingsChanged();
     void memMgmtMode();
     void enableKnockSettings(bool visible);
+    void updateSerialInfos();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
