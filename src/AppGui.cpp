@@ -21,6 +21,14 @@ bool AppGui::initialize()
     setAttribute(Qt::AA_UseHighDpiPixmaps);
 	setQuitOnLastWindowClosed(false);
 
+     QCommandLineParser parser;
+     QCommandLineOption autoLaunchedOption("autolaunched");
+     parser.addOption(autoLaunchedOption);
+     parser.process(*QCoreApplication::instance());
+
+     bool autoLaunched = parser.isSet(autoLaunchedOption);
+
+
     if (!createSingleApplication())
         return false;
 
@@ -92,8 +100,8 @@ bool AppGui::initialize()
     {
         mainWindowHide();
     });
-    //start hidden
-    mainWindowHide();
+
+    autoLaunched ?  mainWindowHide() : mainWindowShow();
 
     connect(wsClient, &WSClient::showAppRequested, [=]()
     {

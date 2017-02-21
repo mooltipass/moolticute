@@ -14,7 +14,7 @@ void AutoStartup::enableAutoStartup(bool en)
         //Install registry key
         QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                            QSettings::NativeFormat);
-        settings.setValue("Moolticute", QDir::toNativeSeparators(qApp->applicationFilePath()));
+        settings.setValue("Moolticute", QStringLiteral("\%1\" --autolaunched").arg(QDir::toNativeSeparators(qApp->applicationFilePath()));
         settings.sync();
     }
     else
@@ -30,7 +30,7 @@ void AutoStartup::enableAutoStartup(bool en)
                                           "Comment=Mooltipass companion\n"
                                           "Icon=moolticute\n"
                                           "Type=Application\n"
-                                          "Exec=%1\n"
+                                          "Exec=\"%1\" --autolaunched %U\n"
                                           "Hidden=false\n"
                                           "NoDisplay=false\n"
                                           "X-GNOME-Autostart-enabled=true\n")
