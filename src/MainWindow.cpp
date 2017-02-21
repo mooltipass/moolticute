@@ -74,7 +74,11 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         updatePage();
         ui->labelAboutFwVers->setVisible(wsClient->get_connected());
     });
-    connect(wsClient, &WSClient::statusChanged, [=]() { updatePage(); });
+    connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
+
+    connect(wsClient, &WSClient::statusChanged, [this]() {
+        this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
+    });
 
     ui->pushButtonMemMode->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
@@ -381,6 +385,11 @@ void MainWindow::updatePage()
         return;
     }
 
+    if (ui->pushButtonDevSettings->isChecked()) {
+        ui->stackedWidget->setCurrentIndex(PAGE_SETTINGS);
+        return;
+    }
+
     if (!wsClient->get_connected())
     {
         ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
@@ -400,8 +409,6 @@ void MainWindow::updatePage()
         return;
     }
 
-    if (ui->pushButtonDevSettings->isChecked())
-        ui->stackedWidget->setCurrentIndex(PAGE_SETTINGS);
     else if (ui->pushButtonCred->isChecked())
     {
         if (wsClient->get_memMgmtMode())
@@ -411,6 +418,21 @@ void MainWindow::updatePage()
     }
     else if (ui->pushButtonSync->isChecked())
         ui->stackedWidget->setCurrentIndex(PAGE_SYNC);
+}
+
+void MainWindow::enableKnockSettings(bool enable)
+{
+    ui->knockSettingsFrame->setEnabled(enable);
+
+    ui->knockSettingsFrame->setToolTip(enable ? "" : tr("Remove the card from the device to change this setting."));
+    ui->knockSettingsFrame->setToolTipDuration(enable ? -1 : std::numeric_limits<int>::max());
+
+    //Make sure the suffix label ("sensitivity") matches the color of the other widgets.
+    const QString color =
+            ui->checkBoxKnock->palette().color(enable ?
+                                               QPalette::Active : QPalette::Disabled, QPalette::ButtonText).name();
+
+    ui->knockSettingsSuffixLabel->setStyleSheet(QStringLiteral("color: %1") .arg(color));
 }
 
 void MainWindow::checkSettingsChanged()
@@ -548,10 +570,6 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
         o["tutorial_enabled"] = ui->checkBoxTuto->isChecked();
     if (ui->comboBoxScreenBrightness->currentData().toInt() != wsClient->get_screenBrightness())
         o["screen_brightness"] = ui->comboBoxScreenBrightness->currentData().toInt();
-    if (ui->checkBoxKnock->isChecked() != wsClient->get_knockEnabled())
-        o["knock_enabled"] = ui->checkBoxKnock->isChecked(); //TODO: cannot be done with a smartcard inserted
-    if (ui->comboBoxKnock->currentData().toInt() != wsClient->get_knockSensitivity())
-        o["knock_sensitivity"] = ui->comboBoxKnock->currentData().toInt();
     if (ui->checkBoxSendAfterLogin->isChecked() != wsClient->get_keyAfterLoginSendEnable())
         o["key_after_login_enabled"] = ui->checkBoxSendAfterLogin->isChecked();
     if (ui->comboBoxLoginOutput->currentData().toInt() != wsClient->get_keyAfterLoginSend())
@@ -564,6 +582,14 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
         o["delay_after_key_enabled"] = ui->checkBoxSlowHost->isChecked();
     if (ui->spinBoxInputDelayAfterKeyPressed->value() != wsClient->get_delayAfterKeyEntry())
         o["delay_after_key"] = ui->spinBoxInputDelayAfterKeyPressed->value();
+
+
+    if(wsClient->get_status() == Common::NoCardInserted) {
+        if (ui->checkBoxKnock->isChecked() != wsClient->get_knockEnabled())
+            o["knock_enabled"] = ui->checkBoxKnock->isChecked();
+        if (ui->comboBoxKnock->currentData().toInt() != wsClient->get_knockSensitivity())
+            o["knock_sensitivity"] = ui->comboBoxKnock->currentData().toInt();
+    }
 
     wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
 }

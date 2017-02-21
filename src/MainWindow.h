@@ -48,6 +48,7 @@ private slots:
     void updatePage();
     void checkSettingsChanged();
     void memMgmtMode();
+    void enableKnockSettings(bool visible);
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
