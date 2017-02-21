@@ -99,16 +99,17 @@ private:
     enum
     {
         PAGE_NO_CONNECTION = 0,
-        PAGE_SETTINGS = 1,
-        PAGE_CREDENTIALS_ENABLE = 2,
-        PAGE_SYNC = 3,
-        PAGE_NO_CARD = 4,
-        PAGE_LOCKED = 5,
-        PAGE_CREDENTIALS = 6,
-        PAGE_WAIT_CONFIRM = 7,
-        PAGE_ABOUT = 8,
-        PAGE_MC_SETTINGS = 9,
-        PAGE_MC_INTEGRITY_CHECK = 10,
+        PAGE_NO_DAEMON = 1,
+        PAGE_SETTINGS,
+        PAGE_CREDENTIALS_ENABLE,
+        PAGE_SYNC,
+        PAGE_NO_CARD,
+        PAGE_LOCKED,
+        PAGE_CREDENTIALS,
+        PAGE_WAIT_CONFIRM,
+        PAGE_ABOUT,
+        PAGE_MC_SETTINGS,
+        PAGE_MC_INTEGRITY_CHECK,
     };
 };
 

@@ -56,6 +56,10 @@ void WSClient::onWsConnected()
     connect(wsocket, &QWebSocket::textMessageReceived, this, &WSClient::onTextMessageReceived);
 }
 
+bool WSClient::isConnected() const {
+    return wsocket && wsocket->state() == QAbstractSocket::ConnectedState;
+}
+
 void WSClient::onWsDisconnected()
 {
     qDebug() << "Websocket disconnect";

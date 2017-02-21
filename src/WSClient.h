@@ -48,6 +48,8 @@ public:
 
     bool isMPMini() const;
 
+    bool isConnected() const;
+
 signals:
     void wsConnected();
     void wsDisconnected();

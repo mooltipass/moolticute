@@ -373,6 +373,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::updatePage()
 {
+    if(!wsClient->isConnected()) {
+         ui->stackedWidget->setCurrentIndex(PAGE_NO_DAEMON);
+         return;
+    }
     if (ui->pushButtonAbout->isChecked())
     {
         ui->stackedWidget->setCurrentIndex(PAGE_ABOUT);
