@@ -66,8 +66,9 @@ class MPDevice: public QObject
     //MP Mini only
     QT_WRITABLE_PROPERTY(int, screenBrightness, 0) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
     QT_WRITABLE_PROPERTY(bool, knockEnabled, false)
-    QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
     QT_WRITABLE_PROPERTY(int, knockSensitivity, 0) // 0-low, 1-medium, 2-high
+    QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
+    QT_WRITABLE_PROPERTY(bool, hashDisplay, false)
 
     QT_WRITABLE_PROPERTY(quint32, serialNumber, 0) // serial number if firmware is above 1.2
     QT_WRITABLE_PROPERTY(quint8, credentialsDbChangeNumber, 0) // credentials db change number
@@ -103,6 +104,7 @@ public:
     void updateKnockEnabled(bool en);
     void updateKnockSensitivity(int s); // 0-low, 1-medium, 2-high
     void updateRandomStartingPin(bool);
+    void updateHashDisplay(bool);
 
     //mem mgmt mode
     void startMemMgmtMode();

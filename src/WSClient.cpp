@@ -205,6 +205,8 @@ void WSClient::udateParameters(const QJsonObject &data)
         set_knockSensitivity(data["value"].toInt());
     else if (param == "random_starting_pin")
         set_randomStartingPin(data["value"].toBool());
+    else if (param == "hash_display")
+        set_displayHash(data["value"].toBool());
     else if (param == "key_after_login_enabled")
         set_keyAfterLoginSendEnable(data["value"].toBool());
     else if (param == "key_after_login")

@@ -260,6 +260,13 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         checkSettingsChanged();
     });
 
+    connect(wsClient, &WSClient::displayHashChanged, [=]()
+    {
+        ui->hashDisplayFeatureCheckBox->setChecked(wsClient->get_displayHash());
+        checkSettingsChanged();
+    });
+
+
     connect(wsClient, &WSClient::keyAfterLoginSendEnableChanged, [=]()
     {
         ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
@@ -338,6 +345,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->checkBoxKnock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->randomStartingPinCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->hashDisplayFeatureCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxSendAfterLogin, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->comboBoxLoginOutput, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxSendAfterPassword, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
@@ -478,6 +486,8 @@ void MainWindow::checkSettingsChanged()
         uichanged = true;
     if (ui->randomStartingPinCheckBox->isChecked() != wsClient->get_randomStartingPin())
         uichanged = true;
+    if (ui->hashDisplayFeatureCheckBox->isChecked() != wsClient->get_displayHash())
+        uichanged = true;
     if (ui->comboBoxScreenBrightness->currentData().toInt() != wsClient->get_screenBrightness())
         uichanged = true;
     if (ui->checkBoxSendAfterLogin->isChecked() != wsClient->get_keyAfterLoginSendEnable())
@@ -526,6 +536,7 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
     ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
     ui->checkBoxKnock->setChecked(wsClient->get_knockEnabled());
     ui->randomStartingPinCheckBox->setChecked(wsClient->get_randomStartingPin());
+    ui->hashDisplayFeatureCheckBox->setChecked(wsClient->get_displayHash());
     ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
     ui->checkBoxSendAfterPassword->setChecked(wsClient->get_keyAfterPassSendEnable());
     ui->checkBoxSlowHost->setChecked(wsClient->get_delayAfterKeyEntryEnable());
@@ -600,6 +611,8 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
         o["delay_after_key_enabled"] = ui->checkBoxSlowHost->isChecked();
     if (ui->randomStartingPinCheckBox->isChecked() != wsClient->get_randomStartingPin())
         o["random_starting_pin"] = ui->randomStartingPinCheckBox->isChecked();
+    if (ui->hashDisplayFeatureCheckBox->isChecked() != wsClient->get_displayHash())
+        o["hash_display"] = ui->hashDisplayFeatureCheckBox->isChecked();
     if (ui->spinBoxInputDelayAfterKeyPressed->value() != wsClient->get_delayAfterKeyEntry())
         o["delay_after_key"] = ui->spinBoxInputDelayAfterKeyPressed->value();
 

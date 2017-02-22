@@ -61,6 +61,7 @@ private slots:
     void sendKnockEnabled();
     void sendKnockSensitivity();
     void sendRandomStartingPin();
+    void sendHashDisplayEnabled();
     void sendKeyAfterLoginSendEnable();
     void sendKeyAfterLoginSend();
     void sendKeyAfterPassSendEnable();
