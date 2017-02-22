@@ -357,6 +357,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(knockSensitivityChanged(int)), this, SLOT(sendKnockSensitivity()));
     connect(mpdevice, SIGNAL(randomStartingPinChanged(bool)), this, SLOT(sendRandomStartingPin()));
     connect(mpdevice, SIGNAL(hashDisplayChanged(bool)), this, SLOT(sendHashDisplayEnabled()));
+    connect(mpdevice, SIGNAL(lockUnlockModeChanged(int)), this, SLOT(sendLockUnlockMode()));
 
     connect(mpdevice, SIGNAL(keyAfterLoginSendEnableChanged(bool)), this, SLOT(sendKeyAfterLoginSendEnable()));
     connect(mpdevice, SIGNAL(keyAfterLoginSendChanged(int)), this, SLOT(sendKeyAfterLoginSend()));
@@ -403,6 +404,7 @@ void WSServerCon::sendInitialStatus()
         sendKnockSensitivity();
         sendRandomStartingPin();
         sendHashDisplayEnabled();
+        sendLockUnlockMode();
         sendKeyAfterLoginSendEnable();
         sendKeyAfterLoginSend();
         sendKeyAfterPassSendEnable();
@@ -539,6 +541,15 @@ void WSServerCon::sendHashDisplayEnabled()
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
 }
 
+void WSServerCon::sendLockUnlockMode()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "lock_unlock_mode" },
+                        { "value", mpdevice->get_lockUnlockMode() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
 void WSServerCon::sendKeyAfterLoginSendEnable()
 {
     if (!mpdevice)
@@ -665,6 +676,8 @@ void WSServerCon::processParametersSet(const QJsonObject &data)
         mpdevice->updateRandomStartingPin(data["random_starting_pin"].toBool());
     if (data.contains("hash_display"))
         mpdevice->updateHashDisplay(data["hash_display"].toBool());
+    if (data.contains("lock_unlock_mode"))
+        mpdevice->updateLockUnlockMode(data["lock_unlock_mode"].toInt());
     if (data.contains("key_after_login_enabled"))
          mpdevice->updateKeyAfterLoginSendEnable(data["key_after_login_enabled"].toBool());
     if (data.contains("key_after_login"))

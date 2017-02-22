@@ -360,7 +360,7 @@ void MPDevice::loadParameters()
             qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
             return false;
         }
-        qDebug() << "received set_randomStartingPin: " << (quint8)data.at(2);
+        qDebug() << "received randomStartingPin: " << (quint8)data.at(2);
         set_randomStartingPin(data.at(2) != 0);
         return true;
     }));
@@ -376,8 +376,23 @@ void MPDevice::loadParameters()
             qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
             return false;
         }
-        qDebug() << "received set_hashDisplay: " << (quint8)data.at(2);
+        qDebug() << "received hashDisplay: " << (quint8)data.at(2);
         set_hashDisplay(data.at(2) != 0);
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, MPParams::LOCK_UNLOCK_FEATURE_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        qDebug() << "received lockUnlockMode: " << (quint8)data.at(2);
+        set_lockUnlockMode(data.at(2));
         return true;
     }));
 
@@ -679,6 +694,11 @@ void MPDevice::updateRandomStartingPin(bool en)
 void MPDevice::updateHashDisplay(bool en)
 {
     updateParam(MPParams::HASH_DISPLAY_FEATURE_PARAM, en);
+}
+
+void MPDevice::updateLockUnlockMode(int val)
+{
+    updateParam(MPParams::LOCK_UNLOCK_FEATURE_PARAM, val);
 }
 
 void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress)

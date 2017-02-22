@@ -139,6 +139,17 @@ public:
         MP_Classic = 0,
         MP_Mini = 1,
     } MPHwVersion;
+
+
+    enum class LockUnlockModeFeatureFlags : uint {
+        Disabled          = 0,
+        Password          = 0x01,
+        SendEnter         = 0x02,
+        Login             = 0x04,
+        SendWin_L         = 0x08,
+        SendCtrl_Alt_Del  = 0x10
+
+    };
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)

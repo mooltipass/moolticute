@@ -41,6 +41,7 @@ class WSClient: public QObject
 
     QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
     QT_WRITABLE_PROPERTY(bool, displayHash, false)
+    QT_WRITABLE_PROPERTY(int, lockUnlockMode, false)
 
 public:
     explicit WSClient(QObject *parent = nullptr);

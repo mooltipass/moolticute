@@ -876,7 +876,7 @@ QWidget {background-color: #EFEFEF;}</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="comboBox">
+                  <widget class="QComboBox" name="lockUnlockModeComboBox">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -884,7 +884,7 @@ QWidget {background-color: #EFEFEF;}</string>
                     </sizepolicy>
                    </property>
                    <property name="modelColumn">
-                    <number>1</number>
+                    <number>0</number>
                    </property>
                   </widget>
                  </item>

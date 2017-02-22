@@ -36,6 +36,15 @@
                             "background-color: #237C95;" \
                         "}"
 
+template <typename T>
+static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0) {
+    int idx = cb->findData(QVariant::fromValue(value));
+    if(idx < 0)
+        idx = defaultIdx;
+    cb->setCurrentIndex(idx);
+}
+
+
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -166,6 +175,19 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->comboBoxPasswordOutput->addItem(tr("Enter"), 40);
     ui->comboBoxPasswordOutput->addItem(tr("Space"), 44);
 
+
+    using LF = Common::LockUnlockModeFeatureFlags;
+
+    //It looks like a bit field - the value shoud be Constants in Common.h
+    ui->lockUnlockModeComboBox->addItem(tr("Disabled")          , (uint)LF::Disabled);
+    ui->lockUnlockModeComboBox->addItem(tr("Password Only")     , (uint)LF::Password);
+    ui->lockUnlockModeComboBox->addItem(tr("Login + Password")  , (uint)LF::Password|(uint)LF::Login);
+    ui->lockUnlockModeComboBox->addItem(tr("Enter + Password")  , (uint)LF::Password|(uint)LF::SendEnter);
+    ui->lockUnlockModeComboBox->addItem(tr("Password / Win+L")  , (uint)LF::Password|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->addItem(tr("Login+Pass / Win+L"), (uint)LF::Password|(uint)LF::Login|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->addItem(tr("Enter+Pass / Win+L"), (uint)LF::Password|(uint)LF::SendEnter|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->setCurrentIndex(0);
+
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
     {
@@ -266,6 +288,11 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         checkSettingsChanged();
     });
 
+    connect(wsClient, &WSClient::lockUnlockModeChanged, [=]()
+    {
+        updateComboBoxIndex(ui->lockUnlockModeComboBox, wsClient->get_lockUnlockMode());
+    });
+
 
     connect(wsClient, &WSClient::keyAfterLoginSendEnableChanged, [=]()
     {
@@ -346,6 +373,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->randomStartingPinCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->hashDisplayFeatureCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->lockUnlockModeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxSendAfterLogin, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->comboBoxLoginOutput, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxSendAfterPassword, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
@@ -488,6 +516,8 @@ void MainWindow::checkSettingsChanged()
         uichanged = true;
     if (ui->hashDisplayFeatureCheckBox->isChecked() != wsClient->get_displayHash())
         uichanged = true;
+    if (ui->lockUnlockModeComboBox->currentData().toInt() != wsClient->get_lockUnlockMode())
+        uichanged = true;
     if (ui->comboBoxScreenBrightness->currentData().toInt() != wsClient->get_screenBrightness())
         uichanged = true;
     if (ui->checkBoxSendAfterLogin->isChecked() != wsClient->get_keyAfterLoginSendEnable())
@@ -537,6 +567,7 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
     ui->checkBoxKnock->setChecked(wsClient->get_knockEnabled());
     ui->randomStartingPinCheckBox->setChecked(wsClient->get_randomStartingPin());
     ui->hashDisplayFeatureCheckBox->setChecked(wsClient->get_displayHash());
+    updateComboBoxIndex(ui->lockUnlockModeComboBox, wsClient->get_lockUnlockMode());
     ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
     ui->checkBoxSendAfterPassword->setChecked(wsClient->get_keyAfterPassSendEnable());
     ui->checkBoxSlowHost->setChecked(wsClient->get_delayAfterKeyEntryEnable());
@@ -613,6 +644,8 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
         o["random_starting_pin"] = ui->randomStartingPinCheckBox->isChecked();
     if (ui->hashDisplayFeatureCheckBox->isChecked() != wsClient->get_displayHash())
         o["hash_display"] = ui->hashDisplayFeatureCheckBox->isChecked();
+    if (ui->lockUnlockModeComboBox->currentData().toInt() != wsClient->get_lockUnlockMode())
+        o["lock_unlock_mode"] = ui->lockUnlockModeComboBox->currentData().toInt();
     if (ui->spinBoxInputDelayAfterKeyPressed->value() != wsClient->get_delayAfterKeyEntry())
         o["delay_after_key"] = ui->spinBoxInputDelayAfterKeyPressed->value();
 
