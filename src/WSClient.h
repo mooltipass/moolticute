@@ -38,6 +38,9 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(bool, delayAfterKeyEntryEnable, false)
     QT_WRITABLE_PROPERTY(int, delayAfterKeyEntry, 0)
 
+
+    QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
+
 public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();

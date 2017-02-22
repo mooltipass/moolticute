@@ -352,6 +352,22 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, MPParams::RANDOM_INIT_PIN_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        qDebug() << "received set_randomStartingPin: " << (quint8)data.at(2);
+        set_randomStartingPin(data.at(2) != 0);
+        return true;
+    }));
+
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
@@ -637,6 +653,11 @@ void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
     if (s == 0) v = 11;
     else if (s == 2) v = 5;
     updateParam(MPParams::MINI_KNOCK_THRES_PARAM, v);
+}
+
+void MPDevice::updateRandomStartingPin(bool en)
+{
+    updateParam(MPParams::RANDOM_INIT_PIN_PARAM, en);
 }
 
 void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress)

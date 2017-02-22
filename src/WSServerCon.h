@@ -60,6 +60,7 @@ private slots:
     void sendScreenBrightness();
     void sendKnockEnabled();
     void sendKnockSensitivity();
+    void sendRandomStartingPin();
     void sendKeyAfterLoginSendEnable();
     void sendKeyAfterLoginSend();
     void sendKeyAfterPassSendEnable();

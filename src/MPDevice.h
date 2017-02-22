@@ -61,9 +61,12 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(bool, delayAfterKeyEntryEnable, false)
     QT_WRITABLE_PROPERTY(int, delayAfterKeyEntry, 0)
 
+
+
     //MP Mini only
     QT_WRITABLE_PROPERTY(int, screenBrightness, 0) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
     QT_WRITABLE_PROPERTY(bool, knockEnabled, false)
+    QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
     QT_WRITABLE_PROPERTY(int, knockSensitivity, 0) // 0-low, 1-medium, 2-high
 
     QT_WRITABLE_PROPERTY(quint32, serialNumber, 0) // serial number if firmware is above 1.2
@@ -94,10 +97,12 @@ public:
     void updateDelayAfterKeyEntryEnable(bool en);
     void updateDelayAfterKeyEntry(int val);
 
+
     //MP Mini only
     void updateScreenBrightness(int bval); //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
     void updateKnockEnabled(bool en);
     void updateKnockSensitivity(int s); // 0-low, 1-medium, 2-high
+    void updateRandomStartingPin(bool);
 
     //mem mgmt mode
     void startMemMgmtMode();

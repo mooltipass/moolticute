@@ -355,6 +355,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(screenBrightnessChanged(int)), this, SLOT(sendScreenBrightness()));
     connect(mpdevice, SIGNAL(knockEnabledChanged(bool)), this, SLOT(sendKnockEnabled()));
     connect(mpdevice, SIGNAL(knockSensitivityChanged(int)), this, SLOT(sendKnockSensitivity()));
+    connect(mpdevice, SIGNAL(randomStartingPinChanged(bool)), this, SLOT(sendRandomStartingPin()));
 
     connect(mpdevice, SIGNAL(keyAfterLoginSendEnableChanged(bool)), this, SLOT(sendKeyAfterLoginSendEnable()));
     connect(mpdevice, SIGNAL(keyAfterLoginSendChanged(int)), this, SLOT(sendKeyAfterLoginSend()));
@@ -399,6 +400,7 @@ void WSServerCon::sendInitialStatus()
         sendScreenBrightness();
         sendKnockEnabled();
         sendKnockSensitivity();
+        sendRandomStartingPin();
         sendKeyAfterLoginSendEnable();
         sendKeyAfterLoginSend();
         sendKeyAfterPassSendEnable();
@@ -516,6 +518,15 @@ void WSServerCon::sendKnockSensitivity()
     sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
 }
 
+
+void WSServerCon::sendRandomStartingPin()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "random_starting_pin" },
+                        { "value", mpdevice->get_randomStartingPin() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
 
 void WSServerCon::sendKeyAfterLoginSendEnable()
 {
@@ -639,6 +650,8 @@ void WSServerCon::processParametersSet(const QJsonObject &data)
         mpdevice->updateKnockEnabled(data["knock_enabled"].toBool());
     if (data.contains("knock_sensitivity"))
         mpdevice->updateKnockSensitivity(data["knock_sensitivity"].toInt());
+    if (data.contains("random_starting_pin"))
+        mpdevice->updateRandomStartingPin(data["random_starting_pin"].toBool());
     if (data.contains("key_after_login_enabled"))
          mpdevice->updateKeyAfterLoginSendEnable(data["key_after_login_enabled"].toBool());
     if (data.contains("key_after_login"))
