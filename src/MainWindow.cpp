@@ -202,15 +202,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
     {
-        for (int i = 0;i < ui->comboBoxLang->count();i++)
-        {
-            if (ui->comboBoxLang->itemData(i).toInt() == wsClient->get_keyboardLayout())
-            {
-                ui->comboBoxLang->setCurrentIndex(i);
-                checkSettingsChanged();
-                break;
-            }
-        }
+       updateComboBoxIndex(ui->comboBoxLang, wsClient->get_keyboardLayout());
+       checkSettingsChanged();
     });
     connect(wsClient, &WSClient::lockTimeoutEnabledChanged, [=]()
     {
@@ -252,18 +245,11 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
         checkSettingsChanged();
     });
+
+
     connect(wsClient, &WSClient::screenBrightnessChanged, [=]()
     {
-        switch (wsClient->get_screenBrightness())
-        {
-        default:
-        case 51: ui->comboBoxScreenBrightness->setCurrentIndex(0); break;
-        case 89: ui->comboBoxScreenBrightness->setCurrentIndex(1); break;
-        case 128: ui->comboBoxScreenBrightness->setCurrentIndex(2); break;
-        case 166: ui->comboBoxScreenBrightness->setCurrentIndex(3); break;
-        case 204: ui->comboBoxScreenBrightness->setCurrentIndex(4); break;
-        case 255: ui->comboBoxScreenBrightness->setCurrentIndex(5); break;
-        }
+        updateComboBoxIndex(ui->comboBoxScreenBrightness, wsClient->get_screenBrightness());
         checkSettingsChanged();
     });
     connect(wsClient, &WSClient::knockEnabledChanged, [=]()
@@ -302,13 +288,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::keyAfterLoginSendChanged, [=]()
     {
-        switch (wsClient->get_keyAfterLoginSend())
-        {
-        default:
-        case 43: ui->comboBoxLoginOutput->setCurrentIndex(0); break;
-        case 40: ui->comboBoxLoginOutput->setCurrentIndex(1); break;
-        case 44: ui->comboBoxLoginOutput->setCurrentIndex(2); break;
-        }
+
+        updateComboBoxIndex(ui->comboBoxLoginOutput, wsClient->get_keyAfterLoginSend());
         checkSettingsChanged();
     });
 
@@ -320,13 +301,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::keyAfterPassSendChanged, [=]()
     {
-        switch (wsClient->get_keyAfterPassSend())
-        {
-        default:
-        case 43: ui->comboBoxPasswordOutput->setCurrentIndex(0); break;
-        case 40: ui->comboBoxPasswordOutput->setCurrentIndex(1); break;
-        case 44: ui->comboBoxPasswordOutput->setCurrentIndex(2); break;
-        }
+        updateComboBoxIndex(ui->comboBoxPasswordOutput, wsClient->get_keyAfterPassSend());
         checkSettingsChanged();
     });
 
@@ -547,15 +522,8 @@ void MainWindow::checkSettingsChanged()
 
 void MainWindow::on_pushButtonSettingsReset_clicked()
 {
-    for (int i = 0;i < ui->comboBoxLang->count();i++)
-    {
-        if (ui->comboBoxLang->itemData(i).toInt() == wsClient->get_keyboardLayout())
-        {
-            ui->comboBoxLang->setCurrentIndex(i);
-            checkSettingsChanged();
-            break;
-        }
-    }
+
+
     ui->checkBoxLock->setChecked(wsClient->get_lockTimeoutEnabled());
     ui->spinBoxLock->setValue(wsClient->get_lockTimeout());
     ui->checkBoxScreensaver->setChecked(wsClient->get_screensaver());
@@ -567,38 +535,16 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
     ui->checkBoxKnock->setChecked(wsClient->get_knockEnabled());
     ui->randomStartingPinCheckBox->setChecked(wsClient->get_randomStartingPin());
     ui->hashDisplayFeatureCheckBox->setChecked(wsClient->get_displayHash());
-    updateComboBoxIndex(ui->lockUnlockModeComboBox, wsClient->get_lockUnlockMode());
     ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
     ui->checkBoxSendAfterPassword->setChecked(wsClient->get_keyAfterPassSendEnable());
     ui->checkBoxSlowHost->setChecked(wsClient->get_delayAfterKeyEntryEnable());
     ui->spinBoxInputDelayAfterKeyPressed->setValue(wsClient->get_delayAfterKeyEntry());
 
-    switch (wsClient->get_keyAfterLoginSend())
-    {
-    default:
-    case 43: ui->comboBoxLoginOutput->setCurrentIndex(0); break;
-    case 40: ui->comboBoxLoginOutput->setCurrentIndex(1); break;
-    case 44: ui->comboBoxLoginOutput->setCurrentIndex(2); break;
-    }
-
-    switch (wsClient->get_keyAfterPassSend())
-    {
-    default:
-    case 43: ui->comboBoxPasswordOutput->setCurrentIndex(0); break;
-    case 40: ui->comboBoxPasswordOutput->setCurrentIndex(1); break;
-    case 44: ui->comboBoxPasswordOutput->setCurrentIndex(2); break;
-    }
-
-    switch (wsClient->get_screenBrightness())
-    {
-    default:
-    case 51: ui->comboBoxScreenBrightness->setCurrentIndex(0); break;
-    case 89: ui->comboBoxScreenBrightness->setCurrentIndex(1); break;
-    case 128: ui->comboBoxScreenBrightness->setCurrentIndex(2); break;
-    case 166: ui->comboBoxScreenBrightness->setCurrentIndex(3); break;
-    case 204: ui->comboBoxScreenBrightness->setCurrentIndex(4); break;
-    case 255: ui->comboBoxScreenBrightness->setCurrentIndex(5); break;
-    }
+    updateComboBoxIndex(ui->lockUnlockModeComboBox, wsClient->get_lockUnlockMode());
+    updateComboBoxIndex(ui->comboBoxLoginOutput, wsClient->get_keyAfterLoginSend());
+    updateComboBoxIndex(ui->comboBoxPasswordOutput, wsClient->get_keyAfterPassSend());
+    updateComboBoxIndex(ui->comboBoxScreenBrightness, wsClient->get_screenBrightness());
+    updateComboBoxIndex(ui->comboBoxLang, wsClient->get_keyboardLayout());
 
     ui->comboBoxKnock->setCurrentIndex(wsClient->get_knockSensitivity());
 
