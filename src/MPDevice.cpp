@@ -38,11 +38,11 @@ MPDevice::MPDevice(QObject *parent):
             if ((quint8)data.at(1) == MP_MOOLTIPASS_STATUS)
             {
                 Common::MPStatus s = (Common::MPStatus)data.at(2);
-                if (s != get_status())
-                {
+                if (s != get_status() || s == Common::UnknownStatus) {
+
                     qDebug() << "received MP_MOOLTIPASS_STATUS: " << (int)data.at(2);
 
-                    if (s == Common::Unlocked)
+                    if (s == Common::Unlocked || get_status() == Common::UnknownStatus)
                     {
                         QTimer::singleShot(10, [=]()
                         {
@@ -61,11 +61,6 @@ MPDevice::MPDevice(QObject *parent):
     });
 
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
-
-    QTimer::singleShot(100, [=]()
-    {
-        loadParameters();
-    });
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
 }
