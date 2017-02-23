@@ -84,7 +84,7 @@ UsbMonitor_linux::UsbMonitor_linux()
     if (!libusb_has_capability (LIBUSB_CAP_HAS_HOTPLUG))
         qDebug() << "libusb Hotplug capabilites are not supported on this platform";
 
-    libusb_set_debug(usb_ctx, LIBUSB_LOG_LEVEL_INFO);
+    libusb_set_debug(usb_ctx, LIBUSB_LOG_LEVEL_ERROR);
 }
 
 void UsbMonitor_linux::start()
@@ -121,11 +121,12 @@ void UsbMonitor_linux::start()
     while(fds && *fds) {
         startMonitoringFd((*fds++)->fd);
     }
+
+   // libusb_set_debug(usb_ctx, 4);
 }
 
 void UsbMonitor_linux::handleEvents() {
-    timeval tv = {};
-    libusb_handle_events_timeout(usb_ctx, &tv);
+    libusb_handle_events_completed(usb_ctx, NULL);
 }
 
 void UsbMonitor_linux::stop()
@@ -147,7 +148,7 @@ void UsbMonitor_linux::startMonitoringFd(int fd) {
 
     if (end == std::find_if(begin, end, [fd](QSocketNotifier* sn) { return sn->socket() == fd; })) {
         QSocketNotifier* sn = new QSocketNotifier(fd, QSocketNotifier::Read);
-        connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents);
+        connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents, Qt::QueuedConnection);
         this->monitoredFds << sn;
     }
 }
