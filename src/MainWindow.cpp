@@ -178,7 +178,6 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     using LF = Common::LockUnlockModeFeatureFlags;
 
-    //It looks like a bit field - the value shoud be Constants in Common.h
     ui->lockUnlockModeComboBox->addItem(tr("Disabled")          , (uint)LF::Disabled);
     ui->lockUnlockModeComboBox->addItem(tr("Password Only")     , (uint)LF::Password);
     ui->lockUnlockModeComboBox->addItem(tr("Login + Password")  , (uint)LF::Password|(uint)LF::Login);
@@ -198,6 +197,63 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::fwVersionChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
+
+
+    connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial) {
+         setUIDRequestInstructionsWithId(serial > 0 ? QString::number(serial) : "XXXX");
+    });
+    connect(wsClient, &WSClient::connectedChanged, [this] () {
+        setUIDRequestInstructionsWithId("XXXX");
+   });
+
+    QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{32}"), ui->UIDRequestKeyInput);
+    ui->UIDRequestKeyInput->setValidator(uidKeyValidator);
+    ui->UIDRequestValidateBtn->setEnabled(false);
+    connect(ui->UIDRequestKeyInput, &QLineEdit::textEdited, [this] () {
+        ui->UIDRequestValidateBtn->setEnabled(ui->UIDRequestKeyInput->hasAcceptableInput());
+    });
+
+    gb_spinner = new QMovie(":/uid_spinner.gif",  {}, this);
+
+    ui->UIDRequestResultLabel->setVisible(false);
+    ui->UIDRequestResultIcon->setVisible(false);
+
+    connect(ui->UIDRequestValidateBtn, &QPushButton::clicked, [this]() {
+        if(wsClient) {
+            wsClient->requestDeviceUID(ui->UIDRequestKeyInput->text().toUtf8());
+            ui->UIDRequestResultIcon->setMovie(gb_spinner);
+            ui->UIDRequestResultIcon->setVisible(true);
+            ui->UIDRequestResultLabel->setVisible(true);
+            ui->UIDRequestResultLabel->setText(tr("Fetching UID from device. This may take a few seconds..."));
+            ui->UIDRequestResultIcon->setAttribute(Qt::WA_NoSystemBackground);
+            gb_spinner->start();
+        }
+    });
+
+    connect(ui->UIDRequestKeyInput, &QLineEdit::returnPressed, ui->UIDRequestValidateBtn, &QPushButton::click);
+
+    connect(wsClient, &WSClient::uidChanged, [this](qint64 uid) {
+        ui->UIDRequestResultLabel->setVisible(true);
+        ui->UIDRequestResultIcon->setVisible(true);
+        gb_spinner->stop();
+        if(uid <= 0) {
+            ui->UIDRequestResultIcon->setPixmap(QPixmap(":/message_error.png").scaledToHeight(ui->UIDRequestResultIcon->height(), Qt::SmoothTransformation));
+            ui->UIDRequestResultLabel->setText("<span style='color:#FF0000; font-weight:bold'>" + tr("Either the device have been tempered with or the input key is invalid.") + "</span>");
+            return;
+        }
+        ui->UIDRequestResultIcon->setPixmap(QPixmap(":/message_success.png").scaledToHeight(ui->UIDRequestResultIcon->height(), Qt::SmoothTransformation));
+        ui->UIDRequestResultLabel->setText("<span style='color:#006400'>" + tr("Your device's UID is %1").arg(QString::number(uid, 16).toUpper()) + "</span>");
+    });
+
+    connect(wsClient, &WSClient::connectedChanged, [this](bool connected) {
+       ui->UIDRequestGB->setVisible(connected);
+       gb_spinner->stop();
+       ui->UIDRequestResultLabel->setMovie(nullptr);
+       ui->UIDRequestResultLabel->setText({});
+       ui->UIDRequestResultLabel->setVisible(false);
+       ui->UIDRequestResultIcon->setVisible(false);
+
+    });
 
 
     connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
@@ -908,4 +964,13 @@ void MainWindow::integrityFinished(bool success)
         QMessageBox::information(this, "Moolticute", "Memory integrity check done successfully");
     ui->stackedWidget->setCurrentIndex(PAGE_SYNC);
     ui->widgetHeader->setEnabled(true);
+}
+
+void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
+{
+    ui->UIDRequestLabel->setText(tr(R"(
+                                    To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.<ol>
+                                    <li>Get the serial number from the back of your device.</li>
+                                    <li>&shy;<a href="mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1">Send us an email</a> with the serial number, requesting the password.</li>
+                                    <li>Enter the password you received from us</li></ol>)").arg(id));
 }

@@ -2438,6 +2438,57 @@ void MPDevice::setCurrentDate()
     runAndDequeueJobs();
 }
 
+
+void MPDevice::getUID(const QByteArray & key)
+{
+
+    AsyncJobs *jobs = new AsyncJobs("Send uid request to device", this);
+    m_uid = -1;
+
+    jobs->append(new MPCommandJob(this, MP_GET_UID,
+                                  [key](const QByteArray &, QByteArray &data_to_send) -> bool
+    {
+        bool ok;
+        data_to_send.clear();
+        data_to_send.resize(16);
+        for(int i = 0; i < 16; i++) {
+            data_to_send[i] = key.mid(2*i, 2).toUInt(&ok, 16);
+            if(!ok)
+                return false;
+        }
+
+        return true;
+    },
+                                [=](const QByteArray &data, bool &) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_UID)
+        {
+            qWarning() << "Send uid request: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            //return false;
+        }
+        if (data[MP_LEN_FIELD_INDEX] == 1 )
+        {
+            qWarning() << "Couldn't request uid" << data[MP_PAYLOAD_FIELD_INDEX] <<  data[MP_LEN_FIELD_INDEX] << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16) << data.toHex();
+            set_uid(-1);
+            return false;
+        }
+
+        bool ok;
+        quint64 uid = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]).toHex().toULongLong(&ok, 16);
+        set_uid(ok ? uid : - 1);
+        return ok;
+    }));
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed get uid from device";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+
 void MPDevice::getChangeNumbers()
 {
     AsyncJobs* v12jobs = new AsyncJobs("Loading device db change numbers", this);

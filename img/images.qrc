@@ -28,5 +28,6 @@
         <file>circle_red@2x.png</file>
         <file>systray_disconnected_white.png</file>
         <file>systray_white.png</file>
+        <file>uid_spinner.gif</file>
     </qresource>
 </RCC>

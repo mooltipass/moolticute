@@ -161,6 +161,19 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "request_device_uid") {
+
+         QJsonObject o = root["data"].toObject();
+         const QByteArray key = o.value("key").toString().toUtf8().simplified();
+
+        if (!mpdevice)
+        {
+            sendFailedJson(root, "No device connected");
+            return;
+        }
+        mpdevice->getUID(key);
+    }
+
     else if (root["msg"] == "get_random_numbers")
     {
         if (!mpdevice)
@@ -365,6 +378,8 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(keyAfterPassSendChanged(int)), this, SLOT(sendKeyAfterPassSend()));
     connect(mpdevice, SIGNAL(delayAfterKeyEntryEnableChanged(bool)), this, SLOT(sendDelayAfterKeyEntryEnable()));
     connect(mpdevice, SIGNAL(delayAfterKeyEntryChanged(int)), this, SLOT(sendDelayAfterKeyEntry()));
+
+    connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
 }
 
 void WSServerCon::statusChanged()
@@ -642,6 +657,15 @@ void WSServerCon::sendVersion()
         data["hw_serial"] = (qint64)mpdevice->get_serialNumber();
     }
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendDeviceUID()
+{
+    if (!mpdevice)
+        return;
+    sendJsonMessage({{ "msg", "device_uid" },
+                     { "data", QJsonObject{ {"uid", mpdevice->get_uid()} } }
+                    });
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

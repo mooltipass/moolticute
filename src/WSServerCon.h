@@ -69,6 +69,7 @@ private slots:
     void sendKeyAfterPassSend();
     void sendDelayAfterKeyEntryEnable();
     void sendDelayAfterKeyEntry();
+    void sendDeviceUID();
 
 private:
     QWebSocket *wsClient;

@@ -173,6 +173,11 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt());
     }
+    else if (rootobj["msg"] == "device_uid")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        set_uid((qint64)o["uid"].toDouble());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -226,4 +231,15 @@ void WSClient::udateParameters(const QJsonObject &data)
 
 bool WSClient::isMPMini() const {
     return  get_mpHwVersion() == Common::MP_Mini;
+}
+
+
+bool WSClient::requestDeviceUID(const QByteArray & key) {
+    m_uid = -1;
+    if(!isConnected())
+        return false;
+    sendJsonData({{ "msg", "request_device_uid" },
+                  { "data", QJsonObject{ {"key", QString::fromUtf8(key) } } }
+                });
+    return true;
 }

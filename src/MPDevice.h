@@ -75,6 +75,8 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(quint8, credentialsDbChangeNumber, 0) // credentials db change number
     QT_WRITABLE_PROPERTY(quint8, dataDbChangeNumber, 0) // data db change number
 
+    QT_WRITABLE_PROPERTY(qint64, uid, -1)
+
 public:
     MPDevice(QObject *parent);
     virtual ~MPDevice();
@@ -107,6 +109,8 @@ public:
     void updateRandomStartingPin(bool);
     void updateHashDisplay(bool);
     void updateLockUnlockMode(int);
+
+    void getUID(const QByteArray & key);
 
     //mem mgmt mode
     void startMemMgmtMode();

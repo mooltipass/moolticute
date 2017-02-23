@@ -43,6 +43,8 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(bool, displayHash, false)
     QT_WRITABLE_PROPERTY(int, lockUnlockMode, false)
 
+    QT_WRITABLE_PROPERTY(qint64, uid, -1)
+
 public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();
@@ -54,6 +56,8 @@ public:
     bool isMPMini() const;
 
     bool isConnected() const;
+
+    bool requestDeviceUID(const QByteArray & key);
 
 signals:
     void wsConnected();
