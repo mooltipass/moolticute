@@ -27,7 +27,8 @@ SOURCES += src/main_gui.cpp \
     src/AutoStartup.cpp \
     src/WindowLog.cpp \
     src/OutputLog.cpp \
-    src/AnsiEscapeCodeHandler.cpp
+    src/AnsiEscapeCodeHandler.cpp \
+    src/PasswordLineEdit.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -42,7 +43,8 @@ HEADERS  += src/MainWindow.h \
     src/AutoStartup.h \
     src/WindowLog.h \
     src/OutputLog.h \
-    src/AnsiEscapeCodeHandler.h
+    src/AnsiEscapeCodeHandler.h \
+    src/PasswordLineEdit.h
 
 mac {
     HEADERS += src/MacUtils.h

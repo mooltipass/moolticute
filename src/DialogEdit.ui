@@ -60,7 +60,7 @@
      <item row="2" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QLineEdit" name="lineEditPass"/>
+        <widget class="PasswordLineEdit" name="lineEditPass"/>
        </item>
        <item>
         <widget class="QPushButton" name="pushButtonGen">
@@ -85,6 +85,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PasswordLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>src/PasswordLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>comboBoxService</tabstop>
   <tabstop>lineEditLogin</tabstop>
