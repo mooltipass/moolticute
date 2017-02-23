@@ -14,7 +14,7 @@ void AutoStartup::enableAutoStartup(bool en)
         //Install registry key
         QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                            QSettings::NativeFormat);
-        settings.setValue("Moolticute", QStringLiteral("\%1\" --autolaunched").arg(QDir::toNativeSeparators(qApp->applicationFilePath())));
+        settings.setValue("Moolticute", QStringLiteral("\"%1\" --autolaunched").arg(QDir::toNativeSeparators(qApp->applicationFilePath())));
         settings.sync();
     }
     else
