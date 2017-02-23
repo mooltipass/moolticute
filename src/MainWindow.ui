@@ -860,7 +860,6 @@ QWidget {background-color: #EFEFEF;}</string>
            <zorder>groupBox_3</zorder>
            <zorder>groupBox</zorder>
            <zorder>groupBox_2</zorder>
-           <zorder>verticalSpacer_3</zorder>
           </widget>
          </widget>
         </item>
