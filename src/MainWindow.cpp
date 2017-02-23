@@ -36,6 +36,15 @@
                             "background-color: #237C95;" \
                         "}"
 
+template <typename T>
+static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0) {
+    int idx = cb->findData(QVariant::fromValue(value));
+    if(idx < 0)
+        idx = defaultIdx;
+    cb->setCurrentIndex(idx);
+}
+
+
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -166,6 +175,18 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->comboBoxPasswordOutput->addItem(tr("Enter"), 40);
     ui->comboBoxPasswordOutput->addItem(tr("Space"), 44);
 
+
+    using LF = Common::LockUnlockModeFeatureFlags;
+
+    ui->lockUnlockModeComboBox->addItem(tr("Disabled")          , (uint)LF::Disabled);
+    ui->lockUnlockModeComboBox->addItem(tr("Password Only")     , (uint)LF::Password);
+    ui->lockUnlockModeComboBox->addItem(tr("Login + Password")  , (uint)LF::Password|(uint)LF::Login);
+    ui->lockUnlockModeComboBox->addItem(tr("Enter + Password")  , (uint)LF::Password|(uint)LF::SendEnter);
+    ui->lockUnlockModeComboBox->addItem(tr("Password / Win+L")  , (uint)LF::Password|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->addItem(tr("Login+Pass / Win+L"), (uint)LF::Password|(uint)LF::Login|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->addItem(tr("Enter+Pass / Win+L"), (uint)LF::Password|(uint)LF::SendEnter|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->setCurrentIndex(0);
+
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
     {
@@ -178,17 +199,67 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
 
 
+    connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial) {
+         setUIDRequestInstructionsWithId(serial > 0 ? QString::number(serial) : "XXXX");
+    });
+    connect(wsClient, &WSClient::connectedChanged, [this] () {
+        setUIDRequestInstructionsWithId("XXXX");
+   });
+
+    QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{32}"), ui->UIDRequestKeyInput);
+    ui->UIDRequestKeyInput->setValidator(uidKeyValidator);
+    ui->UIDRequestValidateBtn->setEnabled(false);
+    connect(ui->UIDRequestKeyInput, &QLineEdit::textEdited, [this] () {
+        ui->UIDRequestValidateBtn->setEnabled(ui->UIDRequestKeyInput->hasAcceptableInput());
+    });
+
+    gb_spinner = new QMovie(":/uid_spinner.gif",  {}, this);
+
+    ui->UIDRequestResultLabel->setVisible(false);
+    ui->UIDRequestResultIcon->setVisible(false);
+
+    connect(ui->UIDRequestValidateBtn, &QPushButton::clicked, [this]() {
+        if(wsClient) {
+            wsClient->requestDeviceUID(ui->UIDRequestKeyInput->text().toUtf8());
+            ui->UIDRequestResultIcon->setMovie(gb_spinner);
+            ui->UIDRequestResultIcon->setVisible(true);
+            ui->UIDRequestResultLabel->setVisible(true);
+            ui->UIDRequestResultLabel->setText(tr("Fetching UID from device. This may take a few seconds..."));
+            ui->UIDRequestResultIcon->setAttribute(Qt::WA_NoSystemBackground);
+            gb_spinner->start();
+        }
+    });
+
+    connect(ui->UIDRequestKeyInput, &QLineEdit::returnPressed, ui->UIDRequestValidateBtn, &QPushButton::click);
+
+    connect(wsClient, &WSClient::uidChanged, [this](qint64 uid) {
+        ui->UIDRequestResultLabel->setVisible(true);
+        ui->UIDRequestResultIcon->setVisible(true);
+        gb_spinner->stop();
+        if(uid <= 0) {
+            ui->UIDRequestResultIcon->setPixmap(QPixmap(":/message_error.png").scaledToHeight(ui->UIDRequestResultIcon->height(), Qt::SmoothTransformation));
+            ui->UIDRequestResultLabel->setText("<span style='color:#FF0000; font-weight:bold'>" + tr("Either the device have been tempered with or the input key is invalid.") + "</span>");
+            return;
+        }
+        ui->UIDRequestResultIcon->setPixmap(QPixmap(":/message_success.png").scaledToHeight(ui->UIDRequestResultIcon->height(), Qt::SmoothTransformation));
+        ui->UIDRequestResultLabel->setText("<span style='color:#006400'>" + tr("Your device's UID is %1").arg(QString::number(uid, 16).toUpper()) + "</span>");
+    });
+
+    connect(wsClient, &WSClient::connectedChanged, [this](bool connected) {
+       ui->UIDRequestGB->setVisible(connected);
+       gb_spinner->stop();
+       ui->UIDRequestResultLabel->setMovie(nullptr);
+       ui->UIDRequestResultLabel->setText({});
+       ui->UIDRequestResultLabel->setVisible(false);
+       ui->UIDRequestResultIcon->setVisible(false);
+
+    });
+
+
     connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
     {
-        for (int i = 0;i < ui->comboBoxLang->count();i++)
-        {
-            if (ui->comboBoxLang->itemData(i).toInt() == wsClient->get_keyboardLayout())
-            {
-                ui->comboBoxLang->setCurrentIndex(i);
-                checkSettingsChanged();
-                break;
-            }
-        }
+       updateComboBoxIndex(ui->comboBoxLang, wsClient->get_keyboardLayout());
+       checkSettingsChanged();
     });
     connect(wsClient, &WSClient::lockTimeoutEnabledChanged, [=]()
     {
@@ -230,18 +301,11 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
         checkSettingsChanged();
     });
+
+
     connect(wsClient, &WSClient::screenBrightnessChanged, [=]()
     {
-        switch (wsClient->get_screenBrightness())
-        {
-        default:
-        case 51: ui->comboBoxScreenBrightness->setCurrentIndex(0); break;
-        case 89: ui->comboBoxScreenBrightness->setCurrentIndex(1); break;
-        case 128: ui->comboBoxScreenBrightness->setCurrentIndex(2); break;
-        case 166: ui->comboBoxScreenBrightness->setCurrentIndex(3); break;
-        case 204: ui->comboBoxScreenBrightness->setCurrentIndex(4); break;
-        case 255: ui->comboBoxScreenBrightness->setCurrentIndex(5); break;
-        }
+        updateComboBoxIndex(ui->comboBoxScreenBrightness, wsClient->get_screenBrightness());
         checkSettingsChanged();
     });
     connect(wsClient, &WSClient::knockEnabledChanged, [=]()
@@ -254,6 +318,24 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         ui->comboBoxKnock->setCurrentIndex(wsClient->get_knockSensitivity());
         checkSettingsChanged();
     });
+    connect(wsClient, &WSClient::randomStartingPinChanged, [=]()
+    {
+        ui->randomStartingPinCheckBox->setChecked(wsClient->get_randomStartingPin());
+        checkSettingsChanged();
+    });
+
+    connect(wsClient, &WSClient::displayHashChanged, [=]()
+    {
+        ui->hashDisplayFeatureCheckBox->setChecked(wsClient->get_displayHash());
+        checkSettingsChanged();
+    });
+
+    connect(wsClient, &WSClient::lockUnlockModeChanged, [=]()
+    {
+        updateComboBoxIndex(ui->lockUnlockModeComboBox, wsClient->get_lockUnlockMode());
+    });
+
+
     connect(wsClient, &WSClient::keyAfterLoginSendEnableChanged, [=]()
     {
         ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
@@ -262,13 +344,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::keyAfterLoginSendChanged, [=]()
     {
-        switch (wsClient->get_keyAfterLoginSend())
-        {
-        default:
-        case 43: ui->comboBoxLoginOutput->setCurrentIndex(0); break;
-        case 40: ui->comboBoxLoginOutput->setCurrentIndex(1); break;
-        case 44: ui->comboBoxLoginOutput->setCurrentIndex(2); break;
-        }
+
+        updateComboBoxIndex(ui->comboBoxLoginOutput, wsClient->get_keyAfterLoginSend());
         checkSettingsChanged();
     });
 
@@ -280,13 +357,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::keyAfterPassSendChanged, [=]()
     {
-        switch (wsClient->get_keyAfterPassSend())
-        {
-        default:
-        case 43: ui->comboBoxPasswordOutput->setCurrentIndex(0); break;
-        case 40: ui->comboBoxPasswordOutput->setCurrentIndex(1); break;
-        case 44: ui->comboBoxPasswordOutput->setCurrentIndex(2); break;
-        }
+        updateComboBoxIndex(ui->comboBoxPasswordOutput, wsClient->get_keyAfterPassSend());
         checkSettingsChanged();
     });
 
@@ -331,7 +402,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->comboBoxScreenBrightness, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxKnock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-
+    connect(ui->randomStartingPinCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->hashDisplayFeatureCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->lockUnlockModeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxSendAfterLogin, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->comboBoxLoginOutput, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxSendAfterPassword, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
@@ -470,6 +543,12 @@ void MainWindow::checkSettingsChanged()
         uichanged = true;
     if (ui->comboBoxKnock->currentData().toInt() != wsClient->get_knockSensitivity())
         uichanged = true;
+    if (ui->randomStartingPinCheckBox->isChecked() != wsClient->get_randomStartingPin())
+        uichanged = true;
+    if (ui->hashDisplayFeatureCheckBox->isChecked() != wsClient->get_displayHash())
+        uichanged = true;
+    if (ui->lockUnlockModeComboBox->currentData().toInt() != wsClient->get_lockUnlockMode())
+        uichanged = true;
     if (ui->comboBoxScreenBrightness->currentData().toInt() != wsClient->get_screenBrightness())
         uichanged = true;
     if (ui->checkBoxSendAfterLogin->isChecked() != wsClient->get_keyAfterLoginSendEnable())
@@ -499,15 +578,8 @@ void MainWindow::checkSettingsChanged()
 
 void MainWindow::on_pushButtonSettingsReset_clicked()
 {
-    for (int i = 0;i < ui->comboBoxLang->count();i++)
-    {
-        if (ui->comboBoxLang->itemData(i).toInt() == wsClient->get_keyboardLayout())
-        {
-            ui->comboBoxLang->setCurrentIndex(i);
-            checkSettingsChanged();
-            break;
-        }
-    }
+
+
     ui->checkBoxLock->setChecked(wsClient->get_lockTimeoutEnabled());
     ui->spinBoxLock->setValue(wsClient->get_lockTimeout());
     ui->checkBoxScreensaver->setChecked(wsClient->get_screensaver());
@@ -517,37 +589,18 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
     ui->checkBoxBoot->setChecked(wsClient->get_offlineMode());
     ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
     ui->checkBoxKnock->setChecked(wsClient->get_knockEnabled());
+    ui->randomStartingPinCheckBox->setChecked(wsClient->get_randomStartingPin());
+    ui->hashDisplayFeatureCheckBox->setChecked(wsClient->get_displayHash());
     ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
     ui->checkBoxSendAfterPassword->setChecked(wsClient->get_keyAfterPassSendEnable());
     ui->checkBoxSlowHost->setChecked(wsClient->get_delayAfterKeyEntryEnable());
     ui->spinBoxInputDelayAfterKeyPressed->setValue(wsClient->get_delayAfterKeyEntry());
 
-    switch (wsClient->get_keyAfterLoginSend())
-    {
-    default:
-    case 43: ui->comboBoxLoginOutput->setCurrentIndex(0); break;
-    case 40: ui->comboBoxLoginOutput->setCurrentIndex(1); break;
-    case 44: ui->comboBoxLoginOutput->setCurrentIndex(2); break;
-    }
-
-    switch (wsClient->get_keyAfterPassSend())
-    {
-    default:
-    case 43: ui->comboBoxPasswordOutput->setCurrentIndex(0); break;
-    case 40: ui->comboBoxPasswordOutput->setCurrentIndex(1); break;
-    case 44: ui->comboBoxPasswordOutput->setCurrentIndex(2); break;
-    }
-
-    switch (wsClient->get_screenBrightness())
-    {
-    default:
-    case 51: ui->comboBoxScreenBrightness->setCurrentIndex(0); break;
-    case 89: ui->comboBoxScreenBrightness->setCurrentIndex(1); break;
-    case 128: ui->comboBoxScreenBrightness->setCurrentIndex(2); break;
-    case 166: ui->comboBoxScreenBrightness->setCurrentIndex(3); break;
-    case 204: ui->comboBoxScreenBrightness->setCurrentIndex(4); break;
-    case 255: ui->comboBoxScreenBrightness->setCurrentIndex(5); break;
-    }
+    updateComboBoxIndex(ui->lockUnlockModeComboBox, wsClient->get_lockUnlockMode());
+    updateComboBoxIndex(ui->comboBoxLoginOutput, wsClient->get_keyAfterLoginSend());
+    updateComboBoxIndex(ui->comboBoxPasswordOutput, wsClient->get_keyAfterPassSend());
+    updateComboBoxIndex(ui->comboBoxScreenBrightness, wsClient->get_screenBrightness());
+    updateComboBoxIndex(ui->comboBoxLang, wsClient->get_keyboardLayout());
 
     ui->comboBoxKnock->setCurrentIndex(wsClient->get_knockSensitivity());
 
@@ -589,6 +642,12 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
         o["key_after_pass"] = ui->comboBoxPasswordOutput->currentData().toInt();
     if (ui->checkBoxSlowHost->isChecked() != wsClient->get_delayAfterKeyEntryEnable())
         o["delay_after_key_enabled"] = ui->checkBoxSlowHost->isChecked();
+    if (ui->randomStartingPinCheckBox->isChecked() != wsClient->get_randomStartingPin())
+        o["random_starting_pin"] = ui->randomStartingPinCheckBox->isChecked();
+    if (ui->hashDisplayFeatureCheckBox->isChecked() != wsClient->get_displayHash())
+        o["hash_display"] = ui->hashDisplayFeatureCheckBox->isChecked();
+    if (ui->lockUnlockModeComboBox->currentData().toInt() != wsClient->get_lockUnlockMode())
+        o["lock_unlock_mode"] = ui->lockUnlockModeComboBox->currentData().toInt();
     if (ui->spinBoxInputDelayAfterKeyPressed->value() != wsClient->get_delayAfterKeyEntry())
         o["delay_after_key"] = ui->spinBoxInputDelayAfterKeyPressed->value();
 
@@ -905,4 +964,13 @@ void MainWindow::integrityFinished(bool success)
         QMessageBox::information(this, "Moolticute", "Memory integrity check done successfully");
     ui->stackedWidget->setCurrentIndex(PAGE_SYNC);
     ui->widgetHeader->setEnabled(true);
+}
+
+void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
+{
+    ui->UIDRequestLabel->setText(tr(R"(
+                                    To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.<ol>
+                                    <li>Get the serial number from the back of your device.</li>
+                                    <li>&shy;<a href="mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1">Send us an email</a> with the serial number, requesting the password.</li>
+                                    <li>Enter the password you received from us</li></ol>)").arg(id));
 }

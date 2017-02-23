@@ -352,6 +352,53 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, MPParams::RANDOM_INIT_PIN_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        qDebug() << "received randomStartingPin: " << (quint8)data.at(2);
+        set_randomStartingPin(data.at(2) != 0);
+        return true;
+    }));
+
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, MPParams::HASH_DISPLAY_FEATURE_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        qDebug() << "received hashDisplay: " << (quint8)data.at(2);
+        set_hashDisplay(data.at(2) != 0);
+        return true;
+    }));
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
+                                  QByteArray(1, MPParams::LOCK_UNLOCK_FEATURE_PARAM),
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_MOOLTIPASS_PARM)
+        {
+            qWarning() << "Get parameter: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            return false;
+        }
+        qDebug() << "received lockUnlockMode: " << (quint8)data.at(2);
+        set_lockUnlockMode(data.at(2));
+        return true;
+    }));
+
+
+    jobs->append(new MPCommandJob(this,
+                                  MP_GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
@@ -637,6 +684,21 @@ void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
     if (s == 0) v = 11;
     else if (s == 2) v = 5;
     updateParam(MPParams::MINI_KNOCK_THRES_PARAM, v);
+}
+
+void MPDevice::updateRandomStartingPin(bool en)
+{
+    updateParam(MPParams::RANDOM_INIT_PIN_PARAM, en);
+}
+
+void MPDevice::updateHashDisplay(bool en)
+{
+    updateParam(MPParams::HASH_DISPLAY_FEATURE_PARAM, en);
+}
+
+void MPDevice::updateLockUnlockMode(int val)
+{
+    updateParam(MPParams::LOCK_UNLOCK_FEATURE_PARAM, val);
 }
 
 void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress)
@@ -2375,6 +2437,57 @@ void MPDevice::setCurrentDate()
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
+
+
+void MPDevice::getUID(const QByteArray & key)
+{
+
+    AsyncJobs *jobs = new AsyncJobs("Send uid request to device", this);
+    m_uid = -1;
+
+    jobs->append(new MPCommandJob(this, MP_GET_UID,
+                                  [key](const QByteArray &, QByteArray &data_to_send) -> bool
+    {
+        bool ok;
+        data_to_send.clear();
+        data_to_send.resize(16);
+        for(int i = 0; i < 16; i++) {
+            data_to_send[i] = key.mid(2*i, 2).toUInt(&ok, 16);
+            if(!ok)
+                return false;
+        }
+
+        return true;
+    },
+                                [=](const QByteArray &data, bool &) -> bool
+    {
+        if ((quint8)data[MP_CMD_FIELD_INDEX] != MP_GET_UID)
+        {
+            qWarning() << "Send uid request: wrong command received as answer:" << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16);
+            //return false;
+        }
+        if (data[MP_LEN_FIELD_INDEX] == 1 )
+        {
+            qWarning() << "Couldn't request uid" << data[MP_PAYLOAD_FIELD_INDEX] <<  data[MP_LEN_FIELD_INDEX] << QString("0x%1").arg((quint8)data[MP_CMD_FIELD_INDEX], 0, 16) << data.toHex();
+            set_uid(-1);
+            return false;
+        }
+
+        bool ok;
+        quint64 uid = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]).toHex().toULongLong(&ok, 16);
+        set_uid(ok ? uid : - 1);
+        return ok;
+    }));
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    {
+        qWarning() << "Failed get uid from device";
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
 
 void MPDevice::getChangeNumbers()
 {

@@ -77,6 +77,7 @@ private slots:
     void on_pushButtonIntegrity_clicked();
 
 private:
+    void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
     virtual void closeEvent(QCloseEvent *event);
 
@@ -96,6 +97,8 @@ private:
 
     WindowLog *dialogLog = nullptr;
     QByteArray logBuffer;
+
+    QMovie* gb_spinner;
 
     enum
     {
