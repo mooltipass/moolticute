@@ -64,8 +64,11 @@ bool WSClient::isConnected() const {
 void WSClient::onWsDisconnected()
 {
     qDebug() << "Websocket disconnect";
+
+    set_memMgmtMode(false);
     force_connected(false);
     closeWebsocket();
+
     Q_EMIT wsDisconnected();
 
     //Auto reconnect websocket connection on failure
@@ -109,6 +112,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
     else if (rootobj["msg"] == "mp_disconnected")
     {
+        set_memMgmtMode(false);
         set_connected(false);
     }
     else if (rootobj["msg"] == "status_changed")

@@ -63,6 +63,8 @@ MPDevice::MPDevice(QObject *parent):
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
+
+    QTimer::singleShot(100, this, &MPDevice::exitMemMgmtMode);
 }
 
 MPDevice::~MPDevice()
