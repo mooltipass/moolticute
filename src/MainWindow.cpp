@@ -78,12 +78,16 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
 
+    connect(wsClient, &WSClient::wsConnected, this, &MainWindow::updatePage);
+    connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
 
     connect(wsClient, &WSClient::statusChanged, [this]() {
         this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
     });
+
+    connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
 
     ui->pushButtonMemMode->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
@@ -125,7 +129,6 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
 
     ui->pushButtonDevSettings->setChecked(false);
-    ui->stackedWidget->setCurrentWidget(ui->pageNoConnect);
 
 
     //Add languages to combobox
@@ -422,7 +425,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     //Setup the confirm view
     ui->widgetSpin->setPixmap(awesome->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
-    connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
+
 
     checkAutoStart();
 
@@ -432,6 +435,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
+
+
+    updatePage();
 }
 
 MainWindow::~MainWindow()

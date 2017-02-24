@@ -54,6 +54,7 @@ void WSClient::onWsConnected()
 {
     qDebug() << "Websocket connected";
     connect(wsocket, &QWebSocket::textMessageReceived, this, &WSClient::onTextMessageReceived);
+    Q_EMIT wsConnected();
 }
 
 bool WSClient::isConnected() const {
@@ -65,6 +66,7 @@ void WSClient::onWsDisconnected()
     qDebug() << "Websocket disconnect";
     force_connected(false);
     closeWebsocket();
+    Q_EMIT wsDisconnected();
 
     //Auto reconnect websocket connection on failure
     QTimer::singleShot(500, [=]()
