@@ -47,9 +47,10 @@ signals:
 private slots:
     void updatePage();
     void checkSettingsChanged();
-    void memMgmtMode();
+    void enableCredentialsManagement(bool);
     void enableKnockSettings(bool visible);
     void updateSerialInfos();
+    void updateQuickAddCredentialsButtonState();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
@@ -62,11 +63,9 @@ private slots:
     void on_pushButtonSettingsReset_clicked();
     void on_pushButtonSettingsSave_clicked();
     void on_pushButtonMemMode_clicked();
-    void on_pushButtonExitMMM_clicked();
     void on_pushButtonShowPass_clicked();
-    void on_pushButtonCredAdd_clicked();
     void on_pushButtonCredEdit_clicked();
-    void on_pushButtonQuickAddCred_clicked();
+    void on_addCredentialButton_clicked();
     void on_pushButtonViewLogs_clicked();
     void on_pushButtonAutoStart_clicked();
 
@@ -78,6 +77,8 @@ private slots:
 
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
+
+
 
     virtual void closeEvent(QCloseEvent *event);
 
@@ -100,21 +101,6 @@ private:
 
     QMovie* gb_spinner;
 
-    enum
-    {
-        PAGE_NO_DAEMON = 0,
-        PAGE_NO_CONNECTION,
-        PAGE_SETTINGS,
-        PAGE_CREDENTIALS_ENABLE,
-        PAGE_SYNC,
-        PAGE_NO_CARD,
-        PAGE_LOCKED,
-        PAGE_CREDENTIALS,
-        PAGE_WAIT_CONFIRM,
-        PAGE_ABOUT,
-        PAGE_MC_SETTINGS,
-        PAGE_MC_INTEGRITY_CHECK,
-    };
 };
 
 #endif // MAINWINDOW_H

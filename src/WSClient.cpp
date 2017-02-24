@@ -243,3 +243,26 @@ bool WSClient::requestDeviceUID(const QByteArray & key) {
                 });
     return true;
 }
+
+
+void WSClient::sendEnterCredentialsManagementRequest()
+{
+    sendJsonData({{ "msg", "start_memorymgmt" }});
+}
+
+void WSClient::sendLeaveCredentialsManagementRequest()
+{
+     sendJsonData({{ "msg", "exit_memorymgmt" }});
+}
+
+void WSClient::addCredential(const QString & service, const QString & login,
+                   const QString & password, const QString & description)
+{
+    QJsonObject o = {{ "service", service},
+                     { "login",   login},
+                     { "password", password },
+                     { "description", description}};
+    sendJsonData({{ "msg", "set_credential" },
+                            { "data", o }});
+}
+

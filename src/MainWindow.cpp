@@ -18,7 +18,6 @@
  ******************************************************************************/
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include "DialogEdit.h"
 #include "version.h"
 #include "AutoStartup.h"
 #include "Common.h"
@@ -76,6 +75,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAppSettings->setIcon(awesome->icon(fa::cogs));
     ui->pushButtonAbout->setIcon(awesome->icon(fa::info));
 
+
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
 
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
@@ -90,27 +90,26 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonImportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsReset->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsSave->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonCredAdd->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonCredDel->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonShowPass->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonExitMMM->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonCredEdit->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonQuickAddCred->setStyleSheet(CSS_BLUE_BUTTON);
+    //ui->pushButtonCredAdd->setStyleSheet(CSS_BLUE_BUTTON);
+    //ui->pushButtonCredDel->setStyleSheet(CSS_BLUE_BUTTON);
+    //ui->pushButtonShowPass->setStyleSheet(CSS_BLUE_BUTTON);
+    //ui->pushButtonExitMMM->setStyleSheet(CSS_BLUE_BUTTON);
+    //ui->pushButtonCredEdit->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->addCredentialButton->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, whiteButtons));
-    ui->pushButtonCredAdd->setIcon(awesome->icon(fa::plus, whiteButtons));
-    ui->pushButtonCredDel->setIcon(awesome->icon(fa::trash, whiteButtons));
-    ui->pushButtonShowPass->setIcon(awesome->icon(fa::eye, whiteButtons));
-    ui->pushButtonExitMMM->setIcon(awesome->icon(fa::signout, whiteButtons));
-    ui->pushButtonCredEdit->setIcon(awesome->icon(fa::pencilsquareo, whiteButtons));
+    //ui->pushButtonCredAdd->setIcon(awesome->icon(fa::plus, whiteButtons));
+    //ui->pushButtonCredDel->setIcon(awesome->icon(fa::trash, whiteButtons));
+    //ui->pushButtonShowPass->setIcon(awesome->icon(fa::eye, whiteButtons));
+    //ui->pushButtonExitMMM->setIcon(awesome->icon(fa::signout, whiteButtons));
+    //ui->pushButtonCredEdit->setIcon(awesome->icon(fa::pencilsquareo, whiteButtons));
     ui->pushButtonSettingsSave->setVisible(false);
     ui->pushButtonSettingsReset->setVisible(false);
-    ui->pushButtonMemMode->setIcon(awesome->icon(fa::database, whiteButtons));
-    ui->pushButtonQuickAddCred->setIcon(awesome->icon(fa::plussquare, whiteButtons));
+    ui->pushButtonMemMode->setIcon(awesome->icon(fa::lock, whiteButtons));
 
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
@@ -118,8 +117,16 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->pushButtonAbout, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonAppSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
 
+
+    connect(ui->addCredServiceInput, &QLineEdit::textChanged, this, &MainWindow::updateQuickAddCredentialsButtonState);
+    connect(ui->addCredLoginInput, &QLineEdit::textChanged, this, &MainWindow::updateQuickAddCredentialsButtonState);
+    connect(ui->addCredPasswordInput, &QLineEdit::textChanged, this, &MainWindow::updateQuickAddCredentialsButtonState);
+    updateQuickAddCredentialsButtonState();
+
+
     ui->pushButtonDevSettings->setChecked(false);
-    ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
+    ui->stackedWidget->setCurrentWidget(ui->pageNoConnect);
+
 
     //Add languages to combobox
     ui->comboBoxLang->addItem("en_US", ID_KEYB_EN_US_LUT);
@@ -415,7 +422,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     //Setup the confirm view
     ui->widgetSpin->setPixmap(awesome->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
-    connect(wsClient, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(memMgmtMode()));
+    connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
 
     checkAutoStart();
 
@@ -440,56 +447,62 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::updatePage()
 {
+    if(ui->stackedWidget->currentWidget() == ui->pageCredentials && wsClient->get_memMgmtMode()) {
+        if(QMessageBox::question(this, tr("Exit the credentials manager?"),
+                                       tr("Switching tabs will lock out the credentials management mode. Are you sure you want to switch tab ?"),
+                                       QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
+            return;
+
+         wsClient->sendLeaveCredentialsManagementRequest();
+    }
+
     if (ui->pushButtonAbout->isChecked())
     {
-        ui->stackedWidget->setCurrentIndex(PAGE_ABOUT);
+        ui->stackedWidget->setCurrentWidget(ui->pageAbout);
         return;
     }
 
     if (ui->pushButtonAppSettings->isChecked())
     {
-        ui->stackedWidget->setCurrentIndex(PAGE_MC_SETTINGS);
+        ui->stackedWidget->setCurrentWidget(ui->pageAppSettings);
         return;
     }
 
     if(!wsClient->isConnected()) {
-         ui->stackedWidget->setCurrentIndex(PAGE_NO_DAEMON);
+         ui->stackedWidget->setCurrentWidget(ui->pageNoDaemon);
          return;
     }
 
     if (!wsClient->get_connected())
     {
-        ui->stackedWidget->setCurrentIndex(PAGE_NO_CONNECTION);
+        ui->stackedWidget->setCurrentWidget(ui->pageNoConnect);
         return;
     }
 
     if (ui->pushButtonDevSettings->isChecked()) {
-        ui->stackedWidget->setCurrentIndex(PAGE_SETTINGS);
+        ui->stackedWidget->setCurrentWidget(ui->pageSettings);
         return;
     }
 
     if (wsClient->get_status() == Common::NoCardInserted)
     {
-        ui->stackedWidget->setCurrentIndex(PAGE_NO_CARD);
+        ui->stackedWidget->setCurrentWidget(ui->pageMissingSecurityCard);
         return;
     }
 
     if (wsClient->get_status() == Common::Locked ||
         wsClient->get_status() == Common::LockedScreen)
     {
-        ui->stackedWidget->setCurrentIndex(PAGE_LOCKED);
+        ui->stackedWidget->setCurrentWidget(ui->pageDeviceLocked);
         return;
     }
 
     else if (ui->pushButtonCred->isChecked())
     {
-        if (wsClient->get_memMgmtMode())
-            ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS);
-        else
-            ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS_ENABLE);
+         ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
     }
     else if (ui->pushButtonSync->isChecked())
-        ui->stackedWidget->setCurrentIndex(PAGE_SYNC);
+        ui->stackedWidget->setCurrentWidget(ui->pageSync);
 }
 
 void MainWindow::enableKnockSettings(bool enable)
@@ -664,33 +677,39 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
 
 void MainWindow::on_pushButtonMemMode_clicked()
 {
-    wsClient->sendJsonData({{ "msg", "start_memorymgmt" }});
-    ui->widgetHeader->setEnabled(false);
-    ui->stackedWidget->setCurrentIndex(PAGE_WAIT_CONFIRM);
-}
+    if(!wsClient->get_memMgmtMode()) {
 
-void MainWindow::memMgmtMode()
-{    
-    if (wsClient->get_memMgmtMode())
-    {
-        qDebug() << "MMM entered";
-        ui->widgetHeader->setEnabled(false);
-        ui->pushButtonCred->setChecked(true); //force
-        ui->stackedWidget->setCurrentIndex(PAGE_CREDENTIALS);
+        wsClient->sendEnterCredentialsManagementRequest();
+        ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     }
-    else
-    {
-        qDebug() << "MMM exitted";
-        updatePage();
-        ui->widgetHeader->setEnabled(true);
-        passItem = nullptr;
+    else {
+
+         wsClient->sendLeaveCredentialsManagementRequest();
     }
 }
 
-void MainWindow::on_pushButtonExitMMM_clicked()
+void MainWindow::enableCredentialsManagement(bool enable)
 {
-    wsClient->sendJsonData({{ "msg", "exit_memorymgmt" }});
+    if(enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
+        ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+    ui->treeViewCred->setEnabled(enable);
+    ui->lineEditFilterCred->setEnabled(enable);
+
+    if(!enable) {
+         updatePage();
+         passItem = nullptr;
+    }
+    ui->pushButtonMemMode->setIcon(awesome->icon(enable ? fa::lock : fa::unlock));
+    ui->pushButtonMemMode->setText(enable ? tr("Lock") : tr("Unlock"));
 }
+
+
+void MainWindow::updateQuickAddCredentialsButtonState() {
+    ui->addCredentialButton->setEnabled(   ui->addCredLoginInput->hasAcceptableInput() && ui->addCredLoginInput->text().length() > 0
+                                        && ui->addCredServiceInput->hasAcceptableInput() && ui->addCredServiceInput->text().length() > 0
+                                        && ui->addCredPasswordInput->hasAcceptableInput() && ui->addCredPasswordInput->text().length() > 0);
+}
+
 
 void MainWindow::on_pushButtonShowPass_clicked()
 {
@@ -723,14 +742,9 @@ void MainWindow::on_pushButtonShowPass_clicked()
     setEnabled(false);
 }
 
-void MainWindow::on_pushButtonCredAdd_clicked()
-{
-    on_pushButtonQuickAddCred_clicked();
-}
-
 void MainWindow::on_pushButtonCredEdit_clicked()
 {
-    if (!wsClient->get_memMgmtMode()) return;
+/*    if (!wsClient->get_memMgmtMode()) return;
 
     QItemSelectionModel *selection = ui->treeViewCred->selectionModel();
     QModelIndexList indexes = selection->selectedIndexes();
@@ -791,37 +805,32 @@ void MainWindow::on_pushButtonCredEdit_clicked()
 
             QMessageBox::information(this, tr("Moolticute"), tr("Update of credential done successfully."));
         });
-    }
+    }*/
 }
 
-void MainWindow::on_pushButtonQuickAddCred_clicked()
+void MainWindow::on_addCredentialButton_clicked()
 {
-    DialogEdit d(credModel);
-    if (d.exec())
+    ui->addCredentialsGroupBox->setEnabled(false);
+    wsClient->addCredential(ui->addCredServiceInput->text(),
+                            ui->addCredLoginInput->text(), ui->addCredPasswordInput->text());
+
+
+    auto conn = std::make_shared<QMetaObject::Connection>();
+    *conn = connect(wsClient, &WSClient::addCredentialDone, [this, conn](bool success)
     {
-        setEnabled(false);
-
-        QJsonObject o = {{ "service", d.getService() },
-                         { "login", d.getLogin() },
-                         { "password", d.getPassword() },
-                         { "description", d.getDescription() }};
-        wsClient->sendJsonData({{ "msg", "set_credential" },
-                                { "data", o }});
-
-        auto conn = std::make_shared<QMetaObject::Connection>();
-        *conn = connect(wsClient, &WSClient::addCredentialDone, [this, conn](bool success)
+        disconnect(*conn);
+        ui->addCredentialsGroupBox->setEnabled(true);
+        if (!success)
         {
-            disconnect(*conn);
-            setEnabled(true);
-            if (!success)
-            {
-                QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential!"));
-                return;
-            }
+            QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential!"));
+            return;
+        }
 
-            QMessageBox::information(this, tr("Moolticute"), tr("New credential added successfully."));
-        });
-    }
+        QMessageBox::information(this, tr("Moolticute"), tr("New credential added successfully."));
+        ui->addCredServiceInput->clear();
+        ui->addCredLoginInput->clear();
+        ui->addCredPasswordInput->clear();
+    });
 }
 
 void MainWindow::askPasswordDone(bool success, const QString &pass)
@@ -937,7 +946,7 @@ void MainWindow::on_pushButtonIntegrity_clicked()
     {
         wsClient->sendJsonData({{ "msg", "start_memcheck" }});
         ui->widgetHeader->setEnabled(false);
-        ui->stackedWidget->setCurrentIndex(PAGE_MC_INTEGRITY_CHECK);
+        ui->stackedWidget->setCurrentWidget(ui->pageIntegrity);
         ui->progressBarIntegrity->setMinimum(0);
         ui->progressBarIntegrity->setMaximum(0);
         ui->progressBarIntegrity->setValue(0);
@@ -962,7 +971,7 @@ void MainWindow::integrityFinished(bool success)
         QMessageBox::warning(this, "Moolticute", tr("Memory integrity check failed!"));
     else
         QMessageBox::information(this, "Moolticute", "Memory integrity check done successfully");
-    ui->stackedWidget->setCurrentIndex(PAGE_SYNC);
+    ui->stackedWidget->setCurrentWidget(ui->pageSync);
     ui->widgetHeader->setEnabled(true);
 }
 

@@ -59,6 +59,12 @@ public:
 
     bool requestDeviceUID(const QByteArray & key);
 
+    void sendEnterCredentialsManagementRequest();
+    void sendLeaveCredentialsManagementRequest();
+
+    void addCredential(const QString & service, const QString & login,
+                       const QString & password, const QString & description = {});
+
 signals:
     void wsConnected();
     void wsDisconnected();
