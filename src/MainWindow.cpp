@@ -79,7 +79,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
 
     delete ui->credentialsListView->selectionModel();
-    ui->credentialsListView->setSelectionModel(new ConditionalItemSelectionModel(ConditionalItemSelectionModel::TestFunction(std::bind(&MainWindow::confirmDiscardUneditedCredentialChanges, this, std::placeholders::_1)), credFilterModel));
+    ui->credentialsListView->setSelectionModel(
+                new ConditionalItemSelectionModel(ConditionalItemSelectionModel::TestFunction(std::bind(&MainWindow::confirmDiscardUneditedCredentialChanges, this, std::placeholders::_1)),
+                                                  credFilterModel));
 
 
     connect(ui->credentialsListView->selectionModel(), &QItemSelectionModel::currentRowChanged, mapper, [this, mapper](const QModelIndex & idx) {

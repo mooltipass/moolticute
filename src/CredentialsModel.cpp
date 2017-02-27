@@ -175,7 +175,7 @@ void  CredentialsModel::mergeWith(const QVector<Credential> & newCreds) {
             return c.login == newCred.login && c.service == newCred.service;
         });
         if(it == std::end(m_credentials)) {
-            beginInsertRows(QModelIndex(), m_credentials.size(), m_credentials.size() + 1);
+            beginInsertRows(QModelIndex(), m_credentials.size(), m_credentials.size());
             m_credentials << newCred;
             endInsertRows();
             continue;
