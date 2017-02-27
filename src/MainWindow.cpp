@@ -717,7 +717,8 @@ void MainWindow::on_pushButtonMemMode_clicked()
         ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     }
     else {
-
+        if(!confirmDiscardUneditedCredentialChanges())
+            return;
          wsClient->sendLeaveCredentialsManagementRequest();
     }
 }
@@ -835,7 +836,7 @@ void  MainWindow::saveSelectedCredential(QModelIndex idx) {
 }
 
 bool MainWindow::confirmDiscardUneditedCredentialChanges(QModelIndex idx) {
-    if(ui->stackedWidget->currentWidget() != ui->pageCredentials)
+    if(ui->stackedWidget->currentWidget() != ui->pageCredentials || !wsClient->get_memMgmtMode())
         return true;
 
 
