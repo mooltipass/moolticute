@@ -64,7 +64,26 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     credFilterModel = new CredentialsFilterModel(this);
 
     credFilterModel->setSourceModel(credModel);
-    ui->treeViewCred->setModel(credFilterModel);
+    ui->credentialsListView->setModel(credFilterModel);
+
+    QDataWidgetMapper* mapper = new QDataWidgetMapper(this);
+    mapper->setItemDelegate(new CredentialViewItemDelegate(mapper));
+    mapper->setModel(credFilterModel);
+    mapper->addMapping(ui->credDisplayServiceInput, CredentialsModel::ServiceIdx);
+    mapper->addMapping(ui->credDisplayLoginInput, CredentialsModel::LoginIdx);
+    mapper->addMapping(ui->credDisplayPasswordInput, CredentialsModel::PasswordIdx);
+    mapper->addMapping(ui->credDisplayDescriptionInput,  CredentialsModel::DescriptionIdx);
+    mapper->addMapping(ui->credDisplayCreationDateInput,  CredentialsModel::DateCreatedIdx);
+    mapper->addMapping(ui->credDisplayModificationDateInput,  CredentialsModel::DateModifiedIdx);
+    mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
+    connect(ui->credentialsListView->selectionModel(), &QItemSelectionModel::currentRowChanged, mapper, [mapper](QModelIndex idx) {
+        mapper->setCurrentIndex(idx.row());
+    });
+    connect(ui->credDisplayPasswordInput, & LockedPasswordLineEdit::unlockRequested,
+            this, &MainWindow::requestPasswordForSelectedItem);
+
+    ui->credDisplayFrame->setStyleSheet("background-color:#FFFFFF");
+
 
     //Disable this option for now, firmware does not support it
     ui->checkBoxInput->setEnabled(false);
@@ -74,6 +93,15 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonSync->setIcon(awesome->icon(fa::refresh));
     ui->pushButtonAppSettings->setIcon(awesome->icon(fa::cogs));
     ui->pushButtonAbout->setIcon(awesome->icon(fa::info));
+
+    connect(ui->credDisplayButtonBox, &QDialogButtonBox::clicked, [mapper, this](QAbstractButton* btn) {
+        if(ui->credDisplayButtonBox->button(QDialogButtonBox::Save) == btn) {
+            saveSelectedCredential();
+        }
+        if(ui->credDisplayButtonBox->button(QDialogButtonBox::Reset) == btn) {
+            mapper->revert();
+        }
+    });
 
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
@@ -94,11 +122,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonImportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsReset->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsSave->setStyleSheet(CSS_BLUE_BUTTON);
-    //ui->pushButtonCredAdd->setStyleSheet(CSS_BLUE_BUTTON);
-    //ui->pushButtonCredDel->setStyleSheet(CSS_BLUE_BUTTON);
-    //ui->pushButtonShowPass->setStyleSheet(CSS_BLUE_BUTTON);
-    //ui->pushButtonExitMMM->setStyleSheet(CSS_BLUE_BUTTON);
-    //ui->pushButtonCredEdit->setStyleSheet(CSS_BLUE_BUTTON);
+
     ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
@@ -106,11 +130,6 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, whiteButtons));
-    //ui->pushButtonCredAdd->setIcon(awesome->icon(fa::plus, whiteButtons));
-    //ui->pushButtonCredDel->setIcon(awesome->icon(fa::trash, whiteButtons));
-    //ui->pushButtonShowPass->setIcon(awesome->icon(fa::eye, whiteButtons));
-    //ui->pushButtonExitMMM->setIcon(awesome->icon(fa::signout, whiteButtons));
-    //ui->pushButtonCredEdit->setIcon(awesome->icon(fa::pencilsquareo, whiteButtons));
     ui->pushButtonSettingsSave->setVisible(false);
     ui->pushButtonSettingsReset->setVisible(false);
     ui->pushButtonMemMode->setIcon(awesome->icon(fa::lock, whiteButtons));
@@ -387,16 +406,13 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     {
         credModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
         ui->lineEditFilterCred->clear();
-        ui->treeViewCred->expandAll();
-        for (int i = 0;i < credModel->columnCount();i++)
-            ui->treeViewCred->resizeColumnToContents(i);
     });
     connect(ui->lineEditFilterCred, &QLineEdit::textChanged, [=](const QString &t)
     {
         credFilterModel->setFilter(t);
     });
 
-    connect(wsClient, &WSClient::askPasswordDone, this, &MainWindow::askPasswordDone);
+    connect(wsClient, &WSClient::passwordUnlocked, this, &MainWindow::onPasswordUnlocked);
 
     //When something changed in GUI, show save/reset buttons
     connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
@@ -698,12 +714,13 @@ void MainWindow::enableCredentialsManagement(bool enable)
 {
     if(enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
         ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
-    ui->treeViewCred->setEnabled(enable);
+    ui->credentialsListView->setEnabled(enable);
     ui->lineEditFilterCred->setEnabled(enable);
+    ui->credDisplayFrame ->setVisible(enable);
+
 
     if(!enable) {
          updatePage();
-         passItem = nullptr;
     }
     ui->pushButtonMemMode->setIcon(awesome->icon(enable ? fa::lock : fa::unlock));
     ui->pushButtonMemMode->setText(enable ? tr("Lock") : tr("Unlock"));
@@ -717,107 +734,31 @@ void MainWindow::updateQuickAddCredentialsButtonState() {
 }
 
 
-void MainWindow::on_pushButtonShowPass_clicked()
+void MainWindow::requestPasswordForSelectedItem()
 {
     if (!wsClient->get_memMgmtMode()) return;
 
-    QItemSelectionModel *selection = ui->treeViewCred->selectionModel();
+    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
     QModelIndexList indexes = selection->selectedIndexes();
 
-    if (indexes.size() < 1)
+    if (indexes.size() != 1)
         return;
 
     QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
 
-    if (!idx.parent().isValid())
-        return;
-
-    QStandardItem *pit = credModel->item(idx.parent().row());
-    QString service = pit->text();
-
-    QStandardItem *it = pit->child(idx.row(), 1);
-    QString login = it->text();
-
-    passItem = pit->child(idx.row(), 2);
-
-    QJsonObject d = {{ "service", service },
-                     { "login", login }};
-    wsClient->sendJsonData({{ "msg", "ask_password" },
-                            { "data", d }});
-
-    setEnabled(false);
-}
-
-void MainWindow::on_pushButtonCredEdit_clicked()
-{
-/*    if (!wsClient->get_memMgmtMode()) return;
-
-    QItemSelectionModel *selection = ui->treeViewCred->selectionModel();
-    QModelIndexList indexes = selection->selectedIndexes();
-
-    if (indexes.size() < 1)
-        return;
-
-    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
-
-    if (!idx.parent().isValid())
-        return;
-
-    QStandardItem *serviceIt = credModel->item(idx.parent().row());
-    QStandardItem *loginIt = serviceIt->child(idx.row(), 1);
-    QStandardItem *passIt = serviceIt->child(idx.row(), 2);
-    QStandardItem *descIt = serviceIt->child(idx.row(), 3);
-
-    //Password is unknown, ask first
-    if (!passIt->data(CredentialsModel::RoleHasPassword).toBool())
-    {
-        on_pushButtonShowPass_clicked();
-        editCredAsked = true;
-        return;
-    }
-
-    DialogEdit d(credModel);
-    d.setService(serviceIt->text());
-    d.setLogin(loginIt->text());
-    d.setPassword(passIt->text());
-    d.setDescription(descIt->text());
-
-    if (d.exec())
-    {
-        setEnabled(false);
-
-        QJsonObject o = {{ "service", d.getService() },
-                         { "login", d.getLogin() },
-                         { "password", d.getPassword() },
-                         { "description", d.getDescription() }};
-        wsClient->sendJsonData({{ "msg", "set_credential" },
-                                { "data", o }});
-
-        auto conn = std::make_shared<QMetaObject::Connection>();
-        *conn = connect(wsClient, &WSClient::addCredentialDone, [=](bool success)
-        {
-            disconnect(*conn);
-            setEnabled(true);
-            if (!success)
-            {
-                QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential!"));
-                return;
-            }
-
-            serviceIt->setText(o["sevice"].toString());
-            loginIt->setText(o["login"].toString());
-            passIt->setText(o["password"].toString());
-            descIt->setText(o["description"].toString());
-
-            QMessageBox::information(this, tr("Moolticute"), tr("Update of credential done successfully."));
-        });
-    }*/
+    const auto&  cred = credModel->at(idx.row());
+    wsClient->requestPassword(cred.service, cred.login);
 }
 
 void MainWindow::on_addCredentialButton_clicked()
-{
+{ QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
+    QModelIndexList indexes = selection->selectedIndexes();
+
+    if (indexes.size() != 1)
+        return;
+
     ui->addCredentialsGroupBox->setEnabled(false);
-    wsClient->addCredential(ui->addCredServiceInput->text(),
+    wsClient->addOrUpdateCredential(ui->addCredServiceInput->text(),
                             ui->addCredLoginInput->text(), ui->addCredPasswordInput->text());
 
 
@@ -839,25 +780,34 @@ void MainWindow::on_addCredentialButton_clicked()
     });
 }
 
-void MainWindow::askPasswordDone(bool success, const QString &pass)
+void MainWindow::onPasswordUnlocked(const QString & service, const QString & login,
+                                    const QString & password, bool success)
 {
-    setEnabled(true);
     if (!success)
     {
         QMessageBox::warning(this, tr("Failure"), tr("Unable to query password!"));
-        passItem = nullptr;
+        return;
     }
-    else
-    {
-        if (passItem)
-        {
-            passItem->setText(pass);
-            passItem->setData(true, CredentialsModel::RoleHasPassword);
-            if (editCredAsked)
-                QTimer::singleShot(1, this, SLOT(on_pushButtonCredEdit_clicked()));
-        }
+
+    credModel->setClearTextPassword(service, login, password);
+}
+
+void  MainWindow::saveSelectedCredential() {
+    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
+    QModelIndexList indexes = selection->selectedIndexes();
+
+    if (indexes.size() != 1)
+        return;
+
+    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
+    const auto&  cred = credModel->at(idx.row());
+
+    QString password = ui->credDisplayPasswordInput->text();
+    QString description = ui->credDisplayDescriptionInput->text();
+
+    if(password != cred.password || description != cred.description) {
+        wsClient->addOrUpdateCredential(cred.service, cred.login, password, description);
     }
-    editCredAsked = false;
 }
 
 void MainWindow::on_pushButtonAutoStart_clicked()

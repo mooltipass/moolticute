@@ -58,13 +58,14 @@ private slots:
     void integrityProgress(int total, int current);
     void integrityFinished(bool success);
 
-    void askPasswordDone(bool success, const QString &pass);
+    void onPasswordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
+
+    void saveSelectedCredential();
 
     void on_pushButtonSettingsReset_clicked();
     void on_pushButtonSettingsSave_clicked();
     void on_pushButtonMemMode_clicked();
-    void on_pushButtonShowPass_clicked();
-    void on_pushButtonCredEdit_clicked();
+    void requestPasswordForSelectedItem();
     void on_addCredentialButton_clicked();
     void on_pushButtonViewLogs_clicked();
     void on_pushButtonAutoStart_clicked();
@@ -91,10 +92,6 @@ private:
 
     CredentialsModel *credModel;
     CredentialsFilterModel *credFilterModel;
-
-    QStandardItem *passItem = nullptr;
-
-    bool editCredAsked = false;
 
     WindowLog *dialogLog = nullptr;
     QByteArray logBuffer;

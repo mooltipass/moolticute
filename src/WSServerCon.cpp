@@ -156,7 +156,6 @@ void WSServerCon::processMessage(const QString &message)
 
             QJsonObject ores = o;
             QJsonObject oroot = root;
-            ores["password"] = "******";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });
@@ -298,7 +297,6 @@ void WSServerCon::processMessage(const QString &message)
 
             QJsonObject ores;
             QJsonObject oroot = root;
-            ores["node_data"] = "********";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         },

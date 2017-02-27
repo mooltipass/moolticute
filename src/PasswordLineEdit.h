@@ -37,13 +37,31 @@ private:
 class PasswordOptionsPopup;
 class PasswordLineEdit : public QLineEdit
 {
+    Q_OBJECT
 public:
     PasswordLineEdit(QWidget* parent = nullptr);
-    QAction *m_showPassword, *m_hidePassword, *m_generateRandom;
-    PasswordOptionsPopup* m_passwordOptionsPopup;
+
+protected:
+    QAction *m_showPassword, *m_hidePassword;
 
 private:
+    QAction *m_generateRandom;
+    PasswordOptionsPopup* m_passwordOptionsPopup;
     void showPasswordOptions();
+};
+
+class LockedPasswordLineEdit : public PasswordLineEdit
+{
+    Q_OBJECT
+public:
+    LockedPasswordLineEdit(QWidget* parent = nullptr);
+    void setLocked(bool);
+
+Q_SIGNALS:
+    void unlockRequested();
+
+private:
+    bool m_locked;
 };
 
 #endif // PASSWORDLINEEDIT_H

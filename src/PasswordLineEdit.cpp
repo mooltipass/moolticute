@@ -148,6 +148,52 @@ void PasswordOptionsPopup::showEvent(QShowEvent* e) {
     QFrame::showEvent(e);
 }
 
+
+LockedPasswordLineEdit::LockedPasswordLineEdit(QWidget* parent)
+ : PasswordLineEdit(parent)
+ , m_locked(false) {
+
+    disconnect(m_showPassword, 0, 0, 0);
+
+    connect(m_showPassword, &QAction::triggered, [this]() {
+
+       if(!m_locked) {
+           this->setEchoMode(QLineEdit::Normal);
+           this->removeAction(m_showPassword);
+           this->addAction(m_hidePassword, QLineEdit::TrailingPosition);
+       }
+       else {
+           Q_EMIT unlockRequested();
+       }
+    });
+
+}
+
+void LockedPasswordLineEdit::setLocked(bool locked) {
+    m_locked = locked;
+
+
+
+
+    if(m_locked) {
+
+        this->setText("");
+        this->setPlaceholderText("Password Locked");
+        this->setEchoMode(QLineEdit::Password);
+
+        this->addAction(m_showPassword, QLineEdit::TrailingPosition);
+        this->removeAction(m_hidePassword);
+
+    }
+    else {
+        this->setEchoMode(QLineEdit::Normal);
+        this->addAction(m_hidePassword, QLineEdit::TrailingPosition);
+        this->removeAction(m_showPassword);
+    }
+    this->setReadOnly(m_locked);
+}
+
+
 void PasswordOptionsPopup::generatePassword() {
 
     static bool init = false;

@@ -62,14 +62,16 @@ public:
     void sendEnterCredentialsManagementRequest();
     void sendLeaveCredentialsManagementRequest();
 
-    void addCredential(const QString & service, const QString & login,
+    void addOrUpdateCredential(const QString & service, const QString & login,
                        const QString & password, const QString & description = {});
+
+    void requestPassword(const QString & service, const QString & login);
 
 signals:
     void wsConnected();
     void wsDisconnected();
     void memoryDataChanged();
-    void askPasswordDone(bool success, const QString &pass);
+    void passwordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
     void addCredentialDone(bool success);
     void showAppRequested();
     void progressChanged(int total, int current);

@@ -41,30 +41,56 @@ private:
     QString filter;
 };
 
-class CredentialsModel: public QStandardItemModel
+class CredentialsModel: public QAbstractTableModel
 {
     Q_OBJECT
 public:
     CredentialsModel(QObject *parent = 0);
 
     void load(const QJsonArray &creds);
-    void reloadData();
+    void setClearTextPassword(const QString & service, const QString & login, const QString & password);
 
-    enum
+
+    enum ColumnIdx
     {
-        RoleType = Qt::UserRole + 1,
-        RoleHasPassword,
+           ServiceIdx,
+           LoginIdx,
+           PasswordIdx,
+           DescriptionIdx,
+           DateCreatedIdx,
+           DateModifiedIdx,
+           ColumnCount
+    };
+    enum CustomRole {
+        LoginRole = Qt::UserRole + 1,
+        PasswordUnlockedRole
     };
 
-    enum
-    {
-        TypeService,
-        TypeLogin,
-        TypeData,
-    };
+
+
+
+protected:
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 private:
-    QJsonArray credentials;
+    struct Credential {
+        QString service;
+        QString login;
+        QString password;
+        QString description;
+        QDate createdDate;
+        QDate updatedDate;
+    };
+    QVector<Credential> m_credentials;
+
+    auto at(int idx) const -> const Credential&;
+
+    void mergeWith(const QVector<Credential> &);
+
+    friend class CredentialsFilterModel;
+    friend class MainWindow;
 };
 
 #endif // CREDENTIALSMODEL_H

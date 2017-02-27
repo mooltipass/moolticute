@@ -139,10 +139,8 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "ask_password")
     {
         QJsonObject o = rootobj["data"].toObject();
-        if (o.contains("failed") && o["failed"].toBool())
-            emit askPasswordDone(false, QString());
-        else
-            emit askPasswordDone(true, o["password"].toString());
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        emit passwordUnlocked(o["service"].toString(), o["login"].toString(), o["password"].toString(), success);
     }
     else if (rootobj["msg"] == "version_changed")
     {
@@ -261,7 +259,7 @@ void WSClient::sendLeaveCredentialsManagementRequest()
      sendJsonData({{ "msg", "exit_memorymgmt" }});
 }
 
-void WSClient::addCredential(const QString & service, const QString & login,
+void WSClient::addOrUpdateCredential(const QString & service, const QString & login,
                    const QString & password, const QString & description)
 {
     QJsonObject o = {{ "service", service},
@@ -270,5 +268,13 @@ void WSClient::addCredential(const QString & service, const QString & login,
                      { "description", description}};
     sendJsonData({{ "msg", "set_credential" },
                             { "data", o }});
+}
+
+void WSClient::requestPassword(const QString & service, const QString & login) {
+
+    QJsonObject d = {{ "service", service },
+                     { "login", login }};
+    sendJsonData({{ "msg", "ask_password" },
+                            { "data", d }});
 }
 
