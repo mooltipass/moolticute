@@ -126,8 +126,7 @@ void UsbMonitor_linux::start()
 }
 
 void UsbMonitor_linux::handleEvents() {
-    timeval tv = {};
-    libusb_handle_events_timeout(usb_ctx, &tv);
+    libusb_handle_events(usb_ctx);
 }
 
 void UsbMonitor_linux::stop()

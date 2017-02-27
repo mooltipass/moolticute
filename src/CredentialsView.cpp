@@ -3,6 +3,7 @@
 #include <QStyledItemDelegate>
 #include "CredentialsModel.h"
 #include <QApplication>
+#include <QDateTime>
 #include "PasswordLineEdit.h"
 
 class ServiceItemDelegate : public QStyledItemDelegate {
@@ -23,6 +24,44 @@ CredentialsView::CredentialsView(QWidget *parent)
     :QListView(parent) {
 
     setItemDelegateForColumn(0, new ServiceItemDelegate(this));
+}
+
+ConditionalItemSelectionModel::ConditionalItemSelectionModel(TestFunction f, QAbstractItemModel *model)
+ : QItemSelectionModel(model)
+ , cb(f)
+ , lastRequestTime(0) {}
+
+void ConditionalItemSelectionModel::select(const QModelIndex &index, QItemSelectionModel::SelectionFlags command) {
+    if(canChangeIndex()) {
+        QItemSelectionModel::select(index, command);
+    }
+}
+
+
+void ConditionalItemSelectionModel::select(const QItemSelection & selection, QItemSelectionModel::SelectionFlags command) {
+     if(canChangeIndex()) {
+        QItemSelectionModel::select(selection, command);
+    }
+}
+
+void  ConditionalItemSelectionModel::setCurrentIndex(const QModelIndex & index, QItemSelectionModel::SelectionFlags command) {
+    if(canChangeIndex()) {
+        QItemSelectionModel::setCurrentIndex(index, command);
+    }
+}
+
+bool ConditionalItemSelectionModel::canChangeIndex() {
+    if(!cb)
+        return true;
+    quint64 time = QDateTime::currentMSecsSinceEpoch();
+    if(time - lastRequestTime < 20 ) {
+        return false;
+    }
+    bool res = cb(currentIndex());
+    if(!res) {
+        lastRequestTime = QDateTime::currentMSecsSinceEpoch();
+    }
+    return res;
 }
 
 ServiceItemDelegate::ServiceItemDelegate(QWidget* parent)
@@ -103,4 +142,6 @@ void CredentialViewItemDelegate::setEditorData(QWidget *editor, const QModelInde
         ed->setLocked(locked);
     }
 }
+
+
 

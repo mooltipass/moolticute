@@ -49,6 +49,7 @@ public:
 
     void load(const QJsonArray &creds);
     void setClearTextPassword(const QString & service, const QString & login, const QString & password);
+    void update(const QString & service, const QString & login, const QString & description);
 
 
     enum ColumnIdx

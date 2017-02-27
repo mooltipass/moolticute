@@ -59,8 +59,10 @@ private slots:
     void integrityFinished(bool success);
 
     void onPasswordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
+    void onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success);
 
-    void saveSelectedCredential();
+    void saveSelectedCredential(QModelIndex idx = {});
+    bool confirmDiscardUneditedCredentialChanges(QModelIndex idx = {});
 
     void on_pushButtonSettingsReset_clicked();
     void on_pushButtonSettingsSave_clicked();

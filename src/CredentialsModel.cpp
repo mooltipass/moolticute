@@ -155,6 +155,18 @@ void CredentialsModel::setClearTextPassword(const QString & service, const QStri
 }
 
 
+void CredentialsModel::update(const QString & service, const QString & login, const QString & description) {
+    auto it = std::find_if(std::begin(m_credentials), std::end(m_credentials), [&login, &service](const Credential & c) {
+        return c.login == login && c.service == service;
+    });
+    if(it != std::end(m_credentials)) {
+        const auto idx = it - std::begin(m_credentials);
+        it->description = description;
+        it->password.clear();
+        Q_EMIT dataChanged(index(idx, PasswordIdx),index(idx, DescriptionIdx));
+    }
+}
+
 
 void  CredentialsModel::mergeWith(const QVector<Credential> & newCreds) {
 

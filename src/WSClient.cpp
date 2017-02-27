@@ -155,10 +155,8 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "set_credential")
     {
         QJsonObject o = rootobj["data"].toObject();
-        if (o.contains("failed") && o["failed"].toBool())
-            emit addCredentialDone(false);
-        else
-            emit addCredentialDone(true);
+        bool success = !o.contains("failed") || !o["failed"].toBool();
+        credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
     }
     else if (rootobj["msg"] == "show_app")
     {

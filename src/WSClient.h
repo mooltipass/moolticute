@@ -72,7 +72,7 @@ signals:
     void wsDisconnected();
     void memoryDataChanged();
     void passwordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
-    void addCredentialDone(bool success);
+    void credentialsUpdated(const QString & service, const QString & login, const QString & description, bool success);
     void showAppRequested();
     void progressChanged(int total, int current);
     void memcheckFinished(bool success);

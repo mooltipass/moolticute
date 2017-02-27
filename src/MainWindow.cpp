@@ -76,11 +76,18 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     mapper->addMapping(ui->credDisplayCreationDateInput,  CredentialsModel::DateCreatedIdx);
     mapper->addMapping(ui->credDisplayModificationDateInput,  CredentialsModel::DateModifiedIdx);
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
-    connect(ui->credentialsListView->selectionModel(), &QItemSelectionModel::currentRowChanged, mapper, [mapper](QModelIndex idx) {
+
+
+    delete ui->credentialsListView->selectionModel();
+    ui->credentialsListView->setSelectionModel(new ConditionalItemSelectionModel(ConditionalItemSelectionModel::TestFunction(std::bind(&MainWindow::confirmDiscardUneditedCredentialChanges, this, std::placeholders::_1)), credFilterModel));
+
+
+    connect(ui->credentialsListView->selectionModel(), &QItemSelectionModel::currentRowChanged, mapper, [this, mapper](const QModelIndex & idx) {
         mapper->setCurrentIndex(idx.row());
     });
     connect(ui->credDisplayPasswordInput, & LockedPasswordLineEdit::unlockRequested,
             this, &MainWindow::requestPasswordForSelectedItem);
+
 
     ui->credDisplayFrame->setStyleSheet("background-color:#FFFFFF");
 
@@ -413,6 +420,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     });
 
     connect(wsClient, &WSClient::passwordUnlocked, this, &MainWindow::onPasswordUnlocked);
+    connect(wsClient, &WSClient::credentialsUpdated, this, &MainWindow::onCredentialUpdated);
 
     //When something changed in GUI, show save/reset buttons
     connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
@@ -470,6 +478,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::updatePage()
 {
     if(ui->stackedWidget->currentWidget() == ui->pageCredentials && wsClient->get_memMgmtMode()) {
+        if(!confirmDiscardUneditedCredentialChanges())
+            return;
         if(QMessageBox::question(this, tr("Exit the credentials manager?"),
                                        tr("Switching tabs will lock out the credentials management mode. Are you sure you want to switch tab ?"),
                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
@@ -763,17 +773,17 @@ void MainWindow::on_addCredentialButton_clicked()
 
 
     auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = connect(wsClient, &WSClient::addCredentialDone, [this, conn](bool success)
+    *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & service, const QString & login, const QString &, bool success)
     {
         disconnect(*conn);
         ui->addCredentialsGroupBox->setEnabled(true);
         if (!success)
         {
-            QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential!"));
+            QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential %1/%2!").arg(service, login));
             return;
         }
 
-        QMessageBox::information(this, tr("Moolticute"), tr("New credential added successfully."));
+        QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(service, login));
         ui->addCredServiceInput->clear();
         ui->addCredLoginInput->clear();
         ui->addCredPasswordInput->clear();
@@ -792,14 +802,26 @@ void MainWindow::onPasswordUnlocked(const QString & service, const QString & log
     credModel->setClearTextPassword(service, login, password);
 }
 
-void  MainWindow::saveSelectedCredential() {
-    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
-    QModelIndexList indexes = selection->selectedIndexes();
-
-    if (indexes.size() != 1)
+void MainWindow::onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success) {
+    if (!success)
+    {
+        QMessageBox::warning(this, tr("Failure"), tr("Unable to modify %1/%2").arg(service, login));
         return;
+    }
 
-    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
+    credModel->update(service, login, description);
+}
+
+void  MainWindow::saveSelectedCredential(QModelIndex idx) {
+    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
+    if(!idx.isValid()) {
+        QModelIndexList indexes = selection->selectedIndexes();
+
+        if (indexes.size() != 1)
+            return;
+
+        idx = credFilterModel->mapToSource(indexes.at(0));
+    }
     const auto&  cred = credModel->at(idx.row());
 
     QString password = ui->credDisplayPasswordInput->text();
@@ -808,6 +830,40 @@ void  MainWindow::saveSelectedCredential() {
     if(password != cred.password || description != cred.description) {
         wsClient->addOrUpdateCredential(cred.service, cred.login, password, description);
     }
+}
+
+bool MainWindow::confirmDiscardUneditedCredentialChanges(QModelIndex idx) {
+    if(ui->stackedWidget->currentWidget() != ui->pageCredentials)
+        return true;
+
+
+    if(!idx.isValid()) {
+        QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
+        QModelIndexList indexes = selection->selectedIndexes();
+        if (indexes.size() != 1)
+            return true;
+
+        idx = credFilterModel->mapToSource(indexes.at(0));
+    }
+    const auto&  cred = credModel->at(idx.row());
+
+    QString password = ui->credDisplayPasswordInput->text();
+    QString description = ui->credDisplayDescriptionInput->text();
+
+    if(password != cred.password || description != cred.description) {
+        auto btn = QMessageBox::question(this, tr("Discard Modifications ?"),
+                                           tr("You have modified %1/%2 - Do you want to discard the modifications ?").arg(cred.service, cred.login),
+                                         QMessageBox::Discard | QMessageBox::Save | QMessageBox::Cancel, QMessageBox::Cancel);
+        if(btn == QMessageBox::Cancel)
+            return false;
+        if(btn == QMessageBox::Discard)
+            return true;
+        if(btn == QMessageBox::Save) {
+            saveSelectedCredential(idx);
+            return true;
+        }
+    }
+    return true;
 }
 
 void MainWindow::on_pushButtonAutoStart_clicked()
