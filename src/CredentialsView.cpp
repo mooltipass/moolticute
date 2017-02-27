@@ -84,7 +84,6 @@ void ServiceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem & 
 QFont ServiceItemDelegate::serviceFont() const {
     QFont f = qApp->font();
     f.setBold(false);
-    f.setCapitalization(QFont::Capitalize);
     f.setPointSize(13);
     return f;
 }
