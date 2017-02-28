@@ -63,6 +63,8 @@ MPDevice::MPDevice(QObject *parent):
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
+
+    QTimer::singleShot(100, this, &MPDevice::exitMemMgmtMode);
 }
 
 MPDevice::~MPDevice()
@@ -2767,10 +2769,10 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                              std::function<void(bool success, QString errstr)> cb)
 {
     if (service.isEmpty() ||
-        pass.isEmpty())
+        login.isEmpty())
     {
-        qWarning() << "context or pass is empty.";
-        cb(false, "context or password is empty");
+        qWarning() << "service or login  is empty.";
+        cb(false, "service or login is empty");
         return;
     }
 
@@ -2846,32 +2848,34 @@ void MPDevice::setCredential(const QString &service, const QString &login,
     QByteArray pdata = pass.toUtf8();
     pdata.append((char)0);
 
-    jobs->append(new MPCommandJob(this, MP_CHECK_PASSWORD,
-                                  pdata,
-                                  [=](const QByteArray &data, bool &) -> bool
-    {
-        if (data[2] != 1)
+    if(!pass.isEmpty()) {
+        jobs->append(new MPCommandJob(this, MP_CHECK_PASSWORD,
+                                      pdata,
+                                      [=](const QByteArray &data, bool &) -> bool
         {
-            //Password does not match, update it
-            jobs->prepend(new MPCommandJob(this, MP_SET_PASSWORD,
-                                          pdata,
-                                          [=](const QByteArray &data, bool &) -> bool
+            if (data[2] != 1)
             {
-                if (data[2] == 0)
+                //Password does not match, update it
+                jobs->prepend(new MPCommandJob(this, MP_SET_PASSWORD,
+                                               pdata,
+                                               [=](const QByteArray &data, bool &) -> bool
                 {
-                    jobs->setCurrentJobError("set_password failed on device");
-                    qWarning() << "failed to set_password";
-                    return false;
-                }
-                qDebug() << "set_password ok";
-                return true;
-            }));
-        }
-        else
-            qDebug() << "password not changed";
+                    if (data[2] == 0)
+                    {
+                        jobs->setCurrentJobError("set_password failed on device");
+                        qWarning() << "failed to set_password";
+                        return false;
+                    }
+                    qDebug() << "set_password ok";
+                    return true;
+                }));
+            }
+            else
+                qDebug() << "password not changed";
 
-        return true;
-    }));
+            return true;
+        }));
+    }
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {

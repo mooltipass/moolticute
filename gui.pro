@@ -21,13 +21,14 @@ SOURCES += src/main_gui.cpp \
     src/WSClient.cpp \
     src/RotateSpinner.cpp \
     src/CredentialsModel.cpp \
-    src/DialogEdit.cpp \
     src/AppGui.cpp \
     src/DaemonMenuAction.cpp \
     src/AutoStartup.cpp \
     src/WindowLog.cpp \
     src/OutputLog.cpp \
-    src/AnsiEscapeCodeHandler.cpp
+    src/AnsiEscapeCodeHandler.cpp \
+    src/PasswordLineEdit.cpp \
+    src/CredentialsView.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -35,14 +36,15 @@ HEADERS  += src/MainWindow.h \
     src/WSClient.h \
     src/RotateSpinner.h \
     src/CredentialsModel.h \
-    src/DialogEdit.h \
     src/version.h \
     src/AppGui.h \
     src/DaemonMenuAction.h \
     src/AutoStartup.h \
     src/WindowLog.h \
     src/OutputLog.h \
-    src/AnsiEscapeCodeHandler.h
+    src/AnsiEscapeCodeHandler.h \
+    src/PasswordLineEdit.h \
+    src/CredentialsView.h
 
 mac {
     HEADERS += src/MacUtils.h
@@ -52,7 +54,6 @@ mac {
 INCLUDEPATH += src
 
 FORMS    += src/MainWindow.ui \
-    src/DialogEdit.ui \
     src/WindowLog.ui
 
 RESOURCES += \

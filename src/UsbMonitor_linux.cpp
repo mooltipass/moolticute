@@ -126,7 +126,7 @@ void UsbMonitor_linux::start()
 }
 
 void UsbMonitor_linux::handleEvents() {
-    libusb_handle_events_completed(usb_ctx, NULL);
+    libusb_handle_events(usb_ctx);
 }
 
 void UsbMonitor_linux::stop()

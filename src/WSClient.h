@@ -59,12 +59,20 @@ public:
 
     bool requestDeviceUID(const QByteArray & key);
 
+    void sendEnterCredentialsManagementRequest();
+    void sendLeaveCredentialsManagementRequest();
+
+    void addOrUpdateCredential(const QString & service, const QString & login,
+                       const QString & password, const QString & description = {});
+
+    void requestPassword(const QString & service, const QString & login);
+
 signals:
     void wsConnected();
     void wsDisconnected();
     void memoryDataChanged();
-    void askPasswordDone(bool success, const QString &pass);
-    void addCredentialDone(bool success);
+    void passwordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
+    void credentialsUpdated(const QString & service, const QString & login, const QString & description, bool success);
     void showAppRequested();
     void progressChanged(int total, int current);
     void memcheckFinished(bool success);
