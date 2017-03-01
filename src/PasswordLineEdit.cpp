@@ -23,21 +23,17 @@ PasswordLineEdit::PasswordLineEdit(QWidget* parent)
     m_generateRandom = new QAction(awesome->icon(fa::sliders), ("Random Password"), this);
 
     connect(m_showPassword, &QAction::triggered, [this]() {
-       this->setEchoMode(QLineEdit::Normal);
-       this->removeAction(m_showPassword);
-       this->addAction(m_hidePassword, QLineEdit::TrailingPosition);
+        this->setPasswordVisible(true);
     });
     connect(m_hidePassword, &QAction::triggered, [this]() {
-       this->setEchoMode(QLineEdit::Password);
-       this->removeAction(m_hidePassword);
-       this->addAction(m_showPassword, QLineEdit::TrailingPosition);
+        this->setPasswordVisible(false);
     });
 
     connect(m_generateRandom, &QAction::triggered, this, &PasswordLineEdit::showPasswordOptions);
 
     this->setEchoMode(QLineEdit::Password);
-    this->addAction(m_showPassword, QLineEdit::TrailingPosition);
     this->addAction(m_generateRandom, QLineEdit::TrailingPosition);
+    this->addAction(m_showPassword, QLineEdit::TrailingPosition);
 }
 
 void PasswordLineEdit::showPasswordOptions() {
@@ -52,6 +48,22 @@ void PasswordLineEdit::showPasswordOptions() {
     m_passwordOptionsPopup->move(mapToGlobal(this->rect().bottomLeft()));
 }
 
+
+void PasswordLineEdit::setPasswordVisible(bool visible) {
+    if(visible) {
+        if(!actions().contains(m_hidePassword)) {
+            this->removeAction(m_showPassword);
+            this->addAction(m_hidePassword, QLineEdit::TrailingPosition);
+
+        }
+    }
+    else if(!actions().contains(m_showPassword)) {
+        this->removeAction(m_hidePassword);
+        this->addAction(m_showPassword, QLineEdit::TrailingPosition);
+
+    }
+    setEchoMode(visible ? QLineEdit::Normal: QLineEdit::Password);
+}
 
 PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
     : QFrame(parent, Qt::Popup)
@@ -158,9 +170,7 @@ LockedPasswordLineEdit::LockedPasswordLineEdit(QWidget* parent)
     connect(m_showPassword, &QAction::triggered, [this]() {
 
        if(!m_locked) {
-           this->setEchoMode(QLineEdit::Normal);
-           this->removeAction(m_showPassword);
-           this->addAction(m_hidePassword, QLineEdit::TrailingPosition);
+           this->setPasswordVisible(true);
        }
        else {
            Q_EMIT unlockRequested();
@@ -172,23 +182,15 @@ LockedPasswordLineEdit::LockedPasswordLineEdit(QWidget* parent)
 void LockedPasswordLineEdit::setLocked(bool locked) {
     m_locked = locked;
 
-
-
-
     if(m_locked) {
 
         this->setText("");
         this->setPlaceholderText("Password Locked");
-        this->setEchoMode(QLineEdit::Password);
-
-        this->addAction(m_showPassword, QLineEdit::TrailingPosition);
-        this->removeAction(m_hidePassword);
+        setPasswordVisible(false);
 
     }
     else {
-        this->setEchoMode(QLineEdit::Normal);
-        this->addAction(m_hidePassword, QLineEdit::TrailingPosition);
-        this->removeAction(m_showPassword);
+        setPasswordVisible(true);
     }
     this->setReadOnly(m_locked);
 }

@@ -43,6 +43,7 @@ public:
 
 protected:
     QAction *m_showPassword, *m_hidePassword;
+    void setPasswordVisible(bool visible);
 
 private:
     QAction *m_generateRandom;
