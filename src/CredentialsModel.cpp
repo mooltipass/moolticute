@@ -165,6 +165,15 @@ void CredentialsModel::update(const QString & service, const QString & login, co
         it->password.clear();
         Q_EMIT dataChanged(index(idx, PasswordIdx),index(idx, DescriptionIdx));
     }
+    else {
+        Credential c;
+        c.service = service;
+        c.login = login;
+        c.description = description;
+        beginInsertRows(QModelIndex(), m_credentials.size(), m_credentials.size());
+        m_credentials << c;
+        endInsertRows();
+    }
 }
 
 
