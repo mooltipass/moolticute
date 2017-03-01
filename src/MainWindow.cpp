@@ -764,12 +764,7 @@ void MainWindow::requestPasswordForSelectedItem()
 }
 
 void MainWindow::on_addCredentialButton_clicked()
-{ QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
-    QModelIndexList indexes = selection->selectedIndexes();
-
-    if (indexes.size() != 1)
-        return;
-
+{
     ui->addCredentialsGroupBox->setEnabled(false);
     wsClient->addOrUpdateCredential(ui->addCredServiceInput->text(),
                             ui->addCredLoginInput->text(), ui->addCredPasswordInput->text());
