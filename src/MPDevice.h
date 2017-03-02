@@ -61,14 +61,21 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(bool, delayAfterKeyEntryEnable, false)
     QT_WRITABLE_PROPERTY(int, delayAfterKeyEntry, 0)
 
+
+
     //MP Mini only
     QT_WRITABLE_PROPERTY(int, screenBrightness, 0) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
     QT_WRITABLE_PROPERTY(bool, knockEnabled, false)
     QT_WRITABLE_PROPERTY(int, knockSensitivity, 0) // 0-low, 1-medium, 2-high
+    QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
+    QT_WRITABLE_PROPERTY(bool, hashDisplay, false)
+    QT_WRITABLE_PROPERTY(int, lockUnlockMode, 0)
 
     QT_WRITABLE_PROPERTY(quint32, serialNumber, 0) // serial number if firmware is above 1.2
     QT_WRITABLE_PROPERTY(quint8, credentialsDbChangeNumber, 0) // credentials db change number
     QT_WRITABLE_PROPERTY(quint8, dataDbChangeNumber, 0) // data db change number
+
+    QT_WRITABLE_PROPERTY(qint64, uid, -1)
 
 public:
     MPDevice(QObject *parent);
@@ -94,10 +101,16 @@ public:
     void updateDelayAfterKeyEntryEnable(bool en);
     void updateDelayAfterKeyEntry(int val);
 
+
     //MP Mini only
     void updateScreenBrightness(int bval); //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
     void updateKnockEnabled(bool en);
     void updateKnockSensitivity(int s); // 0-low, 1-medium, 2-high
+    void updateRandomStartingPin(bool);
+    void updateHashDisplay(bool);
+    void updateLockUnlockMode(int);
+
+    void getUID(const QByteArray & key);
 
     //mem mgmt mode
     void startMemMgmtMode();
@@ -186,20 +199,31 @@ private:
 
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
-    MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address);
+    MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
+    MPNode *findNodeWithServiceInList(const QString &service);
     quint8 getNodeIdFromAddress(const QByteArray &address);
     QByteArray getMemoryFirstNodeAddress(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
+    void detagPointedNodes(void);
 
-    // Functions added by mathieu for MMM : checks
+    // Functions added by mathieu for MMM : checks & repairs
+    bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent);
+    MPNode* addNewServiceToDB(const QString &service);
+    bool addOrphanChildToDB(MPNode* childNodePt);
     bool checkLoadedNodes(bool repairAllowed);
     bool tagPointedNodes(bool repairAllowed);
 
+    // Functions added by mathieu for unit testing
+    bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
+
     // Generate save packets
     bool generateSavePackets(AsyncJobs *jobs);
+
+    // once we fetched free addresses, this function is called
+    void changeVirtualAddressesToFreeAddresses(void);
 
     // Last page scanned
     quint16 lastFlashPageScanned = 0;
@@ -214,13 +238,24 @@ private:
     qint64 diagLastSecs;
     quint32 diagNbBytesRec;
 
+    //local vars for tests
+    bool diagSavePacketsGenerated;
+
     //command queue
     QQueue<MPCommand> commandQueue;
+
+    // Number of new addresses we need
+    quint32 newAddressesNeededCounter = 0;
+
+    // Buffer containing the free addresses we will need
+    QList<QByteArray> freeAddresses;
 
     // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
     QByteArray startNode;
+    quint32 virtualStartNode;
     QByteArray startDataNode;
+    quint32 virtualDataStartNode;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
     QList<MPNode *> loginNodes;         //list of all parent nodes for credentials

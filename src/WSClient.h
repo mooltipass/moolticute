@@ -38,6 +38,13 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(bool, delayAfterKeyEntryEnable, false)
     QT_WRITABLE_PROPERTY(int, delayAfterKeyEntry, 0)
 
+
+    QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
+    QT_WRITABLE_PROPERTY(bool, displayHash, false)
+    QT_WRITABLE_PROPERTY(int, lockUnlockMode, false)
+
+    QT_WRITABLE_PROPERTY(qint64, uid, -1)
+
 public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();
@@ -46,14 +53,26 @@ public:
 
     QJsonObject &getMemoryData() { return memData; }
 
-    bool isMPMini();
+    bool isMPMini() const;
+
+    bool isConnected() const;
+
+    bool requestDeviceUID(const QByteArray & key);
+
+    void sendEnterCredentialsManagementRequest();
+    void sendLeaveCredentialsManagementRequest();
+
+    void addOrUpdateCredential(const QString & service, const QString & login,
+                       const QString & password, const QString & description = {});
+
+    void requestPassword(const QString & service, const QString & login);
 
 signals:
     void wsConnected();
     void wsDisconnected();
     void memoryDataChanged();
-    void askPasswordDone(bool success, const QString &pass);
-    void addCredentialDone(bool success);
+    void passwordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
+    void credentialsUpdated(const QString & service, const QString & login, const QString & description, bool success);
     void showAppRequested();
     void progressChanged(int total, int current);
     void memcheckFinished(bool success);

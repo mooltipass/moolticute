@@ -26,7 +26,9 @@
 #define MP_LEN_FIELD_INDEX      0x00
 #define MP_CMD_FIELD_INDEX      0x01
 #define MP_PAYLOAD_FIELD_INDEX  0x02
-//
+// Max lengths
+#define MP_MAX_SERVICE_LENGTH   121
+#define MP_MAX_LOGIN_LENGTH     63
 
 //Mooltipass commands
 #define MP_EXPORT_FLASH_START    0x8A

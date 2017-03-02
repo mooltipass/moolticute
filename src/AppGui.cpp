@@ -21,6 +21,14 @@ bool AppGui::initialize()
     setAttribute(Qt::AA_UseHighDpiPixmaps);
 	setQuitOnLastWindowClosed(false);
 
+     QCommandLineParser parser;
+     QCommandLineOption autoLaunchedOption("autolaunched");
+     parser.addOption(autoLaunchedOption);
+     parser.process(*QCoreApplication::instance());
+
+     bool autoLaunched = parser.isSet(autoLaunchedOption);
+
+
     if (!createSingleApplication())
         return false;
 
@@ -66,9 +74,12 @@ bool AppGui::initialize()
         // On Linux/Windows, hide/show the app when the tray icon is clicked
         // On OSX this just shows the menu
 #ifndef Q_OS_MACX
-        if (reason == QSystemTrayIcon::DoubleClick ||
-            reason == QSystemTrayIcon::Trigger)
-        {
+        if (reason ==  QSystemTrayIcon::DoubleClick
+#ifndef Q_OS_WIN
+         //On linux, some Desktop environnements such as KDE won't let the user emit a double click
+         || reason == QSystemTrayIcon::Trigger
+#endif
+       ) {
             if (win->isHidden())
                 mainWindowShow();
             else
@@ -80,7 +91,8 @@ bool AppGui::initialize()
     });
 
     wsClient = new WSClient(this);
-    connect(wsClient, &WSClient::connectedChanged, [=]() { connectedChanged(); });
+    connect(wsClient, &WSClient::connectedChanged, this, &AppGui::connectedChanged);
+    connect(wsClient, &WSClient::statusChanged, this, &AppGui::updateSystrayTooltip);
     connectedChanged();
 
     win = new MainWindow(wsClient);
@@ -88,8 +100,8 @@ bool AppGui::initialize()
     {
         mainWindowHide();
     });
-    //start hidden
-    mainWindowHide();
+
+    autoLaunched ?  mainWindowHide() : mainWindowShow();
 
     connect(wsClient, &WSClient::showAppRequested, [=]()
     {
@@ -220,6 +232,7 @@ void AppGui::connectedChanged()
         icon.setIsMask(true);
 #endif
         systray->setIcon(icon);
+        systray->setToolTip(tr("No moolltipass connected."));
     }
     else
     {
@@ -234,6 +247,34 @@ void AppGui::connectedChanged()
 #endif
         systray->setIcon(icon);
     }
+}
+
+void AppGui::updateSystrayTooltip()
+{
+    if(!wsClient->get_connected())
+        return;
+
+    const auto status = wsClient->get_status();
+
+    const QString device_name = wsClient->isMPMini() ? tr("Mooltipass Mini") : tr("Mooltipass");
+
+    QString msg;
+    switch(status) {
+        case Common::Locked:
+        case Common::LockedScreen:
+           msg = tr("%1 locked").arg(device_name);
+           break;
+        case Common::Unlocked:
+           msg = tr("%1 Unlocked").arg(device_name);
+           break;
+       case Common::NoCardInserted:
+           msg = tr("No card inserted in your %1").arg(device_name);
+           break;
+       default:
+           break;
+    }
+
+    systray->setToolTip(msg);
 }
 
 AppGui::~AppGui()

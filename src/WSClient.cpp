@@ -54,13 +54,22 @@ void WSClient::onWsConnected()
 {
     qDebug() << "Websocket connected";
     connect(wsocket, &QWebSocket::textMessageReceived, this, &WSClient::onTextMessageReceived);
+    Q_EMIT wsConnected();
+}
+
+bool WSClient::isConnected() const {
+    return wsocket && wsocket->state() == QAbstractSocket::ConnectedState;
 }
 
 void WSClient::onWsDisconnected()
 {
     qDebug() << "Websocket disconnect";
+
+    set_memMgmtMode(false);
     force_connected(false);
     closeWebsocket();
+
+    Q_EMIT wsDisconnected();
 
     //Auto reconnect websocket connection on failure
     QTimer::singleShot(500, [=]()
@@ -103,6 +112,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
     else if (rootobj["msg"] == "mp_disconnected")
     {
+        set_memMgmtMode(false);
         set_connected(false);
     }
     else if (rootobj["msg"] == "status_changed")
@@ -129,10 +139,8 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "ask_password")
     {
         QJsonObject o = rootobj["data"].toObject();
-        if (o.contains("failed") && o["failed"].toBool())
-            emit askPasswordDone(false, QString());
-        else
-            emit askPasswordDone(true, o["password"].toString());
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        emit passwordUnlocked(o["service"].toString(), o["login"].toString(), o["password"].toString(), success);
     }
     else if (rootobj["msg"] == "version_changed")
     {
@@ -147,10 +155,8 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "set_credential")
     {
         QJsonObject o = rootobj["data"].toObject();
-        if (o.contains("failed") && o["failed"].toBool())
-            emit addCredentialDone(false);
-        else
-            emit addCredentialDone(true);
+        bool success = !o.contains("failed") || !o["failed"].toBool();
+        credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
     }
     else if (rootobj["msg"] == "show_app")
     {
@@ -168,6 +174,11 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         emit progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt());
+    }
+    else if (rootobj["msg"] == "device_uid")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        set_uid((qint64)o["uid"].toDouble());
     }
 }
 
@@ -199,6 +210,12 @@ void WSClient::udateParameters(const QJsonObject &data)
         set_knockEnabled(data["value"].toBool());
     else if (param == "knock_sensitivity")
         set_knockSensitivity(data["value"].toInt());
+    else if (param == "random_starting_pin")
+        set_randomStartingPin(data["value"].toBool());
+    else if (param == "hash_display")
+        set_displayHash(data["value"].toBool());
+    else if (param == "lock_unlock_mode")
+        set_lockUnlockMode(data["value"].toInt());
     else if (param == "key_after_login_enabled")
         set_keyAfterLoginSendEnable(data["value"].toBool());
     else if (param == "key_after_login")
@@ -212,3 +229,50 @@ void WSClient::udateParameters(const QJsonObject &data)
     else if (param == "delay_after_key")
         set_delayAfterKeyEntry(data["value"].toInt());
 }
+
+
+bool WSClient::isMPMini() const {
+    return  get_mpHwVersion() == Common::MP_Mini;
+}
+
+
+bool WSClient::requestDeviceUID(const QByteArray & key) {
+    m_uid = -1;
+    if(!isConnected())
+        return false;
+    sendJsonData({{ "msg", "request_device_uid" },
+                  { "data", QJsonObject{ {"key", QString::fromUtf8(key) } } }
+                });
+    return true;
+}
+
+
+void WSClient::sendEnterCredentialsManagementRequest()
+{
+    sendJsonData({{ "msg", "start_memorymgmt" }});
+}
+
+void WSClient::sendLeaveCredentialsManagementRequest()
+{
+     sendJsonData({{ "msg", "exit_memorymgmt" }});
+}
+
+void WSClient::addOrUpdateCredential(const QString & service, const QString & login,
+                   const QString & password, const QString & description)
+{
+    QJsonObject o = {{ "service", service},
+                     { "login",   login},
+                     { "password", password },
+                     { "description", description}};
+    sendJsonData({{ "msg", "set_credential" },
+                            { "data", o }});
+}
+
+void WSClient::requestPassword(const QString & service, const QString & login) {
+
+    QJsonObject d = {{ "service", service },
+                     { "login", login }};
+    sendJsonData({{ "msg", "ask_password" },
+                            { "data", d }});
+}
+

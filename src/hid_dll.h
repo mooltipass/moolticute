@@ -23,7 +23,7 @@
  * It's declared here for loading at runtime
  */
 
-#include <windows.h>
+#include <qt_windows.h>
 #include <hidsdi.h>
 #include <hidpi.h>
 

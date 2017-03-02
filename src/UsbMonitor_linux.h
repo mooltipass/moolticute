@@ -45,6 +45,10 @@ signals:
     void usbDeviceRemoved();
 
 private:
+    void startMonitoringFd(int fd);
+    void stopMonitoringFd(int fd);
+    void handleEvents();
+
     UsbMonitor_linux();
 
     libusb_context *usb_ctx = nullptr;
@@ -60,6 +64,10 @@ private:
 
     friend int libusb_device_add_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
     friend int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
+    friend void libusb_fd_add_cb(int fd, short events, void *user_data);
+    friend void libusb_fd_del_cb(int fd, void *user_data);
+
+    QVector<QSocketNotifier*> monitoredFds;
 };
 
 Q_DECLARE_METATYPE(struct libusb_transfer *)

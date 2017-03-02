@@ -156,11 +156,23 @@ void WSServerCon::processMessage(const QString &message)
 
             QJsonObject ores = o;
             QJsonObject oroot = root;
-            ores["password"] = "******";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "request_device_uid") {
+
+         QJsonObject o = root["data"].toObject();
+         const QByteArray key = o.value("key").toString().toUtf8().simplified();
+
+        if (!mpdevice)
+        {
+            sendFailedJson(root, "No device connected");
+            return;
+        }
+        mpdevice->getUID(key);
+    }
+
     else if (root["msg"] == "get_random_numbers")
     {
         if (!mpdevice)
@@ -285,7 +297,6 @@ void WSServerCon::processMessage(const QString &message)
 
             QJsonObject ores;
             QJsonObject oroot = root;
-            ores["node_data"] = "********";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         },
@@ -355,6 +366,9 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(screenBrightnessChanged(int)), this, SLOT(sendScreenBrightness()));
     connect(mpdevice, SIGNAL(knockEnabledChanged(bool)), this, SLOT(sendKnockEnabled()));
     connect(mpdevice, SIGNAL(knockSensitivityChanged(int)), this, SLOT(sendKnockSensitivity()));
+    connect(mpdevice, SIGNAL(randomStartingPinChanged(bool)), this, SLOT(sendRandomStartingPin()));
+    connect(mpdevice, SIGNAL(hashDisplayChanged(bool)), this, SLOT(sendHashDisplayEnabled()));
+    connect(mpdevice, SIGNAL(lockUnlockModeChanged(int)), this, SLOT(sendLockUnlockMode()));
 
     connect(mpdevice, SIGNAL(keyAfterLoginSendEnableChanged(bool)), this, SLOT(sendKeyAfterLoginSendEnable()));
     connect(mpdevice, SIGNAL(keyAfterLoginSendChanged(int)), this, SLOT(sendKeyAfterLoginSend()));
@@ -362,6 +376,8 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(keyAfterPassSendChanged(int)), this, SLOT(sendKeyAfterPassSend()));
     connect(mpdevice, SIGNAL(delayAfterKeyEntryEnableChanged(bool)), this, SLOT(sendDelayAfterKeyEntryEnable()));
     connect(mpdevice, SIGNAL(delayAfterKeyEntryChanged(int)), this, SLOT(sendDelayAfterKeyEntry()));
+
+    connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
 }
 
 void WSServerCon::statusChanged()
@@ -399,6 +415,9 @@ void WSServerCon::sendInitialStatus()
         sendScreenBrightness();
         sendKnockEnabled();
         sendKnockSensitivity();
+        sendRandomStartingPin();
+        sendHashDisplayEnabled();
+        sendLockUnlockMode();
         sendKeyAfterLoginSendEnable();
         sendKeyAfterLoginSend();
         sendKeyAfterPassSendEnable();
@@ -517,6 +536,33 @@ void WSServerCon::sendKnockSensitivity()
 }
 
 
+void WSServerCon::sendRandomStartingPin()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "random_starting_pin" },
+                        { "value", mpdevice->get_randomStartingPin() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendHashDisplayEnabled()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "hash_display" },
+                        { "value", mpdevice->get_hashDisplay() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendLockUnlockMode()
+{
+    if (!mpdevice)
+        return;
+    QJsonObject data = {{ "parameter", "lock_unlock_mode" },
+                        { "value", mpdevice->get_lockUnlockMode() }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
 void WSServerCon::sendKeyAfterLoginSendEnable()
 {
     if (!mpdevice)
@@ -611,6 +657,15 @@ void WSServerCon::sendVersion()
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
 }
 
+void WSServerCon::sendDeviceUID()
+{
+    if (!mpdevice)
+        return;
+    sendJsonMessage({{ "msg", "device_uid" },
+                     { "data", QJsonObject{ {"uid", mpdevice->get_uid()} } }
+                    });
+}
+
 void WSServerCon::processParametersSet(const QJsonObject &data)
 {
     if (!mpdevice)
@@ -639,6 +694,12 @@ void WSServerCon::processParametersSet(const QJsonObject &data)
         mpdevice->updateKnockEnabled(data["knock_enabled"].toBool());
     if (data.contains("knock_sensitivity"))
         mpdevice->updateKnockSensitivity(data["knock_sensitivity"].toInt());
+    if (data.contains("random_starting_pin"))
+        mpdevice->updateRandomStartingPin(data["random_starting_pin"].toBool());
+    if (data.contains("hash_display"))
+        mpdevice->updateHashDisplay(data["hash_display"].toBool());
+    if (data.contains("lock_unlock_mode"))
+        mpdevice->updateLockUnlockMode(data["lock_unlock_mode"].toInt());
     if (data.contains("key_after_login_enabled"))
          mpdevice->updateKeyAfterLoginSendEnable(data["key_after_login_enabled"].toBool());
     if (data.contains("key_after_login"))
