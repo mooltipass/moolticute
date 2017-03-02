@@ -2,6 +2,7 @@
 #define PASSWORDLINEEDIT_H
 
 #include <QLineEdit>
+#include <random>
 
 class QPushButton;
 class QSlider;
