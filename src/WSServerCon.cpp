@@ -1,5 +1,6 @@
 #include "WSServerCon.h"
 #include "WSServer.h"
+#include "version.h"
 
 WSServerCon::WSServerCon(QWebSocket *conn):
     wsClient(conn),
@@ -322,6 +323,16 @@ void WSServerCon::processMessage(const QString &message)
     {
         //broadcast the message to all clients
         emit notifyAllClients(root);
+    }
+    else if (root["msg"] == "get_application_id")
+    {
+        QJsonObject ores;
+        QJsonObject oroot = root;
+        ores["application_name"] = "moolticute";
+        ores["application_version"] = QStringLiteral(APP_VERSION);
+        oroot["data"] = ores;
+        oroot["msg"] = "get_application_id";
+        sendJsonMessage(oroot);
     }
 }
 
