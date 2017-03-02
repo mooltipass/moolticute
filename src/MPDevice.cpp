@@ -3381,7 +3381,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         }*/
 
         /* Let's corrupt the DB for fun */
-        testCodeAgainstCleanDBChanges(repairJobs);
+        //testCodeAgainstCleanDBChanges(repairJobs);
 
         /* Check loaded nodes, set bool to repair */
         //checkLoadedNodes(true);
