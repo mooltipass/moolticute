@@ -28,7 +28,8 @@ SOURCES += src/main_gui.cpp \
     src/OutputLog.cpp \
     src/AnsiEscapeCodeHandler.cpp \
     src/PasswordLineEdit.cpp \
-    src/CredentialsView.cpp
+    src/CredentialsView.cpp \
+    src/CredentialsManagement.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -44,7 +45,8 @@ HEADERS  += src/MainWindow.h \
     src/OutputLog.h \
     src/AnsiEscapeCodeHandler.h \
     src/PasswordLineEdit.h \
-    src/CredentialsView.h
+    src/CredentialsView.h \
+    src/CredentialsManagement.h
 
 mac {
     HEADERS += src/MacUtils.h
@@ -54,7 +56,8 @@ mac {
 INCLUDEPATH += src
 
 FORMS    += src/MainWindow.ui \
-    src/WindowLog.ui
+    src/WindowLog.ui \
+    src/CredentialsManagement.ui
 
 RESOURCES += \
     img/images.qrc

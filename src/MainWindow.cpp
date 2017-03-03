@@ -21,22 +21,11 @@
 #include "version.h"
 #include "AutoStartup.h"
 #include "Common.h"
-
-#define CSS_BLUE_BUTTON "QPushButton {" \
-                            "color: #fff;" \
-                            "background-color: #60B1C7;" \
-                            "padding: 15px;" \
-                            "border: none;" \
-                        "}" \
-                        "QPushButton:hover {" \
-                            "background-color: #3d96af;" \
-                        "}" \
-                        "QPushButton:pressed {" \
-                            "background-color: #237C95;" \
-                        "}"
+#include "AppGui.h"
 
 template <typename T>
-static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0) {
+static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
+{
     int idx = cb->findData(QVariant::fromValue(value));
     if(idx < 0)
         idx = defaultIdx;
@@ -49,69 +38,23 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui(new Ui::MainWindow),
     wsClient(client)
 {
-    awesome = new QtAwesome(this);
-    awesome->initFontAwesome();
-
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
                                 { "color-active", QColor(Qt::white) }};
 
     ui->setupUi(this);
+    ui->widgetCredentials->setWsClient(wsClient);
 
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
-
-    credModel = new CredentialsModel(this);
-    credFilterModel = new CredentialsFilterModel(this);
-
-    credFilterModel->setSourceModel(credModel);
-    ui->credentialsListView->setModel(credFilterModel);
-
-    QDataWidgetMapper* mapper = new QDataWidgetMapper(this);
-    mapper->setItemDelegate(new CredentialViewItemDelegate(mapper));
-    mapper->setModel(credFilterModel);
-    mapper->addMapping(ui->credDisplayServiceInput, CredentialsModel::ServiceIdx);
-    mapper->addMapping(ui->credDisplayLoginInput, CredentialsModel::LoginIdx);
-    mapper->addMapping(ui->credDisplayPasswordInput, CredentialsModel::PasswordIdx);
-    mapper->addMapping(ui->credDisplayDescriptionInput,  CredentialsModel::DescriptionIdx);
-    mapper->addMapping(ui->credDisplayCreationDateInput,  CredentialsModel::DateCreatedIdx);
-    mapper->addMapping(ui->credDisplayModificationDateInput,  CredentialsModel::DateModifiedIdx);
-    mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
-
-
-    delete ui->credentialsListView->selectionModel();
-    ui->credentialsListView->setSelectionModel(
-                new ConditionalItemSelectionModel(ConditionalItemSelectionModel::TestFunction(std::bind(&MainWindow::confirmDiscardUneditedCredentialChanges, this, std::placeholders::_1)),
-                                                  credFilterModel));
-
-
-    connect(ui->credentialsListView->selectionModel(), &QItemSelectionModel::currentRowChanged, mapper, [this, mapper](const QModelIndex & idx) {
-        mapper->setCurrentIndex(idx.row());
-    });
-    connect(ui->credDisplayPasswordInput, & LockedPasswordLineEdit::unlockRequested,
-            this, &MainWindow::requestPasswordForSelectedItem);
-
-
-    ui->credDisplayFrame->setStyleSheet("background-color:#FFFFFF");
-
 
     //Disable this option for now, firmware does not support it
     ui->checkBoxInput->setEnabled(false);
 
-    ui->pushButtonDevSettings->setIcon(awesome->icon(fa::wrench));
-    ui->pushButtonCred->setIcon(awesome->icon(fa::key));
-    ui->pushButtonSync->setIcon(awesome->icon(fa::refresh));
-    ui->pushButtonAppSettings->setIcon(awesome->icon(fa::cogs));
-    ui->pushButtonAbout->setIcon(awesome->icon(fa::info));
-
-    connect(ui->credDisplayButtonBox, &QDialogButtonBox::clicked, [mapper, this](QAbstractButton* btn) {
-        if(ui->credDisplayButtonBox->button(QDialogButtonBox::Save) == btn) {
-            saveSelectedCredential();
-        }
-        if(ui->credDisplayButtonBox->button(QDialogButtonBox::Reset) == btn) {
-            mapper->revert();
-        }
-    });
-
+    ui->pushButtonDevSettings->setIcon(AppGui::qtAwesome()->icon(fa::wrench));
+    ui->pushButtonCred->setIcon(AppGui::qtAwesome()->icon(fa::key));
+    ui->pushButtonSync->setIcon(AppGui::qtAwesome()->icon(fa::refresh));
+    ui->pushButtonAppSettings->setIcon(AppGui::qtAwesome()->icon(fa::cogs));
+    ui->pushButtonAbout->setIcon(AppGui::qtAwesome()->icon(fa::info));
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
 
@@ -120,13 +63,14 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
 
-    connect(wsClient, &WSClient::statusChanged, [this]() {
+    connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
+    connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
+
+    connect(wsClient, &WSClient::statusChanged, [this]()
+    {
         this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
     });
 
-    connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
-
-    ui->pushButtonMemMode->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonImportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsReset->setStyleSheet(CSS_BLUE_BUTTON);
@@ -135,13 +79,11 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->addCredentialButton->setStyleSheet(CSS_BLUE_BUTTON);
 
-    ui->pushButtonSettingsSave->setIcon(awesome->icon(fa::floppyo, whiteButtons));
-    ui->pushButtonSettingsReset->setIcon(awesome->icon(fa::undo, whiteButtons));
+    ui->pushButtonSettingsSave->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
+    ui->pushButtonSettingsReset->setIcon(AppGui::qtAwesome()->icon(fa::undo, whiteButtons));
     ui->pushButtonSettingsSave->setVisible(false);
     ui->pushButtonSettingsReset->setVisible(false);
-    ui->pushButtonMemMode->setIcon(awesome->icon(fa::lock, whiteButtons));
 
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
@@ -149,15 +91,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->pushButtonAbout, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonAppSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
 
-
-    connect(ui->addCredServiceInput, &QLineEdit::textChanged, this, &MainWindow::updateQuickAddCredentialsButtonState);
-    connect(ui->addCredLoginInput, &QLineEdit::textChanged, this, &MainWindow::updateQuickAddCredentialsButtonState);
-    connect(ui->addCredPasswordInput, &QLineEdit::textChanged, this, &MainWindow::updateQuickAddCredentialsButtonState);
-    updateQuickAddCredentialsButtonState();
-
-
     ui->pushButtonDevSettings->setChecked(false);
-
 
     //Add languages to combobox
     ui->comboBoxLang->addItem("en_US", ID_KEYB_EN_US_LUT);
@@ -411,19 +345,6 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         checkSettingsChanged();
     });
 
-    connect(wsClient, &WSClient::memoryDataChanged, [=]()
-    {
-        credModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
-        ui->lineEditFilterCred->clear();
-    });
-    connect(ui->lineEditFilterCred, &QLineEdit::textChanged, [=](const QString &t)
-    {
-        credFilterModel->setFilter(t);
-    });
-
-    connect(wsClient, &WSClient::passwordUnlocked, this, &MainWindow::onPasswordUnlocked);
-    connect(wsClient, &WSClient::credentialsUpdated, this, &MainWindow::onCredentialUpdated);
-
     //When something changed in GUI, show save/reset buttons
     connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxLock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
@@ -449,9 +370,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->spinBoxInputDelayAfterKeyPressed, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
 
     //Setup the confirm view
-    ui->widgetSpin->setPixmap(awesome->icon(fa::circleonotch).pixmap(QSize(80, 80)));
-
-
+    ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
     checkAutoStart();
 
@@ -461,7 +380,6 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
-
 
     updatePage();
 }
@@ -479,15 +397,19 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::updatePage()
 {
-    if(ui->stackedWidget->currentWidget() == ui->pageCredentials && wsClient->get_memMgmtMode()) {
-        if(!confirmDiscardUneditedCredentialChanges())
+    if (ui->stackedWidget->currentWidget() == ui->pageCredentials &&
+        wsClient->get_memMgmtMode())
+    {
+        if (!ui->widgetCredentials->confirmDiscardUneditedCredentialChanges())
             return;
-        if(QMessageBox::question(this, tr("Exit the credentials manager?"),
-                                       tr("Switching tabs will lock out the credentials management mode. Are you sure you want to switch tab ?"),
-                                       QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::No)
+        if (QMessageBox::question(this,
+                                  tr("Exit the credentials manager?"),
+                                  tr("Switching tabs will lock out the credentials management mode. Are you sure you want to switch tab ?"),
+                                  QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::Yes) == QMessageBox::No)
             return;
 
-         wsClient->sendLeaveCredentialsManagementRequest();
+         wsClient->sendLeaveMMRequest();
     }
 
     if (ui->pushButtonAbout->isChecked())
@@ -625,8 +547,6 @@ void MainWindow::checkSettingsChanged()
 
 void MainWindow::on_pushButtonSettingsReset_clicked()
 {
-
-
     ui->checkBoxLock->setChecked(wsClient->get_lockTimeoutEnabled());
     ui->spinBoxLock->setValue(wsClient->get_lockTimeout());
     ui->checkBoxScreensaver->setChecked(wsClient->get_screensaver());
@@ -709,159 +629,9 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
     wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
 }
 
-void MainWindow::on_pushButtonMemMode_clicked()
+void MainWindow::wantEnterCredentialManagement()
 {
-    if(!wsClient->get_memMgmtMode()) {
-
-        wsClient->sendEnterCredentialsManagementRequest();
-        ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
-    }
-    else {
-        if(!confirmDiscardUneditedCredentialChanges())
-            return;
-         wsClient->sendLeaveCredentialsManagementRequest();
-    }
-}
-
-void MainWindow::enableCredentialsManagement(bool enable)
-{
-    if(enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
-        ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
-    ui->credentialsListView->setEnabled(enable);
-    ui->lineEditFilterCred->setEnabled(enable);
-    ui->credDisplayFrame ->setVisible(enable);
-
-
-    if(!enable) {
-         updatePage();
-    }
-    ui->pushButtonMemMode->setIcon(awesome->icon(enable ? fa::lock : fa::unlock));
-    ui->pushButtonMemMode->setText(enable ? tr("Lock") : tr("Unlock"));
-}
-
-
-void MainWindow::updateQuickAddCredentialsButtonState() {
-    ui->addCredentialButton->setEnabled(   ui->addCredLoginInput->hasAcceptableInput() && ui->addCredLoginInput->text().length() > 0
-                                        && ui->addCredServiceInput->hasAcceptableInput() && ui->addCredServiceInput->text().length() > 0
-                                        && ui->addCredPasswordInput->hasAcceptableInput() && ui->addCredPasswordInput->text().length() > 0);
-}
-
-
-void MainWindow::requestPasswordForSelectedItem()
-{
-    if (!wsClient->get_memMgmtMode()) return;
-
-    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
-    QModelIndexList indexes = selection->selectedIndexes();
-
-    if (indexes.size() != 1)
-        return;
-
-    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
-
-    const auto&  cred = credModel->at(idx.row());
-    wsClient->requestPassword(cred.service, cred.login);
-}
-
-void MainWindow::on_addCredentialButton_clicked()
-{
-    ui->addCredentialsGroupBox->setEnabled(false);
-    wsClient->addOrUpdateCredential(ui->addCredServiceInput->text(),
-                            ui->addCredLoginInput->text(), ui->addCredPasswordInput->text());
-
-
-    auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & service, const QString & login, const QString &, bool success)
-    {
-        disconnect(*conn);
-        ui->addCredentialsGroupBox->setEnabled(true);
-        if (!success)
-        {
-            QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential %1/%2!").arg(service, login));
-            return;
-        }
-
-        QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(service, login));
-        ui->addCredServiceInput->clear();
-        ui->addCredLoginInput->clear();
-        ui->addCredPasswordInput->clear();
-    });
-}
-
-void MainWindow::onPasswordUnlocked(const QString & service, const QString & login,
-                                    const QString & password, bool success)
-{
-    if (!success)
-    {
-        QMessageBox::warning(this, tr("Failure"), tr("Unable to query password!"));
-        return;
-    }
-
-    credModel->setClearTextPassword(service, login, password);
-}
-
-void MainWindow::onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success) {
-    if (!success)
-    {
-        QMessageBox::warning(this, tr("Failure"), tr("Unable to modify %1/%2").arg(service, login));
-        return;
-    }
-
-    credModel->update(service, login, description);
-}
-
-void  MainWindow::saveSelectedCredential(QModelIndex idx) {
-    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
-    if(!idx.isValid()) {
-        QModelIndexList indexes = selection->selectedIndexes();
-
-        if (indexes.size() != 1)
-            return;
-
-        idx = credFilterModel->mapToSource(indexes.at(0));
-    }
-    const auto&  cred = credModel->at(idx.row());
-
-    QString password = ui->credDisplayPasswordInput->text();
-    QString description = ui->credDisplayDescriptionInput->text();
-
-    if(password != cred.password || description != cred.description) {
-        wsClient->addOrUpdateCredential(cred.service, cred.login, password, description);
-    }
-}
-
-bool MainWindow::confirmDiscardUneditedCredentialChanges(QModelIndex idx) {
-    if(ui->stackedWidget->currentWidget() != ui->pageCredentials || !wsClient->get_memMgmtMode())
-        return true;
-
-
-    if(!idx.isValid()) {
-        QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
-        QModelIndexList indexes = selection->selectedIndexes();
-        if (indexes.size() != 1)
-            return true;
-
-        idx = credFilterModel->mapToSource(indexes.at(0));
-    }
-    const auto&  cred = credModel->at(idx.row());
-
-    QString password = ui->credDisplayPasswordInput->text();
-    QString description = ui->credDisplayDescriptionInput->text();
-
-    if(password != cred.password || description != cred.description) {
-        auto btn = QMessageBox::question(this, tr("Discard Modifications ?"),
-                                           tr("You have modified %1/%2 - Do you want to discard the modifications ?").arg(cred.service, cred.login),
-                                         QMessageBox::Discard | QMessageBox::Save | QMessageBox::Cancel, QMessageBox::Cancel);
-        if(btn == QMessageBox::Cancel)
-            return false;
-        if(btn == QMessageBox::Discard)
-            return true;
-        if(btn == QMessageBox::Save) {
-            saveSelectedCredential(idx);
-            return true;
-        }
-    }
-    return true;
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
 }
 
 void MainWindow::on_pushButtonAutoStart_clicked()
@@ -992,4 +762,13 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
                                     <li>Get the serial number from the back of your device.</li>
                                     <li>&shy;<a href="mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1">Send us an email</a> with the serial number, requesting the password.</li>
                                     <li>Enter the password you received from us</li></ol>)").arg(id));
+}
+
+void MainWindow::enableCredentialsManagement(bool enable)
+{
+    if (enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
+        ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+
+    if (!enable)
+        updatePage();
 }

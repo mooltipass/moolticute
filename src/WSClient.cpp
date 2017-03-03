@@ -247,12 +247,12 @@ bool WSClient::requestDeviceUID(const QByteArray & key) {
 }
 
 
-void WSClient::sendEnterCredentialsManagementRequest()
+void WSClient::sendEnterMMRequest()
 {
     sendJsonData({{ "msg", "start_memorymgmt" }});
 }
 
-void WSClient::sendLeaveCredentialsManagementRequest()
+void WSClient::sendLeaveMMRequest()
 {
      sendJsonData({{ "msg", "exit_memorymgmt" }});
 }

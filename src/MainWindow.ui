@@ -52,14 +52,17 @@ color: #333333;
 background-color: #EFEFEF;
 padding: 15px;
 border: none;
+border-bottom: 4px solid #EFEFEF;
 }
 
 QPushButton:hover {
 background-color: #d5d5d5;
+border-bottom: 4px solid #d5d5d5;
 }
 
 QPushButton:checked {
 background-color: #d5d5d5;
+border-bottom: 4px solid #60B1C7;
 }
 
 QWidget {background-color: #EFEFEF;}</string>
@@ -179,7 +182,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -432,8 +435,8 @@ QWidget {background-color: #EFEFEF;}</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>639</width>
-             <height>684</height>
+             <width>633</width>
+             <height>597</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1000,431 +1003,21 @@ QWidget {background-color: #EFEFEF;}</string>
        </layout>
       </widget>
       <widget class="QWidget" name="pageCredentials">
-       <layout class="QVBoxLayout" name="verticalLayout_22">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
-         <spacer name="verticalSpacer_17">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Maximum</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QGroupBox" name="addCredentialsGroupBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="title">
-             <string>Add or update a credential</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_15">
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLineEdit" name="addCredServiceInput">
-               <property name="maxLength">
-                <number>57</number>
-               </property>
-               <property name="placeholderText">
-                <string>Service or Website name</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="addCredLoginInput">
-               <property name="maxLength">
-                <number>62</number>
-               </property>
-               <property name="placeholderText">
-                <string>Login</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="PasswordLineEdit" name="addCredPasswordInput">
-               <property name="maxLength">
-                <number>31</number>
-               </property>
-               <property name="placeholderText">
-                <string>Password</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="addCredentialButton">
-               <property name="text">
-                <string>Add</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="credentialsManagementGB">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="title">
-             <string>Credentials management</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_23">
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_9">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
-                 <item>
-                  <widget class="QPushButton" name="pushButtonMemMode">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Unlock</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer_2">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="lineEditFilterCred">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="placeholderText">
-                    <string>Filter credentials...</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="CredentialsView" name="credentialsListView">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="credDisplayFrame">
-                 <property name="frameShape">
-                  <enum>QFrame::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_24">
-                  <item>
-                   <widget class="QLineEdit" name="credDisplayServiceInput">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <pointsize>14</pointsize>
-                     </font>
-                    </property>
-                    <property name="frame">
-                     <bool>false</bool>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                    </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="verticalSpacer_2">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::Fixed</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>10</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <layout class="QFormLayout" name="formLayout">
-                    <property name="fieldGrowthPolicy">
-                     <enum>QFormLayout::ExpandingFieldsGrow</enum>
-                    </property>
-                    <property name="rowWrapPolicy">
-                     <enum>QFormLayout::WrapLongRows</enum>
-                    </property>
-                    <property name="labelAlignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                    </property>
-                    <property name="formAlignment">
-                     <set>Qt::AlignHCenter|Qt::AlignTop</set>
-                    </property>
-                    <property name="horizontalSpacing">
-                     <number>4</number>
-                    </property>
-                    <property name="verticalSpacing">
-                     <number>9</number>
-                    </property>
-                    <item row="4" column="0">
-                     <widget class="QLabel" name="credDisplayLoginLabel">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Login</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="6" column="0">
-                     <widget class="QLabel" name="credDisplayPasswordLabel">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Password:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="8" column="0">
-                     <widget class="QLabel" name="credDisplayDescriptionLabel">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Description:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="9" column="0">
-                     <widget class="QLabel" name="credDisplayCreationDateLabel">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Creation Date:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="10" column="0">
-                     <widget class="QLabel" name="credDisplayModificationDateLabel">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Last Modified:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="4" column="1">
-                     <widget class="QLineEdit" name="credDisplayLoginInput">
-                      <property name="font">
-                       <font>
-                        <pointsize>12</pointsize>
-                        <weight>50</weight>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="frame">
-                       <bool>false</bool>
-                      </property>
-                      <property name="readOnly">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="6" column="1">
-                     <widget class="LockedPasswordLineEdit" name="credDisplayPasswordInput">
-                      <property name="font">
-                       <font>
-                        <weight>50</weight>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="8" column="1">
-                     <widget class="QLineEdit" name="credDisplayDescriptionInput">
-                      <property name="font">
-                       <font>
-                        <weight>50</weight>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="maxLength">
-                       <number>22</number>
-                      </property>
-                      <property name="clearButtonEnabled">
-                       <bool>false</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="10" column="1">
-                     <widget class="QLineEdit" name="credDisplayModificationDateInput">
-                      <property name="font">
-                       <font>
-                        <weight>50</weight>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="frame">
-                       <bool>false</bool>
-                      </property>
-                      <property name="readOnly">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="9" column="1">
-                     <widget class="QLineEdit" name="credDisplayCreationDateInput">
-                      <property name="font">
-                       <font>
-                        <weight>50</weight>
-                        <bold>false</bold>
-                       </font>
-                      </property>
-                      <property name="frame">
-                       <bool>false</bool>
-                      </property>
-                      <property name="readOnly">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <widget class="QDialogButtonBox" name="credDisplayButtonBox">
-                    <property name="standardButtons">
-                     <set>QDialogButtonBox::Reset|QDialogButtonBox::Save</set>
-                    </property>
-                    <property name="centerButtons">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
+         <widget class="CredentialsManagement" name="widgetCredentials" native="true"/>
         </item>
        </layout>
       </widget>
@@ -2399,19 +1992,10 @@ QWidget {background-color: #EFEFEF;}</string>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PasswordLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>PasswordLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>CredentialsView</class>
-   <extends>QListView</extends>
-   <header>CredentialsView.h</header>
-  </customwidget>
-  <customwidget>
-   <class>LockedPasswordLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>PasswordLineEdit.h</header>
+   <class>CredentialsManagement</class>
+   <extends>QWidget</extends>
+   <header>CredentialsManagement.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

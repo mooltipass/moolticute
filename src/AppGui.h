@@ -12,6 +12,7 @@
 #include "MainWindow.h"
 #include "WSClient.h"
 #include "DaemonMenuAction.h"
+#include <QtAwesome.h>
 
 class AppGui : public QApplication
 {
@@ -26,6 +27,8 @@ public:
     void mainWindowHide();
     void enableDaemon();
     void disableDaemon();
+
+    static QtAwesome *qtAwesome();
 
 private slots:
     void connectedChanged();

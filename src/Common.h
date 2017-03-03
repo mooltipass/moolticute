@@ -155,5 +155,32 @@ public:
 Q_DECLARE_METATYPE(Common::MPStatus)
 Q_DECLARE_METATYPE(Common::MPHwVersion)
 
+#define CSS_BLUE_BUTTON "QPushButton {" \
+                            "color: #fff;" \
+                            "background-color: #60B1C7;" \
+                            "padding: 12px;" \
+                            "border: none;" \
+                        "}" \
+                        "QPushButton:hover {" \
+                            "background-color: #3d96af;" \
+                        "}" \
+                        "QPushButton:pressed {" \
+                            "background-color: #237C95;" \
+                        "}"
+
+#define CSS_GREY_BUTTON "QPushButton {" \
+                            "color: #888888;" \
+                            "background-color: #E7E7E7;" \
+                            "padding: 12px;" \
+                            "border: none;" \
+                        "}" \
+                        "QPushButton:hover {" \
+                            "background-color: #DCDCDC;" \
+                        "}" \
+                        "QPushButton:pressed {" \
+                            "color: #FFFFFF;" \
+                            "background-color: #E57373;" \
+                        "}"
+
 #endif // COMMON_H
 

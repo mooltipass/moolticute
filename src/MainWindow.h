@@ -22,7 +22,6 @@
 #include <QtWidgets>
 #include "WSClient.h"
 #include <QtAwesome.h>
-#include "CredentialsModel.h"
 #include "WindowLog.h"
 
 namespace Ui {
@@ -45,12 +44,12 @@ signals:
     void windowCloseRequested();
 
 private slots:
+    void enableCredentialsManagement(bool enable);
     void updatePage();
     void checkSettingsChanged();
-    void enableCredentialsManagement(bool);
     void enableKnockSettings(bool visible);
     void updateSerialInfos();
-    void updateQuickAddCredentialsButtonState();
+    void wantEnterCredentialManagement();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
@@ -58,17 +57,6 @@ private slots:
     void integrityProgress(int total, int current);
     void integrityFinished(bool success);
 
-    void onPasswordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
-    void onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success);
-
-    void saveSelectedCredential(QModelIndex idx = {});
-    bool confirmDiscardUneditedCredentialChanges(QModelIndex idx = {});
-
-    void on_pushButtonSettingsReset_clicked();
-    void on_pushButtonSettingsSave_clicked();
-    void on_pushButtonMemMode_clicked();
-    void requestPasswordForSelectedItem();
-    void on_addCredentialButton_clicked();
     void on_pushButtonViewLogs_clicked();
     void on_pushButtonAutoStart_clicked();
 
@@ -78,10 +66,12 @@ private slots:
     void on_pushButtonImportFile_clicked();
     void on_pushButtonIntegrity_clicked();
 
+    //Settings page
+    void on_pushButtonSettingsReset_clicked();
+    void on_pushButtonSettingsSave_clicked();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
-
-
 
     virtual void closeEvent(QCloseEvent *event);
 
@@ -91,9 +81,6 @@ private:
     QtAwesome* awesome;
 
     WSClient *wsClient;
-
-    CredentialsModel *credModel;
-    CredentialsFilterModel *credFilterModel;
 
     WindowLog *dialogLog = nullptr;
     QByteArray logBuffer;

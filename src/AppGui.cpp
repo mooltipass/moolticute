@@ -19,18 +19,19 @@ bool AppGui::initialize()
     Common::installMessageOutputHandler();
 
     setAttribute(Qt::AA_UseHighDpiPixmaps);
-	setQuitOnLastWindowClosed(false);
+    setQuitOnLastWindowClosed(false);
 
-     QCommandLineParser parser;
-     QCommandLineOption autoLaunchedOption("autolaunched");
-     parser.addOption(autoLaunchedOption);
-     parser.process(*QCoreApplication::instance());
+    QCommandLineParser parser;
+    QCommandLineOption autoLaunchedOption("autolaunched");
+    parser.addOption(autoLaunchedOption);
+    parser.process(*QCoreApplication::instance());
 
-     bool autoLaunched = parser.isSet(autoLaunchedOption);
-
+    bool autoLaunched = parser.isSet(autoLaunchedOption);
 
     if (!createSingleApplication())
         return false;
+
+    qtAwesome()->initFontAwesome();
 
     systray = new QSystemTrayIcon(this);
     QIcon icon(":/systray_disconnected.png");
@@ -445,4 +446,10 @@ void AppGui::daemonLogRead()
         win->daemonLogAppend(out);
         //qDebug() << QString::fromUtf8(out);
     }
+}
+
+QtAwesome *AppGui::qtAwesome()
+{
+    static QtAwesome *a = new QtAwesome(qApp);
+    return a;
 }

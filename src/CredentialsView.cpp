@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QDateTime>
 #include "PasswordLineEdit.h"
+#include "AppGui.h"
 
 class ServiceItemDelegate : public QStyledItemDelegate {
 public:
@@ -18,6 +19,7 @@ public:
 private:
     QFont serviceFont() const;
     QFont loginFont() const;
+    QFont favFont() const;
 };
 
 CredentialsView::CredentialsView(QWidget *parent)
@@ -76,20 +78,23 @@ QSize ServiceItemDelegate::sizeHint(const QStyleOptionViewItem &,
     QString login   = index.data(CredentialsModel::LoginRole).toString();
 
     auto serviceMetrics = QFontMetrics(serviceFont());
-    auto loginMetrics   = QFontMetrics(loginFont());
+    auto loginMetrics = QFontMetrics(loginFont());
+    auto favMetrics = QFontMetrics(favFont());
 
     const auto height = serviceMetrics.height() + loginMetrics.height() + 20;
-    const auto width  = qMax(serviceMetrics.width(service), loginMetrics.width(login)) + 10;
+    const auto width  = qMax(serviceMetrics.width(service) + 10 + serviceMetrics.height() + favMetrics.width("00"),
+                             loginMetrics.width(login)) + 10 + loginMetrics.height();
 
     return QSize(width, height);
 
 }
-void ServiceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem & option,
-                         const QModelIndex &index) const {
-
+void ServiceItemDelegate::paint(QPainter *painter,
+                                const QStyleOptionViewItem &option,
+                                const QModelIndex &index) const
+{
+    QPen pen;
     QString service = index.data(Qt::DisplayRole).toString();
     QString login   = index.data(CredentialsModel::LoginRole).toString();
-
 
     qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
 
@@ -101,20 +106,61 @@ void ServiceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem & 
 
     const auto serviceMetrics = QFontMetrics{f};
 
+    //service
     QPoint pos = option.rect.topLeft() + QPoint(5, 5);
 
     painter->drawText(QRect(pos , QSize(option.rect.width() - 5, serviceMetrics.height())), service);
 
+    //Fav icon
+    QIcon star = AppGui::qtAwesome()->icon(fa::star);
+    QSize iconSz = QSize(serviceMetrics.height(), serviceMetrics.height());
+    pos = option.rect.topRight() - QPoint(5 + iconSz.width(), -5);
+    star.paint(painter, QRect(pos, iconSz));
 
+    //Fav number
+    f = favFont();
+    painter->setFont(f);
+    const auto favMetrics = QFontMetrics{f};
 
-    pos = option.rect.topLeft() + QPoint(5, 5); ;
-    pos.setY(pos.y() + serviceMetrics.height() + 5);
+    QString favNumber = QString::number(qrand() % 13 + 1);
+    pos -= QPoint(favMetrics.width("00") + 5, -3);
 
+    pen = painter->pen();
+    pen.setColor(QColor("#a7a7a7"));
+    painter->setPen(pen);
+
+    painter->drawText(QRect(pos , QSize(favMetrics.width("00") + 5, favMetrics.height())), favNumber);
+
+    //Login
     f = loginFont();
     painter->setFont(f);
     const auto loginMetrics = QFontMetrics{f};
 
-    painter->drawText(QRect(pos, QSize(option.rect.width() - 5, loginMetrics.height())), login);
+    pos = option.rect.topLeft() + QPoint(5 + loginMetrics.height() + 5, 5); ;
+    pos.setY(pos.y() + serviceMetrics.height() + 5);
+
+    pen = painter->pen();
+    pen.setColor(QColor("#0097a7"));
+    painter->setPen(pen);
+
+    painter->drawText(QRect(pos, QSize(option.rect.width() - 10, loginMetrics.height())),
+//                      Qt::AlignRight,
+                      login);
+
+    //Icon login
+    QIcon icoLogin = AppGui::qtAwesome()->icon(fa::arrowcircleright, {{ "color", QColor("#0097a7") },
+                                                                       { "color-selected", QColor("#0097a7") },
+                                                                       { "color-active", QColor("#0097a7") }});
+    iconSz = QSize(loginMetrics.height(), loginMetrics.height());
+    pos.setX(option.rect.x() + 5);
+    icoLogin.paint(painter, QRect(pos, iconSz));
+
+    pen = painter->pen();
+    pen.setColor(QColor("#efefef"));
+    painter->setPen(pen);
+    painter->drawLine(option.rect.bottomLeft() + QPoint(10, 0),
+                      option.rect.bottomRight() - QPoint(10, 0));
+
     painter->restore();
 }
 
@@ -123,12 +169,18 @@ void ServiceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem & 
 QFont ServiceItemDelegate::serviceFont() const {
     QFont f = qApp->font();
     f.setBold(false);
-    f.setPointSize(13);
+    f.setPointSize(12);
     return f;
 }
 QFont ServiceItemDelegate::loginFont() const {
     QFont f = qApp->font();
-    f.setPointSize(12);
+    f.setPointSize(10);
+    f.setItalic(true);
+    return f;
+}
+QFont ServiceItemDelegate::favFont() const {
+    QFont f = qApp->font();
+    f.setPointSize(8);
     return f;
 }
 

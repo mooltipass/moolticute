@@ -91,7 +91,7 @@ private:
     void mergeWith(const QVector<Credential> &);
 
     friend class CredentialsFilterModel;
-    friend class MainWindow;
+    friend class CredentialsManagement;
 };
 
 #endif // CREDENTIALSMODEL_H

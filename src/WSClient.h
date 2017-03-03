@@ -59,8 +59,8 @@ public:
 
     bool requestDeviceUID(const QByteArray & key);
 
-    void sendEnterCredentialsManagementRequest();
-    void sendLeaveCredentialsManagementRequest();
+    void sendEnterMMRequest();
+    void sendLeaveMMRequest();
 
     void addOrUpdateCredential(const QString & service, const QString & login,
                        const QString & password, const QString & description = {});
