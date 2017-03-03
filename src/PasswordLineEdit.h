@@ -8,6 +8,7 @@ class QPushButton;
 class QSlider;
 class QCheckBox;
 class QLabel;
+class QProgressBar;
 
 class PasswordOptionsPopup : public QFrame {
     Q_OBJECT
@@ -30,6 +31,8 @@ private:
     QSlider* m_lengthSlider;
     QCheckBox *m_upperCaseCB, *m_lowerCaseCB, *m_digitsCB, *m_symbolsCB;
     QLabel *m_passwordLabel, * m_sliderLengthLabel;
+    QProgressBar *m_strengthBar;
+    QLabel *m_quality, *m_entropy;
 
     std::mt19937 m_random_generator;
 };

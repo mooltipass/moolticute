@@ -6,9 +6,23 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
+#include <QProgressBar>
 #include <array>
 #include "QtAwesome.h"
+#include "zxcvbn.h"
 
+#define PROGRESS_STYLE \
+    "QProgressBar {" \
+    "border: none;" \
+    "height: 2px;" \
+    "font-size: 1px;" \
+    "background-color: transparent;" \
+    "padding: 0 1px;" \
+    "}" \
+    "QProgressBar::chunk {" \
+    "background-color: %1;" \
+    "border-radius: 2px;" \
+    "}"
 
 PasswordLineEdit::PasswordLineEdit(QWidget* parent)
  : QLineEdit(parent)
@@ -79,6 +93,11 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
     m_lengthSlider->setValue(12);
     m_lengthSlider->setOrientation(Qt::Horizontal);
     m_sliderLengthLabel = new QLabel;
+    m_quality = new QLabel;
+    m_entropy = new QLabel;
+
+    m_quality->setStyleSheet("font-size: 7pt;");
+    m_entropy->setStyleSheet("font-size: 7pt;");
 
     m_upperCaseCB = new QCheckBox(tr("Upper case letters"));
     m_upperCaseCB->setChecked(true);
@@ -101,11 +120,17 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
     m_passwordLabel = new QLabel;
     m_passwordLabel->setFixedWidth(QFontMetrics(m_passwordLabel->font()).averageCharWidth() * 40 );
     m_passwordLabel->setAlignment(Qt::AlignCenter);
+    m_passwordLabel->setStyleSheet("font-size: 12pt;");
 
+    m_strengthBar = new QProgressBar;
+    m_strengthBar->setStyleSheet(QStringLiteral(PROGRESS_STYLE).arg("#c0392b"));
+    m_strengthBar->setMaximum(200);
+    m_strengthBar->setTextVisible(false);
 
     QVBoxLayout* mainLayout = new QVBoxLayout;
     QHBoxLayout* buttonLayout = new QHBoxLayout;
     QHBoxLayout* sliderLayout = new QHBoxLayout;
+    QHBoxLayout* qualityLayout = new QHBoxLayout;
 
     buttonLayout->addWidget(m_refreshBtn);
     buttonLayout->addWidget(m_fillBtn);
@@ -114,6 +139,13 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
     mainLayout->addSpacing(10);
     mainLayout->addWidget(m_passwordLabel, 0, Qt::AlignHCenter);
     mainLayout->addSpacing(20);
+    mainLayout->addWidget(m_strengthBar);
+
+    qualityLayout->addWidget(m_quality);
+    qualityLayout->addStretch();
+    qualityLayout->addWidget(m_entropy);
+
+    mainLayout->addLayout(qualityLayout);
 
     sliderLayout->addWidget(m_sliderLengthLabel);
     sliderLayout->addWidget(m_lengthSlider);
@@ -276,4 +308,33 @@ void PasswordOptionsPopup::generatePassword() {
 
     //Done
     m_passwordLabel->setText(result);
+
+    double entropy = ZxcvbnMatch(result, 0, 0);
+    m_entropy->setText(tr("Entropy: %1 bit").arg(QString::number(entropy, 'f', 2)));
+    if (entropy > m_strengthBar->maximum())
+        entropy = m_strengthBar->maximum();
+
+    m_strengthBar->setValue(entropy);
+
+    QString style = QStringLiteral(PROGRESS_STYLE);
+    if (entropy < 35)
+    {
+        m_strengthBar->setStyleSheet(style.arg("#c0392b"));
+        m_quality->setText(tr("Password Quality: %1").arg(tr("Poor")));
+    }
+    else if (entropy >= 35 && entropy < 55)
+    {
+        m_strengthBar->setStyleSheet(style.arg("#f39c1f"));
+        m_quality->setText(tr("Password Quality: %1").arg(tr("Weak")));
+    }
+    else if (entropy >= 55 && entropy < 100)
+    {
+        m_strengthBar->setStyleSheet(style.arg("#11d116"));
+        m_quality->setText(tr("Password Quality: %1").arg(tr("Good")));
+    }
+    else
+    {
+        m_strengthBar->setStyleSheet(style.arg("#27ae60"));
+        m_quality->setText(tr("Password Quality: %1").arg(tr("Excellent")));
+    }
 }

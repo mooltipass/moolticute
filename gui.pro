@@ -29,7 +29,8 @@ SOURCES += src/main_gui.cpp \
     src/AnsiEscapeCodeHandler.cpp \
     src/PasswordLineEdit.cpp \
     src/CredentialsView.cpp \
-    src/CredentialsManagement.cpp
+    src/CredentialsManagement.cpp \
+    src/zxcvbn-c/zxcvbn.c
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -46,14 +47,17 @@ HEADERS  += src/MainWindow.h \
     src/AnsiEscapeCodeHandler.h \
     src/PasswordLineEdit.h \
     src/CredentialsView.h \
-    src/CredentialsManagement.h
+    src/CredentialsManagement.h \
+    src/zxcvbn-c/dict-src.h \
+    src/zxcvbn-c/zxcvbn.h
 
 mac {
     HEADERS += src/MacUtils.h
     OBJECTIVE_SOURCES += src/MacUtils.mm
 }
 
-INCLUDEPATH += src
+INCLUDEPATH += src\
+    src/zxcvbn-c
 
 FORMS    += src/MainWindow.ui \
     src/WindowLog.ui \
