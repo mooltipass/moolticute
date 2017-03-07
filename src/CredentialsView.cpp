@@ -115,7 +115,7 @@ void ServiceItemDelegate::paint(QPainter *painter,
     QIcon star = AppGui::qtAwesome()->icon(fa::star);
     QSize iconSz = QSize(serviceMetrics.height(), serviceMetrics.height());
     pos = option.rect.topRight() - QPoint(5 + iconSz.width(), -5);
-    star.paint(painter, QRect(pos, iconSz));
+//    star.paint(painter, QRect(pos, iconSz));
 
     //Fav number
     f = favFont();
@@ -129,7 +129,7 @@ void ServiceItemDelegate::paint(QPainter *painter,
     pen.setColor(QColor("#a7a7a7"));
     painter->setPen(pen);
 
-    painter->drawText(QRect(pos , QSize(favMetrics.width("00") + 5, favMetrics.height())), favNumber);
+//    painter->drawText(QRect(pos , QSize(favMetrics.width("00") + 5, favMetrics.height())), favNumber);
 
     //Login
     f = loginFont();
