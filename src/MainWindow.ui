@@ -240,14 +240,14 @@ QWidget {background-color: #EFEFEF;}</string>
              </font>
             </property>
             <property name="text">
-             <string>The Multicute deamon is not running.</string>
+             <string>The Moolticute deamon is not running.</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_noDaemonMsg">
             <property name="text">
-             <string>A connection to the Multicute Daemon could not be established. Try to restart the application.</string>
+             <string>A connection to the Moolticute daemon could not be established. Try to restart the application.</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
