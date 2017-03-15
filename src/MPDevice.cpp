@@ -64,7 +64,7 @@ MPDevice::MPDevice(QObject *parent):
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
 
-    QTimer::singleShot(100, this, &MPDevice::exitMemMgmtMode);
+    QTimer::singleShot(100, [this]() { exitMemMgmtMode(false); });
 }
 
 MPDevice::~MPDevice()
@@ -114,13 +114,11 @@ void MPDevice::runAndDequeueJobs()
 
     connect(currentJobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
-        qDebug() << "current job queue is finished with success";
         currentJobs = nullptr;
         runAndDequeueJobs();
     });
     connect(currentJobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
-        qDebug() << "current job queue is finished with failure";
         currentJobs = nullptr;
         runAndDequeueJobs();
     });
@@ -2301,9 +2299,14 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
     return true;
 }
 
-void MPDevice::exitMemMgmtMode()
+// If check_status is false, loaded nodes are not checked, and
+// return status of command is not checked too
+// This prevents having critical and scarry error messages
+// in user console.
+void MPDevice::exitMemMgmtMode(bool check_status)
 {
-    checkLoadedNodes(false);
+    if (check_status)
+        checkLoadedNodes(false);
 
     AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
@@ -2358,7 +2361,8 @@ void MPDevice::exitMemMgmtMode()
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
-        qCritical() << "Failed to exit MMM";
+        if (check_status)
+            qCritical() << "Failed to exit MMM";
 
         /* Cleaning all temp values */
         ctrValue.clear();

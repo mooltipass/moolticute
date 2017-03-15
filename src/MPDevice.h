@@ -114,7 +114,7 @@ public:
 
     //mem mgmt mode
     void startMemMgmtMode();
-    void exitMemMgmtMode();
+    void exitMemMgmtMode(bool check_status = true);
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);
 
