@@ -415,6 +415,13 @@ void MainWindow::updatePage()
                                   QMessageBox::Yes | QMessageBox::No,
                                   QMessageBox::Yes) == QMessageBox::No)
         {
+            //Force the selected button to go back to the correct state
+            //when we pressed "No"
+            if (ui->stackedWidget->currentWidget() == ui->pageCredentials)
+                ui->pushButtonCred->setChecked(true);
+            else if (ui->stackedWidget->currentWidget() == ui->pageFiles)
+                ui->pushButtonFiles->setChecked(true);
+
             return;
         }
 
