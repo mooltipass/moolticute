@@ -183,18 +183,19 @@ QDate Common::bytesToDate(const QByteArray &data)
     int m = (((quint8)data[0] & 0x01) << 3) | (((quint8)data[1] >> 5) & 0x07);
     int d = ((quint8)data[1] & 0x1F);
 
-    return QDate(y, m, d);
+    return QDate(y, m+1, d);
 }
 
 QByteArray Common::dateToBytes(const QDate &dt)
 {
+    // reminder Qt date use 1-12 month
     QByteArray data;
     data.resize(2);
 
     data[0] = (quint8)(((dt.year() - 2010) << 1) & 0xFE);
-    if(dt.month() >= 8)
+    if(dt.month() - 1  >= 8)
         data[0] = (quint8)((quint8)data[0] | 0x01);
-    data[1] = (quint8)(((dt.month() % 8) << 5) & 0xE0);
+    data[1] = (quint8)((((dt.month() -1) % 8) << 5) & 0xE0);
     data[1] = (quint8)((quint8)data[1] | dt.day());
 
     return data;
