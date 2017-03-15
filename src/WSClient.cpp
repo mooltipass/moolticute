@@ -198,6 +198,19 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         set_uid((qint64)o["uid"].toDouble());
     }
+    else if (rootobj["msg"] == "get_data_node")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        QByteArray b = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
+        emit dataFileRequested(o["service"].toString(), b, success);
+    }
+    else if (rootobj["msg"] == "set_data_node")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        emit dataFileSent(o["service"].toString(), success);
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -249,12 +262,14 @@ void WSClient::udateParameters(const QJsonObject &data)
 }
 
 
-bool WSClient::isMPMini() const {
+bool WSClient::isMPMini() const
+{
     return  get_mpHwVersion() == Common::MP_Mini;
 }
 
 
-bool WSClient::requestDeviceUID(const QByteArray & key) {
+bool WSClient::requestDeviceUID(const QByteArray & key)
+{
     m_uid = -1;
     if(!isConnected())
         return false;
@@ -286,7 +301,8 @@ void WSClient::addOrUpdateCredential(const QString & service, const QString & lo
                             { "data", o }});
 }
 
-void WSClient::requestPassword(const QString & service, const QString & login) {
+void WSClient::requestPassword(const QString & service, const QString & login)
+{
 
     QJsonObject d = {{ "service", service },
                      { "login", login }};
@@ -294,3 +310,17 @@ void WSClient::requestPassword(const QString & service, const QString & login) {
                             { "data", d }});
 }
 
+void WSClient::requestDataFile(const QString &service)
+{
+    QJsonObject d = {{ "service", service }};
+    sendJsonData({{ "msg", "get_data_node" },
+                            { "data", d }});
+}
+
+void WSClient::sendDataFile(const QString &service, const QByteArray &data)
+{
+    QJsonObject d = {{ "service", service },
+                     { "node_data", QString(data.toBase64()) }};
+    sendJsonData({{ "msg", "set_data_node" },
+                            { "data", d }});
+}

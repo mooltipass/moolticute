@@ -85,6 +85,9 @@ public:
 
     void requestPassword(const QString & service, const QString & login);
 
+    void requestDataFile(const QString &service);
+    void sendDataFile(const QString &service, const QByteArray &data);
+
 signals:
     void wsConnected();
     void wsDisconnected();
@@ -94,6 +97,8 @@ signals:
     void showAppRequested();
     void progressChanged(int total, int current);
     void memcheckFinished(bool success);
+    void dataFileRequested(const QString &service, const QByteArray &data, bool success);
+    void dataFileSent(const QString &service, bool success);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

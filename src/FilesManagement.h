@@ -26,6 +26,25 @@ namespace Ui {
 class FilesManagement;
 }
 
+class FilesFilterModel: public QSortFilterProxyModel
+{
+    Q_OBJECT
+public:
+    FilesFilterModel(QObject *parent = 0);
+
+    void setFilter(const QString &filter_str);
+
+    Q_INVOKABLE int indexToSource(int idx);
+    Q_INVOKABLE int indexFromSource(int idx);
+
+protected:
+    virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+
+private:
+    QString filter;
+};
+
 class FilesManagement : public QWidget
 {
     Q_OBJECT
@@ -41,14 +60,36 @@ signals:
 
 private slots:
     void enableMemManagement(bool);
+    void dataFileRequested(const QString &service, const QByteArray &data, bool success);
+    void dataFileSent(const QString &service, bool success);
+    void updateProgress(int total, int curr);
+    void updateButtonsUI();
 
     void on_pushButtonEnterMMM_clicked();
     void on_buttonQuitMMM_clicked();
 
+    void currentSelectionChanged(const QModelIndex &curr, const QModelIndex &);
+
+    void on_pushButtonUpdateFile_clicked();
+    void on_pushButtonSaveFile_clicked();
+    void on_pushButtonDelFile_clicked();
+
+    void on_addFileButton_clicked();
+
+    void on_pushButtonFilename_clicked();
+
 private:
+    void loadModel();
+    void addUpdateFile(QString service, QString filename, QProgressBar *pbar);
+
     Ui::FilesManagement *ui;
 
     WSClient *wsClient = nullptr;
+
+    FilesFilterModel *filterModel;
+    QStandardItemModel *filesModel;
+    QStandardItem *currentItem = nullptr;
+    QString fileName;
 };
 
 #endif // FILESMANAGEMENT_H

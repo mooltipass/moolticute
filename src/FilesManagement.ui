@@ -48,21 +48,14 @@ border-right: none;
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="leftMargin">
-      <number>150</number>
+      <number>100</number>
      </property>
      <property name="rightMargin">
-      <number>150</number>
+      <number>100</number>
      </property>
      <item>
       <layout class="QGridLayout" name="gridLayoutAddCred">
-       <item row="1" column="0">
-        <widget class="QLineEdit" name="addFileServiceInput">
-         <property name="maxLength">
-          <number>57</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
+       <item row="1" column="2">
         <widget class="QPushButton" name="addFileButton">
          <property name="minimumSize">
           <size>
@@ -78,11 +71,75 @@ border-right: none;
        <item row="0" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>File name</string>
+          <string>Service/File name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLineEdit" name="addFileServiceInput">
+         <property name="maxLength">
+          <number>57</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLineEdit" name="lineEditFilename">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonFilename">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>25</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Choose file</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>File</string>
          </property>
         </widget>
        </item>
       </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <property name="leftMargin">
+      <number>180</number>
+     </property>
+     <property name="rightMargin">
+      <number>180</number>
+     </property>
+     <item>
+      <widget class="QProgressBar" name="progressBarTop">
+       <property name="value">
+        <number>24</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -244,12 +301,15 @@ border-right: none;
             </widget>
            </item>
            <item>
-            <widget class="CredentialsView" name="filesListView">
+            <widget class="QListView" name="filesListView">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
              </property>
             </widget>
            </item>
@@ -274,7 +334,7 @@ border-right: none;
             </widget>
            </item>
            <item>
-            <widget class="QFrame" name="credDisplayFrame">
+            <widget class="QFrame" name="filesDisplayFrame">
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
              </property>
@@ -485,13 +545,6 @@ padding: 2px;
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CredentialsView</class>
-   <extends>QListView</extends>
-   <header>CredentialsView.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../img/images.qrc"/>
  </resources>

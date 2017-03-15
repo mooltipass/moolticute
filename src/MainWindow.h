@@ -57,6 +57,8 @@ private slots:
     void integrityProgress(int total, int current);
     void integrityFinished(bool success);
 
+    void loadingProgress(int total, int current);
+
     void on_pushButtonViewLogs_clicked();
     void on_pushButtonAutoStart_clicked();
 

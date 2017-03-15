@@ -51,7 +51,7 @@ bool CredentialsFilterModel::filterAcceptsRow(int source_row, const QModelIndex 
     CredentialsModel *credModel = qobject_cast<CredentialsModel *>(sourceModel());
 
     for(int idx : {CredentialsModel::ServiceIdx, CredentialsModel::LoginIdx, CredentialsModel::DescriptionIdx}) {
-        if(credModel->data(credModel->index(source_row, idx)).toString().contains(filter))
+        if(credModel->data(credModel->index(source_row, idx)).toString().toLower().contains(filter.toLower()))
             return true;
     }
 

@@ -61,7 +61,24 @@ void WSServerCon::processMessage(const QString &message)
     {
         //send command to start MMM
         if (mpdevice)
-            mpdevice->startMemMgmtMode();
+            mpdevice->startMemMgmtMode(
+                        //progress callback handling
+                        [=](int total, int current)
+            {
+                if (!WSServer::Instance()->checkClientExists(this))
+                    return;
+
+                if (current > total)
+                    current = total;
+
+                QJsonObject ores;
+                QJsonObject oroot = root;
+                ores["progress_total"] = total;
+                ores["progress_current"] = current;
+                oroot["data"] = ores;
+                oroot["msg"] = "progress";
+                sendJsonMessage(oroot);
+            });
         else
             sendFailedJson(root, "No device connected");
     }

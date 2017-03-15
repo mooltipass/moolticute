@@ -113,7 +113,7 @@ public:
     void getUID(const QByteArray & key);
 
     //mem mgmt mode
-    void startMemMgmtMode();
+    void startMemMgmtMode(std::function<void(int total, int current)> cbProgress);
     void exitMemMgmtMode(bool check_status = true);
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);
@@ -182,11 +182,14 @@ private:
     /* Platform function for writing data, should be implemented in platform class */
     virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
 
-    void loadLoginNode(AsyncJobs *jobs, const QByteArray &address);
+    void loadLoginNode(AsyncJobs *jobs, const QByteArray &address,
+                       std::function<void(int total, int current)> cbProgress);
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
-    void loadDataNode(AsyncJobs *jobs, const QByteArray &address);
+    void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
+                      std::function<void(int total, int current)> cbProgress);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
-    void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, std::function<void(int total, int current)> cbProgress);
+    void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
+                               std::function<void(int total, int current)> cbProgress);
 
     void createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode = false);
 
@@ -288,6 +291,12 @@ private:
 
     //this is a cache for data upload
     QByteArray currentDataNode;
+
+    //Used to maintain progression for current job
+    int progressTotal;
+    int progressCurrent;
+    int progressCurrentLogin;
+    int progressCurrentData;
 };
 
 #endif // MPDEVICE_H

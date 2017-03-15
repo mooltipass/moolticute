@@ -727,6 +727,13 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
             ctrValue = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             ctrValueClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             qDebug() << "CTR value:" << ctrValue.toHex();
+
+            progressTotal = 200 + MOOLTIPASS_FAV_MAX;
+            progressCurrent = 0;
+            progressCurrentLogin = 0;
+            progressCurrentData = 0;
+            cbProgress(progressTotal, progressCurrent);
+
             return true;
         }
     }));
@@ -803,6 +810,10 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                 qDebug() << "Favorite" << i << ": parent address:" << data.mid(MP_PAYLOAD_FIELD_INDEX, 2).toHex() << ", child address:" << data.mid(MP_PAYLOAD_FIELD_INDEX+2, 2).toHex();
                 favoritesAddrs.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
                 favoritesAddrsClone.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
+
+                progressCurrent++;
+                cbProgress(progressTotal, progressCurrent);
+
                 return true;
             }
         }));
@@ -847,7 +858,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                 if (!fullScan)
                 {
                     /* Traverse the flash by following the linked list */
-                    loadLoginNode(jobs, startNode);
+                    loadLoginNode(jobs, startNode, cbProgress);
                 }
                 else
                 {
@@ -902,7 +913,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                 qInfo() << "Loading data parent nodes...";
                 if (!fullScan)
                 {
-                    loadDataNode(jobs, startDataNode);
+                    //full data nodes are not needed. Only parents for service name
+                    loadDataNode(jobs, startDataNode, false, cbProgress);
                 }
             }
             else
@@ -922,7 +934,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
     }));
 }
 
-void MPDevice::startMemMgmtMode()
+void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbProgress)
 {
     /* Start MMM here, and load all memory data from the device */
 
@@ -939,7 +951,7 @@ void MPDevice::startMemMgmtMode()
     jobs->append(new MPCommandJob(this, MP_START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false, [](int, int){});
+    memMgmtModeReadFlash(jobs, false, cbProgress);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -1178,7 +1190,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
-void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, std::function<void(int total, int current)> cbProgress)
 {    
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
@@ -1213,6 +1225,14 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
             pnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
             pnodeClone->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
 
+            QString srv = pnode->getService();
+            if (srv.size() > 0)
+            {
+                progressCurrentLogin = (double)srv.at(0).toLower().toLatin1() / 'z' * 100;
+                progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
+                cbProgress(progressTotal, progressCurrent);
+            }
+
             //Continue to read data until the node is fully received
             if (!pnode->isDataLengthValid())
             {
@@ -1236,7 +1256,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address)
                 //Load next parent
                 if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
                 {
-                    loadLoginNode(jobs, pnode->getNextParentAddress());
+                    loadLoginNode(jobs, pnode->getNextParentAddress(), cbProgress);
                 }
             }
 
@@ -1304,7 +1324,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     }));
 }
 
-void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
+void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, std::function<void(int total, int current)> cbProgress)
 {
     MPNode *pnode = new MPNode(this, address);
     dataNodes.append(pnode);
@@ -1335,6 +1355,14 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
         pnode->appendData(data.mid(2, data[0]));
         pnodeClone->appendData(data.mid(2, data[0]));
 
+        QString srv = pnode->getService();
+        if (srv.size() > 0)
+        {
+            progressCurrentData = (double)srv.at(0).toLower().toLatin1() / 'z' * 100;
+            progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
+            cbProgress(progressTotal, progressCurrent);
+        }
+
         //Continue to read data until the node is fully received
         if (!pnode->isValid())
             done = false;
@@ -1344,7 +1372,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
             qDebug() << "Parent data node loaded: " << pnode->getService();
 
             //Load data child
-            if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
+            if (pnode->getStartChildAddress() != MPNode::EmptyAddress && load_childs)
             {
                 qDebug() << "Loading data child nodes...";
                 loadDataChildNode(jobs, pnode, pnode->getStartChildAddress());
@@ -1354,7 +1382,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address)
 
             //Load next parent
             if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
-                loadDataNode(jobs, pnode->getNextParentAddress());
+                loadDataNode(jobs, pnode->getNextParentAddress(), load_childs, cbProgress);
         }
 
         return true;
@@ -3140,7 +3168,7 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
     firstPacket.append(currentDataNode.mid(0, MOOLTIPASS_BLOCK_SIZE));
     firstPacket.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
-    cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, MOOLTIPASS_BLOCK_SIZE);
+//    cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, MOOLTIPASS_BLOCK_SIZE);
 
     //send the first 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data

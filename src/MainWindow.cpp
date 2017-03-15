@@ -650,6 +650,16 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
 void MainWindow::wantEnterCredentialManagement()
 {
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+
+    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+}
+
+void MainWindow::loadingProgress(int total, int current)
+{
+    ui->progressBarWait->show();
+    ui->progressBarWait->setMaximum(total);
+    ui->progressBarWait->setValue(current);
 }
 
 void MainWindow::on_pushButtonAutoStart_clicked()
@@ -784,6 +794,8 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
 
 void MainWindow::enableCredentialsManagement(bool enable)
 {
+    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+
     if (enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
     {
         if (ui->pushButtonCred->isChecked())
