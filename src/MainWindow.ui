@@ -25,6 +25,17 @@ color: #222222;
 
 QLabel {
 color: #222222;
+}
+
+QProgressBar:horizontal {
+border: none;
+background: #e7e7e7;
+text-align: center;
+height: 20px;
+}
+QProgressBar::chunk:horizontal {
+background-color: #60B1C7;
+width: 1px;
 }</string>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -113,6 +124,32 @@ QWidget {background-color: #EFEFEF;}</string>
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonFiles">
+         <property name="text">
+          <string>Files</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonSSH">
+         <property name="text">
+          <string>SSH Keys</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonSync">
          <property name="text">
           <string>Synchronisation</string>
@@ -182,7 +219,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>7</number>
+       <number>10</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -1424,7 +1461,7 @@ QWidget {background-color: #EFEFEF;}</string>
            </font>
           </property>
           <property name="text">
-           <string>Moolticute (c) 2016 Raoul Hecky</string>
+           <string>Moolticute (c) Raoul Hecky</string>
           </property>
          </widget>
         </item>
@@ -1943,9 +1980,6 @@ QWidget {background-color: #EFEFEF;}</string>
             <property name="value">
              <number>24</number>
             </property>
-            <property name="textVisible">
-             <bool>false</bool>
-            </property>
            </widget>
           </item>
           <item>
@@ -1978,6 +2012,44 @@ QWidget {background-color: #EFEFEF;}</string>
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="pageFiles">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="FilesManagement" name="widgetFiles" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageSSH">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="SSHManagement" name="widgetSSH" native="true"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -1995,6 +2067,18 @@ QWidget {background-color: #EFEFEF;}</string>
    <class>CredentialsManagement</class>
    <extends>QWidget</extends>
    <header>CredentialsManagement.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SSHManagement</class>
+   <extends>QWidget</extends>
+   <header>SSHManagement.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FilesManagement</class>
+   <extends>QWidget</extends>
+   <header>FilesManagement.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

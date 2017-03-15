@@ -139,7 +139,7 @@ void CredentialsManagement::on_buttonDiscard_clicked()
 {
     if (!confirmDiscardUneditedCredentialChanges())
         return;
-     wsClient->sendLeaveMMRequest();
+    wsClient->sendLeaveMMRequest();
 }
 
 void CredentialsManagement::on_buttonSaveChanges_clicked()

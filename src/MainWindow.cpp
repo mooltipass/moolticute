@@ -44,6 +44,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->setupUi(this);
     ui->widgetCredentials->setWsClient(wsClient);
+    ui->widgetFiles->setWsClient(wsClient);
 
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
 
@@ -55,6 +56,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonSync->setIcon(AppGui::qtAwesome()->icon(fa::refresh));
     ui->pushButtonAppSettings->setIcon(AppGui::qtAwesome()->icon(fa::cogs));
     ui->pushButtonAbout->setIcon(AppGui::qtAwesome()->icon(fa::info));
+    ui->pushButtonFiles->setIcon(AppGui::qtAwesome()->icon(fa::file));
+    ui->pushButtonSSH->setIcon(AppGui::qtAwesome()->icon(fa::key));
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
 
@@ -65,6 +68,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
+    connect(ui->widgetFiles, &FilesManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
 
     connect(wsClient, &WSClient::statusChanged, [this]()
     {
@@ -90,6 +94,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->pushButtonSync, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonAbout, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonAppSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonFiles, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonSSH, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
 
     ui->pushButtonDevSettings->setChecked(false);
 
@@ -397,7 +403,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::updatePage()
 {
-    if (ui->stackedWidget->currentWidget() == ui->pageCredentials &&
+    if ((ui->stackedWidget->currentWidget() == ui->pageCredentials ||
+         ui->stackedWidget->currentWidget() == ui->pageFiles) &&
         wsClient->get_memMgmtMode())
     {
         if (!ui->widgetCredentials->confirmDiscardUneditedCredentialChanges())
@@ -407,7 +414,9 @@ void MainWindow::updatePage()
                                   tr("Switching tabs will lock out the credentials management mode. Are you sure you want to switch tab ?"),
                                   QMessageBox::Yes | QMessageBox::No,
                                   QMessageBox::Yes) == QMessageBox::No)
+        {
             return;
+        }
 
          wsClient->sendLeaveMMRequest();
     }
@@ -454,11 +463,13 @@ void MainWindow::updatePage()
     }
 
     else if (ui->pushButtonCred->isChecked())
-    {
          ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
-    }
     else if (ui->pushButtonSync->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageSync);
+    else if (ui->pushButtonFiles->isChecked())
+        ui->stackedWidget->setCurrentWidget(ui->pageFiles);
+    else if (ui->pushButtonSSH->isChecked())
+        ui->stackedWidget->setCurrentWidget(ui->pageSSH);
 }
 
 void MainWindow::enableKnockSettings(bool enable)
@@ -767,7 +778,12 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
 void MainWindow::enableCredentialsManagement(bool enable)
 {
     if (enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
-        ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+    {
+        if (ui->pushButtonCred->isChecked())
+            ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+        else if (ui->pushButtonFiles->isChecked())
+            ui->stackedWidget->setCurrentWidget(ui->pageFiles);
+    }
 
     if (!enable)
         updatePage();

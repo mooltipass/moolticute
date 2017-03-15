@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SSHManagement</class>
+ <widget class="QWidget" name="SSHManagement">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>689</width>
+    <height>502</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#SSHManagement
+{
+background-color: rgb(255, 255, 255);
+}
+
+.FrameTitle {
+border: 2px solid #EFEFEF;
+padding: 2px;
+font-size: 12pt;
+border-top: none;
+border-left: none;
+border-right: none;
+}</string>
+  </property>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

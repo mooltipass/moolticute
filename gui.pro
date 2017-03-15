@@ -30,7 +30,9 @@ SOURCES += src/main_gui.cpp \
     src/PasswordLineEdit.cpp \
     src/CredentialsView.cpp \
     src/CredentialsManagement.cpp \
-    src/zxcvbn-c/zxcvbn.c
+    src/zxcvbn-c/zxcvbn.c \
+    src/FilesManagement.cpp \
+    src/SSHManagement.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -49,7 +51,9 @@ HEADERS  += src/MainWindow.h \
     src/CredentialsView.h \
     src/CredentialsManagement.h \
     src/zxcvbn-c/dict-src.h \
-    src/zxcvbn-c/zxcvbn.h
+    src/zxcvbn-c/zxcvbn.h \
+    src/FilesManagement.h \
+    src/SSHManagement.h
 
 mac {
     HEADERS += src/MacUtils.h
@@ -61,7 +65,9 @@ INCLUDEPATH += src\
 
 FORMS    += src/MainWindow.ui \
     src/WindowLog.ui \
-    src/CredentialsManagement.ui
+    src/CredentialsManagement.ui \
+    src/FilesManagement.ui \
+    src/SSHManagement.ui
 
 RESOURCES += \
     img/images.qrc

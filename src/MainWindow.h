@@ -86,7 +86,6 @@ private:
     QByteArray logBuffer;
 
     QMovie* gb_spinner;
-
 };
 
 #endif // MAINWINDOW_H
