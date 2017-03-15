@@ -36,31 +36,37 @@ bool MPManager::initialize()
 {
     qInfo() << "Starting MPManager";
 
+    if (!AppDaemon::isEmulationMode())
+    {
 #if defined(Q_OS_WIN)
-    connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
-    connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
+        connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
+        connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
 
 #elif defined(Q_OS_MAC)
-    connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
-    connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
+        connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
+        connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
 
 #elif defined(Q_OS_LINUX)
-    UsbMonitor_linux::Instance()->filterVendorId(MOOLTIPASS_VENDORID);
-    UsbMonitor_linux::Instance()->filterProductId(MOOLTIPASS_PRODUCTID);
+        UsbMonitor_linux::Instance()->filterVendorId(MOOLTIPASS_VENDORID);
+        UsbMonitor_linux::Instance()->filterProductId(MOOLTIPASS_PRODUCTID);
 
-    //Opening a device from the hotplug events handler can lead to recursive call withing the libusb. This can lead to libusb
-    //Not detecting hotplugged devices and other libusb-related error.
-    //To avoid this, we simply reenter Qt's event loop before enumerating & handling the changed devices.
-    connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()), Qt::QueuedConnection);
-    connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()), Qt::QueuedConnection);
-    UsbMonitor_linux::Instance()->start();
+        //Opening a device from the hotplug events handler can lead to recursive call withing the libusb. This can lead to libusb
+        //Not detecting hotplugged devices and other libusb-related error.
+        //To avoid this, we simply reenter Qt's event loop before enumerating & handling the changed devices.
+        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()), Qt::QueuedConnection);
+        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()), Qt::QueuedConnection);
+        UsbMonitor_linux::Instance()->start();
 #endif
+    }
 
-#if !defined(Q_OS_MAC)
+    bool startUsbCheck = true;
+#if defined(Q_OS_MAC)
     //This is not needed on osx, the list is updated at startup by UsbMonitor
-    checkUsbDevices();
+    //except the emulation mode is enabled
+    if (!AppDaemon::isEmulationMode())
+        startUsbCheck = false;
 #endif
-    if (g_bEmulationMode)
+    if (startUsbCheck)
         checkUsbDevices();
 
     return true;
@@ -129,15 +135,18 @@ void MPManager::checkUsbDevices()
 
     qDebug() << "List usb devices...";
 
+    if (!AppDaemon::isEmulationMode())
+    {
 #if defined(Q_OS_WIN)
-    devlist = MPDevice_win::enumerateDevices();
+        devlist = MPDevice_win::enumerateDevices();
 #elif defined(Q_OS_MAC)
-    devlist = MPDevice_mac::enumerateDevices();
+        devlist = MPDevice_mac::enumerateDevices();
 #elif defined(Q_OS_LINUX)
-    devlist = MPDevice_linux::enumerateDevices();
+        devlist = MPDevice_linux::enumerateDevices();
 #endif
+    }
 
-    if (devlist.isEmpty() && !g_bEmulationMode)
+    if (devlist.isEmpty() && !AppDaemon::isEmulationMode())
     {
         //No USB devices found, means all MPs are gone disconnected
         auto it = devices.begin();
@@ -152,7 +161,7 @@ void MPManager::checkUsbDevices()
     }
 
 
-    if (g_bEmulationMode)
+    if (AppDaemon::isEmulationMode())
     {
         MPDevice *device;
         device = new MPDevice_emul(this);

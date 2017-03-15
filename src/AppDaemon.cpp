@@ -25,7 +25,7 @@
 #include "MacUtils.h"
 #endif
 
-bool g_bEmulationMode = false;
+bool AppDaemon::emulationMode = false;
 
 AppDaemon::AppDaemon(int &argc, char **argv):
     QAPP(argc, argv),
@@ -90,9 +90,9 @@ bool AppDaemon::initialize()
     parser.addHelpOption();
     parser.addVersionOption();
 
-    QCommandLineOption emulationMode(QStringList() << "e" << "emulation",
+    QCommandLineOption emulMode(QStringList() << "e" << "emulation",
                                      QCoreApplication::translate("main", "Activate emulation mode, all Websocket API function return emulated string, usefull if you want to try the API."));
-    parser.addOption(emulationMode);
+    parser.addOption(emulMode);
 
     // An option with a value
     QCommandLineOption debugHttpServer(QStringList() << "s" << "debug-http-server",
@@ -102,7 +102,7 @@ bool AppDaemon::initialize()
 
     parser.process(qApp->arguments());
 
-    g_bEmulationMode = parser.isSet(emulationMode);
+    emulationMode = parser.isSet(emulMode);
 
     if (parser.isSet(debugHttpServer))
     {
@@ -134,4 +134,9 @@ AppDaemon::~AppDaemon()
 {
     MPManager::Instance()->stop();
     delete httpServer;
+}
+
+bool AppDaemon::isEmulationMode()
+{
+    return emulationMode;
 }

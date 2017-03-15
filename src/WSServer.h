@@ -27,8 +27,6 @@
 #include "MPManager.h"
 #include "WSServerCon.h"
 
-extern bool g_bEmulationMode;
-
 class WSServer: public QObject
 {
     Q_OBJECT

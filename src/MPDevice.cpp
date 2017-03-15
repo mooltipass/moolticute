@@ -111,18 +111,21 @@ void MPDevice::runAndDequeueJobs()
         return;
 
     currentJobs = jobsQueue.dequeue();
-    currentJobs->start();
 
     connect(currentJobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
+        qDebug() << "current job queue is finished with success";
         currentJobs = nullptr;
         runAndDequeueJobs();
     });
     connect(currentJobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
+        qDebug() << "current job queue is finished with failure";
         currentJobs = nullptr;
         runAndDequeueJobs();
     });
+
+    currentJobs->start();
 }
 
 bool MPDevice::isJobsQueueBusy()

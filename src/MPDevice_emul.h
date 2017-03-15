@@ -31,6 +31,7 @@ private:
     QHash<quint8, quint8> mooltipassParam;
     QHash<QString, QString> passwords;
     QHash<QString, QString> logins;
+    QHash<QString, QString> descriptions;
     QString context;
 };
 

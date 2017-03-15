@@ -36,8 +36,6 @@
 #include "WSServer.h"
 #include "HttpServer.h"
 
-extern bool g_bEmulationMode;
-
 class AppDaemon: public QAPP
 {
     Q_OBJECT
@@ -46,6 +44,8 @@ public:
     virtual ~AppDaemon();
 
     bool initialize();
+
+    static bool isEmulationMode();
 
 private:
     WSServer *wsServer;
@@ -56,6 +56,8 @@ private:
 
     //this is to send out logs to gui app
     QLocalServer *localLogServer = nullptr;
+
+    static bool emulationMode;
 };
 
 #endif // APPDAEMON_H
