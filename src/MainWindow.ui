@@ -861,7 +861,7 @@ QWidget {background-color: #EFEFEF;}</string>
                   <string>A hash will be displayed before and after your card is unlocked. Make sure this hash doesn't change to know that your firmware hasn't been tampered with.</string>
                  </property>
                  <property name="text">
-                  <string>Display a hash before &amp;&amp; after the card in unlocked</string>
+                  <string>Display a hash before &amp;&amp; after the card is unlocked</string>
                  </property>
                 </widget>
                </item>
