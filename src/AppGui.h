@@ -54,6 +54,7 @@ private slots:
     void searchDaemonTick();
     void slotConnectionEstablished();
     void daemonLogRead();
+    void checkUpdate();
 
 private:
      MainWindow *win = nullptr;

@@ -64,8 +64,13 @@ python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /usr/local/Ce
 npm install -g appdmg
 appdmg mac/appdmg.json build/$APP-$VERSION.dmg
 
+#create update manifest
+cat > build/updater.json <<EOF
+{ "updates": { "osx": { "latest-version": "$VERSION", "download-url": "https://calaos.fr/mooltipass/macos/$APP-$VERSION.dmg" }}}
+EOF
 
 upload_file build/$APP-$VERSION.dmg $(shasum -a 256 build/$APP-$VERSION.dmg | cut -d' ' -f1) "macos"
+upload_file build/updater.json $(sha256sum build/updater.json | cut -d' ' -f1) "macos"
 
 exit 0
 

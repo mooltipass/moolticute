@@ -32,6 +32,7 @@ function upload_file()
         -F "upload_folder=$INSTALLPATH" \
         -F "upload_sha256=$HASH" \
         -F "upload_file=@$FNAME" \
+		-F "upload_replace=true" \
         https://calaos.fr/mooltipass/upload
 }
 

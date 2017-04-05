@@ -14,6 +14,7 @@ win32 {
 }
 
 include(src/QtAwesome/QtAwesome/QtAwesome.pri)
+include (src/QSimpleUpdater/QSimpleUpdater.pri)
 
 SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \

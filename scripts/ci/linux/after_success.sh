@@ -51,6 +51,12 @@ cat installer.iss >> build.iss
 chmod +x iscc
 ./iscc build.iss
 
+#create update manifest
+cat > build/updater.json <<EOF
+{ "updates": { "windows": { "latest-version": "$VERSION", "download-url": "https://calaos.fr/mooltipass/windows/$FILENAME.exe" }}}
+EOF
+
 upload_file build/$FILENAME.exe $(sha256sum build/$FILENAME.exe | cut -d' ' -f1) "windows"
+upload_file build/updater.json $(sha256sum build/updater.json | cut -d' ' -f1) "windows"
 
 popd

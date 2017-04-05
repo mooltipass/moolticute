@@ -17,9 +17,19 @@
  **
  ******************************************************************************/
 #include "AppGui.h"
+#include "version.h"
+#include "QSimpleUpdater.h"
 
 #ifdef Q_OS_MAC
 #include "MacUtils.h"
+#endif
+
+#if defined(Q_OS_WIN)
+    #define MC_UPDATE_URL   "https://calaos.fr/mooltipass/windows/updater.json"
+#elif defined(Q_OS_MAC)
+    #define MC_UPDATE_URL   "https://calaos.fr/mooltipass/macos/updater.json"
+#else
+    #define MC_UPDATE_URL   ""
 #endif
 
 AppGui::AppGui(int & argc, char ** argv) :
@@ -33,8 +43,11 @@ bool AppGui::initialize()
     QCoreApplication::setOrganizationName("Raoulh");
     QCoreApplication::setOrganizationDomain("raoulh.org");
     QCoreApplication::setApplicationName("Moolticute");
+    QCoreApplication::setApplicationVersion(APP_VERSION);
 
     Common::installMessageOutputHandler();
+
+    QSimpleUpdater::getInstance();
 
     setAttribute(Qt::AA_UseHighDpiPixmaps);
     setQuitOnLastWindowClosed(false);
@@ -203,6 +216,8 @@ bool AppGui::initialize()
     timerDaemon->start(800);
 
     startSSHAgent();
+
+    QTimer::singleShot(15000, this, &AppGui::checkUpdate);
 
     return true;
 }
@@ -470,4 +485,15 @@ QtAwesome *AppGui::qtAwesome()
 {
     static QtAwesome *a = new QtAwesome(qApp);
     return a;
+}
+
+void AppGui::checkUpdate()
+{
+    auto u = QSimpleUpdater::getInstance();
+    u->setModuleVersion(MC_UPDATE_URL, APP_VERSION);
+    u->setNotifyOnFinish(MC_UPDATE_URL, true);
+    u->setNotifyOnUpdate(MC_UPDATE_URL, true);
+    u->setDownloaderEnabled(MC_UPDATE_URL, true);
+
+    u->checkForUpdates(MC_UPDATE_URL);
 }
