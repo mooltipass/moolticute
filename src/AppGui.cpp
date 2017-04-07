@@ -491,7 +491,6 @@ void AppGui::checkUpdate()
 {
     auto u = QSimpleUpdater::getInstance();
     u->setModuleVersion(MC_UPDATE_URL, APP_VERSION);
-    u->setNotifyOnFinish(MC_UPDATE_URL, true);
     u->setNotifyOnUpdate(MC_UPDATE_URL, true);
     u->setDownloaderEnabled(MC_UPDATE_URL, true);
 
