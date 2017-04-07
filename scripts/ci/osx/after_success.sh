@@ -70,7 +70,7 @@ cat > build/updater.json <<EOF
 EOF
 
 upload_file build/$APP-$VERSION.dmg $(shasum -a 256 build/$APP-$VERSION.dmg | cut -d' ' -f1) "macos"
-upload_file build/updater.json $(sha256sum build/updater.json | cut -d' ' -f1) "macos"
+upload_file build/updater.json $(shasum -a 256 build/updater.json | cut -d' ' -f1) "macos"
 
 exit 0
 
