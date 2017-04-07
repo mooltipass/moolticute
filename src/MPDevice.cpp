@@ -2663,7 +2663,12 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
         return true;
     }));
 
+    QByteArray ldata = login.toUtf8();
+    if (!ldata.isEmpty())
+        ldata.append((char)0);
+
     jobs->append(new MPCommandJob(this, MP_GET_LOGIN,
+                                  ldata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
         if (data[2] == 0 && !login.isEmpty())
