@@ -175,6 +175,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::fwVersionChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
+    connect(wsClient, &WSClient::hwMemoryChanged, this, &MainWindow::updateSerialInfos);
 
 
     connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial) {
@@ -496,12 +497,13 @@ void MainWindow::enableKnockSettings(bool enable)
 
 void MainWindow::updateSerialInfos() {
     ui->labelAbouHwSerial->setText(tr("Device Serial: %1").arg(wsClient->get_hwSerial()));
-    ui->labelAboutFwVers->setText(QStringLiteral("Device Firmware version: %1").arg(wsClient->get_fwVersion()));
+    ui->labelAboutFwVers->setText(tr("Device Firmware version: %1").arg(wsClient->get_fwVersion()));
 
     const bool connected = wsClient->get_connected();
 
     ui->labelAboutFwVers->setVisible(connected);
     ui->labelAbouHwSerial->setVisible(connected && wsClient->get_hwSerial() > 0);
+    ui->labelAbouHwMemory->setText(tr("Device Serial: %1Mb").arg(wsClient->get_hwMemory()));
 }
 
 void MainWindow::checkSettingsChanged()

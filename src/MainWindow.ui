@@ -219,7 +219,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>7</number>
+       <number>8</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -472,7 +472,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>545</width>
+             <width>633</width>
              <height>597</height>
             </rect>
            </property>
@@ -1551,6 +1551,18 @@ QWidget {background-color: #EFEFEF;}</string>
           </property>
           <property name="text">
            <string>Device Serial: %1</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelAbouHwMemory">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Device Memory: %1</string>
           </property>
          </widget>
         </item>

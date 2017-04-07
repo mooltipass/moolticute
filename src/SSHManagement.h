@@ -19,7 +19,8 @@
 #ifndef SSHMANAGEMENT_H
 #define SSHMANAGEMENT_H
 
-#include <QWidget>
+#include <QtWidgets>
+#include <QtCore>
 
 namespace Ui {
 class SSHManagement;
@@ -33,8 +34,32 @@ public:
     explicit SSHManagement(QWidget *parent = 0);
     ~SSHManagement();
 
+private slots:
+    void readStdOutLoadKeys();
+    void progressChanged(int total, int current);
+    void onExportPublicKey();
+    void onExportPrivateKey();
+
+    void on_pushButtonUnlock_clicked();
+
+    void on_buttonDiscard_clicked();
+
+    void on_buttonSaveChanges_clicked();
+
+    void on_pushButtonImport_clicked();
+
 private:
     Ui::SSHManagement *ui;
+
+    QProcess *sshProcess = nullptr;
+    bool loaded = false;
+
+    enum {
+        RolePublicKey = Qt::UserRole + 1,
+        RolePrivateKey,
+    };
+
+    QStandardItemModel *keysModel;
 };
 
 #endif // SSHMANAGEMENT_H
