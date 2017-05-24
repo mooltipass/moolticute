@@ -36,6 +36,10 @@
 #define MOOLTIPASS_BLOCK_SIZE   32
 #define MOOLTIPASS_DESC_SIZE    23 //max size allowed for description
 
+#define CMD_MAX_RETRY            3 //retry sending command before dropping
+#define CMD_DEFAULT_TIMEOUT     0xFFAAFFAA
+#define CMD_DEFAULT_TIMEOUT_VAL 3000 //3seconds default timeout
+
 //Data node header size. It contains the size of data in 4 bytes Big endian
 #define MP_DATA_HEADER_SIZE      4
 
@@ -133,6 +137,8 @@ public:
     static QString createUid(QString prefix = QString());
     //release the unique id and remove it from the list
     static void releaseUid(QString uid);
+
+    static QString printCmd(const QByteArray &ba);
 
     typedef enum
     {

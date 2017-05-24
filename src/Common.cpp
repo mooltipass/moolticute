@@ -20,6 +20,7 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <time.h>
+#include "MooltipassCmds.h"
 
 #ifndef Q_OS_WIN
 #include <stdio.h>
@@ -316,4 +317,19 @@ void Common::releaseUid(QString uid)
 {
     //delete this id from the list so it could be used again
     commonExistingUid.remove(uid);
+}
+
+QString Common::printCmd(const QByteArray &ba)
+{
+    if (ba.isEmpty())
+        return QStringLiteral("<empty data>");
+    int i = 0;
+    if (ba.size() > 1)
+        i = MP_CMD_FIELD_INDEX;
+
+    QMetaEnum m = QMetaEnum::fromType<MPParams::Param>();
+    MPCmd::Command c(ba.at(i));
+    return QString("%1 (%2)")
+            .arg(m.valueToKey(c))
+            .arg(MPCmd::toHexString(c));
 }

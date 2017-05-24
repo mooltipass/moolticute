@@ -43,7 +43,8 @@ void WSServerCon::processMessage(const QString &message)
     QJsonParseError err;
     QJsonDocument jdoc = QJsonDocument::fromJson(message.toUtf8(), &err);
 
-    qDebug().noquote() << "JSON API recv:" << message;
+    if (!message.startsWith("{\"ping"))
+        qDebug().noquote() << "JSON API recv:" << message;
 
     if (err.error != QJsonParseError::NoError)
     {

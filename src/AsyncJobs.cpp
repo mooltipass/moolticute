@@ -32,7 +32,7 @@ void MPCommandJob::start(const QByteArray &previous_data)
         return;
     }
 
-    device->sendData(cmd, data, [=](bool success, const QByteArray &resdata, bool &done_recv)
+    device->sendData((MPCmd::Command)cmd, data, CMD_DEFAULT_TIMEOUT, [=](bool success, const QByteArray &resdata, bool &done_recv)
     {
         if (!success)
             emit error();

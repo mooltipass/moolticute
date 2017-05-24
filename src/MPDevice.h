@@ -34,6 +34,9 @@ public:
     QByteArray data;
     MPCommandCb cb;
     bool running = false;
+
+    QTimer *timerTimeout = nullptr;
+    int retry = CMD_MAX_RETRY;
 };
 
 class MPDevice: public QObject
@@ -82,8 +85,9 @@ public:
     virtual ~MPDevice();
 
     /* Send a command with data to the device */
-    void sendData(unsigned char cmd, const QByteArray &data = QByteArray(), MPCommandCb cb = [](bool, const QByteArray &, bool &){});
-    void sendData(unsigned char cmd, MPCommandCb cb = [](bool, const QByteArray &, bool &){});
+    void sendData(MPCmd::Command cmd, const QByteArray &data = QByteArray(), quint32 timeout = CMD_DEFAULT_TIMEOUT, MPCommandCb cb = [](bool, const QByteArray &, bool &){});
+    void sendData(MPCmd::Command cmd, quint32 timeout, MPCommandCb cb);
+    void sendData(MPCmd::Command cmd, MPCommandCb cb = [](bool, const QByteArray &, bool &){});
 
     void updateKeyboardLayout(int lang);
     void updateLockTimeoutEnabled(bool en);
