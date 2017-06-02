@@ -146,11 +146,13 @@ void FilesManagement::on_pushButtonEnterMMM_clicked()
 
 void FilesManagement::on_buttonQuitMMM_clicked()
 {
+    filesModel->clear();
     wsClient->sendLeaveMMRequest();
 }
 
 void FilesManagement::loadModel()
 {
+    filesModel->clear();
     QJsonArray jarr = wsClient->getMemoryData()["data_nodes"].toArray();
     for (int i = 0;i < jarr.count();i++)
     {
