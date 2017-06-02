@@ -64,7 +64,7 @@ void WSClient::closeWebsocket()
 void WSClient::sendJsonData(const QJsonObject &data)
 {
     QJsonDocument jdoc(data);
-//    qDebug().noquote() << jdoc.toJson();
+    //    qDebug().noquote() << jdoc.toJson();
     wsocket->sendTextMessage(jdoc.toJson());
 }
 
@@ -212,6 +212,16 @@ void WSClient::onTextMessageReceived(const QString &message)
         bool success = !o.contains("failed") || !o.value("failed").toBool();
         emit dataFileSent(o["service"].toString(), success);
     }
+    else if (rootobj["msg"] == "data_node_exists")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit dataNodeExists(o["service"].toString(), o["exists"].toBool());
+    }
+    else if (rootobj["msg"] == "credential_exists")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit credentialsExists(o["service"].toString(), o["exists"].toBool());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -276,7 +286,7 @@ bool WSClient::requestDeviceUID(const QByteArray & key)
         return false;
     sendJsonData({{ "msg", "request_device_uid" },
                   { "data", QJsonObject{ {"key", QString::fromUtf8(key) } } }
-                });
+                 });
     return true;
 }
 
@@ -288,18 +298,18 @@ void WSClient::sendEnterMMRequest()
 
 void WSClient::sendLeaveMMRequest()
 {
-     sendJsonData({{ "msg", "exit_memorymgmt" }});
+    sendJsonData({{ "msg", "exit_memorymgmt" }});
 }
 
 void WSClient::addOrUpdateCredential(const QString & service, const QString & login,
-                   const QString & password, const QString & description)
+                                     const QString & password, const QString & description)
 {
     QJsonObject o = {{ "service", service},
                      { "login",   login},
                      { "password", password },
                      { "description", description}};
     sendJsonData({{ "msg", "set_credential" },
-                            { "data", o }});
+                  { "data", o }});
 }
 
 void WSClient::requestPassword(const QString & service, const QString & login)
@@ -308,14 +318,14 @@ void WSClient::requestPassword(const QString & service, const QString & login)
     QJsonObject d = {{ "service", service },
                      { "login", login }};
     sendJsonData({{ "msg", "ask_password" },
-                            { "data", d }});
+                  { "data", d }});
 }
 
 void WSClient::requestDataFile(const QString &service)
 {
     QJsonObject d = {{ "service", service }};
     sendJsonData({{ "msg", "get_data_node" },
-                            { "data", d }});
+                  { "data", d }});
 }
 
 void WSClient::sendDataFile(const QString &service, const QByteArray &data)
@@ -323,5 +333,12 @@ void WSClient::sendDataFile(const QString &service, const QByteArray &data)
     QJsonObject d = {{ "service", service },
                      { "node_data", QString(data.toBase64()) }};
     sendJsonData({{ "msg", "set_data_node" },
-                            { "data", d }});
+                  { "data", d }});
+}
+
+void WSClient::serviceExists(bool isDatanode, const QString &service)
+{
+    QJsonObject d = {{ "service", service }};
+    sendJsonData({{ "msg", isDatanode? "data_node_exists": "credential_exists" },
+                  { "data", d }});
 }

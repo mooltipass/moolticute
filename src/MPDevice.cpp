@@ -3374,3 +3374,55 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
+
+void MPDevice::serviceExists(bool isDatanode, const QString &service, const QString &reqid,
+                             std::function<void(bool success, QString errstr, QString service, bool exists)> cb)
+{
+    if (service.isEmpty())
+    {
+        qWarning() << "context is empty.";
+        cb(false, "context is empty", QString(), false);
+        return;
+    }
+
+    QString logInf = QStringLiteral("Check if %1service exists: %2 reqid: %3")
+                     .arg(isDatanode?"data ":"credential ")
+                     .arg(service)
+                     .arg(reqid);
+
+    AsyncJobs *jobs;
+    if (reqid.isEmpty())
+        jobs = new AsyncJobs(logInf, this);
+    else
+        jobs = new AsyncJobs(logInf, reqid, this);
+
+    QByteArray sdata = service.toUtf8();
+    sdata.append((char)0);
+
+    jobs->append(new MPCommandJob(this, isDatanode? MPCmd::SET_DATA_SERVICE : MPCmd::CONTEXT,
+                                  sdata,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        QVariantMap m = {{ "service", service },
+                         { "exists", data[MP_PAYLOAD_FIELD_INDEX] == 1 }};
+        jobs->user_data = m;
+        return true;
+    }));
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        //all jobs finished success
+        qInfo() << "service_exists success";
+        QVariantMap m = jobs->user_data.toMap();
+        cb(true, QString(), m["service"].toString(), m["exists"].toBool());
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed getting data node";
+        cb(false, failedJob->getErrorStr(), QString(), false);
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}

@@ -76,18 +76,20 @@ public:
 
     bool isConnected() const;
 
-    bool requestDeviceUID(const QByteArray & key);
+    bool requestDeviceUID(const QByteArray &key);
 
     void sendEnterMMRequest();
     void sendLeaveMMRequest();
 
-    void addOrUpdateCredential(const QString & service, const QString & login,
-                       const QString & password, const QString & description = {});
+    void addOrUpdateCredential(const QString &service, const QString &login,
+                       const QString &password, const QString &description = {});
 
-    void requestPassword(const QString & service, const QString & login);
+    void requestPassword(const QString &service, const QString &login);
 
     void requestDataFile(const QString &service);
     void sendDataFile(const QString &service, const QByteArray &data);
+
+    void serviceExists(bool isDatanode, const QString &service);
 
 signals:
     void wsConnected();
@@ -100,6 +102,8 @@ signals:
     void memcheckFinished(bool success);
     void dataFileRequested(const QString &service, const QByteArray &data, bool success);
     void dataFileSent(const QString &service, bool success);
+    void credentialsExists(const QString &service, bool exists);
+    void dataNodeExists(const QString &service, bool exists);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

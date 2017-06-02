@@ -13,7 +13,9 @@ var apiList = ['{"msg": ""}',
                '{"msg": "set_data_node", "data": {"service": "data example", "request_id": "123", "node_data": "<base64_encoded_data>"}}',
                '{"msg": "show_app"}',
                '{"msg": "start_memcheck"}',
-               '{"msg": "get_application_id"}'
+               '{"msg": "get_application_id"}',
+               '{"msg": "credential_exists", "data": {"service": "example.com"}}',
+               '{"msg": "data_node_exists", "data": {"service": "data example"}}'
 ]
 
 function popuplateApiList() {

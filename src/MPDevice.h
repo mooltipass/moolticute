@@ -158,6 +158,10 @@ public:
                      std::function<void(bool success, QString errstr)> cb,
                      std::function<void(int total, int current)> cbProgress);
 
+    //Check is credential/data node exists
+    void serviceExists(bool isDatanode, const QString &service, const QString &reqid,
+                       std::function<void(bool success, QString errstr, QString service, bool exists)> cb);
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }

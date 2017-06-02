@@ -21,6 +21,7 @@
 
 #include <QtWidgets>
 #include <QtCore>
+#include "WSClient.h"
 
 namespace Ui {
 class SSHManagement;
@@ -34,18 +35,18 @@ public:
     explicit SSHManagement(QWidget *parent = 0);
     ~SSHManagement();
 
+    void setWsClient(WSClient *c);
+
 private slots:
     void readStdOutLoadKeys();
     void progressChanged(int total, int current);
     void onExportPublicKey();
     void onExportPrivateKey();
+    void onServiceExists(const QString service, bool exists);
 
     void on_pushButtonUnlock_clicked();
-
     void on_buttonDiscard_clicked();
-
     void on_buttonSaveChanges_clicked();
-
     void on_pushButtonImport_clicked();
 
 private:
@@ -60,6 +61,8 @@ private:
     };
 
     QStandardItemModel *keysModel;
+
+    WSClient *wsClient = nullptr;
 };
 
 #endif // SSHMANAGEMENT_H

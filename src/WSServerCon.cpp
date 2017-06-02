@@ -370,6 +370,76 @@ void WSServerCon::processMessage(const QString &message)
         oroot["msg"] = "get_application_id";
         sendJsonMessage(oroot);
     }
+    else if (root["msg"] == "credential_exists")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        if (!mpdevice)
+        {
+            sendFailedJson(root, "No device connected");
+            return;
+        }
+
+        mpdevice->serviceExists(false, o["service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, bool exists)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["exists"] = exists;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "data_node_exists")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        if (!mpdevice)
+        {
+            sendFailedJson(root, "No device connected");
+            return;
+        }
+
+        mpdevice->serviceExists(true, o["service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, bool exists)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["exists"] = exists;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr)

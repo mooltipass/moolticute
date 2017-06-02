@@ -45,6 +45,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->setupUi(this);
     ui->widgetCredentials->setWsClient(wsClient);
     ui->widgetFiles->setWsClient(wsClient);
+    ui->widgetSSH->setWsClient(wsClient);
 
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
 

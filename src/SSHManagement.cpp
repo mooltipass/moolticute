@@ -61,39 +61,67 @@ SSHManagement::~SSHManagement()
     delete ui;
 }
 
+void SSHManagement::setWsClient(WSClient *c)
+{
+    wsClient = c;
+}
+
 void SSHManagement::on_pushButtonUnlock_clicked()
 {
+    //First check if the ssh service exists.
+    //If not, unlock as the file would be empty
+    connect(wsClient, &WSClient::dataNodeExists, this, &SSHManagement::onServiceExists);
+    wsClient->serviceExists(true, "Moolticute SSH Keys");
+    ui->stackedWidget->setCurrentWidget(ui->pageWait);
+}
+
+void SSHManagement::onServiceExists(const QString service, bool exists)
+{
+    if (service != "Moolticute SSH Keys")
+    {
+        qWarning() << "SSH, Wrong service: " << service;
+        return;
+    }
+
+    disconnect(wsClient, &WSClient::dataNodeExists, this, &SSHManagement::onServiceExists);
+
     ui->progressBarLoad->setMinimum(0);
     ui->progressBarLoad->setMaximum(0);
     ui->progressBarLoad->setValue(0);
     loaded = false;
     keysModel->clear();
 
-    sshProcess = new QProcess(this);
-    QString program = QCoreApplication::applicationDirPath () + "/moolticute_ssh-agent";
-    QStringList arguments;
-    arguments << "--output_progress"
-              << "-c"
-              << "list";
-
-    qDebug() << "Running " << program << " " << arguments;
-    connect(sshProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
-            [=](int exitCode, QProcess::ExitStatus exitStatus)
+    if (exists)
     {
-        qDebug() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
+        sshProcess = new QProcess(this);
+        QString program = QCoreApplication::applicationDirPath () + "/moolticute_ssh-agent";
+        QStringList arguments;
+        arguments << "--output_progress"
+                  << "-c"
+                  << "list";
 
-        if (loaded)
-            ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);
-        else
-            ui->stackedWidget->setCurrentWidget(ui->pageLocked);
-    });
+        qDebug() << "Running " << program << " " << arguments;
+        connect(sshProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+                [=](int exitCode, QProcess::ExitStatus exitStatus)
+        {
+            qDebug() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
 
-    connect(sshProcess, &QProcess::readyReadStandardOutput, this, &SSHManagement::readStdOutLoadKeys);
+            if (loaded)
+                ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);
+            else
+                ui->stackedWidget->setCurrentWidget(ui->pageLocked);
+        });
 
-    sshProcess->setReadChannel(QProcess::StandardOutput);
-    sshProcess->start(program, arguments);
+        connect(sshProcess, &QProcess::readyReadStandardOutput, this, &SSHManagement::readStdOutLoadKeys);
 
-    ui->stackedWidget->setCurrentWidget(ui->pageWait);
+        sshProcess->setReadChannel(QProcess::StandardOutput);
+        sshProcess->start(program, arguments);
+    }
+    else
+    {
+        loaded = true;
+        ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);
+    }
 }
 
 void SSHManagement::readStdOutLoadKeys()
