@@ -196,10 +196,6 @@ void MPDevice::newDataRead(const QByteArray &data)
         commandQueue.dequeue();
         sendDataDequeue();
     }
-    else
-    {
-        qDebug() << "############# NOT done, do not dequeue";
-    }
 }
 
 void MPDevice::sendDataDequeue()
