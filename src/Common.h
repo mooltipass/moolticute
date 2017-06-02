@@ -138,8 +138,6 @@ public:
     //release the unique id and remove it from the list
     static void releaseUid(QString uid);
 
-    static QString printCmd(const QByteArray &ba);
-
     typedef enum
     {
         MP_Classic = 0,

@@ -35,28 +35,22 @@ MPDevice::MPDevice(QObject *parent):
         {
             if (!success)
                 return;
-            if ((quint8)data.at(1) == MPCmd::MOOLTIPASS_STATUS)
-            {
-                Common::MPStatus s = (Common::MPStatus)data.at(2);
-                if (s != get_status() || s == Common::UnknownStatus) {
 
-                    qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << (int)data.at(2);
+            Common::MPStatus s = (Common::MPStatus)data.at(2);
+            if (s != get_status() || s == Common::UnknownStatus) {
 
-                    if (s == Common::Unlocked || get_status() == Common::UnknownStatus)
+                qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << (int)data.at(2);
+
+                if (s == Common::Unlocked || get_status() == Common::UnknownStatus)
+                {
+                    QTimer::singleShot(10, [=]()
                     {
-                        QTimer::singleShot(10, [=]()
-                        {
-                            loadParameters();
-                            setCurrentDate();
-                        });
-                    }
+                        loadParameters();
+                        setCurrentDate();
+                    });
                 }
-                set_status(s);
             }
-            else if ((quint8)data.at(1) == MPCmd::PLEASE_RETRY)
-            {
-                qDebug() << "Please retry received.";
-            }
+            set_status(s);
         });
     });
 
@@ -71,7 +65,7 @@ MPDevice::~MPDevice()
 {
 }
 
-void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb)
+void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
 {
     MPCommand cmd;
 
@@ -80,6 +74,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
     cmd.data.append(c);
     cmd.data.append(data);
     cmd.cb = std::move(cb);
+    cmd.checkReturn = checkReturn;
 
     cmd.timerTimeout = new QTimer(this);
     connect(cmd.timerTimeout, &QTimer::timeout, [=]()
@@ -88,7 +83,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
 
         if (commandQueue.head().retry > 0)
         {
-            qDebug() << "> Retry command: " << Common::printCmd(commandQueue.head().data);
+            qDebug() << "> Retry command: " << MPCmd::printCmd(commandQueue.head().data);
             platformWrite(commandQueue.head().data);
             commandQueue.head().timerTimeout->start(); //restart timer
         }
@@ -98,7 +93,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
             MPCommand currentCmd = commandQueue.head();
             delete currentCmd.timerTimeout;
 
-            qWarning() << "> Retry command: " << Common::printCmd(commandQueue.head().data) << " has failed too many times. Give up.";
+            qWarning() << "> Retry command: " << MPCmd::printCmd(commandQueue.head().data) << " has failed too many times. Give up.";
 
             bool done = true;
             currentCmd.cb(false, QByteArray(3, 0x00), done);
@@ -153,9 +148,11 @@ void MPDevice::newDataRead(const QByteArray &data)
     //we assume that the QByteArray size is at least 64 bytes
     //this should be done by the platform code
 
-    //qWarning() << "---> Packet data " << " size:" << (quint8)data[0] << " data:" << QString("0x%1").arg((quint8)data[1], 2, 16, QChar('0'));
-    if ((quint8)data[1] == MPCmd::DEBUG)
+    if (MPCmd::from(data[1]) == MPCmd::DEBUG)
+    {
         qWarning() << data;
+        return;
+    }
 
     if (commandQueue.isEmpty())
     {
@@ -164,16 +161,44 @@ void MPDevice::newDataRead(const QByteArray &data)
         return;
     }
 
+    //Resend the command, if device ask for retrying
+    if (MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::PLEASE_RETRY)
+    {
+        qDebug() << MPCmd::printCmd(data) << " received, resending command " << MPCmd::printCmd(commandQueue.head().data);
+        platformWrite(commandQueue.head().data);
+        commandQueue.head().timerTimeout->start(); //restart timer
+        return;
+    }
+
     MPCommand currentCmd = commandQueue.head();
 
+    bool success = true;
+
+    //Only check returned command if it was asked
+    //If the returned command does not match, fail
+    if (currentCmd.checkReturn &&
+        data[MP_CMD_FIELD_INDEX] != currentCmd.data[MP_CMD_FIELD_INDEX])
+    {
+        qWarning() << "Wrong answer received: " << MPCmd::printCmd(data)
+                   << " for command: " << MPCmd::printCmd(currentCmd.data);
+        success = false;
+    }
+
+    qDebug() << "Received answer:" << MPCmd::printCmd(data);
+
     bool done = true;
-    currentCmd.cb(true, data, done);
+    currentCmd.cb(success, data, done);
     delete currentCmd.timerTimeout;
+    commandQueue.head().timerTimeout = nullptr;
 
     if (done)
     {
         commandQueue.dequeue();
         sendDataDequeue();
+    }
+    else
+    {
+        qDebug() << "############# NOT done, do not dequeue";
     }
 }
 
@@ -186,7 +211,7 @@ void MPDevice::sendDataDequeue()
     currentCmd.running = true;
 
     // send data with platform code
-    //qDebug() << "Platform send command: " << QString("0x%1").arg((quint8)currentCmd.data[1], 2, 16, QChar('0'));
+    qDebug() << "Platform send command: " << MPCmd::printCmd(currentCmd.data);
     platformWrite(currentCmd.data);
 
     currentCmd.timerTimeout->start();
@@ -228,11 +253,6 @@ void MPDevice::loadParameters()
                                   MPCmd::VERSION,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::VERSION)
-        {
-            qWarning() << "Get version: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received MP version FLASH size: " << (quint8)data.at(2) << "Mb";
         QString hw = QString(data.mid(3, (quint8)data.at(0) - 2));
         qDebug() << "received MP version hw: " << hw;
@@ -257,11 +277,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::KEYBOARD_LAYOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received language: " << (quint8)data.at(2);
         set_keyboardLayout((quint8)data.at(2));
         return true;
@@ -272,11 +287,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::LOCK_TIMEOUT_ENABLE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received lock timeout enable: " << (quint8)data.at(2);
         set_lockTimeoutEnabled(data.at(2) != 0);
         return true;
@@ -287,11 +297,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::LOCK_TIMEOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received lock timeout: " << (quint8)data.at(2);
         set_lockTimeout((quint8)data.at(2));
         return true;
@@ -302,11 +307,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::SCREENSAVER_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received screensaver: " << (quint8)data.at(2);
         set_screensaver(data.at(2) != 0);
         return true;
@@ -317,11 +317,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::USER_REQ_CANCEL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received userRequestCancel: " << (quint8)data.at(2);
         set_userRequestCancel(data.at(2) != 0);
         return true;
@@ -332,11 +327,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::USER_INTER_TIMEOUT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received userInteractionTimeout: " << (quint8)data.at(2);
         set_userInteractionTimeout((quint8)data.at(2));
         return true;
@@ -347,11 +337,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::FLASH_SCREEN_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received flashScreen: " << (quint8)data.at(2);
         set_flashScreen(data.at(2) != 0);
         return true;
@@ -362,11 +347,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::OFFLINE_MODE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received offlineMode: " << (quint8)data.at(2);
         set_offlineMode(data.at(2) != 0);
         return true;
@@ -377,11 +357,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::TUTORIAL_BOOL_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received tutorialEnabled: " << (quint8)data.at(2);
         set_tutorialEnabled(data.at(2) != 0);
         return true;
@@ -392,11 +367,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received screenBrightness: " << (quint8)data.at(2);
         set_screenBrightness((quint8)data.at(2));
         return true;
@@ -407,11 +377,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received set_knockEnabled: " << (quint8)data.at(2);
         set_knockEnabled(data.at(2) != 0);
         return true;
@@ -422,11 +387,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::MINI_KNOCK_THRES_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received knockSensitivity: " << (quint8)data.at(2);
         int v = 1;
         if (data.at(2) == 11) v = 0;
@@ -440,11 +400,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::RANDOM_INIT_PIN_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received randomStartingPin: " << (quint8)data.at(2);
         set_randomStartingPin(data.at(2) != 0);
         return true;
@@ -456,11 +411,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::HASH_DISPLAY_FEATURE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received hashDisplay: " << (quint8)data.at(2);
         set_hashDisplay(data.at(2) != 0);
         return true;
@@ -471,11 +421,6 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::LOCK_UNLOCK_FEATURE_PARAM),
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_MOOLTIPASS_PARM)
-        {
-            qWarning() << "Get parameter: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
         qDebug() << "received lockUnlockMode: " << (quint8)data.at(2);
         set_lockUnlockMode(data.at(2));
         return true;
@@ -560,11 +505,6 @@ void MPDevice::loadParameters()
                                           MPCmd::GET_SERIAL,
                                           [=](const QByteArray &data, bool &) -> bool
             {
-                if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_SERIAL)
-                {
-                    qWarning() << "Get serial: wrong command received as answer:" << Common::printCmd(data);
-                    return false;
-                }
                 set_serialNumber(((quint8)data[MP_PAYLOAD_FIELD_INDEX+3]) +
                         ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]) << 8) +
                         ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]) << 16) +
@@ -755,14 +695,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
     jobs->append(new MPCommandJob(this, MPCmd::GET_CTRVALUE,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_CTRVALUE)
-        {
-            /* Wrong packet received */
-            qCritical() << "Get CTR value: wrong command received as answer:" << Common::printCmd(data);
-            jobs->setCurrentJobError("Get CTR: Mooltipass sent an answer packet with a different command ID");
-            return false;
-        }
-        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Mooltipass refused to send us a CTR packet");
@@ -786,7 +719,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
     }));
 
     /* Get CPZ and CTR values */
-    jobs->append(new MPCommandJob(this, MPCmd::GET_CARD_CPZ_CTR,
+    auto cpzJob = new MPCommandJob(this, MPCmd::GET_CARD_CPZ_CTR,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
         /* The Mooltipass answers with CPZ CTR packets containing the CPZ_CTR values, and then a final MPCmd::GET_CARD_CPZ_CTR packet */
@@ -814,11 +747,13 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
         }
         else
         {
-            qCritical() << "Get CPZ CTR: wrong command received as answer:" << Common::printCmd(data);
+            qCritical() << "Get CPZ CTR: wrong command received as answer:" << MPCmd::printCmd(data);
             jobs->setCurrentJobError("Get CPZ/CTR: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
-    }));
+    });
+    cpzJob->setReturnCheck(false); //disable return command check
+    jobs->append(cpzJob);
 
     /* Get favorites */
     favoritesAddrs.clear();
@@ -837,14 +772,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
         },
                                       [=](const QByteArray &data, bool &) -> bool
         {
-            if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_FAVORITE)
-            {
-                /* Wrong packet received */
-                qCritical() << "Get favorite: wrong command received as answer:" << Common::printCmd(data);
-                jobs->setCurrentJobError("Get Favorite: Mooltipass sent an answer packet with a different command ID");
-                return false;
-            }
-            else if (data[MP_LEN_FIELD_INDEX] == 1)
+            if (data[MP_LEN_FIELD_INDEX] == 1)
             {
                 /* Received one byte as answer: command fail */
                 jobs->setCurrentJobError("Mooltipass refused to send us favorites");
@@ -878,14 +806,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
     jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_STARTING_PARENT)
-        {
-            /* Wrong packet received */
-            qCritical() << "Get start node addr: wrong command received as answer:" << Common::printCmd(data);
-            jobs->setCurrentJobError("Get Start Node: Mooltipass sent an answer packet with a different command ID");
-            return false;
-        }
-        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Mooltipass refused to send us starting parent");
@@ -934,14 +855,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                                   [=](const QByteArray &data, bool &) -> bool
     {
 
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_DN_START_PARENT)
-        {
-            /* Wrong packet received */
-            qCritical() << "Get data start node addr: wrong command received as answer:" << Common::printCmd(data);
-            jobs->setCurrentJobError("Get Data Starting Parent: Mooltipass sent an answer packet with a different command ID");
-            return false;
-        }
-        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Mooltipass refused to send us data starting parent");
@@ -1149,13 +1063,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::READ_FLASH_NODE)
-        {
-            /* Wrong packet received */
-            qCritical() << "Get node: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
-        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: we are not allowed to read */
             //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address) << ": we are not allowed to read there";
@@ -1252,14 +1160,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, std::fu
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::READ_FLASH_NODE)
-        {
-            /* Wrong packet received */
-            qCritical() << "Get node: wrong command received as answer:" << Common::printCmd(data);
-            jobs->setCurrentJobError("Get Parent Node: Mooltipass sent an answer packet with a different command ID");
-            return false;
-        }
-        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Couldn't read parent node, card removed or database corrupted");
@@ -1329,14 +1230,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::READ_FLASH_NODE)
-        {
-            /* Wrong packet received */
-            qCritical() << "Get child node: wrong command received as answer:" << Common::printCmd(data);
-            jobs->setCurrentJobError("Get Child Node: Mooltipass sent an answer packet with a different command ID");
-            return false;
-        }
-        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Couldn't read child node, card removed or database corrupted");
@@ -1384,14 +1278,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::READ_FLASH_NODE)
-        {
-            /* Wrong packet received */
-            qCritical() << "Get data node: wrong command received as answer:" << Common::printCmd(data);
-            jobs->setCurrentJobError("Get Data Node: Mooltipass sent an answer packet with a different command ID");
-            return false;
-        }
-        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Couldn't read data node, card removed or database corrupted");
@@ -1449,14 +1336,7 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArr
                                   address,
                                   [=](const QByteArray &data, bool &done) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::READ_FLASH_NODE)
-        {
-            /* Wrong packet received */
-            qCritical() << "Get data child node: wrong command received as answer:" << Common::printCmd(data);
-            jobs->setCurrentJobError("Get Data Child Node: Mooltipass sent an answer packet with a different command ID");
-            return false;
-        }
-        else if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (data[MP_LEN_FIELD_INDEX] == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Couldn't read data child node, card removed or database corrupted");
@@ -2483,17 +2363,9 @@ void MPDevice::setCurrentDate()
 
         return true;
     },
-                                [=](const QByteArray &data, bool &) -> bool
+                                [=](const QByteArray &, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::SET_DATE)
-        {
-            qWarning() << "Set date: wrong command received as answer:" << Common::printCmd(data);
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return true;
     }));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
@@ -2540,14 +2412,9 @@ void MPDevice::getUID(const QByteArray & key)
     },
                                 [=](const QByteArray &data, bool &) -> bool
     {
-        if ((quint8)data[MP_CMD_FIELD_INDEX] != MPCmd::GET_UID)
-        {
-            qWarning() << "Send uid request: wrong command received as answer:" << Common::printCmd(data);
-            //return false;
-        }
         if (data[MP_LEN_FIELD_INDEX] == 1 )
         {
-            qWarning() << "Couldn't request uid" << data[MP_PAYLOAD_FIELD_INDEX] <<  data[MP_LEN_FIELD_INDEX] << Common::printCmd(data) << data.toHex();
+            qWarning() << "Couldn't request uid" << data[MP_PAYLOAD_FIELD_INDEX] <<  data[MP_LEN_FIELD_INDEX] << MPCmd::printCmd(data) << data.toHex();
             set_uid(-1);
             return false;
         }
@@ -2674,7 +2541,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
                                   sdata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] != 1)
+        if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
             if (!fallback_service.isEmpty())
             {
@@ -2684,7 +2551,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
                                               fsdata,
                                               [=](const QByteArray &data, bool &) -> bool
                 {
-                    if (data[2] != 1)
+                    if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
                     {
                         qWarning() << "Error setting context: " << (quint8)data[2];
                         jobs->setCurrentJobError("failed to select context and fallback_context on device");
@@ -2718,7 +2585,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
                                   ldata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] == 0 && !login.isEmpty())
+        if (data[MP_PAYLOAD_FIELD_INDEX] == 0 && !login.isEmpty())
         {
             jobs->setCurrentJobError("credential access refused by user");
             return false;
@@ -2741,7 +2608,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
     jobs->append(new MPCommandJob(this, MPCmd::GET_DESCRIPTION,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] == 0)
+        if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
             jobs->setCurrentJobError("failed to query description on device");
             qWarning() << "failed to query description on device";
@@ -2756,7 +2623,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
     jobs->append(new MPCommandJob(this, MPCmd::GET_PASSWORD,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] == 0)
+        if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
             jobs->setCurrentJobError("failed to query password on device");
             return false;
@@ -2790,7 +2657,9 @@ void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, 
 {
     AsyncJobs *jobs = new AsyncJobs("Get random numbers from device", this);
 
-    jobs->append(new MPCommandJob(this, MPCmd::GET_RANDOM_NUMBER, QByteArray()));
+    auto cmd = new MPCommandJob(this, MPCmd::GET_RANDOM_NUMBER, QByteArray());
+    cmd->setTimeout(5000);
+    jobs->append(cmd);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -2825,7 +2694,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
                   sdata,
                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] != 1)
+        if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
             qWarning() << "Failed to add new context";
             jobs->setCurrentJobError("add_context failed on device");
@@ -2840,7 +2709,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
                                   sdata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] != 1)
+        if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
             qWarning() << "Failed to select new context";
             jobs->setCurrentJobError("unable to selected context on device");
@@ -2877,7 +2746,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                                   sdata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] != 1)
+        if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
             qWarning() << "context " << service << " does not exist";
             //Context does not exists, create it
@@ -2895,7 +2764,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                                   ldata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] == 0)
+        if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
             jobs->setCurrentJobError("set_login failed on device");
             qWarning() << "failed to set login to " << login;
@@ -2915,7 +2784,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                                       ddata,
                                       [=](const QByteArray &data, bool &) -> bool
         {
-            if (data[2] == 0)
+            if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
             {
                 if (description.size() > MOOLTIPASS_DESC_SIZE)
                 {
@@ -2940,7 +2809,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                                       pdata,
                                       [=](const QByteArray &data, bool &) -> bool
         {
-            if (data[2] != 1)
+            if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
             {
                 //Password does not match, update it
                 jobs->prepend(new MPCommandJob(this, MPCmd::SET_PASSWORD,
@@ -2989,8 +2858,8 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
 
     //qDebug() << "getDataNodeCb data size: " << ((quint8)data[0]) << "  " << ((quint8)data[1]) << "  " << ((quint8)data[2]);
 
-    if (data[0] == 1 && //data size is 1
-        data[2] == 0)   //value is 0 means end of data
+    if (data[MP_LEN_FIELD_INDEX] == 1 && //data size is 1
+        data[MP_PAYLOAD_FIELD_INDEX] == 0)   //value is 0 means end of data
     {
         QVariantMap m = jobs->user_data.toMap();
         if (!m.contains("data"))
@@ -3002,7 +2871,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
         return true;
     }
 
-    if (data[0] != 0)
+    if (data[MP_LEN_FIELD_INDEX] != 0)
     {
         QVariantMap m = jobs->user_data.toMap();
         QByteArray ba = m["data"].toByteArray();
@@ -3010,14 +2879,14 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
         //first packet, we can read the file size
         if (ba.isEmpty())
         {
-            ba.append(data.mid(2, (int)data.at(0)));
+            ba.append(data.mid(MP_PAYLOAD_FIELD_INDEX, (int)data.at(0)));
             quint32 sz = qFromBigEndian<quint32>((quint8 *)ba.data());
             m["progress_total"] = sz;
             cbProgress((int)sz, ba.size() - 4);
         }
         else
         {
-            ba.append(data.mid(2, (int)data.at(0)));
+            ba.append(data.mid(MP_PAYLOAD_FIELD_INDEX, (int)data.at(0)));
             cbProgress(m["progress_total"].toInt(), ba.size() - 4);
         }
 
@@ -3061,7 +2930,7 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
                                   sdata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] != 1)
+        if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
             if (!fallback_service.isEmpty())
             {
@@ -3071,7 +2940,7 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
                                               fsdata,
                                               [=](const QByteArray &data, bool &) -> bool
                 {
-                    if (data[2] != 1)
+                    if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
                     {
                         qWarning() << "Error setting context: " << (quint8)data[2];
                         jobs->setCurrentJobError("failed to select context and fallback_context on device");
@@ -3136,7 +3005,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 
     qDebug() << "setDataNodeCb data current: " << current;
 
-    if (data[2] == 0)
+    if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
     {
         jobs->setCurrentJobError("writing data to device failed");
         return false;
@@ -3194,7 +3063,7 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
                                   sdata,
                                   [=](const QByteArray &data, bool &) -> bool
     {
-        if (data[2] != 1)
+        if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
             qWarning() << "context " << service << " does not exist";
             //Context does not exists, create it

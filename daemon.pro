@@ -59,7 +59,8 @@ SOURCES += src/main_daemon.cpp \
     src/MPDevice_emul.cpp \
     src/http-parser/http_parser.c \
     src/HttpClient.cpp \
-    src/HttpServer.cpp
+    src/HttpServer.cpp \
+    src/MooltipassCmds.cpp
 
 HEADERS  += \
     src/Common.h \

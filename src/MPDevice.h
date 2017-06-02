@@ -37,6 +37,8 @@ public:
 
     QTimer *timerTimeout = nullptr;
     int retry = CMD_MAX_RETRY;
+
+    bool checkReturn = true;
 };
 
 class MPDevice: public QObject
@@ -85,7 +87,7 @@ public:
     virtual ~MPDevice();
 
     /* Send a command with data to the device */
-    void sendData(MPCmd::Command cmd, const QByteArray &data = QByteArray(), quint32 timeout = CMD_DEFAULT_TIMEOUT, MPCommandCb cb = [](bool, const QByteArray &, bool &){});
+    void sendData(MPCmd::Command cmd, const QByteArray &data = QByteArray(), quint32 timeout = CMD_DEFAULT_TIMEOUT, MPCommandCb cb = [](bool, const QByteArray &, bool &){}, bool checkReturn = true);
     void sendData(MPCmd::Command cmd, quint32 timeout, MPCommandCb cb);
     void sendData(MPCmd::Command cmd, MPCommandCb cb = [](bool, const QByteArray &, bool &){});
 

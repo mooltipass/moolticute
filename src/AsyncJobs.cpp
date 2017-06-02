@@ -32,7 +32,7 @@ void MPCommandJob::start(const QByteArray &previous_data)
         return;
     }
 
-    device->sendData((MPCmd::Command)cmd, data, CMD_DEFAULT_TIMEOUT, [=](bool success, const QByteArray &resdata, bool &done_recv)
+    device->sendData((MPCmd::Command)cmd, data, timeout, [=](bool success, const QByteArray &resdata, bool &done_recv)
     {
         if (!success)
             emit error();
@@ -49,7 +49,8 @@ void MPCommandJob::start(const QByteArray &previous_data)
             else
                 emit done(resdata);
         }
-    });
+    },
+    checkReturn);
 }
 
 AsyncJobs::AsyncJobs(QString _log, QObject *parent):

@@ -117,29 +117,10 @@ public:
     };
     Q_ENUM(Command)
 
-    static bool isUserRequired(Command c)
-    {
-        return c == GET_LOGIN ||
-               c == ADD_CONTEXT ||
-               c == SET_LOGIN ||
-               c == SET_PASSWORD ||
-               c == START_MEMORYMGMT ||
-               c == IMPORT_MEDIA_START ||
-               c == RESET_CARD ||
-               c == READ_CARD_LOGIN ||
-               c == SET_CARD_LOGIN ||
-               c == SET_CARD_PASS ||
-               c == ADD_UNKNOWN_CARD ||
-               c == ADD_DATA_SERVICE ||
-               c == WRITE_32B_IN_DN ||
-               c == GET_DESCRIPTION ||
-               c == SET_DESCRIPTION;
-    }
-
-    static QString toHexString(Command c)
-    {
-        return QString("0x%1").arg((quint8)c, 2, 16, QChar('0'));
-    }
+    static Command from(char c);
+    static bool isUserRequired(Command c);
+    static QString toHexString(Command c);
+    static QString printCmd(const QByteArray &ba);
 };
 
 class MPParams: public QObject

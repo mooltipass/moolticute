@@ -25,6 +25,7 @@
 #include <QQueue>
 #include <functional>
 #include <QTimer>
+#include "Common.h"
 
 /*
  * Classes for running jobs (aka a command sent to the device and a result coming from it)
@@ -158,6 +159,9 @@ public:
     //This default func only checks if return value from device is ok or not
     static AsyncFuncDone defaultCheckRet;
 
+    void setReturnCheck(bool enable) { checkReturn = enable; }
+    void setTimeout(int t) { timeout = t; }
+
 public slots:
     virtual void start(const QByteArray &previous_data);
 
@@ -171,6 +175,14 @@ private:
 
     //calback with data from this job before it finishes
     AsyncFuncDone afterFunc = [](const QByteArray &, bool &) -> bool { return true; };
+
+    //By default ask command scheduler to check for the returned command
+    //This can be disabled in some rare case
+    bool checkReturn = true;
+
+    //Timeout that will be used for this command
+    //and passed to MPDevice::sendData()
+    int timeout = CMD_DEFAULT_TIMEOUT;
 };
 
 class AsyncJobs: public QObject
