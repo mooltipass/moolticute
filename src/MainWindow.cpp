@@ -160,9 +160,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->lockUnlockModeComboBox->addItem(tr("Password Only")     , (uint)LF::Password);
     ui->lockUnlockModeComboBox->addItem(tr("Login + Password")  , (uint)LF::Password|(uint)LF::Login);
     ui->lockUnlockModeComboBox->addItem(tr("Enter + Password")  , (uint)LF::Password|(uint)LF::SendEnter);
-    ui->lockUnlockModeComboBox->addItem(tr("Password / Win+L")  , (uint)LF::Password|(uint)LF::SendWin_L);
-    ui->lockUnlockModeComboBox->addItem(tr("Login+Pass / Win+L"), (uint)LF::Password|(uint)LF::Login|(uint)LF::SendWin_L);
-    ui->lockUnlockModeComboBox->addItem(tr("Enter+Pass / Win+L"), (uint)LF::Password|(uint)LF::SendEnter|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->addItem(tr("Password / Win + L")  , (uint)LF::Password|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->addItem(tr("Login + Pass / Win + L"), (uint)LF::Password|(uint)LF::Login|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->addItem(tr("Enter + Pass / Win + L"), (uint)LF::Password|(uint)LF::SendEnter|(uint)LF::SendWin_L);
     ui->lockUnlockModeComboBox->setCurrentIndex(0);
 
     //When device has new parameters, update the GUI

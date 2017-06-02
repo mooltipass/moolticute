@@ -219,7 +219,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>8</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -452,7 +452,7 @@ QWidget {background-color: #EFEFEF;}</string>
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>These Settings change parameters on your Mooltipass device. For browser-specific settings, go to the options page of the extension.</string>
+           <string>These settings change parameters on your Mooltipass device. For browser-specific settings, go to the options page of the extension.</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -471,7 +471,7 @@ QWidget {background-color: #EFEFEF;}</string>
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-242</y>
              <width>633</width>
              <height>597</height>
             </rect>
@@ -534,7 +534,7 @@ QWidget {background-color: #EFEFEF;}</string>
                  <item>
                   <widget class="QCheckBox" name="checkBoxSlowHost">
                    <property name="text">
-                    <string>For Slow computers: wait</string>
+                    <string>For slow computers: wait</string>
                    </property>
                   </widget>
                  </item>
@@ -598,7 +598,7 @@ QWidget {background-color: #EFEFEF;}</string>
                  <item>
                   <widget class="QLabel" name="label_36">
                    <property name="text">
-                    <string>After each login output</string>
+                    <string>after each login output</string>
                    </property>
                   </widget>
                  </item>
@@ -639,7 +639,7 @@ QWidget {background-color: #EFEFEF;}</string>
                  <item>
                   <widget class="QLabel" name="label_37">
                    <property name="text">
-                    <string>After each password output</string>
+                    <string>after each password output</string>
                    </property>
                   </widget>
                  </item>
@@ -736,7 +736,7 @@ QWidget {background-color: #EFEFEF;}</string>
                  <item>
                   <widget class="QLabel" name="label_5">
                    <property name="text">
-                    <string>minutes inactivity</string>
+                    <string>minutes of inactivity</string>
                    </property>
                   </widget>
                  </item>
@@ -758,7 +758,7 @@ QWidget {background-color: #EFEFEF;}</string>
                <item>
                 <widget class="QCheckBox" name="checkBoxScreensaver">
                  <property name="text">
-                  <string>Use screen saver</string>
+                  <string>Enable screen saver</string>
                  </property>
                 </widget>
                </item>
@@ -776,7 +776,7 @@ QWidget {background-color: #EFEFEF;}</string>
                  <item>
                   <widget class="QLabel" name="label_3">
                    <property name="text">
-                    <string>Brightness</string>
+                    <string>Screen Brightness</string>
                    </property>
                   </widget>
                  </item>
@@ -889,7 +889,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QGroupBox" name="advancedSettingsGB">
               <property name="title">
-               <string>Advanced Settings</string>
+               <string>Advanced Settings (See user manual)</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_21">
                <item>
@@ -898,7 +898,7 @@ QWidget {background-color: #EFEFEF;}</string>
                   <string>A hash will be displayed before and after your card is unlocked. Make sure this hash doesn't change to know that your firmware hasn't been tampered with.</string>
                  </property>
                  <property name="text">
-                  <string>Display a hash before &amp;&amp; after the card is unlocked</string>
+                  <string>Display the security hash before &amp;&amp; after the card is unlocked</string>
                  </property>
                 </widget>
                </item>
