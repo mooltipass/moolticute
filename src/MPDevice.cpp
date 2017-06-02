@@ -184,7 +184,7 @@ void MPDevice::newDataRead(const QByteArray &data)
         success = false;
     }
 
-    qDebug() << "Received answer:" << MPCmd::printCmd(data);
+//    qDebug() << "Received answer:" << MPCmd::printCmd(data);
 
     bool done = true;
     currentCmd.cb(success, data, done);
@@ -211,7 +211,7 @@ void MPDevice::sendDataDequeue()
     currentCmd.running = true;
 
     // send data with platform code
-    qDebug() << "Platform send command: " << MPCmd::printCmd(currentCmd.data);
+//    qDebug() << "Platform send command: " << MPCmd::printCmd(currentCmd.data);
     platformWrite(currentCmd.data);
 
     currentCmd.timerTimeout->start();
