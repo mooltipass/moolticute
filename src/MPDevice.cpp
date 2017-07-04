@@ -1172,7 +1172,12 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, std::fu
             QString srv = pnode->getService();
             if (srv.size() > 0)
             {
-                progressCurrentLogin = (double)srv.at(0).toLower().toLatin1() / 'z' * 100;
+                double currentFirstCharVal = srv.at(0).toLower().toLatin1();
+                if (currentFirstCharVal > 'z')
+                    currentFirstCharVal = 'z';
+                if (currentFirstCharVal < 'a')
+                    currentFirstCharVal = 'a';
+                progressCurrentLogin = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
                 progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
                 cbProgress(progressTotal, progressCurrent);
             }
@@ -1288,7 +1293,12 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
         QString srv = pnode->getService();
         if (srv.size() > 0)
         {
-            progressCurrentData = (double)srv.at(0).toLower().toLatin1() / 'z' * 100;
+            double currentFirstCharVal = srv.at(0).toLower().toLatin1();
+            if (currentFirstCharVal > 'z')
+                currentFirstCharVal = 'z';
+            if (currentFirstCharVal < 'a')
+                currentFirstCharVal = 'a';
+            progressCurrentData = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
             progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
             cbProgress(progressTotal, progressCurrent);
         }
