@@ -686,6 +686,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
 {
     /* For when the MMM is left */
     newAddressesNeededCounter = 0;
+    freeAddresses.clear();
 
     /* Get CTR value */
     jobs->append(new MPCommandJob(this, MPCmd::GET_CTRVALUE,
@@ -945,6 +946,7 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
         favoritesAddrsClone.clear();
         loginChildNodesClone.clear();
         dataChildNodesClone.clear();
+        freeAddresses.clear();
 
         exitMemMgmtMode();
         force_memMgmtMode(false);
@@ -2316,6 +2318,7 @@ void MPDevice::exitMemMgmtMode(bool check_status)
         favoritesAddrsClone.clear();
         loginChildNodesClone.clear();
         dataChildNodesClone.clear();
+        freeAddresses.clear();
 
         force_memMgmtMode(false);
     });
@@ -2345,6 +2348,7 @@ void MPDevice::exitMemMgmtMode(bool check_status)
         favoritesAddrsClone.clear();
         loginChildNodesClone.clear();
         dataChildNodesClone.clear();
+        freeAddresses.clear();
 
         force_memMgmtMode(false);
     });
@@ -3273,7 +3277,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     generateSavePackets(jobs);
     if (diagSavePacketsGenerated) {qCritical() << "Changing valid address for virtual address: test failed!";return false;} else qInfo() << "Changing valid address for virtual address: passed!";
 
-    //qInfo() << "Starting child node corruption tests";
+    qInfo() << "Starting child node corruption tests";
 
     /*diagSavePacketsGenerated = false;
     qInfo() << "testCodeAgainstCleanDBChanges: Creating orphan nodes";
@@ -3343,7 +3347,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         }*/
 
         /* Let's corrupt the DB for fun */
-        //testCodeAgainstCleanDBChanges(repairJobs);
+        testCodeAgainstCleanDBChanges(repairJobs);
 
         /* Check loaded nodes, set bool to repair */
         //checkLoadedNodes(true);
