@@ -216,6 +216,7 @@ private:
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service);
+    MPNode *findNodeWithLoginInList(const QString &login);
     quint8 getNodeIdFromAddress(const QByteArray &address);
     QByteArray getMemoryFirstNodeAddress(void);
     quint16 getNumberOfPages(void);
@@ -224,6 +225,7 @@ private:
 
     // Functions added by mathieu for MMM : checks & repairs
     bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent);
+    bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
     bool checkLoadedNodes(bool repairAllowed);

@@ -1400,6 +1400,17 @@ MPNode *MPDevice::findNodeWithServiceInList(const QString &service)
     return it == loginNodes.end()?nullptr:*it;
 }
 
+/* Find a node inside the child list given his name */
+MPNode *MPDevice::findNodeWithLoginInList(const QString &login)
+{
+    auto it = std::find_if(loginChildNodes.begin(), loginChildNodes.end(), [&login](const MPNode *const node)
+    {
+        return node->getLogin() == login;
+    });
+
+    return it == loginChildNodes.end()?nullptr:*it;
+}
+
 void MPDevice::detagPointedNodes(void)
 {
     for (auto &i: loginNodes)
@@ -1935,16 +1946,92 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
         return nullptr;
     }
 
+     /* Increment new addresses counter */
+    newAddressesNeededCounter += 1;
+
     /* Create new node with null address and virtual address set to our counter value */
     newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
     newNodePt->setService(service);
 
-    /* Increment new addresses counter, add node to list */
-    newAddressesNeededCounter += 1;
+    /* Add node to list */
     loginNodes.append(newNodePt);
     addOrphanParentToDB(newNodePt, false);
 
     return newNodePt;
+}
+
+bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
+{
+    qDebug() << "Adding child " << childNodePt->getLogin() << " with parent " << parentNodePt->getService() << " to DB";
+    MPNode* tempChildNodePt = nullptr;
+    MPNode* tempNextChildNodePt;
+
+    /* Get first child */
+    QByteArray tempChildAddress = parentNodePt->getStartChildAddress();
+    quint32 tempVirtualChildAddress = parentNodePt->getFirstChildVirtualAddress();
+
+    /* Check for Empty address */
+    if ((tempChildAddress == MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress == 0))
+    {
+        parentNodePt->setStartChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
+        childNodePt->setPreviousChildAddress(MPNode::EmptyAddress);
+        childNodePt->setNextChildAddress(MPNode::EmptyAddress);
+        return true;
+    }
+
+    /* browse through all the children to find the right slot */
+    while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
+    {
+        /* Get pointer to the child node */
+        tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, tempVirtualChildAddress);
+
+        /* Check we could find child pointer */
+        if (!tempNextChildNodePt)
+        {
+            qCritical() << "Broken child linked list, please run integrity check";
+            return false;
+        }
+        else
+        {
+            /* If the login name is supposed to be before the one we're trying to insert */
+            if (tempNextChildNodePt->getLogin() > childNodePt->getLogin())
+            {
+                /* Check if the current login is the first one */
+                if ((tempChildAddress == parentNodePt->getStartChildAddress()) && (tempVirtualChildAddress == parentNodePt->getFirstChildVirtualAddress()))
+                {
+                    qDebug() << "Added in first position";
+                    parentNodePt->setStartChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
+                    childNodePt->setPreviousChildAddress(MPNode::EmptyAddress);
+                    childNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
+                    tempNextChildNodePt->setPreviousChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
+                    return true;
+                }
+                else
+                {
+                    qDebug() << "Added in middle of list";
+                    tempChildNodePt->setNextChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
+                    childNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
+                    childNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
+                    tempNextChildNodePt->setPreviousChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
+                    return true;
+                }
+            }
+
+            /* Set correct pointed node */
+            tempChildNodePt = tempNextChildNodePt;
+
+            /* Loop to next possible child */
+            tempChildAddress = tempChildNodePt->getNextChildAddress();
+            tempVirtualChildAddress = tempChildNodePt->getNextChildVirtualAddress();
+        }
+    }
+
+    /* If we arrived here, it means we are the last node */
+    qDebug() << "Added in last position";
+    tempChildNodePt->setNextChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
+    childNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
+    childNodePt->setNextChildAddress(MPNode::EmptyAddress);
+    return true;
 }
 
 bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
@@ -1959,10 +2046,11 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
     if (!tempNodePt)
     {
         qInfo() << "No" << recovered_service_name << "service in DB, adding it...";
-
+        tempNodePt = addNewServiceToDB(recovered_service_name);
     }
 
-    // TODO
+    /* Add child to DB */
+    addChildToDB(tempNodePt, childNodePt);
 
     return true;
 }
@@ -3156,6 +3244,8 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
 
 bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 {
+    /* Requirements for this code to run: at least 10 credentials, 10 data services, and the first credential to be "_recovered_" */
+
     QByteArray invalidAddress = QByteArray::fromHex("0200");    // Invalid because in the graphics zone
 
     qInfo() << "testCodeAgainstCleanDBChanges called, performing tests on our correction algo...";
@@ -3279,12 +3369,12 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 
     qInfo() << "Starting child node corruption tests";
 
-    /*diagSavePacketsGenerated = false;
+    diagSavePacketsGenerated = false;
     qInfo() << "testCodeAgainstCleanDBChanges: Creating orphan nodes";
     loginNodes[0]->setStartChildAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true);
     generateSavePackets(jobs);
-    if (diagSavePacketsGenerated) {qCritical() << "Creating orphan nodes: test failed!";return false;} else qInfo() << "Creating orphan nodes: passed!";*/
+    if (diagSavePacketsGenerated) {qCritical() << "Creating orphan nodes: test failed!";return false;} else qInfo() << "Creating orphan nodes: passed!";
 
     return true;
 }
