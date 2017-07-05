@@ -1994,7 +1994,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
         else
         {
             /* If the login name is supposed to be before the one we're trying to insert */
-            if (tempNextChildNodePt->getLogin() > childNodePt->getLogin())
+            if (tempNextChildNodePt->getLogin().compare(childNodePt->getLogin()) > 0)
             {
                 /* Check if the current login is the first one */
                 if ((tempChildAddress == parentNodePt->getStartChildAddress()) && (tempVirtualChildAddress == parentNodePt->getFirstChildVirtualAddress()))
