@@ -224,6 +224,7 @@ private:
     void detagPointedNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
+    bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);

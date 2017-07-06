@@ -1842,6 +1842,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
     if (parentNodePt->getPointedToCheck())
     {
         qCritical() << "addParentOrphan: parent node" << parentNodePt->getService() << "is already pointed to";
+        tagPointedNodes(false);
         return true;
     }
     else
@@ -1885,6 +1886,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
             if (!curNodePt)
             {
                 qCritical() << "Broken parent linked list, please run integrity check";
+                tagPointedNodes(false);
                 return false;
             }
             else
@@ -1893,6 +1895,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
                 if (curNodePt->getPointedToCheck())
                 {
                     qCritical() << "Linked list loop detected, please run integrity check";
+                    tagPointedNodes(false);
                     return false;
                 }
 
@@ -2077,11 +2080,211 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
     return true;
 }
 
-/*bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt)
+bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
 {
     qDebug() << "Removing parent " << parentNodePt->getService() << " from DB";
-    return true;
-}*/
+    MPNode* nextNodePt = nullptr;
+    MPNode* prevNodePt = nullptr;
+    MPNode* curNodePt = nullptr;
+    quint32 curNodeAddrVirtual;
+    QByteArray curNodeAddr;
+
+    /* Tag nodes */
+    if (!tagPointedNodes(false))
+    {
+        qCritical() << "Can't remove parent to a corrupted DB, please run integrity check";
+        return false;
+    }
+
+    /* Detag them */
+    detagPointedNodes();
+
+    /* Which list do we want to browse ? */
+    if (isDataParent)
+    {
+        curNodeAddr = startDataNode;
+        curNodeAddrVirtual = virtualDataStartNode;
+    }
+    else
+    {
+        curNodeAddr = startNode;
+        curNodeAddrVirtual = virtualStartNode;
+    }
+
+    if (parentNodePt->getPointedToCheck())
+    {
+        qCritical() << "addParentOrphan: parent node" << parentNodePt->getService() << "is already pointed to";
+        tagPointedNodes(false);
+        return true;
+    }
+    else
+    {
+        /* Check for Empty DB */
+        if ((curNodeAddr == MPNode::EmptyAddress) || (curNodeAddr.isNull() && curNodeAddrVirtual == 0))
+        {
+            qCritical() << "Database is empty!";
+            tagPointedNodes(false);
+            return false;
+        }
+
+        /* browse through all the parents to find the right slot */
+        while ((curNodeAddr != MPNode::EmptyAddress) || (curNodeAddr.isNull() && curNodeAddrVirtual != 0))
+        {
+            /* Look for node in list */
+            if (isDataParent)
+            {
+                curNodePt = findNodeWithAddressInList(dataNodes, curNodeAddr, curNodeAddrVirtual);
+            }
+            else
+            {
+                curNodePt = findNodeWithAddressInList(loginNodes, curNodeAddr, curNodeAddrVirtual);
+            }
+
+            /* Check if we could find the parent */
+            if (!curNodePt)
+            {
+                qCritical() << "Broken parent linked list, please run integrity check";
+                tagPointedNodes(false);
+                return false;
+            }
+            else
+            {
+                /* Check for tagged to avoid loops */
+                if (curNodePt->getPointedToCheck())
+                {
+                    qCritical() << "Linked list loop detected, please run integrity check";
+                    tagPointedNodes(false);
+                    return false;
+                }
+
+                /* Tag node */
+                curNodePt->setPointedToCheck();
+
+                /* Check for match */
+                if (curNodePt == parentNodePt)
+                {
+                    /* Check if the parent actually doesn't have any child */
+                    if ((curNodePt->getStartChildAddress() == MPNode::EmptyAddress) || (curNodePt->getStartChildAddress().isNull() && curNodePt->getFirstChildVirtualAddress() == 0))
+                    {
+                        qCritical() << "Parent actually has a child!";
+                        tagPointedNodes(false);
+                        return false;
+                    }
+
+                    /* Check if it is the last node */
+                    bool isLastNode = ((parentNodePt->getNextParentAddress() == MPNode::EmptyAddress) || (parentNodePt->getNextParentAddress().isNull() && parentNodePt->getNextParentVirtualAddress() == 0));
+
+                    /* If not the last node, get pointer to it */
+                    if (!isLastNode)
+                    {
+                        /* Get next node pointer, if it exists */
+                        if (isDataParent)
+                        {
+                            nextNodePt = findNodeWithAddressInList(loginNodes, parentNodePt->getNextParentAddress(), parentNodePt->getNextParentVirtualAddress());
+                        }
+                        else
+                        {
+                            nextNodePt = findNodeWithAddressInList(dataNodes, parentNodePt->getNextParentAddress(), parentNodePt->getNextParentVirtualAddress());
+                        }
+
+                        if (!nextNodePt)
+                        {
+                            qCritical() << "Broken child linked list, please run integrity check";
+                            tagPointedNodes(false);
+                            return false;
+                        }
+                    }
+
+                    /* Check if it was first parent */
+                    if (!prevNodePt)
+                    {
+                        qInfo() << "Parent node was start node";
+
+                        if (isLastNode)
+                        {
+                            /* Linked list ends there, only credential */
+                            if (isDataParent)
+                            {
+                                startDataNode = MPNode::EmptyAddress;
+                                virtualDataStartNode = 0;
+                            }
+                            else
+                            {
+                                startNode = MPNode::EmptyAddress;
+                                virtualStartNode = 0;
+                            }
+
+                            /* Delete object */
+                            loginNodes.removeOne(parentNodePt);
+                            delete(parentNodePt);
+                            tagPointedNodes(false);
+                            return true;
+                        }
+                        else
+                        {
+                            /* Link the chain together */
+                            if (isDataParent)
+                            {
+                                startDataNode = nextNodePt->getAddress();
+                                virtualDataStartNode = nextNodePt->getVirtualAddress();
+                            }
+                            else
+                            {
+                                startNode = nextNodePt->getAddress();
+                                virtualStartNode = nextNodePt->getVirtualAddress();
+                            }
+                            nextNodePt->setPreviousParentAddress(MPNode::EmptyAddress, 0);
+
+                            /* Delete object */
+                            loginNodes.removeOne(parentNodePt);
+                            delete(parentNodePt);
+                            tagPointedNodes(false);
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        if (isLastNode)
+                        {
+                            /* Linked list ends there */
+                            prevNodePt->setNextParentAddress(MPNode::EmptyAddress, 0);
+
+                            /* Delete object */
+                            loginNodes.removeOne(parentNodePt);
+                            delete(parentNodePt);
+                            tagPointedNodes(false);
+                            return true;
+                        }
+                        else
+                        {
+                            /* Link the chain together */
+                            prevNodePt->setNextParentAddress(nextNodePt->getAddress(), nextNodePt->getVirtualAddress());
+                            nextNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
+
+                            /* Delete object */
+                            loginNodes.removeOne(parentNodePt);
+                            delete(parentNodePt);
+                            tagPointedNodes(false);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            /* Set correct pointed node */
+            prevNodePt = curNodePt;
+
+            /* Loop to next possible child */
+            curNodeAddr = curNodePt->getNextParentAddress();
+            curNodeAddrVirtual = curNodePt->getNextParentVirtualAddress();
+        }
+
+        /* If we arrived here, it means we didn't find the parent */
+        qCritical() << "Broken parent linked list, please run integrity check";
+        tagPointedNodes(false);
+        return false;
+    }
+}
 
 bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
 {
@@ -2141,7 +2344,8 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
                         /* Linked list ends there, only credential */
                         parentNodePt->setStartChildAddress(MPNode::EmptyAddress, 0);
 
-                        /* TODO: remove parent */
+                        /* Remove parent */
+                        removeEmptyParentFromDB(parentNodePt, false);
 
                         /* Delete object */
                         loginChildNodes.removeOne(childNodePt);
