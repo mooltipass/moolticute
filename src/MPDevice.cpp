@@ -3809,9 +3809,184 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     return true;
 }
 
+bool MPDevice::readExportFile(const QString &fileName)
+{
+    QJsonObject::iterator it;
+    QJsonObject qjobject;
+    QJsonArray qjarray;
+
+    /* Create qfile object */
+    QFile file;
+    QString val;
+    file.setFileName(fileName);
+
+    /* Check if file actually exists */
+    if (!file.exists())
+    {
+        qCritical() << "File does not exist";
+        return false;
+    }
+
+    /* Read file contents */
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    val = file.readAll();
+    file.close();
+
+    /* Use a qjson document */
+    QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
+
+    /* Checks */
+    if (d.isEmpty())
+    {
+        qCritical() << "JSON document is empty";
+        return false;
+    }
+    else if (d.isNull())
+    {
+        qCritical() << "JSON document is null";
+        return false;
+    }
+
+    if (d.isArray())
+    {
+        /** Mooltiapp / Chrome App save file **/
+        qInfo() << "Dealing with MooltiApp export file";
+
+        /* Get the array */
+        QJsonArray importFile = d.array();
+
+        /* Checks */
+        if (importFile.size() != 10)
+        {
+            qCritical() << "Invalid MooltiApp file";
+            return false;
+        }
+        else if (importFile[9].toString() != "mooltipass")
+        {
+            qCritical() << "MooltiApp file does not contain correct keyword";
+            return false;
+        }
+
+        /* Read CTR */
+        importedCtrValue = QByteArray();
+        qjobject = importFile[0].toObject();
+        for (it = qjobject.begin(); it != qjobject.end(); it++) { importedCtrValue.append(it.value().toInt()); }
+        qDebug() << "Imported CTR: " << importedCtrValue.toHex() << " current CTR: " << ctrValue.toHex();
+
+        /* Read CPZ CTR values */
+        qjarray = importFile[1].toArray();
+        for (int32_t i = 0; i < qjarray.size(); i++)
+        {
+            qjobject = qjarray[i].toObject();
+            QByteArray qbarray = QByteArray();
+            for (it = qjobject.begin(); it != qjobject.end(); it++) { qbarray.append(it.value().toInt()); }
+            importedCpzCtrValue.append(qbarray);
+        }
+
+        /* Read Starting Parent */
+        importedStartNode = QByteArray();
+        qjobject = importFile[2].toObject();
+        for (it = qjobject.begin(); it != qjobject.end(); it++) { importedStartNode.append(it.value().toInt()); }
+
+        /* Read Data Starting Parent */
+        importedStartDataNode = QByteArray();
+        qjobject = importFile[3].toObject();
+        for (it = qjobject.begin(); it != qjobject.end(); it++) { importedStartDataNode.append(it.value().toInt()); }
+
+        /* Read favorites */
+        qjarray = importFile[4].toArray();
+        for (int32_t i = 0; i < qjarray.size(); i++)
+        {
+            qjobject = qjarray[i].toObject();
+            QByteArray qbarray = QByteArray();
+            for (it = qjobject.begin(); it != qjobject.end(); it++) { qbarray.append(it.value().toInt()); }
+            importedFavoritesAddrs.append(qbarray);
+        }
+
+        /* Read service nodes */
+        qjarray = importFile[5].toArray();
+        for (int32_t i = 0; i < qjarray.size(); i++)
+        {
+            qjobject = qjarray[i].toObject();
+
+            /* Fetch address */
+            QJsonObject serviceAddrObj = qjobject["address"].toObject();
+            QByteArray serviceAddr = QByteArray();
+            for (it = serviceAddrObj.begin(); it != serviceAddrObj.end(); it++) { serviceAddr.append(it.value().toInt()); }
+
+            /* Fetch core data */
+            QJsonObject dataObj = qjobject["data"].toObject();
+            QByteArray dataCore = QByteArray();
+            for (it = dataObj.begin(); it != dataObj.end(); it++) { dataCore.append(it.value().toInt()); }
+
+            /* Recreate node and add it to the list of imported nodes */
+            MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+            importedLoginNodes.append(importedNode);
+            qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
+        }
+
+        /* Read service child nodes */
+        qjarray = importFile[6].toArray();
+        for (int32_t i = 0; i < qjarray.size(); i++)
+        {
+            qjobject = qjarray[i].toObject();
+
+            /* Fetch address */
+            QJsonObject serviceAddrObj = qjobject["address"].toObject();
+            QByteArray serviceAddr = QByteArray();
+            for (it = serviceAddrObj.begin(); it != serviceAddrObj.end(); it++) { serviceAddr.append(it.value().toInt()); }
+
+            /* Fetch core data */
+            QJsonObject dataObj = qjobject["data"].toObject();
+            QByteArray dataCore = QByteArray();
+            for (it = dataObj.begin(); it != dataObj.end(); it++) { dataCore.append(it.value().toInt()); }
+
+            /* Recreate node and add it to the list of imported nodes */
+            MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+            importedLoginChildNodes.append(importedNode);
+            qDebug() << "Child nodes: imported " << qjobject["name"].toString();
+        }
+
+
+
+        //qInfo() << importFile;
+    }
+    else if (d.isObject())
+    {
+        qInfo() << "File is a JSON object";
+        return false;
+
+        /* Use object */
+        QJsonObject importFile = d.object();
+        qInfo() << importFile.keys();
+    }
+
+#ifdef bla
+    QJsonValue value = sett2.value(QString("appName"));
+    qWarning() << value;
+    QJsonObject item = value.toObject();
+    qWarning() << tr("QJsonObject of description: ") << item;
+
+    /* in case of string value get value and convert into string*/
+    qWarning() << tr("QJsonObject[appName] of description: ") << item["description"];
+    QJsonValue subobj = item["description"];
+    qWarning() << subobj.toString();
+
+    /* in case of array get array and convert into string*/
+    qWarning() << tr("QJsonObject[appName] of value: ") << item["imp"];
+    QJsonArray test = item["imp"].toArray();
+    qWarning() << test[1].toString();
+#endif
+    return true;
+}
+
 void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                                    std::function<void(int total, int current)> cbProgress)
-{
+{    
+    readExportFile("C:/2017_02_26-memory_export.bin");
+    cb(true, QString());
+    return;
+
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting integrity check", this);
 

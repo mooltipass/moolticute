@@ -232,6 +232,7 @@ private:
     bool addOrphanChildToDB(MPNode* childNodePt);
     bool checkLoadedNodes(bool repairAllowed);
     bool tagPointedNodes(bool repairAllowed);
+    bool readExportFile(const QString &fileName);
 
     // Functions added by mathieu for unit testing
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
@@ -290,6 +291,19 @@ private:
     QList<MPNode *> loginChildNodesClone;    //list of all parent nodes for credentials
     QList<MPNode *> dataNodesClone;          //list of all parent nodes for data nodes
     QList<MPNode *> dataChildNodesClone;     //list of all parent nodes for data nodes
+
+    // Imported values
+    QByteArray importedCtrValue;
+    QByteArray importedStartNode;
+    quint32 importedVirtualStartNode;
+    QByteArray importedStartDataNode;
+    quint32 importedVirtualDataStartNode;
+    QList<QByteArray> importedCpzCtrValue;
+    QList<QByteArray> importedFavoritesAddrs;
+    QList<MPNode *> importedLoginNodes;         //list of all parent nodes for credentials
+    QList<MPNode *> importedLoginChildNodes;    //list of all parent nodes for credentials
+    QList<MPNode *> importedDataNodes;          //list of all parent nodes for data nodes
+    QList<MPNode *> importedDataChildNodes;     //list of all parent nodes for data nodes
 
     bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2
