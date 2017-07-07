@@ -36,21 +36,49 @@ MPDevice::MPDevice(QObject *parent):
             if (!success)
                 return;
 
+            /* Map status from received val */
             Common::MPStatus s = (Common::MPStatus)data.at(2);
-            if (s != get_status() || s == Common::UnknownStatus) {
+            Common::MPStatus prevStatus = get_status();
 
+            /* Trigger on status change */
+            if (s != prevStatus)
+            {
                 qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << (int)data.at(2);
 
-                if (s == Common::Unlocked || get_status() == Common::UnknownStatus)
+                /* Update status */
+                set_status(s);
+
+                if (prevStatus == Common::UnknownStatus)
                 {
+                    /* First start: load parameters */
                     QTimer::singleShot(10, [=]()
                     {
                         loadParameters();
                         setCurrentDate();
                     });
                 }
+
+                if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
+                {
+                    QTimer::singleShot(20, [=]()
+                    {
+                        getCurrentCardCPZ();
+                    });
+                }
+
+                if (s == Common::Unlocked)
+                {
+                    /* If v1.2 firmware, query user change number */
+                    QTimer::singleShot(20, [=]()
+                    {
+                        if (isFw12())
+                        {
+                            qInfo() << "Firmware above v1.2, requesting change numbers";
+                            getChangeNumbers();
+                        }
+                    });
+                }
             }
-            set_status(s);
         });
     });
 
@@ -916,6 +944,9 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
         Q_UNUSED(data);
         //data is last result
         //all jobs finished success
+
+        readExportFile("C:/temp/memory_export.bin");
+        startImportFileMerging();
 
         qInfo() << "Mem management mode enabled";
         force_memMgmtMode(true);
@@ -2839,13 +2870,6 @@ void MPDevice::setCurrentDate()
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
         qInfo() << "Date set success";
-
-        /* If v1.2 firmware, query user change number */
-        if (isFw12())
-        {
-            qInfo() << "Firmware above v1.2, requesting change numbers";
-            getChangeNumbers();
-        }
     });
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
@@ -2860,7 +2884,6 @@ void MPDevice::setCurrentDate()
 
 void MPDevice::getUID(const QByteArray & key)
 {
-
     AsyncJobs *jobs = new AsyncJobs("Send uid request to device", this);
     m_uid = -1;
 
@@ -2902,6 +2925,45 @@ void MPDevice::getUID(const QByteArray & key)
     runAndDequeueJobs();
 }
 
+void MPDevice::getCurrentCardCPZ()
+{
+    AsyncJobs* cpzjobs = new AsyncJobs("Loading device card CPZ", this);
+
+    /* Query change number */
+    cpzjobs->append(new MPCommandJob(this,
+                                  MPCmd::GET_CUR_CARD_CPZ,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+        {
+            qWarning() << "Couldn't request card CPZ";
+        }
+        else
+        {
+            set_cardCPZ(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            qDebug() << "Card CPZ: " << get_cardCPZ().toHex();
+        }
+        return true;
+    }));
+
+    connect(cpzjobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+        //data is last result
+        //all jobs finished success
+        qInfo() << "Finished loading card CPZ";
+    });
+
+    connect(cpzjobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Loading card CPZ failed";
+        getCurrentCardCPZ();
+    });
+
+    jobsQueue.enqueue(cpzjobs);
+    runAndDequeueJobs();
+}
 
 void MPDevice::getChangeNumbers()
 {
@@ -3811,7 +3873,6 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 
 bool MPDevice::readExportFile(const QString &fileName)
 {
-    QJsonObject::iterator it;
     QJsonObject qjobject;
     QJsonArray qjarray;
 
@@ -3870,86 +3931,100 @@ bool MPDevice::readExportFile(const QString &fileName)
         /* Read CTR */
         importedCtrValue = QByteArray();
         qjobject = importFile[0].toObject();
-        for (it = qjobject.begin(); it != qjobject.end(); it++) { importedCtrValue.append(it.value().toInt()); }
+        for (qint32 i = 0; i < qjobject.size(); i++) {importedCtrValue.append(qjobject[QString::number(i)].toInt());}
         qDebug() << "Imported CTR: " << importedCtrValue.toHex() << " current CTR: " << ctrValue.toHex();
 
         /* Read CPZ CTR values */
         qjarray = importFile[1].toArray();
-        for (int32_t i = 0; i < qjarray.size(); i++)
+        for (qint32 i = 0; i < qjarray.size(); i++)
         {
             qjobject = qjarray[i].toObject();
             QByteArray qbarray = QByteArray();
-            for (it = qjobject.begin(); it != qjobject.end(); it++) { qbarray.append(it.value().toInt()); }
+            for (qint32 i = 0; i < qjobject.size(); i++) {qbarray.append(qjobject[QString::number(i)].toInt());}
+            qDebug() << "Imported CPZ/CTR value : " << qbarray.toHex();
             importedCpzCtrValue.append(qbarray);
+        }
+
+        /* Check if one of them is for the current card */
+        bool cpzFound = false;
+        for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
+        {
+            if (importedCpzCtrValue[i].mid(0, 8) == get_cardCPZ())
+            {
+                cpzFound = true;
+            }
+        }
+        if (!cpzFound)
+        {
+            qWarning() << "Import file is not a backup for current Card";
+            return false;
         }
 
         /* Read Starting Parent */
         importedStartNode = QByteArray();
         qjobject = importFile[2].toObject();
-        for (it = qjobject.begin(); it != qjobject.end(); it++) { importedStartNode.append(it.value().toInt()); }
+        for (qint32 i = 0; i < qjobject.size(); i++) {importedStartNode.append(qjobject[QString::number(i)].toInt());}
 
         /* Read Data Starting Parent */
         importedStartDataNode = QByteArray();
         qjobject = importFile[3].toObject();
-        for (it = qjobject.begin(); it != qjobject.end(); it++) { importedStartDataNode.append(it.value().toInt()); }
+        for (qint32 i = 0; i < qjobject.size(); i++) {importedStartDataNode.append(qjobject[QString::number(i)].toInt());}
 
         /* Read favorites */
         qjarray = importFile[4].toArray();
-        for (int32_t i = 0; i < qjarray.size(); i++)
+        for (qint32 i = 0; i < qjarray.size(); i++)
         {
             qjobject = qjarray[i].toObject();
             QByteArray qbarray = QByteArray();
-            for (it = qjobject.begin(); it != qjobject.end(); it++) { qbarray.append(it.value().toInt()); }
+            for (qint32 i = 0; i < qjobject.size(); i++) {qbarray.append(qjobject[QString::number(i)].toInt());}
             importedFavoritesAddrs.append(qbarray);
         }
 
         /* Read service nodes */
         qjarray = importFile[5].toArray();
-        for (int32_t i = 0; i < qjarray.size(); i++)
+        for (qint32 i = 0; i < qjarray.size(); i++)
         {
             qjobject = qjarray[i].toObject();
 
             /* Fetch address */
             QJsonObject serviceAddrObj = qjobject["address"].toObject();
             QByteArray serviceAddr = QByteArray();
-            for (it = serviceAddrObj.begin(); it != serviceAddrObj.end(); it++) { serviceAddr.append(it.value().toInt()); }
+            for (qint32 i = 0; i < qjobject.size(); i++) {serviceAddr.append(serviceAddrObj[QString::number(i)].toInt());}
 
             /* Fetch core data */
             QJsonObject dataObj = qjobject["data"].toObject();
             QByteArray dataCore = QByteArray();
-            for (it = dataObj.begin(); it != dataObj.end(); it++) { dataCore.append(it.value().toInt()); }
+            for (qint32 i = 0; i < qjobject.size(); i++) {dataCore.append(dataObj[QString::number(i)].toInt());}
 
             /* Recreate node and add it to the list of imported nodes */
             MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
             importedLoginNodes.append(importedNode);
-            qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
+            //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
         }
 
         /* Read service child nodes */
         qjarray = importFile[6].toArray();
-        for (int32_t i = 0; i < qjarray.size(); i++)
+        for (qint32 i = 0; i < qjarray.size(); i++)
         {
             qjobject = qjarray[i].toObject();
 
             /* Fetch address */
             QJsonObject serviceAddrObj = qjobject["address"].toObject();
             QByteArray serviceAddr = QByteArray();
-            for (it = serviceAddrObj.begin(); it != serviceAddrObj.end(); it++) { serviceAddr.append(it.value().toInt()); }
+            for (qint32 i = 0; i < qjobject.size(); i++) {serviceAddr.append(serviceAddrObj[QString::number(i)].toInt());}
 
             /* Fetch core data */
             QJsonObject dataObj = qjobject["data"].toObject();
             QByteArray dataCore = QByteArray();
-            for (it = dataObj.begin(); it != dataObj.end(); it++) { dataCore.append(it.value().toInt()); }
+            for (qint32 i = 0; i < qjobject.size(); i++) {dataCore.append(dataObj[QString::number(i)].toInt());}
 
             /* Recreate node and add it to the list of imported nodes */
             MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
             importedLoginChildNodes.append(importedNode);
-            qDebug() << "Child nodes: imported " << qjobject["name"].toString();
+            //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
         }
 
-
-
-        //qInfo() << importFile;
+        return true;
     }
     else if (d.isObject())
     {
@@ -3959,34 +4034,24 @@ bool MPDevice::readExportFile(const QString &fileName)
         /* Use object */
         QJsonObject importFile = d.object();
         qInfo() << importFile.keys();
+
+        return false;
     }
+    else
+    {
+        /* If it's not an array or an object... */
+        return false;
+    }
+}
 
-#ifdef bla
-    QJsonValue value = sett2.value(QString("appName"));
-    qWarning() << value;
-    QJsonObject item = value.toObject();
-    qWarning() << tr("QJsonObject of description: ") << item;
-
-    /* in case of string value get value and convert into string*/
-    qWarning() << tr("QJsonObject[appName] of description: ") << item["description"];
-    QJsonValue subobj = item["description"];
-    qWarning() << subobj.toString();
-
-    /* in case of array get array and convert into string*/
-    qWarning() << tr("QJsonObject[appName] of value: ") << item["imp"];
-    QJsonArray test = item["imp"].toArray();
-    qWarning() << test[1].toString();
-#endif
+bool MPDevice::startImportFileMerging(void)
+{
     return true;
 }
 
 void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                                    std::function<void(int total, int current)> cbProgress)
-{    
-    readExportFile("C:/2017_02_26-memory_export.bin");
-    cb(true, QString());
-    return;
-
+{
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting integrity check", this);
 

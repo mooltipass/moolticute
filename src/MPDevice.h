@@ -76,9 +76,10 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(bool, hashDisplay, false)
     QT_WRITABLE_PROPERTY(int, lockUnlockMode, 0)
 
-    QT_WRITABLE_PROPERTY(quint32, serialNumber, 0) // serial number if firmware is above 1.2
-    QT_WRITABLE_PROPERTY(quint8, credentialsDbChangeNumber, 0) // credentials db change number
-    QT_WRITABLE_PROPERTY(quint8, dataDbChangeNumber, 0) // data db change number
+    QT_WRITABLE_PROPERTY(quint32, serialNumber, 0)              // serial number if firmware is above 1.2
+    QT_WRITABLE_PROPERTY(quint8, credentialsDbChangeNumber, 0)  // credentials db change number
+    QT_WRITABLE_PROPERTY(quint8, dataDbChangeNumber, 0)         // data db change number
+    QT_WRITABLE_PROPERTY(QByteArray, cardCPZ, QByteArray())     // Card CPZ
 
     QT_WRITABLE_PROPERTY(qint64, uid, -1)
 
@@ -132,6 +133,9 @@ public:
 
     //Get database change numbers
     void getChangeNumbers();
+
+    //Get current card CPZ
+    void getCurrentCardCPZ();
 
     //Ask a password for specified service/login to MP
     void getCredential(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
@@ -219,6 +223,7 @@ private:
     MPNode *findNodeWithLoginInList(const QString &login);
     quint8 getNodeIdFromAddress(const QByteArray &address);
     QByteArray getMemoryFirstNodeAddress(void);
+    bool startImportFileMerging(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
     void detagPointedNodes(void);
