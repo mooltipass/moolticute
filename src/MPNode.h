@@ -116,6 +116,7 @@ private:
     bool prevVirtualAddressSet = false;
     quint32 prevVirtualAddress = 0;
     quint32 virtualAddress = 0;
+    qint8 favorite = Common::FAV_NOT_SET;
 
     QList<MPNode *> childNodes;
     QList<MPNode *> childDataNodes;

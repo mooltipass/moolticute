@@ -112,7 +112,8 @@ void ServiceItemDelegate::paint(QPainter *painter,
 {
     QPen pen;
     QString service = index.data(Qt::DisplayRole).toString();
-    QString login   = index.data(CredentialsModel::LoginRole).toString();
+    QString login = index.data(CredentialsModel::LoginRole).toString();
+    int fav = index.data(CredentialsModel::FavRole).toInt();
 
     qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
 
@@ -133,21 +134,23 @@ void ServiceItemDelegate::paint(QPainter *painter,
     QIcon star = AppGui::qtAwesome()->icon(fa::star);
     QSize iconSz = QSize(serviceMetrics.height(), serviceMetrics.height());
     pos = option.rect.topRight() - QPoint(5 + iconSz.width(), -5);
-//    star.paint(painter, QRect(pos, iconSz));
+    if (fav != Common::FAV_NOT_SET)
+        star.paint(painter, QRect(pos, iconSz));
 
     //Fav number
     f = favFont();
     painter->setFont(f);
     const auto favMetrics = QFontMetrics{f};
 
-    QString favNumber = QString::number(qrand() % 13 + 1);
+    QString favNumber = QString::number(fav + 1);
     pos -= QPoint(favMetrics.width("00") + 5, -3);
 
     pen = painter->pen();
     pen.setColor(QColor("#a7a7a7"));
     painter->setPen(pen);
 
-//    painter->drawText(QRect(pos , QSize(favMetrics.width("00") + 5, favMetrics.height())), favNumber);
+    if (fav != Common::FAV_NOT_SET)
+        painter->drawText(QRect(pos , QSize(favMetrics.width("00") + 5, favMetrics.height())), favNumber);
 
     //Login
     f = loginFont();
@@ -162,7 +165,6 @@ void ServiceItemDelegate::paint(QPainter *painter,
     painter->setPen(pen);
 
     painter->drawText(QRect(pos, QSize(option.rect.width() - 10, loginMetrics.height())),
-//                      Qt::AlignRight,
                       login);
 
     //Icon login

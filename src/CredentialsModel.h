@@ -21,6 +21,7 @@
 
 #include <QtCore>
 #include <QStandardItemModel>
+#include "Common.h"
 
 class CredentialsFilterModel: public QSortFilterProxyModel
 {
@@ -54,21 +55,26 @@ public:
 
     enum ColumnIdx
     {
-           ServiceIdx,
-           LoginIdx,
-           PasswordIdx,
-           DescriptionIdx,
-           DateCreatedIdx,
-           DateModifiedIdx,
-           ColumnCount
+        ServiceIdx,
+        LoginIdx,
+        PasswordIdx,
+        DescriptionIdx,
+        DateCreatedIdx,
+        DateModifiedIdx,
+        ColumnCount,
+        FavoriteIdx,
     };
     enum CustomRole {
         LoginRole = Qt::UserRole + 1,
-        PasswordUnlockedRole
+        PasswordUnlockedRole,
+        FavRole,
     };
 
-
-
+    //Function for managing the MM mode
+    bool credExists(QString service, QString login);
+    void credAdd(QString service, QString login, QString password);
+    void credUpdate(QString service, QString login, QString password, QString desc, int fav);
+    void credDelete(QString service, QString login);
 
 protected:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -76,15 +82,38 @@ protected:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 private:
-    struct Credential {
+    class Credential
+    {
         QString service;
         QString login;
         QString password;
         QString description;
         QDate createdDate;
         QDate updatedDate;
+        QByteArray address;
+        qint8 favorite;
+
+        bool operator==(const Credential &other) const
+        {
+            if (address.isEmpty() || other.address.isEmpty())
+            {
+                //if address is defined for both, check equality of address
+                return address == other.address;
+            }
+            return service == other.service &&
+                    login == other.login;
+        }
     };
+
+    //currently displayed list
     QVector<Credential> m_credentials;
+    //untouched loaded credentials from the beginning
+    QVector<Credential> origCredentials;
+
+    //Those are the change lists that are sent to the backend on save
+    QHash<QByteArray> changedCredentials;
+    QVector<Credential> deletedCredentials;
+    QVector<Credential> addedCredentials;
 
     auto at(int idx) const -> const Credential&;
 
@@ -92,6 +121,7 @@ private:
 
     friend class CredentialsFilterModel;
     friend class CredentialsManagement;
+    friend class ServiceItemDelegate;
 };
 
 #endif // CREDENTIALSMODEL_H

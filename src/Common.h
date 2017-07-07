@@ -152,7 +152,25 @@ public:
         Login             = 0x04,
         SendWin_L         = 0x08,
         SendCtrl_Alt_Del  = 0x10
+    };
 
+    //Credentials favorites
+    enum FavoriteFlags {
+        FAV_NOT_SET = -1,
+        FAV_1,
+        FAV_2,
+        FAV_3,
+        FAV_4,
+        FAV_5,
+        FAV_6,
+        FAV_7,
+        FAV_8,
+        FAV_9,
+        FAV_10,
+        FAV_11,
+        FAV_12,
+        FAV_13,
+        FAV_14,
     };
 };
 

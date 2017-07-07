@@ -32,12 +32,25 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
                                 { "color-selected", QColor(Qt::white) },
                                 { "color-active", QColor(Qt::white) }};
 
-//    ui->credDisplayFrame->setStyleSheet("background-color:#FFFFFF");
     ui->pushButtonEnterMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->addCredentialButton->setStyleSheet(CSS_BLUE_BUTTON);
     ui->buttonDiscard->setStyleSheet(CSS_GREY_BUTTON);
     ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
+    ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonCancel->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDelete->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDelete->setIcon(AppGui::qtAwesome()->icon(fa::trash, whiteButtons));
+    ui->pushButtonFavorite->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonFavorite->setIcon(AppGui::qtAwesome()->icon(fa::star, whiteButtons));
+
+    QMenu *favMenu = new QMenu();
+    favMenu->addAction(tr("Not a favorite"));
+    for (int i = 1;i < 15;i++)
+    {
+        favMenu->addAction(tr("Set as favorite #%1").arg(i));
+    }
+    ui->pushButtonFavorite->setMenu(favMenu);
 
     credModel = new CredentialsModel(this);
     credFilterModel = new CredentialsFilterModel(this);
@@ -68,16 +81,13 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::unlockRequested,
             this, &CredentialsManagement::requestPasswordForSelectedItem);
 
-    connect(ui->credDisplayButtonBox, &QDialogButtonBox::clicked, [mapper, this](QAbstractButton* btn)
+    connect(ui->pushButtonCancel, &QPushButton::clicked, [this, mapper](bool)
     {
-        if(ui->credDisplayButtonBox->button(QDialogButtonBox::Save) == btn)
-        {
-            saveSelectedCredential();
-        }
-        if(ui->credDisplayButtonBox->button(QDialogButtonBox::Reset) == btn)
-        {
-            mapper->revert();
-        }
+        mapper->revert();
+    });
+    connect(ui->pushButtonConfirm, &QPushButton::clicked, [this, mapper](bool)
+    {
+        saveSelectedCredential();
     });
 
     connect(ui->addCredServiceInput, &QLineEdit::textChanged,this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
@@ -226,9 +236,11 @@ void CredentialsManagement::saveSelectedCredential(QModelIndex idx)
 
     QString password = ui->credDisplayPasswordInput->text();
     QString description = ui->credDisplayDescriptionInput->text();
+    QString login = ui->credDisplayLoginInput->text();
 
     if (password != cred.password ||
-        description != cred.description)
+        description != cred.description ||
+        login != cred.login)
     {
         wsClient->addOrUpdateCredential(cred.service, cred.login, password, description);
     }
@@ -253,9 +265,11 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(QModelIndex 
 
     QString password = ui->credDisplayPasswordInput->text();
     QString description = ui->credDisplayDescriptionInput->text();
+    QString login = ui->credDisplayLoginInput->text();
 
     if (password != cred.password ||
-        description != cred.description)
+        description != cred.description ||
+        login != cred.login)
     {
         auto btn = QMessageBox::question(this,
                                          tr("Discard Modifications ?"),

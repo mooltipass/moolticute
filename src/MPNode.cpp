@@ -372,6 +372,9 @@ QJsonObject MPNode::toJson() const
         obj["password_enc"] = Common::bytesToJson(getPasswordEnc());
         obj["date_created"] = getDateCreated().toString(Qt::ISODate);
         obj["date_last_used"] = getDateLastUsed().toString(Qt::ISODate);
+        obj["address"] = QJsonArray({{ address.at(0) },
+                                     { address.at(1) }});
+        obj["favorite"] = favorite;
     }
     else if (getType() == NodeChildData)
     {

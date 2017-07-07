@@ -94,6 +94,16 @@ void CredentialsModel::load(const QJsonArray &json)
             cred.description = cnode["description"].toString();
             cred.createdDate = QDate::fromString(cnode["date_created"].toString(), Qt::ISODate);
             cred.updatedDate = QDate::fromString(cnode["date_last_used"].toString(), Qt::ISODate);
+            QJsonArray a = cnode["address"].toArray();
+            if (a.size() < 2)
+            {
+                qWarning() << "Moolticute daemon did not send the node address, please upgrade moolticute daemon.";
+                continue;
+            }
+            cred.address.append((char)a.at(0).toInt());
+            cred.address.append((char)a.at(1).toInt());
+
+            cred.favorite = cnode["favorite"].toInt();
 
             creds.append(std::move(cred));
         }
@@ -127,12 +137,16 @@ QVariant CredentialsModel::data(const QModelIndex &index, int role) const {
         case DescriptionIdx: return cred.description;
         case DateCreatedIdx: if(cred.createdDate.isNull()) return tr("N/A"); return cred.createdDate;
         case DateModifiedIdx: if(cred.updatedDate.isNull()) return tr("N/A"); return cred.updatedDate;
+        case FavoriteIdx: return cred.favorite;
         }
 
     }
     //Let us display the login & the service in the same column. Bit of a hack...
     if(role == LoginRole && index.column() == ServiceIdx) {
         return cred.login;
+    }
+    if(role == FavRole && index.column() == ServiceIdx) {
+        return cred.favorite;
     }
 
     if(role == PasswordUnlockedRole && index.column() == PasswordIdx) {
@@ -216,4 +230,98 @@ void  CredentialsModel::mergeWith(const QVector<Credential> & newCreds) {
 
 auto CredentialsModel::at(int idx) const  -> const Credential & {
     return m_credentials.at(idx);
+}
+
+bool CredentialsModel::credExists(QString service, QString login)
+{
+    for (const Credential &cred: qAsConst(m_credentials))
+    {
+        if (cred.service == service &&
+            cred.login == login)
+            return true;
+    }
+    return false;
+}
+
+void CredentialsModel::credAdd(QString service, QString login, QString password)
+{
+    Credential newCred;
+    newCred.service = service;
+    newCred.login = login;
+    newCred.password = password;
+
+    //When this is a completely new cred, just add it
+    if (!deletedCredentials.contains(newCred) &&
+        !m_credentials.contains(newCred))
+    {
+        addedCredentials.append(newCred);
+
+        beginInsertRows(QModelIndex(), m_credentials.size(), m_credentials.size());
+        m_credentials << c;
+        endInsertRows();
+
+        return;
+    }
+
+    //cred exists already in list, update it
+    if (m_credentials.contains(newCred))
+    {
+        auto it = std::find(std::begin(m_credentials), std::end(m_credentials), newCred);
+
+        //update listview
+        if (it != std::end(m_credentials))
+        {
+            const auto idx = it - std::begin(m_credentials);
+            it->password.clear();
+            Q_EMIT dataChanged(index(idx, PasswordIdx),index(idx, DescriptionIdx));
+        }
+
+        if (changedCredentials.contains(newCred))
+        {
+            auto it = std::find(std::begin(changedCredentials), std::end(changedCredentials), newCred);
+            if (it != std::end(changedCredentials))
+            {
+                it->login = newCred.login;
+                it->password = newCred.password;
+            }
+        }
+
+        if (addedCredentials.contains(newCred))
+        {
+            auto it = std::find(std::begin(addedCredentials), std::end(addedCredentials), newCred);
+            if (it != std::end(addedCredentials))
+            {
+                it->login = newCred.login;
+                it->password = newCred.password;
+            }
+        }
+
+        return;
+    }
+
+    if (deletedCredentials.contains(newCred))
+    {
+        //If it were deleted, remove it from the deleted list
+        //and add it back to the current list
+        auto it = std::find(std::begin(origCredentials), std::end(origCredentials), newCred);
+        if (it != std::end(origCredentials))
+        {
+            //The cred was already added before, add it back
+            beginInsertRows(QModelIndex(), m_credentials.size(), m_credentials.size());
+            m_credentials << c;
+            endInsertRows();
+        }
+
+        deletedCredentials.removeAll(newCred);
+    }
+}
+
+void CredentialsModel::credUpdate(QString service, QString login, QString password, QString desc, int fav)
+{
+
+}
+
+void CredentialsModel::credDelete(QString service, QString login)
+{
+
 }
