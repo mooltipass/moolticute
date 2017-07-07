@@ -286,6 +286,9 @@ private:
     QList<MPNode *> dataNodes;          //list of all parent nodes for data nodes
     QList<MPNode *> dataChildNodes;     //list of all parent nodes for data nodes
 
+    // Payload to send when we need to add an unknown card
+    QByteArray unknownCardAddPayload;
+
     // Clones of these values, used when modifying them in MMM
     QByteArray ctrValueClone;
     QByteArray startNodeClone;
@@ -309,6 +312,9 @@ private:
     QList<MPNode *> importedLoginChildNodes;    //list of all parent nodes for credentials
     QList<MPNode *> importedDataNodes;          //list of all parent nodes for data nodes
     QList<MPNode *> importedDataChildNodes;     //list of all parent nodes for data nodes
+
+    // Jobs for merge operations
+    AsyncJobs* pendingMergeJob;
 
     bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2

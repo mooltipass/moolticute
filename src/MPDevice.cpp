@@ -945,8 +945,51 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
         //data is last result
         //all jobs finished success
 
-        readExportFile("C:/temp/memory_export.bin");
-        startImportFileMerging();
+        /* Try to read the export file */
+        if (readExportFile("C:/temp/memory_export.bin"))
+        {
+            /// We are here because the card is known by the export file and the export file is valid
+
+            /* If we don't know this card, we need to add the CPZ CTR */
+            if (get_status() == Common::UnkownSmartcad)
+            {
+                AsyncJobs* addcpzjobs = new AsyncJobs("Adding CPZ/CTR...", this);
+
+                /* Query change number */
+                addcpzjobs->append(new MPCommandJob(this,
+                                              MPCmd::ADD_UNKNOWN_CARD,
+                                              unknownCardAddPayload,
+                                              [=](const QByteArray &data, bool &) -> bool
+                {
+                    if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+                        return false;
+                    else
+                        return true;
+                }));
+
+                connect(addcpzjobs, &AsyncJobs::finished, [=](const QByteArray &data)
+                {
+                    Q_UNUSED(data);
+                    //data is last result
+                    //all jobs finished success
+                    qInfo() << "CPZ/CTR Added";
+                    startImportFileMerging();
+                });
+
+                connect(addcpzjobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+                {
+                    Q_UNUSED(failedJob);
+                    qCritical() << "Adding unknown card failed";
+                });
+
+                jobsQueue.enqueue(addcpzjobs);
+                runAndDequeueJobs();
+            }
+            else
+            {
+                startImportFileMerging();
+            }
+        }
 
         qInfo() << "Mem management mode enabled";
         force_memMgmtMode(true);
@@ -2937,13 +2980,14 @@ void MPDevice::getCurrentCardCPZ()
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
             qWarning() << "Couldn't request card CPZ";
+            return false;
         }
         else
         {
             set_cardCPZ(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
             qDebug() << "Card CPZ: " << get_cardCPZ().toHex();
+            return true;
         }
-        return true;
     }));
 
     connect(cpzjobs, &AsyncJobs::finished, [=](const QByteArray &data)
@@ -2977,6 +3021,7 @@ void MPDevice::getChangeNumbers()
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
             qWarning() << "Couldn't request change numbers";
+            return false;
         }
         else
         {
@@ -2984,8 +3029,8 @@ void MPDevice::getChangeNumbers()
             set_dataDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]);
             qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
             qDebug() << "Data change number:" << get_dataDbChangeNumber();
+            return true;
         }
-        return true;
     }));
 
     connect(v12jobs, &AsyncJobs::finished, [=](const QByteArray &data)
@@ -3932,7 +3977,7 @@ bool MPDevice::readExportFile(const QString &fileName)
         importedCtrValue = QByteArray();
         qjobject = importFile[0].toObject();
         for (qint32 i = 0; i < qjobject.size(); i++) {importedCtrValue.append(qjobject[QString::number(i)].toInt());}
-        qDebug() << "Imported CTR: " << importedCtrValue.toHex() << " current CTR: " << ctrValue.toHex();
+        qDebug() << "Imported CTR: " << importedCtrValue.toHex();
 
         /* Read CPZ CTR values */
         qjarray = importFile[1].toArray();
@@ -3951,6 +3996,7 @@ bool MPDevice::readExportFile(const QString &fileName)
         {
             if (importedCpzCtrValue[i].mid(0, 8) == get_cardCPZ())
             {
+                unknownCardAddPayload = importedCpzCtrValue[i];
                 cpzFound = true;
             }
         }
@@ -4046,6 +4092,31 @@ bool MPDevice::readExportFile(const QString &fileName)
 
 bool MPDevice::startImportFileMerging(void)
 {
+    /* We arrive here knowing that the CPZ is in the CPZ/CTR list */
+    qInfo() << "Starting File Merging...";
+
+    pendingMergeJob = new AsyncJobs("Sending merge packets...", this);
+
+    // Know if we need to add CPZ CTR packets (additive process)
+    for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
+    {
+        bool cpzFound = false;
+        for (qint32 j = 0; j < cpzCtrValue.size(); j++)
+        {
+            if (cpzCtrValue[j] == importedCpzCtrValue[i])
+            {
+                cpzFound = true;
+                break;
+            }
+        }
+
+        if (!cpzFound)
+        {
+            qDebug() << "CPZ CTR not in our DB: " << importedCpzCtrValue[i].toHex();
+            pendingMergeJob->append(new MPCommandJob(this, MPCmd::ADD_CARD_CPZ_CTR, importedCpzCtrValue[i], MPCommandJob::defaultCheckRet));
+        }
+    }
+
     return true;
 }
 
