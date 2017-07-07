@@ -91,6 +91,16 @@ void MPNode::removePointedToCheck()
     pointedToCheck = false;
 }
 
+void MPNode::setMergeTagged()
+{
+    mergeTagged = true;
+}
+
+bool MPNode::getMergeTagged() const
+{
+    return mergeTagged;
+}
+
 bool MPNode::getPointedToCheck() const
 {
     return pointedToCheck;
@@ -329,10 +339,66 @@ QByteArray MPNode::getNodeData() const
     return data;
 }
 
-QByteArray MPNode::getChildData() const
+QByteArray MPNode::getLoginNodeData() const
+{
+    // return core data, excluding linked lists and flags
+    if (!isValid()) return QByteArray();
+    return data.mid(8);
+}
+
+void MPNode::setLoginNodeData(const QByteArray &d)
+{
+    // overwrite core data, excluding linked lists and flags
+    if (isValid())
+    {
+        data.replace(8, MP_NODE_SIZE-8, d);
+    }
+}
+
+QByteArray MPNode::getLoginChildNodeData() const
+{
+    // return core data, excluding linked lists and flags
+    if (!isValid()) return QByteArray();
+    return data.mid(6);
+}
+
+void MPNode::setLoginChildNodeData(const QByteArray &d)
+{
+    // overwrite core data, excluding linked lists and flags
+    if (isValid())
+    {
+        data.replace(6, MP_NODE_SIZE-6, d);
+    }
+}
+
+QByteArray MPNode::getDataNodeData() const
+{
+    if (!isValid()) return QByteArray();
+    return data.mid(8);
+}
+
+void MPNode::setDataNodeData(const QByteArray &d)
+{
+    // overwrite core data, excluding linked lists and flags
+    if (isValid())
+    {
+        data.replace(8, MP_NODE_SIZE-8, d);
+    }
+}
+
+QByteArray MPNode::getDataChildNodeData() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(4);
+}
+
+void MPNode::setDataChildNodeData(const QByteArray &d)
+{
+    // overwrite core data, excluding linked lists and flags
+    if (isValid())
+    {
+        data.replace(4, MP_NODE_SIZE-4, d);
+    }
 }
 
 QJsonObject MPNode::toJson() const
@@ -375,7 +441,7 @@ QJsonObject MPNode::toJson() const
     }
     else if (getType() == NodeChildData)
     {
-        obj["data"] = Common::bytesToJson(getChildData());
+        obj["data"] = Common::bytesToJson(getDataChildNodeData());
     }
 
     return obj;

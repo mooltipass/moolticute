@@ -91,15 +91,28 @@ public:
     // NodeChildData properties
     void setNextDataAddress(const QByteArray &d);
     QByteArray getNextDataAddress() const;
-    QByteArray getChildData() const;
 
     // Node properties
     QByteArray getNodeData() const;
+
+    // Access node core data
+    void setLoginNodeData(const QByteArray &d);
+    QByteArray getLoginNodeData() const;
+    void setLoginChildNodeData(const QByteArray &d);
+    QByteArray getLoginChildNodeData() const;
+    void setDataNodeData(const QByteArray &d);
+    QByteArray getDataNodeData() const;
+    void setDataChildNodeData(const QByteArray &d);
+    QByteArray getDataChildNodeData() const;
 
     // Pointedto access/write
     void setPointedToCheck();
     void removePointedToCheck();
     bool getPointedToCheck() const;
+
+    // MergedTagged access/write
+    void setMergeTagged();
+    bool getMergeTagged() const;
 
     static QByteArray EmptyAddress;
 
@@ -108,6 +121,7 @@ public:
 private:
     QByteArray data;
     QByteArray address;
+    bool mergeTagged = false;
     bool pointedToCheck = false;
     bool firstChildVirtualAddressSet = false;
     quint32 firstChildVirtualAddress = 0;
