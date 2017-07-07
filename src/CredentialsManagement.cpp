@@ -121,15 +121,9 @@ void CredentialsManagement::setWsClient(WSClient *c)
 void CredentialsManagement::enableCredentialsManagement(bool enable)
 {
     if (enable)
-    {
         ui->stackedWidget->setCurrentWidget(ui->pageUnlocked);
-        connect(wsClient, &WSClient::credentialsUpdated, this, &CredentialsManagement::onCredentialUpdated);
-    }
     else
-    {
         ui->stackedWidget->setCurrentWidget(ui->pageLocked);
-        disconnect(wsClient, &WSClient::credentialsUpdated, this, &CredentialsManagement::onCredentialUpdated);
-    }
 }
 
 void CredentialsManagement::updateQuickAddCredentialsButtonState()
@@ -175,27 +169,43 @@ void CredentialsManagement::requestPasswordForSelectedItem()
 
 void CredentialsManagement::on_addCredentialButton_clicked()
 {
-    ui->gridLayoutAddCred->setEnabled(false);
-    wsClient->addOrUpdateCredential(ui->addCredServiceInput->text(),
-                                    ui->addCredLoginInput->text(),
-                                    ui->addCredPasswordInput->text());
-
-    auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & service, const QString & login, const QString &, bool success)
+    if (wsClient->get_memMgmtMode())
     {
-        disconnect(*conn);
-        ui->gridLayoutAddCred->setEnabled(true);
-        if (!success)
-        {
-            QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential %1/%2!").arg(service, login));
-            return;
-        }
-
-        QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(service, login));
+        QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(ui->addCredServiceInput->text(),
+                                                                                                            ui->addCredLoginInput->text()));
         ui->addCredServiceInput->clear();
         ui->addCredLoginInput->clear();
         ui->addCredPasswordInput->clear();
-    });
+
+        credModel->update(ui->addCredServiceInput->text(),
+                          ui->addCredLoginInput->text(),
+                          ui->addCredPasswordInput->text(),
+                          QString());
+    }
+    else
+    {
+        ui->gridLayoutAddCred->setEnabled(false);
+        wsClient->addOrUpdateCredential(ui->addCredServiceInput->text(),
+                                        ui->addCredLoginInput->text(),
+                                        ui->addCredPasswordInput->text());
+
+        auto conn = std::make_shared<QMetaObject::Connection>();
+        *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & service, const QString & login, const QString &, bool success)
+        {
+            disconnect(*conn);
+            ui->gridLayoutAddCred->setEnabled(true);
+            if (!success)
+            {
+                QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential %1/%2!").arg(service, login));
+                return;
+            }
+
+            QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(service, login));
+            ui->addCredServiceInput->clear();
+            ui->addCredLoginInput->clear();
+            ui->addCredPasswordInput->clear();
+        });
+    }
 }
 
 void CredentialsManagement::onPasswordUnlocked(const QString & service, const QString & login,
@@ -210,14 +220,13 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
     credModel->setClearTextPassword(service, login, password);
 }
 
-void CredentialsManagement::onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success) {
+void CredentialsManagement::onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success)
+{
     if (!success)
     {
         QMessageBox::warning(this, tr("Failure"), tr("Unable to modify %1/%2").arg(service, login));
         return;
     }
-
-    credModel->update(service, login, description);
 }
 
 void CredentialsManagement::saveSelectedCredential(QModelIndex idx)

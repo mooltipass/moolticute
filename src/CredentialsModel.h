@@ -50,7 +50,7 @@ public:
 
     void load(const QJsonArray &creds);
     void setClearTextPassword(const QString & service, const QString & login, const QString & password);
-    void update(const QString & service, const QString & login, const QString & description);
+    void update(const QString & service, const QString & login, const QString &password, const QString & description);
 
 
     enum ColumnIdx
@@ -70,12 +70,6 @@ public:
         FavRole,
     };
 
-    //Function for managing the MM mode
-    bool credExists(QString service, QString login);
-    void credAdd(QString service, QString login, QString password);
-    void credUpdate(QString service, QString login, QString password, QString desc, int fav);
-    void credDelete(QString service, QString login);
-
 protected:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -84,6 +78,7 @@ protected:
 private:
     class Credential
     {
+    public:
         QString service;
         QString login;
         QString password;
@@ -107,13 +102,6 @@ private:
 
     //currently displayed list
     QVector<Credential> m_credentials;
-    //untouched loaded credentials from the beginning
-    QVector<Credential> origCredentials;
-
-    //Those are the change lists that are sent to the backend on save
-    QHash<QByteArray> changedCredentials;
-    QVector<Credential> deletedCredentials;
-    QVector<Credential> addedCredentials;
 
     auto at(int idx) const -> const Credential&;
 
