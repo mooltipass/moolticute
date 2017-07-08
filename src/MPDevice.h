@@ -224,6 +224,7 @@ private:
     MPNode *findNodeWithLoginInList(const QString &login);
     quint8 getNodeIdFromAddress(const QByteArray &address);
     QByteArray getMemoryFirstNodeAddress(void);
+    bool finishImportFileMerging(void);
     bool startImportFileMerging(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);

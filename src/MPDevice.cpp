@@ -2461,13 +2461,14 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
                         /* Linked list ends there, only credential */
                         parentNodePt->setStartChildAddress(MPNode::EmptyAddress, 0);
 
-                        /* Remove parent */
-                        removeEmptyParentFromDB(parentNodePt, false);
-
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
                         loginChildNodes.removeOne(childNodePt);
                         delete(childNodePt);
+
+                        /* Remove parent */
+                        removeEmptyParentFromDB(parentNodePt, false);
+
                         return true;
                     }
                     else
@@ -4356,10 +4357,12 @@ bool MPDevice::startImportFileMerging(void)
 
     qInfo() << newAddressesNeededCounter << " addresses are required for merge operations ";
 
-    /// TO REMOVE
-    newAddressesNeededCounter = 340;
+    /* If we need addresses, query them */
     if (newAddressesNeededCounter > 0)
     {
+        /* Add one extra address because we do pre-increment on that counter */
+        newAddressesNeededCounter++;
+
         AsyncJobs* getFreeAddressesJob = new AsyncJobs("Asking free adresses...", this);
         loadFreeAddresses(getFreeAddressesJob, MPNode::EmptyAddress, false);
 
@@ -4370,8 +4373,16 @@ bool MPDevice::startImportFileMerging(void)
             //all jobs finished success
             qInfo() << "Got all required free addresses...";
 
-            /* Unknown card added, start merging */
-            //startImportFileMerging();
+            /* We got all the addresses, change virtual addrs for real addrs and finish merging */
+            changeVirtualAddressesToFreeAddresses();
+            if(!finishImportFileMerging())
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         });
 
         connect(getFreeAddressesJob, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -4382,6 +4393,84 @@ bool MPDevice::startImportFileMerging(void)
 
         jobsQueue.enqueue(getFreeAddressesJob);
         runAndDequeueJobs();
+    }
+    else
+    {
+        if(!finishImportFileMerging())
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    return true;
+}
+
+bool MPDevice::finishImportFileMerging(void)
+{
+    qInfo() << "Finishing Import File Merging...";
+
+    /* Compare parent nodes */
+    if (startNode != startNodeClone)
+    {
+        qDebug() << "Changing starting parent to " << startNode.toHex();
+        pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, startNode, MPCommandJob::defaultCheckRet));
+    }
+
+    /* Same for data parent */
+    /*if (startDataNode != startDataNodeClone)
+    {
+        qDebug() << "Changing starting parent to " << startDataNode.toHex();
+        pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, startDataNode, MPCommandJob::defaultCheckRet));
+    }*/
+
+    /* Now we check all our parents and childs for non merge tag */
+    for (auto &nodelist_iterator: loginNodes)
+    {
+        /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
+        QByteArray curChildNodeAddr = nodelist_iterator->getStartChildAddress();
+
+        /* Check every children */
+        while (curChildNodeAddr != MPNode::EmptyAddress)
+        {
+            MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr);
+
+            /* Safety checks */
+            if (!curNode)
+            {
+                qCritical() << "Couldn't find child node in list (error in algo?)";
+                return false;
+            }
+
+            /* Marked for deletion? */
+            if (!curNode->getMergeTagged())
+            {
+                removeChildFromDB(nodelist_iterator, curNode);
+            }
+
+            /* Next item */
+            curChildNodeAddr = curNode->getNextChildAddress();
+        }
+    }
+
+    /* Favorite syncing */
+    for (qint32 i = 0; i < importedFavoritesAddrs.size(); i++)
+    {
+        MPNode* importedCurParentNode = findNodeWithAddressInList(importedLoginNodes, importedFavoritesAddrs[i].mid(0, 2));
+        MPNode* importedCurChildNode = findNodeWithAddressInList(importedLoginChildNodes, importedFavoritesAddrs[i].mid(2,2));
+        QByteArray localCurParentNodeAddr = favoritesAddrs[i].mid(0, 2);
+        QByteArray localCurChildNodeAddr = favoritesAddrs[i].mid(2, 2);
+
+        if ((!importedCurChildNode || !importedCurParentNode) && (localCurParentNodeAddr != MPNode::EmptyAddress || localCurChildNodeAddr != MPNode::EmptyAddress))
+        {
+            qCritical() << "Empty or invalid favorite, deleting it on MP...";
+            QByteArray deleteFavPacket = QByteArray(5, 0);
+            deleteFavPacket[0] = i;
+            pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, deleteFavPacket, MPCommandJob::defaultCheckRet));
+        }
     }
 
     return true;
@@ -4419,12 +4508,12 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
                 if (discardFirstAddr)
                 {
                     freeAddresses.append(data.mid(MP_PAYLOAD_FIELD_INDEX + 2 + i*2, 2));
-                    qDebug() << "Received free address " << data.mid(MP_PAYLOAD_FIELD_INDEX + 2 + i*2, 2).toHex();
+                    //qDebug() << "Received free address " << data.mid(MP_PAYLOAD_FIELD_INDEX + 2 + i*2, 2).toHex();
                 }
                 else
                 {
                     freeAddresses.append(data.mid(MP_PAYLOAD_FIELD_INDEX + i*2, 2));
-                    qDebug() << "Received free address " << data.mid(MP_PAYLOAD_FIELD_INDEX + i*2, 2).toHex();
+                    //qDebug() << "Received free address " << data.mid(MP_PAYLOAD_FIELD_INDEX + i*2, 2).toHex();
                 }
             }
 
