@@ -4144,19 +4144,21 @@ bool MPDevice::startImportFileMerging(void)
             if (importedLoginNodes[i]->getLoginNodeData() == loginNodes[j]->getLoginNodeData())
             {
                 // We found a parent node that has the same core data (doesn't mean the same prev / next node though!)
-                qDebug() << "Parent node core data match: " << importedLoginNodes[i]->getService();
+                qDebug() << "Parent node core data match for " << importedLoginNodes[i]->getService();
                 loginNodes[j]->setMergeTagged();
                 service_node_found = true;
 
                 // Next step is to check if the children are the same
+                quint32 cur_import_child_node_addr_v = importedLoginNodes[i]->getFirstChildVirtualAddress();
                 QByteArray cur_import_child_node_addr = importedLoginNodes[i]->getStartChildAddress();
+                quint32 matched_parent_first_child_v = loginNodes[j]->getFirstChildVirtualAddress();
                 QByteArray matched_parent_first_child = loginNodes[j]->getStartChildAddress();
 
                 //qDebug() << "First child address for imported node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
-                while (cur_import_child_node_addr != MPNode::EmptyAddress)
+                while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
                 {
                     // Find the imported child node in our list
-                    MPNode* imported_child_node = findNodeWithAddressInList(importedLoginChildNodes, cur_import_child_node_addr);
+                    MPNode* imported_child_node = findNodeWithAddressInList(importedLoginChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
 
                     // Check if we actually found the node
                     if (!imported_child_node)
@@ -4171,10 +4173,11 @@ bool MPDevice::startImportFileMerging(void)
                     // Try to find the match between the child nodes of the matched parent
                     bool matched_login_found = false;
                     QByteArray matched_parent_next_child = QByteArray(matched_parent_first_child);
-                    while((matched_parent_next_child != MPNode::EmptyAddress) && (matched_login_found == false))
+                    quint32 matched_parent_next_child_v = matched_parent_first_child_v;
+                    while (((matched_parent_next_child != MPNode::EmptyAddress) || (matched_parent_next_child.isNull() && matched_parent_next_child_v != 0)) && (matched_login_found == false))
                     {
                         // Find the child node at this address
-                        MPNode* cur_child_node = findNodeWithAddressInList(loginChildNodes, matched_parent_next_child);
+                        MPNode* cur_child_node = findNodeWithAddressInList(loginChildNodes, matched_parent_next_child, matched_parent_next_child_v);
 
                         // We found the child, now we can compare the login name
                         if (cur_child_node->getLogin() == imported_child_node->getLogin())
@@ -4200,26 +4203,37 @@ bool MPDevice::startImportFileMerging(void)
                         {
                             // Not a match, load next child address in var
                             matched_parent_next_child = cur_child_node->getNextChildAddress();
+                            matched_parent_next_child_v = cur_child_node->getNextChildVirtualAddress();
                         }
                     }
 
                     // If we couldn't find the child node, we have to add it
                     if(matched_login_found == false)
                     {
-                        // Add it in our array to be treated later...
                         qDebug() << importedLoginNodes[i]->getService() << " : adding new child " << imported_child_node->getLogin() << " in the mooltipass...";
-                        /// TODO
-                        //new_children_for_existing_parents.push({'parrentAddress': mooltipass.memmgmt.clonedCurServiceNodes[j].address, 'name': mooltipass.memmgmt.importedCurLoginNodes[k].name, 'data': mooltipass.memmgmt.importedCurLoginNodes[k].data});
+
+                        /* Increment new addresses counter */
+                        newAddressesNeededCounter += 1;
+
+                        /* Create new node with null address and virtual address set to our counter value */
+                        MPNode* newChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                        newChildNodePt->setLoginChildNodeData(imported_child_node->getLoginChildNodeData());
+
+                        /* Add node to list */
+                        loginChildNodes.append(newChildNodePt);
+                        addChildToDB(loginNodes[j], newChildNodePt);
                     }
 
                     // Process the next imported child node
                     cur_import_child_node_addr = imported_child_node->getNextChildAddress();
+                    cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
                 }
 
                 // Jump to next service node
                 break;
             }
         }
+
         // Did we find the service core data?
         if(service_node_found == false)
         {
@@ -4249,13 +4263,11 @@ bool MPDevice::startImportFileMerging(void)
                newChildNodePt->setLoginChildNodeData(curImportChildPt->getLoginChildNodeData());
 
                /* Add node to list */
-               loginChildNodes.append(newNodePt);
+               loginChildNodes.append(newChildNodePt);
                addChildToDB(newNodePt, newChildNodePt);
            }
         }
     }
-
-    /// TODO:new_children_for_existing_parents
 
     qInfo() << "Merging packets ready...";
     return true;
