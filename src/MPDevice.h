@@ -201,7 +201,7 @@ private:
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
                       std::function<void(int total, int current)> cbProgress);
-    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
+    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
                                std::function<void(int total, int current)> cbProgress);
 
@@ -229,14 +229,14 @@ private:
     void detagPointedNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
+    bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed);
+    bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
-    bool checkLoadedNodes(bool repairAllowed);
-    bool tagPointedNodes(bool repairAllowed);
     bool readExportFile(const QString &fileName);
 
     // Functions added by mathieu for unit testing
