@@ -217,6 +217,7 @@ private:
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
+    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service);
@@ -269,6 +270,7 @@ private:
 
     // Number of new addresses we need
     quint32 newAddressesNeededCounter = 0;
+    quint32 newAddressesReceivedCounter = 0;
 
     // Buffer containing the free addresses we will need
     QList<QByteArray> freeAddresses;

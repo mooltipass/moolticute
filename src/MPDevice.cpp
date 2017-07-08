@@ -973,6 +973,8 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
                     //data is last result
                     //all jobs finished success
                     qInfo() << "CPZ/CTR Added";
+
+                    /* Unknown card added, start merging */
                     startImportFileMerging();
                 });
 
@@ -987,6 +989,7 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
             }
             else
             {
+                /* Start merging */
                 startImportFileMerging();
             }
         }
@@ -4164,8 +4167,8 @@ bool MPDevice::startImportFileMerging(void)
     qInfo() << "Starting File Merging...";
 
     newAddressesNeededCounter = 0;                  // When we add nodes, we give them an address based on this counter
-    //var new_children_for_existing_parents = [];		// New children for existing parent nodes
 
+    /* Merge jobs depending if everything went well... */
     pendingMergeJob = new AsyncJobs("Sending merge packets...", this);
 
     /// Know if we need to add CPZ CTR packets (additive process)
@@ -4227,7 +4230,7 @@ bool MPDevice::startImportFileMerging(void)
                     // Check if we actually found the node
                     if (!imported_child_node)
                     {
-                        qCritical() << "Couldn't find first child node in our list";
+                        qCritical() << "Couldn't find imported child node in our list (corrupted import file?)";
                         return false;
                     }
 
@@ -4242,6 +4245,12 @@ bool MPDevice::startImportFileMerging(void)
                     {
                         // Find the child node at this address
                         MPNode* cur_child_node = findNodeWithAddressInList(loginChildNodes, matched_parent_next_child, matched_parent_next_child_v);
+
+                        if (!cur_child_node)
+                        {
+                            qCritical() << "Couldn't find child node in our list (bad node reading?)";
+                            return false;
+                        }
 
                         // We found the child, now we can compare the login name
                         if (cur_child_node->getLogin() == imported_child_node->getLogin())
@@ -4285,7 +4294,11 @@ bool MPDevice::startImportFileMerging(void)
 
                         /* Add node to list */
                         loginChildNodes.append(newChildNodePt);
-                        addChildToDB(loginNodes[j], newChildNodePt);
+                        if (!addChildToDB(loginNodes[j], newChildNodePt))
+                        {
+                            qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                            return false;
+                        }
                     }
 
                     // Process the next imported child node
@@ -4310,7 +4323,11 @@ bool MPDevice::startImportFileMerging(void)
 
            /* Add node to list */
            loginNodes.append(newNodePt);
-           addOrphanParentToDB(newNodePt, false);
+           if (!addOrphanParentToDB(newNodePt, false))
+           {
+               qCritical() << "Couldn't add parent to DB (corrupted DB?";
+               return false;
+           }
 
            /* Next step is to follow the children */
            QByteArray curImportChildAddr = importedLoginNodes[i]->getStartChildAddress();
@@ -4328,16 +4345,107 @@ bool MPDevice::startImportFileMerging(void)
 
                /* Add node to list */
                loginChildNodes.append(newChildNodePt);
-               addChildToDB(newNodePt, newChildNodePt);
+               if (!addChildToDB(newNodePt, newChildNodePt))
+               {
+                   qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                   return false;
+               }
            }
         }
     }
 
-    qInfo() << "Merging packets ready...";
+    qInfo() << newAddressesNeededCounter << " addresses are required for merge operations ";
 
     /// TO REMOVE
-    tagPointedNodes(true, false, false);
+    newAddressesNeededCounter = 340;
+    if (newAddressesNeededCounter > 0)
+    {
+        AsyncJobs* getFreeAddressesJob = new AsyncJobs("Asking free adresses...", this);
+        loadFreeAddresses(getFreeAddressesJob, MPNode::EmptyAddress, false);
+
+        connect(getFreeAddressesJob, &AsyncJobs::finished, [=](const QByteArray &data)
+        {
+            Q_UNUSED(data);
+            //data is last result
+            //all jobs finished success
+            qInfo() << "Got all required free addresses...";
+
+            /* Unknown card added, start merging */
+            //startImportFileMerging();
+        });
+
+        connect(getFreeAddressesJob, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+        {
+            Q_UNUSED(failedJob);
+            qCritical() << "Couldn't get enough free addresses";
+        });
+
+        jobsQueue.enqueue(getFreeAddressesJob);
+        runAndDequeueJobs();
+    }
+
     return true;
+}
+
+void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr)
+{
+    qDebug() << "Loading free addresses from address:" << addressFrom.toHex();
+
+    jobs->prepend(new MPCommandJob(this, MPCmd::GET_30_FREE_SLOTS,
+                                  addressFrom,
+                                  [=](const QByteArray &data, bool &) -> bool
+    {
+        quint32 nb_free_addresses_received = data[MP_LEN_FIELD_INDEX]/2;
+        if (discardFirstAddr)
+        {
+            nb_free_addresses_received--;
+        }
+
+
+        qDebug() << "Received " << nb_free_addresses_received << " free addresses";
+
+        if (nb_free_addresses_received == 0)
+        {
+            /* No more free addresses */
+            jobs->setCurrentJobError("No more free addresses to get");
+            qCritical() << "No more free addresses to get";
+            return false;
+        }
+        else
+        {
+            /* Add the free addresses to our buffer */
+            for (quint32 i = 0; i < nb_free_addresses_received; i++)
+            {
+                if (discardFirstAddr)
+                {
+                    freeAddresses.append(data.mid(MP_PAYLOAD_FIELD_INDEX + 2 + i*2, 2));
+                    qDebug() << "Received free address " << data.mid(MP_PAYLOAD_FIELD_INDEX + 2 + i*2, 2).toHex();
+                }
+                else
+                {
+                    freeAddresses.append(data.mid(MP_PAYLOAD_FIELD_INDEX + i*2, 2));
+                    qDebug() << "Received free address " << data.mid(MP_PAYLOAD_FIELD_INDEX + i*2, 2).toHex();
+                }
+            }
+
+            /* Increment counter */
+            newAddressesReceivedCounter += nb_free_addresses_received;
+
+            /* Did we receive enough addresses ? */
+            if (newAddressesReceivedCounter > newAddressesNeededCounter)
+            {
+                qDebug() << "Received enough free addresses";
+            }
+            else
+            {
+                /* Ask more addresses */
+                qDebug() << "Still needing " << newAddressesNeededCounter - newAddressesReceivedCounter << " free addresses";
+                loadFreeAddresses(jobs, freeAddresses[freeAddresses.size()-1], true);
+            }
+
+            return true;
+        }
+    }));
 }
 
 void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
