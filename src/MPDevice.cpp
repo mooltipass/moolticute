@@ -944,8 +944,6 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
         Q_UNUSED(data);
         //data is last result
         //all jobs finished success
-        force_memMgmtMode(true);
-        return;
 
         /* Try to read the export file */
         if (readExportFile("C:/temp/memory_export.bin"))
@@ -1942,7 +1940,10 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
     if (parentNodePt->getPointedToCheck())
     {
         qCritical() << "addParentOrphan: parent node" << parentNodePt->getService() << "is already pointed to";
-        tagPointedNodes(true, false, false);
+        if (!isDataParent)
+            tagPointedNodes(true, false, false);
+        else
+            tagPointedNodes(false, true, false);
         return true;
     }
     else
@@ -1965,7 +1966,10 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
             /* Update prev/next fields */
             parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress, 0);
             parentNodePt->setNextParentAddress(MPNode::EmptyAddress, 0);
-            tagPointedNodes(true, false, false);
+            if (!isDataParent)
+                tagPointedNodes(true, false, false);
+            else
+                tagPointedNodes(false, true, false);
             return true;
         }
 
@@ -2035,7 +2039,10 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
                     /* Update our next node pointers */
                     curNodePt->setPreviousParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
                     parentNodePt->setNextParentAddress(curNodePt->getAddress(), curNodePt->getVirtualAddress());
-                    tagPointedNodes(true, false, false);
+                    if (!isDataParent)
+                        tagPointedNodes(true, false, false);
+                    else
+                        tagPointedNodes(false, true, false);
                     return true;
                 }
             }
@@ -2053,7 +2060,10 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
         prevNodePt->setNextParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
         parentNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
         parentNodePt->setNextParentAddress(MPNode::EmptyAddress);
-        tagPointedNodes(true, false, false);
+        if (!isDataParent)
+            tagPointedNodes(true, false, false);
+        else
+            tagPointedNodes(false, true, false);
         return true;
     }
 }
@@ -2106,6 +2116,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
         parentNodePt->setStartChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
         childNodePt->setPreviousChildAddress(MPNode::EmptyAddress);
         childNodePt->setNextChildAddress(MPNode::EmptyAddress);
+        parentNodePt->appendChild(childNodePt);
         tagPointedNodes(true, false, false);
         return true;
     }
@@ -2147,6 +2158,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
                     childNodePt->setPreviousChildAddress(MPNode::EmptyAddress);
                     childNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                     tempNextChildNodePt->setPreviousChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
+                    parentNodePt->appendChild(childNodePt);
                     tagPointedNodes(true, false, false);
                     return true;
                 }
@@ -2157,6 +2169,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
                     childNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
                     childNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                     tempNextChildNodePt->setPreviousChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
+                    parentNodePt->appendChild(childNodePt);
                     tagPointedNodes(true, false, false);
                     return true;
                 }
@@ -2176,6 +2189,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
     tempChildNodePt->setNextChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
     childNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
     childNodePt->setNextChildAddress(MPNode::EmptyAddress);
+    parentNodePt->appendChild(childNodePt);
     tagPointedNodes(true, false, false);
     return true;
 }
@@ -2448,6 +2462,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
                         removeEmptyParentFromDB(parentNodePt, false);
 
                         /* Delete object */
+                        parentNodePt->removeChild(childNodePt);
                         loginChildNodes.removeOne(childNodePt);
                         delete(childNodePt);
                         return true;
@@ -2459,6 +2474,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
                         tempNextChildNodePt->setPreviousChildAddress(MPNode::EmptyAddress, 0);
 
                         /* Delete object */
+                        parentNodePt->removeChild(childNodePt);
                         loginChildNodes.removeOne(childNodePt);
                         delete(childNodePt);
                         return true;
@@ -2472,6 +2488,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
                         tempChildNodePt->setNextChildAddress(MPNode::EmptyAddress, 0);
 
                         /* Delete object */
+                        parentNodePt->removeChild(childNodePt);
                         loginChildNodes.removeOne(childNodePt);
                         delete(childNodePt);
                         return true;
@@ -2483,6 +2500,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
                         tempNextChildNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
 
                         /* Delete object */
+                        parentNodePt->removeChild(childNodePt);
                         loginChildNodes.removeOne(childNodePt);
                         delete(childNodePt);
                         return true;
@@ -2573,6 +2591,12 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
     if (checkData)
     {
+        if (checkCredentials && !tagPointedNodes(checkCredentials, checkData, repairAllowed))
+        {
+            /* Functions inside the code above may tag again the nodes, so we need to tag again */
+            return_bool = false;
+        }
+
         for (auto &i: dataNodes)
         {
             if (!i->getPointedToCheck())
@@ -4373,7 +4397,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         testCodeAgainstCleanDBChanges(repairJobs);
 
         /* Check loaded nodes, set bool to repair */
-        //checkLoadedNodes(true);
+        //checkLoadedNodes(true, true, true);
 
         /* Generate save packets */
         //generateSavePackets(repairJobs);

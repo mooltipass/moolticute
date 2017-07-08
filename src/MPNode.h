@@ -65,9 +65,11 @@ public:
 
     QList<MPNode *> &getChildNodes() { return childNodes; }
     void appendChild(MPNode *node) { node->setParent(this); childNodes.append(node); }
+    void removeChild(MPNode *node) { node->setParent(nullptr); childNodes.removeAll(node); }
 
     QList<MPNode *> &getChildDataNodes() { return childDataNodes; }
     void appendChildData(MPNode *node) { node->setParent(this); childDataNodes.append(node); }
+    void removeChildData(MPNode *node) { node->setParent(nullptr); childDataNodes.removeAll(node); }
 
     // NodeChild properties
     void setNextChildAddress(const QByteArray &d, const quint32 virt_addr = 0);
