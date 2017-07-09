@@ -266,9 +266,6 @@ private:
     qint64 diagLastSecs;
     quint32 diagNbBytesRec;
 
-    //local vars for tests
-    bool diagSavePacketsGenerated;
-
     //command queue
     QQueue<MPCommand> commandQueue;
 
