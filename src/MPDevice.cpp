@@ -946,7 +946,7 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
         //all jobs finished success
 
         /* Try to read the export file */
-        if (readExportFile("C:/temp/memory_export.bin"))
+        if (readExportFile("C:/temp/memory_export2.bin"))
         {
             /// We are here because the card is known by the export file and the export file is valid
 
@@ -4562,14 +4562,14 @@ bool MPDevice::finishImportFileMerging(void)
                 return false;
             }
 
+            /* Next item */
+            curChildNodeAddr = curNode->getNextChildAddress();
+
             /* Marked for deletion? */
             if (!curNode->getMergeTagged())
             {
                 removeChildFromDB(nodelist_iterator, curNode);
             }
-
-            /* Next item */
-            curChildNodeAddr = curNode->getNextChildAddress();
         }
     }
 
