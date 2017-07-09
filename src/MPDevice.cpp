@@ -2123,6 +2123,7 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
 
     /* Create new node with null address and virtual address set to our counter value */
     newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+    newNodePt->setType(MPNode::NodeParent);
     newNodePt->setService(service);
 
     /* Add node to list */

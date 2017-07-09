@@ -43,6 +43,14 @@ int MPNode::getType() const
     return -1;
 }
 
+void MPNode::setType(const quint8 type)
+{
+    if (data.size() > 1)
+    {
+        data[1] = type << 6;
+    }
+}
+
 bool MPNode::isValid() const
 {
     return getType() != NodeUnknown &&

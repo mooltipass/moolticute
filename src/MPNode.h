@@ -45,6 +45,7 @@ public:
     void setAddress(const QByteArray &d, const quint32 virt_addr = 0);
     quint32 getVirtualAddress(void) const;
     void setVirtualAddress(quint32 addr);
+    void setType(const quint8 type);
     QByteArray getAddress() const;
     int getType() const;
 
