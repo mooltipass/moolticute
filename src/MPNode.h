@@ -96,15 +96,16 @@ public:
 
     // Node properties
     QByteArray getNodeData() const;
+    QByteArray getNodeFlags() const;
 
     // Access node core data
-    void setLoginNodeData(const QByteArray &d);
+    void setLoginNodeData(const QByteArray &flags, const QByteArray &d);
     QByteArray getLoginNodeData() const;
-    void setLoginChildNodeData(const QByteArray &d);
+    void setLoginChildNodeData(const QByteArray &flags, const QByteArray &d);
     QByteArray getLoginChildNodeData() const;
-    void setDataNodeData(const QByteArray &d);
+    void setDataNodeData(const QByteArray &flags, const QByteArray &d);
     QByteArray getDataNodeData() const;
-    void setDataChildNodeData(const QByteArray &d);
+    void setDataChildNodeData(const QByteArray &flags, const QByteArray &d);
     QByteArray getDataChildNodeData() const;
 
     // Pointedto access/write

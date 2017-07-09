@@ -2735,6 +2735,7 @@ void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& addres
         packetToSend.append(address);
         packetToSend.append(i);
         packetToSend.append(data.mid(i*59, payload_size-3));
+        //qDebug() << "Write node packet #" << i << " : " << packetToSend.toHex();
         jobs->append(new MPCommandJob(this, MPCmd::WRITE_FLASH_NODE, packetToSend, MPCommandJob::defaultCheckRet));
     }
 }
@@ -2755,12 +2756,15 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qDebug() << "Generating save packet for new service" << nodelist_iterator->getService();
+            //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
         else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
         {
             qDebug() << "Generating save packet for updated service" << nodelist_iterator->getService();
+            //qDebug() << "Prev contents: " << temp_node_pointer->getNodeData().toHex();
+            //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
@@ -2773,6 +2777,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qDebug() << "Generating save packet for new login" << nodelist_iterator->getLogin();
+            //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
@@ -3902,7 +3907,6 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping one parent node link in chain...";
     loginNodes[1]->setNextParentAddress(loginNodes[3]->getAddress());
     checkLoadedNodes(true, true, true);
-    generateSavePackets(jobs);
     if (generateSavePackets(jobs)) {qCritical() << "Skipping one parent node link in chain: test failed!";return false;} else qInfo() << "Skipping one parent node link in chain: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping first parent node";
@@ -4347,7 +4351,7 @@ bool MPDevice::startImportFileMerging(void)
                             {
                                 // Data mismatch, overwrite the important part
                                 qDebug() << importedLoginNodes[i]->getService() << " : child core data mismatch for child " << imported_child_node->getLogin() << " , updating...";
-                                cur_child_node->setLoginChildNodeData(imported_child_node->getLoginChildNodeData());
+                                cur_child_node->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
                             }
                             break;
                         }
@@ -4369,7 +4373,7 @@ bool MPDevice::startImportFileMerging(void)
 
                         /* Create new node with null address and virtual address set to our counter value */
                         MPNode* newChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
-                        newChildNodePt->setLoginChildNodeData(imported_child_node->getLoginChildNodeData());
+                        newChildNodePt->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
                         newChildNodePt->setMergeTagged();
 
                         /* Add node to list */
@@ -4400,7 +4404,7 @@ bool MPDevice::startImportFileMerging(void)
 
            /* Create new node with null address and virtual address set to our counter value */
            MPNode* newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
-           newNodePt->setLoginNodeData(importedLoginNodes[i]->getLoginNodeData());
+           newNodePt->setLoginNodeData(importedLoginNodes[i]->getNodeFlags(), importedLoginNodes[i]->getLoginNodeData());
            newNodePt->setMergeTagged();
 
            /* Add node to list */
@@ -4430,7 +4434,7 @@ bool MPDevice::startImportFileMerging(void)
 
                /* Create new node with null address and virtual address set to our counter value */
                MPNode* newChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
-               newChildNodePt->setLoginChildNodeData(curImportChildPt->getLoginChildNodeData());
+               newChildNodePt->setLoginChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getLoginChildNodeData());
                newChildNodePt->setMergeTagged();
 
                /* Add node to list */

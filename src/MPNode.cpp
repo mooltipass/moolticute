@@ -339,6 +339,11 @@ QByteArray MPNode::getNodeData() const
     return data;
 }
 
+QByteArray MPNode::getNodeFlags() const
+{
+    return data.mid(0, 2);
+}
+
 QByteArray MPNode::getLoginNodeData() const
 {
     // return core data, excluding linked lists and flags
@@ -346,12 +351,13 @@ QByteArray MPNode::getLoginNodeData() const
     return data.mid(8);
 }
 
-void MPNode::setLoginNodeData(const QByteArray &d)
+void MPNode::setLoginNodeData(const QByteArray &flags, const QByteArray &d)
 {
-    // overwrite core data, excluding linked lists and flags
+    // overwrite core data, excluding linked lists
     if (isValid())
     {
         data.replace(8, MP_NODE_SIZE-8, d);
+        data.replace(0, 2, flags);
     }
 }
 
@@ -362,12 +368,13 @@ QByteArray MPNode::getLoginChildNodeData() const
     return data.mid(6);
 }
 
-void MPNode::setLoginChildNodeData(const QByteArray &d)
+void MPNode::setLoginChildNodeData(const QByteArray &flags, const QByteArray &d)
 {
-    // overwrite core data, excluding linked lists and flags
+    // overwrite core data, excluding linked lists
     if (isValid())
     {
         data.replace(6, MP_NODE_SIZE-6, d);
+        data.replace(0, 2, flags);
     }
 }
 
@@ -377,12 +384,13 @@ QByteArray MPNode::getDataNodeData() const
     return data.mid(8);
 }
 
-void MPNode::setDataNodeData(const QByteArray &d)
+void MPNode::setDataNodeData(const QByteArray &flags, const QByteArray &d)
 {
-    // overwrite core data, excluding linked lists and flags
+    // overwrite core data, excluding linked lists
     if (isValid())
     {
         data.replace(8, MP_NODE_SIZE-8, d);
+        data.replace(0, 2, flags);
     }
 }
 
@@ -392,12 +400,13 @@ QByteArray MPNode::getDataChildNodeData() const
     return data.mid(4);
 }
 
-void MPNode::setDataChildNodeData(const QByteArray &d)
+void MPNode::setDataChildNodeData(const QByteArray &flags, const QByteArray &d)
 {
-    // overwrite core data, excluding linked lists and flags
+    // overwrite core data, excluding linked lists
     if (isValid())
     {
         data.replace(4, MP_NODE_SIZE-4, d);
+        data.replace(0, 2, flags);
     }
 }
 
