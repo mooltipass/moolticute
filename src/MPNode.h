@@ -51,12 +51,12 @@ public:
     // NodeParent / NodeParentData properties
     void setPreviousParentAddress(const QByteArray &d, const quint32 virt_addr = 0);
     QByteArray getPreviousParentAddress() const;
-    quint32 getPrevParentVirtualAddress() const;
+    quint32 getPreviousParentVirtualAddress() const;
     void setNextParentAddress(const QByteArray &d, const quint32 virt_addr = 0);
     QByteArray getNextParentAddress() const;
     quint32 getNextParentVirtualAddress() const;
     void setStartChildAddress(const QByteArray &d, const quint32 virt_addr = 0);
-    quint32 getFirstChildVirtualAddress() const;
+    quint32 getStartChildVirtualAddress() const;
     QByteArray getStartChildAddress() const;
     void setService(const QString &service);
     QString getService() const;

@@ -217,6 +217,7 @@ private:
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
+    void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
@@ -241,6 +242,7 @@ private:
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
     bool readExportFile(const QString &fileName);
+    void cleanImportedVars(void);
 
     // Functions added by mathieu for unit testing
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
@@ -316,9 +318,6 @@ private:
     QList<MPNode *> importedLoginChildNodes;    //list of all parent nodes for credentials
     QList<MPNode *> importedDataNodes;          //list of all parent nodes for data nodes
     QList<MPNode *> importedDataChildNodes;     //list of all parent nodes for data nodes
-
-    // Jobs for merge operations
-    AsyncJobs* pendingMergeJob;
 
     bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2

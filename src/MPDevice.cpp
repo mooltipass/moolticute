@@ -1542,6 +1542,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 {
     quint32 tempVirtualParentAddress;
     QByteArray tempParentAddress;
+    quint32 tempVirtualChildAddress;
     QByteArray tempChildAddress;
     MPNode* tempNextParentNodePt = nullptr;
     MPNode* tempParentNodePt = nullptr;
@@ -1559,7 +1560,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
         tempVirtualParentAddress = virtualStartNode;
 
         /* Loop through the parent nodes */
-        while (tempParentAddress != MPNode::EmptyAddress)
+        while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
         {
             /* Get pointer to next parent node */
             tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress, tempVirtualParentAddress);
@@ -1571,10 +1572,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if (tempParentAddress == startNode)
+                    if ((tempParentAddress == startNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                     {
                         /* start node is incorrect */
                         startNode = QByteArray(MPNode::EmptyAddress);
+                        virtualStartNode = 0;
                     }
                     else
                     {
@@ -1584,7 +1586,8 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                 }
 
                 /* Stop looping */
-                return false;
+                return_bool = false;
+                break;
             }
             else if (tempNextParentNodePt->getPointedToCheck())
             {
@@ -1593,10 +1596,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if (tempParentAddress == startNode)
+                    if ((tempParentAddress == startNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                     {
                         /* start node is already tagged... how's that possible? */
                         startNode = QByteArray(MPNode::EmptyAddress);
+                        virtualStartNode = 0;
                     }
                     else
                     {
@@ -1606,15 +1610,16 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                 }
 
                 /* Stop looping */
-                return false;
+                return_bool = false;
+                break;
             }
             else
             {
                 /* check previous node address */
-                if (tempParentAddress == startNode)
+                if ((tempParentAddress == startNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                 {
                     /* first parent node: previous address should be an empty one */
-                    if (tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress)
+                    if ((tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != 0))
                     {
                         qWarning() << "tagPointedNodes: parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
                         if (repairAllowed)
@@ -1627,12 +1632,12 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                 else
                 {
                     /* normal linked chain */
-                    if (tempNextParentNodePt->getPreviousParentAddress() != tempParentNodePt->getAddress())
+                    if ((tempNextParentNodePt->getPreviousParentAddress() != tempParentNodePt->getAddress()) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != tempParentNodePt->getVirtualAddress()))
                     {
                         qWarning() << "tagPointedNodes: parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << tempParentNodePt->getAddress().toHex();
                         if (repairAllowed)
                         {
-                            tempNextParentNodePt->setPreviousParentAddress(tempParentNodePt->getAddress());
+                            tempNextParentNodePt->setPreviousParentAddress(tempParentNodePt->getAddress(), tempParentNodePt->getVirtualAddress());
                         }
                         return_bool = false;
                     }
@@ -1646,12 +1651,13 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 /* get first child */
                 tempChildAddress = tempParentNodePt->getStartChildAddress();
+                tempVirtualChildAddress = tempParentNodePt->getStartChildVirtualAddress();
 
                 /* browse through all the children */
-                while (tempChildAddress != MPNode::EmptyAddress)
+                while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
                 {
                     /* Get pointer to the child node */
-                    tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, 0);
+                    tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, tempVirtualChildAddress);
 
                     /* Check we could find child pointer */
                     if (!tempNextChildNodePt)
@@ -1661,7 +1667,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                         if (repairAllowed)
                         {
-                            if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                            if ((tempChildAddress == tempParentNodePt->getStartChildAddress()) || (tempChildAddress.isNull() && tempVirtualChildAddress == tempParentNodePt->getStartChildVirtualAddress()))
                             {
                                 // first child
                                 tempParentNodePt->setStartChildAddress(MPNode::EmptyAddress);
@@ -1679,7 +1685,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                     else if (tempNextChildNodePt->getPointedToCheck())
                     {
                         /* Linked chain loop detected */
-                        if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                        if ((tempChildAddress == tempParentNodePt->getStartChildAddress()) || (tempChildAddress.isNull() && tempVirtualChildAddress == tempParentNodePt->getStartChildVirtualAddress()))
                         {
                             qCritical() << "tagPointedNodes: child node already pointed to: parent node with address" << tempParentAddress.toHex() << " points to child node with address" << tempChildAddress.toHex();
                             if (repairAllowed)
@@ -1697,15 +1703,16 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                         }
 
                         /* Stop looping */
-                        return false;
+                        return_bool = false;
+                        break;
                     }
                     else
                     {
                         /* check previous node address */
-                        if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                        if ((tempChildAddress == tempParentNodePt->getStartChildAddress()) || (tempChildAddress.isNull() && tempVirtualChildAddress == tempParentNodePt->getStartChildVirtualAddress()))
                         {
                             /* first child node in given parent: previous address should be an empty one */
-                            if (tempNextChildNodePt->getPreviousChildAddress() != MPNode::EmptyAddress)
+                            if ((tempNextChildNodePt->getPreviousChildAddress() != MPNode::EmptyAddress) || (tempNextChildNodePt->getPreviousChildAddress().isNull() && tempNextChildNodePt->getPreviousChildVirtualAddress() != 0))
                             {
                                 qWarning() << "tagPointedNodes: child node" << tempNextChildNodePt->getLogin() <<  "at address" << tempChildAddress.toHex() << "has incorrect previous address:" << tempNextChildNodePt->getPreviousChildAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
                                 if (repairAllowed)
@@ -1718,7 +1725,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                         else
                         {
                             /* normal linked chain */
-                            if (tempNextChildNodePt->getPreviousChildAddress() != tempChildNodePt->getAddress())
+                            if ((tempNextChildNodePt->getPreviousChildAddress() != tempChildNodePt->getAddress()) || (tempNextChildNodePt->getPreviousChildAddress().isNull() && tempNextChildNodePt->getPreviousChildVirtualAddress() != tempChildNodePt->getVirtualAddress()))
                             {
                                 qWarning() << "tagPointedNodes: child node" << tempNextChildNodePt->getLogin() <<  "at address" << tempChildAddress.toHex() << "has incorrect previous address:" << tempNextChildNodePt->getPreviousChildAddress().toHex() << "instead of" << tempChildNodePt->getAddress().toHex();
                                 if (repairAllowed)
@@ -1737,6 +1744,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                         /* Loop to next possible child */
                         tempChildAddress = tempChildNodePt->getNextChildAddress();
+                        tempVirtualChildAddress = tempChildNodePt->getNextChildVirtualAddress();
                     }
                 }
 
@@ -1752,10 +1760,10 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
         /** SAME FOR DATA NODES **/
         /* start with start node (duh) */
         tempParentAddress = startDataNode;
-        tempVirtualParentAddress = virtualStartNode;
+        tempVirtualParentAddress = virtualDataStartNode;
 
         /* Loop through the parent nodes */
-        while (tempParentAddress != MPNode::EmptyAddress)
+        while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
         {
             /* Get pointer to next parent node */
             tempNextParentNodePt = findNodeWithAddressInList(dataNodes, tempParentAddress, tempVirtualParentAddress);
@@ -1767,10 +1775,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if (tempParentAddress == startDataNode)
+                    if ((tempParentAddress == startDataNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode))
                     {
                         /* start node is incorrect */
                         startDataNode = QByteArray(MPNode::EmptyAddress);
+                        virtualDataStartNode = 0;
                     }
                     else
                     {
@@ -1780,7 +1789,8 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                 }
 
                 /* Stop looping */
-                return false;
+                return_bool = false;
+                break;
             }
             else if (tempNextParentNodePt->getPointedToCheck())
             {
@@ -1789,10 +1799,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if (tempParentAddress == startDataNode)
+                    if ((tempParentAddress == startDataNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode))
                     {
                         /* start node is already tagged... how's that even possible? */
                         startDataNode = QByteArray(MPNode::EmptyAddress);
+                        virtualDataStartNode = 0;
                     }
                     else
                     {
@@ -1802,15 +1813,16 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                 }
 
                 /* Stop looping */
-                return false;
+                return_bool = false;
+                break;
             }
             else
             {
                 /* check previous node address */
-                if (tempParentAddress == startDataNode)
+                if ((tempParentAddress == startDataNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode))
                 {
                     /* first parent node: previous address should be an empty one */
-                    if (tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress)
+                    if ((tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != 0))
                     {
                         qWarning() << "tagPointedNodes: data parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << MPNode::EmptyAddress.toHex();
                         if (repairAllowed)
@@ -1823,12 +1835,12 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                 else
                 {
                     /* normal linked chain */
-                    if (tempNextParentNodePt->getPreviousParentAddress() != tempParentNodePt->getAddress())
+                    if ((tempNextParentNodePt->getPreviousParentAddress() != tempParentNodePt->getAddress()) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != tempParentNodePt->getVirtualAddress()))
                     {
                         qWarning() << "tagPointedNodes: data parent node" << tempNextParentNodePt->getService() <<  "at address" << tempParentAddress.toHex() << "has incorrect previous address:" << tempNextParentNodePt->getPreviousParentAddress().toHex() << "instead of" << tempParentNodePt->getAddress().toHex();
                         if (repairAllowed)
                         {
-                            tempNextParentNodePt->setPreviousParentAddress(tempParentNodePt->getAddress());
+                            tempNextParentNodePt->setPreviousParentAddress(tempParentNodePt->getAddress(), tempParentNodePt->getVirtualAddress());
                         }
                         return_bool = false;
                     }
@@ -1842,17 +1854,18 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 /* get first child */
                 tempChildAddress = tempParentNodePt->getStartChildAddress();
+                tempVirtualChildAddress = tempParentNodePt->getStartChildVirtualAddress();
 
                 /* browse through all the children */
-                while (tempChildAddress != MPNode::EmptyAddress)
+                while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
                 {
                     /* Get pointer to the child node */
-                    tempNextChildNodePt = findNodeWithAddressInList(dataChildNodes, tempChildAddress, 0);
+                    tempNextChildNodePt = findNodeWithAddressInList(dataChildNodes, tempChildAddress, tempVirtualChildAddress);
 
                     /* Check we could find child pointer */
                     if (!tempNextChildNodePt)
                     {
-                        if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                        if ((tempChildAddress == tempParentNodePt->getStartChildAddress()) || (tempChildAddress.isNull() && tempVirtualChildAddress == tempParentNodePt->getStartChildVirtualAddress()))
                         {
                             qWarning() << "tagPointedNodes: couldn't find first data child node with address" << tempChildAddress.toHex() << " for parent " << tempParentNodePt->getService() << " in our list";
                         }
@@ -1864,7 +1877,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                         if (repairAllowed)
                         {
-                            if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                            if ((tempChildAddress == tempParentNodePt->getStartChildAddress()) || (tempChildAddress.isNull() && tempVirtualChildAddress == tempParentNodePt->getStartChildVirtualAddress()))
                             {
                                 // first child
                                 tempParentNodePt->setStartChildAddress(MPNode::EmptyAddress);
@@ -1882,7 +1895,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                     else if (tempNextChildNodePt->getPointedToCheck())
                     {
                         /* Linked chain loop detected */
-                        if (tempChildAddress == tempParentNodePt->getStartChildAddress())
+                        if ((tempChildAddress == tempParentNodePt->getStartChildAddress()) || (tempChildAddress.isNull() && tempVirtualChildAddress == tempParentNodePt->getStartChildVirtualAddress()))
                         {
                             qCritical() << "tagPointedNodes: data child node already pointed to: parent node with address" << tempParentAddress.toHex() << " points to child node with address" << tempChildAddress.toHex();
                             if (repairAllowed)
@@ -1900,7 +1913,8 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                         }
 
                         /* Stop looping */
-                        return false;
+                        return_bool = false;
+                        break;
                     }
                     else
                     {
@@ -1912,6 +1926,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                         /* Loop to next possible child */
                         tempChildAddress = tempChildNodePt->getNextChildDataAddress();
+                        tempVirtualChildAddress = tempChildNodePt->getNextChildVirtualAddress();
                     }
                 }
 
@@ -2030,13 +2045,13 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
                 if (curNodePt->getService().compare(parentNodePt->getService()) > 0)
                 {
                     /* We went one slot too far, curNodePt is the next parent Node */
-                    qInfo() << "Adding parent node before" << curNodePt->getService();
+                    qDebug() << "Adding parent node before" << curNodePt->getService();
 
                     /* Check if it is the new first parent */
                     if (!prevNodePt)
                     {
                         /* We have a new start node! */
-                        qInfo() << "Parent node is the new start node";
+                        qDebug() << "Parent node is the new start node";
                         if (isDataParent)
                         {
                             startDataNode = parentNodePt->getAddress();
@@ -2051,7 +2066,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
                     }
                     else
                     {
-                        qInfo() << "... and after" << prevNodePt->getService();
+                        qDebug() << "... and after" << prevNodePt->getService();
                         prevNodePt->setNextParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
                         parentNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
                     }
@@ -2076,7 +2091,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent)
         }
 
         /* If we are here it means we need to take the last spot */
-        qInfo() << "Adding parent node after" << prevNodePt->getService();
+        qDebug() << "Adding parent node after" << prevNodePt->getService();
         prevNodePt->setNextParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
         parentNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
         parentNodePt->setNextParentAddress(MPNode::EmptyAddress);
@@ -2128,7 +2143,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
 
     /* Get first child */
     QByteArray tempChildAddress = parentNodePt->getStartChildAddress();
-    quint32 tempVirtualChildAddress = parentNodePt->getFirstChildVirtualAddress();
+    quint32 tempVirtualChildAddress = parentNodePt->getStartChildVirtualAddress();
 
     /* Check for Empty address */
     if ((tempChildAddress == MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress == 0))
@@ -2171,7 +2186,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
             if (tempNextChildNodePt->getLogin().compare(childNodePt->getLogin()) > 0)
             {
                 /* Check if the current login is the first one */
-                if ((tempChildAddress == parentNodePt->getStartChildAddress()) && (tempVirtualChildAddress == parentNodePt->getFirstChildVirtualAddress()))
+                if ((tempChildAddress == parentNodePt->getStartChildAddress()) && (tempVirtualChildAddress == parentNodePt->getStartChildVirtualAddress()))
                 {
                     qDebug() << "Added in first position";
                     parentNodePt->setStartChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
@@ -2298,7 +2313,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                 if (curNodePt == parentNodePt)
                 {
                     /* Check if the parent actually doesn't have any child */
-                    if ((curNodePt->getStartChildAddress() != MPNode::EmptyAddress) || (curNodePt->getStartChildAddress().isNull() && curNodePt->getFirstChildVirtualAddress() != 0))
+                    if ((curNodePt->getStartChildAddress() != MPNode::EmptyAddress) || (curNodePt->getStartChildAddress().isNull() && curNodePt->getStartChildVirtualAddress() != 0))
                     {
                         qCritical() << "Parent actually has a child!";
                         tagPointedNodes(true, false, false);
@@ -2428,7 +2443,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
 
     /* Get first child */
     QByteArray tempChildAddress = parentNodePt->getStartChildAddress();
-    quint32 tempVirtualChildAddress = parentNodePt->getFirstChildVirtualAddress();
+    quint32 tempVirtualChildAddress = parentNodePt->getStartChildVirtualAddress();
 
     /* Check for Empty address */
     if ((tempChildAddress == MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress == 0))
@@ -2471,7 +2486,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
                 }
 
                 /* Check if the current login is the first one */
-                if ((tempChildAddress == parentNodePt->getStartChildAddress()) && (tempVirtualChildAddress == parentNodePt->getFirstChildVirtualAddress()))
+                if ((tempChildAddress == parentNodePt->getStartChildAddress()) && (tempVirtualChildAddress == parentNodePt->getStartChildVirtualAddress()))
                 {
                     if (isLastNode)
                     {
@@ -2706,9 +2721,27 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     return return_bool;
 }
 
+void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& address, const QByteArray& data)
+{
+    for (quint32 i = 0; i < 3; i++)
+    {
+        quint32 payload_size = MP_MAX_PACKET_LENGTH - MP_PAYLOAD_FIELD_INDEX;
+        if (i == 2)
+        {
+            payload_size = 17;
+        }
+
+        QByteArray packetToSend = QByteArray();
+        packetToSend.append(address);
+        packetToSend.append(i);
+        packetToSend.append(data.mid(i*59, payload_size-3));
+        jobs->append(new MPCommandJob(this, MPCmd::WRITE_FLASH_NODE, packetToSend, MPCommandJob::defaultCheckRet));
+    }
+}
+
 bool MPDevice::generateSavePackets(AsyncJobs *jobs)
 {
-    Q_UNUSED(jobs);
+    qInfo() << "Generating Save Packets...";
     MPNode* temp_node_pointer;
 
     /* First pass: check the nodes that changed or were added */
@@ -2720,11 +2753,13 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qInfo() << "Generating save packet for new service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
         else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
         {
             qInfo() << "Generating save packet for updated service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
     }
@@ -2736,11 +2771,13 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qInfo() << "Generating save packet for new login" << nodelist_iterator->getLogin();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
         else if (nodelist_iterator->getNodeData() != nodelist_iterator->getNodeData())
         {
             qInfo() << "Generating save packet for updated login" << nodelist_iterator->getLogin();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
     }
@@ -2752,11 +2789,13 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qInfo() << "Generating save packet for new data service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
         else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
         {
             qInfo() << "Generating save packet for updated data service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
     }
@@ -2768,11 +2807,13 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qInfo() << "Generating save packet for new data child node";
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
         else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
         {
             qInfo() << "Generating save packet for updated data child node";
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
             diagSavePacketsGenerated = true;
         }
     }
@@ -2786,6 +2827,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qInfo() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF));
             diagSavePacketsGenerated = true;
         }
     }
@@ -2797,6 +2839,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qInfo() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF));
             diagSavePacketsGenerated = true;
         }
     }
@@ -2808,6 +2851,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qInfo() << "Generating delete packet for deleted data service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF));
             diagSavePacketsGenerated = true;
         }
     }
@@ -2819,6 +2863,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         if (!temp_node_pointer)
         {
             qInfo() << "Generating delete packet for deleted data child node";
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF));
             diagSavePacketsGenerated = true;
         }
     }
@@ -2830,6 +2875,10 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         {
             qInfo() << "Generating favorite" << i << "update packet";
             diagSavePacketsGenerated = true;
+            QByteArray updateFavPacket = QByteArray();
+            updateFavPacket.append(i);
+            updateFavPacket.append(favoritesAddrs[i]);
+            jobs->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, updateFavPacket, MPCommandJob::defaultCheckRet));
         }
     }
 
@@ -2838,6 +2887,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
     {
         qInfo() << "Updating CTR value";
         diagSavePacketsGenerated = true;
+        jobs->append(new MPCommandJob(this, MPCmd::SET_CTRVALUE, ctrValue, MPCommandJob::defaultCheckRet));
     }
 
     /* Diff start node */
@@ -2845,6 +2895,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
     {
         qInfo() << "Updating start node";
         diagSavePacketsGenerated = true;
+        jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, startNode, MPCommandJob::defaultCheckRet));
     }
 
     /* Diff start data node */
@@ -2852,6 +2903,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
     {
         qInfo() << "Updating start data node";
         diagSavePacketsGenerated = true;
+        jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startDataNode, MPCommandJob::defaultCheckRet));
     }
 
     /* We need to diff cpz ctr values for firmwares running < v1.2 */
@@ -2871,6 +2923,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
         {
             qInfo() << "Adding missing cpzctr";
             diagSavePacketsGenerated = true;
+            jobs->append(new MPCommandJob(this, MPCmd::ADD_CARD_CPZ_CTR, cpzCtrValue[i], MPCommandJob::defaultCheckRet));
         }
     }
 
@@ -3777,12 +3830,20 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
 
 void MPDevice::changeVirtualAddressesToFreeAddresses(void)
 {
+    if (virtualStartNode != 0)
+    {
+        startNode = freeAddresses[virtualStartNode];
+    }
+    if (virtualDataStartNode != 0)
+    {
+        startDataNode = freeAddresses[virtualDataStartNode];
+    }
     for (auto &i: loginNodes)
     {
         if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
         if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
-        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPrevParentVirtualAddress()]);
-        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getFirstChildVirtualAddress()]);
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPreviousParentVirtualAddress()]);
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getStartChildVirtualAddress()]);
     }
     for (auto &i: loginChildNodes)
     {
@@ -3794,8 +3855,8 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
     {
         if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
         if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
-        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPrevParentVirtualAddress()]);
-        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getFirstChildVirtualAddress()]);
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPreviousParentVirtualAddress()]);
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getStartChildVirtualAddress()]);
     }
     for (auto &i: dataChildNodes)
     {
@@ -3948,7 +4009,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 
     diagSavePacketsGenerated = false;
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting first child node and adding it again";
-    temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getFirstChildVirtualAddress());
+    temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
     temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
     removeChildFromDB(loginNodes[0], temp_node_pt);
     addChildToDB(loginNodes[0], temp_node);
@@ -3959,7 +4020,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 
     diagSavePacketsGenerated = false;
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting middle child node and adding it again";
-    temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getFirstChildVirtualAddress());
+    temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
     removeChildFromDB(loginNodes[0], temp_node_pt);
@@ -3971,7 +4032,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 
     diagSavePacketsGenerated = false;
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting last child node and adding it again";
-    temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getFirstChildVirtualAddress());
+    temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
@@ -3984,7 +4045,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 
     diagSavePacketsGenerated = false;
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting parent node with single child node and adding it again";
-    temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[1]->getStartChildAddress(), loginNodes[1]->getFirstChildVirtualAddress());
+    temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[1]->getStartChildAddress(), loginNodes[1]->getStartChildVirtualAddress());
     temp_cnode = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
     temp_node = new MPNode(loginNodes[1]->getNodeData(), this, loginNodes[1]->getAddress(), loginNodes[1]->getVirtualAddress());
     temp_node->setStartChildAddress(MPNode::EmptyAddress, 0);
@@ -4002,7 +4063,10 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 }
 
 bool MPDevice::readExportFile(const QString &fileName)
-{
+{    
+    /* When we add nodes, we give them an address based on this counter */
+    cleanImportedVars();
+
     QJsonObject qjobject;
     QJsonArray qjarray;
 
@@ -4179,15 +4243,28 @@ bool MPDevice::readExportFile(const QString &fileName)
     }
 }
 
+void MPDevice::cleanImportedVars(void)
+{
+    newAddressesNeededCounter = 0;
+    importedCtrValue.clear();
+    importedStartNode.clear();
+    importedStartDataNode.clear();
+    importedCpzCtrValue.clear();
+    importedFavoritesAddrs.clear();
+    qDeleteAll(importedLoginNodes);
+    qDeleteAll(importedLoginChildNodes);
+    qDeleteAll(importedDataNodes);
+    qDeleteAll(importedDataChildNodes);
+    importedLoginNodes.clear();
+    importedLoginChildNodes.clear();
+    importedDataNodes.clear();
+    importedDataChildNodes.clear();
+}
+
 bool MPDevice::startImportFileMerging(void)
 {
     /* We arrive here knowing that the CPZ is in the CPZ/CTR list */
     qInfo() << "Starting File Merging...";
-
-    newAddressesNeededCounter = 0;                  // When we add nodes, we give them an address based on this counter
-
-    /* Merge jobs depending if everything went well... */
-    pendingMergeJob = new AsyncJobs("Sending merge packets...", this);
 
     /// Know if we need to add CPZ CTR packets (additive process)
     for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
@@ -4205,7 +4282,7 @@ bool MPDevice::startImportFileMerging(void)
         if (!cpzFound)
         {
             qDebug() << "CPZ CTR not in our DB: " << importedCpzCtrValue[i].toHex();
-            pendingMergeJob->append(new MPCommandJob(this, MPCmd::ADD_CARD_CPZ_CTR, importedCpzCtrValue[i], MPCommandJob::defaultCheckRet));
+            cpzCtrValue.append(importedCpzCtrValue[i]);
         }
     }
 
@@ -4215,7 +4292,7 @@ bool MPDevice::startImportFileMerging(void)
     if (imported_ctr > cur_ctr)
     {
         qDebug() << "CTR value mismatch: " << ctrValue.toHex() << " instead of " << importedCtrValue.toHex();
-        pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_CTRVALUE, importedCtrValue, MPCommandJob::defaultCheckRet));
+        ctrValue = QByteArray(importedCtrValue);
     }
 
     /// Find the nodes we don't have in memory or that have been changed
@@ -4234,9 +4311,9 @@ bool MPDevice::startImportFileMerging(void)
                 service_node_found = true;
 
                 // Next step is to check if the children are the same
-                quint32 cur_import_child_node_addr_v = importedLoginNodes[i]->getFirstChildVirtualAddress();
+                quint32 cur_import_child_node_addr_v = importedLoginNodes[i]->getStartChildVirtualAddress();
                 QByteArray cur_import_child_node_addr = importedLoginNodes[i]->getStartChildAddress();
-                quint32 matched_parent_first_child_v = loginNodes[j]->getFirstChildVirtualAddress();
+                quint32 matched_parent_first_child_v = loginNodes[j]->getStartChildVirtualAddress();
                 QByteArray matched_parent_first_child = loginNodes[j]->getStartChildAddress();
 
                 //qDebug() << "First child address for imported node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
@@ -4249,6 +4326,7 @@ bool MPDevice::startImportFileMerging(void)
                     if (!imported_child_node)
                     {
                         qCritical() << "Couldn't find imported child node in our list (corrupted import file?)";
+                        cleanImportedVars();
                         return false;
                     }
 
@@ -4267,6 +4345,7 @@ bool MPDevice::startImportFileMerging(void)
                         if (!cur_child_node)
                         {
                             qCritical() << "Couldn't find child node in our list (bad node reading?)";
+                            cleanImportedVars();
                             return false;
                         }
 
@@ -4315,6 +4394,7 @@ bool MPDevice::startImportFileMerging(void)
                         if (!addChildToDB(loginNodes[j], newChildNodePt))
                         {
                             qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                            cleanImportedVars();
                             return false;
                         }
                     }
@@ -4344,6 +4424,7 @@ bool MPDevice::startImportFileMerging(void)
            if (!addOrphanParentToDB(newNodePt, false))
            {
                qCritical() << "Couldn't add parent to DB (corrupted DB?";
+               cleanImportedVars();
                return false;
            }
 
@@ -4353,6 +4434,12 @@ bool MPDevice::startImportFileMerging(void)
            {
                /* Find node in list */
                MPNode* curImportChildPt = findNodeWithAddressInList(importedLoginChildNodes, curImportChildAddr);
+
+               if (!curImportChildPt)
+               {
+                   qCritical() << "Couldn't find import child (import file problem?)";
+                   return false;
+               }
 
                /* Increment new addresses counter */
                newAddressesNeededCounter += 1;
@@ -4366,8 +4453,12 @@ bool MPDevice::startImportFileMerging(void)
                if (!addChildToDB(newNodePt, newChildNodePt))
                {
                    qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                   cleanImportedVars();
                    return false;
                }
+
+               /* Go to the next child */
+               curImportChildAddr = curImportChildPt->getNextChildAddress();
            }
         }
     }
@@ -4392,14 +4483,31 @@ bool MPDevice::startImportFileMerging(void)
 
             /* We got all the addresses, change virtual addrs for real addrs and finish merging */
             changeVirtualAddressesToFreeAddresses();
-            if(!finishImportFileMerging())
+            if(finishImportFileMerging())
             {
-                return false;
+                AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
+                connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
+                {
+                    Q_UNUSED(data);
+                    qInfo() << "Merge operations succeeded!";
+                });
+                connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+                {
+                    Q_UNUSED(failedJob);
+                    qCritical() << "Merge operations failed!";
+                });
+                generateSavePackets(mergeOperations);
+                if (diagSavePacketsGenerated)
+                {
+                    jobsQueue.enqueue(mergeOperations);
+                    runAndDequeueJobs();
+                }
+                else
+                {
+                    qInfo() << "Databases already synced";
+                }
             }
-            else
-            {
-                return true;
-            }
+            cleanImportedVars();
         });
 
         connect(getFreeAddressesJob, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -4413,14 +4521,31 @@ bool MPDevice::startImportFileMerging(void)
     }
     else
     {
-        if(!finishImportFileMerging())
+        if(finishImportFileMerging())
         {
-            return false;
+            AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
+            connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
+            {
+                Q_UNUSED(data);
+                qInfo() << "Merge operations succeeded!";
+            });
+            connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+            {
+                Q_UNUSED(failedJob);
+                qCritical() << "Merge operations failed!";
+            });
+            generateSavePackets(mergeOperations);
+            if (diagSavePacketsGenerated)
+            {
+                jobsQueue.enqueue(mergeOperations);
+                runAndDequeueJobs();
+            }
+            else
+            {
+                qInfo() << "Databases already synced";
+            }
         }
-        else
-        {
-            return true;
-        }
+        cleanImportedVars();
     }
 
     return true;
@@ -4434,15 +4559,15 @@ bool MPDevice::finishImportFileMerging(void)
     if (startNode != startNodeClone)
     {
         qDebug() << "Changing starting parent to " << startNode.toHex();
-        pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, startNode, MPCommandJob::defaultCheckRet));
+        startNode = QByteArray(startNodeClone);
     }
 
     /* Same for data parent */
-    /*if (startDataNode != startDataNodeClone)
+    if (startDataNode != startDataNodeClone)
     {
         qDebug() << "Changing starting parent to " << startDataNode.toHex();
-        pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, startDataNode, MPCommandJob::defaultCheckRet));
-    }*/
+        startDataNode = QByteArray(startDataNodeClone);
+    }
 
     /* Now we check all our parents and childs for non merge tag */
     for (auto &nodelist_iterator: loginNodes)
@@ -4459,6 +4584,7 @@ bool MPDevice::finishImportFileMerging(void)
             if (!curNode)
             {
                 qCritical() << "Couldn't find child node in list (error in algo?)";
+                cleanImportedVars();
                 return false;
             }
 
@@ -4489,9 +4615,7 @@ bool MPDevice::finishImportFileMerging(void)
             if (localCurParentNodeAddr != MPNode::EmptyAddress || localCurChildNodeAddr != MPNode::EmptyAddress)
             {
                 qDebug() << "Empty or invalid favorite, deleting it on MP...";
-                QByteArray deleteFavPacket = QByteArray(5, 0);
-                deleteFavPacket[0] = i;
-                pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, deleteFavPacket, MPCommandJob::defaultCheckRet));
+                favoritesAddrs[i] = QByteArray(4, 0);
             }
         }
         else
@@ -4502,9 +4626,7 @@ bool MPDevice::finishImportFileMerging(void)
             if (!localCurChildNode || !localCurParentNode)
             {
                 qCritical() << "Couldn't find matching favorite " << importedCurParentNode->getService() << " & " << importedCurChildNode->getLogin();
-                QByteArray deleteFavPacket = QByteArray(5, 0);
-                deleteFavPacket[0] = i;
-                pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, deleteFavPacket, MPCommandJob::defaultCheckRet));
+                favoritesAddrs[i] = QByteArray(4, 0);
             }
             else if((localCurParentNode->getAddress() == localCurParentNodeAddr) && (localCurChildNode->getAddress() == localCurChildNodeAddr))
             {
@@ -4513,13 +4635,18 @@ bool MPDevice::finishImportFileMerging(void)
             else
             {
                 qDebug() << "New favorite " << importedCurParentNode->getService() << " & " << importedCurChildNode->getLogin();
-                QByteArray updateFavPacket = QByteArray();
-                updateFavPacket.append(i);
-                updateFavPacket.append(localCurParentNode->getAddress());
-                updateFavPacket.append(localCurChildNode->getAddress());
-                pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, updateFavPacket, MPCommandJob::defaultCheckRet));
+                favoritesAddrs[i].replace(0, 2, localCurParentNode->getAddress());
+                favoritesAddrs[i].replace(2, 2, localCurChildNode->getAddress());
             }
         }
+    }
+
+    /* Check that we didn't do a mess */
+    if (!checkLoadedNodes(true, false, false))
+    {
+        qCritical() << "Error in merging algorithm... please contact the devs";
+        cleanImportedVars();
+        return false;
     }
 
     return true;
@@ -4640,10 +4767,10 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         }*/
 
         /* Let's corrupt the DB for fun */
-        testCodeAgainstCleanDBChanges(repairJobs);
+        //testCodeAgainstCleanDBChanges(repairJobs);
 
         /* Check loaded nodes, set bool to repair */
-        //checkLoadedNodes(true, true, true);
+        checkLoadedNodes(true, true, true);
 
         /* Generate save packets */
         //generateSavePackets(repairJobs);

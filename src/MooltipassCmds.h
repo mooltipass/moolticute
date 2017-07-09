@@ -29,6 +29,7 @@
 // Max lengths
 #define MP_MAX_SERVICE_LENGTH   121
 #define MP_MAX_LOGIN_LENGTH     63
+#define MP_MAX_PACKET_LENGTH    64
 
 class MPCmd: public QObject
 {

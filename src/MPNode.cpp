@@ -113,7 +113,7 @@ QByteArray MPNode::getPreviousParentAddress() const
     return data.mid(2, 2);
 }
 
-quint32 MPNode::getPrevParentVirtualAddress() const
+quint32 MPNode::getPreviousParentVirtualAddress() const
 {
     return prevVirtualAddress;
 }
@@ -167,7 +167,7 @@ QByteArray MPNode::getStartChildAddress() const
     return data.mid(6, 2);
 }
 
-quint32 MPNode::getFirstChildVirtualAddress() const
+quint32 MPNode::getStartChildVirtualAddress() const
 {
     return firstChildVirtualAddress;
 }
