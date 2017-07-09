@@ -1478,6 +1478,23 @@ MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArr
     return it == list.end()?nullptr:*it;
 }
 
+/* Find a node inside a given list given his address */
+MPNode *MPDevice::findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent)
+{
+    auto it = std::find_if(list.begin(), list.end(), [&name, isParent](const MPNode *const node)
+    {
+        if (isParent)
+        {
+            return node->getService() == name;
+        }
+        else
+        {
+            return node->getLogin() == name;
+        }
+    });
+
+    return it == list.end()?nullptr:*it;
+}
 /* Find a node inside the parent list given his service */
 MPNode *MPDevice::findNodeWithServiceInList(const QString &service)
 {
@@ -4457,6 +4474,7 @@ bool MPDevice::finishImportFileMerging(void)
     }
 
     /* Favorite syncing */
+    qInfo() << "Syncing favorites...";
     for (qint32 i = 0; i < importedFavoritesAddrs.size(); i++)
     {
         MPNode* importedCurParentNode = findNodeWithAddressInList(importedLoginNodes, importedFavoritesAddrs[i].mid(0, 2));
@@ -4464,12 +4482,43 @@ bool MPDevice::finishImportFileMerging(void)
         QByteArray localCurParentNodeAddr = favoritesAddrs[i].mid(0, 2);
         QByteArray localCurChildNodeAddr = favoritesAddrs[i].mid(2, 2);
 
-        if ((!importedCurChildNode || !importedCurParentNode) && (localCurParentNodeAddr != MPNode::EmptyAddress || localCurChildNodeAddr != MPNode::EmptyAddress))
+        // Only compare if both addresses are different than 0
+        if (!importedCurChildNode || !importedCurParentNode)
         {
-            qCritical() << "Empty or invalid favorite, deleting it on MP...";
-            QByteArray deleteFavPacket = QByteArray(5, 0);
-            deleteFavPacket[0] = i;
-            pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, deleteFavPacket, MPCommandJob::defaultCheckRet));
+            // Check that the same favorite is also empty on our DB
+            if (localCurParentNodeAddr != MPNode::EmptyAddress || localCurChildNodeAddr != MPNode::EmptyAddress)
+            {
+                qDebug() << "Empty or invalid favorite, deleting it on MP...";
+                QByteArray deleteFavPacket = QByteArray(5, 0);
+                deleteFavPacket[0] = i;
+                pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, deleteFavPacket, MPCommandJob::defaultCheckRet));
+            }
+        }
+        else
+        {
+            MPNode* localCurParentNode = findNodeWithNameInList(loginNodes, importedCurParentNode->getService(), true);
+            MPNode* localCurChildNode = findNodeWithNameInList(loginChildNodes, importedCurChildNode->getLogin(), false);
+
+            if (!localCurChildNode || !localCurParentNode)
+            {
+                qCritical() << "Couldn't find matching favorite " << importedCurParentNode->getService() << " & " << importedCurChildNode->getLogin();
+                QByteArray deleteFavPacket = QByteArray(5, 0);
+                deleteFavPacket[0] = i;
+                pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, deleteFavPacket, MPCommandJob::defaultCheckRet));
+            }
+            else if((localCurParentNode->getAddress() == localCurParentNodeAddr) && (localCurChildNode->getAddress() == localCurChildNodeAddr))
+            {
+                qDebug() << "Found matching favorite " << importedCurParentNode->getService() << " & " << importedCurChildNode->getLogin();
+            }
+            else
+            {
+                qDebug() << "New favorite " << importedCurParentNode->getService() << " & " << importedCurChildNode->getLogin();
+                QByteArray updateFavPacket = QByteArray();
+                updateFavPacket.append(i);
+                updateFavPacket.append(localCurParentNode->getAddress());
+                updateFavPacket.append(localCurChildNode->getAddress());
+                pendingMergeJob->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, updateFavPacket, MPCommandJob::defaultCheckRet));
+            }
         }
     }
 

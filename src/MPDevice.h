@@ -218,6 +218,7 @@ private:
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
+    MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service);
