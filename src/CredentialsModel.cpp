@@ -251,7 +251,8 @@ void  CredentialsModel::mergeWith(const QVector<Credential> & newCreds) {
     }
 }
 
-auto CredentialsModel::at(int idx) const  -> const Credential & {
+auto CredentialsModel::at(int idx) const  -> const Credential &
+{
     return m_credentials.at(idx);
 }
 
@@ -279,4 +280,14 @@ QJsonObject CredentialsModel::Credential::toJson() const
             { "description", description },
             { "address", addr },
             { "favorite", favorite }};
+}
+
+void CredentialsModel::removeCredential(const QModelIndex &idx)
+{
+    if (!idx.isValid())
+        return;
+
+    beginRemoveRows(QModelIndex(), idx.row(), idx.row());
+    m_credentials.remove(idx.row());
+    endRemoveRows();
 }

@@ -45,10 +45,12 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonFavorite->setIcon(AppGui::qtAwesome()->icon(fa::star, whiteButtons));
 
     QMenu *favMenu = new QMenu();
-    favMenu->addAction(tr("Not a favorite"));
+    QAction *action = favMenu->addAction(tr("Not a favorite"));
+    connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
     for (int i = 1;i < 15;i++)
     {
-        favMenu->addAction(tr("Set as favorite #%1").arg(i));
+        action = favMenu->addAction(tr("Set as favorite #%1").arg(i));
+        connect(action, &QAction::triggered, [this, i](){ changeCurrentFavorite(i - 1); });
     }
     ui->pushButtonFavorite->setMenu(favMenu);
 
@@ -389,5 +391,40 @@ void CredentialsManagement::updateSaveDiscardState(QModelIndex idx)
             ui->pushButtonCancel->hide();
             ui->pushButtonConfirm->hide();
         }
+    }
+}
+
+void CredentialsManagement::changeCurrentFavorite(int fav)
+{
+    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
+    QModelIndexList indexes = selection->selectedIndexes();
+    if (indexes.size() != 1)
+        return;
+
+    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
+    auto cred = credModel->at(idx.row());
+    cred.favorite = fav;
+    credModel->update(idx, cred);
+}
+
+void CredentialsManagement::on_pushButtonDelete_clicked()
+{
+    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
+    QModelIndexList indexes = selection->selectedIndexes();
+    if (indexes.size() != 1)
+        return;
+
+    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
+    auto cred = credModel->at(idx.row());
+
+    auto btn = QMessageBox::question(this,
+                                     tr("Delete?"),
+                                     tr("Remove the current credential %1/%2 ?").arg(cred.service, cred.login),
+                                     QMessageBox::Yes |
+                                     QMessageBox::Cancel,
+                                     QMessageBox::Cancel);
+    if (btn == QMessageBox::Yes)
+    {
+        credModel->removeCredential(idx);
     }
 }

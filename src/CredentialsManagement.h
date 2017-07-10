@@ -64,7 +64,11 @@ private slots:
     void on_pushButtonConfirm_clicked();
     void on_pushButtonCancel_clicked();
 
+    void on_pushButtonDelete_clicked();
+
 private:
+    void changeCurrentFavorite(int fav);
+
     Ui::CredentialsManagement *ui;
 
     CredentialsModel *credModel = nullptr;

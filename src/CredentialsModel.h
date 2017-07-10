@@ -78,6 +78,7 @@ public:
     void setClearTextPassword(const QString &service, const QString &login, const QString &password);
     void update(const QString &service, const QString &login, const QString &password, const QString &description);
     void update(const QModelIndex &idx, const Credential &cred);
+    void removeCredential(const QModelIndex &idx);
 
     QJsonArray getJsonChanges();
 
