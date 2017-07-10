@@ -91,6 +91,8 @@ public:
 
     void serviceExists(bool isDatanode, const QString &service);
 
+    void sendCredentialsMM(const QJsonArray &creds);
+
 signals:
     void wsConnected();
     void wsDisconnected();

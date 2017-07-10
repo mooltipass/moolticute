@@ -77,23 +77,27 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credentialsListView->selectionModel(), &QItemSelectionModel::currentRowChanged, mapper, [this, mapper](const QModelIndex & idx)
     {
         mapper->setCurrentIndex(idx.row());
+        ui->credDisplayFrame->setEnabled(idx.isValid());
+        updateSaveDiscardState(idx);
     });
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::unlockRequested,
             this, &CredentialsManagement::requestPasswordForSelectedItem);
 
-    connect(ui->pushButtonCancel, &QPushButton::clicked, [this, mapper](bool)
-    {
-        mapper->revert();
-    });
-    connect(ui->pushButtonConfirm, &QPushButton::clicked, [this, mapper](bool)
+    connect(ui->pushButtonConfirm, &QPushButton::clicked, [this](bool)
     {
         saveSelectedCredential();
     });
 
-    connect(ui->addCredServiceInput, &QLineEdit::textChanged,this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
+    connect(ui->addCredServiceInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredLoginInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredPasswordInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     updateQuickAddCredentialsButtonState();
+
+    connect(ui->credDisplayLoginInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
+    connect(ui->credDisplayDescriptionInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
+    connect(ui->credDisplayPasswordInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
+    ui->credDisplayFrame->setEnabled(false);
+    updateSaveDiscardState();
 
     connect(ui->lineEditFilterCred, &QLineEdit::textChanged, [=](const QString &t)
     {
@@ -147,8 +151,9 @@ void CredentialsManagement::on_buttonDiscard_clicked()
 }
 
 void CredentialsManagement::on_buttonSaveChanges_clicked()
-{
-    QMessageBox::information(this, "Moolticute", "Not implemented yet!");
+{   
+    wsClient->sendCredentialsMM(credModel->getJsonChanges());
+    emit wantSaveMemMode(); //waits for the daemon to process the data
 }
 
 void CredentialsManagement::requestPasswordForSelectedItem()
@@ -222,6 +227,7 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
 
 void CredentialsManagement::onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success)
 {
+    Q_UNUSED(description)
     if (!success)
     {
         QMessageBox::warning(this, tr("Failure"), tr("Unable to modify %1/%2").arg(service, login));
@@ -241,7 +247,7 @@ void CredentialsManagement::saveSelectedCredential(QModelIndex idx)
 
         idx = credFilterModel->mapToSource(indexes.at(0));
     }
-    const auto &cred = credModel->at(idx.row());
+    auto cred = credModel->at(idx.row());
 
     QString password = ui->credDisplayPasswordInput->text();
     QString description = ui->credDisplayDescriptionInput->text();
@@ -251,7 +257,10 @@ void CredentialsManagement::saveSelectedCredential(QModelIndex idx)
         description != cred.description ||
         login != cred.login)
     {
-        wsClient->addOrUpdateCredential(cred.service, cred.login, password, description);
+        cred.login = login;
+        cred.password = password;
+        cred.description = description;
+        credModel->update(idx, cred);
     }
 }
 
@@ -298,4 +307,87 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(QModelIndex 
         }
     }
     return true;
+}
+
+void CredentialsManagement::on_pushButtonConfirm_clicked()
+{
+    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
+    QModelIndexList indexes = selection->selectedIndexes();
+    if (indexes.size() != 1)
+        return;
+
+    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
+    saveSelectedCredential(idx);
+
+    updateSaveDiscardState();
+}
+
+void CredentialsManagement::on_pushButtonCancel_clicked()
+{
+    QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
+    QModelIndexList indexes = selection->selectedIndexes();
+    if (indexes.size() != 1)
+        return;
+
+    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
+    const auto &cred = credModel->at(idx.row());
+
+    auto btn = QMessageBox::question(this,
+                                     tr("Discard Modifications ?"),
+                                     tr("You have modified %1/%2 - Do you want to discard the modifications ?").arg(cred.service, cred.login),
+                                     QMessageBox::Discard |
+                                     QMessageBox::Cancel,
+                                     QMessageBox::Cancel);
+    if (btn == QMessageBox::Discard)
+    {
+        ui->credDisplayPasswordInput->setText(cred.password);
+        ui->credDisplayDescriptionInput->setText(cred.description);
+        ui->credDisplayLoginInput->setText(cred.login);
+        updateSaveDiscardState();
+    }
+}
+
+void CredentialsManagement::updateSaveDiscardState(QModelIndex idx)
+{
+    if (!idx.isValid())
+    {
+        QItemSelectionModel *selection = ui->credentialsListView->selectionModel();
+        QModelIndexList indexes = selection->selectedIndexes();
+        if (indexes.size() != 1)
+        {
+            ui->pushButtonCancel->hide();
+            ui->pushButtonConfirm->hide();
+        }
+        else
+        {
+            idx = credFilterModel->mapToSource(indexes.at(0));
+        }
+    }
+
+    if (!idx.isValid())
+    {
+        ui->pushButtonCancel->hide();
+        ui->pushButtonConfirm->hide();
+    }
+    else
+    {
+        const auto &cred = credModel->at(idx.row());
+
+        QString password = ui->credDisplayPasswordInput->text();
+        QString description = ui->credDisplayDescriptionInput->text();
+        QString login = ui->credDisplayLoginInput->text();
+
+        if (password != cred.password ||
+            description != cred.description ||
+            login != cred.login)
+        {
+            ui->pushButtonCancel->show();
+            ui->pushButtonConfirm->show();
+        }
+        else
+        {
+            ui->pushButtonCancel->hide();
+            ui->pushButtonConfirm->hide();
+        }
+    }
 }

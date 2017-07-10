@@ -162,6 +162,10 @@ public:
     void serviceExists(bool isDatanode, const QString &service, const QString &reqid,
                        std::function<void(bool success, QString errstr, QString service, bool exists)> cb);
 
+    //Set full list of credentials in MMM
+    void setMMCredentials(const QJsonArray &creds,
+                          std::function<void(bool success, QString errstr)> cb);
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }

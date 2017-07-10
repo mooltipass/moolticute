@@ -48,34 +48,6 @@ class CredentialsModel: public QAbstractTableModel
 public:
     CredentialsModel(QObject *parent = 0);
 
-    void load(const QJsonArray &creds);
-    void setClearTextPassword(const QString & service, const QString & login, const QString & password);
-    void update(const QString & service, const QString & login, const QString &password, const QString & description);
-
-
-    enum ColumnIdx
-    {
-        ServiceIdx,
-        LoginIdx,
-        PasswordIdx,
-        DescriptionIdx,
-        DateCreatedIdx,
-        DateModifiedIdx,
-        ColumnCount,
-        FavoriteIdx,
-    };
-    enum CustomRole {
-        LoginRole = Qt::UserRole + 1,
-        PasswordUnlockedRole,
-        FavRole,
-    };
-
-protected:
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-private:
     class Credential
     {
     public:
@@ -98,8 +70,40 @@ private:
             return service == other.service &&
                     login == other.login;
         }
+
+        QJsonObject toJson() const;
     };
 
+    void load(const QJsonArray &creds);
+    void setClearTextPassword(const QString &service, const QString &login, const QString &password);
+    void update(const QString &service, const QString &login, const QString &password, const QString &description);
+    void update(const QModelIndex &idx, const Credential &cred);
+
+    QJsonArray getJsonChanges();
+
+    enum ColumnIdx
+    {
+        ServiceIdx,
+        LoginIdx,
+        PasswordIdx,
+        DescriptionIdx,
+        DateCreatedIdx,
+        DateModifiedIdx,
+        FavoriteIdx,
+        ColumnCount,
+    };
+    enum CustomRole {
+        LoginRole = Qt::UserRole + 1,
+        PasswordUnlockedRole,
+        FavRole,
+    };
+
+protected:
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
+private:
     //currently displayed list
     QVector<Credential> m_credentials;
 

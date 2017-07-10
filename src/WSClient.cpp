@@ -342,3 +342,9 @@ void WSClient::serviceExists(bool isDatanode, const QString &service)
     sendJsonData({{ "msg", isDatanode? "data_node_exists": "credential_exists" },
                   { "data", d }});
 }
+
+void WSClient::sendCredentialsMM(const QJsonArray &creds)
+{
+    sendJsonData({{ "msg", "set_credentials" },
+                  { "data", creds }});
+}

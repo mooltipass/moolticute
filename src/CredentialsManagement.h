@@ -39,6 +39,7 @@ public:
 
 signals:
     void wantEnterMemMode();
+    void wantSaveMemMode();
 
 public slots:
     bool confirmDiscardUneditedCredentialChanges(QModelIndex idx = {});
@@ -46,6 +47,7 @@ public slots:
 private slots:
     void enableCredentialsManagement(bool);
     void updateQuickAddCredentialsButtonState();
+    void updateSaveDiscardState(QModelIndex idx = {});
 
     void onPasswordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
     void onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success);
@@ -58,6 +60,9 @@ private slots:
 
     void requestPasswordForSelectedItem();
     void on_addCredentialButton_clicked();
+
+    void on_pushButtonConfirm_clicked();
+    void on_pushButtonCancel_clicked();
 
 private:
     Ui::CredentialsManagement *ui;

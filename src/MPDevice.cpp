@@ -3426,3 +3426,31 @@ void MPDevice::serviceExists(bool isDatanode, const QString &service, const QStr
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
+
+void MPDevice::setMMCredentials(const QJsonArray &creds,
+                                std::function<void(bool success, QString errstr)> cb)
+{
+    AsyncJobs *jobs = new AsyncJobs("Merging credentials changes", this);
+
+    /////////
+    //TODO: Simulation here. limpkin can implement the core work here.
+    jobs->append(new TimerJob(5000));
+    /////////
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "Finished merging all credentials in memory";
+        cb(true, QString());
+
+        exitMemMgmtMode(false);
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed getting data node";
+        cb(false, failedJob->getErrorStr());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}

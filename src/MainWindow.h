@@ -50,6 +50,7 @@ private slots:
     void enableKnockSettings(bool visible);
     void updateSerialInfos();
     void wantEnterCredentialManagement();
+    void wantSaveCredentialManagement();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);

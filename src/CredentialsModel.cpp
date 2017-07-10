@@ -169,7 +169,7 @@ void CredentialsModel::setClearTextPassword(const QString & service, const QStri
 }
 
 
-void CredentialsModel::update(const QString & service, const QString & login, const QString & password, const QString & description)
+void CredentialsModel::update(const QString &service, const QString &login, const QString &password, const QString &description)
 {
     auto it = std::find_if(std::begin(m_credentials), std::end(m_credentials), [&login, &service](const Credential & c)
     {
@@ -183,7 +183,7 @@ void CredentialsModel::update(const QString & service, const QString & login, co
         it->password = password;
         if (!description.isEmpty())
             it->description = description;
-        emit dataChanged(index(idx, PasswordIdx), index(idx, DescriptionIdx));
+        emit dataChanged(index(idx, LoginIdx), index(idx, ColumnCount-1));
     }
     else
     {
@@ -198,6 +198,21 @@ void CredentialsModel::update(const QString & service, const QString & login, co
     }
 }
 
+void CredentialsModel::update(const QModelIndex &idx, const Credential &cred)
+{
+    if (!idx.isValid())
+        update(cred.service, cred.login, cred.password, cred.description);
+    else
+    {
+        Credential newCred = m_credentials.at(idx.row());
+        newCred.description = cred.description;
+        newCred.favorite = cred.favorite;
+        newCred.login = cred.login;
+        newCred.password = cred.password;
+        m_credentials.replace(idx.row(), newCred);
+        emit dataChanged(index(idx.row(), LoginIdx), index(idx.row(), ColumnCount-1));
+    }
+}
 
 void  CredentialsModel::mergeWith(const QVector<Credential> & newCreds) {
 
@@ -238,4 +253,30 @@ void  CredentialsModel::mergeWith(const QVector<Credential> & newCreds) {
 
 auto CredentialsModel::at(int idx) const  -> const Credential & {
     return m_credentials.at(idx);
+}
+
+QJsonArray CredentialsModel::getJsonChanges()
+{
+    QJsonArray jarr;
+
+    for (const Credential &cred: qAsConst(m_credentials))
+    {
+        jarr.append(cred.toJson());
+    }
+
+    return jarr;
+}
+
+QJsonObject CredentialsModel::Credential::toJson() const
+{
+    QJsonArray addr;
+    addr.append((int)address.at(0));
+    addr.append((int)address.at(1));
+
+    return {{ "service", service },
+            { "login", login },
+            { "password", password },
+            { "description", description },
+            { "address", addr },
+            { "favorite", favorite }};
 }
