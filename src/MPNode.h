@@ -85,6 +85,7 @@ public:
     QByteArray getPasswordEnc() const;
     QDate getDateCreated() const;
     QDate getDateLastUsed() const;
+    void setFavoriteProperty(const quint8 favId);
 
     //Data node address
     //Address in data node is not at the same position as cred nodes

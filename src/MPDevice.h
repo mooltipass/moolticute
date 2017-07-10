@@ -235,6 +235,7 @@ private:
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
     void detagPointedNodes(void);
+    bool tagFavoriteNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
     bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed);

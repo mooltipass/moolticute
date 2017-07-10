@@ -114,6 +114,11 @@ bool MPNode::getPointedToCheck() const
     return pointedToCheck;
 }
 
+void MPNode::setFavoriteProperty(const quint8 favId)
+{
+    favorite = favId;
+}
+
 QByteArray MPNode::getPreviousParentAddress() const
 {
     if (!isValid()) return QByteArray();

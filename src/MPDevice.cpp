@@ -947,7 +947,7 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
         //all jobs finished success
 
         /* Write export file */
-        if (writeExportFile("C:/temp/wip.bin"))
+        if (false && writeExportFile("C:/temp/wip.bin"))
         {
             qInfo() << "Successfully wrote export file";
         }
@@ -1004,6 +1004,9 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
                 startImportFileMerging();
             }
         }
+
+        /* Tag favorites */
+        tagFavoriteNodes();
 
         qInfo() << "Mem management mode enabled";
         force_memMgmtMode(true);
@@ -1526,6 +1529,83 @@ MPNode *MPDevice::findNodeWithLoginInList(const QString &login)
     });
 
     return it == loginChildNodes.end()?nullptr:*it;
+}
+
+bool MPDevice::tagFavoriteNodes(void)
+{
+    quint32 tempVirtualParentAddress;
+    QByteArray tempParentAddress;
+    quint32 tempVirtualChildAddress;
+    QByteArray tempChildAddress;
+    MPNode* tempParentNodePt = nullptr;
+    MPNode* tempChildNodePt = nullptr;
+
+    /* start with start node (duh) */
+    tempParentAddress = startNode;
+    tempVirtualParentAddress = virtualStartNode;
+
+    /* Loop through the parent nodes */
+    while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
+    {
+        /* Get pointer to next parent node */
+        tempParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress, tempVirtualParentAddress);
+
+        /* Check that we could actually find it */
+        if (!tempParentNodePt)
+        {
+            qCritical() << "tagFavoriteNodes: couldn't find parent node with address" << tempParentAddress.toHex() << "in our list";
+            return false;
+        }
+        else
+        {
+            /* get first child */
+            tempChildAddress = tempParentNodePt->getStartChildAddress();
+            tempVirtualChildAddress = tempParentNodePt->getStartChildVirtualAddress();
+
+            /* browse through all the children */
+            while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
+            {
+                /* Get pointer to the child node */
+                tempChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, tempVirtualChildAddress);
+
+                /* Check we could find child pointer */
+                if (!tempChildNodePt)
+                {
+                    qWarning() << "tagFavoriteNodes: couldn't find child node with address" << tempChildAddress.toHex() << "in our list";
+                    return false;
+                }
+                else
+                {
+                    /* Check if it is a favorite */
+                    if (tempParentAddress != MPNode::EmptyAddress && !tempParentAddress.isNull() && tempChildAddress != MPNode::EmptyAddress && !tempChildAddress.isNull())
+                    {
+                        QByteArray curParentChildFavAddr = QByteArray();
+                        curParentChildFavAddr.append(tempParentAddress);
+                        curParentChildFavAddr.append(tempChildAddress);
+
+                        for (qint32 i = 0; i < favoritesAddrs.size(); i++)
+                        {
+                            if (favoritesAddrs[i] == curParentChildFavAddr)
+                            {
+                                qDebug() << tempChildNodePt->getLogin() << " is favorite #" << i;
+                                tempChildNodePt->setFavoriteProperty((quint8)i);
+                            }
+                        }
+                    }
+
+                    /* Loop to next possible child */
+                    tempChildAddress = tempChildNodePt->getNextChildAddress();
+                    tempVirtualChildAddress = tempChildNodePt->getNextChildVirtualAddress();
+                }
+            }
+
+            /* get next parent address */
+            tempParentAddress = tempParentNodePt->getNextParentAddress();
+            tempVirtualParentAddress = tempParentNodePt->getNextParentVirtualAddress();
+        }
+    }
+
+    return true;
 }
 
 void MPDevice::detagPointedNodes(void)
