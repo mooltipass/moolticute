@@ -947,17 +947,17 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
         //all jobs finished success
 
         /* Write export file */
-        /*if (writeExportFile("C:/temp/wip.bin"))
+        if (writeExportFile("C:/temp/wip.bin"))
         {
             qInfo() << "Successfully wrote export file";
         }
         else
         {
             qInfo() << "Couldn't write export file";
-        }*/
+        }
 
         /* Try to read the export file */
-        if (true && readExportFile("C:/temp/wip.bin"))
+        if (false && readExportFile("C:/temp/wip.bin"))
         {
             /// We are here because the card is known by the export file and the export file is valid
 
@@ -4132,8 +4132,9 @@ bool MPDevice::writeExportFile(const QString &fileName)
     {
         QJsonObject nodeObject = QJsonObject();
         nodeObject["address"] = QJsonValue(Common::bytesToJson(loginChildNodes[i]->getAddress()));
-        nodeObject["name"] = QJsonValue(loginChildNodes[i]->getService());
+        nodeObject["name"] = QJsonValue(loginChildNodes[i]->getLogin());
         nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(loginChildNodes[i]->getNodeData()));
+        nodeObject["pointed"] = QJsonValue(false);
         nodeQJsonArray.append(QJsonValue(nodeObject));
     }
     exportTopArray.append(QJsonValue(nodeQJsonArray));
@@ -4156,8 +4157,8 @@ bool MPDevice::writeExportFile(const QString &fileName)
     {
         QJsonObject nodeObject = QJsonObject();
         nodeObject["address"] = QJsonValue(Common::bytesToJson(dataChildNodes[i]->getAddress()));
-        nodeObject["name"] = QJsonValue(dataChildNodes[i]->getService());
         nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(dataChildNodes[i]->getNodeData()));
+        nodeObject["pointed"] = QJsonValue(false);
         nodeQJsonArray.append(QJsonValue(nodeObject));
     }
     exportTopArray.append(QJsonValue(nodeQJsonArray));
