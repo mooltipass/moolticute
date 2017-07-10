@@ -241,6 +241,7 @@ private:
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
+    bool writeExportFile(const QString &fileName);
     bool readExportFile(const QString &fileName);
     void cleanImportedVars(void);
 

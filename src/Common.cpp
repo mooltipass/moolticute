@@ -209,6 +209,16 @@ QJsonArray Common::bytesToJson(const QByteArray &data)
     return arr;
 }
 
+QJsonObject Common::bytesToJsonObjectArray(const QByteArray &data)
+{
+    QJsonObject returnObject;
+    for (qint32 i = 0; i < data.size(); i++)
+    {
+        returnObject[QString::number(i)] = QJsonValue((quint8)data[i]);
+    }
+    return returnObject;
+}
+
 //Check if the process with <pid> is running
 bool Common::isProcessRunning(qint64 pid)
 {

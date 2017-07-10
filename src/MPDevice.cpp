@@ -945,8 +945,18 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
         //data is last result
         //all jobs finished success
 
+        /* Write export file */
+        if (writeExportFile("C:/temp/wip.bin"))
+        {
+            qInfo() << "Successfully wrote export file";
+        }
+        else
+        {
+            qInfo() << "Couldn't write export file";
+        }
+
         /* Try to read the export file */
-        if (readExportFile("C:/temp/memory_export2.bin"))
+        if (false && readExportFile("C:/temp/memory_export2.bin"))
         {
             /// We are here because the card is known by the export file and the export file is valid
 
@@ -4047,6 +4057,103 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     return true;
 }
 
+bool MPDevice::writeExportFile(const QString &fileName)
+{
+    QJsonArray exportTopArray = QJsonArray();
+
+    /* Create qfile object */
+    QFile saveFile;
+    saveFile.setFileName(fileName);
+
+    /* Open file for writing */
+    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qCritical() << "Couldn't open file for writing";
+        return false;
+    }
+
+    /* CTR */
+    exportTopArray.append(QJsonValue(Common::bytesToJsonObjectArray(ctrValue)));
+
+    /* CPZ/CTR packets */
+    QJsonArray cpzCtrQJsonArray = QJsonArray();
+    for (qint32 i = 0; i < cpzCtrValue.size(); i++)
+    {
+        cpzCtrQJsonArray.append(QJsonValue(Common::bytesToJsonObjectArray(cpzCtrValue[i])));
+    }
+    exportTopArray.append(QJsonValue(cpzCtrQJsonArray));
+
+    /* Starting parent */
+    exportTopArray.append(QJsonValue(Common::bytesToJson(startNode)));
+
+    /* Data starting parent */
+    exportTopArray.append(QJsonValue(Common::bytesToJson(startDataNode)));
+
+    /* Favorites */
+    QJsonArray favQJsonArray = QJsonArray();
+    for (qint32 i = 0; i < favoritesAddrs.size(); i++)
+    {
+        favQJsonArray.append(QJsonValue(Common::bytesToJsonObjectArray(favoritesAddrs[i])));
+    }
+    exportTopArray.append(QJsonValue(favQJsonArray));
+
+    /* Service nodes */
+    QJsonArray nodeQJsonArray = QJsonArray();
+    for (qint32 i = 0; i < loginNodes.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(loginNodes[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(loginNodes[i]->getService());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(loginNodes[i]->getNodeData()));
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
+
+    /* Child nodes */
+    nodeQJsonArray = QJsonArray();
+    for (qint32 i = 0; i < loginChildNodes.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(loginChildNodes[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(loginChildNodes[i]->getService());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(loginChildNodes[i]->getNodeData()));
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
+
+    /* Child nodes */
+    nodeQJsonArray = QJsonArray();
+    for (qint32 i = 0; i < dataNodes.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(dataNodes[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(dataNodes[i]->getService());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(dataNodes[i]->getNodeData()));
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
+
+    /* Child nodes */
+    nodeQJsonArray = QJsonArray();
+    for (qint32 i = 0; i < dataChildNodes.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(dataChildNodes[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(dataChildNodes[i]->getService());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(dataChildNodes[i]->getNodeData()));
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
+
+    /* export identifier */
+    exportTopArray.append(QJsonValue(QString("mooltipass")));
+
+    /* Finally, write file contents */
+    QJsonDocument saveDoc(exportTopArray);
+    saveFile.write(saveDoc.toJson());
+    return true;
+}
+
 bool MPDevice::readExportFile(const QString &fileName)
 {    
     /* When we add nodes, we give them an address based on this counter */
@@ -4068,7 +4175,11 @@ bool MPDevice::readExportFile(const QString &fileName)
     }
 
     /* Read file contents */
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qCritical() << "Couldn't open file";
+        return false;
+    }
     val = file.readAll();
     file.close();
 

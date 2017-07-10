@@ -127,6 +127,7 @@ public:
     static QByteArray dateToBytes(const QDate &dt);
 
     static QJsonArray bytesToJson(const QByteArray &data);
+    static QJsonObject bytesToJsonObjectArray(const QByteArray &data);
 
     static bool isProcessRunning(qint64 pid);
 
