@@ -21,6 +21,7 @@
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
+/// TODO (with help from raoul): query change numbers every time a credential/file gets modified
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
 {
@@ -946,17 +947,17 @@ void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbPr
         //all jobs finished success
 
         /* Write export file */
-        if (writeExportFile("C:/temp/wip.bin"))
+        /*if (writeExportFile("C:/temp/wip.bin"))
         {
             qInfo() << "Successfully wrote export file";
         }
         else
         {
             qInfo() << "Couldn't write export file";
-        }
+        }*/
 
         /* Try to read the export file */
-        if (false && readExportFile("C:/temp/memory_export2.bin"))
+        if (true && readExportFile("C:/temp/wip.bin"))
         {
             /// We are here because the card is known by the export file and the export file is valid
 
@@ -2758,6 +2759,20 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
     bool diagSavePacketsGenerated = false;
     MPNode* temp_node_pointer;
 
+    /* Change numbers */
+    if (isFw12())
+    {
+        if ((get_credentialsDbChangeNumber() != credentialsDbChangeNumberClone) || (get_dataDbChangeNumber() != dataDbChangeNumberClone))
+        {
+            diagSavePacketsGenerated = true;
+            qDebug() << "Updating cred & data change numbers";
+            QByteArray updateChangeNumbersPacket = QByteArray();
+            updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
+            updateChangeNumbersPacket.append(get_dataDbChangeNumber());
+            jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+        }
+    }
+
     /* First pass: check the nodes that changed or were added */
     for (auto &nodelist_iterator: loginNodes)
     {
@@ -3191,7 +3206,9 @@ void MPDevice::getChangeNumbers()
         else
         {
             set_credentialsDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]);
+            credentialsDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+1];
             set_dataDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]);
+            dataDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
             qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
             qDebug() << "Data change number:" << get_dataDbChangeNumber();
             return true;
@@ -4145,8 +4162,20 @@ bool MPDevice::writeExportFile(const QString &fileName)
     }
     exportTopArray.append(QJsonValue(nodeQJsonArray));
 
-    /* export identifier */
-    exportTopArray.append(QJsonValue(QString("mooltipass")));
+    /* identifier */
+    exportTopArray.append(QJsonValue(QString("moolticute")));
+
+    /* bundle version */
+    exportTopArray.append(QJsonValue((qint64)1));
+
+    /* Credential change number */
+    exportTopArray.append(QJsonValue((quint8)get_credentialsDbChangeNumber()));
+
+    /* Data change number */
+    exportTopArray.append(QJsonValue((quint8)get_dataDbChangeNumber()));
+
+    /* Mooltipass serial */
+    exportTopArray.append(QJsonValue((qint64)get_serialNumber()));
 
     /* Finally, write file contents */
     QJsonDocument saveDoc(exportTopArray);
@@ -4207,15 +4236,26 @@ bool MPDevice::readExportFile(const QString &fileName)
         QJsonArray importFile = d.array();
 
         /* Checks */
-        if (importFile.size() != 10)
+        if (!((importFile[9].toString() == "mooltipass" && importFile.size() == 10) || (importFile[9].toString() == "moolticute" && importFile.size() == 14)))
         {
             qCritical() << "Invalid MooltiApp file";
             return false;
         }
-        else if (importFile[9].toString() != "mooltipass")
+
+        /* Know which bundle we're dealing with */
+        if (importFile[9].toString() == "mooltipass")
         {
-            qCritical() << "MooltiApp file does not contain correct keyword";
-            return false;
+            isMooltiAppImportFile = true;
+        }
+        else
+        {
+            isMooltiAppImportFile = false;
+            importedCredentialsDbChangeNumber = importFile[11].toInt();
+            qDebug() << "Imported cred change number: " << importedCredentialsDbChangeNumber;
+            importedDataDbChangeNumber = importFile[12].toInt();
+            qDebug() << "Imported data change number: " << importedDataDbChangeNumber;
+            importedDbMiniSerialNumber = importFile[13].toInt();
+            qDebug() << "Imported mini serial number: " << importedDbMiniSerialNumber;
         }
 
         /* Read CTR */
@@ -4385,8 +4425,8 @@ bool MPDevice::startImportFileMerging(void)
     }
 
     /// Check CTR value
-    quint32 cur_ctr = ctrValue[0]*256*256 + ctrValue[1]*256 + ctrValue[2];
-    quint32 imported_ctr = importedCtrValue[0]*256*256 + importedCtrValue[1]*256 + importedCtrValue[2];
+    quint32 cur_ctr = ((quint8)ctrValue[0])*256*256 + ((quint8)ctrValue[1])*256 + ((quint8)ctrValue[2]);
+    quint32 imported_ctr = ((quint8)importedCtrValue[0])*256*256 + ((quint8)importedCtrValue[1]*256) + ((quint8)importedCtrValue[2]);
     if (imported_ctr > cur_ctr)
     {
         qDebug() << "CTR value mismatch: " << ctrValue.toHex() << " instead of " << importedCtrValue.toHex();
@@ -4734,6 +4774,12 @@ bool MPDevice::finishImportFileMerging(void)
         return false;
     }
 
+    /* Now that we're here, update the change numbers */
+    if (!isMooltiAppImportFile)
+    {
+        set_credentialsDbChangeNumber(importedCredentialsDbChangeNumber);
+        set_dataDbChangeNumber(importedDataDbChangeNumber);
+    }
     return true;
 }
 

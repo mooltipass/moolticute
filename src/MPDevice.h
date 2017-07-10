@@ -294,6 +294,8 @@ private:
     QByteArray unknownCardAddPayload;
 
     // Clones of these values, used when modifying them in MMM
+    quint8 credentialsDbChangeNumberClone;
+    quint8 dataDbChangeNumberClone;
     QByteArray ctrValueClone;
     QByteArray startNodeClone;
     QByteArray startDataNodeClone;
@@ -305,6 +307,11 @@ private:
     QList<MPNode *> dataChildNodesClone;     //list of all parent nodes for data nodes
 
     // Imported values
+    bool isMooltiAppImportFile;
+    quint32 moolticuteImportFileVersion;
+    quint8 importedCredentialsDbChangeNumber;
+    quint8 importedDataDbChangeNumber;
+    quint32 importedDbMiniSerialNumber;
     QByteArray importedCtrValue;
     QByteArray importedStartNode;
     quint32 importedVirtualStartNode;
