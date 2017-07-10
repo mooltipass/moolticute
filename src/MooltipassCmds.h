@@ -29,6 +29,7 @@
 // Max lengths
 #define MP_MAX_SERVICE_LENGTH   121
 #define MP_MAX_LOGIN_LENGTH     63
+#define MP_MAX_PACKET_LENGTH    64
 
 class MPCmd: public QObject
 {
@@ -91,6 +92,7 @@ public:
         ADD_DATA_SERVICE      = 0xBF,
         WRITE_32B_IN_DN       = 0xC0,
         READ_32B_IN_DN        = 0xC1,
+        GET_CUR_CARD_CPZ      = 0xC2,
         CANCEL_USER_REQUEST   = 0xC3,
         PLEASE_RETRY          = 0xC4,
         READ_FLASH_NODE       = 0xC5,

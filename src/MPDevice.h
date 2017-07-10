@@ -76,9 +76,10 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(bool, hashDisplay, false)
     QT_WRITABLE_PROPERTY(int, lockUnlockMode, 0)
 
-    QT_WRITABLE_PROPERTY(quint32, serialNumber, 0) // serial number if firmware is above 1.2
-    QT_WRITABLE_PROPERTY(quint8, credentialsDbChangeNumber, 0) // credentials db change number
-    QT_WRITABLE_PROPERTY(quint8, dataDbChangeNumber, 0) // data db change number
+    QT_WRITABLE_PROPERTY(quint32, serialNumber, 0)              // serial number if firmware is above 1.2
+    QT_WRITABLE_PROPERTY(quint8, credentialsDbChangeNumber, 0)  // credentials db change number
+    QT_WRITABLE_PROPERTY(quint8, dataDbChangeNumber, 0)         // data db change number
+    QT_WRITABLE_PROPERTY(QByteArray, cardCPZ, QByteArray())     // Card CPZ
 
     QT_WRITABLE_PROPERTY(qint64, uid, -1)
 
@@ -132,6 +133,9 @@ public:
 
     //Get database change numbers
     void getChangeNumbers();
+
+    //Get current card CPZ
+    void getCurrentCardCPZ();
 
     //Ask a password for specified service/login to MP
     void getCredential(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
@@ -201,7 +205,7 @@ private:
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
                       std::function<void(int total, int current)> cbProgress);
-    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, const QByteArray &address);
+    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
                                std::function<void(int total, int current)> cbProgress);
 
@@ -217,21 +221,33 @@ private:
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
+    void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data);
+    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
+    MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service);
+    MPNode *findNodeWithLoginInList(const QString &login);
     quint8 getNodeIdFromAddress(const QByteArray &address);
     QByteArray getMemoryFirstNodeAddress(void);
+    bool finishImportFileMerging(void);
+    bool startImportFileMerging(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
     void detagPointedNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
+    bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed);
+    bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed);
+    bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
+    bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent);
+    bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
-    bool checkLoadedNodes(bool repairAllowed);
-    bool tagPointedNodes(bool repairAllowed);
+    bool writeExportFile(const QString &fileName);
+    bool readExportFile(const QString &fileName);
+    void cleanImportedVars(void);
 
     // Functions added by mathieu for unit testing
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
@@ -255,14 +271,12 @@ private:
     qint64 diagLastSecs;
     quint32 diagNbBytesRec;
 
-    //local vars for tests
-    bool diagSavePacketsGenerated;
-
     //command queue
     QQueue<MPCommand> commandQueue;
 
     // Number of new addresses we need
     quint32 newAddressesNeededCounter = 0;
+    quint32 newAddressesReceivedCounter = 0;
 
     // Buffer containing the free addresses we will need
     QList<QByteArray> freeAddresses;
@@ -280,7 +294,12 @@ private:
     QList<MPNode *> dataNodes;          //list of all parent nodes for data nodes
     QList<MPNode *> dataChildNodes;     //list of all parent nodes for data nodes
 
+    // Payload to send when we need to add an unknown card
+    QByteArray unknownCardAddPayload;
+
     // Clones of these values, used when modifying them in MMM
+    quint8 credentialsDbChangeNumberClone;
+    quint8 dataDbChangeNumberClone;
     QByteArray ctrValueClone;
     QByteArray startNodeClone;
     QByteArray startDataNodeClone;
@@ -290,6 +309,24 @@ private:
     QList<MPNode *> loginChildNodesClone;    //list of all parent nodes for credentials
     QList<MPNode *> dataNodesClone;          //list of all parent nodes for data nodes
     QList<MPNode *> dataChildNodesClone;     //list of all parent nodes for data nodes
+
+    // Imported values
+    bool isMooltiAppImportFile;
+    quint32 moolticuteImportFileVersion;
+    quint8 importedCredentialsDbChangeNumber;
+    quint8 importedDataDbChangeNumber;
+    quint32 importedDbMiniSerialNumber;
+    QByteArray importedCtrValue;
+    QByteArray importedStartNode;
+    quint32 importedVirtualStartNode;
+    QByteArray importedStartDataNode;
+    quint32 importedVirtualDataStartNode;
+    QList<QByteArray> importedCpzCtrValue;
+    QList<QByteArray> importedFavoritesAddrs;
+    QList<MPNode *> importedLoginNodes;         //list of all parent nodes for credentials
+    QList<MPNode *> importedLoginChildNodes;    //list of all parent nodes for credentials
+    QList<MPNode *> importedDataNodes;          //list of all parent nodes for data nodes
+    QList<MPNode *> importedDataChildNodes;     //list of all parent nodes for data nodes
 
     bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2
