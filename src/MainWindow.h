@@ -51,6 +51,8 @@ private slots:
     void updateSerialInfos();
     void wantEnterCredentialManagement();
     void wantSaveCredentialManagement();
+    void wantImportDatabase();
+    void wantExportDatabase();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
@@ -59,6 +61,9 @@ private slots:
     void integrityFinished(bool success);
 
     void loadingProgress(int total, int current);
+
+    void dbExported(const QByteArray &d, bool success);
+    void dbImported(bool success);
 
     void on_pushButtonViewLogs_clicked();
     void on_pushButtonAutoStart_clicked();

@@ -54,6 +54,24 @@ void WSServerCon::processMessage(const QString &message)
 
     QJsonObject root = jdoc.object();
 
+    //Default progress callback handling
+    auto defaultProgressCb = [=](int total, int current)
+    {
+        if (!WSServer::Instance()->checkClientExists(this))
+            return;
+
+        if (current > total)
+            current = total;
+
+        QJsonObject ores;
+        QJsonObject oroot = root;
+        ores["progress_total"] = total;
+        ores["progress_current"] = current;
+        oroot["data"] = ores;
+        oroot["msg"] = "progress"; //change msg to avoid breaking of client waiting of the response
+        sendJsonMessage(oroot);
+    };
+
     if (root["msg"] == "param_set")
     {
         processParametersSet(root["data"].toObject());
@@ -62,24 +80,7 @@ void WSServerCon::processMessage(const QString &message)
     {
         //send command to start MMM
         if (mpdevice)
-            mpdevice->startMemMgmtMode(
-                        //progress callback handling
-                        [=](int total, int current)
-            {
-                if (!WSServer::Instance()->checkClientExists(this))
-                    return;
-
-                if (current > total)
-                    current = total;
-
-                QJsonObject ores;
-                QJsonObject oroot = root;
-                ores["progress_total"] = total;
-                ores["progress_current"] = current;
-                oroot["data"] = ores;
-                oroot["msg"] = "progress";
-                sendJsonMessage(oroot);
-            });
+            mpdevice->startMemMgmtMode(defaultProgressCb);
         else
             sendFailedJson(root, "No device connected");
     }
@@ -115,23 +116,7 @@ void WSServerCon::processMessage(const QString &message)
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         },
-        //progress callback handling
-        [=](int total, int current)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (current > total)
-                current = total;
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["progress_total"] = total;
-            ores["progress_current"] = current;
-            oroot["data"] = ores;
-            oroot["msg"] = "progress";
-            sendJsonMessage(oroot);
-        });
+        defaultProgressCb);
     }
     else if (root["msg"] == "ask_password" ||
              root["msg"] == "get_credential")
@@ -283,23 +268,7 @@ void WSServerCon::processMessage(const QString &message)
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         },
-        //progress callback handling
-        [=](int total, int current)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (current > total)
-                current = total;
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["progress_total"] = total;
-            ores["progress_current"] = current;
-            oroot["data"] = ores;
-            oroot["msg"] = "progress"; //change msg to avoid breaking of client waiting of the response
-            sendJsonMessage(oroot);
-        });
+        defaultProgressCb);
     }
     else if (root["msg"] == "set_data_node")
     {
@@ -337,23 +306,7 @@ void WSServerCon::processMessage(const QString &message)
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         },
-        //progress callback handling
-        [=](int total, int current)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (current > total)
-                current = total;
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["progress_total"] = total;
-            ores["progress_current"] = current;
-            oroot["data"] = ores;
-            oroot["msg"] = "progress"; //change msg to avoid breaking of client waiting of the response
-            sendJsonMessage(oroot);
-        });
+        defaultProgressCb);
     }
     else if (root["msg"] == "show_app")
     {
@@ -442,7 +395,6 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "set_credentials")
     {
-        //start integrity check
         if (!mpdevice)
             return;
 
@@ -467,10 +419,69 @@ void WSServerCon::processMessage(const QString &message)
 
             QJsonObject ores;
             QJsonObject oroot = root;
-            ores["set_credentials"] = "done";
+            ores["success"] = "true";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });
+    }
+    else if (root["msg"] == "export_database")
+    {
+        if (!mpdevice)
+            return;
+
+        mpdevice->exportDatabase(
+                    [=](bool success, QString errstr, QByteArray fileData)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["file_data"] = QString(fileData.toBase64());
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
+    else if (root["msg"] == "import_database")
+    {
+        if (!mpdevice)
+            return;
+
+        QJsonObject o = root["data"].toObject();
+
+        QByteArray data = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
+        if (data.isEmpty())
+        {
+            sendFailedJson(root, "file_data is empty");
+            return;
+        }
+
+        mpdevice->importDatabase(data, o["no_delete"].toBool(),
+                    [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
     }
 }
 

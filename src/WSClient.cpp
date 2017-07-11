@@ -222,6 +222,19 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit credentialsExists(o["service"].toString(), o["exists"].toBool());
     }
+    else if (rootobj["msg"] == "export_database")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        QByteArray b = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
+        emit dbExported(b, success);
+    }
+    else if (rootobj["msg"] == "import_database")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        emit dbImported(success);
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -347,4 +360,17 @@ void WSClient::sendCredentialsMM(const QJsonArray &creds)
 {
     sendJsonData({{ "msg", "set_credentials" },
                   { "data", creds }});
+}
+
+void WSClient::exportDbFile()
+{
+    sendJsonData({{ "msg", "export_database" }});
+}
+
+void WSClient::importDbFile(const QByteArray &fileData, bool noDelete)
+{
+    QJsonObject d = {{ "file_data", QString(fileData.toBase64()) },
+                     { "no_delete", noDelete }};
+    sendJsonData({{ "msg", "import_database" },
+                  { "data", d }});
 }

@@ -669,6 +669,24 @@ void MainWindow::wantSaveCredentialManagement()
     connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
 }
 
+void MainWindow::wantImportDatabase()
+{
+    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Importing and merging file to device</span></p><p>Please wait.</p></body></html>"));
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+
+    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+}
+
+void MainWindow::wantExportDatabase()
+{
+    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+
+    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+}
+
 void MainWindow::loadingProgress(int total, int current)
 {
     ui->progressBarWait->show();
@@ -753,12 +771,62 @@ void MainWindow::on_checkBoxSSHAgent_stateChanged(int)
 
 void MainWindow::on_pushButtonExportFile_clicked()
 {
-    QMessageBox::information(this, "Moolticute", "Not yet implemented.");
+    wsClient->exportDbFile();
+    connect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
+    wantExportDatabase();
 }
 
 void MainWindow::on_pushButtonImportFile_clicked()
 {
-    QMessageBox::information(this, "Moolticute", "Not yet implemented.");
+    QString fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
+                                                 "Memory exports (*.bin);;All files (*.*)");
+    if (fname.isEmpty())
+        return;
+
+    QFile f(fname);
+    if (!f.open(QFile::ReadOnly))
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
+        return;
+    }
+    wsClient->importDbFile(f.readAll(), ui->checkBoxImport->isChecked());
+    connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
+    wantImportDatabase();
+}
+
+void MainWindow::dbExported(const QByteArray &d, bool success)
+{
+    disconnect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
+    if (!success)
+        QMessageBox::warning(this, tr("Error"), tr("Failed to export the database, an error occured. Please check the log."));
+    else
+    {
+        QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),
+                                                 "Memory exports (*.bin);;All files (*.*)");
+        if (!fname.isEmpty())
+        {
+            QFile f(fname);
+            if (!f.open(QFile::WriteOnly | QFile::Truncate))
+                QMessageBox::warning(this, tr("Error"), tr("Unable to write to file %1").arg(fname));
+            else
+                f.write(d);
+            f.close();
+        }
+    }
+    ui->stackedWidget->setCurrentWidget(ui->pageSync);
+    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+}
+
+void MainWindow::dbImported(bool success)
+{
+    disconnect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
+    if (!success)
+        QMessageBox::warning(this, tr("Error"), tr("Failed to import the database, an error occured. Please check the log."));
+    else
+        QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
+
+    ui->stackedWidget->setCurrentWidget(ui->pageSync);
+    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
 }
 
 void MainWindow::on_pushButtonIntegrity_clicked()

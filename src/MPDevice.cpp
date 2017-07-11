@@ -5020,3 +5020,56 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
+
+void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
+                              std::function<void(int total, int current)> cbProgress)
+{
+    AsyncJobs *jobs = new AsyncJobs("Exporting database", this);
+
+    /////////
+    //TODO: Simulation here. limpkin can implement the core work here.
+    jobs->append(new TimerJob(5000));
+    /////////
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "Finished exporting database";
+        cb(true, QString(), QByteArray());
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed exporting database";
+        cb(false, failedJob->getErrorStr(), QByteArray());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
+                              std::function<void(bool success, QString errstr)> cb,
+                              std::function<void(int total, int current)> cbProgress)
+{
+    AsyncJobs *jobs = new AsyncJobs("Importing database", this);
+
+    /////////
+    //TODO: Simulation here. limpkin can implement the core work here.
+    jobs->append(new TimerJob(5000));
+    /////////
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        qInfo() << "Finished importing database";
+        cb(true, QString());
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed importing database";
+        cb(false, failedJob->getErrorStr());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}

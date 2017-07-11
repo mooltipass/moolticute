@@ -93,6 +93,9 @@ public:
 
     void sendCredentialsMM(const QJsonArray &creds);
 
+    void exportDbFile();
+    void importDbFile(const QByteArray &fileData, bool noDelete);
+
 signals:
     void wsConnected();
     void wsDisconnected();
@@ -106,6 +109,8 @@ signals:
     void dataFileSent(const QString &service, bool success);
     void credentialsExists(const QString &service, bool exists);
     void dataNodeExists(const QString &service, bool exists);
+    void dbExported(const QByteArray &fileData, bool success);
+    void dbImported(bool success);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

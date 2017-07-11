@@ -170,6 +170,14 @@ public:
     void setMMCredentials(const QJsonArray &creds,
                           std::function<void(bool success, QString errstr)> cb);
 
+    //Export database
+    void exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
+                        std::function<void(int total, int current)> cbProgress);
+    //Import database
+    void importDatabase(const QByteArray &fileData, bool noDelete,
+                        std::function<void(bool success, QString errstr)> cb,
+                        std::function<void(int total, int current)> cbProgress);
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }
