@@ -114,6 +114,11 @@ bool MPNode::getPointedToCheck() const
     return pointedToCheck;
 }
 
+void MPNode::setFavoriteProperty(const quint8 favId)
+{
+    favorite = favId;
+}
+
 QByteArray MPNode::getPreviousParentAddress() const
 {
     if (!isValid()) return QByteArray();
@@ -333,12 +338,6 @@ QByteArray MPNode::getNextDataAddress() const
 {
     if (!isValid()) return QByteArray();
     return data.mid(2, 2);
-}
-
-void MPNode::setNextDataAddress(const QByteArray &d)
-{
-    data[2] = d[0];
-    data[3] = d[1];
 }
 
 QByteArray MPNode::getNodeData() const

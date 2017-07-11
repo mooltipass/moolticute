@@ -248,13 +248,15 @@ private:
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
     void detagPointedNodes(void);
+    bool tagFavoriteNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
+    bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren);
     bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed);
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed);
+    bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt);
-    bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
