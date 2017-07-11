@@ -93,7 +93,6 @@ public:
     QByteArray getNextChildDataAddress() const;
 
     // NodeChildData properties
-    void setNextDataAddress(const QByteArray &d);
     QByteArray getNextDataAddress() const;
 
     // Node properties

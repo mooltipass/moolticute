@@ -340,12 +340,6 @@ QByteArray MPNode::getNextDataAddress() const
     return data.mid(2, 2);
 }
 
-void MPNode::setNextDataAddress(const QByteArray &d)
-{
-    data[2] = d[0];
-    data[3] = d[1];
-}
-
 QByteArray MPNode::getNodeData() const
 {
     if (!isValid()) return QByteArray();
