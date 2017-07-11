@@ -267,9 +267,10 @@ void CredentialsManagement::saveSelectedCredential(QModelIndex idx)
 }
 
 bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(QModelIndex idx)
-{
+{   
     if (ui->stackedWidget->currentWidget() != ui->pageUnlocked ||
-        !wsClient->get_memMgmtMode())
+        !wsClient->get_memMgmtMode() ||
+        deletingCred)
         return true;
 
     if (!idx.isValid())
@@ -416,6 +417,8 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
                                      QMessageBox::Cancel);
     if (btn == QMessageBox::Yes)
     {
+        deletingCred = true;
         credModel->removeCredential(idx);
+        deletingCred = false;
     }
 }

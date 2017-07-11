@@ -63,7 +63,6 @@ private slots:
 
     void on_pushButtonConfirm_clicked();
     void on_pushButtonCancel_clicked();
-
     void on_pushButtonDelete_clicked();
 
 private:
@@ -74,6 +73,9 @@ private:
     CredentialsModel *credModel = nullptr;
     CredentialsFilterModel *credFilterModel = nullptr;
     WSClient *wsClient = nullptr;
+
+    //use when deleting a cred and not prompt user
+    bool deletingCred = false;
 };
 
 #endif // CREDENTIALSMANAGEMENT_H
