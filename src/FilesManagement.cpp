@@ -140,7 +140,7 @@ void FilesManagement::enableMemManagement(bool enable)
 
 void FilesManagement::on_pushButtonEnterMMM_clicked()
 {
-    wsClient->sendEnterMMRequest();
+    wsClient->sendEnterMMRequest(true);
     emit wantEnterMemMode();
 }
 

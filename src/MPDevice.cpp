@@ -921,7 +921,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
     }));
 }
 
-void MPDevice::startMemMgmtMode(std::function<void(int total, int current)> cbProgress)
+void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int current)> cbProgress)
 {
     /* Start MMM here, and load all memory data from the device */
 

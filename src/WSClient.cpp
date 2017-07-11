@@ -304,9 +304,11 @@ bool WSClient::requestDeviceUID(const QByteArray & key)
 }
 
 
-void WSClient::sendEnterMMRequest()
+void WSClient::sendEnterMMRequest(bool wantData)
 {
-    sendJsonData({{ "msg", "start_memorymgmt" }});
+    sendJsonData({{ "msg", "start_memorymgmt" },
+                  { "data", QJsonObject{ {"want_data", wantData } } }
+                 });
 }
 
 void WSClient::sendLeaveMMRequest()

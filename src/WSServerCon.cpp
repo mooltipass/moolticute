@@ -78,9 +78,11 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "start_memorymgmt")
     {
+        QJsonObject o = root["data"].toObject();
+
         //send command to start MMM
         if (mpdevice)
-            mpdevice->startMemMgmtMode(defaultProgressCb);
+            mpdevice->startMemMgmtMode(o["want_data"].toBool(), defaultProgressCb);
         else
             sendFailedJson(root, "No device connected");
     }

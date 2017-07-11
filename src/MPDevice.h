@@ -120,7 +120,7 @@ public:
     void getUID(const QByteArray & key);
 
     //mem mgmt mode
-    void startMemMgmtMode(std::function<void(int total, int current)> cbProgress);
+    void startMemMgmtMode(bool wantData, std::function<void(int total, int current)> cbProgress);
     void exitMemMgmtMode(bool check_status = true);
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);
