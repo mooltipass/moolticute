@@ -334,19 +334,10 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
     QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
     const auto &cred = credModel->at(idx.row());
 
-    auto btn = QMessageBox::question(this,
-                                     tr("Discard Modifications ?"),
-                                     tr("You have modified %1/%2 - Do you want to discard the modifications ?").arg(cred.service, cred.login),
-                                     QMessageBox::Discard |
-                                     QMessageBox::Cancel,
-                                     QMessageBox::Cancel);
-    if (btn == QMessageBox::Discard)
-    {
-        ui->credDisplayPasswordInput->setText(cred.password);
-        ui->credDisplayDescriptionInput->setText(cred.description);
-        ui->credDisplayLoginInput->setText(cred.login);
-        updateSaveDiscardState();
-    }
+    ui->credDisplayPasswordInput->setText(cred.password);
+    ui->credDisplayDescriptionInput->setText(cred.description);
+    ui->credDisplayLoginInput->setText(cred.login);
+    updateSaveDiscardState();
 }
 
 void CredentialsManagement::updateSaveDiscardState(QModelIndex idx)
