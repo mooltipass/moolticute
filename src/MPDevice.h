@@ -237,14 +237,14 @@ private:
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
+    void startImportFileMerging(std::function<void(bool success, QString errstr)> cb);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service);
     MPNode *findNodeWithLoginInList(const QString &login);
     quint8 getNodeIdFromAddress(const QByteArray &address);
+    bool finishImportFileMerging(QString &stringError);
     QByteArray getMemoryFirstNodeAddress(void);
-    bool finishImportFileMerging(void);
-    bool startImportFileMerging(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
     void detagPointedNodes(void);
@@ -256,12 +256,12 @@ private:
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
+    bool readExportFile(const QByteArray &fileData, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
     bool writeExportFile(const QString &fileName);
-    bool readExportFile(const QString &fileName);
     void cleanImportedVars(void);
 
     // Functions added by mathieu for unit testing

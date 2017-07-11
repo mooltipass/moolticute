@@ -954,56 +954,7 @@ void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int
         else
         {
             qInfo() << "Couldn't write export file";
-        }
-
-        /* Try to read the export file */
-        if (true && readExportFile("C:/temp/memory_export3.bin"))
-        {
-            /// We are here because the card is known by the export file and the export file is valid
-
-            /* If we don't know this card, we need to add the CPZ CTR */
-            if (get_status() == Common::UnkownSmartcad)
-            {
-                AsyncJobs* addcpzjobs = new AsyncJobs("Adding CPZ/CTR...", this);
-
-                /* Query change number */
-                addcpzjobs->append(new MPCommandJob(this,
-                                              MPCmd::ADD_UNKNOWN_CARD,
-                                              unknownCardAddPayload,
-                                              [=](const QByteArray &data, bool &) -> bool
-                {
-                    if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
-                        return false;
-                    else
-                        return true;
-                }));
-
-                connect(addcpzjobs, &AsyncJobs::finished, [=](const QByteArray &data)
-                {
-                    Q_UNUSED(data);
-                    //data is last result
-                    //all jobs finished success
-                    qInfo() << "CPZ/CTR Added";
-
-                    /* Unknown card added, start merging */
-                    startImportFileMerging();
-                });
-
-                connect(addcpzjobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
-                {
-                    Q_UNUSED(failedJob);
-                    qCritical() << "Adding unknown card failed";
-                });
-
-                jobsQueue.enqueue(addcpzjobs);
-                runAndDequeueJobs();
-            }
-            else
-            {
-                /* Start merging */
-                startImportFileMerging();
-            }
-        }
+        }        
 
         /* Tag favorites */
         tagFavoriteNodes();
@@ -4429,54 +4380,35 @@ bool MPDevice::writeExportFile(const QString &fileName)
     return true;
 }
 
-bool MPDevice::readExportFile(const QString &fileName)
+bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
 {    
     /* When we add nodes, we give them an address based on this counter */
     cleanImportedVars();
 
+    /* Local vars */
     QJsonObject qjobject;
     QJsonArray qjarray;
 
-    /* Create qfile object */
-    QFile file;
-    QString val;
-    file.setFileName(fileName);
-
-    /* Check if file actually exists */
-    if (!file.exists())
-    {
-        qCritical() << "File does not exist";
-        return false;
-    }
-
-    /* Read file contents */
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        qCritical() << "Couldn't open file";
-        return false;
-    }
-    val = file.readAll();
-    file.close();
-
     /* Use a qjson document */
-    QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
+    QJsonDocument d = QJsonDocument::fromJson(fileData);
 
     /* Checks */
     if (d.isEmpty())
     {
         qCritical() << "JSON document is empty";
+        errorString = "Selected File Isn't Correct";
         return false;
     }
     else if (d.isNull())
     {
         qCritical() << "JSON document is null";
+        errorString = "Selected File Isn't Correct";
         return false;
     }
 
     if (d.isArray())
     {
         /** Mooltiapp / Chrome App save file **/
-        qInfo() << "Dealing with MooltiApp export file";
 
         /* Get the array */
         QJsonArray importFile = d.array();
@@ -4485,6 +4417,7 @@ bool MPDevice::readExportFile(const QString &fileName)
         if (!((importFile[9].toString() == "mooltipass" && importFile.size() == 10) || (importFile[9].toString() == "moolticute" && importFile.size() == 14)))
         {
             qCritical() << "Invalid MooltiApp file";
+            errorString = "Selected File Isn't Correct";
             return false;
         }
 
@@ -4492,9 +4425,11 @@ bool MPDevice::readExportFile(const QString &fileName)
         if (importFile[9].toString() == "mooltipass")
         {
             isMooltiAppImportFile = true;
+            qInfo() << "Dealing with MooltiApp export file";
         }
         else
         {
+            qInfo() << "Dealing with Moolticute export file";
             isMooltiAppImportFile = false;
             importedCredentialsDbChangeNumber = importFile[11].toInt();
             qDebug() << "Imported cred change number: " << importedCredentialsDbChangeNumber;
@@ -4534,7 +4469,8 @@ bool MPDevice::readExportFile(const QString &fileName)
         }
         if (!cpzFound)
         {
-            qWarning() << "Import file is not a backup for current Card";
+            qWarning() << "Import file is not a backup for current Card";            
+            errorString = "Selected File Is Not For That Card";
             return false;
         }
 
@@ -4657,17 +4593,18 @@ bool MPDevice::readExportFile(const QString &fileName)
     else if (d.isObject())
     {
         qInfo() << "File is a JSON object";
+        errorString = "Selected File Isn't Correct";
         return false;
 
         /* Use object */
         QJsonObject importFile = d.object();
         qInfo() << importFile.keys();
-
         return false;
     }
     else
     {
         /* If it's not an array or an object... */
+        errorString = "Selected File Isn't Correct";
         return false;
     }
 }
@@ -4692,330 +4629,177 @@ void MPDevice::cleanImportedVars(void)
     importedDataChildNodes.clear();
 }
 
-bool MPDevice::startImportFileMerging(void)
+void MPDevice::startImportFileMerging(std::function<void(bool success, QString errstr)> cb)
 {
-    /* We arrive here knowing that the CPZ is in the CPZ/CTR list */
-    qInfo() << "Starting File Merging...";
+    /* New job for starting MMM */
+    AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
 
-    /// Know if we need to add CPZ CTR packets (additive process)
-    for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
+    /* Ask device to go into MMM first */
+    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+
+    /* Load flash contents the usual way */
+    memMgmtModeReadFlash(jobs, false,
+                            [=](int total, int current)
+                            {
+                                Q_UNUSED(total);
+                                Q_UNUSED(current);
+                            });
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
-        bool cpzFound = false;
-        for (qint32 j = 0; j < cpzCtrValue.size(); j++)
+        Q_UNUSED(data);
+
+        /* Tag favorites */
+        tagFavoriteNodes();
+
+        qInfo() << "Mem management mode enabled";
+        force_memMgmtMode(true);
+
+        /* We arrive here knowing that the CPZ is in the CPZ/CTR list */
+        qInfo() << "Starting File Merging...";
+
+        /// Know if we need to add CPZ CTR packets (additive process)
+        for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
         {
-            if (cpzCtrValue[j] == importedCpzCtrValue[i])
+            bool cpzFound = false;
+            for (qint32 j = 0; j < cpzCtrValue.size(); j++)
             {
-                cpzFound = true;
-                break;
+                if (cpzCtrValue[j] == importedCpzCtrValue[i])
+                {
+                    cpzFound = true;
+                    break;
+                }
+            }
+
+            if (!cpzFound)
+            {
+                qDebug() << "CPZ CTR not in our DB: " << importedCpzCtrValue[i].toHex();
+                cpzCtrValue.append(importedCpzCtrValue[i]);
             }
         }
 
-        if (!cpzFound)
+        /// Check CTR value
+        quint32 cur_ctr = ((quint8)ctrValue[0])*256*256 + ((quint8)ctrValue[1])*256 + ((quint8)ctrValue[2]);
+        quint32 imported_ctr = ((quint8)importedCtrValue[0])*256*256 + ((quint8)importedCtrValue[1]*256) + ((quint8)importedCtrValue[2]);
+        if (imported_ctr > cur_ctr)
         {
-            qDebug() << "CPZ CTR not in our DB: " << importedCpzCtrValue[i].toHex();
-            cpzCtrValue.append(importedCpzCtrValue[i]);
-        }
-    }
-
-    /// Check CTR value
-    quint32 cur_ctr = ((quint8)ctrValue[0])*256*256 + ((quint8)ctrValue[1])*256 + ((quint8)ctrValue[2]);
-    quint32 imported_ctr = ((quint8)importedCtrValue[0])*256*256 + ((quint8)importedCtrValue[1]*256) + ((quint8)importedCtrValue[2]);
-    if (imported_ctr > cur_ctr)
-    {
-        qDebug() << "CTR value mismatch: " << ctrValue.toHex() << " instead of " << importedCtrValue.toHex();
-        ctrValue = QByteArray(importedCtrValue);
-    }
-
-    /// Find the nodes we don't have in memory or that have been changed
-    for (qint32 i = 0; i < importedLoginNodes.size(); i++)
-    {
-        bool service_node_found = false;
-
-        // Loop in the memory nodes to compare data
-        for (qint32 j = 0; j < loginNodes.size(); j++)
-        {
-            if (importedLoginNodes[i]->getLoginNodeData() == loginNodes[j]->getLoginNodeData())
-            {
-                // We found a parent node that has the same core data (doesn't mean the same prev / next node though!)
-                //qDebug() << "Parent node core data match for " << importedLoginNodes[i]->getService();
-                loginNodes[j]->setMergeTagged();
-                service_node_found = true;
-
-                // Next step is to check if the children are the same
-                quint32 cur_import_child_node_addr_v = importedLoginNodes[i]->getStartChildVirtualAddress();
-                QByteArray cur_import_child_node_addr = importedLoginNodes[i]->getStartChildAddress();
-                quint32 matched_parent_first_child_v = loginNodes[j]->getStartChildVirtualAddress();
-                QByteArray matched_parent_first_child = loginNodes[j]->getStartChildAddress();
-
-                /* Special case: parent doesn't have children but we do */
-                if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((matched_parent_first_child != MPNode::EmptyAddress) || (matched_parent_first_child.isNull() && matched_parent_first_child_v != 0)))
-                {
-                    loginNodes[j]->setStartChildAddress(MPNode::EmptyAddress);
-                }
-
-                //qDebug() << "First child address for imported node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
-                while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
-                {
-                    // Find the imported child node in our list
-                    MPNode* imported_child_node = findNodeWithAddressInList(importedLoginChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
-
-                    // Check if we actually found the node
-                    if (!imported_child_node)
-                    {
-                        qCritical() << "Couldn't find imported child node in our list (corrupted import file?)";
-                        cleanImportedVars();
-                        return false;
-                    }
-
-                    // We found the imported child, now we need to find the one that matches
-                    //qDebug() << "Looking for child " + imported_child_node->getLogin() + " in the Mooltipass";
-
-                    // Try to find the match between the child nodes of the matched parent
-                    bool matched_login_found = false;
-                    QByteArray matched_parent_next_child = QByteArray(matched_parent_first_child);
-                    quint32 matched_parent_next_child_v = matched_parent_first_child_v;
-                    while (((matched_parent_next_child != MPNode::EmptyAddress) || (matched_parent_next_child.isNull() && matched_parent_next_child_v != 0)) && (matched_login_found == false))
-                    {
-                        // Find the child node at this address
-                        MPNode* cur_child_node = findNodeWithAddressInList(loginChildNodes, matched_parent_next_child, matched_parent_next_child_v);
-
-                        if (!cur_child_node)
-                        {
-                            qCritical() << "Couldn't find child node in our list (bad node reading?)";
-                            cleanImportedVars();
-                            return false;
-                        }
-
-                        // We found the child, now we can compare the login name
-                        if (cur_child_node->getLogin() == imported_child_node->getLogin())
-                        {
-                            // We have a match between imported login node & current login node
-                            //qDebug() << "Child found in the mooltipass, comparing rest of the data";
-                            cur_child_node->setMergeTagged();
-                            matched_login_found = true;
-
-                            if (cur_child_node->getLoginChildNodeData() == imported_child_node->getLoginChildNodeData())
-                            {
-                                //qDebug() << importedLoginNodes[i]->getService() << " : child core data match for child " << imported_child_node->getLogin() << " , nothing to do";
-                            }
-                            else
-                            {
-                                // Data mismatch, overwrite the important part
-                                qDebug() << importedLoginNodes[i]->getService() << " : child core data mismatch for child " << imported_child_node->getLogin() << " , updating...";
-                                cur_child_node->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
-                            }
-                            break;
-                        }
-                        else
-                        {
-                            // Not a match, load next child address in var
-                            matched_parent_next_child = cur_child_node->getNextChildAddress();
-                            matched_parent_next_child_v = cur_child_node->getNextChildVirtualAddress();
-                        }
-                    }
-
-                    // If we couldn't find the child node, we have to add it
-                    if(matched_login_found == false)
-                    {
-                        qDebug() << importedLoginNodes[i]->getService() << " : adding new child " << imported_child_node->getLogin() << " in the mooltipass...";
-
-                        /* Increment new addresses counter */
-                        newAddressesNeededCounter += 1;
-
-                        /* Create new node with null address and virtual address set to our counter value */
-                        MPNode* newChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
-                        newChildNodePt->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
-                        newChildNodePt->setMergeTagged();
-
-                        /* Add node to list */
-                        loginChildNodes.append(newChildNodePt);
-                        if (!addChildToDB(loginNodes[j], newChildNodePt))
-                        {
-                            qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
-                            cleanImportedVars();
-                            return false;
-                        }
-                    }
-
-                    // Process the next imported child node
-                    cur_import_child_node_addr = imported_child_node->getNextChildAddress();
-                    cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
-                }
-
-                // Jump to next service node
-                break;
-            }
+            qDebug() << "CTR value mismatch: " << ctrValue.toHex() << " instead of " << importedCtrValue.toHex();
+            ctrValue = QByteArray(importedCtrValue);
         }
 
-        // Did we find the service core data?
-        if(service_node_found == false)
-        {
-           /* Increment new addresses counter */
-           newAddressesNeededCounter += 1;
-
-           /* Create new node with null address and virtual address set to our counter value */
-           MPNode* newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
-           newNodePt->setLoginNodeData(importedLoginNodes[i]->getNodeFlags(), importedLoginNodes[i]->getLoginNodeData());
-           newNodePt->setMergeTagged();
-
-           /* Add node to list */
-           loginNodes.append(newNodePt);
-           if (!addOrphanParentToDB(newNodePt, false, false))
-           {
-               qCritical() << "Couldn't add parent to DB (corrupted DB?";
-               cleanImportedVars();
-               return false;
-           }
-
-           /* Next step is to follow the children */
-           QByteArray curImportChildAddr = importedLoginNodes[i]->getStartChildAddress();
-           while (curImportChildAddr != MPNode::EmptyAddress)
-           {
-               /* Find node in list */
-               MPNode* curImportChildPt = findNodeWithAddressInList(importedLoginChildNodes, curImportChildAddr);
-
-               if (!curImportChildPt)
-               {
-                   qCritical() << "Couldn't find import child (import file problem?)";
-                   return false;
-               }
-
-               /* Increment new addresses counter */
-               newAddressesNeededCounter += 1;
-
-               /* Create new node with null address and virtual address set to our counter value */
-               MPNode* newChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
-               newChildNodePt->setLoginChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getLoginChildNodeData());
-               newChildNodePt->setMergeTagged();
-
-               /* Add node to list */
-               loginChildNodes.append(newChildNodePt);
-               if (!addChildToDB(newNodePt, newChildNodePt))
-               {
-                   qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
-                   cleanImportedVars();
-                   return false;
-               }
-
-               /* Go to the next child */
-               curImportChildAddr = curImportChildPt->getNextChildAddress();
-           }
-        }
-    }
-
-    /// Same but for data nodes
-    if (!isMooltiAppImportFile)
-    {
-        /// Find the data nodes we don't have in memory or that have been changed
-        for (qint32 i = 0; i < importedDataNodes.size(); i++)
+        /// Find the nodes we don't have in memory or that have been changed
+        for (qint32 i = 0; i < importedLoginNodes.size(); i++)
         {
             bool service_node_found = false;
 
             // Loop in the memory nodes to compare data
-            for (qint32 j = 0; j < dataNodes.size(); j++)
+            for (qint32 j = 0; j < loginNodes.size(); j++)
             {
-                if (importedDataNodes[i]->getLoginNodeData() == dataNodes[j]->getLoginNodeData())
+                if (importedLoginNodes[i]->getLoginNodeData() == loginNodes[j]->getLoginNodeData())
                 {
-                    // We found a parent data node that has the same core data (doesn't mean the same prev / next node though!)
-                    qDebug() << "Data parent node core data match for " << importedDataNodes[i]->getService();
-                    dataNodes[j]->setMergeTagged();
+                    // We found a parent node that has the same core data (doesn't mean the same prev / next node though!)
+                    //qDebug() << "Parent node core data match for " << importedLoginNodes[i]->getService();
+                    loginNodes[j]->setMergeTagged();
                     service_node_found = true;
 
                     // Next step is to check if the children are the same
-                    quint32 cur_import_child_node_addr_v = importedDataNodes[i]->getStartChildVirtualAddress();
-                    QByteArray cur_import_child_node_addr = importedDataNodes[i]->getStartChildAddress();
-                    quint32 cur_matched_child_node_addr_v = dataNodes[j]->getStartChildVirtualAddress();
-                    QByteArray cur_matched_child_node_addr = dataNodes[j]->getStartChildAddress();
-                    MPNode* prev_matched_child_node = nullptr;
-                    MPNode* matched_child_node = nullptr;
-                    bool data_match_ongoing = true;
+                    quint32 cur_import_child_node_addr_v = importedLoginNodes[i]->getStartChildVirtualAddress();
+                    QByteArray cur_import_child_node_addr = importedLoginNodes[i]->getStartChildAddress();
+                    quint32 matched_parent_first_child_v = loginNodes[j]->getStartChildVirtualAddress();
+                    QByteArray matched_parent_first_child = loginNodes[j]->getStartChildAddress();
 
                     /* Special case: parent doesn't have children but we do */
-                    if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0)))
+                    if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((matched_parent_first_child != MPNode::EmptyAddress) || (matched_parent_first_child.isNull() && matched_parent_first_child_v != 0)))
                     {
-                        dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress);
+                        loginNodes[j]->setStartChildAddress(MPNode::EmptyAddress);
                     }
 
-                    //qDebug() << "First child address for imported data node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
+                    //qDebug() << "First child address for imported node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
                     while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
                     {
                         // Find the imported child node in our list
-                        MPNode* imported_child_node = findNodeWithAddressInList(importedDataChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
+                        MPNode* imported_child_node = findNodeWithAddressInList(importedLoginChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
 
                         // Check if we actually found the node
                         if (!imported_child_node)
                         {
-                            qCritical() << "Couldn't find imported data child node in our list (corrupted import file?)";
+                            qCritical() << "Couldn't find imported child node in our list (corrupted import file?)";
                             cleanImportedVars();
-                            return false;
+                            cb(false, "Couldn't Import Database: Corrupted Export File");
                         }
 
-                        // If we are still matching, check that we still can
-                        if (data_match_ongoing)
+                        // We found the imported child, now we need to find the one that matches
+                        //qDebug() << "Looking for child " + imported_child_node->getLogin() + " in the Mooltipass";
+
+                        // Try to find the match between the child nodes of the matched parent
+                        bool matched_login_found = false;
+                        QByteArray matched_parent_next_child = QByteArray(matched_parent_first_child);
+                        quint32 matched_parent_next_child_v = matched_parent_first_child_v;
+                        while (((matched_parent_next_child != MPNode::EmptyAddress) || (matched_parent_next_child.isNull() && matched_parent_next_child_v != 0)) && (matched_login_found == false))
                         {
-                            if ((cur_matched_child_node_addr == MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v == 0))
+                            // Find the child node at this address
+                            MPNode* cur_child_node = findNodeWithAddressInList(loginChildNodes, matched_parent_next_child, matched_parent_next_child_v);
+
+                            if (!cur_child_node)
                             {
-                                /* No next node */
-                                qDebug() << "Matched imported data child node chain is longer than what we have";
-                                data_match_ongoing = false;
+                                qCritical() << "Couldn't find child node in our list (bad node reading?)";
+                                cleanImportedVars();
+                                cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                            }
+
+                            // We found the child, now we can compare the login name
+                            if (cur_child_node->getLogin() == imported_child_node->getLogin())
+                            {
+                                // We have a match between imported login node & current login node
+                                //qDebug() << "Child found in the mooltipass, comparing rest of the data";
+                                cur_child_node->setMergeTagged();
+                                matched_login_found = true;
+
+                                if (cur_child_node->getLoginChildNodeData() == imported_child_node->getLoginChildNodeData())
+                                {
+                                    //qDebug() << importedLoginNodes[i]->getService() << " : child core data match for child " << imported_child_node->getLogin() << " , nothing to do";
+                                }
+                                else
+                                {
+                                    // Data mismatch, overwrite the important part
+                                    qDebug() << importedLoginNodes[i]->getService() << " : child core data mismatch for child " << imported_child_node->getLogin() << " , updating...";
+                                    cur_child_node->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
+                                }
+                                break;
                             }
                             else
                             {
-                                matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
-
-                                // Check if we actually found the node
-                                if (!matched_child_node)
-                                {
-                                    qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
-                                    cleanImportedVars();
-                                    return false;
-                                }
-
-                                // Check for data match
-                                if (matched_child_node->getDataChildNodeData() != imported_child_node->getDataChildNodeData())
-                                {
-                                    qDebug() << "Data child node mismatch for " << importedDataNodes[i]->getService();
-                                    data_match_ongoing = false;
-                                }
+                                // Not a match, load next child address in var
+                                matched_parent_next_child = cur_child_node->getNextChildAddress();
+                                matched_parent_next_child_v = cur_child_node->getNextChildVirtualAddress();
                             }
                         }
 
-                        // If we stopped matching the child nodes, add child node data
-                        if (!data_match_ongoing)
+                        // If we couldn't find the child node, we have to add it
+                        if(matched_login_found == false)
                         {
-                            qDebug() << importedDataNodes[i]->getService() << " : appending child data in the mooltipass...";
+                            qDebug() << importedLoginNodes[i]->getService() << " : adding new child " << imported_child_node->getLogin() << " in the mooltipass...";
 
                             /* Increment new addresses counter */
                             newAddressesNeededCounter += 1;
 
                             /* Create new node with null address and virtual address set to our counter value */
-                            MPNode* newDataChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
-                            newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
-                            newDataChildNodePt->setMergeTagged();
+                            MPNode* newChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                            newChildNodePt->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
+                            newChildNodePt->setMergeTagged();
 
                             /* Add node to list */
-                            dataChildNodes.append(newDataChildNodePt);
-                            if (!prev_matched_child_node)
+                            loginChildNodes.append(newChildNodePt);
+                            if (!addChildToDB(loginNodes[j], newChildNodePt))
                             {
-                                /* First node */
-                                dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress, newAddressesNeededCounter);
-                            }
-                            else
-                            {
-                                prev_matched_child_node->setNextChildDataAddress(MPNode::EmptyAddress, newAddressesNeededCounter);
+                                qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                                cleanImportedVars();
+                                cb(false, "Couldn't Import Database: Please Run Integrity Check");
                             }
                         }
 
-                        // Fetch next matched child if comparison is still ongoing
-                        if (data_match_ongoing)
-                        {
-                            prev_matched_child_node = matched_child_node;
-                            matched_child_node->setMergeTagged();
-                            cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
-                            cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
-                        }
-
-                        cur_import_child_node_addr = imported_child_node->getNextChildDataAddress();
+                        // Process the next imported child node
+                        cur_import_child_node_addr = imported_child_node->getNextChildAddress();
                         cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
                     }
 
@@ -5032,92 +4816,326 @@ bool MPDevice::startImportFileMerging(void)
 
                /* Create new node with null address and virtual address set to our counter value */
                MPNode* newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
-               newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
+               newNodePt->setLoginNodeData(importedLoginNodes[i]->getNodeFlags(), importedLoginNodes[i]->getLoginNodeData());
                newNodePt->setMergeTagged();
 
                /* Add node to list */
-               dataNodes.append(newNodePt);
-               if (!addOrphanParentToDB(newNodePt, true, false))
+               loginNodes.append(newNodePt);
+               if (!addOrphanParentToDB(newNodePt, false, false))
                {
-                   qCritical() << "Couldn't add data parent to DB (corrupted DB?)";
+                   qCritical() << "Couldn't add parent to DB (corrupted DB?)";
                    cleanImportedVars();
-                   return false;
+                   cb(false, "Couldn't Import Database: Please Run Integrity Check");
                }
 
                /* Next step is to follow the children */
-               QByteArray curImportChildAddr = importedDataNodes[i]->getStartChildAddress();
-               MPNode* prev_added_child_node = nullptr;
+               QByteArray curImportChildAddr = importedLoginNodes[i]->getStartChildAddress();
                while (curImportChildAddr != MPNode::EmptyAddress)
                {
                    /* Find node in list */
-                   MPNode* curImportChildPt = findNodeWithAddressInList(importedDataChildNodes, curImportChildAddr);
+                   MPNode* curImportChildPt = findNodeWithAddressInList(importedLoginChildNodes, curImportChildAddr);
 
                    if (!curImportChildPt)
                    {
                        qCritical() << "Couldn't find import child (import file problem?)";
-                       return false;
+                       cb(false, "Couldn't Import Database: Corrupted Import File");
                    }
 
                    /* Increment new addresses counter */
                    newAddressesNeededCounter += 1;
 
                    /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newDataChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
-                   newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
-                   newDataChildNodePt->setMergeTagged();
+                   MPNode* newChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                   newChildNodePt->setLoginChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getLoginChildNodeData());
+                   newChildNodePt->setMergeTagged();
 
                    /* Add node to list */
-                   dataChildNodes.append(newDataChildNodePt);
-                   if (!prev_added_child_node)
+                   loginChildNodes.append(newChildNodePt);
+                   if (!addChildToDB(newNodePt, newChildNodePt))
                    {
-                       /* First node */
-                       newNodePt->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
-                   }
-                   else
-                   {
-                       prev_added_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
+                       qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                       cleanImportedVars();
+                       cb(false, "Couldn't Import Database: Please Run Integrity Check");
                    }
 
                    /* Go to the next child */
-                   curImportChildAddr = curImportChildPt->getNextChildDataAddress();
-                   prev_added_child_node = newDataChildNodePt;
+                   curImportChildAddr = curImportChildPt->getNextChildAddress();
                }
             }
         }
-    }
 
-    qInfo() << newAddressesNeededCounter << " addresses are required for merge operations ";
-
-    /* If we need addresses, query them */
-    if (newAddressesNeededCounter > 0)
-    {
-        /* Add one extra address because we do pre-increment on that counter */
-        newAddressesNeededCounter++;
-
-        AsyncJobs* getFreeAddressesJob = new AsyncJobs("Asking free adresses...", this);
-        loadFreeAddresses(getFreeAddressesJob, MPNode::EmptyAddress, false);
-
-        connect(getFreeAddressesJob, &AsyncJobs::finished, [=](const QByteArray &data)
+        /// Same but for data nodes
+        if (!isMooltiAppImportFile)
         {
-            Q_UNUSED(data);
-            //data is last result
-            //all jobs finished success
-            qInfo() << "Got all required free addresses...";
+            /// Find the data nodes we don't have in memory or that have been changed
+            for (qint32 i = 0; i < importedDataNodes.size(); i++)
+            {
+                bool service_node_found = false;
 
-            /* We got all the addresses, change virtual addrs for real addrs and finish merging */
-            changeVirtualAddressesToFreeAddresses();
-            if(finishImportFileMerging())
+                // Loop in the memory nodes to compare data
+                for (qint32 j = 0; j < dataNodes.size(); j++)
+                {
+                    if (importedDataNodes[i]->getLoginNodeData() == dataNodes[j]->getLoginNodeData())
+                    {
+                        // We found a parent data node that has the same core data (doesn't mean the same prev / next node though!)
+                        qDebug() << "Data parent node core data match for " << importedDataNodes[i]->getService();
+                        dataNodes[j]->setMergeTagged();
+                        service_node_found = true;
+
+                        // Next step is to check if the children are the same
+                        quint32 cur_import_child_node_addr_v = importedDataNodes[i]->getStartChildVirtualAddress();
+                        QByteArray cur_import_child_node_addr = importedDataNodes[i]->getStartChildAddress();
+                        quint32 cur_matched_child_node_addr_v = dataNodes[j]->getStartChildVirtualAddress();
+                        QByteArray cur_matched_child_node_addr = dataNodes[j]->getStartChildAddress();
+                        MPNode* prev_matched_child_node = nullptr;
+                        MPNode* matched_child_node = nullptr;
+                        bool data_match_ongoing = true;
+
+                        /* Special case: parent doesn't have children but we do */
+                        if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0)))
+                        {
+                            dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress);
+                        }
+
+                        //qDebug() << "First child address for imported data node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
+                        while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
+                        {
+                            // Find the imported child node in our list
+                            MPNode* imported_child_node = findNodeWithAddressInList(importedDataChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
+
+                            // Check if we actually found the node
+                            if (!imported_child_node)
+                            {
+                                qCritical() << "Couldn't find imported data child node in our list (corrupted import file?)";
+                                cleanImportedVars();
+                                cb(false, "Couldn't Import Database: Corrupted Import File");
+                            }
+
+                            // If we are still matching, check that we still can
+                            if (data_match_ongoing)
+                            {
+                                if ((cur_matched_child_node_addr == MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v == 0))
+                                {
+                                    /* No next node */
+                                    qDebug() << "Matched imported data child node chain is longer than what we have";
+                                    data_match_ongoing = false;
+                                }
+                                else
+                                {
+                                    matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
+
+                                    // Check if we actually found the node
+                                    if (!matched_child_node)
+                                    {
+                                        qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
+                                        cleanImportedVars();
+                                        cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                                    }
+
+                                    // Check for data match
+                                    if (matched_child_node->getDataChildNodeData() != imported_child_node->getDataChildNodeData())
+                                    {
+                                        qDebug() << "Data child node mismatch for " << importedDataNodes[i]->getService();
+                                        data_match_ongoing = false;
+                                    }
+                                }
+                            }
+
+                            // If we stopped matching the child nodes, add child node data
+                            if (!data_match_ongoing)
+                            {
+                                qDebug() << importedDataNodes[i]->getService() << " : appending child data in the mooltipass...";
+
+                                /* Increment new addresses counter */
+                                newAddressesNeededCounter += 1;
+
+                                /* Create new node with null address and virtual address set to our counter value */
+                                MPNode* newDataChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                                newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
+                                newDataChildNodePt->setMergeTagged();
+
+                                /* Add node to list */
+                                dataChildNodes.append(newDataChildNodePt);
+                                if (!prev_matched_child_node)
+                                {
+                                    /* First node */
+                                    dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress, newAddressesNeededCounter);
+                                }
+                                else
+                                {
+                                    prev_matched_child_node->setNextChildDataAddress(MPNode::EmptyAddress, newAddressesNeededCounter);
+                                }
+                            }
+
+                            // Fetch next matched child if comparison is still ongoing
+                            if (data_match_ongoing)
+                            {
+                                prev_matched_child_node = matched_child_node;
+                                matched_child_node->setMergeTagged();
+                                cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
+                                cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
+                            }
+
+                            cur_import_child_node_addr = imported_child_node->getNextChildDataAddress();
+                            cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
+                        }
+
+                        // Jump to next service node
+                        break;
+                    }
+                }
+
+                // Did we find the service core data?
+                if(service_node_found == false)
+                {
+                   /* Increment new addresses counter */
+                   newAddressesNeededCounter += 1;
+
+                   /* Create new node with null address and virtual address set to our counter value */
+                   MPNode* newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                   newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
+                   newNodePt->setMergeTagged();
+
+                   /* Add node to list */
+                   dataNodes.append(newNodePt);
+                   if (!addOrphanParentToDB(newNodePt, true, false))
+                   {
+                       qCritical() << "Couldn't add data parent to DB (corrupted DB?)";
+                       cleanImportedVars();
+                       cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                   }
+
+                   /* Next step is to follow the children */
+                   QByteArray curImportChildAddr = importedDataNodes[i]->getStartChildAddress();
+                   MPNode* prev_added_child_node = nullptr;
+                   while (curImportChildAddr != MPNode::EmptyAddress)
+                   {
+                       /* Find node in list */
+                       MPNode* curImportChildPt = findNodeWithAddressInList(importedDataChildNodes, curImportChildAddr);
+
+                       if (!curImportChildPt)
+                       {
+                           qCritical() << "Couldn't find import child (import file problem?)";
+                           cb(false, "Couldn't Import Database: Corrupted Database File");
+                       }
+
+                       /* Increment new addresses counter */
+                       newAddressesNeededCounter += 1;
+
+                       /* Create new node with null address and virtual address set to our counter value */
+                       MPNode* newDataChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                       newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
+                       newDataChildNodePt->setMergeTagged();
+
+                       /* Add node to list */
+                       dataChildNodes.append(newDataChildNodePt);
+                       if (!prev_added_child_node)
+                       {
+                           /* First node */
+                           newNodePt->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
+                       }
+                       else
+                       {
+                           prev_added_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
+                       }
+
+                       /* Go to the next child */
+                       curImportChildAddr = curImportChildPt->getNextChildDataAddress();
+                       prev_added_child_node = newDataChildNodePt;
+                   }
+                }
+            }
+        }
+
+        qInfo() << newAddressesNeededCounter << " addresses are required for merge operations ";
+
+        /* If we need addresses, query them */
+        if (newAddressesNeededCounter > 0)
+        {
+            /* Add one extra address because we do pre-increment on that counter */
+            newAddressesNeededCounter++;
+
+            AsyncJobs* getFreeAddressesJob = new AsyncJobs("Asking free adresses...", this);
+            loadFreeAddresses(getFreeAddressesJob, MPNode::EmptyAddress, false);
+
+            connect(getFreeAddressesJob, &AsyncJobs::finished, [=](const QByteArray &data)
+            {
+                Q_UNUSED(data);
+                //data is last result
+                //all jobs finished success
+                qInfo() << "Got all required free addresses...";
+
+                /* We got all the addresses, change virtual addrs for real addrs and finish merging */
+                changeVirtualAddressesToFreeAddresses();
+
+                /* Finish import file merging */
+                QString stringError;
+                if(finishImportFileMerging(stringError))
+                {
+                    AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
+                    connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
+                    {
+                        Q_UNUSED(data);
+                        qInfo() << "Merge operations succeeded!";
+                        cb(true, "Import File Merged With Current Database");
+                        exitMemMgmtMode(false);
+                    });
+                    connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+                    {
+                        Q_UNUSED(failedJob);
+                        qCritical() << "Merge operations failed!";
+                        cb(false, "Couldn't Import Database: Device Unplugged?");
+                        exitMemMgmtMode(false);
+                    });
+                    if (generateSavePackets(mergeOperations))
+                    {
+                        jobsQueue.enqueue(mergeOperations);
+                        runAndDequeueJobs();
+                    }
+                    else
+                    {
+                        qInfo() << "Databases already synced";
+                        cb(true, "Local Database Already Is Up To Date!");
+                        exitMemMgmtMode(false);
+                    }
+                }
+                else
+                {
+                    cb(false, "Couldn't Import Database: Corrupted Database File");
+                    exitMemMgmtMode(false);
+                }
+                cleanImportedVars();
+            });
+
+            connect(getFreeAddressesJob, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+            {
+                Q_UNUSED(failedJob);
+                qCritical() << "Couldn't get enough free addresses";
+            });
+
+            jobsQueue.enqueue(getFreeAddressesJob);
+            runAndDequeueJobs();
+        }
+        else
+        {
+            /* Finish import file merging */
+            QString stringError;
+            if(finishImportFileMerging(stringError))
             {
                 AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
                 connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
                 {
                     Q_UNUSED(data);
                     qInfo() << "Merge operations succeeded!";
+                    cb(true, "Import File Merged With Current Database");
+                    exitMemMgmtMode(false);
                 });
                 connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
                 {
                     Q_UNUSED(failedJob);
                     qCritical() << "Merge operations failed!";
+                    cb(false, "Couldn't Import Database: Device Unplugged?");
+                    exitMemMgmtMode(false);
                 });
                 if (generateSavePackets(mergeOperations))
                 {
@@ -5127,52 +5145,56 @@ bool MPDevice::startImportFileMerging(void)
                 else
                 {
                     qInfo() << "Databases already synced";
+                    cb(true, "Local Database Already Is Up To Date!");
+                    exitMemMgmtMode(false);
                 }
-            }
-            cleanImportedVars();
-        });
-
-        connect(getFreeAddressesJob, &AsyncJobs::failed, [=](AsyncJob *failedJob)
-        {
-            Q_UNUSED(failedJob);
-            qCritical() << "Couldn't get enough free addresses";
-        });
-
-        jobsQueue.enqueue(getFreeAddressesJob);
-        runAndDequeueJobs();
-    }
-    else
-    {
-        if(finishImportFileMerging())
-        {
-            AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
-            connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
-            {
-                Q_UNUSED(data);
-                qInfo() << "Merge operations succeeded!";
-            });
-            connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
-            {
-                Q_UNUSED(failedJob);
-                qCritical() << "Merge operations failed!";
-            });
-            if (generateSavePackets(mergeOperations))
-            {
-                jobsQueue.enqueue(mergeOperations);
-                runAndDequeueJobs();
             }
             else
             {
-                qInfo() << "Databases already synced";
+                cb(false, "Couldn't Import Database: Corrupted Database File");
+                exitMemMgmtMode(false);
             }
+            cleanImportedVars();
         }
-        cleanImportedVars();
-    }
+    });
 
-    return true;
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Setting device in MMM failed";
+
+        /* Cleaning all temp values */
+        ctrValue.clear();
+        cpzCtrValue.clear();
+        qDeleteAll(loginNodes);
+        loginNodes.clear();
+        qDeleteAll(dataNodes);
+        dataNodes.clear();
+        favoritesAddrs.clear();
+        loginChildNodes.clear();
+        dataChildNodes.clear();
+        /* Cleaning the clones as well */
+        ctrValueClone.clear();
+        cpzCtrValueClone.clear();
+        qDeleteAll(loginNodesClone);
+        loginNodesClone.clear();
+        qDeleteAll(dataNodesClone);
+        dataNodesClone.clear();
+        favoritesAddrsClone.clear();
+        loginChildNodesClone.clear();
+        dataChildNodesClone.clear();
+        freeAddresses.clear();
+
+        exitMemMgmtMode(false);
+        force_memMgmtMode(false);
+        cb(false, "Please Retry and Approve Credential Management");
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
-bool MPDevice::finishImportFileMerging(void)
+bool MPDevice::finishImportFileMerging(QString &stringError)
 {
     qInfo() << "Finishing Import File Merging...";
 
@@ -5201,6 +5223,7 @@ bool MPDevice::finishImportFileMerging(void)
             if (!curNode)
             {
                 qCritical() << "Couldn't find child node in list (error in algo?)";
+                stringError = "Moolticute Internal Error: Please Contact The Team (IFM#1)";
                 cleanImportedVars();
                 return false;
             }
@@ -5241,6 +5264,7 @@ bool MPDevice::finishImportFileMerging(void)
             if (!curNode)
             {
                 qCritical() << "Couldn't find child node in list (error in algo?)";
+                stringError = "Moolticute Internal Error: Please Contact The Team (IFM#2)";
                 cleanImportedVars();
                 return false;
             }
@@ -5304,9 +5328,10 @@ bool MPDevice::finishImportFileMerging(void)
     }
 
     /* Check that we didn't do a mess */
-    if (!checkLoadedNodes(true, false, false))
+    if (!checkLoadedNodes(true, !isMooltiAppImportFile, false))
     {
         qCritical() << "Error in merging algorithm... please contact the devs";
+        stringError = "Moolticute Internal Error: Please Contact The Team (IFM#3)";
         cleanImportedVars();
         return false;
     }
@@ -5587,25 +5612,59 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                               std::function<void(bool success, QString errstr)> cb,
                               std::function<void(int total, int current)> cbProgress)
 {
-    AsyncJobs *jobs = new AsyncJobs("Importing database", this);
+    QString errorString;
 
-    /////////
-    //TODO: Simulation here. limpkin can implement the core work here.
-    jobs->append(new TimerJob(5000));
-    /////////
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    /* Try to read the export file */
+    if (readExportFile(fileData, errorString))
     {
-        qInfo() << "Finished importing database";
-        cb(true, QString());
-    });
+        /// We are here because the card is known by the export file and the export file is valid
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+        /* If we don't know this card, we need to add the CPZ CTR */
+        if (get_status() == Common::UnkownSmartcad)
+        {
+            AsyncJobs* addcpzjobs = new AsyncJobs("Adding CPZ/CTR...", this);
+
+            /* Query change number */
+            addcpzjobs->append(new MPCommandJob(this,
+                                          MPCmd::ADD_UNKNOWN_CARD,
+                                          unknownCardAddPayload,
+                                          [=](const QByteArray &data, bool &) -> bool
+            {
+                if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+                    return false;
+                else
+                    return true;
+            }));
+
+            connect(addcpzjobs, &AsyncJobs::finished, [=](const QByteArray &data)
+            {
+                Q_UNUSED(data);
+                //data is last result
+                //all jobs finished success
+                qInfo() << "CPZ/CTR Added";
+
+                /* Unknown card added, start merging */
+                startImportFileMerging(cb);
+            });
+
+            connect(addcpzjobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+            {
+                Q_UNUSED(failedJob);
+                qCritical() << "Adding unknown card failed";
+                cb(false, "Please Retry and Enter Your Card PIN");
+            });
+
+            jobsQueue.enqueue(addcpzjobs);
+            runAndDequeueJobs();
+        }
+        else
+        {
+            /* Start merging */
+            startImportFileMerging(cb);
+        }
+    }
+    else
     {
-        qCritical() << "Failed importing database";
-        cb(false, failedJob->getErrorStr());
-    });
-
-    jobsQueue.enqueue(jobs);
-    runAndDequeueJobs();
+        cb(false, errorString);
+    }
 }
