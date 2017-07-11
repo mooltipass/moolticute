@@ -88,6 +88,7 @@ public:
 
     void requestDataFile(const QString &service);
     void sendDataFile(const QString &service, const QByteArray &data);
+    void deleteDataFile(const QString &service);
 
     void serviceExists(bool isDatanode, const QString &service);
 
@@ -107,6 +108,7 @@ signals:
     void memcheckFinished(bool success);
     void dataFileRequested(const QString &service, const QByteArray &data, bool success);
     void dataFileSent(const QString &service, bool success);
+    void dataFileDeleted(const QString &service, bool success);
     void credentialsExists(const QString &service, bool exists);
     void dataNodeExists(const QString &service, bool exists);
     void dbExported(const QByteArray &fileData, bool success);

@@ -290,7 +290,9 @@ void WSServerCon::processMessage(const QString &message)
         if (!mpdevice)
             return;
 
-        mpdevice->setDataNode(o["service"].toString(), data,
+        QString service = o["service"].toString();
+
+        mpdevice->setDataNode(service, data,
                 reqid,
                 [=](bool success, QString errstr)
         {
@@ -304,6 +306,41 @@ void WSServerCon::processMessage(const QString &message)
             }
 
             QJsonObject ores;
+            ores["service"] = service;
+            QJsonObject oroot = root;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
+    else if (root["msg"] == "delete_data_node")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        if (!mpdevice)
+            return;
+
+        QString service = o["service"].toString();
+
+        mpdevice->deleteDataNode(service,
+                reqid,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            ores["service"] = service;
             QJsonObject oroot = root;
             oroot["data"] = ores;
             sendJsonMessage(oroot);

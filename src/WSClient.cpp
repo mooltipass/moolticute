@@ -212,6 +212,12 @@ void WSClient::onTextMessageReceived(const QString &message)
         bool success = !o.contains("failed") || !o.value("failed").toBool();
         emit dataFileSent(o["service"].toString(), success);
     }
+    else if (rootobj["msg"] == "delete_data_node")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        emit dataFileDeleted(o["service"].toString(), success);
+    }
     else if (rootobj["msg"] == "data_node_exists")
     {
         QJsonObject o = rootobj["data"].toObject();
@@ -348,6 +354,13 @@ void WSClient::sendDataFile(const QString &service, const QByteArray &data)
     QJsonObject d = {{ "service", service },
                      { "node_data", QString(data.toBase64()) }};
     sendJsonData({{ "msg", "set_data_node" },
+                  { "data", d }});
+}
+
+void WSClient::deleteDataFile(const QString &service)
+{
+    QJsonObject d = {{ "service", service }};
+    sendJsonData({{ "msg", "delete_data_node" },
                   { "data", d }});
 }
 

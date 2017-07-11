@@ -162,6 +162,11 @@ public:
                      std::function<void(bool success, QString errstr)> cb,
                      std::function<void(int total, int current)> cbProgress);
 
+    //Delete a data context from the device
+    void deleteDataNode(const QString &service, const QString &reqid,
+                        std::function<void(bool success, QString errstr)> cb,
+                        std::function<void(int total, int current)> cbProgress);
+
     //Check is credential/data node exists
     void serviceExists(bool isDatanode, const QString &service, const QString &reqid,
                        std::function<void(bool success, QString errstr, QString service, bool exists)> cb);

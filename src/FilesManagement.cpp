@@ -219,7 +219,23 @@ void FilesManagement::on_pushButtonDelFile_clicked()
     if (!currentItem)
         return;
 
-    QMessageBox::information(this, "moolticute", "Not implemented yet!");
+    if (QMessageBox::question(this, "Moolticute",
+                              tr("The file \"%1\" is going to be removed from the device.\nContinue?")
+                              .arg(currentItem->text())) != QMessageBox::Yes)
+    {
+        return;
+    }
+
+    ui->progressBar->setMinimum(0);
+    ui->progressBar->setMaximum(0);
+    ui->progressBar->setValue(0);
+    ui->progressBar->show();
+    updateButtonsUI();
+
+    connect(wsClient, &WSClient::dataFileDeleted, this, &FilesManagement::dataFileDeleted);
+    connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
+
+    wsClient->deleteDataFile(currentItem->text());
 }
 
 void FilesManagement::dataFileRequested(const QString &service, const QByteArray &data, bool success)
@@ -244,6 +260,24 @@ void FilesManagement::dataFileRequested(const QString &service, const QByteArray
     }
 
     f.write(data);
+}
+
+void FilesManagement::dataFileDeleted(const QString &service, bool success)
+{
+    Q_UNUSED(service)
+    disconnect(wsClient, &WSClient::dataFileDeleted, this, &FilesManagement::dataFileDeleted);
+    disconnect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
+    ui->progressBar->hide();
+    updateButtonsUI();
+
+    if (!success)
+    {
+        QMessageBox::warning(this, tr("Failure"), tr("Data deletion was denied for '%1'!").arg(currentItem->text()));
+        return;
+    }
+
+    filesModel->removeRow(currentItem->row());
+    currentItem = nullptr;
 }
 
 void FilesManagement::updateProgress(int total, int curr)

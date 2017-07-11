@@ -3872,6 +3872,49 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
     runAndDequeueJobs();
 }
 
+void  MPDevice::deleteDataNode(const QString &service, const QString &reqid,
+                               std::function<void(bool success, QString errstr)> cb,
+                               std::function<void(int total, int current)> cbProgress)
+{
+    if (service.isEmpty())
+    {
+        qWarning() << "context is empty.";
+        cb(false, "context is empty");
+        return;
+    }
+
+    QString logInf = QStringLiteral("Delete data node for service: %1 reqid: %2")
+                     .arg(service)
+                     .arg(reqid);
+
+    AsyncJobs *jobs;
+    if (reqid.isEmpty())
+        jobs = new AsyncJobs(logInf, this);
+    else
+        jobs = new AsyncJobs(logInf, reqid, this);
+
+    /////////
+    //TODO: Simulation here. limpkin can implement the core work here.
+    jobs->append(new TimerJob(5000));
+    /////////
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    {
+        //all jobs finished success
+        qInfo() << "delete_data_node success";
+        cb(true, QString());
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed deleting data node";
+        cb(false, failedJob->getErrorStr());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
 void MPDevice::changeVirtualAddressesToFreeAddresses(void)
 {
     if (virtualStartNode != 0)
