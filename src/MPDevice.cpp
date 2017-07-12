@@ -943,18 +943,6 @@ void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
         Q_UNUSED(data);
-        //data is last result
-        //all jobs finished success
-
-        /* Write export file */
-        if (false && writeExportFile("C:/temp/wip.bin"))
-        {
-            qInfo() << "Successfully wrote export file";
-        }
-        else
-        {
-            qInfo() << "Couldn't write export file";
-        }        
 
         /* Tag favorites */
         tagFavoriteNodes();
@@ -4182,20 +4170,9 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     return true;
 }
 
-bool MPDevice::writeExportFile(const QString &fileName)
+QByteArray MPDevice::generateExportFileData(void)
 {
     QJsonArray exportTopArray = QJsonArray();
-
-    /* Create qfile object */
-    QFile saveFile;
-    saveFile.setFileName(fileName);
-
-    /* Open file for writing */
-    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        qCritical() << "Couldn't open file for writing";
-        return false;
-    }
 
     /* CTR */
     exportTopArray.append(QJsonValue(Common::bytesToJsonObjectArray(ctrValue)));
@@ -4288,8 +4265,7 @@ bool MPDevice::writeExportFile(const QString &fileName)
 
     /* Finally, write file contents */
     QJsonDocument saveDoc(exportTopArray);
-    saveFile.write(saveDoc.toJson());
-    return true;
+    return saveDoc.toJson();
 }
 
 bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
@@ -5533,23 +5509,43 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                               std::function<void(int total, int current)> cbProgress)
 {
-    AsyncJobs *jobs = new AsyncJobs("Exporting database", this);
+    /* New job for starting MMM */
+    AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for export file generation", this);
 
-    /////////
-    //TODO: Simulation here. limpkin can implement the core work here.
-    jobs->append(new TimerJob(5000));
-    /////////
+    /* Ask device to go into MMM first */
+    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+
+    /* Load flash contents the usual way */
+    memMgmtModeReadFlash(jobs, false,
+                            [=](int total, int current)
+                            {
+                                Q_UNUSED(total);
+                                Q_UNUSED(current);
+                            });
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
-        qInfo() << "Finished exporting database";
-        cb(true, QString(), QByteArray());
+        qInfo() << "Memory management mode entered";
+        exitMemMgmtMode(false);
+
+        /* Check DB just in case.... */
+        if (!checkLoadedNodes(true, true, false))
+        {
+            qCritical() << "Corrupted DB";
+            cb(false, "Couldn't create export file, please run integrity check", QByteArray());
+        }
+        else
+        {
+            /* Generate export file */
+            cb(true, "Export File Generated!", generateExportFileData());
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
-        qCritical() << "Failed exporting database";
-        cb(false, failedJob->getErrorStr(), QByteArray());
+        Q_UNUSED(failedJob);
+        qCritical() << "Setting device in MMM failed";
+        cb(false, "Please Retry and Approve Credential Management", QByteArray());
     });
 
     jobsQueue.enqueue(jobs);
