@@ -968,29 +968,8 @@ void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
 
-        /* Cleaning all temp values */
-        ctrValue.clear();
-        cpzCtrValue.clear();
-        qDeleteAll(loginNodes);
-        loginNodes.clear();
-        qDeleteAll(dataNodes);
-        dataNodes.clear();
-        favoritesAddrs.clear();
-        loginChildNodes.clear();
-        dataChildNodes.clear();
-        /* Cleaning the clones as well */
-        ctrValueClone.clear();
-        cpzCtrValueClone.clear();
-        qDeleteAll(loginNodesClone);
-        loginNodesClone.clear();
-        qDeleteAll(dataNodesClone);
-        dataNodesClone.clear();
-        favoritesAddrsClone.clear();
-        loginChildNodesClone.clear();
-        dataChildNodesClone.clear();
-        freeAddresses.clear();
-
-        exitMemMgmtMode();
+        cleanMMMVars();
+        exitMemMgmtMode(true);
         force_memMgmtMode(false);
     });
 
@@ -1299,7 +1278,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
                 qDebug() << address.toHex() << ": child node loaded:" << cnode->getLogin();
 
                 //Load next child
-                if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
+                if (cnode->getNextChildDataAddress() != MPNode::EmptyAddress)
                 {
                     loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress());
                 }
@@ -3125,97 +3104,30 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs)
     return diagSavePacketsGenerated;
 }
 
-// If check_status is false, loaded nodes are not checked, and
-// return status of command is not checked too
-// This prevents having critical and scarry error messages
-// in user console.
-void MPDevice::exitMemMgmtMode(bool check_status)
+void MPDevice::exitMemMgmtMode(bool setMMMBool)
 {
-    if (check_status)
-    {
-        checkLoadedNodes(true, false, false);
-    }
-
     AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
     jobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
-        //data is last result
-        //all jobs finished success
-
         qInfo() << "MMM exit ok";
-
-        /* Debug */
-        /*qDebug() << ctrValue;
-        qDebug() << ctrValueClone;
-        qDebug() << startNode;
-        qDebug() << startNodeClone;
-        qDebug() << cpzCtrValue;
-        qDebug() << cpzCtrValueClone;
-        qDebug() << favoritesAddrs;
-        qDebug() << favoritesAddrsClone;
-        qDebug() << loginNodes;         //list of all parent nodes for credentials
-        qDebug() << loginNodesClone;         //list of all parent nodes for credentials
-        qDebug() << loginChildNodes;    //list of all parent nodes for credentials
-        qDebug() << loginChildNodesClone;    //list of all parent nodes for credentials
-        qDebug() << dataNodes;          //list of all parent nodes for data nodes
-        qDebug() << dataNodesClone;          //list of all parent nodes for data nodes*/
-
-        /* Cleaning all temp values */
-        ctrValue.clear();
-        cpzCtrValue.clear();
-        qDeleteAll(loginNodes);
-        loginNodes.clear();
-        qDeleteAll(dataNodes);
-        dataNodes.clear();
-        favoritesAddrs.clear();
-        loginChildNodes.clear();
-        dataChildNodes.clear();
-        /* Cleaning the clones as well */
-        ctrValueClone.clear();
-        cpzCtrValueClone.clear();
-        qDeleteAll(loginNodesClone);
-        loginNodesClone.clear();
-        qDeleteAll(dataNodesClone);
-        dataNodesClone.clear();
-        favoritesAddrsClone.clear();
-        loginChildNodesClone.clear();
-        dataChildNodesClone.clear();
-        freeAddresses.clear();
-
-        force_memMgmtMode(false);
+        cleanMMMVars();
+        if (setMMMBool)
+        {
+            force_memMgmtMode(false);
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
     {
-        if (check_status)
-            qCritical() << "Failed to exit MMM";
-
-        /* Cleaning all temp values */
-        ctrValue.clear();
-        cpzCtrValue.clear();
-        qDeleteAll(loginNodes);
-        loginNodes.clear();
-        qDeleteAll(dataNodes);
-        dataNodes.clear();
-        favoritesAddrs.clear();
-        loginChildNodes.clear();
-        dataChildNodes.clear();
-        /* Cleaning the clones as well */
-        ctrValueClone.clear();
-        cpzCtrValueClone.clear();
-        qDeleteAll(loginNodesClone);
-        loginNodesClone.clear();
-        qDeleteAll(dataNodesClone);
-        dataNodesClone.clear();
-        favoritesAddrsClone.clear();
-        loginChildNodesClone.clear();
-        dataChildNodesClone.clear();
-        freeAddresses.clear();
-
-        force_memMgmtMode(false);
+        qCritical() << "Failed to exit MMM";
+        cleanMMMVars();
+        if (setMMMBool)
+        {
+            force_memMgmtMode(false);
+        }
     });
 
     jobsQueue.enqueue(jobs);
@@ -4629,7 +4541,32 @@ void MPDevice::cleanImportedVars(void)
     importedDataChildNodes.clear();
 }
 
-void MPDevice::startImportFileMerging(std::function<void(bool success, QString errstr)> cb)
+void MPDevice::cleanMMMVars(void)
+{
+    /* Cleaning all temp values */
+    ctrValue.clear();
+    cpzCtrValue.clear();
+    qDeleteAll(loginNodes);
+    loginNodes.clear();
+    qDeleteAll(dataNodes);
+    dataNodes.clear();
+    favoritesAddrs.clear();
+    loginChildNodes.clear();
+    dataChildNodes.clear();
+    /* Cleaning the clones as well */
+    ctrValueClone.clear();
+    cpzCtrValueClone.clear();
+    qDeleteAll(loginNodesClone);
+    loginNodesClone.clear();
+    qDeleteAll(dataNodesClone);
+    dataNodesClone.clear();
+    favoritesAddrsClone.clear();
+    loginChildNodesClone.clear();
+    dataChildNodesClone.clear();
+    freeAddresses.clear();
+}
+
+void MPDevice::startImportFileMerging(std::function<void(bool success, QString errstr)> cb, bool noDelete)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
@@ -4648,12 +4585,10 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
         Q_UNUSED(data);
+        qInfo() << "Mem management mode enabled";
 
         /* Tag favorites */
         tagFavoriteNodes();
-
-        qInfo() << "Mem management mode enabled";
-        force_memMgmtMode(true);
 
         /* We arrive here knowing that the CPZ is in the CPZ/CTR list */
         qInfo() << "Starting File Merging...";
@@ -4723,9 +4658,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                         // Check if we actually found the node
                         if (!imported_child_node)
                         {
-                            qCritical() << "Couldn't find imported child node in our list (corrupted import file?)";
                             cleanImportedVars();
+                            exitMemMgmtMode(false);
                             cb(false, "Couldn't Import Database: Corrupted Export File");
+                            qCritical() << "Couldn't find imported child node in our list (corrupted import file?)";
+                            return;
                         }
 
                         // We found the imported child, now we need to find the one that matches
@@ -4742,9 +4679,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
 
                             if (!cur_child_node)
                             {
-                                qCritical() << "Couldn't find child node in our list (bad node reading?)";
                                 cleanImportedVars();
+                                exitMemMgmtMode(false);
                                 cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                                qCritical() << "Couldn't find child node in our list (bad node reading?)";
+                                return;
                             }
 
                             // We found the child, now we can compare the login name
@@ -4792,9 +4731,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                             loginChildNodes.append(newChildNodePt);
                             if (!addChildToDB(loginNodes[j], newChildNodePt))
                             {
-                                qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
                                 cleanImportedVars();
+                                exitMemMgmtMode(false);
                                 cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                                qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                                return;
                             }
                         }
 
@@ -4823,9 +4764,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                loginNodes.append(newNodePt);
                if (!addOrphanParentToDB(newNodePt, false, false))
                {
-                   qCritical() << "Couldn't add parent to DB (corrupted DB?)";
                    cleanImportedVars();
+                   exitMemMgmtMode(false);
+                   qCritical() << "Couldn't add parent to DB (corrupted DB?)";
                    cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                   return;
                }
 
                /* Next step is to follow the children */
@@ -4837,8 +4780,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
 
                    if (!curImportChildPt)
                    {
-                       qCritical() << "Couldn't find import child (import file problem?)";
+                       cleanImportedVars();
+                       exitMemMgmtMode(false);
                        cb(false, "Couldn't Import Database: Corrupted Import File");
+                       qCritical() << "Couldn't find import child (import file problem?)";
+                       return;
                    }
 
                    /* Increment new addresses counter */
@@ -4853,9 +4799,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                    loginChildNodes.append(newChildNodePt);
                    if (!addChildToDB(newNodePt, newChildNodePt))
                    {
-                       qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
                        cleanImportedVars();
+                       exitMemMgmtMode(false);
                        cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                       qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                       return;
                    }
 
                    /* Go to the next child */
@@ -4906,9 +4854,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                             // Check if we actually found the node
                             if (!imported_child_node)
                             {
-                                qCritical() << "Couldn't find imported data child node in our list (corrupted import file?)";
                                 cleanImportedVars();
+                                exitMemMgmtMode(false);
                                 cb(false, "Couldn't Import Database: Corrupted Import File");
+                                qCritical() << "Couldn't find imported data child node in our list (corrupted import file?)";
+                                return;
                             }
 
                             // If we are still matching, check that we still can
@@ -4927,9 +4877,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                                     // Check if we actually found the node
                                     if (!matched_child_node)
                                     {
-                                        qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
                                         cleanImportedVars();
+                                        exitMemMgmtMode(false);
                                         cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                                        qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
+                                        return;
                                     }
 
                                     // Check for data match
@@ -5000,9 +4952,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                    dataNodes.append(newNodePt);
                    if (!addOrphanParentToDB(newNodePt, true, false))
                    {
-                       qCritical() << "Couldn't add data parent to DB (corrupted DB?)";
                        cleanImportedVars();
+                       exitMemMgmtMode(false);
+                       qCritical() << "Couldn't add data parent to DB (corrupted DB?)";
                        cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                       return;
                    }
 
                    /* Next step is to follow the children */
@@ -5015,8 +4969,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
 
                        if (!curImportChildPt)
                        {
-                           qCritical() << "Couldn't find import child (import file problem?)";
+                           cleanImportedVars();
+                           exitMemMgmtMode(false);
                            cb(false, "Couldn't Import Database: Corrupted Database File");
+                           qCritical() << "Couldn't find import child (import file problem?)";
+                           return;
                        }
 
                        /* Increment new addresses counter */
@@ -5070,22 +5027,26 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
 
                 /* Finish import file merging */
                 QString stringError;
-                if(finishImportFileMerging(stringError))
+                if(finishImportFileMerging(stringError, noDelete))
                 {
                     AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
                     connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
                     {
                         Q_UNUSED(data);
+                        cleanImportedVars();
+                        exitMemMgmtMode(false);
                         qInfo() << "Merge operations succeeded!";
                         cb(true, "Import File Merged With Current Database");
-                        exitMemMgmtMode(false);
+                        return;
                     });
                     connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
                     {
                         Q_UNUSED(failedJob);
+                        cleanImportedVars();
+                        exitMemMgmtMode(false);
                         qCritical() << "Merge operations failed!";
                         cb(false, "Couldn't Import Database: Device Unplugged?");
-                        exitMemMgmtMode(false);
+                        return;
                     });
                     if (generateSavePackets(mergeOperations))
                     {
@@ -5094,17 +5055,20 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                     }
                     else
                     {
+                        cleanImportedVars();
+                        exitMemMgmtMode(false);
                         qInfo() << "Databases already synced";
                         cb(true, "Local Database Already Is Up To Date!");
-                        exitMemMgmtMode(false);
+                        return;
                     }
                 }
                 else
                 {
-                    cb(false, "Couldn't Import Database: Corrupted Database File");
+                    cleanImportedVars();
                     exitMemMgmtMode(false);
+                    cb(false, "Couldn't Import Database: Corrupted Database File");
+                    return;
                 }
-                cleanImportedVars();
             });
 
             connect(getFreeAddressesJob, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -5120,22 +5084,26 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
         {
             /* Finish import file merging */
             QString stringError;
-            if(finishImportFileMerging(stringError))
+            if(finishImportFileMerging(stringError, noDelete))
             {
                 AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
                 connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
                 {
                     Q_UNUSED(data);
+                    cleanImportedVars();
+                    exitMemMgmtMode(false);
                     qInfo() << "Merge operations succeeded!";
                     cb(true, "Import File Merged With Current Database");
-                    exitMemMgmtMode(false);
+                    return;
                 });
                 connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
                 {
                     Q_UNUSED(failedJob);
+                    cleanImportedVars();
+                    exitMemMgmtMode(false);
                     qCritical() << "Merge operations failed!";
                     cb(false, "Couldn't Import Database: Device Unplugged?");
-                    exitMemMgmtMode(false);
+                    return;
                 });
                 if (generateSavePackets(mergeOperations))
                 {
@@ -5144,17 +5112,20 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                 }
                 else
                 {
+                    cleanImportedVars();
+                    exitMemMgmtMode(false);
                     qInfo() << "Databases already synced";
                     cb(true, "Local Database Already Is Up To Date!");
-                    exitMemMgmtMode(false);
+                    return;
                 }
             }
             else
             {
-                cb(false, "Couldn't Import Database: Corrupted Database File");
+                cleanImportedVars();
                 exitMemMgmtMode(false);
+                cb(false, "Couldn't Import Database: Corrupted Database File");
+                return;
             }
-            cleanImportedVars();
         }
     });
 
@@ -5162,31 +5133,6 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
-
-        /* Cleaning all temp values */
-        ctrValue.clear();
-        cpzCtrValue.clear();
-        qDeleteAll(loginNodes);
-        loginNodes.clear();
-        qDeleteAll(dataNodes);
-        dataNodes.clear();
-        favoritesAddrs.clear();
-        loginChildNodes.clear();
-        dataChildNodes.clear();
-        /* Cleaning the clones as well */
-        ctrValueClone.clear();
-        cpzCtrValueClone.clear();
-        qDeleteAll(loginNodesClone);
-        loginNodesClone.clear();
-        qDeleteAll(dataNodesClone);
-        dataNodesClone.clear();
-        favoritesAddrsClone.clear();
-        loginChildNodesClone.clear();
-        dataChildNodesClone.clear();
-        freeAddresses.clear();
-
-        exitMemMgmtMode(false);
-        force_memMgmtMode(false);
         cb(false, "Please Retry and Approve Credential Management");
     });
 
@@ -5194,93 +5140,96 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
     runAndDequeueJobs();
 }
 
-bool MPDevice::finishImportFileMerging(QString &stringError)
+bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
 {
     qInfo() << "Finishing Import File Merging...";
 
-    /* Now we check all our parents and childs for non merge tag */
-    QListIterator<MPNode*> i(loginNodes);
-    while (i.hasNext())
+    if (!noDelete)
     {
-        MPNode* nodeItem = i.next();
-
-        /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
-        QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
-
-        /* Special case: no child */
-        if (curChildNodeAddr == MPNode::EmptyAddress)
+        /* Now we check all our parents and childs for non merge tag */
+        QListIterator<MPNode*> i(loginNodes);
+        while (i.hasNext())
         {
-            /* Remove parent */
-            removeEmptyParentFromDB(nodeItem, false);
-        }
+            MPNode* nodeItem = i.next();
 
-        /* Check every children */
-        while (curChildNodeAddr != MPNode::EmptyAddress)
-        {
-            MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr);
+            /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
+            QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
 
-            /* Safety checks */
-            if (!curNode)
+            /* Special case: no child */
+            if (curChildNodeAddr == MPNode::EmptyAddress)
             {
-                qCritical() << "Couldn't find child node in list (error in algo?)";
-                stringError = "Moolticute Internal Error: Please Contact The Team (IFM#1)";
-                cleanImportedVars();
-                return false;
+                /* Remove parent */
+                removeEmptyParentFromDB(nodeItem, false);
             }
 
-            /* Next item */
-            curChildNodeAddr = curNode->getNextChildAddress();
-
-            /* Marked for deletion? */
-            if (!curNode->getMergeTagged())
+            /* Check every children */
+            while (curChildNodeAddr != MPNode::EmptyAddress)
             {
-                removeChildFromDB(nodeItem, curNode);
-            }
-        }
-    }
+                MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr);
 
-    /* Now we check all our parents and childs for non merge tag */
-    QListIterator<MPNode*> j(dataNodes);
-    while (j.hasNext())
-    {
-        MPNode* nodeItem = j.next();
-
-        /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
-        QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
-
-        /* Special case: no child */
-        if (curChildNodeAddr == MPNode::EmptyAddress)
-        {
-            /* Remove parent */
-            removeEmptyParentFromDB(nodeItem, true);
-        }
-
-        /* Check every children */
-        while (curChildNodeAddr != MPNode::EmptyAddress)
-        {
-            MPNode* curNode = findNodeWithAddressInList(dataChildNodes, curChildNodeAddr);
-
-            /* Safety checks */
-            if (!curNode)
-            {
-                qCritical() << "Couldn't find child node in list (error in algo?)";
-                stringError = "Moolticute Internal Error: Please Contact The Team (IFM#2)";
-                cleanImportedVars();
-                return false;
-            }
-
-            /* Next item */
-            curChildNodeAddr = curNode->getNextDataAddress();
-
-            /* Marked for deletion? */
-            if (!curNode->getMergeTagged())
-            {
-                /* First child? */
-                if (curNode->getAddress() == nodeItem->getStartChildAddress())
+                /* Safety checks */
+                if (!curNode)
                 {
-                    nodeItem->setStartChildAddress(MPNode::EmptyAddress);
+                    qCritical() << "Couldn't find child node in list (error in algo?)";
+                    stringError = "Moolticute Internal Error: Please Contact The Team (IFM#1)";
+                    cleanImportedVars();
+                    return false;
                 }
-                dataChildNodes.removeOne(curNode);
+
+                /* Next item */
+                curChildNodeAddr = curNode->getNextChildAddress();
+
+                /* Marked for deletion? */
+                if (!curNode->getMergeTagged())
+                {
+                    removeChildFromDB(nodeItem, curNode);
+                }
+            }
+        }
+
+        /* Now we check all our parents and childs for non merge tag */
+        QListIterator<MPNode*> j(dataNodes);
+        while (j.hasNext())
+        {
+            MPNode* nodeItem = j.next();
+
+            /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
+            QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
+
+            /* Special case: no child */
+            if (curChildNodeAddr == MPNode::EmptyAddress)
+            {
+                /* Remove parent */
+                removeEmptyParentFromDB(nodeItem, true);
+            }
+
+            /* Check every children */
+            while (curChildNodeAddr != MPNode::EmptyAddress)
+            {
+                MPNode* curNode = findNodeWithAddressInList(dataChildNodes, curChildNodeAddr);
+
+                /* Safety checks */
+                if (!curNode)
+                {
+                    qCritical() << "Couldn't find child node in list (error in algo?)";
+                    stringError = "Moolticute Internal Error: Please Contact The Team (IFM#2)";
+                    cleanImportedVars();
+                    return false;
+                }
+
+                /* Next item */
+                curChildNodeAddr = curNode->getNextDataAddress();
+
+                /* Marked for deletion? */
+                if (!curNode->getMergeTagged())
+                {
+                    /* First child? */
+                    if (curNode->getAddress() == nodeItem->getStartChildAddress())
+                    {
+                        nodeItem->setStartChildAddress(MPNode::EmptyAddress);
+                    }
+                    dataChildNodes.removeOne(curNode);
+                }
             }
         }
     }
@@ -5358,7 +5307,6 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
         {
             nb_free_addresses_received--;
         }
-
 
         qDebug() << "Received " << nb_free_addresses_received << " free addresses";
 
@@ -5569,7 +5517,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         qInfo() << "Finished merging all credentials in memory";
         cb(true, QString());
 
-        exitMemMgmtMode(false);
+        exitMemMgmtMode(true);
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -5639,12 +5587,10 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
             connect(addcpzjobs, &AsyncJobs::finished, [=](const QByteArray &data)
             {
                 Q_UNUSED(data);
-                //data is last result
-                //all jobs finished success
                 qInfo() << "CPZ/CTR Added";
 
                 /* Unknown card added, start merging */
-                startImportFileMerging(cb);
+                startImportFileMerging(cb, noDelete);
             });
 
             connect(addcpzjobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -5660,11 +5606,12 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
         else
         {
             /* Start merging */
-            startImportFileMerging(cb);
+            startImportFileMerging(cb, noDelete);
         }
     }
     else
     {
+        /* Something went wrong during export file reading */
         cb(false, errorString);
     }
 }

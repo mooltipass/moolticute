@@ -121,7 +121,7 @@ public:
 
     //mem mgmt mode
     void startMemMgmtMode(bool wantData, std::function<void(int total, int current)> cbProgress);
-    void exitMemMgmtMode(bool check_status = true);
+    void exitMemMgmtMode(bool setMMMBool = true);
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);
 
@@ -235,15 +235,15 @@ private:
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data);
+    void startImportFileMerging(std::function<void(bool success, QString errstr)> cb, bool noDelete);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
-    void startImportFileMerging(std::function<void(bool success, QString errstr)> cb);
+    bool finishImportFileMerging(QString &stringError, bool noDelete);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service);
     MPNode *findNodeWithLoginInList(const QString &login);
     quint8 getNodeIdFromAddress(const QByteArray &address);
-    bool finishImportFileMerging(QString &stringError);
     QByteArray getMemoryFirstNodeAddress(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
@@ -263,6 +263,7 @@ private:
     bool addOrphanChildToDB(MPNode* childNodePt);
     bool writeExportFile(const QString &fileName);
     void cleanImportedVars(void);
+    void cleanMMMVars(void);
 
     // Functions added by mathieu for unit testing
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
