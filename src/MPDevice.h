@@ -121,7 +121,7 @@ public:
 
     //mem mgmt mode
     void startMemMgmtMode(bool wantData, std::function<void(int total, int current)> cbProgress);
-    void exitMemMgmtMode(bool check_status = true);
+    void exitMemMgmtMode(bool setMMMBool = true);
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);
 
@@ -235,16 +235,16 @@ private:
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data);
+    void startImportFileMerging(std::function<void(bool success, QString errstr)> cb, bool noDelete);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
+    bool finishImportFileMerging(QString &stringError, bool noDelete);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service);
     MPNode *findNodeWithLoginInList(const QString &login);
     quint8 getNodeIdFromAddress(const QByteArray &address);
     QByteArray getMemoryFirstNodeAddress(void);
-    bool finishImportFileMerging(void);
-    bool startImportFileMerging(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
     void detagPointedNodes(void);
@@ -256,13 +256,14 @@ private:
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
+    bool readExportFile(const QByteArray &fileData, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
-    bool writeExportFile(const QString &fileName);
-    bool readExportFile(const QString &fileName);
+    QByteArray generateExportFileData(void);
     void cleanImportedVars(void);
+    void cleanMMMVars(void);
 
     // Functions added by mathieu for unit testing
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
