@@ -1278,7 +1278,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
                 qDebug() << address.toHex() << ": child node loaded:" << cnode->getLogin();
 
                 //Load next child
-                if (cnode->getNextChildDataAddress() != MPNode::EmptyAddress)
+                if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
                 {
                     loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress());
                 }
