@@ -178,9 +178,6 @@ void CredentialsManagement::on_addCredentialButton_clicked()
 {
     if (wsClient->get_memMgmtMode())
     {
-        QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(ui->addCredServiceInput->text(),
-                                                                                                            ui->addCredLoginInput->text()));
-
         credModel->update(ui->addCredServiceInput->text(),
                           ui->addCredLoginInput->text(),
                           ui->addCredPasswordInput->text(),
