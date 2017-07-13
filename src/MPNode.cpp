@@ -99,6 +99,16 @@ void MPNode::removePointedToCheck()
     pointedToCheck = false;
 }
 
+void MPNode::setNotDeletedTagged()
+{
+    notDeletedTagged = true;
+}
+
+bool MPNode::getNotDeletedTagged() const
+{
+    return notDeletedTagged;
+}
+
 void MPNode::setMergeTagged()
 {
     mergeTagged = true;

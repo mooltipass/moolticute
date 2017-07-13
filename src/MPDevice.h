@@ -269,7 +269,7 @@ private:
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
 
     // Generate save packets
-    bool generateSavePackets(AsyncJobs *jobs);
+    bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData);
 
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
