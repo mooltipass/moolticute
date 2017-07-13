@@ -1393,6 +1393,45 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
     }));
 }
 
+/* Find a credential parent node given a child address */
+MPNode* MPDevice::findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr)
+{
+    QListIterator<MPNode*> i(loginNodes);
+    while (i.hasNext())
+    {
+        MPNode* nodeItem = i.next();
+
+        /* Get first child node addr */
+        QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
+        quint32 curChildNodeAddr_v = nodeItem->getStartChildVirtualAddress();
+
+        /* Check every children */
+        while ((curChildNodeAddr != MPNode::EmptyAddress) || (curChildNodeAddr.isNull() && curChildNodeAddr_v != 0))
+        {
+            MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr);
+
+            /* Safety checks */
+            if (!curNode)
+            {
+                qCritical() << "Couldn't find child node in list (corrupted DB?)";
+                return nullptr;
+            }
+
+            /* Correct one? */
+            if ((!curChildNodeAddr.isNull() && curChildNodeAddr == address) || (curChildNodeAddr.isNull() && curChildNodeAddr_v == virt_addr))
+            {
+                return nodeItem;
+            }
+
+            /* Next item */
+            curChildNodeAddr = curNode->getNextChildAddress();
+            curChildNodeAddr_v = curNode->getNextChildVirtualAddress();
+        }
+    }
+
+    return nullptr;
+}
+
 /* Find a node inside a given list given his address */
 MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr)
 {
@@ -2557,7 +2596,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
     }
 }
 
-bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
+bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent)
 {
     qDebug() << "Removing child " << childNodePt->getLogin() << " with parent " << parentNodePt->getService() << " from DB";
     MPNode* tempChildNodePt = nullptr;
@@ -2621,7 +2660,10 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt)
                         delete(childNodePt);
 
                         /* Remove parent */
-                        removeEmptyParentFromDB(parentNodePt, false);
+                        if (deleteEmptyParent)
+                        {
+                            removeEmptyParentFromDB(parentNodePt, false);
+                        }
 
                         return true;
                     }
@@ -2927,11 +2969,15 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
                 addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
                 diagSavePacketsGenerated = true;
             }
-            else if (nodelist_iterator->getNodeData() != nodelist_iterator->getNodeData())
+            else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
             {
                 qDebug() << "Generating save packet for updated login" << nodelist_iterator->getLogin();
                 addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
                 diagSavePacketsGenerated = true;
+            }
+            else
+            {
+                qDebug() << "Node data match for login" << nodelist_iterator->getLogin();
             }
         }
     }
@@ -4139,7 +4185,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting first child node and adding it again";
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
     temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
-    removeChildFromDB(loginNodes[0], temp_node_pt);
+    removeChildFromDB(loginNodes[0], temp_node_pt, true);
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
     checkLoadedNodes(true, true, true);
@@ -4149,7 +4195,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
-    removeChildFromDB(loginNodes[0], temp_node_pt);
+    removeChildFromDB(loginNodes[0], temp_node_pt, true);
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
     checkLoadedNodes(true, true, true);
@@ -4160,7 +4206,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
-    removeChildFromDB(loginNodes[0], temp_node_pt);
+    removeChildFromDB(loginNodes[0], temp_node_pt, true);
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
     checkLoadedNodes(true, true, true);
@@ -4171,7 +4217,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     temp_cnode = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
     temp_node = new MPNode(loginNodes[1]->getNodeData(), this, loginNodes[1]->getAddress(), loginNodes[1]->getVirtualAddress());
     temp_node->setStartChildAddress(MPNode::EmptyAddress, 0);
-    removeChildFromDB(loginNodes[1], temp_node_pt);
+    removeChildFromDB(loginNodes[1], temp_node_pt, true);
     loginNodes.append(temp_node);
     addOrphanParentToDB(temp_node, false, true);
     loginChildNodes.append(temp_cnode);
@@ -5171,7 +5217,7 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
                 /* Marked for deletion? */
                 if (!curNode->getMergeTagged())
                 {
-                    removeChildFromDB(nodeItem, curNode);
+                    removeChildFromDB(nodeItem, curNode, true);
                 }
             }
         }
@@ -5496,7 +5542,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 {
     AsyncJobs *jobs = new AsyncJobs("Merging credentials changes", this);
 
-    /* Look for deleted nodes */
+    /* Look for deleted or changed nodes */
     for (qint32 i = 0; i < creds.size(); i++)
     {
         /* Create object */
@@ -5510,10 +5556,12 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         else
         {
             /* Credential data */
-            QJsonArray addrArray = qjobject["address"].toArray();
             QByteArray nodeAddr;
+            QString login = qjobject["login"].toString();
+            QString service = qjobject["service"].toString();
+            QJsonArray addrArray = qjobject["address"].toArray();
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
-            qDebug() << "MMM Save: tackling " << qjobject["login"].toString() << " for service " << qjobject["service"].toString() << " at address " << nodeAddr.toHex();
+            qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
 
             /* Find node in our list */
             MPNode* nodePtr = findNodeWithAddressInList(loginChildNodes, nodeAddr);
@@ -5529,6 +5577,30 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             {
                 /* Tag it as not deleted */
                 nodePtr->setNotDeletedTagged();
+
+                /* Check for changed login or password */
+                if (login != nodePtr->getLogin())
+                {
+                    qDebug() << "Detected login change";
+
+                    /* Look for parent Node */
+                    MPNode* parentNodePtr = findCredParentNodeGivenChildNodeAddr(nodePtr->getAddress(), nodePtr->getVirtualAddress());
+                    if (!parentNodePtr)
+                    {
+                        qCritical() << "Couldn't find parent node" << qjobject["service"].toString() << " for login " << qjobject["login"].toString() << " at address " << nodeAddr.toHex();
+                        cb(false, "Moolticute Internal Error (SMMC#3)");
+                        exitMemMgmtMode(true);
+                        return;
+                    }
+
+                    /* Create new node, remove the old one and add it */
+                    MPNode* newNode = new MPNode(nodePtr->getNodeData(), this, nodePtr->getAddress(), nodePtr->getVirtualAddress());
+                    newNode->setLogin(login);
+                    newNode->setNotDeletedTagged();
+                    loginChildNodes.append(newNode);
+                    removeChildFromDB(parentNodePtr, nodePtr, false);
+                    addChildToDB(parentNodePtr, newNode);
+                }
             }
         }
     }
@@ -5569,7 +5641,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             /* Marked for deletion? */
             if (!curNode->getNotDeletedTagged())
             {
-                removeChildFromDB(nodeItem, curNode);
+                removeChildFromDB(nodeItem, curNode, true);
             }
         }
     }

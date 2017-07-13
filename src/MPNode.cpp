@@ -326,6 +326,18 @@ QString MPNode::getLogin() const
     return QString::fromUtf8(data.mid(37, 63));
 }
 
+void MPNode::setLogin(QString newLogin)
+{
+    if (isValid())
+    {
+        QByteArray login = newLogin.toUtf8();
+        login.append('\0');
+        login.resize(MP_MAX_PAYLOAD_LENGTH);
+        login[login.size()-1] = '\0';
+        data.replace(37, MP_MAX_PAYLOAD_LENGTH, login);
+    }
+}
+
 QByteArray MPNode::getPasswordEnc() const
 {
     if (!isValid()) return QByteArray();
