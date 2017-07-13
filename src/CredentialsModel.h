@@ -58,7 +58,7 @@ public:
         QDate createdDate;
         QDate updatedDate;
         QByteArray address;
-        qint8 favorite;
+        qint8 favorite = Common::FAV_NOT_SET;
 
         bool operator==(const Credential &other) const
         {

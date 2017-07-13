@@ -180,14 +180,15 @@ void CredentialsManagement::on_addCredentialButton_clicked()
     {
         QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(ui->addCredServiceInput->text(),
                                                                                                             ui->addCredLoginInput->text()));
-        ui->addCredServiceInput->clear();
-        ui->addCredLoginInput->clear();
-        ui->addCredPasswordInput->clear();
 
         credModel->update(ui->addCredServiceInput->text(),
                           ui->addCredLoginInput->text(),
                           ui->addCredPasswordInput->text(),
                           QString());
+
+        ui->addCredServiceInput->clear();
+        ui->addCredLoginInput->clear();
+        ui->addCredPasswordInput->clear();
     }
     else
     {
