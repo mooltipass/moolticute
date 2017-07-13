@@ -239,6 +239,7 @@ private:
     void startImportFileMerging(std::function<void(bool success, QString errstr)> cb, bool noDelete);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
+    void deletePossibleFavorite(QByteArray parentAddr, QByteArray childAddr);
     bool finishImportFileMerging(QString &stringError, bool noDelete);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
@@ -304,9 +305,9 @@ private:
     // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
     QByteArray startNode;
-    quint32 virtualStartNode;
+    quint32 virtualStartNode = 0;
     QByteArray startDataNode;
-    quint32 virtualDataStartNode;
+    quint32 virtualDataStartNode = 0;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
     QList<MPNode *> loginNodes;         //list of all parent nodes for credentials

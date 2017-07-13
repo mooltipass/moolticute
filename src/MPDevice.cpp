@@ -1432,6 +1432,21 @@ MPNode* MPDevice::findCredParentNodeGivenChildNodeAddr(const QByteArray &address
     return nullptr;
 }
 
+void MPDevice::deletePossibleFavorite(QByteArray parentAddr, QByteArray childAddr)
+{
+    QByteArray curAddr = QByteArray();
+    curAddr.append(parentAddr);
+    curAddr.append(childAddr);
+
+    for (qint32 i = 0; i < favoritesAddrs.size(); i++)
+    {
+        if (favoritesAddrs[i] == curAddr)
+        {
+            favoritesAddrs[i] = QByteArray(4, 0);
+        }
+    }
+}
+
 /* Find a node inside a given list given his address */
 MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr)
 {
@@ -2654,6 +2669,9 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                         /* Linked list ends there, only credential */
                         parentNodePt->setStartChildAddress(MPNode::EmptyAddress, 0);
 
+                        /* Delete possible fav */
+                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
                         loginChildNodes.removeOne(childNodePt);
@@ -2673,6 +2691,9 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                         parentNodePt->setStartChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                         tempNextChildNodePt->setPreviousChildAddress(MPNode::EmptyAddress, 0);
 
+                        /* Delete possible fav */
+                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
                         loginChildNodes.removeOne(childNodePt);
@@ -2687,6 +2708,9 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                         /* Linked list ends there */
                         tempChildNodePt->setNextChildAddress(MPNode::EmptyAddress, 0);
 
+                        /* Delete possible fav */
+                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
                         loginChildNodes.removeOne(childNodePt);
@@ -2698,6 +2722,9 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                         /* Link the chain together */
                         tempChildNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                         tempNextChildNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
+
+                        /* Delete possible fav */
+                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
 
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
@@ -4579,6 +4606,8 @@ void MPDevice::cleanImportedVars(void)
 void MPDevice::cleanMMMVars(void)
 {
     /* Cleaning all temp values */
+    virtualStartNode = 0;
+    virtualDataStartNode = 0;
     ctrValue.clear();
     cpzCtrValue.clear();
     qDeleteAll(loginNodes);
@@ -5542,7 +5571,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 {
     newAddressesNeededCounter = 0;
     newAddressesReceivedCounter = 0;
+    bool packet_send_needed = false;
     AsyncJobs *jobs = new AsyncJobs("Merging credentials changes", this);
+
+    /// TODO: sanitize inputs
 
     /* Look for deleted or changed nodes */
     for (qint32 i = 0; i < creds.size(); i++)
@@ -5603,22 +5635,24 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                     loginChildNodes.append(newNode);
                     removeChildFromDB(parentNodePtr, nodePtr, false);
                     addChildToDB(parentNodePtr, newNode);
+                    packet_send_needed = true;
                 }
 
                 /* Check for changed password */
-                if (password.isEmpty())
+                if (!password.isEmpty())
                 {
                     qDebug() << "Detected password change for" << login << "on" << service;
 
                     QStringList changeList;
                     changeList << service << login << password;
                     mmmPasswordChangeArray.append(changeList);
+                    packet_send_needed = true;
                 }
             }
         }
     }
 
-    /* Browse through the memory contents to find not nonDeleted nodes *//* Now we check all our parents and childs for non merge tag */
+    /* Browse through the memory contents to find not nonDeleted nodes */
     QListIterator<MPNode*> i(loginNodes);
     while (i.hasNext())
     {
@@ -5632,6 +5666,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         {
             /* Remove parent */
             removeEmptyParentFromDB(nodeItem, false);
+            packet_send_needed = true;
         }
 
         /* Check every children */
@@ -5655,6 +5690,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             if (!curNode->getNotDeletedTagged())
             {
                 removeChildFromDB(nodeItem, curNode, true);
+                packet_send_needed = true;
             }
         }
     }
@@ -5669,7 +5705,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
     }
 
     /* Generate save passwords */
-    if (!generateSavePackets(jobs, true, false) && mmmPasswordChangeArray.size() == 0)
+    if (!packet_send_needed)
     {
         qInfo() << "No changes detected";
         cb(true, "No Changes Required");
@@ -5677,48 +5713,133 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         return;
     }
 
+    /* Out of pure coding laziness, ask free addresses even if we don't need */
+    loadFreeAddresses(jobs, MPNode::EmptyAddress, false);
+
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
-        qInfo() << "Finished merging all credentials in memory";
+        qInfo() << "Received enough free addresses";
 
-        if (mmmPasswordChangeArray.size() > 0)
+        /* We got all the addresses, change virtual addrs for real addrs and finish merging */
+        if (newAddressesNeededCounter > 0)
         {
-            exitMemMgmtMode(false);
-            AsyncJobs *pwdChangeJobs = new AsyncJobs("Changing passwords...", this);
+            changeVirtualAddressesToFreeAddresses();
+        }
 
-            /* Create password change jobs */
-            for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
+        AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
+        connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
+        {
+            Q_UNUSED(data);
+            exitMemMgmtMode(true);
+            qInfo() << "Merge operations succeeded!";
+
+            if (mmmPasswordChangeArray.size() > 0)
             {
+                AsyncJobs *pwdChangeJobs = new AsyncJobs("Changing passwords...", this);
 
+                /* Create password change jobs */
+                for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
+                {
+                    QByteArray sdata = mmmPasswordChangeArray[i][0].toUtf8();
+                    sdata.append((char)0);
+
+                    //First query if context exist
+                    pwdChangeJobs->append(new MPCommandJob(this, MPCmd::CONTEXT,
+                                                  sdata,
+                                                  [=](const QByteArray &data, bool &) -> bool
+                    {
+                        if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
+                        {
+                            qWarning() << "context " << mmmPasswordChangeArray[i][0] << " does not exist";
+                            return false;
+                        }
+                        else
+                        {
+                            qDebug() << "set_context " << mmmPasswordChangeArray[i][0];
+                            return true;
+                        }
+                    }));
+
+                    QByteArray ldata = mmmPasswordChangeArray[i][1].toUtf8();
+                    ldata.append((char)0);
+
+                    pwdChangeJobs->append(new MPCommandJob(this, MPCmd::SET_LOGIN,
+                                                  ldata,
+                                                  [=](const QByteArray &data, bool &) -> bool
+                    {
+                        if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+                        {
+                            jobs->setCurrentJobError("set_login failed on device");
+                            qWarning() << "failed to set login to " << mmmPasswordChangeArray[i][1];
+                            return false;
+                        }
+                        else
+                        {
+                            qDebug() << "set_login " << mmmPasswordChangeArray[i][1];
+                            return true;
+                        }
+                    }));
+
+                    QByteArray pdata = mmmPasswordChangeArray[i][2].toUtf8();
+                    pdata.append((char)0);
+
+                    pwdChangeJobs->prepend(new MPCommandJob(this, MPCmd::SET_PASSWORD,
+                                                   pdata,
+                                                   [=](const QByteArray &data, bool &) -> bool
+                    {
+                        if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+                        {
+                            jobs->setCurrentJobError("set_password failed on device");
+                            qWarning() << "failed to set_password";
+                            return false;
+                        }
+                        qDebug() << "set_password ok";
+                        return true;
+                    }));
+                }
+
+                connect(pwdChangeJobs, &AsyncJobs::finished, [=](const QByteArray &)
+                {
+                    cb(true, "Changes Applied to Memory");
+                    qInfo() << "Passwords changed!";
+                    mmmPasswordChangeArray.clear();
+                });
+
+                connect(pwdChangeJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+                {
+                    Q_UNUSED(failedJob);
+                    mmmPasswordChangeArray.clear();
+                    qCritical() << "Couldn't change passwords";
+                    cb(false, "Please Approve Password Changes On The Device");
+                });
+
+                jobsQueue.enqueue(pwdChangeJobs);
+                runAndDequeueJobs();
             }
-
-            connect(pwdChangeJobs, &AsyncJobs::finished, [=](const QByteArray &)
+            else
             {
                 cb(true, "Changes Applied to Memory");
-            });
-
-            connect(pwdChangeJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
-            {
-                Q_UNUSED(failedJob);
-                qCritical() << "Couldn't change passwords";
-                cb(false, "Please Approve Password Changes On The Device");
-            });
-
-            jobsQueue.enqueue(pwdChangeJobs);
-            runAndDequeueJobs();
-        }
-        else
+                qInfo() << "No passwords to be changed";
+            }
+        });
+        connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
         {
-            qDebug() << "No passwords to be changed",
-            cb(true, "Changes Applied to Memory");
+            Q_UNUSED(failedJob);
             exitMemMgmtMode(true);
-        }
+            qCritical() << "Merge operations failed!";
+            cb(false, "Couldn't Import Database: Device Unplugged?");
+            return;
+        });
+
+        generateSavePackets(mergeOperations, true, false);
+        jobsQueue.enqueue(mergeOperations);
+        runAndDequeueJobs();
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
-        qCritical() << "MMM save failed";
+        qCritical() << "MMM save failed: couldn't load enough free addresses";
         cb(false, "Couldn't Save Changes (Device Disconnected?)");
         exitMemMgmtMode(true);
     });
