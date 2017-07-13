@@ -234,10 +234,12 @@ private:
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
+    MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data);
     void startImportFileMerging(std::function<void(bool success, QString errstr)> cb, bool noDelete);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
+    void deletePossibleFavorite(QByteArray parentAddr, QByteArray childAddr);
     bool finishImportFileMerging(QString &stringError, bool noDelete);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
@@ -257,7 +259,7 @@ private:
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
-    bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt);
+    bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
@@ -269,7 +271,7 @@ private:
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
 
     // Generate save packets
-    bool generateSavePackets(AsyncJobs *jobs);
+    bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData);
 
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
@@ -290,6 +292,9 @@ private:
     //command queue
     QQueue<MPCommand> commandQueue;
 
+    //passwords we need to change after leaving mmm
+    QList<QStringList> mmmPasswordChangeArray;
+
     // Number of new addresses we need
     quint32 newAddressesNeededCounter = 0;
     quint32 newAddressesReceivedCounter = 0;
@@ -300,9 +305,9 @@ private:
     // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
     QByteArray startNode;
-    quint32 virtualStartNode;
+    quint32 virtualStartNode = 0;
     QByteArray startDataNode;
-    quint32 virtualDataStartNode;
+    quint32 virtualDataStartNode = 0;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
     QList<MPNode *> loginNodes;         //list of all parent nodes for credentials

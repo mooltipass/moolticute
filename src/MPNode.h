@@ -81,6 +81,7 @@ public:
     QByteArray getPreviousChildAddress() const;
     QByteArray getCTR() const;
     QString getDescription() const;
+    void setLogin(QString newLogin);
     QString getLogin() const;
     QByteArray getPasswordEnc() const;
     QDate getDateCreated() const;
@@ -118,6 +119,10 @@ public:
     void setMergeTagged();
     bool getMergeTagged() const;
 
+    // NotDeletedTagged access/write
+    void setNotDeletedTagged();
+    bool getNotDeletedTagged() const;
+
     static QByteArray EmptyAddress;
 
     QJsonObject toJson() const;
@@ -127,6 +132,7 @@ private:
     QByteArray address;
     bool mergeTagged = false;
     bool pointedToCheck = false;
+    bool notDeletedTagged = false;
     bool firstChildVirtualAddressSet = false;
     quint32 firstChildVirtualAddress = 0;
     bool nextVirtualAddressSet = false;
