@@ -271,8 +271,11 @@ QJsonArray CredentialsModel::getJsonChanges()
 QJsonObject CredentialsModel::Credential::toJson() const
 {
     QJsonArray addr;
-    addr.append((int)address.at(0));
-    addr.append((int)address.at(1));
+    if (!address.isEmpty())
+    {
+        addr.append((int)address.at(0));
+        addr.append((int)address.at(1));
+    }
 
     return {{ "service", service },
             { "login", login },
