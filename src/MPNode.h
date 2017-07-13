@@ -81,8 +81,8 @@ public:
     QByteArray getPreviousChildAddress() const;
     QByteArray getCTR() const;
     QString getDescription() const;
-    void setLogin(QString newLogin);
     QString getLogin() const;
+    void setLogin(const QString &newLogin);
     QByteArray getPasswordEnc() const;
     QDate getDateCreated() const;
     QDate getDateLastUsed() const;

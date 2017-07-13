@@ -3004,7 +3004,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             }
             else
             {
-                qDebug() << "Node data match for login" << nodelist_iterator->getLogin();
+                //qDebug() << "Node data match for login" << nodelist_iterator->getLogin();
             }
         }
     }
@@ -5601,7 +5601,38 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             /* Find node in our list */
             MPNode* nodePtr = findNodeWithAddressInList(loginChildNodes, nodeAddr);
 
-            if (!nodePtr)
+            if (nodeAddr.isNull())
+            {
+                qDebug() << "New login" << qjobject["login"].toString() << " for service " << qjobject["service"].toString() << " at address " << nodeAddr.toHex();
+
+                /* Look if there's a parent node with that name */
+                MPNode* parentPtr = findNodeWithServiceInList(service);
+
+                /* If no parent, create it */
+                if (!parentPtr)
+                {
+                    parentPtr = addNewServiceToDB(service);
+                }
+
+                /* Increment new addresses counter */
+                newAddressesNeededCounter += 1;
+
+                /* Create new node with null address and virtual address set to our counter value */
+                MPNode* newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                newNodePt->setType(MPNode::NodeChild);
+                loginChildNodes.append(newNodePt);
+                newNodePt->setNotDeletedTagged();
+                newNodePt->setLogin(login);
+                addChildToDB(parentPtr, newNodePt);
+                packet_send_needed = true;
+
+                /* Finally, change password */
+                QStringList changeList;
+                changeList << service << login << password;
+                mmmPasswordChangeArray.append(changeList);
+                qDebug() << "Queing password change as well";
+            }
+            else if (!nodePtr)
             {
                 qCritical() << "Couldn't find" << qjobject["login"].toString() << " for service " << qjobject["service"].toString() << " at address " << nodeAddr.toHex();
                 cb(false, "Moolticute Internal Error (SMMC#1)");
@@ -5660,9 +5691,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 
         /* No need to check for notdeleted tagged for parent, as it'll automatically be removed if it doesn't have any child */
         QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
+        quint32 curChildNodeAddr_v = nodeItem->getStartChildVirtualAddress();
 
         /* Special case: no child */
-        if (curChildNodeAddr == MPNode::EmptyAddress)
+        if ((curChildNodeAddr == MPNode::EmptyAddress) || (curChildNodeAddr.isNull() && curChildNodeAddr_v == 0))
         {
             /* Remove parent */
             removeEmptyParentFromDB(nodeItem, false);
@@ -5670,9 +5702,9 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         }
 
         /* Check every children */
-        while (curChildNodeAddr != MPNode::EmptyAddress)
+        while ((curChildNodeAddr != MPNode::EmptyAddress) || (curChildNodeAddr.isNull() && curChildNodeAddr_v != 0))
         {
-            MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr);
+            MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr, curChildNodeAddr_v);
 
             /* Safety checks */
             if (!curNode)
@@ -5685,6 +5717,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 
             /* Next item */
             curChildNodeAddr = curNode->getNextChildAddress();
+            curChildNodeAddr_v = curNode->getNextChildVirtualAddress();
 
             /* Marked for deletion? */
             if (!curNode->getNotDeletedTagged())
@@ -5769,7 +5802,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                     {
                         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
                         {
-                            jobs->setCurrentJobError("set_login failed on device");
+                            pwdChangeJobs->setCurrentJobError("set_login failed on device");
                             qWarning() << "failed to set login to " << mmmPasswordChangeArray[i][1];
                             return false;
                         }
@@ -5783,13 +5816,13 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                     QByteArray pdata = mmmPasswordChangeArray[i][2].toUtf8();
                     pdata.append((char)0);
 
-                    pwdChangeJobs->prepend(new MPCommandJob(this, MPCmd::SET_PASSWORD,
+                    pwdChangeJobs->append(new MPCommandJob(this, MPCmd::SET_PASSWORD,
                                                    pdata,
                                                    [=](const QByteArray &data, bool &) -> bool
                     {
                         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
                         {
-                            jobs->setCurrentJobError("set_password failed on device");
+                            pwdChangeJobs->setCurrentJobError("set_password failed on device");
                             qWarning() << "failed to set_password";
                             return false;
                         }
