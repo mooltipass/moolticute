@@ -5592,6 +5592,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             /* Credential data */
             QByteArray nodeAddr;
             QString login = qjobject["login"].toString();
+            qint32 favorite = qjobject["favorite"].toInt();
             QString service = qjobject["service"].toString();
             QString password = qjobject["password"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
@@ -5626,6 +5627,9 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
 
+                /* Set favorite */
+                newNodePt->setFavoriteProperty(favorite);
+
                 /* Finally, change password */
                 QStringList changeList;
                 changeList << service << login << password;
@@ -5643,6 +5647,16 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             {
                 /* Tag it as not deleted */
                 nodePtr->setNotDeletedTagged();
+
+                /* Check if favorite is different */
+                if (favorite != nodePtr->getFavoriteProperty())
+                {
+                    qDebug() << "Favorite id change for login" << qjobject["login"].toString() << " for service " << qjobject["service"].toString() << " at address " << nodeAddr.toHex();
+                    packet_send_needed = true;
+                }
+
+                /* Set favorite */
+                nodePtr->setFavoriteProperty(favorite);
 
                 /* Check for changed login */
                 if (login != nodePtr->getLogin())
@@ -5667,6 +5681,9 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                     removeChildFromDB(parentNodePtr, nodePtr, false);
                     addChildToDB(parentNodePtr, newNode);
                     packet_send_needed = true;
+
+                    /* Set favorite */
+                    newNode->setFavoriteProperty(favorite);
                 }
 
                 /* Check for changed password */
@@ -5757,6 +5774,26 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         if (newAddressesNeededCounter > 0)
         {
             changeVirtualAddressesToFreeAddresses();
+        }
+
+        /* Browse through the memory contents to find to store favorites */
+        for (qint32 i = 0; i < favoritesAddrs.size(); i++)
+        {
+            favoritesAddrs[i] = QByteArray(4, 0);
+        }
+        QListIterator<MPNode*> i(loginChildNodes);
+        while (i.hasNext())
+        {
+            MPNode* nodeItem = i.next();
+
+            if (nodeItem->getFavoriteProperty() >= 0)
+            {
+                MPNode* parentItem = findCredParentNodeGivenChildNodeAddr(nodeItem->getAddress(), 0);
+                QByteArray favAddr = QByteArray();
+                favAddr.append(parentItem->getAddress());
+                favAddr.append(nodeItem->getAddress());
+                favoritesAddrs[nodeItem->getFavoriteProperty()] = favAddr;
+            }
         }
 
         AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);

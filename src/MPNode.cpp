@@ -124,7 +124,12 @@ bool MPNode::getPointedToCheck() const
     return pointedToCheck;
 }
 
-void MPNode::setFavoriteProperty(const quint8 favId)
+qint8 MPNode::getFavoriteProperty() const
+{
+    return favorite;
+}
+
+void MPNode::setFavoriteProperty(const qint8 favId)
 {
     favorite = favId;
 }
