@@ -5540,6 +5540,8 @@ void MPDevice::serviceExists(bool isDatanode, const QString &service, const QStr
 void MPDevice::setMMCredentials(const QJsonArray &creds,
                                 std::function<void(bool success, QString errstr)> cb)
 {
+    newAddressesNeededCounter = 0;
+    newAddressesReceivedCounter = 0;
     AsyncJobs *jobs = new AsyncJobs("Merging credentials changes", this);
 
     /* Look for deleted or changed nodes */
@@ -5559,6 +5561,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             QByteArray nodeAddr;
             QString login = qjobject["login"].toString();
             QString service = qjobject["service"].toString();
+            QString password = qjobject["password"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
@@ -5578,7 +5581,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                 /* Tag it as not deleted */
                 nodePtr->setNotDeletedTagged();
 
-                /* Check for changed login or password */
+                /* Check for changed login */
                 if (login != nodePtr->getLogin())
                 {
                     qDebug() << "Detected login change";
@@ -5600,6 +5603,16 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                     loginChildNodes.append(newNode);
                     removeChildFromDB(parentNodePtr, nodePtr, false);
                     addChildToDB(parentNodePtr, newNode);
+                }
+
+                /* Check for changed password */
+                if (password.isEmpty())
+                {
+                    qDebug() << "Detected password change for" << login << "on" << service;
+
+                    QStringList changeList;
+                    changeList << service << login << password;
+                    mmmPasswordChangeArray.append(changeList);
                 }
             }
         }
@@ -5656,7 +5669,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
     }
 
     /* Generate save passwords */
-    if (!generateSavePackets(jobs, true, false))
+    if (!generateSavePackets(jobs, true, false) && mmmPasswordChangeArray.size() == 0)
     {
         qInfo() << "No changes detected";
         cb(true, "No Changes Required");
@@ -5667,15 +5680,47 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
         qInfo() << "Finished merging all credentials in memory";
-        cb(true, QString());
 
-        exitMemMgmtMode(true);
+        if (mmmPasswordChangeArray.size() > 0)
+        {
+            exitMemMgmtMode(false);
+            AsyncJobs *pwdChangeJobs = new AsyncJobs("Changing passwords...", this);
+
+            /* Create password change jobs */
+            for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
+            {
+
+            }
+
+            connect(pwdChangeJobs, &AsyncJobs::finished, [=](const QByteArray &)
+            {
+                cb(true, "Changes Applied to Memory");
+            });
+
+            connect(pwdChangeJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+            {
+                Q_UNUSED(failedJob);
+                qCritical() << "Couldn't change passwords";
+                cb(false, "Please Approve Password Changes On The Device");
+            });
+
+            jobsQueue.enqueue(pwdChangeJobs);
+            runAndDequeueJobs();
+        }
+        else
+        {
+            qDebug() << "No passwords to be changed",
+            cb(true, "Changes Applied to Memory");
+            exitMemMgmtMode(true);
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
-        qCritical() << "Merging failed";
-        cb(false, failedJob->getErrorStr());
+        Q_UNUSED(failedJob);
+        qCritical() << "MMM save failed";
+        cb(false, "Couldn't Save Changes (Device Disconnected?)");
+        exitMemMgmtMode(true);
     });
 
     jobsQueue.enqueue(jobs);

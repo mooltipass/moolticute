@@ -291,6 +291,9 @@ private:
     //command queue
     QQueue<MPCommand> commandQueue;
 
+    //passwords we need to change after leaving mmm
+    QList<QStringList> mmmPasswordChangeArray;
+
     // Number of new addresses we need
     quint32 newAddressesNeededCounter = 0;
     quint32 newAddressesReceivedCounter = 0;
