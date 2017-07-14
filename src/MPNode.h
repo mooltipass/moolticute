@@ -81,12 +81,13 @@ public:
     QByteArray getPreviousChildAddress() const;
     QByteArray getCTR() const;
     QString getDescription() const;
-    void setLogin(QString newLogin);
     QString getLogin() const;
+    void setLogin(const QString &newLogin);
     QByteArray getPasswordEnc() const;
     QDate getDateCreated() const;
     QDate getDateLastUsed() const;
-    void setFavoriteProperty(const quint8 favId);
+    void setFavoriteProperty(const qint8 favId);
+    qint8 getFavoriteProperty() const;
 
     //Data node address
     //Address in data node is not at the same position as cred nodes

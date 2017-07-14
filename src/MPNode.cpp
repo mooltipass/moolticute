@@ -124,7 +124,12 @@ bool MPNode::getPointedToCheck() const
     return pointedToCheck;
 }
 
-void MPNode::setFavoriteProperty(const quint8 favId)
+qint8 MPNode::getFavoriteProperty() const
+{
+    return favorite;
+}
+
+void MPNode::setFavoriteProperty(const qint8 favId)
 {
     favorite = favId;
 }
@@ -221,8 +226,10 @@ void MPNode::setService(const QString &service)
     if (isValid())
     {
         QByteArray serviceArray = service.toUtf8();
-        serviceArray.truncate(MP_MAX_SERVICE_LENGTH - 1);
-        data.replace(8, serviceArray.size(), serviceArray);
+        serviceArray.append('\0');
+        serviceArray.resize(MP_MAX_PAYLOAD_LENGTH);
+        serviceArray[serviceArray.size()-1] = '\0';
+        data.replace(8, MP_MAX_PAYLOAD_LENGTH, serviceArray);
     }
 }
 
@@ -326,7 +333,7 @@ QString MPNode::getLogin() const
     return QString::fromUtf8(data.mid(37, 63));
 }
 
-void MPNode::setLogin(QString newLogin)
+void MPNode::setLogin(const QString &newLogin)
 {
     if (isValid())
     {
