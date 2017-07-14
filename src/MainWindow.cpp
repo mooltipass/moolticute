@@ -179,6 +179,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwMemoryChanged, this, &MainWindow::updateSerialInfos);
 
+    connect(wsClient, &WSClient::memMgmtModeFailed, this, &MainWindow::memMgmtModeFailed);
 
     connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial) {
          setUIDRequestInstructionsWithId(serial > 0 ? QString::number(serial) : "XXXX");
@@ -890,4 +891,12 @@ void MainWindow::enableCredentialsManagement(bool enable)
 
     if (!enable)
         updatePage();
+}
+
+void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
+{
+    Q_UNUSED(errCode)
+    QMessageBox::warning(this,
+                         tr("Memory Management Error"),
+                         tr("An error occured when trying to go into Memory Management mode.\n\n%1").arg(errMsg));
 }

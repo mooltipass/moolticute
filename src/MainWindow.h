@@ -65,6 +65,8 @@ private slots:
     void dbExported(const QByteArray &d, bool success);
     void dbImported(bool success);
 
+    void memMgmtModeFailed(int errCode, QString errMsg);
+
     void on_pushButtonViewLogs_clicked();
     void on_pushButtonAutoStart_clicked();
 

@@ -82,7 +82,17 @@ void WSServerCon::processMessage(const QString &message)
 
         //send command to start MMM
         if (mpdevice)
-            mpdevice->startMemMgmtMode(o["want_data"].toBool(), defaultProgressCb);
+            mpdevice->startMemMgmtMode(o["want_data"].toBool(),
+                    defaultProgressCb,
+            [=](int errCode, QString errMsg)
+            {
+                if (!WSServer::Instance()->checkClientExists(this))
+                    return;
+
+                QJsonObject oroot = root;
+                oroot["msg"] = "failed_memorymgmt";
+                sendFailedJson(oroot, errMsg, errCode);
+            });
         else
             sendFailedJson(root, "No device connected");
     }
@@ -524,12 +534,14 @@ void WSServerCon::processMessage(const QString &message)
     }
 }
 
-void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr)
+void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)
 {
     QJsonObject odata;
     odata["failed"] = true;
     if (!errstr.isEmpty())
         odata["error_message"] = errstr;
+    if (errCode != -999)
+        odata["error_code"] = errCode;
     obj["data"] = odata;
     sendJsonMessage(obj);
 }

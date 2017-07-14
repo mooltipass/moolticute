@@ -908,7 +908,9 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
     }
 }
 
-void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int current)> cbProgress)
+void MPDevice::startMemMgmtMode(bool wantData,
+                                std::function<void(int total, int current)> cbProgress,
+                                std::function<void(int errCode, QString errMsg)> cbFailure)
 {
     /* Start MMM here, and load all memory data from the device */
 
@@ -944,6 +946,12 @@ void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int
         {
             qInfo() << "DB has errors, leaving MMM";
             exitMemMgmtMode(true);
+
+            //TODO: the errCode parameter could be used as an
+            //identifier for a translated error message
+            //The string is used for client (CLI for ex.) that
+            //does not want to use the error code
+            cbFailure(0, "some error messages");
         }
     });
 
@@ -952,6 +960,12 @@ void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
         exitMemMgmtMode(true);
+
+        //TODO: the errCode parameter could be used as an
+        //identifier for a translated error message
+        //The string is used for client (CLI for ex.) that
+        //does not want to use the error code
+        cbFailure(0, "some error messages");
     });
 
     jobsQueue.enqueue(jobs);

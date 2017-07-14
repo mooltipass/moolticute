@@ -79,7 +79,7 @@ private:
     QString clientUid;
 
     void processParametersSet(const QJsonObject &data);
-    void sendFailedJson(QJsonObject obj, QString errstr = QString());
+    void sendFailedJson(QJsonObject obj, QString errstr = QString(), int errCode = -999);
     QString getRequestId(const QJsonValue &v);
 };
 

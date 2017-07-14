@@ -120,7 +120,10 @@ public:
     void getUID(const QByteArray & key);
 
     //mem mgmt mode
-    void startMemMgmtMode(bool wantData, std::function<void(int total, int current)> cbProgress);
+    //cbFailure is used to propagate an error to clients when entering mmm
+    void startMemMgmtMode(bool wantData,
+                          std::function<void(int total, int current)> cbProgress,
+                          std::function<void(int errCode, QString errMsg)> cbFailure);
     void exitMemMgmtMode(bool setMMMBool = true);
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);

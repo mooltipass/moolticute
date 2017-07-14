@@ -113,6 +113,7 @@ signals:
     void dataNodeExists(const QString &service, bool exists);
     void dbExported(const QByteArray &fileData, bool success);
     void dbImported(bool success);
+    void memMgmtModeFailed(int errCode, QString errMsg);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

@@ -241,6 +241,13 @@ void WSClient::onTextMessageReceived(const QString &message)
         bool success = !o.contains("failed") || !o.value("failed").toBool();
         emit dbImported(success);
     }
+    else if (rootobj["msg"] == "failed_memorymgmt")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        if (!success)
+            emit memMgmtModeFailed(o["error_code"].toInt(), o["error_message"].toString());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
