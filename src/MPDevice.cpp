@@ -951,7 +951,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
             //identifier for a translated error message
             //The string is used for client (CLI for ex.) that
             //does not want to use the error code
-            cbFailure(0, "some error messages");
+            cbFailure(0, "Database Contains Errors, Please Run Integrity Check");
         }
     });
 
@@ -965,7 +965,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
         //identifier for a translated error message
         //The string is used for client (CLI for ex.) that
         //does not want to use the error code
-        cbFailure(0, "some error messages");
+        cbFailure(0, "Couldn't Load Database (Device Disconnected?)");
     });
 
     jobsQueue.enqueue(jobs);
