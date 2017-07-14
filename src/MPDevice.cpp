@@ -711,11 +711,10 @@ void MPDevice::updateLockUnlockMode(int val)
     updateParam(MPParams::LOCK_UNLOCK_FEATURE_PARAM, val);
 }
 
-void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress)
+void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData)
 {
     /* For when the MMM is left */
-    newAddressesNeededCounter = 0;
-    freeAddresses.clear();
+    cleanMMMVars();
 
     /* Get CTR value */
     jobs->append(new MPCommandJob(this, MPCmd::GET_CTRVALUE,
@@ -782,8 +781,6 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
     jobs->append(cpzJob);
 
     /* Get favorites */
-    favoritesAddrs.clear();
-    favoritesAddrsClone.clear();
     for (int i = 0; i<MOOLTIPASS_FAV_MAX; i++)
     {
         jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE,
@@ -820,105 +817,95 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
         }));
     }
 
-    /* Delete node list */
-    qDeleteAll(loginNodes);
-    loginNodes.clear();
-    loginChildNodes.clear();
-    qDeleteAll(loginNodesClone);
-    loginNodesClone.clear();
-    loginChildNodesClone.clear();
-
-    /* Get parent node start address */
-    jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
-                                  [=](const QByteArray &data, bool &) -> bool
+    if (getCreds)
     {
-        if (data[MP_LEN_FIELD_INDEX] == 1)
+        /* Get parent node start address */
+        jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
+                                      [=](const QByteArray &data, bool &) -> bool
         {
-            /* Received one byte as answer: command fail */
-            jobs->setCurrentJobError("Mooltipass refused to send us starting parent");
-            qCritical() << "Get start node addr: couldn't get answer";
-            return false;
-        }
-        else
-        {
-            startNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-            startNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-            qDebug() << "Start node addr:" << startNode.toHex();
-
-            //if parent address is not null, load nodes
-            if (startNode != MPNode::EmptyAddress)
+            if (data[MP_LEN_FIELD_INDEX] == 1)
             {
-                qInfo() << "Loading parent nodes...";
-                if (!fullScan)
+                /* Received one byte as answer: command fail */
+                jobs->setCurrentJobError("Mooltipass refused to send us starting parent");
+                qCritical() << "Get start node addr: couldn't get answer";
+                return false;
+            }
+            else
+            {
+                startNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+                startNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+                qDebug() << "Start node addr:" << startNode.toHex();
+
+                //if parent address is not null, load nodes
+                if (startNode != MPNode::EmptyAddress)
                 {
-                    /* Traverse the flash by following the linked list */
-                    loadLoginNode(jobs, startNode, cbProgress);
+                    qInfo() << "Loading parent nodes...";
+                    if (!fullScan)
+                    {
+                        /* Traverse the flash by following the linked list */
+                        loadLoginNode(jobs, startNode, cbProgress);
+                    }
+                    else
+                    {
+                        /* Full scan will be triggered once the answer from get data start node is received */
+                    }
                 }
                 else
                 {
-                    /* Full scan will be triggered once the answer from get data start node is received */
+                    qInfo() << "No parent nodes to load.";
                 }
+
+                return true;
             }
-            else
-            {
-                qInfo() << "No parent nodes to load.";
-            }
+        }));
+    }
 
-            return true;
-        }
-    }));
-
-    /* Delete data node list */
-    qDeleteAll(dataNodes);
-    dataNodes.clear();
-    dataChildNodes.clear();
-    qDeleteAll(dataNodesClone);
-    dataNodesClone.clear();
-    dataChildNodesClone.clear();
-
-    //Get parent data node start address
-    jobs->append(new MPCommandJob(this, MPCmd::GET_DN_START_PARENT,
-                                  [=](const QByteArray &data, bool &) -> bool
+    if (getData)
     {
-
-        if (data[MP_LEN_FIELD_INDEX] == 1)
+        //Get parent data node start address
+        jobs->append(new MPCommandJob(this, MPCmd::GET_DN_START_PARENT,
+                                      [=](const QByteArray &data, bool &) -> bool
         {
-            /* Received one byte as answer: command fail */
-            jobs->setCurrentJobError("Mooltipass refused to send us data starting parent");
-            qCritical() << "Get data start node addr: couldn't get answer";
-            return false;
-        }
-        else
-        {
-            startDataNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-            startDataNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-            qDebug() << "Start data node addr:" << startDataNode.toHex();
 
-            //if data parent address is not null, load nodes
-            if (startDataNode != MPNode::EmptyAddress)
+            if (data[MP_LEN_FIELD_INDEX] == 1)
             {
-                qInfo() << "Loading data parent nodes...";
-                if (!fullScan)
-                {
-                    //full data nodes are not needed. Only parents for service name
-                    loadDataNode(jobs, startDataNode, true, cbProgress);
-                }
+                /* Received one byte as answer: command fail */
+                jobs->setCurrentJobError("Mooltipass refused to send us data starting parent");
+                qCritical() << "Get data start node addr: couldn't get answer";
+                return false;
             }
             else
             {
-                qInfo() << "No parent data nodes to load.";
-            }
+                startDataNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+                startDataNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+                qDebug() << "Start data node addr:" << startDataNode.toHex();
 
-            //once we received start node address and data start node address, trigger full scan
-            if (fullScan)
-            {
-                /* Launch the scan */
-                loadSingleNodeAndScan(jobs, getMemoryFirstNodeAddress(), cbProgress);
-            }
+                //if data parent address is not null, load nodes
+                if (startDataNode != MPNode::EmptyAddress)
+                {
+                    qInfo() << "Loading data parent nodes...";
+                    if (!fullScan)
+                    {
+                        //full data nodes are not needed. Only parents for service name
+                        loadDataNode(jobs, startDataNode, true, cbProgress);
+                    }
+                }
+                else
+                {
+                    qInfo() << "No parent data nodes to load.";
+                }
 
-            return true;
-        }
-    }));
+                //once we received start node address and data start node address, trigger full scan
+                if (fullScan)
+                {
+                    /* Launch the scan */
+                    loadSingleNodeAndScan(jobs, getMemoryFirstNodeAddress(), cbProgress);
+                }
+
+                return true;
+            }
+        }));
+    }
 }
 
 void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int current)> cbProgress)
@@ -938,7 +925,7 @@ void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int
     jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false, cbProgress);
+    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -947,18 +934,24 @@ void MPDevice::startMemMgmtMode(bool wantData, std::function<void(int total, int
         /* Tag favorites */
         tagFavoriteNodes();
 
-        qInfo() << "Mem management mode enabled";
-        force_memMgmtMode(true);
+        /* Check DB */
+        if (checkLoadedNodes(!wantData, wantData, false))
+        {
+            qInfo() << "Mem management mode enabled, DB checked";
+            force_memMgmtMode(true);
+        }
+        else
+        {
+            qInfo() << "DB has errors, leaving MMM";
+            exitMemMgmtMode(true);
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
-
-        cleanMMMVars();
         exitMemMgmtMode(true);
-        force_memMgmtMode(false);
     });
 
     jobsQueue.enqueue(jobs);
@@ -4644,7 +4637,8 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                             {
                                 Q_UNUSED(total);
                                 Q_UNUSED(current);
-                            });
+                            },
+                            true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -5433,7 +5427,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;    
 
     /* Load CTR, favorites, nodes... */
-    memMgmtModeReadFlash(jobs, true, cbProgress);
+    memMgmtModeReadFlash(jobs, true, cbProgress, true, true);
 
     /////////
     //TODO: Simulation here. limpkin can implement the core work here.
@@ -5933,7 +5927,8 @@ void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, Q
                             {
                                 Q_UNUSED(total);
                                 Q_UNUSED(current);
-                            });
+                            }
+                            , true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
