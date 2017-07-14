@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>780</width>
+    <width>707</width>
     <height>553</height>
    </rect>
   </property>
@@ -219,7 +219,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -255,9 +255,6 @@ QWidget {background-color: #EFEFEF;}</string>
            <spacer name="verticalSpacer_noDaemon2">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -356,9 +353,6 @@ QWidget {background-color: #EFEFEF;}</string>
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
-            </property>
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
@@ -452,7 +446,7 @@ QWidget {background-color: #EFEFEF;}</string>
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>These settings change parameters on your Mooltipass device. For browser-specific settings, go to the options page of the extension.</string>
+           <string>These settings change parameters on your Mooltipass device. For browser specific settings, go to the options page of the extension.</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -464,6 +458,9 @@ QWidget {background-color: #EFEFEF;}</string>
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
           </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -472,7 +469,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>633</width>
+             <width>720</width>
              <height>597</height>
             </rect>
            </property>
@@ -873,6 +870,16 @@ QWidget {background-color: #EFEFEF;}</string>
                     </property>
                    </spacer>
                   </item>
+                  <item>
+                   <widget class="QLabel" name="labelRemoveCard">
+                    <property name="text">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic; color:#ac0000;&quot;&gt;(remove the card to change that setting)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </item>
@@ -889,7 +896,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QGroupBox" name="advancedSettingsGB">
               <property name="title">
-               <string>Advanced Settings (See user manual)</string>
+               <string>Advanced Settings (See User Manual)</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_21">
                <item>
@@ -1839,19 +1846,6 @@ QWidget {background-color: #EFEFEF;}</string>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButtonAutoStart">
-              <property name="minimumSize">
-               <size>
-                <width>120</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Change</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <spacer name="horizontalSpacer_21">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -1863,6 +1857,19 @@ QWidget {background-color: #EFEFEF;}</string>
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonAutoStart">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Change</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -1882,19 +1889,6 @@ QWidget {background-color: #EFEFEF;}</string>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButtonViewLogs">
-              <property name="minimumSize">
-               <size>
-                <width>120</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>View</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <spacer name="horizontalSpacer_20">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -1907,27 +1901,27 @@ QWidget {background-color: #EFEFEF;}</string>
               </property>
              </spacer>
             </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonViewLogs">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>View</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_19">
             <item>
              <widget class="QLabel" name="label_34">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
               <property name="text">
                <string>Start moolticute SSH agent automatically</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="checkBoxSSHAgent">
-              <property name="text">
-               <string>Autostart SSH Agent</string>
               </property>
              </widget>
             </item>
@@ -1956,6 +1950,13 @@ QWidget {background-color: #EFEFEF;}</string>
               </property>
              </spacer>
             </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxSSHAgent">
+              <property name="text">
+               <string>Autostart SSH Agent</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -1974,13 +1975,6 @@ QWidget {background-color: #EFEFEF;}</string>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBoxDebugHttp">
-              <property name="text">
-               <string>Enable daemon web server</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <spacer name="horizontalSpacer_22">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -1992,6 +1986,13 @@ QWidget {background-color: #EFEFEF;}</string>
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxDebugHttp">
+              <property name="text">
+               <string>Enable daemon web server</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -2049,9 +2050,6 @@ QWidget {background-color: #EFEFEF;}</string>
            <spacer name="verticalSpacer_13">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>

@@ -489,6 +489,8 @@ void MainWindow::enableKnockSettings(bool enable)
     ui->knockSettingsFrame->setToolTip(enable ? "" : tr("Remove the card from the device to change this setting."));
     ui->knockSettingsFrame->setToolTipDuration(enable ? -1 : std::numeric_limits<int>::max());
 
+    ui->labelRemoveCard->setVisible(!ui->knockSettingsFrame->isEnabled());
+
     //Make sure the suffix label ("sensitivity") matches the color of the other widgets.
     const QString color =
             ui->checkBoxKnock->palette().color(enable ?

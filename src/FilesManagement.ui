@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>685</width>
-    <height>549</height>
+    <width>695</width>
+    <height>595</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,7 +166,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageLocked">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -205,9 +205,6 @@ border-right: none;
           <spacer name="verticalSpacer_5">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Preferred</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -549,6 +546,8 @@ padding: 2px;
   </layout>
  </widget>
  <resources>
+  <include location="../img/images.qrc"/>
+  <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
  </resources>
  <connections/>
