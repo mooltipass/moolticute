@@ -164,6 +164,7 @@ void CredentialsModel::setClearTextPassword(const QString & service, const QStri
     if(it != std::end(m_credentials)) {
         const auto idx = it - std::begin(m_credentials);
         it->password = password;
+        it->passwordOrig = password;
         Q_EMIT dataChanged(index(idx, PasswordIdx),index(idx, PasswordIdx));
     }
 }
@@ -277,9 +278,18 @@ QJsonObject CredentialsModel::Credential::toJson() const
         addr.append((int)address.at(1));
     }
 
+    QString p;
+    //Only send password if it has been changed by user
+    //Else the fiels stays empty
+    if (!passwordOrig.isEmpty())
+    {
+        if (password != passwordOrig)
+            p = password;
+    }
+
     return {{ "service", service },
             { "login", login },
-            { "password", password },
+            { "password", p },
             { "description", description },
             { "address", addr },
             { "favorite", favorite }};

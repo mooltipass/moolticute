@@ -53,7 +53,7 @@ public:
     public:
         QString service;
         QString login;
-        QString password;
+        QString password, passwordOrig;
         QString description;
         QDate createdDate;
         QDate updatedDate;
