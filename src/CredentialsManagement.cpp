@@ -412,7 +412,7 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
                                      tr("Remove the current credential %1/%2 ?").arg(cred.service, cred.login),
                                      QMessageBox::Yes |
                                      QMessageBox::Cancel,
-                                     QMessageBox::Cancel);
+                                     QMessageBox::Yes);
     if (btn == QMessageBox::Yes)
     {
         deletingCred = true;
