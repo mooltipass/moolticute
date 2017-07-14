@@ -5429,41 +5429,12 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     /* Load CTR, favorites, nodes... */
     memMgmtModeReadFlash(jobs, true, cbProgress, true, true);
 
-    /////////
-    //TODO: Simulation here. limpkin can implement the core work here.
-    //When you stay in this AsyncJobs, the main queue is blocked from other
-    //query.
-    /*for (int i = 0;i < 10;i++)
-    {
-        jobs->append(new TimerJob(1000));
-        CustomJob *c = new CustomJob();
-        c->setWork([i, cbProgress, c]()
-        {
-            cbProgress(100, (i + 1) * 10);
-            emit c->done(QByteArray());
-        });
-        jobs->append(c);
-    }*/
-    /////////
-
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
         qInfo() << "Finished loading the nodes in memory";
 
         /* We finished loading the nodes in memory */
         AsyncJobs* repairJobs = new AsyncJobs("Checking memory contents...", this);
-
-        /*qInfo() << "before";
-        for (auto &nodelist_iterator: loginNodes)
-        {
-            qInfo() << nodelist_iterator->getService();
-        }*/
-
-        /*qInfo() << "after";
-        for (auto &nodelist_iterator: loginNodes)
-        {
-            qInfo() << nodelist_iterator->getService();
-        }*/
 
         /* Let's corrupt the DB for fun */
         //testCodeAgainstCleanDBChanges(repairJobs);
@@ -5472,7 +5443,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         checkLoadedNodes(true, true, true);
 
         /* Generate save packets */
-        generateSavePackets(repairJobs, true, true);
+        bool packets_generated = generateSavePackets(repairJobs, true, true);
 
         /* Leave MMM */
         repairJobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
@@ -5480,18 +5451,24 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         connect(repairJobs, &AsyncJobs::finished, [=](const QByteArray &data)
         {
             Q_UNUSED(data);
-            //data is last result
 
-            qInfo() << "Finished checking memory contents";
-            cb(true, QString());
+            if (packets_generated)
+            {
+                qInfo() << "Found and Corrected Errors in Database";
+                cb(true, "Errors Were Found And Corrected In The Database");
+            }
+            else
+            {
+                qInfo() << "Nothing to correct in DB";
+                cb(true, "Database Is Free Of Errors");
+            }
         });
 
         connect(repairJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
         {
             Q_UNUSED(failedJob);
-
             qCritical() << "Couldn't check memory contents";
-            cb(false, failedJob->getErrorStr());
+            cb(false, "Error While Correcting Database (Device Disconnected?)");
         });
 
         jobsQueue.enqueue(repairJobs);
@@ -5500,8 +5477,9 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
+        Q_UNUSED(failedJob);
         qCritical() << "Failed scanning the flash memory";
-        cb(false, failedJob->getErrorStr());
+        cb(false, "Couldn't scan the complete memory (Device Disconnected?)");
     });
 
     jobsQueue.enqueue(jobs);
