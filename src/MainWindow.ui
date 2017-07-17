@@ -128,6 +128,9 @@ QWidget {background-color: #EFEFEF;}</string>
          <property name="text">
           <string>Files</string>
          </property>
+         <property name="shortcut">
+          <string>Ctrl+A, Ctrl+D, Ctrl+F</string>
+         </property>
          <property name="checkable">
           <bool>true</bool>
          </property>
@@ -140,6 +143,9 @@ QWidget {background-color: #EFEFEF;}</string>
         <widget class="QPushButton" name="pushButtonSSH">
          <property name="text">
           <string>SSH Keys</string>
+         </property>
+         <property name="shortcut">
+          <string>Ctrl+A, Ctrl+D, Ctrl+F</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -2197,8 +2203,6 @@ QWidget {background-color: #EFEFEF;}</string>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../img/images.qrc"/>
-  <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
  </resources>
  <connections/>

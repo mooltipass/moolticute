@@ -115,6 +115,9 @@ private:
     friend class CredentialsFilterModel;
     friend class CredentialsManagement;
     friend class ServiceItemDelegate;
+
+signals:
+    void modelLoaded();
 };
 
 #endif // CREDENTIALSMODEL_H
