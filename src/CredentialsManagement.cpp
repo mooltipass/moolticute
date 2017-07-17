@@ -59,6 +59,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     credFilterModel->setSourceModel(credModel);
     ui->credentialsListView->setModel(credFilterModel);
+    connect(credModel, &CredentialsModel::modelLoaded, ui->credentialsListView, &CredentialsView::onModelLoaded);
 
     QDataWidgetMapper* mapper = new QDataWidgetMapper(this);
     mapper->setItemDelegate(new CredentialViewItemDelegate(mapper));
@@ -286,9 +287,9 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(QModelIndex 
     QString description = ui->credDisplayDescriptionInput->text();
     QString login = ui->credDisplayLoginInput->text();
 
-    if (password != cred.password ||
-        description != cred.description ||
-        login != cred.login)
+    if ((!password.isEmpty() && (password != cred.password)) ||
+        (!description.isEmpty() && (description != cred.description)) ||
+        (!login.isEmpty() && (login != cred.login)))
     {
         auto btn = QMessageBox::question(this,
                                          tr("Discard Modifications ?"),

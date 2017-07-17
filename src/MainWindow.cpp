@@ -36,7 +36,8 @@ static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx =
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    wsClient(client)
+    wsClient(client),
+    bFilesAndSSHKeyTabsVisible(false)
 {
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
@@ -58,9 +59,13 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAppSettings->setIcon(AppGui::qtAwesome()->icon(fa::cogs));
     ui->pushButtonAbout->setIcon(AppGui::qtAwesome()->icon(fa::info));
     ui->pushButtonFiles->setIcon(AppGui::qtAwesome()->icon(fa::file));
+    ui->pushButtonFiles->setVisible(bFilesAndSSHKeyTabsVisible);
     ui->pushButtonSSH->setIcon(AppGui::qtAwesome()->icon(fa::key));
-
+    ui->pushButtonSSH->setVisible(bFilesAndSSHKeyTabsVisible);
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
+
+    QShortcut *shortCut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F1), this);
+    connect(shortCut, SIGNAL(activated()), this, SLOT(onKeyboardShortcutActivated()));
 
     connect(wsClient, &WSClient::wsConnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
@@ -182,11 +187,11 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::memMgmtModeFailed, this, &MainWindow::memMgmtModeFailed);
 
     connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial) {
-         setUIDRequestInstructionsWithId(serial > 0 ? QString::number(serial) : "XXXX");
+        setUIDRequestInstructionsWithId(serial > 0 ? QString::number(serial) : "XXXX");
     });
     connect(wsClient, &WSClient::connectedChanged, [this] () {
         setUIDRequestInstructionsWithId("XXXX");
-   });
+    });
 
     QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{32}"), ui->UIDRequestKeyInput);
     ui->UIDRequestKeyInput->setValidator(uidKeyValidator);
@@ -228,20 +233,20 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     });
 
     connect(wsClient, &WSClient::connectedChanged, [this](bool connected) {
-       ui->UIDRequestGB->setVisible(connected);
-       gb_spinner->stop();
-       ui->UIDRequestResultLabel->setMovie(nullptr);
-       ui->UIDRequestResultLabel->setText({});
-       ui->UIDRequestResultLabel->setVisible(false);
-       ui->UIDRequestResultIcon->setVisible(false);
+        ui->UIDRequestGB->setVisible(connected);
+        gb_spinner->stop();
+        ui->UIDRequestResultLabel->setMovie(nullptr);
+        ui->UIDRequestResultLabel->setText({});
+        ui->UIDRequestResultLabel->setVisible(false);
+        ui->UIDRequestResultIcon->setVisible(false);
 
     });
 
 
     connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
     {
-       updateComboBoxIndex(ui->comboBoxLang, wsClient->get_keyboardLayout());
-       checkSettingsChanged();
+        updateComboBoxIndex(ui->comboBoxLang, wsClient->get_keyboardLayout());
+        checkSettingsChanged();
     });
     connect(wsClient, &WSClient::lockTimeoutEnabledChanged, [=]()
     {
@@ -409,7 +414,7 @@ void MainWindow::updatePage()
 {
     if ((ui->stackedWidget->currentWidget() == ui->pageCredentials ||
          ui->stackedWidget->currentWidget() == ui->pageFiles) &&
-        wsClient->get_memMgmtMode())
+            wsClient->get_memMgmtMode())
     {
         if (!ui->widgetCredentials->confirmDiscardUneditedCredentialChanges())
             return;
@@ -429,7 +434,7 @@ void MainWindow::updatePage()
             return;
         }
 
-         wsClient->sendLeaveMMRequest();
+        wsClient->sendLeaveMMRequest();
     }
 
     if (ui->pushButtonAbout->isChecked())
@@ -445,8 +450,8 @@ void MainWindow::updatePage()
     }
 
     if(!wsClient->isConnected()) {
-         ui->stackedWidget->setCurrentWidget(ui->pageNoDaemon);
-         return;
+        ui->stackedWidget->setCurrentWidget(ui->pageNoDaemon);
+        return;
     }
 
     if (!wsClient->get_connected())
@@ -467,14 +472,14 @@ void MainWindow::updatePage()
     }
 
     if (wsClient->get_status() == Common::Locked ||
-        wsClient->get_status() == Common::LockedScreen)
+            wsClient->get_status() == Common::LockedScreen)
     {
         ui->stackedWidget->setCurrentWidget(ui->pageDeviceLocked);
         return;
     }
 
     else if (ui->pushButtonCred->isChecked())
-         ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+        ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
     else if (ui->pushButtonSync->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageSync);
     else if (ui->pushButtonFiles->isChecked())
@@ -495,7 +500,7 @@ void MainWindow::enableKnockSettings(bool enable)
     //Make sure the suffix label ("sensitivity") matches the color of the other widgets.
     const QString color =
             ui->checkBoxKnock->palette().color(enable ?
-                                               QPalette::Active : QPalette::Disabled, QPalette::ButtonText).name();
+                                                   QPalette::Active : QPalette::Disabled, QPalette::ButtonText).name();
 
     ui->knockSettingsSuffixLabel->setStyleSheet(QStringLiteral("color: %1") .arg(color));
 }
@@ -654,6 +659,13 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
     wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
 }
 
+void MainWindow::onKeyboardShortcutActivated()
+{
+    bFilesAndSSHKeyTabsVisible = !bFilesAndSSHKeyTabsVisible;
+    ui->pushButtonFiles->setVisible(bFilesAndSSHKeyTabsVisible);
+    ui->pushButtonSSH->setVisible(bFilesAndSSHKeyTabsVisible);
+}
+
 void MainWindow::wantEnterCredentialManagement()
 {
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Wait for device confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
@@ -805,7 +817,7 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
     else
     {
         QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),
-                                                 "Memory exports (*.bin);;All files (*.*)");
+                                                     "Memory exports (*.bin);;All files (*.*)");
         if (!fname.isEmpty())
         {
             QFile f(fname);

@@ -27,6 +27,7 @@
 namespace Ui {
 class MainWindow;
 }
+class QShortcut;
 
 class MainWindow : public QMainWindow
 {
@@ -80,6 +81,8 @@ private slots:
     void on_pushButtonSettingsReset_clicked();
     void on_pushButtonSettingsSave_clicked();
 
+    void onKeyboardShortcutActivated();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -96,6 +99,9 @@ private:
     QByteArray logBuffer;
 
     QMovie* gb_spinner;
+
+    QShortcut *keyboardShortcut;
+    bool bFilesAndSSHKeyTabsVisible;
 };
 
 #endif // MAINWINDOW_H

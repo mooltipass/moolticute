@@ -46,6 +46,15 @@ CredentialsView::CredentialsView(QWidget *parent)
     setItemDelegateForColumn(0, new ServiceItemDelegate(this));
 }
 
+void CredentialsView::onModelLoaded()
+{
+    QModelIndex firstIndex = model()->index(0, 0, QModelIndex());
+    if (firstIndex.isValid()) {
+        ConditionalItemSelectionModel *pSelectionModel = dynamic_cast<ConditionalItemSelectionModel *>(selectionModel());
+        pSelectionModel->setCurrentIndex(firstIndex, QItemSelectionModel::ClearAndSelect);
+    }
+}
+
 ConditionalItemSelectionModel::ConditionalItemSelectionModel(TestFunction f, QAbstractItemModel *model)
  : QItemSelectionModel(model)
  , cb(f)

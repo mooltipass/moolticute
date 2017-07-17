@@ -109,7 +109,7 @@ void CredentialsModel::load(const QJsonArray &json)
         }
     }
     mergeWith(creds);
-
+    emit modelLoaded();
 }
 
 
@@ -304,3 +304,4 @@ void CredentialsModel::removeCredential(const QModelIndex &idx)
     m_credentials.remove(idx.row());
     endRemoveRows();
 }
+

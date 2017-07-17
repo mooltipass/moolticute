@@ -26,8 +26,13 @@
 
 class CredentialsView : public QListView
 {
+    Q_OBJECT
+
 public:
     explicit CredentialsView(QWidget *parent = nullptr);
+
+public slots:
+    void onModelLoaded();
 };
 
 class ConditionalItemSelectionModel : public QItemSelectionModel {
