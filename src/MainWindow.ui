@@ -195,6 +195,19 @@ QWidget {background-color: #EFEFEF;}</string>
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonAdvanced">
+         <property name="text">
+          <string>Advanced</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonAbout">
          <property name="text">
           <string>About</string>
@@ -225,7 +238,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>13</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -2167,6 +2180,24 @@ QWidget {background-color: #EFEFEF;}</string>
         </property>
         <item>
          <widget class="SSHManagement" name="widgetSSH" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageAdvanced">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QRadioButton" name="radioButtonFilesAndSSHKeysTabsAlwaysVisible">
+          <property name="text">
+           <string>Files and SSH Keys tabs ALWAYS visible</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QRadioButton" name="radioButtonTabsAndSSHKeyTabsVisibleOnDemand">
+          <property name="text">
+           <string>Files and SSH Keys tabs visible ON DEMAND (use CTRL+SHIFT+F2 keyboard shortcut)</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

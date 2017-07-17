@@ -81,7 +81,9 @@ private slots:
     void on_pushButtonSettingsReset_clicked();
     void on_pushButtonSettingsSave_clicked();
 
-    void onKeyboardShortcutActivated();
+    void onFilesAndSSHTabsShortcutActivated();
+    void onAdvancedTabShortcutActivated();
+    void onRadioButtonFilesAndSSHKeysTabsAlwaysVisibleToggled(bool bChecked);
 
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
@@ -89,6 +91,8 @@ private:
     virtual void closeEvent(QCloseEvent *event);
 
     void checkAutoStart();
+
+    void setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdateAdvancedTabVisibility=false);
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;
@@ -102,6 +106,11 @@ private:
 
     QShortcut *keyboardShortcut;
     bool bFilesAndSSHKeyTabsVisible;
+    bool bAdvancedTabVisible;
+    bool bFilesAndSSHKeysTabsVisibleOnDemand;
+
+    QShortcut *m_FilesAndSSHKeysTabsShortcut;
+    QShortcut *m_advancedTabShortcut;
 };
 
 #endif // MAINWINDOW_H
