@@ -3677,7 +3677,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         return true;
     }));
 
-    if (isFw12() && setDesc)
+    if (isFw12() && setDesc && description != "None")
     {
         QByteArray ddata = description.toUtf8();
         ddata.append((char)0);
