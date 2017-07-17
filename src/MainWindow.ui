@@ -2195,7 +2195,7 @@ QWidget {background-color: #EFEFEF;}</string>
         <item row="1" column="0">
          <widget class="QRadioButton" name="radioButtonTabsAndSSHKeyTabsVisibleOnDemand">
           <property name="text">
-           <string>Files and SSH Keys tabs visible ON DEMAND (use CTRL+SHIFT+F2 keyboard shortcut)</string>
+           <string>Files and SSH Keys tabs visible ON DEMAND (use CTRL+SHIFT+F1 keyboard shortcut)</string>
           </property>
          </widget>
         </item>
