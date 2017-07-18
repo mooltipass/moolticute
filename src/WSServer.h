@@ -44,6 +44,9 @@ public:
     bool checkClientExists(WSServerCon *wscon);
     bool checkClientExists(QWebSocket *ws);
 
+    void setMemLockedClient(QString uid) { lockedUid = uid; }
+    bool isMemModeLocked(QString uid = QString());
+
 private slots:
     void onNewConnection();
     void socketDisconnected();
@@ -57,6 +60,8 @@ private:
     QWebSocketServer *wsServer = nullptr;
     QHash<QWebSocket *, WSServerCon *> wsClients;
     QHash<WSServerCon *, QWebSocket *> wsClientsReverse; //reverse map for fast lookup
+
+    QString lockedUid;
 
     //Current MP
     //For now only one MP is supported. maybe add multi support

@@ -138,3 +138,16 @@ bool WSServer::checkClientExists(QWebSocket *ws)
         return false;
     return true;
 }
+
+bool WSServer::isMemModeLocked(QString uid)
+{
+    //if the current client that has locked
+    //the mem mode query for locked state, return false
+    if (uid == lockedUid)
+        return false;
+
+    //if mem mode is enabled, it is locked
+    if (device && device->get_memMgmtMode())
+        return true;
+    return false;
+}
