@@ -57,12 +57,12 @@ public:
 
 signals:
     void wantEnterMemMode();
+    void wantExitMemMode();
 
 private slots:
     void enableMemManagement(bool);
     void dataFileRequested(const QString &service, const QByteArray &data, bool success);
     void dataFileSent(const QString &service, bool success);
-    void dataFileDeleted(const QString &service, bool success);
     void updateProgress(int total, int curr);
     void updateButtonsUI();
 
@@ -91,6 +91,8 @@ private:
     QStandardItemModel *filesModel;
     QStandardItem *currentItem = nullptr;
     QString fileName;
+
+    QStringList deletedList;
 };
 
 #endif // FILESMANAGEMENT_H

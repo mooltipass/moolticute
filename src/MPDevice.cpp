@@ -4018,19 +4018,19 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
     runAndDequeueJobs();
 }
 
-void  MPDevice::deleteDataNode(const QString &service, const QString &reqid,
-                               std::function<void(bool success, QString errstr)> cb,
-                               std::function<void(int total, int current)> cbProgress)
+void  MPDevice::deleteDataNodesAndLeave(const QStringList &services, const QString &reqid,
+                                        std::function<void(bool success, QString errstr)> cb,
+                                        std::function<void(int total, int current)> cbProgress)
 {
-    if (service.isEmpty())
+    if (services.isEmpty())
     {
-        qWarning() << "context is empty.";
-        cb(false, "context is empty");
+        //No data services do delete, just exit mmm
+        exitMemMgmtMode();
         return;
     }
 
-    QString logInf = QStringLiteral("Delete data node for service: %1 reqid: %2")
-                     .arg(service)
+    QString logInf = QStringLiteral("Delete data nodes for services: %1 reqid: %2")
+                     .arg(services.join(','))
                      .arg(reqid);
 
     AsyncJobs *jobs;
@@ -4047,13 +4047,13 @@ void  MPDevice::deleteDataNode(const QString &service, const QString &reqid,
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
         //all jobs finished success
-        qInfo() << "delete_data_node success";
-        cb(true, QString());
+        qInfo() << "delete_data_nodes success";
+        exitMemMgmtMode();
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
-        qCritical() << "Failed deleting data node";
+        qCritical() << "Failed deleting data nodes";
         cb(false, failedJob->getErrorStr());
     });
 

@@ -52,6 +52,7 @@ private slots:
     void updateSerialInfos();
     void wantEnterCredentialManagement();
     void wantSaveCredentialManagement();
+    void wantExitFilesManagement();
     void wantImportDatabase();
     void wantExportDatabase();
 

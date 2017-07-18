@@ -88,7 +88,7 @@ public:
 
     void requestDataFile(const QString &service);
     void sendDataFile(const QString &service, const QByteArray &data);
-    void deleteDataFile(const QString &service);
+    void deleteDataFilesAndLeave(const QStringList &services);
 
     void serviceExists(bool isDatanode, const QString &service);
 

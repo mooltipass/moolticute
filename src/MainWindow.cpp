@@ -86,6 +86,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantSaveMemMode, this, &MainWindow::wantSaveCredentialManagement);
     connect(ui->widgetFiles, &FilesManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
+    connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
 
     connect(wsClient, &WSClient::statusChanged, [this]()
     {
@@ -741,6 +742,15 @@ void MainWindow::wantImportDatabase()
 void MainWindow::wantExportDatabase()
 {
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+
+    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+}
+
+void MainWindow::wantExitFilesManagement()
+{
+    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
 

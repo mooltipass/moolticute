@@ -323,7 +323,7 @@ void WSServerCon::processMessage(const QString &message)
         },
         defaultProgressCb);
     }
-    else if (root["msg"] == "delete_data_node")
+    else if (root["msg"] == "delete_data_nodes")
     {
         QJsonObject o = root["data"].toObject();
 
@@ -334,26 +334,32 @@ void WSServerCon::processMessage(const QString &message)
         if (!mpdevice)
             return;
 
-        QString service = o["service"].toString();
+        if (!mpdevice->get_memMgmtMode())
+        {
+            sendFailedJson(root, "Not in memory management mode");
+            return;
+        }
 
-        mpdevice->deleteDataNode(service,
+        QJsonArray jarr = o["services"].toArray();
+        QStringList services;
+        for (int i = 0;i < jarr.size();i++)
+            services.append(jarr[i].toString());
+
+        mpdevice->deleteDataNodesAndLeave(services,
                 reqid,
                 [=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
+            //If not success send an error json
+            //if success, don't do anything, the mmm mode will
+            //be disabled automatically
             if (!success)
             {
                 sendFailedJson(root, errstr);
                 return;
             }
-
-            QJsonObject ores;
-            ores["service"] = service;
-            QJsonObject oroot = root;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
         },
         defaultProgressCb);
     }
