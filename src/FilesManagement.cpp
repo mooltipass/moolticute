@@ -286,6 +286,17 @@ void FilesManagement::updateButtonsUI()
 void FilesManagement::addUpdateFile(QString service, QString filename, QProgressBar *pbar)
 {
     Q_UNUSED(service)
+
+    qint64 maxSize = MP_MAX_FILE_SIZE;
+    if (service == MC_SSH_SERVICE)
+        maxSize = MP_MAX_SSH_SIZE;
+    QFileInfo fi(filename);
+    if (fi.size() > maxSize)
+    {
+        QMessageBox::warning(this, tr("Failure"), tr("File '%1' is too big to be stored in the Mooltipass!").arg(filename));
+        return;
+    }
+
     QFile f(filename);
     if (!f.open(QFile::ReadWrite))
     {

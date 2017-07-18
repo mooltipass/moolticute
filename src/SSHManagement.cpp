@@ -71,13 +71,13 @@ void SSHManagement::on_pushButtonUnlock_clicked()
     //First check if the ssh service exists.
     //If not, unlock as the file would be empty
     connect(wsClient, &WSClient::dataNodeExists, this, &SSHManagement::onServiceExists);
-    wsClient->serviceExists(true, "Moolticute SSH Keys");
+    wsClient->serviceExists(true, MC_SSH_SERVICE);
     ui->stackedWidget->setCurrentWidget(ui->pageWait);
 }
 
 void SSHManagement::onServiceExists(const QString service, bool exists)
 {
-    if (service != "Moolticute SSH Keys")
+    if (service != MC_SSH_SERVICE)
     {
         qWarning() << "SSH, Wrong service: " << service;
         return;

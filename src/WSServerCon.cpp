@@ -290,6 +290,15 @@ void WSServerCon::processMessage(const QString &message)
             return;
         }
 
+        int maxSize = MP_MAX_FILE_SIZE;
+        if (service == MC_SSH_SERVICE)
+            maxSize = MP_MAX_SSH_SIZE;
+        if (data.size() > maxSize)
+        {
+            sendFailedJson(root, "data is too big to be stored in device");
+            return;
+        }
+
         mpdevice->setDataNode(service, data,
                 reqid,
                 [=](bool success, QString errstr)
