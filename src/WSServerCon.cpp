@@ -277,12 +277,7 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "set_data_node")
     {
         QJsonObject o = root["data"].toObject();
-
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
         QString service = o["service"].toString();
-
         QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
         if (data.isEmpty())
         {
@@ -300,7 +295,6 @@ void WSServerCon::processMessage(const QString &message)
         }
 
         mpdevice->setDataNode(service, data,
-                reqid,
                 [=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))
@@ -324,10 +318,6 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
 
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
         if (!mpdevice->get_memMgmtMode())
         {
             sendFailedJson(root, "Not in memory management mode");
@@ -340,7 +330,6 @@ void WSServerCon::processMessage(const QString &message)
             services.append(jarr[i].toString());
 
         mpdevice->deleteDataNodesAndLeave(services,
-                reqid,
                 [=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))

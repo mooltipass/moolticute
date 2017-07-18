@@ -3938,7 +3938,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
     return true;
 }
 
-void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, const QString &reqid,
+void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
                            std::function<void(bool success, QString errstr)> cb,
                            std::function<void(int total, int current)> cbProgress)
 {
@@ -3949,15 +3949,10 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
         return;
     }
 
-    QString logInf = QStringLiteral("Set data node for service: %1 reqid: %2")
-                     .arg(service)
-                     .arg(reqid);
+    QString logInf = QStringLiteral("Set data node for service: %1")
+                     .arg(service);
 
-    AsyncJobs *jobs;
-    if (reqid.isEmpty())
-        jobs = new AsyncJobs(logInf, this);
-    else
-        jobs = new AsyncJobs(logInf, reqid, this);
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray sdata = service.toUtf8();
     sdata.append((char)0);
@@ -4018,7 +4013,7 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
     runAndDequeueJobs();
 }
 
-void  MPDevice::deleteDataNodesAndLeave(const QStringList &services, const QString &reqid,
+void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
                                         std::function<void(bool success, QString errstr)> cb,
                                         std::function<void(int total, int current)> cbProgress)
 {
@@ -4029,15 +4024,10 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services, const QStri
         return;
     }
 
-    QString logInf = QStringLiteral("Delete data nodes for services: %1 reqid: %2")
-                     .arg(services.join(','))
-                     .arg(reqid);
+    QString logInf = QStringLiteral("Delete data nodes for services: %1")
+                     .arg(services.join(','));
 
-    AsyncJobs *jobs;
-    if (reqid.isEmpty())
-        jobs = new AsyncJobs(logInf, this);
-    else
-        jobs = new AsyncJobs(logInf, reqid, this);
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     /////////
     //TODO: Simulation here. limpkin can implement the core work here.

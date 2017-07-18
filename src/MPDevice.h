@@ -161,12 +161,12 @@ public:
                      std::function<void(int total, int current)> cbProgress);
 
     //Set data to a context on the device
-    void setDataNode(const QString &service, const QByteArray &nodeData, const QString &reqid,
+    void setDataNode(const QString &service, const QByteArray &nodeData,
                      std::function<void(bool success, QString errstr)> cb,
                      std::function<void(int total, int current)> cbProgress);
 
     //Delete a data context from the device
-    void deleteDataNodesAndLeave(const QStringList &services, const QString &reqid,
+    void deleteDataNodesAndLeave(const QStringList &services,
                                  std::function<void(bool success, QString errstr)> cb,
                                  std::function<void(int total, int current)> cbProgress);
 
