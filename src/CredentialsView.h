@@ -35,7 +35,8 @@ public slots:
     void onModelLoaded();
 };
 
-class ConditionalItemSelectionModel : public QItemSelectionModel {
+class ConditionalItemSelectionModel : public QItemSelectionModel
+{
     Q_OBJECT
 public:
     using TestFunction = std::function<bool(const QModelIndex & idx)>;
@@ -53,8 +54,8 @@ private:
     quint64 lastRequestTime;
 };
 
-class CredentialViewItemDelegate : public QItemDelegate {
-
+class CredentialViewItemDelegate : public QItemDelegate
+{
 public:
     using QItemDelegate::QItemDelegate;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;

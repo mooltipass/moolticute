@@ -25,15 +25,15 @@
 #include "PasswordLineEdit.h"
 #include "AppGui.h"
 
-class ServiceItemDelegate : public QStyledItemDelegate {
+class ServiceItemDelegate : public QStyledItemDelegate
+{
 public:
     explicit ServiceItemDelegate(QWidget* parent = nullptr);
 
-
     QSize sizeHint(const QStyleOptionViewItem &option,
-                       const QModelIndex &index) const override;
+                   const QModelIndex &index) const override;
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
-                             const QModelIndex &index) const override;
+               const QModelIndex &index) const override;
 private:
     QFont serviceFont() const;
     QFont loginFont() const;
@@ -41,7 +41,8 @@ private:
 };
 
 CredentialsView::CredentialsView(QWidget *parent)
-    :QListView(parent) {
+    :QListView(parent)
+{
 
     setItemDelegateForColumn(0, new ServiceItemDelegate(this));
 }
@@ -49,58 +50,62 @@ CredentialsView::CredentialsView(QWidget *parent)
 void CredentialsView::onModelLoaded()
 {
     QModelIndex firstIndex = model()->index(0, 0, QModelIndex());
-    if (firstIndex.isValid()) {
+    if (firstIndex.isValid())
+    {
         ConditionalItemSelectionModel *pSelectionModel = dynamic_cast<ConditionalItemSelectionModel *>(selectionModel());
         pSelectionModel->setCurrentIndex(firstIndex, QItemSelectionModel::ClearAndSelect);
     }
 }
 
-ConditionalItemSelectionModel::ConditionalItemSelectionModel(TestFunction f, QAbstractItemModel *model)
- : QItemSelectionModel(model)
- , cb(f)
- , lastRequestTime(0) {}
+ConditionalItemSelectionModel::ConditionalItemSelectionModel(TestFunction f, QAbstractItemModel *model):
+    QItemSelectionModel(model),
+    cb(f),
+    lastRequestTime(0)
+{}
 
-void ConditionalItemSelectionModel::select(const QModelIndex &index, QItemSelectionModel::SelectionFlags command) {
-    if(canChangeIndex()) {
+void ConditionalItemSelectionModel::select(const QModelIndex &index, QItemSelectionModel::SelectionFlags command)
+{
+    if (canChangeIndex())
         QItemSelectionModel::select(index, command);
-    }
 }
 
 
-void ConditionalItemSelectionModel::select(const QItemSelection & selection, QItemSelectionModel::SelectionFlags command) {
-     if(canChangeIndex()) {
+void ConditionalItemSelectionModel::select(const QItemSelection & selection, QItemSelectionModel::SelectionFlags command)
+{
+    if (canChangeIndex())
         QItemSelectionModel::select(selection, command);
-    }
 }
 
-void  ConditionalItemSelectionModel::setCurrentIndex(const QModelIndex & index, QItemSelectionModel::SelectionFlags command) {
-    if(canChangeIndex()) {
+void  ConditionalItemSelectionModel::setCurrentIndex(const QModelIndex & index, QItemSelectionModel::SelectionFlags command)
+{
+    if (canChangeIndex())
         QItemSelectionModel::setCurrentIndex(index, command);
-    }
 }
 
-bool ConditionalItemSelectionModel::canChangeIndex() {
-    if(!cb)
+bool ConditionalItemSelectionModel::canChangeIndex()
+{
+    if (!cb)
         return true;
     quint64 time = QDateTime::currentMSecsSinceEpoch();
-    if(time - lastRequestTime < 20 ) {
+
+    if (time - lastRequestTime < 20 )
         return false;
-    }
+
     bool res = cb(currentIndex());
-    if(!res) {
+    if (!res)
         lastRequestTime = QDateTime::currentMSecsSinceEpoch();
-    }
+
     return res;
 }
 
-ServiceItemDelegate::ServiceItemDelegate(QWidget* parent)
- : QStyledItemDelegate(parent) {
-
+ServiceItemDelegate::ServiceItemDelegate(QWidget* parent):
+    QStyledItemDelegate(parent)
+{
 }
 
 QSize ServiceItemDelegate::sizeHint(const QStyleOptionViewItem &,
-                   const QModelIndex &index) const  {
-
+                                    const QModelIndex &index) const
+{
     QString service = index.data(Qt::DisplayRole).toString();
     QString login   = index.data(CredentialsModel::LoginRole).toString();
 
@@ -109,12 +114,12 @@ QSize ServiceItemDelegate::sizeHint(const QStyleOptionViewItem &,
     auto favMetrics = QFontMetrics(favFont());
 
     const auto height = serviceMetrics.height() + loginMetrics.height() + 20;
-    const auto width  = qMax(serviceMetrics.width(service) + 10 + serviceMetrics.height() + favMetrics.width("00"),
-                             loginMetrics.width(login)) + 10 + loginMetrics.height();
+    const auto width = qMax(serviceMetrics.width(service) + 10 + serviceMetrics.height() + favMetrics.width("00"),
+                            loginMetrics.width(login)) + 10 + loginMetrics.height();
 
     return QSize(width, height);
-
 }
+
 void ServiceItemDelegate::paint(QPainter *painter,
                                 const QStyleOptionViewItem &option,
                                 const QModelIndex &index) const
@@ -178,8 +183,8 @@ void ServiceItemDelegate::paint(QPainter *painter,
 
     //Icon login
     QIcon icoLogin = AppGui::qtAwesome()->icon(fa::arrowcircleright, {{ "color", QColor("#0097a7") },
-                                                                       { "color-selected", QColor("#0097a7") },
-                                                                       { "color-active", QColor("#0097a7") }});
+                                                                      { "color-selected", QColor("#0097a7") },
+                                                                      { "color-active", QColor("#0097a7") }});
     iconSz = QSize(loginMetrics.height(), loginMetrics.height());
     pos.setX(option.rect.x() + 5);
     icoLogin.paint(painter, QRect(pos, iconSz));
@@ -193,36 +198,37 @@ void ServiceItemDelegate::paint(QPainter *painter,
     painter->restore();
 }
 
-
-
-QFont ServiceItemDelegate::serviceFont() const {
+QFont ServiceItemDelegate::serviceFont() const
+{
     QFont f = qApp->font();
     f.setBold(false);
     f.setPointSize(12);
     return f;
 }
-QFont ServiceItemDelegate::loginFont() const {
+
+QFont ServiceItemDelegate::loginFont() const
+{
     QFont f = qApp->font();
     f.setPointSize(10);
     f.setItalic(true);
     return f;
 }
-QFont ServiceItemDelegate::favFont() const {
+
+QFont ServiceItemDelegate::favFont() const
+{
     QFont f = qApp->font();
     f.setPointSize(8);
     return f;
 }
 
-
-
-void CredentialViewItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+void CredentialViewItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
     QItemDelegate::setEditorData(editor, index);
     auto ed = qobject_cast<LockedPasswordLineEdit*>(editor);
-    if(index.model() && ed  && index.column() == CredentialsModel::PasswordIdx) {
+
+    if (index.model() && ed  && index.column() == CredentialsModel::PasswordIdx)
+    {
         bool locked = !index.model()->data(index, CredentialsModel::PasswordUnlockedRole).toBool();
         ed->setLocked(locked);
     }
 }
-
-
-

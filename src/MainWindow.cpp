@@ -32,7 +32,6 @@ static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx =
     cb->setCurrentIndex(idx);
 }
 
-
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
