@@ -33,7 +33,13 @@ SOURCES += src/main_gui.cpp \
     src/CredentialsManagement.cpp \
     src/zxcvbn-c/zxcvbn.c \
     src/FilesManagement.cpp \
-    src/SSHManagement.cpp
+    src/SSHManagement.cpp \
+    src/treeitem.cpp \
+    src/serviceitem.cpp \
+    src/loginitem.cpp \
+    src/rootitem.cpp \
+    src/credentialmodel.cpp \
+    src/credentialmodelfilter.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -54,7 +60,13 @@ HEADERS  += src/MainWindow.h \
     src/zxcvbn-c/dict-src.h \
     src/zxcvbn-c/zxcvbn.h \
     src/FilesManagement.h \
-    src/SSHManagement.h
+    src/SSHManagement.h \
+    src/treeitem.h \
+    src/serviceitem.h \
+    src/loginitem.h \
+    src/rootitem.h \
+    src/credentialmodel.h \
+    src/credentialmodelfilter.h
 
 mac {
     HEADERS += src/MacUtils.h

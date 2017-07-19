@@ -26,6 +26,8 @@
 namespace Ui {
 class CredentialsManagement;
 }
+class CredentialModel;
+class CredentialModelFilter;
 
 class CredentialsManagement : public QWidget
 {
@@ -72,6 +74,10 @@ private:
 
     CredentialsModel *credModel = nullptr;
     CredentialsFilterModel *credFilterModel = nullptr;
+
+    CredentialModel *m_pCredModel = nullptr;
+    CredentialModelFilter *m_pCredModelFilter = nullptr;
+
     WSClient *wsClient = nullptr;
 
     //use when deleting a cred and not prompt user

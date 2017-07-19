@@ -92,7 +92,7 @@ private:
 
     void checkAutoStart();
 
-    void setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdateAdvancedTabVisibility=false);
+    void setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue);
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;

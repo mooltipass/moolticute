@@ -17,6 +17,8 @@
  **
  ******************************************************************************/
 #include "CredentialsManagement.h"
+#include "credentialmodel.h"
+#include "credentialmodelfilter.h"
 #include "ui_CredentialsManagement.h"
 #include "Common.h"
 #include "AppGui.h"
@@ -56,10 +58,18 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     credModel = new CredentialsModel(this);
     credFilterModel = new CredentialsFilterModel(this);
-
     credFilterModel->setSourceModel(credModel);
     ui->credentialsListView->setModel(credFilterModel);
     connect(credModel, &CredentialsModel::modelLoaded, ui->credentialsListView, &CredentialsView::onModelLoaded);
+
+
+
+    m_pCredModel = new CredentialModel(this);
+    m_pCredModelFilter = new CredentialModelFilter(this);
+    m_pCredModelFilter->setSourceModel(m_pCredModel);
+    ui->credentialTreeView->setModel(m_pCredModelFilter);
+
+
 
     QDataWidgetMapper* mapper = new QDataWidgetMapper(this);
     mapper->setItemDelegate(new CredentialViewItemDelegate(mapper));
@@ -120,6 +130,8 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memoryDataChanged, [=]()
     {
         credModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
+        m_pCredModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
+
         ui->lineEditFilterCred->clear();
     });
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);

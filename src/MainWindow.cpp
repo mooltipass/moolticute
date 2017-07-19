@@ -708,7 +708,7 @@ void MainWindow::onAdvancedTabShortcutActivated()
 
 void MainWindow::onRadioButtonFilesAndSSHKeysTabsAlwaysVisibleToggled(bool bChecked)
 {
-    setFilesAndSSHKeysTabsVisibleOnDemand(!bChecked, true);
+    setFilesAndSSHKeysTabsVisibleOnDemand(!bChecked);
 }
 
 void MainWindow::wantEnterCredentialManagement()
@@ -789,7 +789,7 @@ void MainWindow::checkAutoStart()
         ui->pushButtonAutoStart->setText(tr("Enable"));
 }
 
-void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdateAdvancedTabVisibility)
+void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue)
 {
     bFilesAndSSHKeysTabsVisibleOnDemand = bValue;
 
@@ -816,8 +816,10 @@ void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdate
         ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
     }
 
+    /*
     if (bUpdateAdvancedTabVisibility)
         onAdvancedTabShortcutActivated();
+        */
 }
 
 void MainWindow::daemonLogAppend(const QByteArray &logdata)
