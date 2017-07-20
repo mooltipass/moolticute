@@ -10,6 +10,7 @@
 #include "Common.h"
 class RootItem;
 class ServiceItem;
+class LoginItem;
 class TreeItem;
 
 class CredentialModel : public QAbstractItemModel
@@ -30,7 +31,7 @@ public:
         DateCreatedIdx,
         DateModifiedIdx,
         FavoriteIdx,
-        ColumnCount,
+        ColumnCount
     };
 
     enum CustomRole {
@@ -82,16 +83,16 @@ public:
     //-------------------------------------------------------------------------------------------------
 
     //! Data
-    virtual QVariant data(const QModelIndex &index, int role) const;
+    virtual QVariant data(const QModelIndex &idx, int role) const;
 
     //! Return flags
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+    virtual Qt::ItemFlags flags(const QModelIndex &idx) const;
 
     //! Index
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
 
     //! Parent
-    virtual QModelIndex parent(const QModelIndex &index) const;
+    virtual QModelIndex parent(const QModelIndex &idx) const;
 
     //! Row count
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -109,7 +110,7 @@ public:
     void update(const QString &sServiceName, const QString &sLoginName, const QString &sPassowrd, const QString &sDescription);
 
     //! Update
-    void update(const QModelIndex &idx, const Credential &cred);
+    void update(const QModelIndex &idx, const LoginItem *pRefLoginItem);
 
     //! Get JSON changes
     QJsonArray getJsonChanges();
@@ -118,10 +119,16 @@ public:
     void removeCredential(const QModelIndex &idx);
 
     //! Get item
-    TreeItem *getItemByIndex(const QModelIndex &index) const;
+    TreeItem *getItemByIndex(const QModelIndex &idx) const;
 
     //! Return item for UID
     TreeItem *getItemByUID(const QString &sItemUID) const;
+
+    //! Update login item at index
+    void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName);
+
+    //! Update login item specific property
+    void updateLoginItem(const QModelIndex &idx, const ColumnIdx &colIdx, const QVariant &vValue);
 
 private:
     //! Add service

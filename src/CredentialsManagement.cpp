@@ -16,6 +16,8 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
+
+// Application
 #include "CredentialsManagement.h"
 #include "credentialmodel.h"
 #include "credentialmodelfilter.h"
@@ -26,9 +28,10 @@
 #include "loginitem.h"
 #include "serviceitem.h"
 
+//-------------------------------------------------------------------------------------------------
+
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CredentialsManagement)
+    QWidget(parent), ui(new Ui::CredentialsManagement)
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentWidget(ui->pageLocked);
@@ -59,16 +62,6 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     }
     ui->pushButtonFavorite->setMenu(favMenu);
 
-    // NEW STUFF
-    /*
-    credModel = new CredentialsModel(this);
-    credFilterModel = new CredentialsFilterModel(this);
-    credFilterModel->setSourceModel(credModel);
-    ui->credentialTreeView->setModel(credFilterModel);
-    connect(credModel, &CredentialsModel::modelLoaded, ui->credentialTreeView, &CredentialsView::onModelLoaded);
-    */
-
-
     m_pCredModel = new CredentialModel(this);
     m_pCredModelFilter = new CredentialModelFilter(this);
     m_pCredModelFilter->setSourceModel(m_pCredModel);
@@ -94,26 +87,14 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->credentialTreeView->setSelectionModel(
                 new ConditionalItemSelectionModel(ConditionalItemSelectionModel::TestFunction(std::bind(&CredentialsManagement::confirmDiscardUneditedCredentialChanges, this, std::placeholders::_1)),
                                                   credFilterModel));
-
-    connect(ui->credentialTreeView->selectionModel(), &QItemSelectionModel::currentRowChanged, mapper, [this, mapper](const QModelIndex & idx)
-    {
-        mapper->setCurrentIndex(idx.row());
-        ui->credDisplayFrame->setEnabled(idx.isValid());
-        updateSaveDiscardState(idx);
-    });
     */
 
-
-    connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::unlockRequested,
-            this, &CredentialsManagement::requestPasswordForSelectedItem);
-
-
+    connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::unlockRequested, this, &CredentialsManagement::requestPasswordForSelectedItem);
     connect(ui->pushButtonConfirm, &QPushButton::clicked, [this](bool)
     {
         saveSelectedCredential();
     });
 
-    /*
     connect(ui->addCredServiceInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredLoginInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredPasswordInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
@@ -127,20 +108,18 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     connect(ui->lineEditFilterCred, &QLineEdit::textChanged, [=](const QString &t)
     {
-        credFilterModel->setFilter(t);
-    });
-    */
-
-    connect(ui->lineEditFilterCred, &QLineEdit::textChanged, [=](const QString &t)
-    {
         m_pCredModelFilter->setFilter(t);
     });
 }
+
+//-------------------------------------------------------------------------------------------------
 
 CredentialsManagement::~CredentialsManagement()
 {
     delete ui;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::setWsClient(WSClient *c)
 {
@@ -148,14 +127,14 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::enableCredentialsManagement);
     connect(wsClient, &WSClient::memoryDataChanged, [=]()
     {
-        //TO DO
-        //credModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
         m_pCredModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
         ui->credentialTreeView->expandAll();
         ui->lineEditFilterCred->clear();
     });
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::enableCredentialsManagement(bool enable)
 {
@@ -165,6 +144,8 @@ void CredentialsManagement::enableCredentialsManagement(bool enable)
         ui->stackedWidget->setCurrentWidget(ui->pageLocked);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void CredentialsManagement::updateQuickAddCredentialsButtonState()
 {
     ui->addCredentialButton->setEnabled(ui->addCredLoginInput->hasAcceptableInput() && ui->addCredLoginInput->text().length() > 0 &&
@@ -172,11 +153,15 @@ void CredentialsManagement::updateQuickAddCredentialsButtonState()
                                         ui->addCredPasswordInput->hasAcceptableInput() && ui->addCredPasswordInput->text().length() > 0);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void CredentialsManagement::on_pushButtonEnterMMM_clicked()
 {
     wsClient->sendEnterMMRequest();
     emit wantEnterMemMode();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::on_buttonDiscard_clicked()
 {
@@ -185,11 +170,15 @@ void CredentialsManagement::on_buttonDiscard_clicked()
     wsClient->sendLeaveMMRequest();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void CredentialsManagement::on_buttonSaveChanges_clicked()
 {
-    wsClient->sendCredentialsMM(credModel->getJsonChanges());
+    wsClient->sendCredentialsMM(m_pCredModel->getJsonChanges());
     emit wantSaveMemMode(); //waits for the daemon to process the data
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::requestPasswordForSelectedItem()
 {
@@ -220,14 +209,16 @@ void CredentialsManagement::requestPasswordForSelectedItem()
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void CredentialsManagement::on_addCredentialButton_clicked()
 {
     if (wsClient->get_memMgmtMode())
     {
-        credModel->update(ui->addCredServiceInput->text(),
-                          ui->addCredLoginInput->text(),
-                          ui->addCredPasswordInput->text(),
-                          QString());
+        m_pCredModel->update(ui->addCredServiceInput->text(),
+                             ui->addCredLoginInput->text(),
+                             ui->addCredPasswordInput->text(),
+                             QString());
 
         ui->addCredServiceInput->clear();
         ui->addCredLoginInput->clear();
@@ -259,6 +250,8 @@ void CredentialsManagement::on_addCredentialButton_clicked()
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void CredentialsManagement::onPasswordUnlocked(const QString & service, const QString & login,
                                                const QString & password, bool success)
 {
@@ -268,8 +261,10 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
         return;
     }
 
-    credModel->setClearTextPassword(service, login, password);
+    m_pCredModel->setClearTextPassword(service, login, password);
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success)
 {
@@ -281,6 +276,8 @@ void CredentialsManagement::onCredentialUpdated(const QString & service, const Q
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex)
 {
     // Retrieve selection model
@@ -288,13 +285,12 @@ void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex
 
     // Retrieve src index
     QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
-
     if (!srcIndex.isValid())
     {
         QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
         if (lIndexes.size() != 1)
             return;
-        srcIndex = credFilterModel->mapToSource(lIndexes.first());
+        srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
     }
 
     // Retrieve item
@@ -302,71 +298,73 @@ void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex
 
     // Do we have a login item?
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
-
-    if (pLoginItem != nullptr) {
-        // Retrieve UI information
-        QString sPassword = ui->credDisplayPasswordInput->text();
-        QString sDescription = ui->credDisplayDescriptionInput->text();
-        QString sLogin = ui->credDisplayLoginInput->text();
-
-        if (sPassword != pLoginItem->password() ||
-                sDescription != pLoginItem->description() ||
-                sLogin != pLoginItem->name())
-        {
-            pLoginItem->setName(sLogin);
-            pLoginItem->setPassword(sPassword);
-            pLoginItem->setDescription(sDescription);
-            //TO DO
-            //m_pCredModel->update(idx, cred);
-        }
-    }
+    if (pLoginItem != nullptr)
+        m_pCredModel->updateLoginItem(srcIndex, ui->credDisplayPasswordInput->text(), ui->credDisplayDescriptionInput->text(), ui->credDisplayLoginInput->text());
 }
 
-bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(QModelIndex idx)
+//-------------------------------------------------------------------------------------------------
+
+bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex)
 {   
-    if (ui->stackedWidget->currentWidget() != ui->pageUnlocked ||
-            !wsClient->get_memMgmtMode() ||
-            deletingCred)
+    if (ui->stackedWidget->currentWidget() != ui->pageUnlocked || !wsClient->get_memMgmtMode() || deletingCred)
         return true;
 
-    if (!idx.isValid())
+    // Retrieve src index
+    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
+    if (!srcIndex.isValid())
     {
-        QItemSelectionModel *selection = ui->credentialTreeView->selectionModel();
-        QModelIndexList indexes = selection->selectedIndexes();
-        if (indexes.size() != 1)
+        // Retrieve selection model
+        QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
+        QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
+        if (lIndexes.size() != 1)
             return true;
 
-        idx = credFilterModel->mapToSource(indexes.at(0));
+        srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
     }
-    const auto &cred = credModel->at(idx.row());
 
-    QString password = ui->credDisplayPasswordInput->text();
-    QString description = ui->credDisplayDescriptionInput->text();
-    QString login = ui->credDisplayLoginInput->text();
+    // Retrieve item
+    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
 
-    if ((!password.isEmpty() && (password != cred.password)) ||
-            (!description.isEmpty() && (description != cred.description)) ||
-            (!login.isEmpty() && (login != cred.login)))
-    {
-        auto btn = QMessageBox::question(this,
-                                         tr("Discard Modifications ?"),
-                                         tr("You have modified %1/%2 - Do you want to discard the modifications ?").arg(cred.service, cred.login),
-                                         QMessageBox::Discard |
-                                         QMessageBox::Save |
-                                         QMessageBox::Cancel,
-                                         QMessageBox::Cancel);
-        if (btn == QMessageBox::Cancel)
-            return false;
-        if (btn == QMessageBox::Discard)
-            return true;
-        if (btn == QMessageBox::Save)
-        {
-            saveSelectedCredential(idx);
-            return true;
+    // Retrieve login item
+    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+
+    if (pLoginItem != nullptr) {
+        // Retrieve parent item
+        TreeItem *pServiceItem = pLoginItem->parentItem();
+        if (pServiceItem != nullptr) {
+            // Retrieve UI information
+            QString sPassword = ui->credDisplayPasswordInput->text();
+            QString sDescription = ui->credDisplayDescriptionInput->text();
+            QString sLogin = ui->credDisplayLoginInput->text();
+
+            if ((!sPassword.isEmpty() && (sPassword != pLoginItem->password())) ||
+                    (!sDescription.isEmpty() && (sDescription != pLoginItem->description())) ||
+                    (!sLogin.isEmpty() && (sLogin != pLoginItem->name())))
+            {
+                auto btn = QMessageBox::question(this,
+                                                 tr("Discard Modifications ?"),
+                                                 tr("You have modified %1/%2 - Do you want to discard the modifications ?").arg(pServiceItem->name(), pLoginItem->name()),
+                                                 QMessageBox::Discard |
+                                                 QMessageBox::Save |
+                                                 QMessageBox::Cancel,
+                                                 QMessageBox::Cancel);
+                if (btn == QMessageBox::Cancel)
+                    return false;
+                if (btn == QMessageBox::Discard)
+                    return true;
+                if (btn == QMessageBox::Save)
+                {
+                    saveSelectedCredential(proxyIndex);
+                    return true;
+                }
+            }
         }
     }
-    return true;
+
+    return false;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::on_pushButtonConfirm_clicked()
 {
@@ -376,30 +374,40 @@ void CredentialsManagement::on_pushButtonConfirm_clicked()
     if (lIndexes.size() != 1)
         return;
 
-    // Retrieve source index
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
-
     // Save selected credential
-    saveSelectedCredential(srcIndex);
+    saveSelectedCredential(lIndexes.first());
 
+    // Update save discard state
     updateSaveDiscardState();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::on_pushButtonCancel_clicked()
 {
-    QItemSelectionModel *selection = ui->credentialTreeView->selectionModel();
-    QModelIndexList indexes = selection->selectedIndexes();
-    if (indexes.size() != 1)
+    // Retrieve selection model
+    QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
+
+    // Retrieve selected indexes
+    QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
+    if (lIndexes.size() != 1)
         return;
 
-    QModelIndex idx = m_pCredModelFilter->mapToSource(indexes.first());
-    const auto &cred = credModel->at(idx.row());
+    // Retrieve src index
+    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
 
-    ui->credDisplayPasswordInput->setText(cred.password);
-    ui->credDisplayDescriptionInput->setText(cred.description);
-    ui->credDisplayLoginInput->setText(cred.login);
-    updateSaveDiscardState();
+    // Retrieve login item
+    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
+    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+    if (pLoginItem != nullptr) {
+        ui->credDisplayPasswordInput->setText(pLoginItem->password());
+        ui->credDisplayDescriptionInput->setText(pLoginItem->description());
+        ui->credDisplayLoginInput->setText(pLoginItem->name());
+        updateSaveDiscardState();
+    }
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex)
 {
@@ -414,10 +422,7 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
             ui->pushButtonCancel->hide();
             ui->pushButtonConfirm->hide();
         }
-        else
-        {
-            srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
-        }
+        else srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
     }
 
     if (!srcIndex.isValid())
@@ -455,45 +460,73 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
     }
 }
 
-void CredentialsManagement::changeCurrentFavorite(int fav)
+//-------------------------------------------------------------------------------------------------
+
+void CredentialsManagement::changeCurrentFavorite(int iFavorite)
 {
-    QItemSelectionModel *selection = ui->credentialTreeView->selectionModel();
-    QModelIndexList indexes = selection->selectedIndexes();
-    if (indexes.size() != 1)
+    // Retrieve selection model
+    QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
+
+    // Retrieve selected indexes
+    QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
+    if (lIndexes.size() != 1)
         return;
 
-    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
-    auto cred = credModel->at(idx.row());
-    cred.favorite = fav;
-    credModel->update(idx, cred);
+    // Retrieve src index
+    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
+
+    // Retrieve login item
+    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
+    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+
+    if (pLoginItem != nullptr)
+        m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteIdx, iFavorite);
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::on_pushButtonDelete_clicked()
 {
-    QItemSelectionModel *selection = ui->credentialTreeView->selectionModel();
-    QModelIndexList indexes = selection->selectedIndexes();
-    if (indexes.size() != 1)
+    // Retrieve selection model
+    QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
+
+    // Retrieve selected indexes
+    QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
+    if (lIndexes.size() != 1)
         return;
 
-    QModelIndex idx = credFilterModel->mapToSource(indexes.at(0));
-    auto cred = credModel->at(idx.row());
+    // Retrieve src index
+    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(lIndexes.at(0));
 
-    auto btn = QMessageBox::question(this,
-                                     tr("Delete?"),
-                                     tr("Remove the current credential %1/%2 ?").arg(cred.service, cred.login),
-                                     QMessageBox::Yes |
-                                     QMessageBox::Cancel,
-                                     QMessageBox::Yes);
-    if (btn == QMessageBox::Yes)
-    {
-        deletingCred = true;
-        credModel->removeCredential(idx);
-        deletingCred = false;
+    // Retrieve login item
+    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
+    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+
+    if (pLoginItem != nullptr) {
+        // Retrieve parent item
+        TreeItem *pParentItem = pLoginItem->parentItem();
+        if (pParentItem != nullptr) {
+            auto btn = QMessageBox::question(this,
+                                             tr("Delete?"),
+                                             tr("Remove the current credential %1/%2 ?").arg(pParentItem->name(), pLoginItem->name()),
+                                             QMessageBox::Yes |
+                                             QMessageBox::Cancel,
+                                             QMessageBox::Yes);
+            if (btn == QMessageBox::Yes)
+            {
+                deletingCred = true;
+                m_pCredModel->removeCredential(srcIndex);
+                deletingCred = false;
+            }
+        }
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, const QModelIndex &previous)
 {
+    Q_UNUSED(previous)
     if (proxyIndex.isValid()) {
         QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
         if (srcIndex.isValid()) {
@@ -514,11 +547,15 @@ void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, 
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void CredentialsManagement::onLoginSelected(const QString &sItemUID)
 {
     ui->credDisplayFrame->setEnabled(true);
     updateLoginDescription(sItemUID);
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::onServiceSelected(const QString &sItemUID)
 {
@@ -526,6 +563,8 @@ void CredentialsManagement::onServiceSelected(const QString &sItemUID)
     ui->credDisplayFrame->setEnabled(false);
     clearLoginDescription();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
 {
@@ -544,6 +583,8 @@ void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
         }
     }
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::clearLoginDescription()
 {
