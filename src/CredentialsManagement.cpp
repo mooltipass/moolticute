@@ -302,10 +302,7 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
     QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
     if (!srcIndex.isValid())
     {
-        // Retrieve selection model
-        ConditionalItemSelectionModel *pSelectionModel = dynamic_cast<ConditionalItemSelectionModel *>(ui->credentialTreeView->selectionModel());
-
-        //QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
+        QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
         QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
         if (lIndexes.size() != 1)
             return true;
