@@ -54,6 +54,25 @@ void WSServerCon::processMessage(const QString &message)
 
     QJsonObject root = jdoc.object();
 
+    /* API that does not require device */
+    if (root["msg"] == "show_app")
+    {
+        //broadcast the message to all clients
+        emit notifyAllClients(root);
+        return;
+    }
+    else if (root["msg"] == "get_application_id")
+    {
+        QJsonObject ores;
+        QJsonObject oroot = root;
+        ores["application_name"] = "moolticute";
+        ores["application_version"] = QStringLiteral(APP_VERSION);
+        oroot["data"] = ores;
+        oroot["msg"] = "get_application_id";
+        sendJsonMessage(oroot);
+        return;
+    }
+
     //Default progress callback handling
     auto defaultProgressCb = [=](int total, int current)
     {
@@ -72,6 +91,15 @@ void WSServerCon::processMessage(const QString &message)
         sendJsonMessage(oroot);
     };
 
+    if (!mpdevice)
+    {
+        sendFailedJson(root, "No device connected");
+        return;
+    }
+
+    if (checkMemModeEnabled(root))
+        return;
+
     if (root["msg"] == "param_set")
     {
         processParametersSet(root["data"].toObject());
@@ -80,34 +108,29 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
 
-        //send command to start MMM
-        if (mpdevice)
-            mpdevice->startMemMgmtMode(o["want_data"].toBool(),
-                    defaultProgressCb,
-            [=](int errCode, QString errMsg)
-            {
-                if (!WSServer::Instance()->checkClientExists(this))
-                    return;
+        WSServer::Instance()->setMemLockedClient(clientUid);
 
-                QJsonObject oroot = root;
-                oroot["msg"] = "failed_memorymgmt";
-                sendFailedJson(oroot, errMsg, errCode);
-            });
-        else
-            sendFailedJson(root, "No device connected");
+        //send command to start MMM
+        mpdevice->startMemMgmtMode(o["want_data"].toBool(),
+                defaultProgressCb,
+                [=](int errCode, QString errMsg)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject oroot = root;
+            oroot["msg"] = "failed_memorymgmt";
+            sendFailedJson(oroot, errMsg, errCode);
+        });
     }
     else if (root["msg"] == "exit_memorymgmt")
     {
         //send command to exit MMM
-        if (mpdevice)
-            mpdevice->exitMemMgmtMode();
+        mpdevice->exitMemMgmtMode();
     }
     else if (root["msg"] == "start_memcheck")
     {
         //start integrity check
-        if (!mpdevice)
-            return;
-
         mpdevice->startIntegrityCheck(
                     [=](bool success, QString errstr)
         {
@@ -139,12 +162,6 @@ void WSServerCon::processMessage(const QString &message)
         if (o.contains("request_id"))
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
-        if (!mpdevice)
-        {
-            sendFailedJson(root, "No device connected");
-            return;
-        }
-
         mpdevice->getCredential(o["service"].toString(), o["login"].toString(), o["fallback_service"].toString(),
                 reqid,
                 [=](bool success, QString errstr, const QString &service, const QString &login, const QString &pass, const QString &desc)
@@ -172,9 +189,6 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "set_credential")
     {
         QJsonObject o = root["data"].toObject();
-        if (!mpdevice)
-            return;
-
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)
@@ -194,27 +208,15 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
-    else if (root["msg"] == "request_device_uid") {
-
-         QJsonObject o = root["data"].toObject();
-         const QByteArray key = o.value("key").toString().toUtf8().simplified();
-
-        if (!mpdevice)
-        {
-            sendFailedJson(root, "No device connected");
-            return;
-        }
+    else if (root["msg"] == "request_device_uid")
+    {
+        QJsonObject o = root["data"].toObject();
+        const QByteArray key = o.value("key").toString().toUtf8().simplified();
         mpdevice->getUID(key);
     }
 
     else if (root["msg"] == "get_random_numbers")
     {
-        if (!mpdevice)
-        {
-            sendFailedJson(root, "No device connected");
-            return;
-        }
-
         mpdevice->getRandomNumber([=](bool success, QString errstr, const QByteArray &rndNums)
         {
             if (!WSServer::Instance()->checkClientExists(this))
@@ -241,24 +243,14 @@ void WSServerCon::processMessage(const QString &message)
         if (o.contains("request_id"))
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
-        if (!mpdevice)
-            return;
-
         mpdevice->cancelUserRequest(reqid);
     }
     else if (root["msg"] == "get_data_node")
     {
         QJsonObject o = root["data"].toObject();
-
         QString reqid;
         if (o.contains("request_id"))
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        if (!mpdevice)
-        {
-            sendFailedJson(root, "No device connected");
-            return;
-        }
 
         mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
                 reqid,
@@ -285,11 +277,7 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "set_data_node")
     {
         QJsonObject o = root["data"].toObject();
-
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
+        QString service = o["service"].toString();
         QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
         if (data.isEmpty())
         {
@@ -297,94 +285,74 @@ void WSServerCon::processMessage(const QString &message)
             return;
         }
 
-        if (!mpdevice)
-            return;
-
-        QString service = o["service"].toString();
-
-        mpdevice->setDataNode(service, data,
-                reqid,
-                [=](bool success, QString errstr)
+        int maxSize = MP_MAX_FILE_SIZE;
+        if (service == MC_SSH_SERVICE)
+            maxSize = MP_MAX_SSH_SIZE;
+        if (data.size() > maxSize)
         {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            ores["service"] = service;
-            QJsonObject oroot = root;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        defaultProgressCb);
-    }
-    else if (root["msg"] == "delete_data_node")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        if (!mpdevice)
-            return;
-
-        QString service = o["service"].toString();
-
-        mpdevice->deleteDataNode(service,
-                reqid,
-                [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            ores["service"] = service;
-            QJsonObject oroot = root;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        defaultProgressCb);
-    }
-    else if (root["msg"] == "show_app")
-    {
-        //broadcast the message to all clients
-        emit notifyAllClients(root);
-    }
-    else if (root["msg"] == "get_application_id")
-    {
-        QJsonObject ores;
-        QJsonObject oroot = root;
-        ores["application_name"] = "moolticute";
-        ores["application_version"] = QStringLiteral(APP_VERSION);
-        oroot["data"] = ores;
-        oroot["msg"] = "get_application_id";
-        sendJsonMessage(oroot);
-    }
-    else if (root["msg"] == "credential_exists")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        if (!mpdevice)
-        {
-            sendFailedJson(root, "No device connected");
+            sendFailedJson(root, "data is too big to be stored in device");
             return;
         }
+
+        mpdevice->setDataNode(service, data,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            ores["service"] = service;
+            QJsonObject oroot = root;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
+    else if (root["msg"] == "delete_data_nodes")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        if (!mpdevice->get_memMgmtMode())
+        {
+            sendFailedJson(root, "Not in memory management mode");
+            return;
+        }
+
+        QJsonArray jarr = o["services"].toArray();
+        QStringList services;
+        for (int i = 0;i < jarr.size();i++)
+            services.append(jarr[i].toString());
+
+        mpdevice->deleteDataNodesAndLeave(services,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            //If not success send an error json
+            //if success, don't do anything, the mmm mode will
+            //be disabled automatically
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+        },
+        defaultProgressCb);
+    }
+    else if (root["msg"] == "credential_exists")
+    {       
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
         mpdevice->serviceExists(false, o["service"].toString(),
                 reqid,
@@ -415,12 +383,6 @@ void WSServerCon::processMessage(const QString &message)
         if (o.contains("request_id"))
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
-        if (!mpdevice)
-        {
-            sendFailedJson(root, "No device connected");
-            return;
-        }
-
         mpdevice->serviceExists(true, o["service"].toString(),
                 reqid,
                 [=](bool success, QString errstr, const QString &service, bool exists)
@@ -444,9 +406,6 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "set_credentials")
     {
-        if (!mpdevice)
-            return;
-
         if (!mpdevice->get_memMgmtMode())
         {
             sendFailedJson(root, "Not in memory management mode");
@@ -475,9 +434,6 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "export_database")
     {
-        if (!mpdevice)
-            return;
-
         mpdevice->exportDatabase(
                     [=](bool success, QString errstr, QByteArray fileData)
         {
@@ -500,9 +456,6 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "import_database")
     {
-        if (!mpdevice)
-            return;
-
         QJsonObject o = root["data"].toObject();
 
         QByteArray data = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
@@ -934,4 +887,15 @@ QString WSServerCon::getRequestId(const QJsonValue &v)
     if (v.isDouble())
         return QString::number(v.toInt());
     return v.toString();
+}
+
+bool WSServerCon::checkMemModeEnabled(const QJsonObject &root)
+{
+    if (WSServer::Instance()->isMemModeLocked(clientUid))
+    {
+        sendFailedJson(root, "Device is in memory management mode");
+        return true;
+    }
+
+    return false;
 }

@@ -161,14 +161,14 @@ public:
                      std::function<void(int total, int current)> cbProgress);
 
     //Set data to a context on the device
-    void setDataNode(const QString &service, const QByteArray &nodeData, const QString &reqid,
+    void setDataNode(const QString &service, const QByteArray &nodeData,
                      std::function<void(bool success, QString errstr)> cb,
                      std::function<void(int total, int current)> cbProgress);
 
     //Delete a data context from the device
-    void deleteDataNode(const QString &service, const QString &reqid,
-                        std::function<void(bool success, QString errstr)> cb,
-                        std::function<void(int total, int current)> cbProgress);
+    void deleteDataNodesAndLeave(const QStringList &services,
+                                 std::function<void(bool success, QString errstr)> cb,
+                                 std::function<void(int total, int current)> cbProgress);
 
     //Check is credential/data node exists
     void serviceExists(bool isDatanode, const QString &service, const QString &reqid,
@@ -264,6 +264,7 @@ private:
     bool readExportFile(const QByteArray &fileData, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
+    bool deleteDataParentChilds(MPNode *parentNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
     QByteArray generateExportFileData(void);

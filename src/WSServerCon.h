@@ -37,6 +37,8 @@ public:
     void resetDevice(MPDevice *dev);
     void sendInitialStatus();
 
+    QString getClientUid() { return clientUid; }
+
 signals:
     void notifyAllClients(const QJsonObject &obj);
 
@@ -72,6 +74,8 @@ private slots:
     void sendDeviceUID();
 
 private:
+    bool checkMemModeEnabled(const QJsonObject &root);
+
     QWebSocket *wsClient;
 
     MPDevice *mpdevice = nullptr;

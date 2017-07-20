@@ -52,6 +52,7 @@ private slots:
     void updateSerialInfos();
     void wantEnterCredentialManagement();
     void wantSaveCredentialManagement();
+    void wantExitFilesManagement();
     void wantImportDatabase();
     void wantExportDatabase();
 
@@ -92,7 +93,7 @@ private:
 
     void checkAutoStart();
 
-    void setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue);
+    void setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdateAdvancedTabVisibility=false);
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;

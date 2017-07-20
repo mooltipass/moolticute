@@ -50,8 +50,9 @@ bool CredentialsFilterModel::filterAcceptsRow(int source_row, const QModelIndex 
 
     CredentialsModel *credModel = qobject_cast<CredentialsModel *>(sourceModel());
 
-    for(int idx : {CredentialsModel::ServiceIdx, CredentialsModel::LoginIdx, CredentialsModel::DescriptionIdx}) {
-        if(credModel->data(credModel->index(source_row, idx)).toString().toLower().contains(filter.toLower()))
+    for(int idx : {CredentialsModel::ServiceIdx, CredentialsModel::LoginIdx, CredentialsModel::DescriptionIdx})
+    {
+        if (credModel->data(credModel->index(source_row, idx)).toString().toLower().contains(filter.toLower()))
             return true;
     }
 
@@ -62,11 +63,11 @@ bool CredentialsFilterModel::lessThan(const QModelIndex &left, const QModelIndex
 {
     CredentialsModel *credModel = qobject_cast<CredentialsModel *>(sourceModel());
 
-    if(left.row() < 0 || left.row() >= credModel->rowCount() || right.row() < 0 || right.row() >= credModel->rowCount())
+    if (left.row() < 0 || left.row() >= credModel->rowCount() || right.row() < 0 || right.row() >= credModel->rowCount())
         return false;
 
-    const auto & l = credModel->at(left.row());
-    const auto & r = credModel->at(right.row());
+    const auto &l = credModel->at(left.row());
+    const auto &r = credModel->at(right.row());
 
     return l.service < r.service || l.login < r.login;
 }
@@ -112,24 +113,32 @@ void CredentialsModel::load(const QJsonArray &json)
     emit modelLoaded();
 }
 
+void CredentialsModel::clear()
+{
+    beginResetModel();
+    m_credentials.clear();
+    endResetModel();
+}
 
-
-int CredentialsModel::rowCount(const QModelIndex &) const {
+int CredentialsModel::rowCount(const QModelIndex &) const
+{
     return m_credentials.size();
 }
 
-int CredentialsModel::columnCount(const QModelIndex &) const {
+int CredentialsModel::columnCount(const QModelIndex &) const
+{
     return ColumnCount;
 }
 
-
-QVariant CredentialsModel::data(const QModelIndex &index, int role) const {
-    if(m_credentials.size() < index.row())
+QVariant CredentialsModel::data(const QModelIndex &index, int role) const
+{
+    if (m_credentials.size() < index.row())
         return {};
 
     const Credential & cred = m_credentials.at(index.row());
 
-    if(role == Qt::DisplayRole || role == Qt::EditRole) {
+    if (role == Qt::DisplayRole || role == Qt::EditRole)
+    {
         switch(index.column()) {
         case ServiceIdx: return cred.service;
         case LoginIdx: return cred.login;
@@ -142,26 +151,26 @@ QVariant CredentialsModel::data(const QModelIndex &index, int role) const {
 
     }
     //Let us display the login & the service in the same column. Bit of a hack...
-    if(role == LoginRole && index.column() == ServiceIdx) {
+    if (role == LoginRole && index.column() == ServiceIdx)
         return cred.login;
-    }
-    if(role == FavRole && index.column() == ServiceIdx) {
+    if (role == FavRole && index.column() == ServiceIdx)
         return cred.favorite;
-    }
 
-    if(role == PasswordUnlockedRole && index.column() == PasswordIdx) {
+    if (role == PasswordUnlockedRole && index.column() == PasswordIdx)
         return !cred.password.isEmpty();
-    }
-
 
     return {};
 }
 
-void CredentialsModel::setClearTextPassword(const QString & service, const QString & login, const QString & password) {
-    auto it = std::find_if(std::begin(m_credentials), std::end(m_credentials), [&login, &service](const Credential & c) {
+void CredentialsModel::setClearTextPassword(const QString & service, const QString & login, const QString & password)
+{
+    auto it = std::find_if(std::begin(m_credentials), std::end(m_credentials), [&login, &service](const Credential & c)
+    {
         return c.login == login && c.service == service;
     });
-    if(it != std::end(m_credentials)) {
+
+    if (it != std::end(m_credentials))
+    {
         const auto idx = it - std::begin(m_credentials);
         it->password = password;
         it->passwordOrig = password;
@@ -215,39 +224,50 @@ void CredentialsModel::update(const QModelIndex &idx, const Credential &cred)
     }
 }
 
-void  CredentialsModel::mergeWith(const QVector<Credential> & newCreds) {
-
-    for(const Credential & newCred: newCreds) {
-        auto it = std::find_if(std::begin(m_credentials), std::end(m_credentials), [&newCred](const Credential & c) {
+void  CredentialsModel::mergeWith(const QVector<Credential> & newCreds)
+{
+    for (const Credential & newCred: newCreds)
+    {
+        auto it = std::find_if(std::begin(m_credentials), std::end(m_credentials), [&newCred](const Credential & c)
+        {
             return c.login == newCred.login && c.service == newCred.service;
         });
-        if(it == std::end(m_credentials)) {
+
+        if (it == std::end(m_credentials))
+        {
             beginInsertRows(QModelIndex(), m_credentials.size(), m_credentials.size());
             m_credentials << newCred;
             endInsertRows();
             continue;
         }
-        if(it->description != newCred.description || it->createdDate != newCred.createdDate || it->updatedDate != newCred.updatedDate){
+
+        if (it->description != newCred.description || it->createdDate != newCred.createdDate || it->updatedDate != newCred.updatedDate)
+        {
             *it = newCred;
             const auto idx = it - std::begin(m_credentials);
             dataChanged(index(idx, LoginIdx +1), index(idx, ColumnCount-1));
         }
     }
-    if(newCreds.size() != m_credentials.size()) {
+
+    if (newCreds.size() != m_credentials.size())
+    {
         QVector<Credential>::size_type idx = 0;
-        while(idx < m_credentials.size())  {
+        while(idx < m_credentials.size())
+        {
             const Credential & oldCred = m_credentials.at(idx);
-            auto it = std::find_if(std::begin(newCreds), std::end(newCreds), [&oldCred](const Credential & c) {
+            auto it = std::find_if(std::begin(newCreds), std::end(newCreds), [&oldCred](const Credential & c)
+            {
                 return c.login == oldCred.login && c.service == oldCred.service;
             });
-            if(it == std::end(newCreds)) {
+
+            if(it == std::end(newCreds))
+            {
                 beginRemoveRows({}, idx, idx);
                 m_credentials.remove(idx);
                 endRemoveRows();
             }
-            else  {
+            else
                 idx++;
-            }
         }
     }
 }

@@ -733,12 +733,18 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
             ctrValueClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             qDebug() << "CTR value:" << ctrValue.toHex();
 
-            progressTotal = 200 + MOOLTIPASS_FAV_MAX;
+            if (getCreds && getData)
+            {
+                progressTotal = 200 + MOOLTIPASS_FAV_MAX;
+            }
+            else
+            {
+                progressTotal = 100 + MOOLTIPASS_FAV_MAX;
+            }
             progressCurrent = 0;
             progressCurrentLogin = 0;
             progressCurrentData = 0;
             cbProgress(progressTotal, progressCurrent);
-
             return true;
         }
     }));
@@ -2010,6 +2016,49 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
     return return_bool;
 }
+
+bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt)
+{
+    quint32 cur_child_addr_v = parentNodePt->getStartChildVirtualAddress();
+    QByteArray cur_child_addr = parentNodePt->getStartChildAddress();
+
+    /* Detag nodes */
+    detagPointedNodes();
+
+    /* Set empty child (required because of tests later */
+    parentNodePt->setStartChildAddress(MPNode::EmptyAddress);
+
+    /* Start following the chain */
+    while ((cur_child_addr != MPNode::EmptyAddress) || (cur_child_addr.isNull() && cur_child_addr_v != 0))
+    {
+        MPNode* cur_child_pt;
+
+        /* Find node in list */
+        cur_child_pt = findNodeWithAddressInList(dataChildNodes, cur_child_addr, cur_child_addr_v);
+
+        if (!cur_child_pt)
+        {
+            qDebug() << "Data child node can't be found in list!";
+            return false;
+        }
+        else
+        {
+            /* Deleting child node at address */
+            qDebug() << "Deleting child node at address" << cur_child_pt->getAddress().toHex();
+
+            /* Follow the list */
+            cur_child_addr = cur_child_pt->getNextChildDataAddress();
+            cur_child_addr_v = cur_child_pt->getNextChildVirtualAddress();
+
+            /* Delete node */
+            parentNodePt->removeChild(cur_child_pt);
+            dataChildNodes.removeOne(cur_child_pt);
+        }
+    }
+
+    return true;
+}
+
 
 bool MPDevice::addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent)
 {
@@ -3677,7 +3726,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         return true;
     }));
 
-    if (isFw12() && setDesc)
+    if (isFw12() && setDesc && description != "None")
     {
         QByteArray ddata = description.toUtf8();
         ddata.append((char)0);
@@ -3938,7 +3987,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
     return true;
 }
 
-void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, const QString &reqid,
+void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
                            std::function<void(bool success, QString errstr)> cb,
                            std::function<void(int total, int current)> cbProgress)
 {
@@ -3949,15 +3998,10 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
         return;
     }
 
-    QString logInf = QStringLiteral("Set data node for service: %1 reqid: %2")
-                     .arg(service)
-                     .arg(reqid);
+    QString logInf = QStringLiteral("Set data node for service: %1")
+                     .arg(service);
 
-    AsyncJobs *jobs;
-    if (reqid.isEmpty())
-        jobs = new AsyncJobs(logInf, this);
-    else
-        jobs = new AsyncJobs(logInf, reqid, this);
+    AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray sdata = service.toUtf8();
     sdata.append((char)0);
@@ -4018,43 +4062,99 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData, c
     runAndDequeueJobs();
 }
 
-void  MPDevice::deleteDataNode(const QString &service, const QString &reqid,
-                               std::function<void(bool success, QString errstr)> cb,
-                               std::function<void(int total, int current)> cbProgress)
+void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
+                                        std::function<void(bool success, QString errstr)> cb,
+                                        std::function<void(int total, int current)> cbProgress)
 {
-    if (service.isEmpty())
+    // TODO for the future:
+    // When scanning the parent nodes, store their file sizes
+    // Use this file size to make a progress bar for rescan and delete
+    // ... and of course to display stats in file MMM
+
+    if (services.isEmpty())
     {
-        qWarning() << "context is empty.";
-        cb(false, "context is empty");
+        //No data services do delete, just exit mmm
+        exitMemMgmtMode(true);
         return;
     }
 
-    QString logInf = QStringLiteral("Delete data node for service: %1 reqid: %2")
-                     .arg(service)
-                     .arg(reqid);
+    AsyncJobs *jobs = new AsyncJobs("Re-scanning the memory", this);
 
-    AsyncJobs *jobs;
-    if (reqid.isEmpty())
-        jobs = new AsyncJobs(logInf, this);
-    else
-        jobs = new AsyncJobs(logInf, reqid, this);
+    /* Re-scan the memory to take into account new changes that may have occured */
+    cleanMMMVars();
+    memMgmtModeReadFlash(jobs, false, cbProgress, false, true);
 
-    /////////
-    //TODO: Simulation here. limpkin can implement the core work here.
-    jobs->append(new TimerJob(5000));
-    /////////
-
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
-        //all jobs finished success
-        qInfo() << "delete_data_node success";
-        cb(true, QString());
+        Q_UNUSED(data);
+
+        for (qint32 i = 0; i < services.size(); i++)
+        {
+            qDebug() << "Deleting file for " << services[i];
+            MPNode* parentPt = findNodeWithNameInList(dataNodes, services[i], true);
+
+            if(!parentPt)
+            {
+                exitMemMgmtMode(true);
+                qCritical() << "Couldn't find node for " << services[i];
+                cb(false, "Moolticute Internal Error (DDNAL#1)");
+            }
+            else
+            {
+                /* Delete all the childs */
+                deleteDataParentChilds(parentPt);
+
+                /* Delete empty parent */
+                removeEmptyParentFromDB(parentPt, true);
+            }
+        }
+
+        /* Check our DB */
+        if(!checkLoadedNodes(false, true, false))
+        {
+            exitMemMgmtMode(true);
+            qCritical() << "Error in our internal algo";
+            cb(false, "Moolticute Internal Error (DDNAL#2)");
+        }
+
+        /* Generate save packets */
+        AsyncJobs* saveJobs = new AsyncJobs("Starting save operations...", this);
+        connect(saveJobs, &AsyncJobs::finished, [=](const QByteArray &data)
+        {
+            Q_UNUSED(data);
+            exitMemMgmtMode(true);
+            qInfo() << "Save operations succeeded!";
+            cb(true, "Successfully Saved File Database");
+            return;
+        });
+        connect(saveJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+        {
+            Q_UNUSED(failedJob);
+            exitMemMgmtMode(true);
+            qCritical() << "Save operations failed!";
+            cb(false, "Couldn't Save File Database: Device Unplugged?");
+            return;
+        });
+        if (generateSavePackets(saveJobs, false, true))
+        {
+            jobsQueue.enqueue(saveJobs);
+            runAndDequeueJobs();
+        }
+        else
+        {
+            exitMemMgmtMode(true);
+            qInfo() << "No changes to make on database";
+            cb(true, "No Changes Were Required On Local DB!");
+            return;
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
     {
-        qCritical() << "Failed deleting data node";
-        cb(false, failedJob->getErrorStr());
+        Q_UNUSED(failedJob);
+        qCritical() << "Couldn't Rescan The Memory";
+        exitMemMgmtMode(true);
+        cb(false, "Couldn't Rescan The Memory");
     });
 
     jobsQueue.enqueue(jobs);

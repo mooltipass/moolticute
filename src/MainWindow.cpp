@@ -32,7 +32,6 @@ static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx =
     cb->setCurrentIndex(idx);
 }
 
-
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -86,6 +85,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantSaveMemMode, this, &MainWindow::wantSaveCredentialManagement);
     connect(ui->widgetFiles, &FilesManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
+    connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
 
     connect(wsClient, &WSClient::statusChanged, [this]()
     {
@@ -708,7 +708,7 @@ void MainWindow::onAdvancedTabShortcutActivated()
 
 void MainWindow::onRadioButtonFilesAndSSHKeysTabsAlwaysVisibleToggled(bool bChecked)
 {
-    setFilesAndSSHKeysTabsVisibleOnDemand(!bChecked);
+    setFilesAndSSHKeysTabsVisibleOnDemand(!bChecked, true);
 }
 
 void MainWindow::wantEnterCredentialManagement()
@@ -741,6 +741,15 @@ void MainWindow::wantImportDatabase()
 void MainWindow::wantExportDatabase()
 {
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+
+    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+}
+
+void MainWindow::wantExitFilesManagement()
+{
+    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
 
@@ -789,7 +798,7 @@ void MainWindow::checkAutoStart()
         ui->pushButtonAutoStart->setText(tr("Enable"));
 }
 
-void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue)
+void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdateAdvancedTabVisibility)
 {
     bFilesAndSSHKeysTabsVisibleOnDemand = bValue;
 
@@ -816,10 +825,8 @@ void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue)
         ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
     }
 
-    /*
     if (bUpdateAdvancedTabVisibility)
         onAdvancedTabShortcutActivated();
-        */
 }
 
 void MainWindow::daemonLogAppend(const QByteArray &logdata)

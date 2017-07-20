@@ -45,8 +45,14 @@
 
 #define MOOLTICUTE_DAEMON_PORT  30035
 
+//Max file size for standard data file
+#define MP_MAX_FILE_SIZE        1024 * 10
+#define MP_MAX_SSH_SIZE         1024 * 50
+
+#define MC_SSH_SERVICE          "Moolticute SSH Keys"
+
 //shared memory size
-#define SHMEM_SIZE      128 * 1024
+#define SHMEM_SIZE              128 * 1024
 
 #define qToChar(s) s.toLocal8Bit().constData()
 #define qToUtf8(s) s.toUtf8().constData()

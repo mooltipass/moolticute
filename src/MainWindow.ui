@@ -238,7 +238,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>12</number>
+       <number>11</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -2234,6 +2234,8 @@ QWidget {background-color: #EFEFEF;}</string>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../img/images.qrc"/>
+  <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
  </resources>
  <connections/>

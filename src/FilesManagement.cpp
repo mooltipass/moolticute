@@ -106,7 +106,7 @@ FilesManagement::FilesManagement(QWidget *parent) :
         filterModel->setFilter(t);
     });
 
-    connect(ui->filesListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &FilesManagement::currentSelectionChanged);
+    connect(ui->filesListView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FilesManagement::currentSelectionChanged);
     currentSelectionChanged(QModelIndex(), QModelIndex());
 }
 
@@ -147,7 +147,13 @@ void FilesManagement::on_pushButtonEnterMMM_clicked()
 void FilesManagement::on_buttonQuitMMM_clicked()
 {
     filesModel->clear();
-    wsClient->sendLeaveMMRequest();
+    if (!deletedList.isEmpty())
+    {
+        emit wantExitMemMode();
+        wsClient->deleteDataFilesAndLeave(deletedList);
+    }
+    else
+        wsClient->sendLeaveMMRequest();
 }
 
 void FilesManagement::loadModel()
@@ -161,6 +167,7 @@ void FilesManagement::loadModel()
         item->setIcon(AppGui::qtAwesome()->icon(fa::fileo));
         filesModel->appendRow(item);
     }
+    deletedList.clear();
 }
 
 void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QModelIndex &)
@@ -226,16 +233,8 @@ void FilesManagement::on_pushButtonDelFile_clicked()
         return;
     }
 
-    ui->progressBar->setMinimum(0);
-    ui->progressBar->setMaximum(0);
-    ui->progressBar->setValue(0);
-    ui->progressBar->show();
-    updateButtonsUI();
-
-    connect(wsClient, &WSClient::dataFileDeleted, this, &FilesManagement::dataFileDeleted);
-    connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
-
-    wsClient->deleteDataFile(currentItem->text());
+    deletedList.append(currentItem->text());
+    filesModel->removeRow(currentItem->row());
 }
 
 void FilesManagement::dataFileRequested(const QString &service, const QByteArray &data, bool success)
@@ -262,24 +261,6 @@ void FilesManagement::dataFileRequested(const QString &service, const QByteArray
     f.write(data);
 }
 
-void FilesManagement::dataFileDeleted(const QString &service, bool success)
-{
-    Q_UNUSED(service)
-    disconnect(wsClient, &WSClient::dataFileDeleted, this, &FilesManagement::dataFileDeleted);
-    disconnect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
-    ui->progressBar->hide();
-    updateButtonsUI();
-
-    if (!success)
-    {
-        QMessageBox::warning(this, tr("Failure"), tr("Data deletion was denied for '%1'!").arg(currentItem->text()));
-        return;
-    }
-
-    filesModel->removeRow(currentItem->row());
-    currentItem = nullptr;
-}
-
 void FilesManagement::updateProgress(int total, int curr)
 {
     ui->progressBar->setMaximum(total);
@@ -304,6 +285,17 @@ void FilesManagement::updateButtonsUI()
 void FilesManagement::addUpdateFile(QString service, QString filename, QProgressBar *pbar)
 {
     Q_UNUSED(service)
+
+    qint64 maxSize = MP_MAX_FILE_SIZE;
+    if (service == MC_SSH_SERVICE)
+        maxSize = MP_MAX_SSH_SIZE;
+    QFileInfo fi(filename);
+    if (fi.size() > maxSize)
+    {
+        QMessageBox::warning(this, tr("Failure"), tr("File '%1' is too big to be stored in the Mooltipass!").arg(filename));
+        return;
+    }
+
     QFile f(filename);
     if (!f.open(QFile::ReadWrite))
     {
@@ -320,6 +312,9 @@ void FilesManagement::addUpdateFile(QString service, QString filename, QProgress
 
     connect(wsClient, &WSClient::dataFileSent, this, &FilesManagement::dataFileSent);
     connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
+
+    if (deletedList.contains(service))
+        deletedList.removeOne(service);
 
     wsClient->sendDataFile(service, b);
 }
@@ -340,6 +335,19 @@ void FilesManagement::dataFileSent(const QString &service, bool success)
         QMessageBox::warning(this, tr("Failure"), tr("Unable to send data!"));
         return;
     }
+
+    //item already exists
+    for (int i = 0;i < filesModel->rowCount();i++)
+    {
+        QStandardItem *it = filesModel->item(i);
+        if (it->text() == service)
+            return;
+    }
+
+    //if not, add the new item
+    QStandardItem *item = new QStandardItem(service);
+    item->setIcon(AppGui::qtAwesome()->icon(fa::fileo));
+    filesModel->appendRow(item);
 }
 
 void FilesManagement::on_addFileButton_clicked()
