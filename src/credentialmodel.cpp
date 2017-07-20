@@ -22,7 +22,7 @@ CredentialModel::CredentialModel(QObject *parent) : QAbstractItemModel(parent)
 
 CredentialModel::~CredentialModel()
 {
-
+    delete m_pRootItem;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -413,6 +413,8 @@ QJsonArray CredentialModel::getJsonChanges()
             jarr.append(object);
         }
     }
+
+    qDebug() << jarr;
     return jarr;
 }
 

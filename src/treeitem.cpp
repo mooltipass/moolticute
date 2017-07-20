@@ -1,6 +1,7 @@
 // Qt
 #include <QStringList>
 #include <QUuid>
+#include <QDebug>
 
 // Application
 #include "treeitem.h"
@@ -19,6 +20,7 @@ TreeItem::TreeItem(const QString &sName,
 
 TreeItem::~TreeItem()
 {
+    qDebug() << "DESTROYING " << this;
     qDeleteAll(m_vChilds);
 }
 
