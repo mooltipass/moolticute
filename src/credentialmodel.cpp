@@ -1,6 +1,8 @@
 // Qt
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QColor>
+#include <QFont>
 
 // Application
 #include "credentialmodel.h"
@@ -40,14 +42,20 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     if (!pItem)
         return QVariant();
 
+    // Cast to service item
+    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+
     // Cast to login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
     // Display data for role
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         switch (idx.column()) {
-        case ServiceIdx: return pItem->name();
-        case LoginIdx: return pItem->name();
+        case ServiceIdx:
+        case LoginIdx: {
+            QString sCreatedDate = QString(" (%1)").arg(pItem->createdDate().toString());
+            return pItem->name() + sCreatedDate;
+        }
         case PasswordIdx: return (pLoginItem != nullptr) ? pLoginItem->password() : QVariant();
         case DescriptionIdx: return pItem->description();
         case DateCreatedIdx: {
@@ -62,6 +70,20 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
         }
         case FavoriteIdx: (pLoginItem != nullptr) ? pLoginItem->favorite() : QVariant();
         }
+    }
+
+    if (role == Qt::ForegroundRole) {
+        if (pLoginItem != nullptr)
+            return QColor("green");
+        if (pServiceItem != nullptr)
+            return QColor("blue");
+        return QColor("black");
+    }
+
+    if (role == Qt::FontRole) {
+        QFont font;
+        font.setBold(true);
+        return font;
     }
 
     if (role == LoginRole && idx.column() == ServiceIdx)
@@ -218,6 +240,8 @@ void CredentialModel::load(const QJsonArray &json)
     m_pRootItem->removeUnusedItems();
 
     endResetModel();
+
+    emit modelLoaded();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -354,75 +378,6 @@ void CredentialModel::setClearTextPassword(const QString &sServiceName, const QS
 
 //-------------------------------------------------------------------------------------------------
 
-void CredentialModel::update(const QString &sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription)
-{
-    // Retrieve target service
-    ServiceItem *pTargetService = m_pRootItem->findServiceByName(sServiceName);
-    if (pTargetService != nullptr) {
-        // Retrieve target login
-        LoginItem *pTargetLogin = pTargetService->findLoginByName(sLoginName);
-        if (pTargetLogin != nullptr) {
-            if (!sDescription.isEmpty())
-                pTargetLogin->setDescription(sDescription);
-            pTargetLogin->setPassword(sPassword);
-            QModelIndex itemIndex = getItemIndexByUID(pTargetLogin->uid());
-            if (itemIndex.isValid())
-                emit dataChanged(itemIndex, itemIndex);
-        }
-        else {
-            QModelIndex serviceIndex = getItemIndexByUID(pTargetService->uid());
-            if (serviceIndex.isValid()) {
-                beginInsertRows(serviceIndex, pTargetService->childCount(), pTargetService->childCount());
-                LoginItem *pLoginItem = pTargetService->addLogin(sLoginName);
-                if (!sDescription.isEmpty())
-                    pLoginItem->setDescription(sDescription);
-                pLoginItem->setPassword(sPassword);
-                endInsertRows();
-            }
-        }
-    }
-    else {
-        beginInsertRows(QModelIndex(), rowCount(), rowCount());
-        ServiceItem *pServiceItem = m_pRootItem->addService(sServiceName);
-        LoginItem *pLoginItem = pServiceItem->addLogin(sLoginName);
-        if (!sDescription.isEmpty())
-            pLoginItem->setDescription(sDescription);
-        pLoginItem->setPassword(sPassword);
-        endInsertRows();
-    }
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void CredentialModel::update(const QModelIndex &idx, const LoginItem *pRefLoginItem)
-{
-    if (pRefLoginItem != nullptr) {
-        if (!idx.isValid()) {
-            // Retrieve parent
-            TreeItem *pParentItem = pRefLoginItem->parentItem();
-            if (pParentItem != nullptr)
-                update(pParentItem->name(), pRefLoginItem->name(), pRefLoginItem->password(), pRefLoginItem->description());
-        }
-        else
-        {
-            // Retrieve item
-            TreeItem *pItem = getItemByIndex(idx);
-            LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
-            if (pLoginItem != nullptr) {
-                pLoginItem->setDescription(pRefLoginItem->description());
-                pLoginItem->setFavorite(pRefLoginItem->favorite());
-                pLoginItem->setName(pRefLoginItem->name());
-                pLoginItem->setPassword(pRefLoginItem->password());
-                QModelIndex itemIndex = getItemIndexByUID(pLoginItem->uid());
-                if (itemIndex.isValid())
-                    emit dataChanged(itemIndex, itemIndex);
-            }
-        }
-    }
-}
-
-//-------------------------------------------------------------------------------------------------
-
 QJsonArray CredentialModel::getJsonChanges()
 {
     QJsonArray jarr;
@@ -463,18 +418,70 @@ QJsonArray CredentialModel::getJsonChanges()
 
 //-------------------------------------------------------------------------------------------------
 
+void CredentialModel::addCredential(const QString &sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription)
+{
+    // Retrieve target service
+    ServiceItem *pTargetService = m_pRootItem->findServiceByName(sServiceName);
+
+    // Check if a service/login pair already exists
+    if (pTargetService != nullptr) {
+        // Retrieve target login
+        LoginItem *pTargetLogin = pTargetService->findLoginByName(sLoginName);
+        if (pTargetLogin != nullptr)
+            return;
+        else {
+            QModelIndex serviceIndex = getItemIndexByUID(pTargetService->uid());
+            beginInsertRows(serviceIndex, pTargetService->childCount(), pTargetService->childCount());
+            LoginItem *pLoginItem = pTargetService->addLogin(sLoginName);
+            pLoginItem->setPassword(sPassword);
+            pLoginItem->setDescription(sDescription);
+            endInsertRows();
+        }
+    }
+    // No matching service
+    else {
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        ServiceItem *pServiceItem = m_pRootItem->addService(sServiceName);
+        LoginItem *pLoginItem = pServiceItem->addLogin(sLoginName);
+        pLoginItem->setPassword(sPassword);
+        pLoginItem->setDescription(sDescription);
+        endInsertRows();
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void CredentialModel::removeCredential(const QModelIndex &idx)
 {
     if (idx.isValid()) {
         TreeItem *pItem = getItemByIndex(idx);
-        if (pItem != nullptr) {
-            TreeItem *pParentItem = pItem->parentItem();
-            if (pParentItem != nullptr) {
-                beginRemoveRows(idx.parent(), idx.row(), idx.row());
-                if (pParentItem->removeOne(pItem))
-                    delete pItem;
-                endRemoveRows();
-            }
+        if (pItem == nullptr)
+            return;
+
+        // Check what we have
+        ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+        LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+        if ((pServiceItem == nullptr) && (pLoginItem == nullptr))
+            return;
+
+        // Retrieve parent item
+        TreeItem *pParentItem = pItem->parentItem();
+        if (pParentItem == nullptr)
+            return;
+
+        // Can remove a service only if it has no child
+        bool bCondition = true;
+        if (pServiceItem != nullptr)
+            bCondition = (pServiceItem->childCount() == 0);
+        QModelIndex parentIndex = idx.parent();
+        if (bCondition) {
+            beginRemoveRows(parentIndex, idx.row(), idx.row());
+            if (pParentItem->removeOne(pItem))
+                delete pItem;
+            endRemoveRows();
         }
+
+        if (pParentItem && (pParentItem != m_pRootItem) && (pParentItem->childCount() == 0))
+            removeCredential(parentIndex);
     }
 }

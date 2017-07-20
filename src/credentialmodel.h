@@ -106,14 +106,11 @@ public:
     //! Set clear text passowrd
     void setClearTextPassword(const QString &sServiceName, const QString &sLoginName, const QString &sPassword);
 
-    //! Update
-    void update(const QString &sServiceName, const QString &sLoginName, const QString &sPassowrd, const QString &sDescription);
-
-    //! Update
-    void update(const QModelIndex &idx, const LoginItem *pRefLoginItem);
-
     //! Get JSON changes
     QJsonArray getJsonChanges();
+
+    //! Add credential
+    void addCredential(const QString &sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription="");
 
     //! Remove credential
     void removeCredential(const QModelIndex &idx);

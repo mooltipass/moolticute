@@ -123,7 +123,7 @@ private:
     void updateLoginDescription(const QString &sItemUID);
 
     //! Clear login description
-    void clearLoginDescription();
+    void clearLoginDescription(const QString &sItemUID);
 
 private:
     //! Changed current favorite
