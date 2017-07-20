@@ -21,7 +21,6 @@ SOURCES += src/main_gui.cpp \
     src/Common.cpp \
     src/WSClient.cpp \
     src/RotateSpinner.cpp \
-    src/CredentialsModel.cpp \
     src/AppGui.cpp \
     src/DaemonMenuAction.cpp \
     src/AutoStartup.cpp \
@@ -29,18 +28,23 @@ SOURCES += src/main_gui.cpp \
     src/OutputLog.cpp \
     src/AnsiEscapeCodeHandler.cpp \
     src/PasswordLineEdit.cpp \
-    src/CredentialsView.cpp \
     src/CredentialsManagement.cpp \
     src/zxcvbn-c/zxcvbn.c \
     src/FilesManagement.cpp \
-    src/SSHManagement.cpp
+    src/SSHManagement.cpp \
+    src/treeitem.cpp \
+    src/serviceitem.cpp \
+    src/loginitem.cpp \
+    src/rootitem.cpp \
+    src/credentialmodel.cpp \
+    src/credentialmodelfilter.cpp \
+    src/credentialview.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
     src/QtHelper.h \
     src/WSClient.h \
     src/RotateSpinner.h \
-    src/CredentialsModel.h \
     src/version.h \
     src/AppGui.h \
     src/DaemonMenuAction.h \
@@ -49,12 +53,18 @@ HEADERS  += src/MainWindow.h \
     src/OutputLog.h \
     src/AnsiEscapeCodeHandler.h \
     src/PasswordLineEdit.h \
-    src/CredentialsView.h \
     src/CredentialsManagement.h \
     src/zxcvbn-c/dict-src.h \
     src/zxcvbn-c/zxcvbn.h \
     src/FilesManagement.h \
-    src/SSHManagement.h
+    src/SSHManagement.h \
+    src/treeitem.h \
+    src/serviceitem.h \
+    src/loginitem.h \
+    src/rootitem.h \
+    src/credentialmodel.h \
+    src/credentialmodelfilter.h \
+    src/credentialview.h
 
 mac {
     HEADERS += src/MacUtils.h
