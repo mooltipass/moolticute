@@ -49,12 +49,12 @@ public slots:
 private slots:
     void enableCredentialsManagement(bool);
     void updateQuickAddCredentialsButtonState();
-    void updateSaveDiscardState(QModelIndex idx = {});
+    void updateSaveDiscardState(const QModelIndex &proxyIndex=QModelIndex());
 
     void onPasswordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
     void onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success);
 
-    void saveSelectedCredential(QModelIndex idx = {});
+    void saveSelectedCredential(const QModelIndex &proxyIndex=QModelIndex());
 
     void on_pushButtonEnterMMM_clicked();
     void on_buttonDiscard_clicked();
@@ -66,6 +66,14 @@ private slots:
     void on_pushButtonConfirm_clicked();
     void on_pushButtonCancel_clicked();
     void on_pushButtonDelete_clicked();
+
+    void onCredentialSelected(const QModelIndex &current, const QModelIndex &previous);
+    void onLoginSelected(const QString &sItemUID);
+    void onServiceSelected(const QString &sItemUID);
+
+private:
+    void updateLoginDescription(const QString &sItemUID);
+    void clearLoginDescription();
 
 private:
     void changeCurrentFavorite(int fav);
@@ -82,6 +90,10 @@ private:
 
     //use when deleting a cred and not prompt user
     bool deletingCred = false;
+
+signals:
+    void loginSelected(const QString &sItemUID);
+    void serviceSelected(const QString &sItemUID);
 };
 
 #endif // CREDENTIALSMANAGEMENT_H

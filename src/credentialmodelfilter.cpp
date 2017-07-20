@@ -44,15 +44,15 @@ int CredentialModelFilter::indexFromSource(int idx)
 
 bool CredentialModelFilter::filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const
 {
-    // get source-model index for current row
-    QModelIndex source_index = sourceModel()->index(iSrcRow, 0, srcParent);
-    if (source_index.isValid())
+    // Get source index
+    QModelIndex srcIndex = sourceModel()->index(iSrcRow, 0, srcParent);
+    if (srcIndex.isValid())
     {
-        // if any of children matches the filter, then current index matches the filter as well
-        int iRowCount = sourceModel()->rowCount(source_index) ;
+        // If any of children matches the filter, then current index matches the filter as well
+        int iRowCount = sourceModel()->rowCount(srcIndex);
         for (int i=0; i<iRowCount; ++i)
-            if (filterAcceptsRow(i, source_index))
-                return true ;
+            if (filterAcceptsRow(i, srcIndex))
+                return true;
         return acceptRow(iSrcRow, srcParent);
     }
 
@@ -60,7 +60,20 @@ bool CredentialModelFilter::filterAcceptsRow(int iSrcRow, const QModelIndex &src
     return QSortFilterProxyModel::filterAcceptsRow(iSrcRow, srcParent) ;
 }
 
-// Accept row:
+//-------------------------------------------------------------------------------------------------
+
+bool CredentialModelFilter::testItemAgainstNameAndDescription(TreeItem *pItem, const QString &sFilter) const
+{
+    if (pItem) {
+        bool bCondition1 = pItem->name().contains(sFilter, Qt::CaseInsensitive);
+        bool bCondition2 = pItem->description().contains(sFilter, Qt::CaseInsensitive);
+        return bCondition1 || bCondition2;
+    }
+    return false;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 bool CredentialModelFilter::acceptRow(int iSrcRow, const QModelIndex &srcParent) const
 {
     // Get src model
@@ -70,17 +83,18 @@ bool CredentialModelFilter::acceptRow(int iSrcRow, const QModelIndex &srcParent)
     QModelIndex srcIndex = pCredentialModel->index(iSrcRow, 0, srcParent);
     if (srcIndex.isValid()) {
         // Get item
-        TreeItem *pItem = pCredentialModel->getItem(srcIndex);
+        TreeItem *pItem = pCredentialModel->getItemByIndex(srcIndex);
         if (pItem != nullptr) {
-            ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
-            if (pServiceItem != nullptr)
-                return pServiceItem->name().contains(m_sFilter, Qt::CaseInsensitive);
+            // Is it a login item?
             LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
             if (pLoginItem != nullptr) {
-                bool bCondition1 = pLoginItem->name().contains(m_sFilter, Qt::CaseInsensitive);
-                bool bCondition2 = pLoginItem->description().contains(m_sFilter, Qt::CaseInsensitive);
-                return bCondition1 || bCondition2;
+                TreeItem *pParentItem = pLoginItem->parentItem();
+                bool bCondition = testItemAgainstNameAndDescription(pParentItem, m_sFilter);
+                if (bCondition)
+                    return true;
             }
+
+            return testItemAgainstNameAndDescription(pItem, m_sFilter);
         }
     }
 
@@ -94,8 +108,8 @@ bool CredentialModelFilter::lessThan(const QModelIndex &srcLeft, const QModelInd
     // Get src model
     CredentialModel *pSrcModel = dynamic_cast<CredentialModel *>(sourceModel());
 
-    TreeItem *pLeftItem = pSrcModel->getItem(srcLeft);
-    TreeItem *pRightItem = pSrcModel->getItem(srcRight);
+    TreeItem *pLeftItem = pSrcModel->getItemByIndex(srcLeft);
+    TreeItem *pRightItem = pSrcModel->getItemByIndex(srcRight);
 
     if ((pLeftItem != nullptr) && (pRightItem != nullptr))
         return pLeftItem->name() < pRightItem->name();

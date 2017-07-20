@@ -7,8 +7,11 @@
 
 //-------------------------------------------------------------------------------------------------
 
-TreeItem::TreeItem(const Type &eType, const QString &sName) : m_sUID(QUuid::createUuid().toString()), m_eType(eType),
-    m_pParentItem(nullptr), m_eStatus(UNUSED), m_sName(sName)
+TreeItem::TreeItem(const QString &sName,
+    const QDate &dCreatedDate, const QDate &dUpdatedDate, const QString &sDescription) :
+    m_pParentItem(nullptr), m_sUID(QUuid::createUuid().toString()), m_eStatus(UNUSED),
+    m_sName(sName), m_dCreatedDate(dCreatedDate), m_dUpdatedDate(dUpdatedDate),
+    m_sDescription(sDescription)
 {
 }
 
@@ -28,9 +31,16 @@ const QString &TreeItem::uid() const
 
 //-------------------------------------------------------------------------------------------------
 
-const TreeItem::Type &TreeItem::type() const
+const QString &TreeItem::name() const
 {
-    return m_eType;
+    return m_sName;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void TreeItem::setName(const QString &sName)
+{
+    m_sName = sName;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -61,16 +71,9 @@ int TreeItem::row() const
 
 //-------------------------------------------------------------------------------------------------
 
-const QString &TreeItem::name() const
+TreeItem *TreeItem::parentItem() const
 {
-    return m_sName;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void TreeItem::setName(const QString &sName)
-{
-    m_sName = sName;
+    return m_pParentItem;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -82,6 +85,13 @@ void TreeItem::setParentItem(TreeItem *pParentItem)
 
 //-------------------------------------------------------------------------------------------------
 
+const TreeItem::Status &TreeItem::status() const
+{
+    return m_eStatus;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void TreeItem::setStatus(const Status &eStatus)
 {
     m_eStatus = eStatus;
@@ -89,9 +99,44 @@ void TreeItem::setStatus(const Status &eStatus)
 
 //-------------------------------------------------------------------------------------------------
 
-const TreeItem::Status &TreeItem::status() const
+const QDate &TreeItem::createdDate() const
 {
-    return m_eStatus;
+    return m_dCreatedDate;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void TreeItem::setCreatedDate(const QDate &dDate)
+{
+    m_dCreatedDate = dDate;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+const QDate &TreeItem::updatedDate() const
+{
+    return m_dUpdatedDate;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void TreeItem::setUpdatedDate(const QDate &dDate)
+{
+    m_dUpdatedDate = dDate;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+const QString &TreeItem::description() const
+{
+    return m_sDescription;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void TreeItem::setDescription(const QString &sDescription)
+{
+    m_sDescription = sDescription;
 }
 
 //-------------------------------------------------------------------------------------------------

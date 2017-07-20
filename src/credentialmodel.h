@@ -118,14 +118,17 @@ public:
     void removeCredential(const QModelIndex &idx);
 
     //! Get item
-    TreeItem *getItem(const QModelIndex &index) const;
+    TreeItem *getItemByIndex(const QModelIndex &index) const;
+
+    //! Return item for UID
+    TreeItem *getItemByUID(const QString &sItemUID) const;
 
 private:
     //! Add service
     ServiceItem *addService(const QString &sServiceName);
 
     //! Return index for item UID
-    QModelIndex findIndexForItemUID(const QString &sItemUID) const;
+    QModelIndex getItemIndexByUID(const QString &sItemUID) const;
 
 private:
     //! Root item

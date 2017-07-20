@@ -36,40 +36,29 @@ QVariant CredentialModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     // Get item
-    TreeItem *pItem = getItem(index);
+    TreeItem *pItem = getItemByIndex(index);
     if (!pItem)
         return QVariant();
 
-    // Cast to service item
-    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
-
     // Cast to login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
-
-    qDebug() << "ICI: " << pLoginItem;
 
     // Display data for role
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         switch (index.column()) {
         case ServiceIdx: return pItem->name();
-        case LoginIdx: return (pLoginItem != nullptr) ? pLoginItem->name() : QVariant();
+        case LoginIdx: return pItem->name();
         case PasswordIdx: return (pLoginItem != nullptr) ? pLoginItem->password() : QVariant();
-        case DescriptionIdx: return (pLoginItem != nullptr) ? pLoginItem->description() : QVariant();
+        case DescriptionIdx: return pItem->description();
         case DateCreatedIdx: {
-            if (pLoginItem != nullptr) {
-                if (pLoginItem->createdDate().isNull())
-                    return tr("N/A");
-                return pLoginItem->createdDate();
-            }
-            else return QVariant();
+            if (pItem->createdDate().isNull())
+                return tr("N/A");
+            return pItem->createdDate();
         }
         case DateModifiedIdx: {
-            if (pLoginItem != nullptr) {
-                if (pLoginItem->updatedDate().isNull())
-                    return tr("N/A");
-                return pLoginItem->updatedDate();
-            }
-            else return QVariant();
+            if (pItem->updatedDate().isNull())
+                return tr("N/A");
+            return pItem->updatedDate();
         }
         case FavoriteIdx: (pLoginItem != nullptr) ? pLoginItem->favorite() : QVariant();
         }
@@ -147,7 +136,7 @@ int CredentialModel::columnCount(const QModelIndex &parent) const
 
 //-------------------------------------------------------------------------------------------------
 
-TreeItem *CredentialModel::getItem(const QModelIndex &index) const
+TreeItem *CredentialModel::getItemByIndex(const QModelIndex &index) const
 {
     if (!index.isValid())
         return nullptr;
@@ -246,13 +235,23 @@ ServiceItem *CredentialModel::addService(const QString &sServiceName)
 
 //-------------------------------------------------------------------------------------------------
 
-QModelIndex CredentialModel::findIndexForItemUID(const QString &sItemUID) const
+QModelIndex CredentialModel::getItemIndexByUID(const QString &sItemUID) const
 {
     QModelIndexList lMatches = match(index(0, 0, QModelIndex()), UidRole, sItemUID, 1, Qt::MatchRecursive);
     if (!lMatches.isEmpty())
         return lMatches.first();
 
     return QModelIndex();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+TreeItem *CredentialModel::getItemByUID(const QString &sItemUID) const
+{
+    QModelIndex itemIndex = getItemIndexByUID(sItemUID);
+    if (itemIndex.isValid())
+        return getItemByIndex(itemIndex);
+    return nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -269,7 +268,7 @@ void CredentialModel::setClearTextPassword(const QString &sServiceName, const QS
         if (pTargetLogin != nullptr) {
             pTargetLogin->setPassword(sPassword);
             pTargetLogin->setPasswordOrig(sPassword);
-            QModelIndex itemIndex = findIndexForItemUID(pTargetLogin->uid());
+            QModelIndex itemIndex = getItemIndexByUID(pTargetLogin->uid());
             if (itemIndex.isValid())
                 emit dataChanged(itemIndex, itemIndex);
         }
@@ -289,12 +288,12 @@ void CredentialModel::update(const QString &sServiceName, const QString &sLoginN
             if (!sDescription.isEmpty())
                 pTargetLogin->setDescription(sDescription);
             pTargetLogin->setPassword(sPassword);
-            QModelIndex itemIndex = findIndexForItemUID(pTargetLogin->uid());
+            QModelIndex itemIndex = getItemIndexByUID(pTargetLogin->uid());
             if (itemIndex.isValid())
                 emit dataChanged(itemIndex, itemIndex);
         }
         else {
-            beginInsertRows(findIndexForItemUID(pTargetService->uid()), pTargetService->childCount(), pTargetService->childCount());
+            beginInsertRows(getItemIndexByUID(pTargetService->uid()), pTargetService->childCount(), pTargetService->childCount());
             LoginItem *pLoginItem = pTargetService->addLogin(sLoginName);
             if (!sDescription.isEmpty())
                 pLoginItem->setDescription(sDescription);
@@ -322,7 +321,7 @@ void CredentialModel::update(const QModelIndex &idx, const Credential &cred)
     else
     {
         // Retrieve item
-        TreeItem *pItem = getItem(idx);
+        TreeItem *pItem = getItemByIndex(idx);
         if (pItem != nullptr) {
             LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
             if (pLoginItem != nullptr) {
@@ -330,7 +329,7 @@ void CredentialModel::update(const QModelIndex &idx, const Credential &cred)
                 pLoginItem->setFavorite(cred.favorite);
                 pLoginItem->setName(cred.login);
                 pLoginItem->setPassword(cred.password);
-                QModelIndex itemIndex = findIndexForItemUID(pLoginItem->uid());
+                QModelIndex itemIndex = getItemIndexByUID(pLoginItem->uid());
                 if (itemIndex.isValid())
                     emit dataChanged(itemIndex, itemIndex);
             }
@@ -366,11 +365,11 @@ QJsonArray CredentialModel::getJsonChanges()
             }
             QJsonObject object
             {{"service", pServiceItem->name()},
-             {"login", pLoginItem->name()},
-             {"password", p},
-             {"description", pLoginItem->description()},
-             {"address", addr},
-             {"favorite", pLoginItem->favorite()}};
+                {"login", pLoginItem->name()},
+                {"password", p},
+                {"description", pLoginItem->description()},
+                {"address", addr},
+                {"favorite", pLoginItem->favorite()}};
 
             jarr.append(object);
         }

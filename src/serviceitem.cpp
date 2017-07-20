@@ -4,7 +4,7 @@
 
 //-------------------------------------------------------------------------------------------------
 
-ServiceItem::ServiceItem(const QString &sServiceName) : TreeItem(SERVICE, sServiceName)
+ServiceItem::ServiceItem(const QString &sServiceName) : TreeItem(sServiceName)
 {
 
 }

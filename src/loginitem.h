@@ -25,24 +25,6 @@ public:
     // Getters and setters
     //-------------------------------------------------------------------------------------------------
 
-    //! Return created date
-    const QDate &createdDate() const;
-
-    //! Set created date
-    void setCreatedDate(const QDate &dDate);
-
-    //! Return updated date
-    const QDate &updatedDate() const;
-
-    //! Set updated date
-    void setUpdatedDate(const QDate &dDate);
-
-    //! Return description
-    const QString &description() const;
-
-    //! Set description
-    void setDescription(const QString &sDescription);
-
     //! Return address
     const QByteArray &address() const;
 
@@ -68,15 +50,6 @@ public:
     void setPasswordOrig(const QString &setPassword);
 
 private:    
-    //! Created date
-    QDate m_dCreatedDate;
-
-    //! Updated date
-    QDate m_dUpdatedDate;
-
-    //! Description
-    QString m_sDescription;
-
     //! Address
     QByteArray m_bAddress;
 

@@ -7,12 +7,8 @@
 
 //-------------------------------------------------------------------------------------------------
 
-LoginItem::LoginItem(const QString &sLoginName) : TreeItem(LOGIN, sLoginName),
-    m_dCreatedDate(QDate::currentDate()),
-    m_dUpdatedDate(QDate::currentDate()),
-    m_sDescription(""),
-    m_sPassword(""),
-    m_sPasswordOrig("")
+LoginItem::LoginItem(const QString &sLoginName) : TreeItem(sLoginName),
+    m_iFavorite(0), m_sPassword(""), m_sPasswordOrig("")
 {
 
 }
@@ -22,48 +18,6 @@ LoginItem::LoginItem(const QString &sLoginName) : TreeItem(LOGIN, sLoginName),
 LoginItem::~LoginItem()
 {
 
-}
-
-//-------------------------------------------------------------------------------------------------
-
-const QDate &LoginItem::createdDate() const
-{
-    return m_dCreatedDate;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void LoginItem::setCreatedDate(const QDate &dDate)
-{
-    m_dCreatedDate = dDate;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-const QDate &LoginItem::updatedDate() const
-{
-    return m_dUpdatedDate;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void LoginItem::setUpdatedDate(const QDate &dDate)
-{
-    m_dUpdatedDate = dDate;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-const QString &LoginItem::description() const
-{
-    return m_sDescription;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void LoginItem::setDescription(const QString &sDescription)
-{
-    m_sDescription = sDescription;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -4,6 +4,9 @@
 // Qt
 #include <QSortFilterProxyModel>
 
+// Application
+class TreeItem;
+
 class CredentialModelFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
@@ -44,10 +47,14 @@ protected:
     virtual bool lessThan(const QModelIndex &srcLeft, const QModelIndex &srcRight) const;
 
 private:
-    // Accept row:
+    //! Accept row
     bool acceptRow(int iSrcRow, const QModelIndex &srcParent) const;
 
+    //! Test item against name and description
+    bool testItemAgainstNameAndDescription(TreeItem *pItem, const QString &sFilter) const;
+
 private:
+    //! Filter
     QString m_sFilter;
 };
 
