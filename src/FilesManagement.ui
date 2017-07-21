@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>695</width>
-    <height>595</height>
+    <width>691</width>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,7 +166,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageLocked">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -512,15 +512,28 @@ padding: 2px;
           <number>20</number>
          </property>
          <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>288</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
           <widget class="QPushButton" name="buttonQuitMMM">
            <property name="minimumSize">
             <size>
-             <width>150</width>
+             <width>200</width>
              <height>0</height>
             </size>
            </property>
            <property name="text">
-            <string>Quit management mode</string>
+            <string>Save &amp;&amp; Quit management mode</string>
            </property>
           </widget>
          </item>

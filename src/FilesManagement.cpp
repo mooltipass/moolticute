@@ -106,7 +106,7 @@ FilesManagement::FilesManagement(QWidget *parent) :
         filterModel->setFilter(t);
     });
 
-    connect(ui->filesListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &FilesManagement::currentSelectionChanged);
+    connect(ui->filesListView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FilesManagement::currentSelectionChanged);
     currentSelectionChanged(QModelIndex(), QModelIndex());
 }
 
@@ -235,7 +235,6 @@ void FilesManagement::on_pushButtonDelFile_clicked()
 
     deletedList.append(currentItem->text());
     filesModel->removeRow(currentItem->row());
-    currentItem = nullptr;
 }
 
 void FilesManagement::dataFileRequested(const QString &service, const QByteArray &data, bool success)
@@ -336,6 +335,19 @@ void FilesManagement::dataFileSent(const QString &service, bool success)
         QMessageBox::warning(this, tr("Failure"), tr("Unable to send data!"));
         return;
     }
+
+    //item already exists
+    for (int i = 0;i < filesModel->rowCount();i++)
+    {
+        QStandardItem *it = filesModel->item(i);
+        if (it->text() == service)
+            return;
+    }
+
+    //if not, add the new item
+    QStandardItem *item = new QStandardItem(service);
+    item->setIcon(AppGui::qtAwesome()->icon(fa::fileo));
+    filesModel->appendRow(item);
 }
 
 void FilesManagement::on_addFileButton_clicked()
