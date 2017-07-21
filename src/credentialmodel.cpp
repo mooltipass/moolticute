@@ -11,21 +11,15 @@
 #include "loginitem.h"
 #include "treeitem.h"
 
-//-------------------------------------------------------------------------------------------------
-
 CredentialModel::CredentialModel(QObject *parent) : QAbstractItemModel(parent)
 {
     m_pRootItem = new RootItem();
 }
 
-//-------------------------------------------------------------------------------------------------
-
 CredentialModel::~CredentialModel()
 {
     delete m_pRootItem;
 }
-
-//-------------------------------------------------------------------------------------------------
 
 QVariant CredentialModel::data(const QModelIndex &idx, int role) const
 {
@@ -49,21 +43,25 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
     // Display data for role
-    if (role == Qt::DisplayRole || role == Qt::EditRole) {
+    if (role == Qt::DisplayRole || role == Qt::EditRole)
+    {
         switch (idx.column()) {
         case ServiceIdx:
-        case LoginIdx: {
+        case LoginIdx:
+        {
             QString sCreatedDate = QString(" (%1)").arg(pItem->createdDate().toString());
             return pItem->name() + sCreatedDate;
         }
         case PasswordIdx: return (pLoginItem != nullptr) ? pLoginItem->password() : QVariant();
         case DescriptionIdx: return pItem->description();
-        case DateCreatedIdx: {
+        case DateCreatedIdx:
+        {
             if (pItem->createdDate().isNull())
                 return tr("N/A");
             return pItem->createdDate();
         }
-        case DateModifiedIdx: {
+        case DateModifiedIdx:
+        {
             if (pItem->updatedDate().isNull())
                 return tr("N/A");
             return pItem->updatedDate();
@@ -72,7 +70,8 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
         }
     }
 
-    if (role == Qt::ForegroundRole) {
+    if (role == Qt::ForegroundRole)
+    {
         if (pLoginItem != nullptr)
             return QColor("green");
         if (pServiceItem != nullptr)
@@ -80,7 +79,8 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
         return QColor("black");
     }
 
-    if (role == Qt::FontRole) {
+    if (role == Qt::FontRole)
+    {
         QFont font;
         font.setBold(true);
         return font;
@@ -101,8 +101,6 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     return QVariant();
 }
 
-//-------------------------------------------------------------------------------------------------
-
 Qt::ItemFlags CredentialModel::flags(const QModelIndex &idx) const
 {
     if (!idx.isValid())
@@ -110,8 +108,6 @@ Qt::ItemFlags CredentialModel::flags(const QModelIndex &idx) const
 
     return QAbstractItemModel::flags(idx);
 }
-
-//-------------------------------------------------------------------------------------------------
 
 QModelIndex CredentialModel::index(int row, int column, const QModelIndex &parent) const
 {
@@ -122,8 +118,6 @@ QModelIndex CredentialModel::index(int row, int column, const QModelIndex &paren
     TreeItem *pChildItem = pParentItem ? pParentItem->child(row) : nullptr;
     return pChildItem ? createIndex(row, column, pChildItem) : QModelIndex();
 }
-
-//-------------------------------------------------------------------------------------------------
 
 QModelIndex CredentialModel::parent(const QModelIndex &idx) const
 {
@@ -138,8 +132,6 @@ QModelIndex CredentialModel::parent(const QModelIndex &idx) const
     return pParentItem == m_pRootItem ? QModelIndex() : createIndex(pParentItem->row(), 0, pParentItem);
 }
 
-//-------------------------------------------------------------------------------------------------
-
 int CredentialModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.column() > 0)
@@ -148,15 +140,11 @@ int CredentialModel::rowCount(const QModelIndex &parent) const
     return pParentItem ? pParentItem->childCount() : 0;
 }
 
-//-------------------------------------------------------------------------------------------------
-
 int CredentialModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return 1;
 }
-
-//-------------------------------------------------------------------------------------------------
 
 TreeItem *CredentialModel::getItemByIndex(const QModelIndex &idx) const
 {
@@ -164,8 +152,6 @@ TreeItem *CredentialModel::getItemByIndex(const QModelIndex &idx) const
         return nullptr;
     return static_cast<TreeItem *>(idx.internalPointer());
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialModel::load(const QJsonArray &json)
 {
@@ -244,8 +230,6 @@ void CredentialModel::load(const QJsonArray &json)
     emit modelLoaded();
 }
 
-//-------------------------------------------------------------------------------------------------
-
 ServiceItem *CredentialModel::addService(const QString &sServiceName)
 {
     // Do we have a match for sServiceName?
@@ -257,8 +241,6 @@ ServiceItem *CredentialModel::addService(const QString &sServiceName)
     return new ServiceItem(sServiceName);
 }
 
-//-------------------------------------------------------------------------------------------------
-
 QModelIndex CredentialModel::getItemIndexByUID(const QString &sItemUID) const
 {
     QModelIndexList lMatches = match(index(0, 0, QModelIndex()), UidRole, sItemUID, 1, Qt::MatchRecursive);
@@ -268,8 +250,6 @@ QModelIndex CredentialModel::getItemIndexByUID(const QString &sItemUID) const
     return QModelIndex();
 }
 
-//-------------------------------------------------------------------------------------------------
-
 TreeItem *CredentialModel::getItemByUID(const QString &sItemUID) const
 {
     QModelIndex itemIndex = getItemIndexByUID(sItemUID);
@@ -278,71 +258,82 @@ TreeItem *CredentialModel::getItemByUID(const QString &sItemUID) const
     return nullptr;
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName)
 {
     // Retrieve item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(getItemByIndex(idx));
-    if (pLoginItem != nullptr) {
+    if (pLoginItem != nullptr)
+    {
         updateLoginItem(idx, PasswordIdx, sPassword);
         updateLoginItem(idx, DescriptionIdx, sDescription);
         updateLoginItem(idx, LoginIdx, sName);
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const ColumnIdx &colIdx, const QVariant &vValue)
 {
     TreeItem *pItem = getItemByIndex(idx);
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
     bool bChanged = false;
-    if (pLoginItem != nullptr) {
-        switch (colIdx) {
-        case LoginIdx: {
+    if (pLoginItem != nullptr)
+    {
+        switch (colIdx)
+        {
+        case LoginIdx:
+        {
             QString sName = vValue.toString();
-            if (sName != pLoginItem->name()) {
+            if (sName != pLoginItem->name())
+            {
                 pLoginItem->setName(sName);
                 bChanged = true;
             }
             break;
         }
-        case PasswordIdx: {
+        case PasswordIdx:
+        {
             QString sPassword = vValue.toString();
-            if (sPassword != pLoginItem->password()) {
+            if (sPassword != pLoginItem->password())
+            {
                 pLoginItem->setPassword(sPassword);
                 bChanged = true;
             }
             break;
         }
-        case DescriptionIdx: {
+        case DescriptionIdx:
+        {
             QString sDescription = vValue.toString();
-            if (sDescription != pLoginItem->description()) {
+            if (sDescription != pLoginItem->description())
+            {
                 pLoginItem->setDescription(sDescription);
                 bChanged = true;
             }
             break;
         }
-        case DateCreatedIdx: {
+        case DateCreatedIdx:
+        {
             QDate dDate = vValue.toDate();
-            if (dDate != pLoginItem->createdDate()) {
+            if (dDate != pLoginItem->createdDate())
+            {
                 pLoginItem->setCreatedDate(dDate);
                 bChanged = true;
             }
             break;
         }
-        case DateModifiedIdx: {
+        case DateModifiedIdx:
+        {
             QDate dDate = vValue.toDate();
-            if (dDate != pLoginItem->updatedDate()) {
+            if (dDate != pLoginItem->updatedDate())
+            {
                 pLoginItem->setUpdatedDate(dDate);
                 bChanged = true;
             }
             break;
         }
-        case FavoriteIdx: {
+        case FavoriteIdx:
+        {
             qint8 iFavorite = (qint8)vValue.toInt();
-            if (iFavorite != pLoginItem->favorite()) {
+            if (iFavorite != pLoginItem->favorite())
+            {
                 pLoginItem->setFavorite(iFavorite);
                 bChanged = true;
             }
@@ -355,18 +346,18 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ColumnIdx &c
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialModel::setClearTextPassword(const QString &sServiceName, const QString &sLoginName, const QString &sPassword)
 {
     // Retrieve target service
     ServiceItem *pTargetService = m_pRootItem->findServiceByName(sServiceName);
 
     // Got a match
-    if (pTargetService != nullptr) {
+    if (pTargetService != nullptr)
+    {
         // Retrieve target login
         LoginItem *pTargetLogin = pTargetService->findLoginByName(sLoginName);
-        if (pTargetLogin != nullptr) {
+        if (pTargetLogin != nullptr)
+        {
             pTargetLogin->setPassword(sPassword);
             pTargetLogin->setPasswordOrig(sPassword);
             QModelIndex itemIndex = getItemIndexByUID(pTargetLogin->uid());
@@ -376,13 +367,12 @@ void CredentialModel::setClearTextPassword(const QString &sServiceName, const QS
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-
 QJsonArray CredentialModel::getJsonChanges()
 {
     QJsonArray jarr;
     QVector<TreeItem *> vServices = m_pRootItem->childs();
-    foreach (TreeItem *pService, vServices) {
+    foreach (TreeItem *pService, vServices)
+    {
         QJsonArray addr;
         ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pService);
         QVector<TreeItem *> vLogins = pServiceItem->childs();
@@ -418,20 +408,20 @@ QJsonArray CredentialModel::getJsonChanges()
     return jarr;
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialModel::addCredential(const QString &sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription)
 {
     // Retrieve target service
     ServiceItem *pTargetService = m_pRootItem->findServiceByName(sServiceName);
 
     // Check if a service/login pair already exists
-    if (pTargetService != nullptr) {
+    if (pTargetService != nullptr)
+    {
         // Retrieve target login
         LoginItem *pTargetLogin = pTargetService->findLoginByName(sLoginName);
         if (pTargetLogin != nullptr)
             return;
-        else {
+        else
+        {
             QModelIndex serviceIndex = getItemIndexByUID(pTargetService->uid());
             beginInsertRows(serviceIndex, pTargetService->childCount(), pTargetService->childCount());
             LoginItem *pLoginItem = pTargetService->addLogin(sLoginName);
@@ -441,7 +431,8 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
         }
     }
     // No matching service
-    else {
+    else
+    {
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
         ServiceItem *pServiceItem = m_pRootItem->addService(sServiceName);
         LoginItem *pLoginItem = pServiceItem->addLogin(sLoginName);
@@ -451,11 +442,10 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialModel::removeCredential(const QModelIndex &idx)
 {
-    if (idx.isValid()) {
+    if (idx.isValid())
+    {
         TreeItem *pItem = getItemByIndex(idx);
         if (pItem == nullptr)
             return;
@@ -476,7 +466,8 @@ void CredentialModel::removeCredential(const QModelIndex &idx)
         if (pServiceItem != nullptr)
             bCondition = (pServiceItem->childCount() == 0);
         QModelIndex parentIndex = idx.parent();
-        if (bCondition) {
+        if (bCondition)
+        {
             beginRemoveRows(parentIndex, idx.row(), idx.row());
             if (pParentItem->removeOne(pItem))
                 delete pItem;

@@ -28,8 +28,6 @@
 #include "loginitem.h"
 #include "serviceitem.h"
 
-//-------------------------------------------------------------------------------------------------
-
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement)
 {
@@ -101,14 +99,10 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     });
 }
 
-//-------------------------------------------------------------------------------------------------
-
 CredentialsManagement::~CredentialsManagement()
 {
     delete ui;
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::setWsClient(WSClient *c)
 {
@@ -123,8 +117,6 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::enableCredentialsManagement(bool enable)
 {
     if (enable)
@@ -133,8 +125,6 @@ void CredentialsManagement::enableCredentialsManagement(bool enable)
         ui->stackedWidget->setCurrentWidget(ui->pageLocked);
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::updateQuickAddCredentialsButtonState()
 {
     ui->addCredentialButton->setEnabled(ui->addCredLoginInput->hasAcceptableInput() && ui->addCredLoginInput->text().length() > 0 &&
@@ -142,15 +132,11 @@ void CredentialsManagement::updateQuickAddCredentialsButtonState()
                                         ui->addCredPasswordInput->hasAcceptableInput() && ui->addCredPasswordInput->text().length() > 0);
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::on_pushButtonEnterMMM_clicked()
 {
     wsClient->sendEnterMMRequest();
     emit wantEnterMemMode();
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::on_buttonDiscard_clicked()
 {
@@ -159,15 +145,11 @@ void CredentialsManagement::on_buttonDiscard_clicked()
     wsClient->sendLeaveMMRequest();
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::on_buttonSaveChanges_clicked()
 {
     wsClient->sendCredentialsMM(m_pCredModel->getJsonChanges());
     emit wantSaveMemMode(); //waits for the daemon to process the data
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::requestPasswordForSelectedItem()
 {
@@ -190,15 +172,14 @@ void CredentialsManagement::requestPasswordForSelectedItem()
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
     // Request password
-    if (pLoginItem != nullptr) {
+    if (pLoginItem != nullptr)
+    {
         // Retrieve parent
         TreeItem *pItem = pLoginItem->parentItem();
         if (pItem != nullptr)
             wsClient->requestPassword(pItem->name(), pLoginItem->name());
     }
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::on_addCredentialButton_clicked()
 {
@@ -239,8 +220,6 @@ void CredentialsManagement::on_addCredentialButton_clicked()
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::onPasswordUnlocked(const QString & service, const QString & login,
                                                const QString & password, bool success)
 {
@@ -253,8 +232,6 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
     m_pCredModel->setClearTextPassword(service, login, password);
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success)
 {
     Q_UNUSED(description)
@@ -264,8 +241,6 @@ void CredentialsManagement::onCredentialUpdated(const QString & service, const Q
         return;
     }
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex)
 {
@@ -291,8 +266,6 @@ void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex
         m_pCredModel->updateLoginItem(srcIndex, ui->credDisplayPasswordInput->text(), ui->credDisplayDescriptionInput->text(), ui->credDisplayLoginInput->text());
 }
 
-//-------------------------------------------------------------------------------------------------
-
 bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex)
 {   
     if (ui->stackedWidget->currentWidget() != ui->pageUnlocked || !wsClient->get_memMgmtMode() || deletingCred)
@@ -316,10 +289,12 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
     // Retrieve login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
-    if (pLoginItem != nullptr) {
+    if (pLoginItem != nullptr)
+    {
         // Retrieve parent item
         TreeItem *pServiceItem = pLoginItem->parentItem();
-        if (pServiceItem != nullptr) {
+        if (pServiceItem != nullptr)
+        {
             // Retrieve UI information
             QString sPassword = ui->credDisplayPasswordInput->text();
             QString sDescription = ui->credDisplayDescriptionInput->text();
@@ -352,8 +327,6 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
     return true;
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::on_pushButtonConfirm_clicked()
 {
     // Retrieve selection model
@@ -368,8 +341,6 @@ void CredentialsManagement::on_pushButtonConfirm_clicked()
     // Update save discard state
     updateSaveDiscardState();
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::on_pushButtonCancel_clicked()
 {
@@ -387,15 +358,14 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
     // Retrieve login item
     TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
-    if (pLoginItem != nullptr) {
+    if (pLoginItem != nullptr)
+    {
         ui->credDisplayPasswordInput->setText(pLoginItem->password());
         ui->credDisplayDescriptionInput->setText(pLoginItem->description());
         ui->credDisplayLoginInput->setText(pLoginItem->name());
         updateSaveDiscardState();
     }
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex)
 {
@@ -426,7 +396,8 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
         // Do we have a login item?
         LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
-        if (pLoginItem != nullptr) {
+        if (pLoginItem != nullptr)
+        {
             // Retrieve item info
             QString sPassword = ui->credDisplayPasswordInput->text();
             QString sDescription = ui->credDisplayDescriptionInput->text();
@@ -445,14 +416,13 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
                 ui->pushButtonConfirm->hide();
             }
         }
-        else {
+        else
+        {
             ui->pushButtonCancel->hide();
             ui->pushButtonConfirm->hide();
         }
     }
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::changeCurrentFavorite(int iFavorite)
 {
@@ -475,8 +445,6 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
         m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteIdx, iFavorite);
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::on_pushButtonDelete_clicked()
 {
     // Retrieve selection model
@@ -494,7 +462,8 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
     TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
-    if (pLoginItem != nullptr) {
+    if (pLoginItem != nullptr)
+    {
         // Retrieve parent item
         TreeItem *pParentItem = pLoginItem->parentItem();
         if (pParentItem != nullptr) {
@@ -514,14 +483,14 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, const QModelIndex &previous)
 {
     Q_UNUSED(previous)
-    if (proxyIndex.isValid()) {
+    if (proxyIndex.isValid())
+    {
         QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
-        if (srcIndex.isValid()) {
+        if (srcIndex.isValid())
+        {
             TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
 
             // A login item was selected
@@ -539,15 +508,11 @@ void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, 
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::onLoginSelected(const QString &sItemUID)
 {
     ui->credDisplayFrame->setEnabled(true);
     updateLoginDescription(sItemUID);
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::onServiceSelected(const QString &sItemUID)
 {
@@ -555,15 +520,15 @@ void CredentialsManagement::onServiceSelected(const QString &sItemUID)
     clearLoginDescription(sItemUID);
 }
 
-//-------------------------------------------------------------------------------------------------
-
 void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
 {
     // Retrieve login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(m_pCredModel->getItemByUID(sItemUID));
-    if (pLoginItem != nullptr) {
+    if (pLoginItem != nullptr)
+    {
         TreeItem *pParentItem = pLoginItem->parentItem();
-        if (pParentItem != nullptr) {
+        if (pParentItem != nullptr)
+        {
             QString sFormat("dd/MM/yyyy");
             ui->credDisplayServiceInput->setText(pParentItem->name());
             ui->credDisplayLoginInput->setText(pLoginItem->name());
@@ -574,8 +539,6 @@ void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
         }
     }
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void CredentialsManagement::clearLoginDescription(const QString &sItemUID)
 {
