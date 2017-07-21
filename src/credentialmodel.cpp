@@ -10,6 +10,7 @@
 #include "serviceitem.h"
 #include "loginitem.h"
 #include "treeitem.h"
+#include "AppGui.h"
 
 CredentialModel::CredentialModel(QObject *parent) : QAbstractItemModel(parent)
 {
@@ -80,9 +81,7 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     if (role == Qt::ForegroundRole)
     {
         if (pLoginItem != nullptr)
-            return QColor("green");
-        if (pServiceItem != nullptr)
-            return QColor("blue");
+            return QColor("#3D96AF");
         return QColor("black");
     }
 
@@ -90,6 +89,8 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     {
         QFont font;
         font.setBold(true);
+        if (pLoginItem != nullptr)
+            font.setItalic(true);
         return font;
     }
 
@@ -102,8 +103,12 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     if (role == PasswordUnlockedRole && idx.column() == PasswordIdx)
         return (pLoginItem != nullptr) ? !pLoginItem->password().isEmpty() : false;
 
-    if (role == UidRole)
-        return pItem->uid();
+    if (role == Qt::DecorationRole) {
+        if (pLoginItem != nullptr)
+            return AppGui::qtAwesome()->icon(fa::arrowcircleright, {{ "color", QColor("#0097a7") },
+                                                                    { "color-selected", QColor("#0097a7") },
+                                                                    { "color-active", QColor("#0097a7") }});
+    }
 
     return QVariant();
 }
