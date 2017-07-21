@@ -21,16 +21,6 @@ void CredentialModelFilter::setFilter(const QString &sFilter)
     invalidate();
 }
 
-int CredentialModelFilter::indexToSource(int idx)
-{
-    return mapToSource(index(idx, 0)).row();
-}
-
-int CredentialModelFilter::indexFromSource(int idx)
-{
-    return mapFromSource(index(idx, 0)).row();
-}
-
 bool CredentialModelFilter::filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const
 {
     // Get source index

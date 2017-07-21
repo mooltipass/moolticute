@@ -110,6 +110,9 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
                                                                     { "color-active", QColor("#0097a7") }});
     }
 
+    if (role == UidRole)
+        return pItem->uid();
+
     return QVariant();
 }
 

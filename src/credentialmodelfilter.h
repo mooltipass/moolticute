@@ -15,8 +15,6 @@ public:
     CredentialModelFilter(QObject *parent = nullptr);
     virtual ~CredentialModelFilter();
     void setFilter(const QString &sFilter);
-    int indexToSource(int idx);
-    int indexFromSource(int idx);
 
 protected:
     virtual bool filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const;
