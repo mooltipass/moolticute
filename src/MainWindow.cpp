@@ -41,6 +41,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     bFilesAndSSHKeysTabsVisibleOnDemand(true),
     previousWidget(nullptr)
 {
+    QSettings s;
+    bFilesAndSSHKeysTabsVisibleOnDemand = s.value("settings/FilesAndSSHKeysTabsVisibleOnDemand").toBool();
+
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
                                 { "color-active", QColor(Qt::white) }};
@@ -402,7 +405,6 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     checkAutoStart();
 
     //Check is ssh agent opt has to be checked
-    QSettings s;
     ui->checkBoxSSHAgent->setChecked(s.value("settings/auto_start_ssh").toBool());
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
@@ -803,6 +805,10 @@ void MainWindow::checkAutoStart()
 void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdateAdvancedTabVisibility)
 {
     bFilesAndSSHKeysTabsVisibleOnDemand = bValue;
+
+    // Save in settings
+    QSettings s;
+    s.setValue("settings/FilesAndSSHKeysTabsVisibleOnDemand", bValue);
 
     // Files and SSH keys tabs will show up only after activating the CTRL+SHIFT+F1 shortcut
     if (bFilesAndSSHKeysTabsVisibleOnDemand) {
