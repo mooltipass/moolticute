@@ -532,13 +532,12 @@ void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
         TreeItem *pParentItem = pLoginItem->parentItem();
         if (pParentItem != nullptr)
         {
-            QString sFormat("dd/MM/yyyy");
             ui->credDisplayServiceInput->setText(pParentItem->name());
             ui->credDisplayLoginInput->setText(pLoginItem->name());
             ui->credDisplayPasswordInput->setText(pLoginItem->password());
             ui->credDisplayDescriptionInput->setText(pLoginItem->description());
-            ui->credDisplayCreationDateInput->setText(pLoginItem->createdDate().toString(sFormat));
-            ui->credDisplayModificationDateInput->setText(pLoginItem->updatedDate().toString(sFormat));
+            ui->credDisplayCreationDateInput->setText(pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate));
+            ui->credDisplayModificationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
             bool bPasswordIsEmpty = pLoginItem->password().isEmpty();
             ui->credDisplayPasswordInput->setLocked(bPasswordIsEmpty);
         }

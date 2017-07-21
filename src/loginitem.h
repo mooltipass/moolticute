@@ -3,6 +3,7 @@
 
 // Qt
 #include <QDate>
+#include <QJsonObject>
 
 // Application
 #include "treeitem.h"
@@ -21,6 +22,7 @@ public:
     void setPassword(const QString &sPassword);
     const QString &passwordOrig() const;
     void setPasswordOrig(const QString &setPassword);
+    QJsonObject toJson() const;
 
 private:    
     QByteArray m_bAddress;

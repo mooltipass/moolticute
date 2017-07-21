@@ -42,9 +42,7 @@ protected:
             const QString &setDescription="");
 
 protected:
-    QVector<TreeItem *> m_vChilds;
-
-private:    
+    QVector<TreeItem *> m_vChilds;   
     TreeItem *m_pParentItem;
     QString m_sUID;
     Status m_eStatus;

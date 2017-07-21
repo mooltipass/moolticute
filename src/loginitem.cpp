@@ -1,5 +1,6 @@
 // Qt
 #include <QUuid>
+#include <QJsonArray>
 
 // Application
 #include "loginitem.h"
@@ -54,4 +55,31 @@ const QString &LoginItem::passwordOrig() const
 void LoginItem::setPasswordOrig(const QString &setPassword)
 {
     m_sPasswordOrig = setPassword;
+}
+
+QJsonObject LoginItem::toJson() const
+{
+    QJsonArray addr;
+    if (!m_bAddress.isEmpty())
+    {
+        addr.append((int)m_bAddress.at(0));
+        addr.append((int)m_bAddress.at(1));
+    }
+
+    QString p;
+    //Only send password if it has been changed by user
+    //Else the fiels stays empty
+    if (!m_sPasswordOrig.isEmpty())
+    {
+        if (m_sPassword != m_sPasswordOrig)
+            p = m_sPassword;
+    }
+
+    QString service = (m_pParentItem != nullptr) ? m_pParentItem->name() : "";
+    return {{ "service", service },
+            { "login", m_sName },
+            { "password", p },
+            { "description", m_sDescription },
+            { "address", addr },
+            { "favorite", m_iFavorite }};
 }

@@ -49,8 +49,15 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
         case ServiceIdx:
         case LoginIdx:
         {
-            QString sCreatedDate = QString(" (%1)").arg(pItem->createdDate().toString());
-            return pItem->name() + sCreatedDate;
+            QString sData = pItem->name();
+            if (pLoginItem != nullptr)
+            {
+                QString sTargetDate = pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate);
+                if (!pLoginItem->updatedDate().isNull())
+                    sTargetDate = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
+                return sData + QString(" (") + sTargetDate + QString(")");
+            }
+            return pItem->name();
         }
         case PasswordIdx: return (pLoginItem != nullptr) ? pLoginItem->password() : QVariant();
         case DescriptionIdx: return pItem->description();
@@ -377,38 +384,18 @@ QJsonArray CredentialModel::getJsonChanges()
     QVector<TreeItem *> vServices = m_pRootItem->childs();
     foreach (TreeItem *pService, vServices)
     {
-        QJsonArray addr;
-        ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pService);
-        QVector<TreeItem *> vLogins = pServiceItem->childs();
+        QVector<TreeItem *> vLogins = pService->childs();
         foreach (TreeItem *pLogin, vLogins) {
             LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pLogin);
-            QByteArray sAddress = pLoginItem->address();
-            if (!sAddress.isEmpty())
-            {
-                addr.append((int)sAddress.at(0));
-                addr.append((int)sAddress.at(1));
-            }
-            QString p;
-            QString sPassword = pLoginItem->password();
-            QString sPasswordOrig = pLoginItem->passwordOrig();
-            if (!sPasswordOrig.isEmpty())
-            {
-                if (sPassword != sPasswordOrig)
-                    p = sPassword;
-            }
-            QJsonObject object
-            {{"service", pServiceItem->name()},
-                {"login", pLoginItem->name()},
-                {"password", p},
-                {"description", pLoginItem->description()},
-                {"address", addr},
-                {"favorite", pLoginItem->favorite()}};
-
+            QJsonObject object = pLoginItem->toJson();
             jarr.append(object);
         }
     }
 
+    qDebug() << "*********************************************************************** ";
     qDebug() << jarr;
+    qDebug() << "*********************************************************************** ";
+
     return jarr;
 }
 
