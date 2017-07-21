@@ -367,9 +367,6 @@ void CredentialModel::setClearTextPassword(const QString &sServiceName, const QS
         {
             pTargetLogin->setPassword(sPassword);
             pTargetLogin->setPasswordOrig(sPassword);
-            QModelIndex itemIndex = getItemIndexByUID(pTargetLogin->uid());
-            if (itemIndex.isValid())
-                emit dataChanged(itemIndex, itemIndex);
         }
     }
 }

@@ -231,6 +231,8 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
     }
 
     m_pCredModel->setClearTextPassword(service, login, password);
+    ui->credDisplayPasswordInput->setText(password);
+    ui->credDisplayPasswordInput->setLocked(false);
 }
 
 void CredentialsManagement::onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success)
@@ -537,6 +539,8 @@ void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
             ui->credDisplayDescriptionInput->setText(pLoginItem->description());
             ui->credDisplayCreationDateInput->setText(pLoginItem->createdDate().toString(sFormat));
             ui->credDisplayModificationDateInput->setText(pLoginItem->updatedDate().toString(sFormat));
+            bool bPasswordIsEmpty = pLoginItem->password().isEmpty();
+            ui->credDisplayPasswordInput->setLocked(bPasswordIsEmpty);
         }
     }
 }

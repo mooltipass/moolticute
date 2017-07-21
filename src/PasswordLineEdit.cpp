@@ -28,6 +28,7 @@
 #include <array>
 #include "QtAwesome.h"
 #include "zxcvbn.h"
+#include <QDebug>
 
 #define PROGRESS_STYLE \
     "QProgressBar {" \
@@ -221,9 +222,11 @@ LockedPasswordLineEdit::LockedPasswordLineEdit(QWidget* parent)
     connect(m_showPassword, &QAction::triggered, [this]() {
 
        if(!m_locked) {
+           qDebug() << "*** NOT LOCKED ***";
            this->setPasswordVisible(true);
        }
        else {
+           qDebug() << "*** UNLOCK REQUESTED ***";
            Q_EMIT unlockRequested();
        }
     });
