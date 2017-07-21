@@ -346,6 +346,13 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ColumnIdx &c
     }
 }
 
+void CredentialModel::clear()
+{
+    beginResetModel();
+    m_pRootItem->clear();
+    endResetModel();
+}
+
 void CredentialModel::setClearTextPassword(const QString &sServiceName, const QString &sLoginName, const QString &sPassword)
 {
     // Retrieve target service

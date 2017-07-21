@@ -34,6 +34,7 @@ public:
     virtual QVariant data(int iColumn) const;
     void addChild(TreeItem *pItem);
     bool removeOne(TreeItem *pItem);
+    void clear();
 
 protected:
     explicit TreeItem(const QString &sName="",

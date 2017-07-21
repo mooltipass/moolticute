@@ -77,6 +77,7 @@ public:
     TreeItem *getItemByUID(const QString &sItemUID) const;
     void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName);
     void updateLoginItem(const QModelIndex &idx, const ColumnIdx &colIdx, const QVariant &vValue);
+    void clear();
 
 private:
     ServiceItem *addService(const QString &sServiceName);
