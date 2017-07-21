@@ -1,5 +1,4 @@
 // Qt
-#include <QUuid>
 #include <QJsonArray>
 
 // Application
