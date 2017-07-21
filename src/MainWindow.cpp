@@ -38,7 +38,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     wsClient(client),
     bFilesAndSSHKeyTabsVisible(false),
     bAdvancedTabVisible(false),
-    bFilesAndSSHKeysTabsVisibleOnDemand(true)
+    bFilesAndSSHKeysTabsVisibleOnDemand(true),
+    previousWidget(nullptr)
 {
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
@@ -698,11 +699,12 @@ void MainWindow::onAdvancedTabShortcutActivated()
 
     if (bAdvancedTabVisible) {
         ui->pushButtonAdvanced->setChecked(true);
+        previousWidget = ui->stackedWidget->currentWidget();
         ui->stackedWidget->setCurrentWidget(ui->pageAdvanced);
     }
     else {
         ui->pushButtonAppSettings->setChecked(true);
-        ui->stackedWidget->setCurrentWidget(ui->pageSettings);
+        ui->stackedWidget->setCurrentWidget(previousWidget);
     }
 }
 

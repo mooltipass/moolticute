@@ -112,6 +112,7 @@ private:
 
     QShortcut *m_FilesAndSSHKeysTabsShortcut;
     QShortcut *m_advancedTabShortcut;
+    QWidget *previousWidget;
 };
 
 #endif // MAINWINDOW_H
