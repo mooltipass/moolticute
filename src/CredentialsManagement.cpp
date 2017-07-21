@@ -85,6 +85,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->addCredServiceInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredLoginInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredPasswordInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
+    connect(ui->addCredPasswordInput, &QLineEdit::returnPressed, this, &CredentialsManagement::onPasswordInputReturnPressed);
     updateQuickAddCredentialsButtonState();
 
     connect(ui->credDisplayLoginInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
@@ -130,6 +131,12 @@ void CredentialsManagement::updateQuickAddCredentialsButtonState()
     ui->addCredentialButton->setEnabled(ui->addCredLoginInput->hasAcceptableInput() && ui->addCredLoginInput->text().length() > 0 &&
                                         ui->addCredServiceInput->hasAcceptableInput() && ui->addCredServiceInput->text().length() > 0 &&
                                         ui->addCredPasswordInput->hasAcceptableInput() && ui->addCredPasswordInput->text().length() > 0);
+}
+
+void CredentialsManagement::onPasswordInputReturnPressed()
+{
+    on_addCredentialButton_clicked();
+    ui->addCredServiceInput->setFocus();
 }
 
 void CredentialsManagement::on_pushButtonEnterMMM_clicked()

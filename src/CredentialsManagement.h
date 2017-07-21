@@ -47,6 +47,7 @@ public slots:
 private slots:
     void enableCredentialsManagement(bool);
     void updateQuickAddCredentialsButtonState();
+    void onPasswordInputReturnPressed();
     void updateSaveDiscardState(const QModelIndex &proxyIndex=QModelIndex());
     void onPasswordUnlocked(const QString &service, const QString &login, const QString &password, bool success);
     void onCredentialUpdated(const QString &service, const QString &login, const QString &description, bool success);
