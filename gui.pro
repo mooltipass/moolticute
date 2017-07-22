@@ -38,7 +38,8 @@ SOURCES += src/main_gui.cpp \
     src/LoginItem.cpp \
     src/RootItem.cpp \
     src/ServiceItem.cpp \
-    src/TreeItem.cpp
+    src/TreeItem.cpp \
+    src/AnimatedColorButton.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -64,7 +65,8 @@ HEADERS  += src/MainWindow.h \
     src/LoginItem.h \
     src/RootItem.h \
     src/ServiceItem.h \
-    src/TreeItem.h
+    src/TreeItem.h \
+    src/AnimatedColorButton.h
 
 mac {
     HEADERS += src/MacUtils.h
