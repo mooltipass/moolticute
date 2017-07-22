@@ -238,7 +238,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -1401,6 +1401,13 @@ QWidget {background-color: #EFEFEF;}</string>
            </spacer>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="AnimatedColorButton" name="testPushButton">
+          <property name="text">
+           <string>test</string>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_4">

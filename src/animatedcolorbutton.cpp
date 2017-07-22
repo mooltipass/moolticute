@@ -5,14 +5,13 @@
 // Application
 #include "AnimatedColorButton.h"
 
-AnimatedColorButton::AnimatedColorButton(const QColor &startColor, const QColor &endColor, int iAnimationDuration, QWidget *parent) : QPushButton(parent),
+AnimatedColorButton::AnimatedColorButton(QWidget *parent, const QColor &startColor, const QColor &endColor, int iAnimationDuration) : QPushButton(parent),
     m_pAnimation(nullptr), m_bAnimationStarted(false), m_iAnimationDuration(iAnimationDuration)
 {
-    m_pAnimation = new QPropertyAnimation(this, "color");
+    m_pAnimation = new QPropertyAnimation(this, "bkgColor");
     m_pAnimation->setDuration(iAnimationDuration);
     m_pAnimation->setStartValue(startColor);
     m_pAnimation->setEndValue(endColor);
-    m_pAnimation->start();
 }
 
 void AnimatedColorButton::setBkgColor(const QColor &color)

@@ -12,7 +12,7 @@ class AnimatedColorButton : public QPushButton
     Q_PROPERTY(QColor bkgColor READ bkgColor WRITE setBkgColor)
 
 public:
-    AnimatedColorButton(const QColor &startColor=QColor(0, 0, 0), const QColor &endColor=QColor(240, 240, 240), int iAnimationDuration=1000, QWidget *parent = 0);
+    AnimatedColorButton(QWidget *parent=nullptr, const QColor &startColor=QColor(0, 0, 0), const QColor &endColor=QColor(240, 240, 240), int iAnimationDuration=1000);
     void setBkgColor(const QColor &color);
     QColor bkgColor();
 
