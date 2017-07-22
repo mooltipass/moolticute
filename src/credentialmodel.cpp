@@ -37,45 +37,21 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     if (!pItem)
         return QVariant();
 
-    // Cast to service item
-    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
-
     // Cast to login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
     // Display data for role
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
-        switch (idx.column()) {
-        case ServiceIdx:
-        case LoginIdx:
+        QString sData = pItem->name();
+        if (pLoginItem != nullptr)
         {
-            QString sData = pItem->name();
-            if (pLoginItem != nullptr)
-            {
-                QString sTargetDate = pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate);
-                if (!pLoginItem->updatedDate().isNull())
-                    sTargetDate = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
-                return sData + QString(" (") + sTargetDate + QString(")");
-            }
-            return pItem->name();
+            QString sTargetDate = pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate);
+            if (!pLoginItem->updatedDate().isNull())
+                sTargetDate = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
+            return sData + QString(" (") + sTargetDate + QString(")");
         }
-        case PasswordIdx: return (pLoginItem != nullptr) ? pLoginItem->password() : QVariant();
-        case DescriptionIdx: return pItem->description();
-        case DateCreatedIdx:
-        {
-            if (pItem->createdDate().isNull())
-                return tr("N/A");
-            return pItem->createdDate();
-        }
-        case DateModifiedIdx:
-        {
-            if (pItem->updatedDate().isNull())
-                return tr("N/A");
-            return pItem->updatedDate();
-        }
-        case FavoriteIdx: (pLoginItem != nullptr) ? pLoginItem->favorite() : QVariant();
-        }
+        return pItem->name();
     }
 
     if (role == Qt::ForegroundRole)
@@ -93,15 +69,6 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
             font.setItalic(true);
         return font;
     }
-
-    if (role == LoginRole && idx.column() == ServiceIdx)
-        return (pLoginItem != nullptr) ? pLoginItem->name() : QVariant();
-
-    if (role == FavRole && idx.column() == ServiceIdx)
-        return (pLoginItem != nullptr) ? pLoginItem->favorite() : QVariant();
-
-    if (role == PasswordUnlockedRole && idx.column() == PasswordIdx)
-        return (pLoginItem != nullptr) ? !pLoginItem->password().isEmpty() : false;
 
     if (role == Qt::DecorationRole) {
         if (pLoginItem != nullptr)

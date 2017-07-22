@@ -44,7 +44,11 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonCancel->setStyleSheet(CSS_BLUE_BUTTON);
+
+    ui->pushButtonCancel->setDefaultText(tr("Discard changes"));
+    ui->pushButtonCancel->setPressAndHoldText(tr("Hold to disgard"));
+    connect(ui->pushButtonCancel, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_pushButtonCancel_clicked);
+
     ui->pushButtonDelete->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonDelete->setIcon(AppGui::qtAwesome()->icon(fa::trash, whiteButtons));
     ui->pushButtonFavorite->setStyleSheet(CSS_BLUE_BUTTON);
@@ -545,8 +549,10 @@ void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
             ui->credDisplayDescriptionInput->setText(pLoginItem->description());
             ui->credDisplayCreationDateInput->setText(pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayModificationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
-            bool bPasswordIsEmpty = pLoginItem->password().isEmpty();
-            ui->credDisplayPasswordInput->setLocked(bPasswordIsEmpty);
+
+            // TO CHECK
+            //bool bPasswordIsEmpty = pLoginItem->password().isEmpty();
+            ui->credDisplayPasswordInput->setLocked(true);
         }
     }
 }

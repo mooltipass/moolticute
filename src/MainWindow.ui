@@ -1403,13 +1403,6 @@ QWidget {background-color: #EFEFEF;}</string>
          </layout>
         </item>
         <item>
-         <widget class="AnimatedColorButton" name="testPushButton">
-          <property name="text">
-           <string>test</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="verticalSpacer_4">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -2373,6 +2366,11 @@ QWidget {background-color: #EFEFEF;}</string>
    <extends>QWidget</extends>
    <header>FilesManagement.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AnimatedColorButton</class>
+   <extends>QWidget</extends>
+   <header>animatedcolorbutton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

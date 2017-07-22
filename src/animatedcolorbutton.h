@@ -12,19 +12,48 @@ class AnimatedColorButton : public QPushButton
     Q_PROPERTY(QColor bkgColor READ bkgColor WRITE setBkgColor)
 
 public:
-    AnimatedColorButton(QWidget *parent=nullptr, const QColor &startColor=QPalette::Button, const QColor &endColor=Qt::red, int iAnimationDuration=1000);
-    void setBkgColor(const QColor &color);
-    QColor bkgColor();
+    AnimatedColorButton(QWidget *parent=nullptr,
+        const QString &sStartColor="#60B1C7",
+        const QString &sEndColor="red",
+        const QString &sDefaultText="DEFAULT",
+        const QString &sPressAndHoldText="PRESS AND HOLD",
+        int iAnimationDuration=3000);
+
+    void setAnimationDuration(int iAnimationDuration);
+    int animationDuration() const;
+
+    void setDefaultText(const QString &sDefaultText);
+    const QString &defaultText() const;
+
+    void setPressAndHoldText(const QString &sPressAndHoldText);
+    const QString &pressAndHoldText() const;
+
+    void setStartColor(const QColor &cColor);
+    const QColor &startColor() const;
+
+    void setEndColor(const QColor &cEndColor);
+    const QColor &endColor() const;
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
 
 private:
+    void setBkgColor(const QColor &color);
+    QColor bkgColor();
+
+private:
     QPropertyAnimation *m_pAnimation;
     bool m_bAnimationStarted;
     int m_iAnimationDuration;
+    QString m_sDefaultText;
+    QString m_sPressAndHoldText;
+    QColor m_cStartColor;
+    QColor m_cEndColor;
     QTime m_tTimer;
+
+signals:
+    void actionValidated();
 };
 
 #endif // ANIMATEDCOLORBUTTON_H
