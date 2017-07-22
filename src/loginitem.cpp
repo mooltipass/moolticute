@@ -1,12 +1,13 @@
 // Qt
 #include <QJsonArray>
+#include <QDebug>
 
 // Application
 #include "loginitem.h"
 #include "serviceitem.h"
 
 LoginItem::LoginItem(const QString &sLoginName) : TreeItem(sLoginName),
-    m_iFavorite(0), m_sPassword(""), m_sPasswordOrig("")
+    m_iFavorite(-1), m_sPassword(""), m_sPasswordOrig("")
 {
 
 }
@@ -65,10 +66,12 @@ QJsonObject LoginItem::toJson() const
         addr.append((int)m_bAddress.at(1));
     }
 
+    qDebug() << "*** INPUT PASSWORDS ARE *** " << m_sPasswordOrig << m_sPassword;
+
     QString p;
     //Only send password if it has been changed by user
     //Else the fiels stays empty
-    if (!m_sPasswordOrig.isEmpty())
+    //if (!m_sPasswordOrig.isEmpty())
     {
         if (m_sPassword != m_sPasswordOrig)
             p = m_sPassword;
