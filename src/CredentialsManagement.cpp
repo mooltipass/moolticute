@@ -103,6 +103,9 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     {
         m_pCredModelFilter->setFilter(t);
     });
+
+    connect(ui->credentialTreeView, &CredentialView::expanded, this, &CredentialsManagement::onItemExpanded);
+    connect(ui->credentialTreeView, &CredentialView::collapsed, this, &CredentialsManagement::onItemCollapsed);
 }
 
 CredentialsManagement::~CredentialsManagement()
@@ -117,7 +120,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memoryDataChanged, [=]()
     {
         m_pCredModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
-        ui->credentialTreeView->expandAll();
+        ui->credentialTreeView->collapseAll();
         ui->lineEditFilterCred->clear();
     });
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
@@ -501,25 +504,22 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
 void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, const QModelIndex &previous)
 {
     Q_UNUSED(previous)
-    if (proxyIndex.isValid())
+    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
+    if (srcIndex.isValid())
     {
-        QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
-        if (srcIndex.isValid())
-        {
-            TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
+        TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
 
-            // A login item was selected
-            LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
-            if (pLoginItem != nullptr)
-                emit loginSelected(pLoginItem->uid());
-            else {
-                // A service item was selected
-                ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
-                if (pServiceItem != nullptr)
-                    emit serviceSelected(pServiceItem->uid());
-            }
-            updateSaveDiscardState(proxyIndex);
+        // A login item was selected
+        LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+        if (pLoginItem != nullptr)
+            emit loginSelected(pLoginItem->uid());
+        else {
+            // A service item was selected
+            ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+            if (pServiceItem != nullptr)
+                emit serviceSelected(pServiceItem->uid());
         }
+        updateSaveDiscardState(proxyIndex);
     }
 }
 
@@ -550,9 +550,6 @@ void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
             ui->credDisplayDescriptionInput->setText(pLoginItem->description());
             ui->credDisplayCreationDateInput->setText(pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayModificationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
-
-            // TO CHECK
-            //bool bPasswordIsEmpty = pLoginItem->password().isEmpty();
             ui->credDisplayPasswordInput->setLocked(true);
         }
     }
@@ -569,4 +566,22 @@ void CredentialsManagement::clearLoginDescription(const QString &sItemUID)
     ui->credDisplayDescriptionInput->setText("");
     ui->credDisplayCreationDateInput->setText("");
     ui->credDisplayModificationDateInput->setText("");
+}
+
+void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
+{
+    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
+    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
+    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+    if (pServiceItem != nullptr)
+        pServiceItem->setExpanded(false);
+}
+
+void CredentialsManagement::onItemExpanded(const QModelIndex &proxyIndex)
+{
+    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
+    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
+    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+    if (pServiceItem != nullptr)
+        pServiceItem->setExpanded(true);
 }

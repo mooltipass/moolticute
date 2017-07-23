@@ -2,7 +2,8 @@
 #include "serviceitem.h"
 #include "loginitem.h"
 
-ServiceItem::ServiceItem(const QString &sServiceName) : TreeItem(sServiceName)
+ServiceItem::ServiceItem(const QString &sServiceName) : TreeItem(sServiceName),
+    m_bIsExpanded(false)
 {
 
 }
@@ -28,4 +29,24 @@ LoginItem *ServiceItem::findLoginByName(const QString &sLoginName)
             return pLoginItem;
     }
     return nullptr;
+}
+
+bool ServiceItem::isExpanded() const
+{
+    return m_bIsExpanded;
+}
+
+void ServiceItem::setExpanded(bool bExpanded)
+{
+    m_bIsExpanded = bExpanded;
+}
+
+QString ServiceItem::getToolTip() const
+{
+    QStringList lLoginNames;
+    foreach (TreeItem *pLoginItem, m_vChilds)
+        lLoginNames << pLoginItem->name();
+    if (!lLoginNames.isEmpty())
+        return lLoginNames.join("\n");
+    return QString("");
 }

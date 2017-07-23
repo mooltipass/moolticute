@@ -34,8 +34,14 @@ public:
     explicit CredentialView(QWidget *parent = nullptr);
     virtual ~CredentialView();
 
+protected:
+    virtual void mouseMoveEvent(QMouseEvent *event);
+
 public slots:
     void onModelLoaded();
+
+private:
+    QModelIndex m_previousSelectedProxyIndex;
 };
 
 #endif // CREDENTIALVIEW_H

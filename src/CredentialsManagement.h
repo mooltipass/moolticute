@@ -63,6 +63,8 @@ private slots:
     void onCredentialSelected(const QModelIndex &current, const QModelIndex &previous);
     void onLoginSelected(const QString &sItemUID);
     void onServiceSelected(const QString &sItemUID);
+    void onItemExpanded(const QModelIndex &proxyIndex);
+    void onItemCollapsed(const QModelIndex &proxyIndex);
 
 private:
     void updateLoginDescription(const QString &sItemUID);

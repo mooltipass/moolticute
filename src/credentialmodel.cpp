@@ -367,10 +367,6 @@ QJsonArray CredentialModel::getJsonChanges()
         }
     }
 
-    qDebug() << "*********************************************************************** ";
-    qDebug() << jarr;
-    qDebug() << "*********************************************************************** ";
-
     return jarr;
 }
 
@@ -444,3 +440,4 @@ void CredentialModel::removeCredential(const QModelIndex &idx)
             removeCredential(parentIndex);
     }
 }
+

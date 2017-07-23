@@ -12,6 +12,12 @@ public:
     virtual ~ServiceItem();
     LoginItem *addLogin(const QString &sLoginName);
     LoginItem *findLoginByName(const QString &sLoginName);
+    bool isExpanded() const;
+    void setExpanded(bool bExpanded);
+    QString getToolTip() const;
+
+private:
+    bool m_bIsExpanded;
 };
 
 #endif // SERVICEITEM_H
