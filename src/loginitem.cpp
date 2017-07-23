@@ -85,3 +85,11 @@ QJsonObject LoginItem::toJson() const
             { "address", addr },
             { "favorite", m_iFavorite }};
 }
+
+QString LoginItem::itemLabel() const
+{
+    QString sTargetDate = createdDate().toString(Qt::DefaultLocaleShortDate);
+    if (!updatedDate().isNull())
+        sTargetDate = updatedDate().toString(Qt::DefaultLocaleShortDate);
+    return m_sName + QString(" (") + sTargetDate + QString(")");
+}

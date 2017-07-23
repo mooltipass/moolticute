@@ -18,45 +18,15 @@ class CredentialModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    enum ColumnIdx
+    enum ItemRole
     {
-        ServiceIdx,
-        LoginIdx,
-        PasswordIdx,
-        DescriptionIdx,
-        DateCreatedIdx,
-        DateModifiedIdx,
-        FavoriteIdx,
-        ColumnCount
-    };
-
-    enum CustomRole {
-        LoginRole = Qt::UserRole + 1,
-        PasswordUnlockedRole,
-        FavRole
-    };
-
-    class Credential
-    {
-    public:
-        QString service;
-        QString login;
-        QString password, passwordOrig;
-        QString description;
-        QDate createdDate;
-        QDate updatedDate;
-        QByteArray address;
-        qint8 favorite = Common::FAV_NOT_SET;
-
-        bool operator==(const Credential &other) const
-        {
-            if (address.isEmpty() || other.address.isEmpty())
-            {
-                //if address is defined for both, check equality of address
-                return address == other.address;
-            }
-            return service == other.service && login == other.login;
-        }
+        ItemNameRole,
+        ItemLabelRole,
+        PasswordRole,
+        DescriptionRole,
+        DateCreatedRole,
+        DateUpdatedRole,
+        FavoriteRole
     };
 
     CredentialModel(QObject *parent=nullptr);
@@ -74,7 +44,7 @@ public:
     void removeCredential(const QModelIndex &idx);
     TreeItem *getItemByIndex(const QModelIndex &idx) const;
     void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName);
-    void updateLoginItem(const QModelIndex &idx, const ColumnIdx &colIdx, const QVariant &vValue);
+    void updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue);
     void clear();
 
 private:

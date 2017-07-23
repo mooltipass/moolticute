@@ -460,7 +460,7 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
     if (pLoginItem != nullptr)
-        m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteIdx, iFavorite);
+        m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteRole, iFavorite);
 }
 
 void CredentialsManagement::on_pushButtonDelete_clicked()

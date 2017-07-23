@@ -41,12 +41,46 @@ void ServiceItem::setExpanded(bool bExpanded)
     m_bIsExpanded = bExpanded;
 }
 
-QString ServiceItem::getToolTip() const
+QString ServiceItem::logins() const
 {
-    QStringList lLoginNames;
-    foreach (TreeItem *pLoginItem, m_vChilds)
-        lLoginNames << pLoginItem->name();
-    if (!lLoginNames.isEmpty())
-        return lLoginNames.join("\n");
-    return QString("");
+    int nLogins = childCount();
+    if (nLogins == 0)
+        return QString();
+    if (nLogins == 1)
+    {
+        TreeItem *pItem = m_vChilds.first();
+        QString sName = pItem->name().mid(0, 15);
+        if (pItem->name().length() > 15)
+            sName += "...";
+        return sName;
+    }
+    else
+        if ((nLogins >= 1) && (nLogins <=3))
+        {
+            QStringList lLogins;
+            foreach (TreeItem *pItem, m_vChilds)
+            {
+                QString sName = pItem->name().mid(0, 6);
+                if (pItem->name().length() > 6)
+                    sName += "...";
+                lLogins << sName;
+            }
+            return lLogins.join(" ");
+        }
+        else
+        {
+            QStringList lLogins;
+            foreach (TreeItem *pItem, m_vChilds)
+            {
+                QString sName = pItem->name().mid(0, 3);
+                if (pItem->name().length() > 3)
+                    sName += "...";
+                lLogins << sName;
+            }
+            return lLogins.join(" ");
+        }
+
+    return QString();
 }
+
+

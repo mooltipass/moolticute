@@ -140,3 +140,4 @@ void TreeItem::clear()
     qDeleteAll(m_vChilds);
     m_vChilds.clear();
 }
+

@@ -1,13 +1,13 @@
 // Qt
 #include <QDateTime>
 #include <QMouseEvent>
-#include <QToolTip>
 #include <QDebug>
 
 // Application
 #include "credentialview.h"
 #include "CredentialModelFilter.h"
 #include "serviceitem.h"
+#include "itemdelegate.h"
 
 ConditionalItemSelectionModel::ConditionalItemSelectionModel(TestFunction f, QAbstractItemModel *model)
     : QItemSelectionModel(model)
@@ -58,7 +58,7 @@ bool ConditionalItemSelectionModel::canChangeIndex()
 CredentialView::CredentialView(QWidget *parent) : QTreeView(parent)
 {
     setHeaderHidden(true);
-    setMouseTracking(true);
+    setItemDelegateForColumn(0, new ItemDelegate(this));
 }
 
 CredentialView::~CredentialView()
@@ -76,24 +76,5 @@ void CredentialView::onModelLoaded()
             selectionModel()->setCurrentIndex(firstLoginIndex, QItemSelectionModel::ClearAndSelect);
             expand(firstLoginIndex.parent());
         }
-    }
-}
-
-void CredentialView::mouseMoveEvent(QMouseEvent *event)
-{
-    QPoint targetPoint(128, event->y());
-    QModelIndex selectedProxyIndex = indexAt(targetPoint);
-    if (selectedProxyIndex != m_previousSelectedProxyIndex) {
-        m_previousSelectedProxyIndex = selectedProxyIndex;
-        CredentialModelFilter *pModel = dynamic_cast<CredentialModelFilter *>(model());
-        TreeItem *pItem = pModel->getItemByProxyIndex(selectedProxyIndex);
-        ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
-        if ((pServiceItem != nullptr) && (!pServiceItem->isExpanded()))
-        {
-            QString sTooltip = pServiceItem->getToolTip();
-            if (!sTooltip.isEmpty())
-                QToolTip::showText(mapToGlobal(targetPoint), sTooltip);
-        }
-        else QToolTip::hideText();
     }
 }

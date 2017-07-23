@@ -29,37 +29,45 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     if (!pItem)
         return QVariant();
 
+    // Cast to service item
+    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+
     // Cast to login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
-    // Display data for role
     if (role == Qt::DisplayRole)
+        return pItem->name();
+
+    if (role == ItemLabelRole)
     {
-        QString sData = pItem->name();
-        if (pLoginItem != nullptr)
-        {
-            QString sTargetDate = pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate);
-            if (!pLoginItem->updatedDate().isNull())
-                sTargetDate = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
-            sData += QString(" (") + sTargetDate + QString(")");
-        }
-        return sData;
+        if (pServiceItem != nullptr)
+            return pItem->name();
     }
 
     if (role == Qt::ForegroundRole)
     {
         if (pLoginItem != nullptr)
             return QColor("#3D96AF");
-        return QColor("black");
     }
 
     if (role == Qt::FontRole)
     {
-        QFont font;
-        font.setBold(true);
+        if (pServiceItem != nullptr)
+        {
+            QFont font = qApp->font();
+            font.setBold(true);
+            font.setPointSize(12);
+            return font;
+        }
+        else
         if (pLoginItem != nullptr)
+        {
+            QFont font = qApp->font();
+            font.setBold(true);
             font.setItalic(true);
-        return font;
+            font.setPointSize(10);
+            return font;
+        }
     }
 
     if (role == Qt::DecorationRole) {
@@ -230,7 +238,7 @@ ServiceItem *CredentialModel::addService(const QString &sServiceName)
 
 QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName) const
 {
-    QModelIndexList lMatches = match(index(0, 0, QModelIndex()), Qt::DisplayRole, sServiceName, 1);
+    QModelIndexList lMatches = match(index(0, 0, QModelIndex()), CredentialModel::ItemLabelRole, sServiceName, 1);
     if (!lMatches.isEmpty())
         return lMatches.first();
 
@@ -243,22 +251,22 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPa
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(getItemByIndex(idx));
     if (pLoginItem != nullptr)
     {
-        updateLoginItem(idx, PasswordIdx, sPassword);
-        updateLoginItem(idx, DescriptionIdx, sDescription);
-        updateLoginItem(idx, LoginIdx, sName);
+        updateLoginItem(idx, PasswordRole, sPassword);
+        updateLoginItem(idx, DescriptionRole, sDescription);
+        updateLoginItem(idx, ItemNameRole, sName);
     }
 }
 
-void CredentialModel::updateLoginItem(const QModelIndex &idx, const ColumnIdx &colIdx, const QVariant &vValue)
+void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue)
 {
     TreeItem *pItem = getItemByIndex(idx);
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
     bool bChanged = false;
     if (pLoginItem != nullptr)
     {
-        switch (colIdx)
+        switch (role)
         {
-        case LoginIdx:
+        case ItemNameRole:
         {
             QString sName = vValue.toString();
             if (sName != pLoginItem->name())
@@ -268,7 +276,7 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ColumnIdx &c
             }
             break;
         }
-        case PasswordIdx:
+        case PasswordRole:
         {
             QString sPassword = vValue.toString();
             if (sPassword != pLoginItem->password())
@@ -278,7 +286,7 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ColumnIdx &c
             }
             break;
         }
-        case DescriptionIdx:
+        case DescriptionRole:
         {
             QString sDescription = vValue.toString();
             if (sDescription != pLoginItem->description())
@@ -288,7 +296,7 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ColumnIdx &c
             }
             break;
         }
-        case DateCreatedIdx:
+        case DateCreatedRole:
         {
             QDate dDate = vValue.toDate();
             if (dDate != pLoginItem->createdDate())
@@ -298,7 +306,7 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ColumnIdx &c
             }
             break;
         }
-        case DateModifiedIdx:
+        case DateUpdatedRole:
         {
             QDate dDate = vValue.toDate();
             if (dDate != pLoginItem->updatedDate())
@@ -308,7 +316,7 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ColumnIdx &c
             }
             break;
         }
-        case FavoriteIdx:
+        case FavoriteRole:
         {
             qint8 iFavorite = (qint8)vValue.toInt();
             if (iFavorite != pLoginItem->favorite())
@@ -384,16 +392,12 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
             QModelIndex serviceIndex = getServiceIndexByName(pTargetService->name());
             if (serviceIndex.isValid())
             {
-                qDebug() << " AVANT SERVICE CHILD COUNT " << pTargetService->childCount();
-
                 beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
                 LoginItem *pLoginItem = pTargetService->addLogin(sLoginName);
                 pLoginItem->setPassword(sPassword);
                 pLoginItem->setDescription(sDescription);
                 endInsertRows();
-
-                qDebug() << " AVANT SERVICE CHILD COUNT " << pTargetService->childCount();
-             }
+            }
         }
     }
     // No matching service

@@ -14,7 +14,7 @@ public:
     LoginItem *findLoginByName(const QString &sLoginName);
     bool isExpanded() const;
     void setExpanded(bool bExpanded);
-    QString getToolTip() const;
+    QString logins() const;
 
 private:
     bool m_bIsExpanded;

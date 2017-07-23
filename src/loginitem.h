@@ -23,6 +23,7 @@ public:
     const QString &passwordOrig() const;
     void setPasswordOrig(const QString &setPassword);
     QJsonObject toJson() const;
+    QString itemLabel() const;
 
 private:    
     QByteArray m_bAddress;

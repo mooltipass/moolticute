@@ -16,6 +16,7 @@ public:
     virtual ~CredentialModelFilter();
     void setFilter(const QString &sFilter);
     TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex);
+    const TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex) const;
 
 protected:
     virtual bool filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const;
