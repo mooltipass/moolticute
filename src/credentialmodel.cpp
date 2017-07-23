@@ -24,21 +24,10 @@ CredentialModel::~CredentialModel()
 
 QVariant CredentialModel::data(const QModelIndex &idx, int role) const
 {
-    // Check index
-    if (!idx.isValid())
-        return QVariant();
-
-    // Check row
-    if ((idx.row() < 0) || (idx.row() > (rowCount()-1)))
-        return QVariant();
-
-    // Get item
+    // Get item (no need check index)
     TreeItem *pItem = getItemByIndex(idx);
     if (!pItem)
         return QVariant();
-
-    if (role == Qt::DisplayRole)
-        return pItem->name();
 
     // Cast to login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
