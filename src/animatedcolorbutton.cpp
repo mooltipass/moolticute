@@ -7,29 +7,26 @@
 #include "Common.h"
 
 AnimatedColorButton::AnimatedColorButton(QWidget *parent, const QString &sStartColor, const QString &sEndColor,
-    const QString &sDefaultText,
-    const QString &sPressAndHoldText,
-    int iAnimationDuration) : QPushButton(parent),
+                                         const QString &sDefaultText,
+                                         const QString &sPressAndHoldText,
+                                         int iAnimationDuration) : QPushButton(parent),
     m_pAnimation(nullptr),
-    m_bAnimationStarted(false),
     m_iAnimationDuration(iAnimationDuration),
     m_sDefaultText(sDefaultText),
     m_sPressAndHoldText(sPressAndHoldText)
 {
+    m_tTimer.setSingleShot(true);
+    m_tTimer.setInterval(iAnimationDuration);
+    connect(&m_tTimer, QTimer::timeout, this, &AnimatedColorButton::onTimeOut);
+
     m_cStartColor.setNamedColor(sStartColor);
     m_cEndColor.setNamedColor(sEndColor);
     m_pAnimation = new QPropertyAnimation(this, "bkgColor");
     m_pAnimation->setDuration(iAnimationDuration);
     m_pAnimation->setStartValue(m_cStartColor);
     m_pAnimation->setEndValue(m_cEndColor);
-    QString sButtonStyleSheet = QString("QPushButton {" \
-                                        "color: #000;" \
-                                        "background-color: %1;" \
-                                        "padding: 12px;" \
-                                        "border: none;" \
-                                        "}").arg(sStartColor);
-    setText(m_sDefaultText);
-    setStyleSheet(sButtonStyleSheet);
+
+    reset();
 }
 
 void AnimatedColorButton::setBkgColor(const QColor &color)
@@ -101,21 +98,32 @@ const QColor &AnimatedColorButton::endColor() const
 
 void AnimatedColorButton::mousePressEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event);
     setText(m_sPressAndHoldText);
-    if (!m_bAnimationStarted)
+    if (!m_tTimer.isActive())
     {
-        m_tTimer.restart();
+        m_tTimer.start();
         m_pAnimation->start();
-        m_bAnimationStarted = true;
     }
-    else event->ignore();
 }
 
 void AnimatedColorButton::mouseReleaseEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event);
+    reset();
+}
+
+void AnimatedColorButton::onTimeOut()
+{
+    reset();
+    emit actionValidated();
+}
+
+void AnimatedColorButton::reset()
+{
     setText(m_sDefaultText);
+    m_tTimer.stop();
     m_pAnimation->stop();
-    m_bAnimationStarted = false;
     QString sButtonStyleSheet = QString("QPushButton {" \
                                         "color: #000;" \
                                         "background-color: %1;" \
@@ -123,10 +131,4 @@ void AnimatedColorButton::mouseReleaseEvent(QMouseEvent *event)
                                         "border: none;" \
                                         "}").arg(m_cStartColor.name());
     setStyleSheet(sButtonStyleSheet);
-    if (m_tTimer.elapsed() > m_iAnimationDuration) {
-        event->accept();
-        emit actionValidated();
-        hide();
-    }
-    else event->ignore();
 }

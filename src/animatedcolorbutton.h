@@ -3,7 +3,7 @@
 
 // Qt
 #include <QPushButton>
-#include <QTime>
+#include <QTimer>
 class QPropertyAnimation;
 
 class AnimatedColorButton : public QPushButton
@@ -13,11 +13,11 @@ class AnimatedColorButton : public QPushButton
 
 public:
     AnimatedColorButton(QWidget *parent=nullptr,
-        const QString &sStartColor="#60B1C7",
+        const QString &sStartColor="lightgray",
         const QString &sEndColor="red",
         const QString &sDefaultText="DEFAULT",
         const QString &sPressAndHoldText="PRESS AND HOLD",
-        int iAnimationDuration=3000);
+        int iAnimationDuration=2000);
 
     void setAnimationDuration(int iAnimationDuration);
     int animationDuration() const;
@@ -41,16 +41,19 @@ protected:
 private:
     void setBkgColor(const QColor &color);
     QColor bkgColor();
+    void reset();
 
 private:
     QPropertyAnimation *m_pAnimation;
-    bool m_bAnimationStarted;
     int m_iAnimationDuration;
     QString m_sDefaultText;
     QString m_sPressAndHoldText;
     QColor m_cStartColor;
     QColor m_cEndColor;
-    QTime m_tTimer;
+    QTimer m_tTimer;
+
+public slots:
+    void onTimeOut();
 
 signals:
     void actionValidated();

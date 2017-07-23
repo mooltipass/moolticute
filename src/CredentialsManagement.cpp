@@ -46,7 +46,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonCancel->setDefaultText(tr("Discard changes"));
-    ui->pushButtonCancel->setPressAndHoldText(tr("Hold to disgard"));
+    ui->pushButtonCancel->setFixedWidth(108);
+    ui->pushButtonCancel->setPressAndHoldText(tr("Hold to discard"));
     connect(ui->pushButtonCancel, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_pushButtonCancel_clicked);
 
     ui->pushButtonDelete->setStyleSheet(CSS_BLUE_BUTTON);
