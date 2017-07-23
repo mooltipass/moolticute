@@ -33,8 +33,7 @@ public:
     enum CustomRole {
         LoginRole = Qt::UserRole + 1,
         PasswordUnlockedRole,
-        FavRole,
-        UidRole
+        FavRole
     };
 
     class Credential
@@ -74,14 +73,13 @@ public:
     void addCredential(const QString &sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription="");
     void removeCredential(const QModelIndex &idx);
     TreeItem *getItemByIndex(const QModelIndex &idx) const;
-    TreeItem *getItemByUID(const QString &sItemUID) const;
     void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName);
     void updateLoginItem(const QModelIndex &idx, const ColumnIdx &colIdx, const QVariant &vValue);
     void clear();
 
 private:
     ServiceItem *addService(const QString &sServiceName);
-    QModelIndex getItemIndexByUID(const QString &sItemUID) const;
+    QModelIndex getServiceIndexByName(const QString &sServiceName) const;
 
 private:
     RootItem *m_pRootItem;

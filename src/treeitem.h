@@ -12,7 +12,6 @@ class TreeItem
 public:
     enum Status {USED=0, UNUSED};
     virtual ~TreeItem();
-    const QString &uid() const;
     const QString &name() const;
     void setName(const QString &sName);
     TreeItem *parentItem() const;
@@ -44,7 +43,6 @@ protected:
 protected:
     QVector<TreeItem *> m_vChilds;   
     TreeItem *m_pParentItem;
-    QString m_sUID;
     Status m_eStatus;
     QString m_sName;
     QDate m_dCreatedDate;

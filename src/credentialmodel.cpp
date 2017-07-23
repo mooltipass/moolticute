@@ -37,11 +37,14 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     if (!pItem)
         return QVariant();
 
+    if (role == Qt::DisplayRole)
+        return pItem->name();
+
     // Cast to login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
     // Display data for role
-    if (role == Qt::DisplayRole || role == Qt::EditRole)
+    if (role == Qt::DisplayRole)
     {
         QString sData = pItem->name();
         if (pLoginItem != nullptr)
@@ -49,9 +52,9 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
             QString sTargetDate = pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate);
             if (!pLoginItem->updatedDate().isNull())
                 sTargetDate = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
-            return sData + QString(" (") + sTargetDate + QString(")");
+            sData += QString(" (") + sTargetDate + QString(")");
         }
-        return pItem->name();
+        return sData;
     }
 
     if (role == Qt::ForegroundRole)
@@ -77,9 +80,6 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
                                                                     { "color-active", QColor("#0097a7") }});
     }
 
-    if (role == UidRole)
-        return pItem->uid();
-
     return QVariant();
 }
 
@@ -96,9 +96,18 @@ QModelIndex CredentialModel::index(int row, int column, const QModelIndex &paren
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    TreeItem *pParentItem = !parent.isValid() ? m_pRootItem : static_cast<TreeItem *>(parent.internalPointer());
-    TreeItem *pChildItem = pParentItem ? pParentItem->child(row) : nullptr;
-    return pChildItem ? createIndex(row, column, pChildItem) : QModelIndex();
+    TreeItem *pParentItem = nullptr;
+
+    if (!parent.isValid())
+        pParentItem = m_pRootItem;
+    else
+        pParentItem = static_cast<TreeItem *>(parent.internalPointer());
+
+    TreeItem *pChildItem = pParentItem->child(row);
+    if (pChildItem)
+        return createIndex(row, column, pChildItem);
+    else
+        return QModelIndex();
 }
 
 QModelIndex CredentialModel::parent(const QModelIndex &idx) const
@@ -107,19 +116,26 @@ QModelIndex CredentialModel::parent(const QModelIndex &idx) const
         return QModelIndex();
 
     TreeItem *pChildItem = static_cast<TreeItem *>(idx.internalPointer());
-    if (!pChildItem)
-        return QModelIndex();
     TreeItem *pParentItem = pChildItem->parentItem();
 
-    return pParentItem == m_pRootItem ? QModelIndex() : createIndex(pParentItem->row(), 0, pParentItem);
+    if (pParentItem == m_pRootItem)
+        return QModelIndex();
+
+    return createIndex(pParentItem->row(), 0, pParentItem);
 }
 
 int CredentialModel::rowCount(const QModelIndex &parent) const
 {
+    TreeItem *pParentItem = nullptr;
     if (parent.column() > 0)
         return 0;
-    TreeItem *pParentItem = !parent.isValid() ? m_pRootItem : static_cast<TreeItem *>(parent.internalPointer());
-    return pParentItem ? pParentItem->childCount() : 0;
+
+    if (!parent.isValid())
+        pParentItem = m_pRootItem;
+    else
+        pParentItem = static_cast<TreeItem *>(parent.internalPointer());
+
+    return pParentItem->childCount();
 }
 
 int CredentialModel::columnCount(const QModelIndex &parent) const
@@ -223,21 +239,13 @@ ServiceItem *CredentialModel::addService(const QString &sServiceName)
     return new ServiceItem(sServiceName);
 }
 
-QModelIndex CredentialModel::getItemIndexByUID(const QString &sItemUID) const
+QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName) const
 {
-    QModelIndexList lMatches = match(index(0, 0, QModelIndex()), UidRole, sItemUID, 1, Qt::MatchRecursive);
+    QModelIndexList lMatches = match(index(0, 0, QModelIndex()), Qt::DisplayRole, sServiceName, 1);
     if (!lMatches.isEmpty())
         return lMatches.first();
 
     return QModelIndex();
-}
-
-TreeItem *CredentialModel::getItemByUID(const QString &sItemUID) const
-{
-    QModelIndex itemIndex = getItemIndexByUID(sItemUID);
-    if (itemIndex.isValid())
-        return getItemByIndex(itemIndex);
-    return nullptr;
 }
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName)
@@ -384,12 +392,19 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
             return;
         else
         {
-            QModelIndex serviceIndex = getItemIndexByUID(pTargetService->uid());
-            beginInsertRows(serviceIndex, pTargetService->childCount(), pTargetService->childCount());
-            LoginItem *pLoginItem = pTargetService->addLogin(sLoginName);
-            pLoginItem->setPassword(sPassword);
-            pLoginItem->setDescription(sDescription);
-            endInsertRows();
+            QModelIndex serviceIndex = getServiceIndexByName(pTargetService->name());
+            if (serviceIndex.isValid())
+            {
+                qDebug() << " AVANT SERVICE CHILD COUNT " << pTargetService->childCount();
+
+                beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
+                LoginItem *pLoginItem = pTargetService->addLogin(sLoginName);
+                pLoginItem->setPassword(sPassword);
+                pLoginItem->setDescription(sDescription);
+                endInsertRows();
+
+                qDebug() << " AVANT SERVICE CHILD COUNT " << pTargetService->childCount();
+             }
         }
     }
     // No matching service

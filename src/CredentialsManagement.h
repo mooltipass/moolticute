@@ -61,14 +61,14 @@ private slots:
     void on_pushButtonCancel_clicked();
     void on_pushButtonDelete_clicked();
     void onCredentialSelected(const QModelIndex &current, const QModelIndex &previous);
-    void onLoginSelected(const QString &sItemUID);
-    void onServiceSelected(const QString &sItemUID);
+    void onLoginSelected(const QModelIndex &srcIndex);
+    void onServiceSelected(const QModelIndex &srcIndex);
     void onItemExpanded(const QModelIndex &proxyIndex);
     void onItemCollapsed(const QModelIndex &proxyIndex);
 
 private:
-    void updateLoginDescription(const QString &sItemUID);
-    void clearLoginDescription(const QString &sItemUID);
+    void updateLoginDescription(const QModelIndex &srcIndex);
+    void clearLoginDescription(const QModelIndex &srcIndex);
 
 private:
     void changeCurrentFavorite(int iFavorite);
@@ -81,8 +81,8 @@ private:
 signals:
     void wantEnterMemMode();
     void wantSaveMemMode();
-    void loginSelected(const QString &sItemUID);
-    void serviceSelected(const QString &sItemUID);
+    void loginSelected(const QModelIndex &srcIndex);
+    void serviceSelected(const QModelIndex &srcIndex);
 };
 
 #endif // CREDENTIALSMANAGEMENT_H

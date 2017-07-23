@@ -8,7 +8,7 @@
 
 TreeItem::TreeItem(const QString &sName,
     const QDate &dCreatedDate, const QDate &dUpdatedDate, const QString &sDescription) :
-    m_pParentItem(nullptr), m_sUID(QUuid::createUuid().toString()), m_eStatus(UNUSED),
+    m_pParentItem(nullptr), m_eStatus(UNUSED),
     m_sName(sName), m_dCreatedDate(dCreatedDate), m_dUpdatedDate(dUpdatedDate),
     m_sDescription(sDescription)
 {
@@ -18,11 +18,6 @@ TreeItem::~TreeItem()
 {
     qDebug() << "DESTROYING " << this;
     qDeleteAll(m_vChilds);
-}
-
-const QString &TreeItem::uid() const
-{
-    return m_sUID;
 }
 
 const QString &TreeItem::name() const
@@ -50,7 +45,7 @@ int TreeItem::childCount() const
 int TreeItem::row() const
 {
     if (m_pParentItem)
-        return m_pParentItem->m_vChilds.indexOf(const_cast<TreeItem*>(this));
+        return childs().indexOf(const_cast<TreeItem*>(this));
 
     return 0;
 }

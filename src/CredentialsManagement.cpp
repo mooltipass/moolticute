@@ -512,33 +512,33 @@ void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, 
         // A login item was selected
         LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
         if (pLoginItem != nullptr)
-            emit loginSelected(pLoginItem->uid());
+            emit loginSelected(srcIndex);
         else {
             // A service item was selected
             ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
             if (pServiceItem != nullptr)
-                emit serviceSelected(pServiceItem->uid());
+                emit serviceSelected(srcIndex);
         }
         updateSaveDiscardState(proxyIndex);
     }
 }
 
-void CredentialsManagement::onLoginSelected(const QString &sItemUID)
+void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 {
     ui->credDisplayFrame->setEnabled(true);
-    updateLoginDescription(sItemUID);
+    updateLoginDescription(srcIndex);
 }
 
-void CredentialsManagement::onServiceSelected(const QString &sItemUID)
+void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
 {
     ui->credDisplayFrame->setEnabled(false);
-    clearLoginDescription(sItemUID);
+    clearLoginDescription(srcIndex);
 }
 
-void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
+void CredentialsManagement::updateLoginDescription(const QModelIndex &srcIndex)
 {
     // Retrieve login item
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(m_pCredModel->getItemByUID(sItemUID));
+    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(m_pCredModel->getItemByIndex(srcIndex));
     if (pLoginItem != nullptr)
     {
         TreeItem *pParentItem = pLoginItem->parentItem();
@@ -555,9 +555,9 @@ void CredentialsManagement::updateLoginDescription(const QString &sItemUID)
     }
 }
 
-void CredentialsManagement::clearLoginDescription(const QString &sItemUID)
+void CredentialsManagement::clearLoginDescription(const QModelIndex &srcIndex)
 {
-    TreeItem *pItem = m_pCredModel->getItemByUID(sItemUID);
+    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
     ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
     if (pServiceItem != nullptr)
         ui->credDisplayServiceInput->setText(pServiceItem->name());
