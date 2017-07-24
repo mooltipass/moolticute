@@ -85,6 +85,7 @@ private slots:
     void onFilesAndSSHTabsShortcutActivated();
     void onAdvancedTabShortcutActivated();
     void onRadioButtonFilesAndSSHKeysTabsAlwaysVisibleToggled(bool bChecked);
+    void onCurrentTabChanged(int);
 
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
@@ -93,7 +94,7 @@ private:
 
     void checkAutoStart();
 
-    void setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdateAdvancedTabVisibility=false);
+    void setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue);
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;
@@ -112,6 +113,7 @@ private:
 
     QShortcut *m_FilesAndSSHKeysTabsShortcut;
     QShortcut *m_advancedTabShortcut;
+    QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;
 };
 

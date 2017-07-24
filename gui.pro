@@ -35,12 +35,12 @@ SOURCES += src/main_gui.cpp \
     src/CredentialModel.cpp \
     src/CredentialModelFilter.cpp \
     src/CredentialView.cpp \
-    src/LoginItem.cpp \
     src/RootItem.cpp \
     src/ServiceItem.cpp \
     src/TreeItem.cpp \
     src/AnimatedColorButton.cpp \
-    src/ItemDelegate.cpp
+    src/ItemDelegate.cpp \
+    src/loginitem.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
