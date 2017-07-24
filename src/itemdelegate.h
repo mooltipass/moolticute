@@ -18,7 +18,7 @@ public:
 private:
     void paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const;
     void paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option, const LoginItem *pLoginItem) const;
-    void paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite);
+    void paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite) const;
     QFont loginFont() const;
     QFont favFont() const;
 };

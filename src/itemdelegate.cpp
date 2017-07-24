@@ -16,31 +16,28 @@ ItemDelegate::ItemDelegate(QWidget* parent):
 {
 }
 
-void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite)
+void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite) const
 {
     QFont f = loginFont();
-    const QFontMetrics serviceMetrics = QFontMetrics{f};
 
     QIcon star = AppGui::qtAwesome()->icon(fa::star);
-    QSize iconSz = QSize(serviceMetrics.height(), serviceMetrics.height());
-    QPoint pos = option.rect.topRight() - QPoint(5 + iconSz.width(), -5);
+    QSize iconSz = QSize(option.rect.height(), option.rect.height()); //QSize(serviceMetrics.height(), serviceMetrics.height());
+    QPoint pos = option.rect.topRight() - QPoint(iconSz.width(), -(option.rect.height()-iconSz.height())/2);
     if (iFavorite != Common::FAV_NOT_SET)
         star.paint(painter, QRect(pos, iconSz));
 
     // Fav number
     f = favFont();
     painter->setFont(f);
-    const auto favMetrics = QFontMetrics{f};
-
     QString sFavNumber = QString::number(iFavorite + 1);
-    pos -= QPoint(favMetrics.width("00") + 5, -3);
-
     QPen pen = painter->pen();
-    pen.setColor(QColor("#a7a7a7"));
+    pen.setColor(QColor("#666666"));
     painter->setPen(pen);
 
-    if (iFavorite != Common::FAV_NOT_SET)
-        painter->drawText(QRect(pos, QSize(favMetrics.width("00") + 5, favMetrics.height())), sFavNumber);
+    if (iFavorite != Common::FAV_NOT_SET) {
+        QRect textRect(pos+QPoint(-20, 0), iconSz);
+        painter->drawText(textRect, Qt::AlignCenter, sFavNumber);
+    }
 }
 
 void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const
@@ -77,11 +74,6 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
         QPen pen;
         QString sDisplayedData = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
 
-        if (pLoginItem->favorite() >= 0) {
-            QString sFavorite = QString(" [%1]").arg(pLoginItem->favorite()+1);
-            sDisplayedData += sFavorite;
-        }
-
         qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
         painter->save();
         painter->setRenderHint(QPainter::Antialiasing, true);
@@ -98,6 +90,7 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
         painter->setPen(pen);
         painter->drawText(otherRect, sDisplayedData);
 
+        paintFavorite(painter, option, pLoginItem->favorite());
         painter->restore();
     }
 }
