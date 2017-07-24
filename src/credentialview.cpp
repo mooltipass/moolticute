@@ -84,8 +84,6 @@ void CredentialView::onModelLoaded()
 
 void CredentialView::onExpandItem(const QModelIndex &proxyIndex)
 {
-    CredentialModelFilter *pProxyModel = dynamic_cast<CredentialModelFilter *>(model());
-    QModelIndex srcIndex = pProxyModel->mapToSource(proxyIndex);
     if (isExpanded(proxyIndex))
         collapse(proxyIndex);
     else

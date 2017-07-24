@@ -16,13 +16,35 @@ ItemDelegate::ItemDelegate(QWidget* parent):
 {
 }
 
-void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite)
 {
-    const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
-    const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
-    const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
-    const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
+    QFont f = loginFont();
+    const QFontMetrics serviceMetrics = QFontMetrics{f};
 
+    QIcon star = AppGui::qtAwesome()->icon(fa::star);
+    QSize iconSz = QSize(serviceMetrics.height(), serviceMetrics.height());
+    QPoint pos = option.rect.topRight() - QPoint(5 + iconSz.width(), -5);
+    if (iFavorite != Common::FAV_NOT_SET)
+        star.paint(painter, QRect(pos, iconSz));
+
+    // Fav number
+    f = favFont();
+    painter->setFont(f);
+    const auto favMetrics = QFontMetrics{f};
+
+    QString sFavNumber = QString::number(iFavorite + 1);
+    pos -= QPoint(favMetrics.width("00") + 5, -3);
+
+    QPen pen = painter->pen();
+    pen.setColor(QColor("#a7a7a7"));
+    painter->setPen(pen);
+
+    if (iFavorite != Common::FAV_NOT_SET)
+        painter->drawText(QRect(pos, QSize(favMetrics.width("00") + 5, favMetrics.height())), sFavNumber);
+}
+
+void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const
+{
     if (pServiceItem != nullptr)
     {
         QPen pen;
@@ -38,7 +60,6 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         QRect dstRect = option.rect;
         if (!pServiceItem->isExpanded()) {
             QRect otherRect(dstRect.width()-serviceMetrics.width(sLogins), dstRect.y()+(dstRect.height()-serviceMetrics.height())/2, serviceMetrics.width(sLogins), dstRect.height());
-
             pen.setColor(QColor("#666666"));
             painter->setFont(f);
             painter->setPen(pen);
@@ -47,7 +68,10 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
         painter->restore();
     }
-    else
+}
+
+void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option, const LoginItem *pLoginItem) const
+{
     if (pLoginItem != nullptr)
     {
         QPen pen;
@@ -76,16 +100,22 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
         painter->restore();
     }
-
-    return QStyledItemDelegate::paint(painter, option, index);
 }
 
-QFont ItemDelegate::serviceFont() const
+void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QFont f = qApp->font();
-    f.setBold(true);
-    f.setPointSize(8);
-    return f;
+    const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
+    const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
+    const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
+    const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
+
+    if (pServiceItem != nullptr)
+        paintServiceItem(painter, option, pServiceItem);
+    else
+    if (pLoginItem != nullptr)
+        paintLoginItem(painter, option, pLoginItem);
+
+    return QStyledItemDelegate::paint(painter, option, index);
 }
 
 QFont ItemDelegate::loginFont() const

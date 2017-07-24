@@ -4,6 +4,10 @@
 // Qt
 #include <QStyledItemDelegate>
 
+// Application
+class ServiceItem;
+class LoginItem;
+
 class ItemDelegate : public QStyledItemDelegate
 {
 public:
@@ -12,7 +16,9 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const override;
 private:
-    QFont serviceFont() const;
+    void paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const;
+    void paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option, const LoginItem *pLoginItem) const;
+    void paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite);
     QFont loginFont() const;
     QFont favFont() const;
 };
