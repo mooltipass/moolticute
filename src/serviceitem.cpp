@@ -43,6 +43,7 @@ void ServiceItem::setExpanded(bool bExpanded)
 
 QString ServiceItem::logins() const
 {
+    QString sLogins = "";
     int nLogins = childCount();
     if (nLogins == 0)
         return QString();
@@ -52,35 +53,41 @@ QString ServiceItem::logins() const
         QString sName = pItem->name().simplified().mid(0, 15);
         if (pItem->name().length() > 15)
             sName += "...";
-        return sName;
+        sLogins = sName;
     }
     else
-        if ((nLogins >= 1) && (nLogins <=3))
+    if ((nLogins >= 1) && (nLogins <=3))
+    {
+        QStringList lLogins;
+        foreach (TreeItem *pItem, m_vChilds)
         {
-            QStringList lLogins;
-            foreach (TreeItem *pItem, m_vChilds)
-            {
-                QString sName = pItem->name().simplified().mid(0, 6);
-                if (pItem->name().length() > 6)
-                    sName += "...";
-                lLogins << sName;
-            }
-            return lLogins.join(" ");
+            QString sName = pItem->name().simplified().mid(0, 6);
+            if (pItem->name().length() > 6)
+                sName += "...";
+            lLogins << sName;
         }
-        else
+        sLogins = lLogins.join(" ");
+    }
+    else
+    {
+        QStringList lLogins;
+        int c = 0;
+        foreach (TreeItem *pItem, m_vChilds)
         {
-            QStringList lLogins;
-            foreach (TreeItem *pItem, m_vChilds)
-            {
-                QString sName = pItem->name().simplified().mid(0, 3);
-                if (pItem->name().length() > 3)
-                    sName += "...";
-                lLogins << sName;
-            }
-            return lLogins.join(" ");
+            QString sName = pItem->name().simplified().mid(0, 3);
+            if (pItem->name().length() > 3)
+                sName += "...";
+            lLogins << sName;
+            c++;
+            if (c > 9)
+                break;
         }
+        sLogins = lLogins.join(" ");
+    }
 
-    return QString();
+    if (!sLogins.isEmpty())
+        sLogins = QString("(")+sLogins+QString(")");
+    return sLogins;
 }
 
 

@@ -35,13 +35,12 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     // Cast to login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
-    if (role == Qt::DisplayRole)
-        return pItem->name();
-
-    if (role == ItemLabelRole)
-    {
+    if (role == Qt::DisplayRole) {
         if (pServiceItem != nullptr)
             return pItem->name();
+        else
+        if (pLoginItem != nullptr)
+            return pLoginItem->itemLabel();
     }
 
     if (role == Qt::ForegroundRole)
@@ -56,7 +55,7 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
         {
             QFont font = qApp->font();
             font.setBold(false);
-            font.setPointSize(12);
+            font.setPointSize(10);
             return font;
         }
         else
@@ -238,7 +237,7 @@ ServiceItem *CredentialModel::addService(const QString &sServiceName)
 
 QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName) const
 {
-    QModelIndexList lMatches = match(index(0, 0, QModelIndex()), CredentialModel::ItemLabelRole, sServiceName, 1);
+    QModelIndexList lMatches = match(index(0, 0, QModelIndex()), Qt::DisplayRole, sServiceName, 1);
     if (!lMatches.isEmpty())
         return lMatches.first();
 

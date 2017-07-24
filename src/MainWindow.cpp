@@ -734,7 +734,6 @@ void MainWindow::onCurrentTabChanged(int)
         QPushButton *pButton = m_tabMap[pCurrentWidget];
         if (pButton != nullptr)
             pButton->setChecked(true);
-        else ui->stackedWidget->setCurrentWidget(ui->pageSettings);
     }
 }
 

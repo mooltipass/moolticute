@@ -17,6 +17,7 @@ ItemDelegate::ItemDelegate(QWidget* parent):
 
 QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &style, const QModelIndex &index) const
 {
+    /*
     const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
     const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
     const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
@@ -33,6 +34,7 @@ QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &style, const QModelInde
 
         return QSize(width, height);
     }
+    */
 
     return QStyledItemDelegate::sizeHint(style, index);
 }
@@ -52,7 +54,7 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         painter->save();
         painter->setRenderHint(QPainter::Antialiasing, true);
 
-        QFont f = serviceFont();
+        QFont f = loginFont();
         const QFontMetrics serviceMetrics = QFontMetrics{f};
 
         QRect dstRect = option.rect;
@@ -60,7 +62,6 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
             QRect otherRect(dstRect.width()-serviceMetrics.width(sLogins), dstRect.y()+(dstRect.height()-serviceMetrics.height())/2, serviceMetrics.width(sLogins), dstRect.height());
 
             pen.setColor(QColor("#666666"));
-            QFont f = loginFont();
             painter->setFont(f);
             painter->setPen(pen);
             painter->drawText(otherRect, Qt::AlignRight, sLogins);
@@ -76,14 +77,14 @@ QFont ItemDelegate::serviceFont() const
 {
     QFont f = qApp->font();
     f.setBold(true);
-    f.setPointSize(12);
+    f.setPointSize(8);
     return f;
 }
 
 QFont ItemDelegate::loginFont() const
 {
     QFont f = qApp->font();
-    f.setPointSize(12);
+    f.setPointSize(8);
     f.setItalic(true);
     return f;
 }

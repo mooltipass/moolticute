@@ -21,7 +21,6 @@ public:
     enum ItemRole
     {
         ItemNameRole,
-        ItemLabelRole,
         PasswordRole,
         DescriptionRole,
         DateCreatedRole,
