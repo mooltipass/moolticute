@@ -412,6 +412,7 @@ void CredentialModel::removeCredential(const QModelIndex &idx)
     if (idx.isValid())
     {
         TreeItem *pItem = getItemByIndex(idx);
+        qDebug() << "REMOVING : " << pItem->name();
         if (pItem == nullptr)
             return;
 
@@ -421,26 +422,30 @@ void CredentialModel::removeCredential(const QModelIndex &idx)
         if ((pServiceItem == nullptr) && (pLoginItem == nullptr))
             return;
 
-        // Retrieve parent item
-        TreeItem *pParentItem = pItem->parentItem();
-        if (pParentItem == nullptr)
-            return;
-
-        // Can remove a service only if it has no child
-        bool bCondition = true;
-        if (pServiceItem != nullptr)
-            bCondition = (pServiceItem->childCount() == 0);
-        QModelIndex parentIndex = idx.parent();
-        if (bCondition)
+        if (pLoginItem != nullptr)
         {
-            beginRemoveRows(parentIndex, idx.row(), idx.row());
-            if (pParentItem->removeOne(pItem))
-                delete pItem;
-            endRemoveRows();
-        }
+            TreeItem *pServiceItem = pLoginItem->parentItem();
+            if (pServiceItem != nullptr)
+            {
+                QModelIndex serviceIndex = getServiceIndexByName(pServiceItem->name());
+                if (serviceIndex.isValid())
+                {
+                    beginRemoveRows(serviceIndex, idx.row(), idx.row());
+                    if (pServiceItem->removeOne(pItem))
+                        delete pItem;
+                    endRemoveRows();
 
-        if (pParentItem && (pParentItem != m_pRootItem) && (pParentItem->childCount() == 0))
-            removeCredential(parentIndex);
+                    int iLoginCount = pServiceItem->childCount();
+                    if (iLoginCount == 0)
+                    {
+                        beginRemoveRows(QModelIndex(), serviceIndex.row(), serviceIndex.row());
+                        if (m_pRootItem->removeOne(pServiceItem))
+                            delete pServiceItem;
+                        endRemoveRows();
+                    }
+                }
+            }
+        }
     }
 }
 
