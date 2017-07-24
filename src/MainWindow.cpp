@@ -716,8 +716,10 @@ void MainWindow::onAdvancedTabShortcutActivated()
     }
     else
     {
-        if (previousWidget != nullptr)
+        if ((previousWidget != nullptr) && (previousWidget != ui->pageFiles) && (previousWidget != ui->pageSSH))
             ui->stackedWidget->setCurrentWidget(previousWidget);
+        else
+            ui->stackedWidget->setCurrentWidget(ui->pageSettings);
     }
 }
 
