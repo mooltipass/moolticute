@@ -55,10 +55,13 @@ bool ConditionalItemSelectionModel::canChangeIndex()
 }
 
 
-CredentialView::CredentialView(QWidget *parent) : QTreeView(parent)
+CredentialView::CredentialView(QWidget *parent) : QTreeView(parent),
+    m_bIsFullyExpanded(false)
 {
     setHeaderHidden(true);
     setItemDelegateForColumn(0, new ItemDelegate(this));
+    setMinimumWidth(430);
+    connect(this, &CredentialView::clicked, this, &CredentialView::onExpandItem);
 }
 
 CredentialView::~CredentialView()
@@ -78,3 +81,24 @@ void CredentialView::onModelLoaded()
         }
     }
 }
+
+void CredentialView::onExpandItem(const QModelIndex &proxyIndex)
+{
+    CredentialModelFilter *pProxyModel = dynamic_cast<CredentialModelFilter *>(model());
+    QModelIndex srcIndex = pProxyModel->mapToSource(proxyIndex);
+    if (isExpanded(proxyIndex))
+        collapse(proxyIndex);
+    else
+        expand(proxyIndex);
+}
+
+void CredentialView::onChangeExpandedState()
+{
+    m_bIsFullyExpanded = !m_bIsFullyExpanded;
+    if (m_bIsFullyExpanded)
+        expandAll();
+    else
+        collapseAll();
+    emit expandedStateChanged(m_bIsFullyExpanded);
+}
+

@@ -35,13 +35,8 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     // Cast to login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
-    if (role == Qt::DisplayRole) {
-        if (pServiceItem != nullptr)
-            return pItem->name();
-        else
-        if (pLoginItem != nullptr)
-            return pLoginItem->itemLabel();
-    }
+    if (role == Qt::DisplayRole)
+        return pItem->name();
 
     if (role == Qt::ForegroundRole)
     {

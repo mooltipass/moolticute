@@ -36,9 +36,15 @@ public:
 
 public slots:
     void onModelLoaded();
+    void onExpandItem(const QModelIndex &proxyIndex);
+    void onChangeExpandedState();
 
 private:
     QModelIndex m_previousSelectedProxyIndex;
+    bool m_bIsFullyExpanded;
+
+signals:
+    void expandedStateChanged(bool bIsExpanded);
 };
 
 #endif // CREDENTIALVIEW_H

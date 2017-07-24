@@ -9,8 +9,6 @@ class ItemDelegate : public QStyledItemDelegate
 public:
     explicit ItemDelegate(QWidget* parent = nullptr);
 
-    QSize sizeHint(const QStyleOptionViewItem &option,
-                   const QModelIndex &index) const override;
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const override;
 private:

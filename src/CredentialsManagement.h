@@ -65,6 +65,7 @@ private slots:
     void onServiceSelected(const QModelIndex &srcIndex);
     void onItemExpanded(const QModelIndex &proxyIndex);
     void onItemCollapsed(const QModelIndex &proxyIndex);
+    void onExpandedStateChanged(bool bIsExpanded);
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);

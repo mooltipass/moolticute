@@ -8,6 +8,7 @@
 // Application
 #include "ItemDelegate.h"
 #include "ServiceItem.h"
+#include "LoginItem.h"
 #include "AppGui.h"
 
 ItemDelegate::ItemDelegate(QWidget* parent):
@@ -15,34 +16,11 @@ ItemDelegate::ItemDelegate(QWidget* parent):
 {
 }
 
-QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &style, const QModelIndex &index) const
-{
-    /*
-    const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
-    const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
-    const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
-
-    if (pServiceItem != nullptr)
-    {
-        QString sFullServiceDesc = index.data(Qt::DisplayRole).toString();
-
-        auto serviceMetrics = QFontMetrics(serviceFont());
-        auto favMetrics = QFontMetrics(favFont());
-
-        const auto height = serviceMetrics.height() + 12;
-        const auto width = serviceMetrics.width(sFullServiceDesc) + 10 + serviceMetrics.height() + favMetrics.width("00");
-
-        return QSize(width, height);
-    }
-    */
-
-    return QStyledItemDelegate::sizeHint(style, index);
-}
-
 void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
     const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
+    const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
     const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
 
     if (pServiceItem != nullptr)
@@ -66,6 +44,35 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
             painter->setPen(pen);
             painter->drawText(otherRect, Qt::AlignRight, sLogins);
         }
+
+        painter->restore();
+    }
+    else
+    if (pLoginItem != nullptr)
+    {
+        QPen pen;
+        QString sDisplayedData = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
+
+        if (pLoginItem->favorite() >= 0) {
+            QString sFavorite = QString(" [%1]").arg(pLoginItem->favorite()+1);
+            sDisplayedData += sFavorite;
+        }
+
+        qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
+        painter->save();
+        painter->setRenderHint(QPainter::Antialiasing, true);
+
+        QFont f = loginFont();
+        const QFontMetrics serviceMetrics = QFontMetrics{f};
+
+        QRect dstRect = option.rect;
+        int delta = 4;
+        QRect otherRect(dstRect.width()-serviceMetrics.width(sDisplayedData)-delta, dstRect.y()+(dstRect.height()-serviceMetrics.height())/2, serviceMetrics.width(sDisplayedData)+delta, dstRect.height());
+
+        pen.setColor(QColor("#666666"));
+        painter->setFont(f);
+        painter->setPen(pen);
+        painter->drawText(otherRect, sDisplayedData);
 
         painter->restore();
     }

@@ -106,6 +106,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     connect(ui->credentialTreeView, &CredentialView::expanded, this, &CredentialsManagement::onItemExpanded);
     connect(ui->credentialTreeView, &CredentialView::collapsed, this, &CredentialsManagement::onItemCollapsed);
+    connect(ui->pushButtonExpandAll, &QPushButton::clicked, ui->credentialTreeView, &CredentialView::onChangeExpandedState);
+    connect(ui->credentialTreeView, &CredentialView::expandedStateChanged, this, &CredentialsManagement::onExpandedStateChanged);
 }
 
 CredentialsManagement::~CredentialsManagement()
@@ -202,9 +204,9 @@ void CredentialsManagement::on_addCredentialButton_clicked()
     if (wsClient->get_memMgmtMode())
     {
         m_pCredModel->addCredential(ui->addCredServiceInput->text(),
-             ui->addCredLoginInput->text(),
-             ui->addCredPasswordInput->text(),
-             QString());
+                                    ui->addCredLoginInput->text(),
+                                    ui->addCredPasswordInput->text(),
+                                    QString());
 
         ui->addCredServiceInput->clear();
         ui->addCredLoginInput->clear();
@@ -575,6 +577,11 @@ void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
     ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
     if (pServiceItem != nullptr)
         pServiceItem->setExpanded(false);
+}
+
+void CredentialsManagement::onExpandedStateChanged(bool bIsExpanded)
+{
+    ui->pushButtonExpandAll->setText(bIsExpanded ? tr("Collapse All") : tr("Expand All"));
 }
 
 void CredentialsManagement::onItemExpanded(const QModelIndex &proxyIndex)
