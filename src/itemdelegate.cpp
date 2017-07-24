@@ -7,7 +7,7 @@
 
 // Application
 #include "ItemDelegate.h"
-#include "serviceitem.h"
+#include "ServiceItem.h"
 #include "AppGui.h"
 
 ItemDelegate::ItemDelegate(QWidget* parent):
@@ -46,7 +46,6 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     if (pServiceItem != nullptr)
     {
         QPen pen;
-        QString sShortServiceName = pServiceItem->name();
         QString sLogins = pServiceItem->logins();
 
         qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
@@ -55,16 +54,16 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
         QFont f = serviceFont();
         const QFontMetrics serviceMetrics = QFontMetrics{f};
-        QPoint pos = option.rect.topLeft() + QPoint(5, 5);
 
-        QRect dstRect(pos , QSize(option.rect.width() - 5, serviceMetrics.height()));
+        QRect dstRect = option.rect;
         if (!pServiceItem->isExpanded()) {
-            QRect otherRect(dstRect.x()+serviceMetrics.width(sShortServiceName)+24, dstRect.y()+1, dstRect.width(), dstRect.height());
+            QRect otherRect(dstRect.width()-serviceMetrics.width(sLogins), dstRect.y()+(dstRect.height()-serviceMetrics.height())/2, serviceMetrics.width(sLogins), dstRect.height());
+
             pen.setColor(QColor("#666666"));
             QFont f = loginFont();
             painter->setFont(f);
             painter->setPen(pen);
-            painter->drawText(otherRect, sLogins);
+            painter->drawText(otherRect, Qt::AlignRight, sLogins);
         }
 
         painter->restore();

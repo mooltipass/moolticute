@@ -1,6 +1,6 @@
 // Application
-#include "serviceitem.h"
-#include "loginitem.h"
+#include "ServiceItem.h"
+#include "LoginItem.h"
 
 ServiceItem::ServiceItem(const QString &sServiceName) : TreeItem(sServiceName),
     m_bIsExpanded(false)
@@ -49,7 +49,7 @@ QString ServiceItem::logins() const
     if (nLogins == 1)
     {
         TreeItem *pItem = m_vChilds.first();
-        QString sName = pItem->name().mid(0, 15);
+        QString sName = pItem->name().simplified().mid(0, 15);
         if (pItem->name().length() > 15)
             sName += "...";
         return sName;
@@ -60,7 +60,7 @@ QString ServiceItem::logins() const
             QStringList lLogins;
             foreach (TreeItem *pItem, m_vChilds)
             {
-                QString sName = pItem->name().mid(0, 6);
+                QString sName = pItem->name().simplified().mid(0, 6);
                 if (pItem->name().length() > 6)
                     sName += "...";
                 lLogins << sName;
@@ -72,7 +72,7 @@ QString ServiceItem::logins() const
             QStringList lLogins;
             foreach (TreeItem *pItem, m_vChilds)
             {
-                QString sName = pItem->name().mid(0, 3);
+                QString sName = pItem->name().simplified().mid(0, 3);
                 if (pItem->name().length() > 3)
                     sName += "...";
                 lLogins << sName;

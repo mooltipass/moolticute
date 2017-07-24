@@ -6,8 +6,8 @@
 // Application
 #include "credentialview.h"
 #include "CredentialModelFilter.h"
-#include "serviceitem.h"
-#include "itemdelegate.h"
+#include "ServiceItem.h"
+#include "ItemDelegate.h"
 
 ConditionalItemSelectionModel::ConditionalItemSelectionModel(TestFunction f, QAbstractItemModel *model)
     : QItemSelectionModel(model)
