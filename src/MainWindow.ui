@@ -1262,6 +1262,19 @@ QWidget {background-color: #EFEFEF;}</string>
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxImport">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Do not delete credentials on local DB</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -1274,19 +1287,6 @@ QWidget {background-color: #EFEFEF;}</string>
             </property>
             <property name="text">
              <string>Import from file</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBoxImport">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Do not delete credentials on local DB</string>
             </property>
            </widget>
           </item>
@@ -2366,11 +2366,6 @@ QWidget {background-color: #EFEFEF;}</string>
    <extends>QWidget</extends>
    <header>FilesManagement.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>AnimatedColorButton</class>
-   <extends>QWidget</extends>
-   <header>animatedcolorbutton.h</header>
   </customwidget>
  </customwidgets>
  <resources>
