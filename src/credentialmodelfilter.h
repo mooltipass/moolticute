@@ -17,6 +17,7 @@ public:
     void setFilter(const QString &sFilter);
     TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex);
     const TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex) const;
+    void invalidate();
 
 protected:
     virtual bool filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const;

@@ -466,8 +466,7 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
 
     if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteRole, iFavorite);
-        ui->credentialTreeView->selectionModel()->setCurrentIndex(lIndexes.first(), QItemSelectionModel::ClearAndSelect);
-        ui->credentialTreeView->setCurrentIndex(lIndexes.first());
+        m_pCredModelFilter->invalidate();
     }
 }
 

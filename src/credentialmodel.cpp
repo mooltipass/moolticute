@@ -434,13 +434,6 @@ void CredentialModel::removeCredential(const QModelIndex &idx)
                         delete pItem;
                     endRemoveRows();
 
-                    /*
-                    QModelIndex newIndex = index(idx.row(), 0, serviceIndex);
-                    if (!newIndex.isValid())
-                        newIndex = index(rowCount(serviceIndex)-1, 0, serviceIndex);
-                    qDebug() << newIndex << newIndex.isValid();
-                    */
-
                     int iLoginCount = pServiceItem->childCount();
                     if (iLoginCount == 0)
                     {

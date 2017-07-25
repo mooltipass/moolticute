@@ -35,6 +35,11 @@ const TreeItem *CredentialModelFilter::getItemByProxyIndex(const QModelIndex &pr
     return pSrcModel->getItemByIndex(srcIndex);
 }
 
+void CredentialModelFilter::invalidate()
+{
+    QSortFilterProxyModel::invalidate();
+}
+
 bool CredentialModelFilter::filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const
 {
     // Get source index

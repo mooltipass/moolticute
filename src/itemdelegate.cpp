@@ -23,7 +23,7 @@ QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
     const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
     const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
     const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
-    if ((pLoginItem != nullptr))
+    if ((pLoginItem != nullptr) && (pLoginItem->favorite() != Common::FAV_NOT_SET))
         return QSize(defaultSize.width(), defaultSize.height()*2);
     return defaultSize;
 }
@@ -31,6 +31,8 @@ QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
 void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite) const
 {
     QFont f = loginFont();
+
+    painter->save();
 
     QIcon star = AppGui::qtAwesome()->icon(fa::star);
     QSize iconSz = QSize(option.rect.height(), option.rect.height()); //QSize(serviceMetrics.height(), serviceMetrics.height());
@@ -49,17 +51,20 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
 
     if (iFavorite != Common::FAV_NOT_SET)
         painter->drawText(iconRect, Qt::AlignCenter, sFavNumber);
+
+    painter->restore();
 }
 
 void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const
 {
     if (pServiceItem != nullptr)
     {
+        painter->save();
+
         QPen pen;
         QString sLogins = pServiceItem->logins();
 
         qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
-        painter->save();
         painter->setRenderHint(QPainter::Antialiasing, true);
 
         QFont f = loginFont();
@@ -82,11 +87,12 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
 {
     if (pLoginItem != nullptr)
     {
+        painter->save();
+
         QPen pen;
         QString sDisplayedData = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
 
         qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
-        painter->save();
         painter->setRenderHint(QPainter::Antialiasing, true);
 
         QFont f = loginFont();
@@ -102,6 +108,7 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
         painter->drawText(otherRect, sDisplayedData);
 
         paintFavorite(painter, option, pLoginItem->favorite());
+
         painter->restore();
     }
 }
@@ -116,8 +123,8 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     if (pServiceItem != nullptr)
         paintServiceItem(painter, option, pServiceItem);
     else
-    if (pLoginItem != nullptr)
-        paintLoginItem(painter, option, pLoginItem);
+        if (pLoginItem != nullptr)
+            paintLoginItem(painter, option, pLoginItem);
 
     return QStyledItemDelegate::paint(painter, option, index);
 }
