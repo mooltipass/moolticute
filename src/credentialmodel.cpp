@@ -412,7 +412,6 @@ void CredentialModel::removeCredential(const QModelIndex &idx)
     if (idx.isValid())
     {
         TreeItem *pItem = getItemByIndex(idx);
-        qDebug() << "REMOVING : " << pItem->name();
         if (pItem == nullptr)
             return;
 
@@ -434,6 +433,13 @@ void CredentialModel::removeCredential(const QModelIndex &idx)
                     if (pServiceItem->removeOne(pItem))
                         delete pItem;
                     endRemoveRows();
+
+                    /*
+                    QModelIndex newIndex = index(idx.row(), 0, serviceIndex);
+                    if (!newIndex.isValid())
+                        newIndex = index(rowCount(serviceIndex)-1, 0, serviceIndex);
+                    qDebug() << newIndex << newIndex.isValid();
+                    */
 
                     int iLoginCount = pServiceItem->childCount();
                     if (iLoginCount == 0)
