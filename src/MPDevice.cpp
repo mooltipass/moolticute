@@ -3009,6 +3009,8 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         {
             diagSavePacketsGenerated = true;
             qDebug() << "Updating cred & data change numbers";
+            qDebug() << "Cred DB: " << get_credentialsDbChangeNumber() << " clone: " << credentialsDbChangeNumberClone;
+            qDebug() << "Cred DB: " << get_dataDbChangeNumber() << " clone: " << dataDbChangeNumberClone;
             QByteArray updateChangeNumbersPacket = QByteArray();
             updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
             updateChangeNumbersPacket.append(get_dataDbChangeNumber());
@@ -4996,7 +4998,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                 // Loop in the memory nodes to compare data
                 for (qint32 j = 0; j < dataNodes.size(); j++)
                 {
-                    if (importedDataNodes[i]->getLoginNodeData() == dataNodes[j]->getLoginNodeData())
+                    if (importedDataNodes[i]->getService() == dataNodes[j]->getService())
                     {
                         // We found a parent data node that has the same core data (doesn't mean the same prev / next node though!)
                         qDebug() << "Data parent node core data match for " << importedDataNodes[i]->getService();
@@ -5404,6 +5406,9 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
                     dataChildNodes.removeOne(curNode);
                 }
             }
+
+            /* Remove parent */
+            removeEmptyParentFromDB(nodeItem, true);
         }
     }
 
