@@ -327,6 +327,18 @@ QString MPNode::getDescription() const
     return QString::fromUtf8(data.mid(6, 24));
 }
 
+void MPNode::setDescription(const QString &newDescription)
+{
+    if (isValid())
+    {
+        QByteArray desc = newDescription.toUtf8();
+        desc.append('\0');
+        desc.resize(MP_MAX_DESC_LENGTH);
+        desc[desc.size()-1] = '\0';
+        data.replace(6, MP_MAX_DESC_LENGTH, desc);
+    }
+}
+
 QString MPNode::getLogin() const
 {
     if (!isValid()) return QString();
