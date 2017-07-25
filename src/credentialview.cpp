@@ -59,7 +59,7 @@ CredentialView::CredentialView(QWidget *parent) : QTreeView(parent),
     m_bIsFullyExpanded(false)
 {
     setHeaderHidden(true);
-    //setItemDelegateForColumn(0, new ItemDelegate(this));
+    setItemDelegateForColumn(0, new ItemDelegate(this));
     setMinimumWidth(430);
     connect(this, &CredentialView::clicked, this, &CredentialView::onExpandItem);
 }
