@@ -17,7 +17,7 @@ CredentialModelFilter::~CredentialModelFilter()
 
 void CredentialModelFilter::setFilter(const QString &sFilter)
 {
-    m_sFilter = sFilter.toLower();
+    m_sFilter = sFilter;
     invalidate();
 }
 

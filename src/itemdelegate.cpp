@@ -32,8 +32,6 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
 {
     QFont f = loginFont();
 
-    painter->save();
-
     QIcon star = AppGui::qtAwesome()->icon(fa::star);
     QSize iconSz = QSize(option.rect.height(), option.rect.height()); //QSize(serviceMetrics.height(), serviceMetrics.height());
     QPoint pos = option.rect.topRight() - QPoint(iconSz.width(), -(option.rect.height()-iconSz.height())/2);
@@ -51,16 +49,12 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
 
     if (iFavorite != Common::FAV_NOT_SET)
         painter->drawText(iconRect, Qt::AlignCenter, sFavNumber);
-
-    painter->restore();
 }
 
 void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const
 {
     if (pServiceItem != nullptr)
     {
-        painter->save();
-
         QPen pen;
         QString sLogins = pServiceItem->logins();
 
@@ -78,8 +72,6 @@ void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewIte
             painter->setPen(pen);
             painter->drawText(otherRect, Qt::AlignRight, sLogins);
         }
-
-        painter->restore();
     }
 }
 
@@ -87,8 +79,6 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
 {
     if (pLoginItem != nullptr)
     {
-        painter->save();
-
         QPen pen;
         QString sDisplayedData = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
 
@@ -108,8 +98,6 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
         painter->drawText(otherRect, sDisplayedData);
 
         paintFavorite(painter, option, pLoginItem->favorite());
-
-        painter->restore();
     }
 }
 
@@ -120,13 +108,15 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
     const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
 
+    painter->save();
     if (pServiceItem != nullptr)
         paintServiceItem(painter, option, pServiceItem);
     else
-        if (pLoginItem != nullptr)
-            paintLoginItem(painter, option, pLoginItem);
+    if (pLoginItem != nullptr)
+        paintLoginItem(painter, option, pLoginItem);
+    painter->restore();
 
-    return QStyledItemDelegate::paint(painter, option, index);
+    QStyledItemDelegate::paint(painter, option, index);
 }
 
 QFont ItemDelegate::loginFont() const
