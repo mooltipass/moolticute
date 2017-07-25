@@ -5682,6 +5682,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             qint32 favorite = qjobject["favorite"].toInt();
             QString service = qjobject["service"].toString();
             QString password = qjobject["password"].toString();
+            QString description = qjobject["description"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
@@ -5744,6 +5745,14 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 
                 /* Set favorite */
                 nodePtr->setFavoriteProperty(favorite);
+
+                /* Check for changed description */
+                if (description != nodePtr->getDescription())
+                {
+                    qDebug() << "Detected description change";
+                    nodePtr->setDescription(description);
+                    packet_send_needed = true;
+                }
 
                 /* Check for changed login */
                 if (login != nodePtr->getLogin())
