@@ -12,8 +12,8 @@ class ItemDelegate : public QStyledItemDelegate
 {
 public:
     explicit ItemDelegate(QWidget* parent = nullptr);
-
-    void paint(QPainter *painter, const QStyleOptionViewItem &option,
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const override;
 private:
     void paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const;

@@ -16,6 +16,18 @@ ItemDelegate::ItemDelegate(QWidget* parent):
 {
 }
 
+QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QSize defaultSize = QStyledItemDelegate::sizeHint(option, index);
+
+    const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
+    const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
+    const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
+    if ((pLoginItem != nullptr))
+        return QSize(defaultSize.width(), defaultSize.height()*2);
+    return defaultSize;
+}
+
 void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite) const
 {
     QFont f = loginFont();
@@ -23,21 +35,20 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
     QIcon star = AppGui::qtAwesome()->icon(fa::star);
     QSize iconSz = QSize(option.rect.height(), option.rect.height()); //QSize(serviceMetrics.height(), serviceMetrics.height());
     QPoint pos = option.rect.topRight() - QPoint(iconSz.width(), -(option.rect.height()-iconSz.height())/2);
+    QRect iconRect(pos, iconSz);
     if (iFavorite != Common::FAV_NOT_SET)
-        star.paint(painter, QRect(pos, iconSz));
+        star.paint(painter, iconRect);
 
     // Fav number
     f = favFont();
     painter->setFont(f);
     QString sFavNumber = QString::number(iFavorite + 1);
     QPen pen = painter->pen();
-    pen.setColor(QColor("#666666"));
+    pen.setColor(QColor("white"));
     painter->setPen(pen);
 
-    if (iFavorite != Common::FAV_NOT_SET) {
-        QRect textRect(pos+QPoint(-20, 0), iconSz);
-        painter->drawText(textRect, Qt::AlignCenter, sFavNumber);
-    }
+    if (iFavorite != Common::FAV_NOT_SET)
+        painter->drawText(iconRect, Qt::AlignCenter, sFavNumber);
 }
 
 void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const

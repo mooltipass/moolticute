@@ -282,8 +282,11 @@ void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex
 
     // Do we have a login item?
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
-    if (pLoginItem != nullptr)
+    if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, ui->credDisplayPasswordInput->text(), ui->credDisplayDescriptionInput->text(), ui->credDisplayLoginInput->text());
+        ui->credentialTreeView->viewport()->setUpdatesEnabled(true);
+        ui->credentialTreeView->viewport()->repaint();
+    }
 }
 
 bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex)
@@ -461,8 +464,11 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
     TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
 
-    if (pLoginItem != nullptr)
+    if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteRole, iFavorite);
+        ui->credentialTreeView->selectionModel()->setCurrentIndex(lIndexes.first(), QItemSelectionModel::ClearAndSelect);
+        ui->credentialTreeView->setCurrentIndex(lIndexes.first());
+    }
 }
 
 void CredentialsManagement::on_pushButtonDelete_clicked()
