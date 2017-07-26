@@ -45,10 +45,10 @@ public:
     void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName);
     void updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue);
     void clear();
+    QModelIndex getServiceIndexByName(const QString &sServiceName) const;
 
 private:
     ServiceItem *addService(const QString &sServiceName);
-    QModelIndex getServiceIndexByName(const QString &sServiceName) const;
 
 private:
     RootItem *m_pRootItem;

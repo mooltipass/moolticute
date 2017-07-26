@@ -539,12 +539,26 @@ void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
 {
     ui->credDisplayFrame->setEnabled(false);
     clearLoginDescription(srcIndex);
+    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(m_pCredModel->getItemByIndex(srcIndex));
+    if ((pServiceItem != nullptr) && (pServiceItem->childCount() > 0))
+    {
+        LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pServiceItem->child(0));
+        if (pLoginItem != nullptr) {
+            ui->credDisplayFrame->setEnabled(true);
+            updateLoginDescription(pLoginItem);
+        }
+    }
 }
 
 void CredentialsManagement::updateLoginDescription(const QModelIndex &srcIndex)
 {
     // Retrieve login item
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(m_pCredModel->getItemByIndex(srcIndex));
+    updateLoginDescription(pLoginItem);
+}
+
+void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
+{
     if (pLoginItem != nullptr)
     {
         TreeItem *pParentItem = pLoginItem->parentItem();

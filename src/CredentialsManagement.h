@@ -31,6 +31,7 @@ class CredentialsManagement;
 }
 class CredentialModel;
 class CredentialModelFilter;
+class LoginItem;
 
 class CredentialsManagement : public QWidget
 {
@@ -69,6 +70,7 @@ private slots:
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
+    void updateLoginDescription(LoginItem *pLoginItem);
     void clearLoginDescription(const QModelIndex &srcIndex);
 
 private:
