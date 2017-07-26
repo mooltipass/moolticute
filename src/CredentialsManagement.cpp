@@ -484,7 +484,7 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
         if (pParentItem != nullptr) {
             auto btn = QMessageBox::question(this,
                                              tr("Delete?"),
-                                             tr("Remove the current credential %1/%2 ?").arg(pParentItem->name(), pLoginItem->name()),
+                                             tr("Service: %1 delete credential %2?").arg(pParentItem->name(), pLoginItem->name()),
                                              QMessageBox::Yes |
                                              QMessageBox::Cancel,
                                              QMessageBox::Yes);

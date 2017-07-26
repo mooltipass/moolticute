@@ -66,7 +66,7 @@ QString ServiceItem::logins() const
                 sName += "...";
             lLogins << sName;
         }
-        sLogins = lLogins.join(" ");
+        sLogins = lLogins.join(", ");
     }
     else
     {
@@ -82,7 +82,7 @@ QString ServiceItem::logins() const
             if (c > 9)
                 break;
         }
-        sLogins = lLogins.join(" ");
+        sLogins = lLogins.join(", ");
     }
 
     if (!sLogins.isEmpty())

@@ -71,14 +71,18 @@ CredentialView::~CredentialView()
 
 void CredentialView::onModelLoaded()
 {
-    QModelIndex firstIndex = model()->index(0, 0, QModelIndex());
-    if (firstIndex.isValid())
+    QModelIndex firstServiceIndex = model()->index(0, 0, QModelIndex());
+    if (firstServiceIndex.isValid())
     {
+        selectionModel()->setCurrentIndex(firstServiceIndex, QItemSelectionModel::ClearAndSelect);
+
+        /*
         QModelIndex firstLoginIndex = firstIndex.child(0, 0);
         if (firstLoginIndex.isValid()) {
             selectionModel()->setCurrentIndex(firstLoginIndex, QItemSelectionModel::ClearAndSelect);
             expand(firstLoginIndex.parent());
         }
+        */
     }
 }
 

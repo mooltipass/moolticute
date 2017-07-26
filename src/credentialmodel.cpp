@@ -265,7 +265,6 @@ ServiceItem *CredentialModel::getServiceItemByIndex(const QModelIndex &idx) cons
     return dynamic_cast<ServiceItem *>(getItemByIndex(idx));
 }
 
-
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName)
 {
     // Retrieve item
