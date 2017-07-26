@@ -4,7 +4,7 @@
 
 RootItem::RootItem()
 {
-
+    m_sName = "ROOT";
 }
 
 RootItem::~RootItem()

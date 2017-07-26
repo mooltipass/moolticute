@@ -24,6 +24,9 @@ CredentialModel::~CredentialModel()
 
 QVariant CredentialModel::data(const QModelIndex &idx, int role) const
 {
+    if ((role != Qt::DisplayRole) && (role != Qt::ForegroundRole) && (role != Qt::FontRole) && (role != Qt::DecorationRole))
+        return QVariant();
+
     // Get item (no need check index)
     TreeItem *pItem = getItemByIndex(idx);
     if (!pItem)
@@ -62,6 +65,7 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
             font.setPointSize(10);
             return font;
         }
+        return qApp->font();
     }
 
     if (role == Qt::DecorationRole) {
@@ -92,7 +96,7 @@ QModelIndex CredentialModel::index(int row, int column, const QModelIndex &paren
     if (!parent.isValid())
         pParentItem = m_pRootItem;
     else
-        pParentItem = static_cast<TreeItem *>(parent.internalPointer());
+        pParentItem = static_cast<TreeItem*>(parent.internalPointer());
 
     TreeItem *pChildItem = pParentItem->child(row);
     if (pChildItem)
@@ -106,7 +110,7 @@ QModelIndex CredentialModel::parent(const QModelIndex &idx) const
     if (!idx.isValid())
         return QModelIndex();
 
-    TreeItem *pChildItem = static_cast<TreeItem *>(idx.internalPointer());
+    TreeItem *pChildItem = static_cast<TreeItem*>(idx.internalPointer());
     TreeItem *pParentItem = pChildItem->parentItem();
 
     if (pParentItem == m_pRootItem)
@@ -399,11 +403,18 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
     else
     {
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
-        ServiceItem *pServiceItem = m_pRootItem->addService(sServiceName);
-        LoginItem *pLoginItem = pServiceItem->addLogin(sLoginName);
-        pLoginItem->setPassword(sPassword);
-        pLoginItem->setDescription(sDescription);
+        ServiceItem *pAddedService = m_pRootItem->addService(sServiceName);
         endInsertRows();
+
+        QModelIndex serviceIndex = getServiceIndexByName(pAddedService->name());
+        if (serviceIndex.isValid())
+        {
+            beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
+            LoginItem *pLoginItem = pAddedService->addLogin(sLoginName);
+            pLoginItem->setPassword(sPassword);
+            pLoginItem->setDescription(sDescription);
+            endInsertRows();
+        }
     }
 }
 

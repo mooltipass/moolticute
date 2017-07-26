@@ -98,3 +98,4 @@ void CredentialView::onChangeExpandedState()
     emit expandedStateChanged(m_bIsFullyExpanded);
 }
 
+

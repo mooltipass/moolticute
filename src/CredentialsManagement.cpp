@@ -284,8 +284,7 @@ void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex
     LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
     if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, ui->credDisplayPasswordInput->text(), ui->credDisplayDescriptionInput->text(), ui->credDisplayLoginInput->text());
-        ui->credentialTreeView->viewport()->setUpdatesEnabled(true);
-        ui->credentialTreeView->viewport()->repaint();
+        m_pCredModelFilter->invalidate();
     }
 }
 

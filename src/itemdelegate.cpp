@@ -20,11 +20,14 @@ QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
 {
     QSize defaultSize = QStyledItemDelegate::sizeHint(option, index);
 
-    const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
-    const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
-    const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
-    if ((pLoginItem != nullptr) && (pLoginItem->favorite() != Common::FAV_NOT_SET))
-        return QSize(defaultSize.width(), defaultSize.height()*2);
+    if (index.isValid())
+    {
+        const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
+        const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
+        const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
+        if ((pLoginItem != nullptr) && (pLoginItem->favorite() != Common::FAV_NOT_SET))
+            return QSize(defaultSize.width(), defaultSize.height()*2);
+    }
     return defaultSize;
 }
 
@@ -79,42 +82,53 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
 {
     if (pLoginItem != nullptr)
     {
-        QPen pen;
-        QString sDisplayedData = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
+        ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
 
-        qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
-        painter->setRenderHint(QPainter::Antialiasing, true);
+        if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
+        {
+            QPen pen;
+            QString sDisplayedData = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
 
-        QFont f = loginFont();
-        const QFontMetrics serviceMetrics = QFontMetrics{f};
+            qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
+            painter->setRenderHint(QPainter::Antialiasing, true);
 
-        QRect dstRect = option.rect;
-        int delta = 4;
-        QRect otherRect(dstRect.width()-serviceMetrics.width(sDisplayedData)-delta, dstRect.y()+(dstRect.height()-serviceMetrics.height())/2, serviceMetrics.width(sDisplayedData)+delta, dstRect.height());
+            QFont f = loginFont();
+            const QFontMetrics serviceMetrics = QFontMetrics{f};
 
-        pen.setColor(QColor("#666666"));
-        painter->setFont(f);
-        painter->setPen(pen);
-        painter->drawText(otherRect, sDisplayedData);
+            QRect dstRect = option.rect;
+            int delta = 4;
+            QRect otherRect(dstRect.width()-serviceMetrics.width(sDisplayedData)-delta, dstRect.y()+(dstRect.height()-serviceMetrics.height())/2, serviceMetrics.width(sDisplayedData)+delta, dstRect.height());
 
-        paintFavorite(painter, option, pLoginItem->favorite());
+            pen.setColor(QColor("#666666"));
+            painter->setFont(f);
+            painter->setPen(pen);
+            painter->drawText(otherRect, sDisplayedData);
+
+            paintFavorite(painter, option, pLoginItem->favorite());
+        }
     }
 }
 
 void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
-    const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
-    const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
-    const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
+    if (index.isValid())
+    {
+        const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
+        const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
+        const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
+        const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
 
-    painter->save();
-    if (pServiceItem != nullptr)
-        paintServiceItem(painter, option, pServiceItem);
-    else
-    if (pLoginItem != nullptr)
-        paintLoginItem(painter, option, pLoginItem);
-    painter->restore();
+        painter->save();
+        if ((pServiceItem != nullptr) && (!pServiceItem->isExpanded()))
+            paintServiceItem(painter, option, pServiceItem);
+        else
+            if (pLoginItem != nullptr) {
+                ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
+                if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
+                    paintLoginItem(painter, option, pLoginItem);
+            }
+        painter->restore();
+    }
 
     QStyledItemDelegate::paint(painter, option, index);
 }

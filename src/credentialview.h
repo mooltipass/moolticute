@@ -40,7 +40,6 @@ public slots:
     void onChangeExpandedState();
 
 private:
-    QModelIndex m_previousSelectedProxyIndex;
     bool m_bIsFullyExpanded;
 
 signals:
