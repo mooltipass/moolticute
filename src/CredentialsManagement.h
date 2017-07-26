@@ -32,6 +32,7 @@ class CredentialsManagement;
 class CredentialModel;
 class CredentialModelFilter;
 class LoginItem;
+class ServiceItem;
 
 class CredentialsManagement : public QWidget
 {
@@ -67,11 +68,14 @@ private slots:
     void onItemExpanded(const QModelIndex &proxyIndex);
     void onItemCollapsed(const QModelIndex &proxyIndex);
     void onExpandedStateChanged(bool bIsExpanded);
+    void onSelectionTimerTimeOut();
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);
     void clearLoginDescription(const QModelIndex &srcIndex);
+    QModelIndex getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex);
+    QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
 
 private:
     void changeCurrentFavorite(int iFavorite);
@@ -80,12 +84,15 @@ private:
     CredentialModelFilter *m_pCredModelFilter = nullptr;
     WSClient *wsClient = nullptr;
     bool deletingCred = false;
+    QTimer m_tSelectionTimer;
+    ServiceItem *m_pCurrentServiceItem;
 
 signals:
     void wantEnterMemMode();
     void wantSaveMemMode();
     void loginSelected(const QModelIndex &srcIndex);
     void serviceSelected(const QModelIndex &srcIndex);
+    void selectLoginItem(const QModelIndex &proxyIndex);
 };
 
 #endif // CREDENTIALSMANAGEMENT_H

@@ -33,10 +33,10 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
         return QVariant();
 
     // Cast to service item
-    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+    ServiceItem *pServiceItem = getServiceItemByIndex(idx);
 
     // Cast to login item
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+    LoginItem *pLoginItem = getLoginItemByIndex(idx);
 
     if (role == Qt::DisplayRole)
         return pItem->name();
@@ -243,10 +243,33 @@ QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName) 
     return QModelIndex();
 }
 
+QModelIndex CredentialModel::getLoginIndexByName(const QModelIndex &serviceIndex, const QString &sLoginName) const
+{
+    if (serviceIndex.isValid())
+    {
+        QModelIndexList lMatches = match(serviceIndex, Qt::DisplayRole, sLoginName, 1);
+        if (!lMatches.isEmpty())
+            return lMatches.first();
+    }
+
+    return QModelIndex();
+}
+
+LoginItem *CredentialModel::getLoginItemByIndex(const QModelIndex &idx) const
+{
+    return dynamic_cast<LoginItem *>(getItemByIndex(idx));
+}
+
+ServiceItem *CredentialModel::getServiceItemByIndex(const QModelIndex &idx) const
+{
+    return dynamic_cast<ServiceItem *>(getItemByIndex(idx));
+}
+
+
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName)
 {
     // Retrieve item
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(getItemByIndex(idx));
+    LoginItem *pLoginItem = getLoginItemByIndex(idx);
     if (pLoginItem != nullptr)
     {
         updateLoginItem(idx, PasswordRole, sPassword);
@@ -257,8 +280,7 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPa
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue)
 {
-    TreeItem *pItem = getItemByIndex(idx);
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+    LoginItem *pLoginItem = getLoginItemByIndex(idx);
     bool bChanged = false;
     if (pLoginItem != nullptr)
     {
@@ -427,8 +449,8 @@ void CredentialModel::removeCredential(const QModelIndex &idx)
             return;
 
         // Check what we have
-        ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
-        LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+        ServiceItem *pServiceItem = getServiceItemByIndex(idx);
+        LoginItem *pLoginItem = getLoginItemByIndex(idx);
         if ((pServiceItem == nullptr) && (pLoginItem == nullptr))
             return;
 

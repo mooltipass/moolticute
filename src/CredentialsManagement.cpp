@@ -29,7 +29,8 @@
 #include "ServiceItem.h"
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
-    QWidget(parent), ui(new Ui::CredentialsManagement)
+    QWidget(parent), ui(new Ui::CredentialsManagement),
+    m_pCurrentServiceItem(nullptr)
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentWidget(ui->pageLocked);
@@ -108,6 +109,10 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credentialTreeView, &CredentialView::collapsed, this, &CredentialsManagement::onItemCollapsed);
     connect(ui->pushButtonExpandAll, &QPushButton::clicked, ui->credentialTreeView, &CredentialView::onChangeExpandedState);
     connect(ui->credentialTreeView, &CredentialView::expandedStateChanged, this, &CredentialsManagement::onExpandedStateChanged);
+
+    m_tSelectionTimer.setInterval(50);
+    m_tSelectionTimer.setSingleShot(true);
+    connect(&m_tSelectionTimer, &QTimer::timeout, this, &CredentialsManagement::onSelectionTimerTimeOut, Qt::QueuedConnection);
 }
 
 CredentialsManagement::~CredentialsManagement()
@@ -181,13 +186,10 @@ void CredentialsManagement::requestPasswordForSelectedItem()
         return;
 
     // Retrieve src index
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
-
-    // Retrieve item
-    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(lIndexes.first());
 
     // Do we have a login item?
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+    LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
 
     // Request password
     if (pLoginItem != nullptr)
@@ -268,20 +270,17 @@ void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex
     QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
 
     // Retrieve src index
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
     if (!srcIndex.isValid())
     {
         QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
         if (lIndexes.size() != 1)
             return;
-        srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
+        srcIndex = getSourceIndexFromProxyIndex(lIndexes.first());
     }
 
-    // Retrieve item
-    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-
     // Do we have a login item?
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+    LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
     if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, ui->credDisplayPasswordInput->text(), ui->credDisplayDescriptionInput->text(), ui->credDisplayLoginInput->text());
         m_pCredModelFilter->invalidate();
@@ -294,7 +293,7 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
         return true;
 
     // Retrieve src index
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
     if (!srcIndex.isValid())
     {
         QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
@@ -302,14 +301,11 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
         if (lIndexes.size() != 1)
             return true;
 
-        srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
+        srcIndex = getSourceIndexFromProxyIndex(lIndexes.first());
     }
 
-    // Retrieve item
-    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-
     // Retrieve login item
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+    LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
 
     if (pLoginItem != nullptr)
     {
@@ -375,11 +371,10 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
         return;
 
     // Retrieve src index
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(lIndexes.first());
 
     // Retrieve login item
-    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+    LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
     if (pLoginItem != nullptr)
     {
         ui->credDisplayPasswordInput->setText(pLoginItem->password());
@@ -392,7 +387,7 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
 void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex)
 {
     // Retrieve src index
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
     if (!srcIndex.isValid())
     {
         QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
@@ -402,7 +397,7 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
             ui->pushButtonCancel->hide();
             ui->pushButtonConfirm->hide();
         }
-        else srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
+        else srcIndex = getSourceIndexFromProxyIndex(lIndexes.first());
     }
 
     if (!srcIndex.isValid())
@@ -412,11 +407,8 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
     }
     else
     {
-        // Retrieve item
-        TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-
         // Do we have a login item?
-        LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+        LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
 
         if (pLoginItem != nullptr)
         {
@@ -425,9 +417,10 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
             QString sDescription = ui->credDisplayDescriptionInput->text();
             QString sLogin = ui->credDisplayLoginInput->text();
 
-            if (sPassword != pLoginItem->password() ||
-                    sDescription != pLoginItem->description() ||
-                    sLogin != pLoginItem->name())
+            bool bPasswordCondition = !sPassword.isEmpty() && (sPassword != pLoginItem->password());
+            bool bDescriptionCondition = !sDescription.isEmpty() && (sDescription != pLoginItem->description());
+            bool bLoginCondition = !sLogin.isEmpty() && (sLogin != pLoginItem->name());
+            if (bPasswordCondition || bDescriptionCondition || bLoginCondition)
             {
                 ui->pushButtonCancel->show();
                 ui->pushButtonConfirm->show();
@@ -457,11 +450,10 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
         return;
 
     // Retrieve src index
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(lIndexes.first());
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(lIndexes.first());
 
     // Retrieve login item
-    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+    LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
 
     if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteRole, iFavorite);
@@ -480,11 +472,10 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
         return;
 
     // Retrieve src index
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(lIndexes.at(0));
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(lIndexes.at(0));
 
     // Retrieve login item
-    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+    LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
 
     if (pLoginItem != nullptr)
     {
@@ -510,18 +501,16 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
 void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, const QModelIndex &previous)
 {
     Q_UNUSED(previous)
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
     if (srcIndex.isValid())
     {
-        TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-
-        // A login item was selected
-        LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+        // Was a login item selected?
+        LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
         if (pLoginItem != nullptr)
             emit loginSelected(srcIndex);
         else {
             // A service item was selected
-            ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+            ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
             if (pServiceItem != nullptr)
                 emit serviceSelected(srcIndex);
         }
@@ -539,21 +528,18 @@ void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
 {
     ui->credDisplayFrame->setEnabled(false);
     clearLoginDescription(srcIndex);
-    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(m_pCredModel->getItemByIndex(srcIndex));
-    if ((pServiceItem != nullptr) && (pServiceItem->childCount() > 0))
-    {
-        LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pServiceItem->child(0));
-        if (pLoginItem != nullptr) {
-            ui->credDisplayFrame->setEnabled(true);
-            updateLoginDescription(pLoginItem);
-        }
+    ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
+    m_pCurrentServiceItem = nullptr;
+    if ((pServiceItem != nullptr) && (pServiceItem->childCount() > 0)) {
+        m_pCurrentServiceItem = pServiceItem;
+        m_tSelectionTimer.start();
     }
 }
 
 void CredentialsManagement::updateLoginDescription(const QModelIndex &srcIndex)
 {
     // Retrieve login item
-    LoginItem *pLoginItem = dynamic_cast<LoginItem *>(m_pCredModel->getItemByIndex(srcIndex));
+    LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
     updateLoginDescription(pLoginItem);
 }
 
@@ -577,8 +563,7 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
 
 void CredentialsManagement::clearLoginDescription(const QModelIndex &srcIndex)
 {
-    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+    ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
     if (pServiceItem != nullptr)
         ui->credDisplayServiceInput->setText(pServiceItem->name());
     ui->credDisplayLoginInput->setText("");
@@ -588,11 +573,20 @@ void CredentialsManagement::clearLoginDescription(const QModelIndex &srcIndex)
     ui->credDisplayModificationDateInput->setText("");
 }
 
+QModelIndex CredentialsManagement::getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex)
+{
+    return m_pCredModelFilter->mapToSource(proxyIndex);
+}
+
+QModelIndex CredentialsManagement::getProxyIndexFromSourceIndex(const QModelIndex &srcIndex)
+{
+    return m_pCredModelFilter->mapFromSource(srcIndex);
+}
+
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
 {
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
-    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
+    ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
     if (pServiceItem != nullptr)
         pServiceItem->setExpanded(false);
 }
@@ -602,11 +596,32 @@ void CredentialsManagement::onExpandedStateChanged(bool bIsExpanded)
     ui->pushButtonExpandAll->setText(bIsExpanded ? tr("Collapse All") : tr("Expand All"));
 }
 
+void CredentialsManagement::onSelectionTimerTimeOut()
+{
+    if (m_pCurrentServiceItem)
+    {
+        QModelIndex serviceIndex = m_pCredModel->getServiceIndexByName(m_pCurrentServiceItem->name());
+        if (serviceIndex.isValid())
+        {
+            QModelIndex proxyIndex = getProxyIndexFromSourceIndex(serviceIndex);
+            if (proxyIndex.isValid())
+            {
+                int nVisibleChilds = m_pCredModelFilter->rowCount(proxyIndex);
+                if (nVisibleChilds > 0)
+                {
+                    QModelIndex firstLoginIndex = proxyIndex.child(0, 0);
+                    if (firstLoginIndex.isValid())
+                        ui->credentialTreeView->setCurrentIndex(firstLoginIndex);
+                }
+            }
+        }
+    }
+}
+
 void CredentialsManagement::onItemExpanded(const QModelIndex &proxyIndex)
 {
-    QModelIndex srcIndex = m_pCredModelFilter->mapToSource(proxyIndex);
-    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
-    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
+    ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
     if (pServiceItem != nullptr)
         pServiceItem->setExpanded(true);
 }

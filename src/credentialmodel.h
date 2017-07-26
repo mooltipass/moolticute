@@ -46,6 +46,9 @@ public:
     void updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue);
     void clear();
     QModelIndex getServiceIndexByName(const QString &sServiceName) const;
+    QModelIndex getLoginIndexByName(const QModelIndex &serviceIndex, const QString &sLoginName) const;
+    LoginItem *getLoginItemByIndex(const QModelIndex &idx) const;
+    ServiceItem *getServiceItemByIndex(const QModelIndex &idx) const;
 
 private:
     ServiceItem *addService(const QString &sServiceName);
