@@ -119,14 +119,23 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
 
         painter->save();
+        QColor bkgColor("white");
+        if (pLoginItem != nullptr) {
+            if (index.row()%2 == 0)
+                bkgColor.setNamedColor("#DBECF6");
+            else
+                bkgColor.setNamedColor("white");
+        }
+        painter->fillRect(option.rect, bkgColor);
+
         if ((pServiceItem != nullptr) && (!pServiceItem->isExpanded()))
             paintServiceItem(painter, option, pServiceItem);
         else
-            if (pLoginItem != nullptr) {
-                ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
-                if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
-                    paintLoginItem(painter, option, pLoginItem);
-            }
+        if (pLoginItem != nullptr) {
+            ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
+            if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
+                paintLoginItem(painter, option, pLoginItem);
+        }
         painter->restore();
     }
 
