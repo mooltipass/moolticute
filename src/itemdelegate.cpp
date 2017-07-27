@@ -124,14 +124,14 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         if (pServiceItem != nullptr)
         {
             if (index.row()%2 == 0)
-                bkgColor.setNamedColor("#deffff");
+                bkgColor.setNamedColor("#eef7fa");
             else
                 bkgColor.setNamedColor("white");
         }
         else
         if (pLoginItem != nullptr) {
             if (index.parent().row()%2 == 0)
-                bkgColor.setNamedColor("#deffff");
+                bkgColor.setNamedColor("#eef7fa");
             else
                 bkgColor.setNamedColor("white");
         }
