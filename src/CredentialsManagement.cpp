@@ -79,6 +79,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     */
 
     connect(m_pCredModel, &CredentialModel::modelLoaded, ui->credentialTreeView, &CredentialView::onModelLoaded);
+    connect(m_pCredModel, &CredentialModel::modelLoaded, this, &CredentialsManagement::onModelLoaded);
     connect(ui->credentialTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &CredentialsManagement::onCredentialSelected);
     connect(this, &CredentialsManagement::loginSelected, this, &CredentialsManagement::onLoginSelected);
     connect(this, &CredentialsManagement::serviceSelected, this, &CredentialsManagement::onServiceSelected);
@@ -529,7 +530,7 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
 {
     ui->credDisplayFrame->setEnabled(false);
-    clearLoginDescription(srcIndex);
+    clearLoginDescription();
     ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
     m_pCurrentServiceItem = nullptr;
     if ((pServiceItem != nullptr) && (pServiceItem->childCount() > 0)) {
@@ -563,11 +564,9 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
     }
 }
 
-void CredentialsManagement::clearLoginDescription(const QModelIndex &srcIndex)
+void CredentialsManagement::clearLoginDescription()
 {
-    ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
-    if (pServiceItem != nullptr)
-        ui->credDisplayServiceInput->setText(pServiceItem->name());
+    ui->credDisplayServiceInput->setText("");
     ui->credDisplayLoginInput->setText("");
     ui->credDisplayPasswordInput->setText("");
     ui->credDisplayDescriptionInput->setText("");
@@ -618,6 +617,12 @@ void CredentialsManagement::onSelectionTimerTimeOut()
             }
         }
     }
+}
+
+void CredentialsManagement::onModelLoaded(bool bClearLoginDescription)
+{
+    if (bClearLoginDescription)
+        clearLoginDescription();
 }
 
 void CredentialsManagement::onItemExpanded(const QModelIndex &proxyIndex)
