@@ -57,7 +57,7 @@ private:
     RootItem *m_pRootItem;
 
 signals:
-    void modelLoaded();
+    void modelLoaded(bool bClearLoginDescription);
 };
 
 #endif // CREDENTIALMODEL_H

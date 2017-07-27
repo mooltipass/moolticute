@@ -69,11 +69,12 @@ private slots:
     void onItemCollapsed(const QModelIndex &proxyIndex);
     void onExpandedStateChanged(bool bIsExpanded);
     void onSelectionTimerTimeOut();
+    void onModelLoaded(bool bClearLoginDescription);
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);
-    void clearLoginDescription(const QModelIndex &srcIndex);
+    void clearLoginDescription();
     QModelIndex getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex);
     QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
 

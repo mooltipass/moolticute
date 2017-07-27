@@ -69,8 +69,9 @@ CredentialView::~CredentialView()
 
 }
 
-void CredentialView::onModelLoaded()
+void CredentialView::onModelLoaded(bool bClearLoginDescription)
 {
+    Q_UNUSED(bClearLoginDescription)
     QModelIndex firstServiceIndex = model()->index(0, 0, QModelIndex());
     if (firstServiceIndex.isValid())
         selectionModel()->setCurrentIndex(firstServiceIndex, QItemSelectionModel::ClearAndSelect);

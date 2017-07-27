@@ -35,7 +35,7 @@ public:
     virtual ~CredentialView();
 
 public slots:
-    void onModelLoaded();
+    void onModelLoaded(bool bClearLoginDescription);
     void onExpandItem(const QModelIndex &proxyIndex);
     void onChangeExpandedState();
 

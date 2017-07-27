@@ -220,7 +220,8 @@ void CredentialModel::load(const QJsonArray &json)
 
     endResetModel();
 
-    emit modelLoaded();
+    bool bClearLoginDescription = m_pRootItem->childCount() == 0;
+    emit modelLoaded(bClearLoginDescription);
 }
 
 ServiceItem *CredentialModel::addService(const QString &sServiceName)
