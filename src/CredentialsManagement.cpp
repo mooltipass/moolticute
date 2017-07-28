@@ -466,23 +466,41 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
     // Retrieve login item
     LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
 
-    if (pLoginItem != nullptr)
+    // Retrieve parent item
+    TreeItem *pParentItem = pLoginItem->parentItem();
+    if ((pLoginItem != nullptr) && (pParentItem != nullptr))
     {
+        // Get service index
+        QModelIndex serviceIndex = m_pCredModel->getServiceIndexByName(pLoginItem->parentItem()->name());
+        QModelIndex serviceProxyIndex = m_pCredModelFilter->mapFromSource(serviceIndex);
+        int iServiceRow = serviceProxyIndex.row();
+
         // Retrieve parent item
-        TreeItem *pParentItem = pLoginItem->parentItem();
-        if (pParentItem != nullptr) {
-            auto btn = QMessageBox::question(this,
-                                             tr("Delete?"),
-                                             tr("<i><b>%1</b></i>: Delete credential <i><b>%2</b></i>?").arg(pParentItem->name(), pLoginItem->name()),
-                                             QMessageBox::Yes |
-                                             QMessageBox::Cancel,
-                                             QMessageBox::Yes);
-            if (btn == QMessageBox::Yes)
+        auto btn = QMessageBox::question(this,
+                                         tr("Delete?"),
+                                         tr("<i><b>%1</b></i>: Delete credential <i><b>%2</b></i>?").arg(pParentItem->name(), pLoginItem->name()),
+                                         QMessageBox::Yes |
+                                         QMessageBox::Cancel,
+                                         QMessageBox::Yes);
+        if (btn == QMessageBox::Yes)
+        {
+            deletingCred = true;
+            bool bSelectNextAvailableLogin = m_pCredModel->removeCredential(srcIndex);
+            if (bSelectNextAvailableLogin)
             {
-                deletingCred = true;
-                m_pCredModel->removeCredential(srcIndex);
-                deletingCred = false;
+                int nVisibleChilds = m_pCredModelFilter->rowCount(QModelIndex());
+                if (nVisibleChilds > 0)
+                {
+                    if (iServiceRow > (nVisibleChilds-1))
+                        iServiceRow = nVisibleChilds-1;
+                    serviceIndex = m_pCredModelFilter->index(iServiceRow, 0, QModelIndex());
+
+                    QModelIndex firstLoginIndex = serviceIndex.child(0, 0);
+                    if (firstLoginIndex.isValid())
+                        ui->credentialTreeView->setCurrentIndex(firstLoginIndex);
+                }
             }
+            deletingCred = false;
         }
     }
 }
@@ -498,8 +516,8 @@ void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, 
         if (pLoginItem != nullptr)
             emit loginSelected(srcIndex);
         else
-        if (pServiceItem != nullptr)
-            emit serviceSelected(srcIndex);
+            if (pServiceItem != nullptr)
+                emit serviceSelected(srcIndex);
         updateSaveDiscardState(proxyIndex);
     }
 }
@@ -512,6 +530,9 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 
 void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
 {
+    TreeItem *pItem = m_pCredModel->getItemByIndex(srcIndex);
+    qDebug() << "YOU SELECTED " << pItem->name();
+
     ui->credDisplayFrame->setEnabled(false);
     clearLoginDescription();
 }

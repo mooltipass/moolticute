@@ -40,7 +40,7 @@ public:
     void setClearTextPassword(const QString &sServiceName, const QString &sLoginName, const QString &sPassword);
     QJsonArray getJsonChanges();
     void addCredential(const QString &sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription="");
-    void removeCredential(const QModelIndex &idx);
+    bool removeCredential(const QModelIndex &idx);
     TreeItem *getItemByIndex(const QModelIndex &idx) const;
     void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName);
     void updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue);

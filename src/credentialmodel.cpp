@@ -440,19 +440,20 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
     }
 }
 
-void CredentialModel::removeCredential(const QModelIndex &idx)
+bool CredentialModel::removeCredential(const QModelIndex &idx)
 {
+    bool bSelectNextAvailableLogin = false;
     if (idx.isValid())
     {
         TreeItem *pItem = getItemByIndex(idx);
         if (pItem == nullptr)
-            return;
+            return false;
 
         // Check what we have
         ServiceItem *pServiceItem = getServiceItemByIndex(idx);
         LoginItem *pLoginItem = getLoginItemByIndex(idx);
         if ((pServiceItem == nullptr) && (pLoginItem == nullptr))
-            return;
+            return false;
 
         if (pLoginItem != nullptr)
         {
@@ -474,10 +475,13 @@ void CredentialModel::removeCredential(const QModelIndex &idx)
                         if (m_pRootItem->removeOne(pServiceItem))
                             delete pServiceItem;
                         endRemoveRows();
+                        bSelectNextAvailableLogin = true;
                     }
                 }
             }
         }
     }
+
+    return bSelectNextAvailableLogin;
 }
 
