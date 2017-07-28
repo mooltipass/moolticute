@@ -29,8 +29,7 @@
 #include "ServiceItem.h"
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
-    QWidget(parent), ui(new Ui::CredentialsManagement),
-    m_pCurrentServiceItem(nullptr)
+    QWidget(parent), ui(new Ui::CredentialsManagement)
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentWidget(ui->pageLocked);
@@ -71,13 +70,6 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     m_pCredModelFilter->setSourceModel(m_pCredModel);
     ui->credentialTreeView->setModel(m_pCredModelFilter);
 
-    /*
-    delete ui->credentialTreeView->selectionModel();
-    ui->credentialTreeView->setSelectionModel(
-                new ConditionalItemSelectionModel(ConditionalItemSelectionModel::TestFunction(std::bind(&CredentialsManagement::confirmDiscardUneditedCredentialChanges, this, std::placeholders::_1)),
-                                                  m_pCredModelFilter));
-    */
-
     connect(m_pCredModel, &CredentialModel::modelLoaded, ui->credentialTreeView, &CredentialView::onModelLoaded);
     connect(m_pCredModel, &CredentialModel::modelLoaded, this, &CredentialsManagement::onModelLoaded);
     connect(ui->credentialTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &CredentialsManagement::onCredentialSelected);
@@ -110,10 +102,6 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credentialTreeView, &CredentialView::collapsed, this, &CredentialsManagement::onItemCollapsed);
     connect(ui->pushButtonExpandAll, &QPushButton::clicked, ui->credentialTreeView, &CredentialView::onChangeExpandedState);
     connect(ui->credentialTreeView, &CredentialView::expandedStateChanged, this, &CredentialsManagement::onExpandedStateChanged);
-
-    m_tSelectionTimer.setInterval(50);
-    m_tSelectionTimer.setSingleShot(true);
-    connect(&m_tSelectionTimer, &QTimer::timeout, this, &CredentialsManagement::onSelectionTimerTimeOut, Qt::QueuedConnection);
 }
 
 CredentialsManagement::~CredentialsManagement()
@@ -128,7 +116,6 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memoryDataChanged, [=]()
     {
         m_pCredModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
-        ui->credentialTreeView->collapseAll();
         ui->lineEditFilterCred->clear();
     });
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
@@ -458,7 +445,6 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
 
     if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteRole, iFavorite);
-        //m_pCredModelFilter->invalidate();
         ui->credentialTreeView->collapse(lIndexes.first().parent());
         ui->credentialTreeView->expand(lIndexes.first().parent());
     }
@@ -507,16 +493,13 @@ void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, 
     QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
     if (srcIndex.isValid())
     {
-        // Was a login item selected?
+        ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
         LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
         if (pLoginItem != nullptr)
             emit loginSelected(srcIndex);
-        else {
-            // A service item was selected
-            ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
-            if (pServiceItem != nullptr)
-                emit serviceSelected(srcIndex);
-        }
+        else
+        if (pServiceItem != nullptr)
+            emit serviceSelected(srcIndex);
         updateSaveDiscardState(proxyIndex);
     }
 }
@@ -531,12 +514,6 @@ void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
 {
     ui->credDisplayFrame->setEnabled(false);
     clearLoginDescription();
-    ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
-    m_pCurrentServiceItem = nullptr;
-    if ((pServiceItem != nullptr) && (pServiceItem->childCount() > 0)) {
-        m_pCurrentServiceItem = pServiceItem;
-        m_tSelectionTimer.start();
-    }
 }
 
 void CredentialsManagement::updateLoginDescription(const QModelIndex &srcIndex)
@@ -595,28 +572,6 @@ void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
 void CredentialsManagement::onExpandedStateChanged(bool bIsExpanded)
 {
     ui->pushButtonExpandAll->setText(bIsExpanded ? tr("Collapse All") : tr("Expand All"));
-}
-
-void CredentialsManagement::onSelectionTimerTimeOut()
-{
-    if (m_pCurrentServiceItem)
-    {
-        QModelIndex serviceIndex = m_pCredModel->getServiceIndexByName(m_pCurrentServiceItem->name());
-        if (serviceIndex.isValid())
-        {
-            QModelIndex proxyIndex = getProxyIndexFromSourceIndex(serviceIndex);
-            if (proxyIndex.isValid())
-            {
-                int nVisibleChilds = m_pCredModelFilter->rowCount(proxyIndex);
-                if (nVisibleChilds > 0)
-                {
-                    QModelIndex firstLoginIndex = proxyIndex.child(0, 0);
-                    if (firstLoginIndex.isValid())
-                        ui->credentialTreeView->setCurrentIndex(firstLoginIndex);
-                }
-            }
-        }
-    }
 }
 
 void CredentialsManagement::onModelLoaded(bool bClearLoginDescription)

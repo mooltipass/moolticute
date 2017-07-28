@@ -24,7 +24,6 @@
 
 // Application
 #include "WSClient.h"
-#include "CredentialsModel.h"
 
 namespace Ui {
 class CredentialsManagement;
@@ -32,7 +31,6 @@ class CredentialsManagement;
 class CredentialModel;
 class CredentialModelFilter;
 class LoginItem;
-class ServiceItem;
 
 class CredentialsManagement : public QWidget
 {
@@ -68,7 +66,6 @@ private slots:
     void onItemExpanded(const QModelIndex &proxyIndex);
     void onItemCollapsed(const QModelIndex &proxyIndex);
     void onExpandedStateChanged(bool bIsExpanded);
-    void onSelectionTimerTimeOut();
     void onModelLoaded(bool bClearLoginDescription);
 
 private:
@@ -85,8 +82,6 @@ private:
     CredentialModelFilter *m_pCredModelFilter = nullptr;
     WSClient *wsClient = nullptr;
     bool deletingCred = false;
-    QTimer m_tSelectionTimer;
-    ServiceItem *m_pCurrentServiceItem;
 
 signals:
     void wantEnterMemMode();

@@ -79,7 +79,7 @@ QString ServiceItem::logins() const
                 sName += "...";
             lLogins << sName;
             c++;
-            if (c > 9)
+            if (c > 10)
                 break;
         }
         sLogins = lLogins.join(", ");

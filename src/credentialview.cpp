@@ -6,62 +6,21 @@
 // Application
 #include "credentialview.h"
 #include "CredentialModelFilter.h"
+#include "CredentialModel.h"
 #include "ServiceItem.h"
 #include "ItemDelegate.h"
 
-ConditionalItemSelectionModel::ConditionalItemSelectionModel(TestFunction f, QAbstractItemModel *model)
-    : QItemSelectionModel(model)
-    , cb(f)
-    , lastRequestTime(0)
-{
-
-}
-
-ConditionalItemSelectionModel::~ConditionalItemSelectionModel()
-{
-
-}
-
-void ConditionalItemSelectionModel::select(const QModelIndex &index, QItemSelectionModel::SelectionFlags command)
-{
-    if (canChangeIndex()) {
-        QItemSelectionModel::select(index, command);
-    }
-}
-
-void ConditionalItemSelectionModel::select(const QItemSelection & selection, QItemSelectionModel::SelectionFlags command)
-{
-    if (canChangeIndex())
-        QItemSelectionModel::select(selection, command);
-}
-
-void  ConditionalItemSelectionModel::setCurrentIndex(const QModelIndex & index, QItemSelectionModel::SelectionFlags command)
-{
-    if (canChangeIndex())
-        QItemSelectionModel::setCurrentIndex(index, command);
-}
-
-bool ConditionalItemSelectionModel::canChangeIndex()
-{
-    if (!cb)
-        return true;
-    quint64 time = QDateTime::currentMSecsSinceEpoch();
-    if(time - lastRequestTime < 20 )
-        return false;
-    bool res = cb(currentIndex());
-    if (!res)
-        lastRequestTime = QDateTime::currentMSecsSinceEpoch();
-    return res;
-}
-
-
 CredentialView::CredentialView(QWidget *parent) : QTreeView(parent),
-    m_bIsFullyExpanded(false)
+    m_bIsFullyExpanded(false), m_pCurrentServiceItem(nullptr)
 {
+    m_tSelectionTimer.setInterval(50);
+    m_tSelectionTimer.setSingleShot(true);
+    connect(&m_tSelectionTimer, &QTimer::timeout, this, &CredentialView::onSelectionTimerTimeOut);
+
     setHeaderHidden(true);
     setItemDelegateForColumn(0, new ItemDelegate(this));
     setMinimumWidth(430);
-    connect(this, &CredentialView::clicked, this, &CredentialView::onExpandItem);
+    connect(this, &CredentialView::clicked, this, &CredentialView::onToggleExpandedState);
 }
 
 CredentialView::~CredentialView()
@@ -73,14 +32,29 @@ void CredentialView::onModelLoaded(bool bClearLoginDescription)
 {
     Q_UNUSED(bClearLoginDescription)
     QModelIndex firstServiceIndex = model()->index(0, 0, QModelIndex());
-    if (firstServiceIndex.isValid())
+    if (firstServiceIndex.isValid()) {
         selectionModel()->setCurrentIndex(firstServiceIndex, QItemSelectionModel::ClearAndSelect);
+        onToggleExpandedState(firstServiceIndex);
+    }
 }
 
-void CredentialView::onExpandItem(const QModelIndex &proxyIndex)
+void CredentialView::onToggleExpandedState(const QModelIndex &proxyIndex)
 {
-    if (!isExpanded(proxyIndex))
-        expand(proxyIndex);
+    CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
+    TreeItem *pItem = pCredModelFilter->getItemByProxyIndex(proxyIndex);
+    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
+    m_pCurrentServiceItem = nullptr;
+    if (pServiceItem != nullptr)
+    {
+        m_pCurrentServiceItem = pServiceItem;
+        if (!isExpanded(proxyIndex)) {
+            expand(proxyIndex);
+            if (pServiceItem->childCount() > 0)
+                m_tSelectionTimer.start();
+        }
+        else
+            collapse(proxyIndex);
+    }
 }
 
 void CredentialView::onChangeExpandedState()
@@ -93,4 +67,27 @@ void CredentialView::onChangeExpandedState()
     emit expandedStateChanged(m_bIsFullyExpanded);
 }
 
+void CredentialView::onSelectionTimerTimeOut()
+{
+    if ((m_pCurrentServiceItem != nullptr) && (m_pCurrentServiceItem->isExpanded()))
+    {
+        CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
+        CredentialModel *pCredModel = dynamic_cast<CredentialModel *>(pCredModelFilter->sourceModel());
+        QModelIndex serviceIndex = pCredModel->getServiceIndexByName(m_pCurrentServiceItem->name());
+        if (serviceIndex.isValid())
+        {
+            QModelIndex proxyIndex = pCredModelFilter->mapFromSource(serviceIndex);
+            if (proxyIndex.isValid())
+            {
+                int nVisibleChilds = pCredModelFilter->rowCount(proxyIndex);
+                if (nVisibleChilds > 0)
+                {
+                    QModelIndex firstLoginIndex = proxyIndex.child(0, 0);
+                    if (firstLoginIndex.isValid())
+                        setCurrentIndex(firstLoginIndex);
+                }
+            }
+        }
+    }
+}
 

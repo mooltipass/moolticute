@@ -29,7 +29,7 @@ public:
     };
 
     CredentialModel(QObject *parent=nullptr);
-    virtual ~CredentialModel();
+    ~CredentialModel();
     virtual QVariant data(const QModelIndex &idx, int role) const;
     virtual Qt::ItemFlags flags(const QModelIndex &idx) const;
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;

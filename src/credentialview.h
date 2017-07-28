@@ -3,28 +3,10 @@
 
 // Qt
 #include <QTreeView>
-#include <functional>
+#include <QTimer>
 
-class ConditionalItemSelectionModel : public QItemSelectionModel {
-
-    Q_OBJECT
-public:
-    using TestFunction = std::function<bool(const QModelIndex & idx)>;
-    ConditionalItemSelectionModel(TestFunction f, QAbstractItemModel *model =  nullptr);
-    virtual ~ConditionalItemSelectionModel();
-
-public Q_SLOTS:
-    void select(const QModelIndex &index, QItemSelectionModel::SelectionFlags command) override;
-    void select(const QItemSelection & selection, QItemSelectionModel::SelectionFlags command) override;
-    void setCurrentIndex(const QModelIndex & index, QItemSelectionModel::SelectionFlags command) override;
-
-private:
-    bool canChangeIndex();
-
-private:
-    TestFunction cb;
-    quint64 lastRequestTime;
-};
+// Application
+class ServiceItem;
 
 class CredentialView : public QTreeView
 {
@@ -32,15 +14,18 @@ class CredentialView : public QTreeView
 
 public:
     explicit CredentialView(QWidget *parent = nullptr);
-    virtual ~CredentialView();
+    ~CredentialView();
 
 public slots:
     void onModelLoaded(bool bClearLoginDescription);
-    void onExpandItem(const QModelIndex &proxyIndex);
+    void onToggleExpandedState(const QModelIndex &proxyIndex);
     void onChangeExpandedState();
+    void onSelectionTimerTimeOut();
 
 private:
     bool m_bIsFullyExpanded;
+    QTimer m_tSelectionTimer;
+    ServiceItem *m_pCurrentServiceItem;
 
 signals:
     void expandedStateChanged(bool bIsExpanded);
