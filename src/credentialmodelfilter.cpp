@@ -6,7 +6,7 @@
 
 CredentialModelFilter::CredentialModelFilter(QObject *parent) : QSortFilterProxyModel(parent)
 {
-    setDynamicSortFilter(false);
+    setDynamicSortFilter(true);
     sort(0);
 }
 
