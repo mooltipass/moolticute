@@ -355,6 +355,7 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &ro
 
 void CredentialModel::clear()
 {
+    qDebug() << "*** CLEAR ALL ITEMS FROM GUI ***";
     beginResetModel();
     m_pRootItem->clear();
     endResetModel();

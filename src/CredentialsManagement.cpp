@@ -158,8 +158,10 @@ void CredentialsManagement::on_buttonDiscard_clicked()
 
 void CredentialsManagement::on_buttonSaveChanges_clicked()
 {
+    qDebug() << m_pCredModel->getJsonChanges();
     wsClient->sendCredentialsMM(m_pCredModel->getJsonChanges());
     emit wantSaveMemMode(); //waits for the daemon to process the data
+    m_pCredModel->clear();
 }
 
 void CredentialsManagement::requestPasswordForSelectedItem()
