@@ -435,6 +435,7 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
         {
             beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
             LoginItem *pLoginItem = pAddedService->addLogin(sLoginName);
+            pLoginItem->setPasswordLocked(false);
             pLoginItem->setPassword(sPassword);
             pLoginItem->setDescription(sDescription);
             endInsertRows();
