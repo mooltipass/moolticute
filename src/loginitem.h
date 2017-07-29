@@ -24,12 +24,15 @@ public:
     void setPasswordOrig(const QString &setPassword);
     QJsonObject toJson() const;
     QString itemLabel() const;
+    void setPasswordLocked(bool bVisible);
+    bool passwordLocked() const;
 
 private:    
     QByteArray m_bAddress;
     qint8 m_iFavorite;
     QString m_sPassword;
     QString m_sPasswordOrig;
+    bool m_bPasswordLocked;
 };
 
 #endif // LOGINITEM_H

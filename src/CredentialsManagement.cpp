@@ -559,7 +559,7 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
             ui->credDisplayDescriptionInput->setText(pLoginItem->description());
             ui->credDisplayCreationDateInput->setText(pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayModificationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
-            ui->credDisplayPasswordInput->setLocked(true);
+            ui->credDisplayPasswordInput->setLocked(pLoginItem->passwordLocked());
         }
     }
 }

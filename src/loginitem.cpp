@@ -7,7 +7,7 @@
 #include "serviceitem.h"
 
 LoginItem::LoginItem(const QString &sLoginName) : TreeItem(sLoginName),
-    m_iFavorite(-1), m_sPassword(""), m_sPasswordOrig("")
+    m_iFavorite(-1), m_sPassword(""), m_sPasswordOrig(""), m_bPasswordLocked(true)
 {
 
 }
@@ -92,4 +92,14 @@ QString LoginItem::itemLabel() const
     if (!updatedDate().isNull())
         sTargetDate = updatedDate().toString(Qt::DefaultLocaleShortDate);
     return m_sName + QString(" (") + sTargetDate + QString(")");
+}
+
+void LoginItem::setPasswordLocked(bool bLocked)
+{
+    m_bPasswordLocked = bLocked;
+}
+
+bool LoginItem::passwordLocked() const
+{
+    return m_bPasswordLocked;
 }
