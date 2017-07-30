@@ -454,7 +454,7 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
 
     if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteRole, iFavorite);
-        ui->credentialTreeView->refreshLoginItem(srcIndex);
+        ui->credentialTreeView->refreshLoginItem(srcIndex, true);
     }
 }
 

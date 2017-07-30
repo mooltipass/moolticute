@@ -14,12 +14,12 @@
 ItemDelegate::ItemDelegate(QWidget* parent):
     QStyledItemDelegate(parent)
 {
+
 }
 
 QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QSize defaultSize = QStyledItemDelegate::sizeHint(option, index);
-
     if (index.isValid())
     {
         const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
@@ -165,4 +165,9 @@ QFont ItemDelegate::favFont() const
     QFont f = qApp->font();
     f.setPointSize(8);
     return f;
+}
+
+void ItemDelegate::emitSizeHintChanged(const QModelIndex &index)
+{
+    emit sizeHintChanged(index);
 }

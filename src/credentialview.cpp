@@ -9,16 +9,19 @@
 #include "CredentialModel.h"
 #include "ServiceItem.h"
 #include "ItemDelegate.h"
+#include "treeitem.h"
+#include "loginitem.h"
 
 CredentialView::CredentialView(QWidget *parent) : QTreeView(parent),
-    m_bIsFullyExpanded(false), m_pCurrentServiceItem(nullptr)
+    m_bIsFullyExpanded(false), m_pCurrentServiceItem(nullptr), m_pItemDelegate(nullptr)
 {
     m_tSelectionTimer.setInterval(50);
     m_tSelectionTimer.setSingleShot(true);
     connect(&m_tSelectionTimer, &QTimer::timeout, this, &CredentialView::onSelectionTimerTimeOut);
 
     setHeaderHidden(true);
-    setItemDelegateForColumn(0, new ItemDelegate(this));
+    m_pItemDelegate = new ItemDelegate(this);
+    setItemDelegateForColumn(0, m_pItemDelegate);
     setMinimumWidth(430);
     connect(this, &CredentialView::clicked, this, &CredentialView::onToggleExpandedState);
 }
@@ -28,10 +31,13 @@ CredentialView::~CredentialView()
 
 }
 
-void CredentialView::refreshLoginItem(const QModelIndex &srcIndex)
+void CredentialView::refreshLoginItem(const QModelIndex &srcIndex, bool bIsFavorite)
 {
     Q_UNUSED(srcIndex)
-    viewport()->repaint();
+    if (bIsFavorite)
+        m_pItemDelegate->emitSizeHintChanged(srcIndex);
+    else
+        viewport()->update();
 }
 
 void CredentialView::onModelLoaded(bool bClearLoginDescription)
@@ -96,4 +102,3 @@ void CredentialView::onSelectionTimerTimeOut()
         }
     }
 }
-

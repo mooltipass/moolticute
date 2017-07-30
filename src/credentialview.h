@@ -7,6 +7,7 @@
 
 // Application
 class ServiceItem;
+class ItemDelegate;
 
 class CredentialView : public QTreeView
 {
@@ -15,7 +16,7 @@ class CredentialView : public QTreeView
 public:
     explicit CredentialView(QWidget *parent = nullptr);
     ~CredentialView();
-    void refreshLoginItem(const QModelIndex &srcIndex);
+    void refreshLoginItem(const QModelIndex &srcIndex, bool bIsFavorite=false);
 
 public slots:
     void onModelLoaded(bool bClearLoginDescription);
@@ -27,6 +28,7 @@ private:
     bool m_bIsFullyExpanded;
     QTimer m_tSelectionTimer;
     ServiceItem *m_pCurrentServiceItem;
+    ItemDelegate *m_pItemDelegate;
 
 signals:
     void expandedStateChanged(bool bIsExpanded);
