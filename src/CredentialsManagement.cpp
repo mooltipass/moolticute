@@ -40,14 +40,12 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     ui->pushButtonEnterMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->addCredentialButton->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->buttonDiscard->setStyleSheet(CSS_GREY_BUTTON);
+    ui->buttonDiscard->setDefaultText(tr("Discard all changes"));
+    ui->buttonDiscard->setPressAndHoldText(tr("Hold to discard all changes"));
+
     ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
-
-    ui->pushButtonConfirm->setDefaultText(tr("Confirm changes"));
-    ui->pushButtonConfirm->setFixedWidth(108);
-    ui->pushButtonConfirm->setPressAndHoldText(tr("Hold to confirm"));
-    connect(ui->pushButtonConfirm, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_pushButtonConfirm_clicked);
+    ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonCancel->setDefaultText(tr("Discard changes"));
     ui->pushButtonCancel->setFixedWidth(108);
@@ -540,7 +538,7 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 
 void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
 {
-    Q_UNUSED(srcIndex)
+    Q_UNUSED(srcIndex);
     ui->credDisplayFrame->setEnabled(false);
     clearLoginDescription();
 }
