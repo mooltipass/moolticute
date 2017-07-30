@@ -5,6 +5,7 @@
 #include <QAbstractItemModel>
 #include <QJsonArray>
 #include <QDate>
+#include <QTimer>
 
 // Application
 #include "Common.h"
@@ -20,7 +21,7 @@ class CredentialModel : public QAbstractItemModel
 public:
     enum ItemRole
     {
-        ItemNameRole,
+        ItemNameRole=Qt::UserRole+1,
         PasswordRole,
         DescriptionRole,
         DateCreatedRole,
@@ -46,7 +47,6 @@ public:
     void updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue);
     void clear();
     QModelIndex getServiceIndexByName(const QString &sServiceName) const;
-    QModelIndex getLoginIndexByName(const QModelIndex &serviceIndex, const QString &sLoginName) const;
     LoginItem *getLoginItemByIndex(const QModelIndex &idx) const;
     ServiceItem *getServiceItemByIndex(const QModelIndex &idx) const;
 
@@ -58,6 +58,7 @@ private:
 
 signals:
     void modelLoaded(bool bClearLoginDescription);
+    void selectLoginItem(LoginItem *pLoginItem);
 };
 
 #endif // CREDENTIALMODEL_H

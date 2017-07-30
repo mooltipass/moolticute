@@ -24,9 +24,6 @@ CredentialModel::~CredentialModel()
 
 QVariant CredentialModel::data(const QModelIndex &idx, int role) const
 {
-    if ((role != Qt::DisplayRole) && (role != Qt::ForegroundRole) && (role != Qt::FontRole) && (role != Qt::DecorationRole))
-        return QVariant();
-
     // Get item (no need check index)
     TreeItem *pItem = getItemByIndex(idx);
     if (!pItem)
@@ -244,18 +241,6 @@ QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName) 
     return QModelIndex();
 }
 
-QModelIndex CredentialModel::getLoginIndexByName(const QModelIndex &serviceIndex, const QString &sLoginName) const
-{
-    if (serviceIndex.isValid())
-    {
-        QModelIndexList lMatches = match(serviceIndex, Qt::DisplayRole, sLoginName, 1);
-        if (!lMatches.isEmpty())
-            return lMatches.first();
-    }
-
-    return QModelIndex();
-}
-
 LoginItem *CredentialModel::getLoginItemByIndex(const QModelIndex &idx) const
 {
     return dynamic_cast<LoginItem *>(getItemByIndex(idx));
@@ -400,6 +385,7 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
 {
     // Retrieve target service
     ServiceItem *pTargetService = m_pRootItem->findServiceByName(sServiceName);
+    LoginItem *pAddedLoginItem = nullptr;
 
     // Check if a service/login pair already exists
     if (pTargetService != nullptr)
@@ -414,12 +400,11 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
             if (serviceIndex.isValid())
             {
                 beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
-                LoginItem *pLoginItem = pTargetService->addLogin(sLoginName);
-                pLoginItem->setPasswordLocked(false);
-                pLoginItem->setPassword(sPassword);
-                pLoginItem->setDescription(sDescription);
+                pAddedLoginItem = pTargetService->addLogin(sLoginName);
+                pAddedLoginItem->setPasswordLocked(false);
+                pAddedLoginItem->setPassword(sPassword);
+                pAddedLoginItem->setDescription(sDescription);
                 endInsertRows();
-                emit dataChanged(serviceIndex, serviceIndex);
             }
         }
     }
@@ -434,13 +419,16 @@ void CredentialModel::addCredential(const QString &sServiceName, const QString &
         if (serviceIndex.isValid())
         {
             beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
-            LoginItem *pLoginItem = pAddedService->addLogin(sLoginName);
-            pLoginItem->setPasswordLocked(false);
-            pLoginItem->setPassword(sPassword);
-            pLoginItem->setDescription(sDescription);
+            pAddedLoginItem = pAddedService->addLogin(sLoginName);
+            pAddedLoginItem->setPasswordLocked(false);
+            pAddedLoginItem->setPassword(sPassword);
+            pAddedLoginItem->setDescription(sDescription);
             endInsertRows();
         }
     }
+
+    if (pAddedLoginItem)
+        emit selectLoginItem(pAddedLoginItem);
 }
 
 bool CredentialModel::removeCredential(const QModelIndex &idx)
@@ -487,4 +475,5 @@ bool CredentialModel::removeCredential(const QModelIndex &idx)
 
     return bSelectNextAvailableLogin;
 }
+
 

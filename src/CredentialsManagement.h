@@ -67,6 +67,8 @@ private slots:
     void onItemCollapsed(const QModelIndex &proxyIndex);
     void onExpandedStateChanged(bool bIsExpanded);
     void onModelLoaded(bool bClearLoginDescription);
+    void onSelectLoginItem(LoginItem *pLoginItem);
+    void onSelectLoginTimerTimeOut();
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
@@ -82,6 +84,8 @@ private:
     CredentialModelFilter *m_pCredModelFilter = nullptr;
     WSClient *wsClient = nullptr;
     bool deletingCred = false;
+    QTimer m_tSelectLoginTimer;
+    LoginItem *m_pAddedLoginItem;
 
 signals:
     void wantEnterMemMode();

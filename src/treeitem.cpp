@@ -1,6 +1,5 @@
 // Qt
 #include <QStringList>
-#include <QUuid>
 #include <QDebug>
 
 // Application
@@ -140,4 +139,3 @@ void TreeItem::clear()
     qDeleteAll(m_vChilds);
     m_vChilds.clear();
 }
-
