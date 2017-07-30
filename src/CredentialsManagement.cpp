@@ -278,7 +278,7 @@ void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex
     LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
     if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, ui->credDisplayPasswordInput->text(), ui->credDisplayDescriptionInput->text(), ui->credDisplayLoginInput->text());
-        m_pCredModelFilter->invalidate();
+        ui->credentialTreeView->refreshLoginItem(srcIndex);
     }
 }
 
@@ -452,8 +452,7 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
 
     if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteRole, iFavorite);
-        ui->credentialTreeView->collapse(lIndexes.first().parent());
-        ui->credentialTreeView->expand(lIndexes.first().parent());
+        ui->credentialTreeView->refreshLoginItem(srcIndex);
     }
 }
 

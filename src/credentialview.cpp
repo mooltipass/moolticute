@@ -28,6 +28,12 @@ CredentialView::~CredentialView()
 
 }
 
+void CredentialView::refreshLoginItem(const QModelIndex &srcIndex)
+{
+    Q_UNUSED(srcIndex)
+    viewport()->repaint();
+}
+
 void CredentialView::onModelLoaded(bool bClearLoginDescription)
 {
     Q_UNUSED(bClearLoginDescription)

@@ -18,7 +18,7 @@ CredentialModelFilter::~CredentialModelFilter()
 void CredentialModelFilter::setFilter(const QString &sFilter)
 {
     m_sFilter = sFilter;
-    invalidate();
+    invalidateFilter();
 }
 
 TreeItem *CredentialModelFilter::getItemByProxyIndex(const QModelIndex &proxyIndex)
@@ -33,11 +33,6 @@ const TreeItem *CredentialModelFilter::getItemByProxyIndex(const QModelIndex &pr
     QModelIndex srcIndex = mapToSource(proxyIndex);
     CredentialModel *pSrcModel = dynamic_cast<CredentialModel *>(sourceModel());
     return pSrcModel->getItemByIndex(srcIndex);
-}
-
-void CredentialModelFilter::invalidate()
-{
-    QSortFilterProxyModel::invalidate();
 }
 
 bool CredentialModelFilter::filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const

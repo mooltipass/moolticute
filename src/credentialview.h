@@ -15,6 +15,7 @@ class CredentialView : public QTreeView
 public:
     explicit CredentialView(QWidget *parent = nullptr);
     ~CredentialView();
+    void refreshLoginItem(const QModelIndex &srcIndex);
 
 public slots:
     void onModelLoaded(bool bClearLoginDescription);
