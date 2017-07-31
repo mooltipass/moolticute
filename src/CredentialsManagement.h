@@ -19,63 +19,80 @@
 #ifndef CREDENTIALSMANAGEMENT_H
 #define CREDENTIALSMANAGEMENT_H
 
+// Qt
 #include <QtWidgets>
+
+// Application
 #include "WSClient.h"
-#include "CredentialsModel.h"
 
 namespace Ui {
 class CredentialsManagement;
 }
+class CredentialModel;
+class CredentialModelFilter;
+class LoginItem;
 
 class CredentialsManagement : public QWidget
 {
     Q_OBJECT
 
-public:
+public:    
     explicit CredentialsManagement(QWidget *parent = 0);
     ~CredentialsManagement();
-
     void setWsClient(WSClient *c);
 
-signals:
-    void wantEnterMemMode();
-    void wantSaveMemMode();
-
 public slots:
-    bool confirmDiscardUneditedCredentialChanges(QModelIndex idx = {});
+    bool confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex = {});
 
 private slots:
     void enableCredentialsManagement(bool);
     void updateQuickAddCredentialsButtonState();
-    void updateSaveDiscardState(QModelIndex idx = {});
-
-    void onPasswordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
-    void onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success);
-
-    void saveSelectedCredential(QModelIndex idx = {});
-
+    void onPasswordInputReturnPressed();
+    void updateSaveDiscardState(const QModelIndex &proxyIndex=QModelIndex());
+    void onPasswordUnlocked(const QString &service, const QString &login, const QString &password, bool success);
+    void onCredentialUpdated(const QString &service, const QString &login, const QString &description, bool success);
+    void saveSelectedCredential(const QModelIndex &proxyIndex=QModelIndex());
     void on_pushButtonEnterMMM_clicked();
     void on_buttonDiscard_clicked();
     void on_buttonSaveChanges_clicked();
-
     void requestPasswordForSelectedItem();
     void on_addCredentialButton_clicked();
-
     void on_pushButtonConfirm_clicked();
     void on_pushButtonCancel_clicked();
     void on_pushButtonDelete_clicked();
+    void onCredentialSelected(const QModelIndex &current, const QModelIndex &previous);
+    void onLoginSelected(const QModelIndex &srcIndex);
+    void onServiceSelected(const QModelIndex &srcIndex);
+    void onItemExpanded(const QModelIndex &proxyIndex);
+    void onItemCollapsed(const QModelIndex &proxyIndex);
+    void onExpandedStateChanged(bool bIsExpanded);
+    void onModelLoaded(bool bClearLoginDescription);
+    void onSelectLoginItem(LoginItem *pLoginItem);
+    void onSelectLoginTimerTimeOut();
 
 private:
-    void changeCurrentFavorite(int fav);
+    void updateLoginDescription(const QModelIndex &srcIndex);
+    void updateLoginDescription(LoginItem *pLoginItem);
+    void clearLoginDescription();
+    QModelIndex getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex);
+    QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
 
+private:
+    void changeCurrentFavorite(int iFavorite);
     Ui::CredentialsManagement *ui;
-
-    CredentialsModel *credModel = nullptr;
-    CredentialsFilterModel *credFilterModel = nullptr;
+    CredentialModel *m_pCredModel = nullptr;
+    CredentialModelFilter *m_pCredModelFilter = nullptr;
     WSClient *wsClient = nullptr;
-
-    //use when deleting a cred and not prompt user
     bool deletingCred = false;
+    QTimer m_tSelectLoginTimer;
+    LoginItem *m_pAddedLoginItem;
+
+signals:
+    void wantEnterMemMode();
+    void wantSaveMemMode();
+    void loginSelected(const QModelIndex &srcIndex);
+    void serviceSelected(const QModelIndex &srcIndex);
+    void selectLoginItem(const QModelIndex &proxyIndex);
 };
 
 #endif // CREDENTIALSMANAGEMENT_H

@@ -38,13 +38,28 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     wsClient(client),
     bFilesAndSSHKeyTabsVisible(false),
     bAdvancedTabVisible(false),
-    bFilesAndSSHKeysTabsVisibleOnDemand(true)
+    bFilesAndSSHKeysTabsVisibleOnDemand(true),
+    previousWidget(nullptr)
 {
+    QSettings s;
+    bFilesAndSSHKeysTabsVisibleOnDemand = s.value("settings/FilesAndSSHKeysTabsVisibleOnDemand").toBool();
+
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
                                 { "color-active", QColor(Qt::white) }};
 
     ui->setupUi(this);
+
+    m_tabMap[ui->pageAbout] = ui->pushButtonAbout;
+    m_tabMap[ui->pageAppSettings] = ui->pushButtonAppSettings;
+    m_tabMap[ui->pageSettings] = ui->pushButtonDevSettings;
+    m_tabMap[ui->pageAdvanced] = ui->pushButtonAdvanced;
+    m_tabMap[ui->pageCredentials] = ui->pushButtonCred;
+    m_tabMap[ui->pageSync] = ui->pushButtonSync;
+    m_tabMap[ui->pageFiles] = ui->pushButtonFiles;
+    m_tabMap[ui->pageSSH] = ui->pushButtonSSH;
+    connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::onCurrentTabChanged);
+
     ui->widgetCredentials->setWsClient(wsClient);
     ui->widgetFiles->setWsClient(wsClient);
     ui->widgetSSH->setWsClient(wsClient);
@@ -401,7 +416,6 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     checkAutoStart();
 
     //Check is ssh agent opt has to be checked
-    QSettings s;
     ui->checkBoxSSHAgent->setChecked(s.value("settings/auto_start_ssh").toBool());
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
@@ -682,12 +696,12 @@ void MainWindow::onFilesAndSSHTabsShortcutActivated()
     ui->pushButtonSSH->setVisible(bFilesAndSSHKeyTabsVisible);
 
     if (bFilesAndSSHKeyTabsVisible) {
-        ui->pushButtonFiles->setChecked(true);
-        ui->stackedWidget->setCurrentWidget(ui->pageFiles);
+        previousWidget = ui->stackedWidget->currentWidget();
     }
-    else {
-        ui->pushButtonCred->setChecked(true);
-        ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+    else
+    {
+        if (previousWidget != nullptr)
+            ui->stackedWidget->setCurrentWidget(previousWidget);
     }
 }
 
@@ -697,18 +711,32 @@ void MainWindow::onAdvancedTabShortcutActivated()
     ui->pushButtonAdvanced->setVisible(bAdvancedTabVisible);
 
     if (bAdvancedTabVisible) {
-        ui->pushButtonAdvanced->setChecked(true);
+        previousWidget = ui->stackedWidget->currentWidget();
         ui->stackedWidget->setCurrentWidget(ui->pageAdvanced);
     }
-    else {
-        ui->pushButtonAppSettings->setChecked(true);
-        ui->stackedWidget->setCurrentWidget(ui->pageSettings);
+    else
+    {
+        if ((previousWidget != nullptr) && (previousWidget != ui->pageFiles) && (previousWidget != ui->pageSSH))
+            ui->stackedWidget->setCurrentWidget(previousWidget);
+        else
+            ui->stackedWidget->setCurrentWidget(ui->pageSettings);
     }
 }
 
 void MainWindow::onRadioButtonFilesAndSSHKeysTabsAlwaysVisibleToggled(bool bChecked)
 {
-    setFilesAndSSHKeysTabsVisibleOnDemand(!bChecked, true);
+    setFilesAndSSHKeysTabsVisibleOnDemand(!bChecked);
+}
+
+void MainWindow::onCurrentTabChanged(int)
+{
+    QWidget *pCurrentWidget = ui->stackedWidget->currentWidget();
+    if (pCurrentWidget != nullptr)
+    {
+        QPushButton *pButton = m_tabMap[pCurrentWidget];
+        if (pButton != nullptr)
+            pButton->setChecked(true);
+    }
 }
 
 void MainWindow::wantEnterCredentialManagement()
@@ -798,9 +826,13 @@ void MainWindow::checkAutoStart()
         ui->pushButtonAutoStart->setText(tr("Enable"));
 }
 
-void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdateAdvancedTabVisibility)
+void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue)
 {
     bFilesAndSSHKeysTabsVisibleOnDemand = bValue;
+
+    // Save in settings
+    QSettings s;
+    s.setValue("settings/FilesAndSSHKeysTabsVisibleOnDemand", bValue);
 
     // Files and SSH keys tabs will show up only after activating the CTRL+SHIFT+F1 shortcut
     if (bFilesAndSSHKeysTabsVisibleOnDemand) {
@@ -815,18 +847,6 @@ void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue, bool bUpdate
 
     ui->pushButtonFiles->setVisible(bFilesAndSSHKeyTabsVisible);
     ui->pushButtonSSH->setVisible(bFilesAndSSHKeyTabsVisible);
-
-    if (bFilesAndSSHKeyTabsVisible) {
-        ui->pushButtonFiles->setChecked(true);
-        ui->stackedWidget->setCurrentWidget(ui->pageFiles);
-    }
-    else {
-        ui->pushButtonCred->setChecked(true);
-        ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
-    }
-
-    if (bUpdateAdvancedTabVisibility)
-        onAdvancedTabShortcutActivated();
 }
 
 void MainWindow::daemonLogAppend(const QByteArray &logdata)
