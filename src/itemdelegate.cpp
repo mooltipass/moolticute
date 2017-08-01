@@ -6,9 +6,9 @@
 #include <QFontMetrics>
 
 // Application
-#include "ItemDelegate.h"
-#include "ServiceItem.h"
-#include "LoginItem.h"
+#include "itemdelegate.h"
+#include "serviceitem.h"
+#include "loginitem.h"
 #include "AppGui.h"
 
 ItemDelegate::ItemDelegate(QWidget* parent):

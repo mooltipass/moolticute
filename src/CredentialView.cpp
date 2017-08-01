@@ -4,11 +4,11 @@
 #include <QDebug>
 
 // Application
-#include "credentialview.h"
-#include "CredentialModelFilter.h"
-#include "CredentialModel.h"
-#include "ServiceItem.h"
-#include "ItemDelegate.h"
+#include "CredentialView.h"
+#include "credentialmodelfilter.h"
+#include "credentialmodel.h"
+#include "serviceitem.h"
+#include "itemdelegate.h"
 #include "treeitem.h"
 #include "loginitem.h"
 
