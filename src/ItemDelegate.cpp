@@ -1,5 +1,5 @@
 // Qt
-#include "credentialmodelfilter.h"
+#include "CredentialModelFilter.h"
 #include <QApplication>
 #include <QPen>
 #include <QPainter>

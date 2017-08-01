@@ -17,7 +17,7 @@ AnimatedColorButton::AnimatedColorButton(QWidget *parent, const QString &sStartC
 {
     m_tTimer.setSingleShot(true);
     m_tTimer.setInterval(iAnimationDuration);
-    connect(&m_tTimer, QTimer::timeout, this, &AnimatedColorButton::onTimeOut);
+    connect(&m_tTimer, &QTimer::timeout, this, &AnimatedColorButton::onTimeOut);
 
     m_cStartColor.setNamedColor(sStartColor);
     m_cEndColor.setNamedColor(sEndColor);

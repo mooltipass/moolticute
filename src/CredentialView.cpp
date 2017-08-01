@@ -4,13 +4,13 @@
 #include <QDebug>
 
 // Application
-#include "credentialview.h"
+#include "CredentialView.h"
 #include "CredentialModelFilter.h"
 #include "CredentialModel.h"
 #include "ServiceItem.h"
 #include "ItemDelegate.h"
-#include "treeitem.h"
-#include "loginitem.h"
+#include "TreeItem.h"
+#include "LoginItem.h"
 
 CredentialView::CredentialView(QWidget *parent) : QTreeView(parent),
     m_bIsFullyExpanded(false), m_pCurrentServiceItem(nullptr), m_pItemDelegate(nullptr)

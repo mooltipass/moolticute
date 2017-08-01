@@ -3,8 +3,8 @@
 #include <QDebug>
 
 // Application
-#include "loginitem.h"
-#include "serviceitem.h"
+#include "LoginItem.h"
+#include "ServiceItem.h"
 
 LoginItem::LoginItem(const QString &sLoginName) : TreeItem(sLoginName),
     m_iFavorite(-1), m_sPassword(""), m_sPasswordOrig(""), m_bPasswordLocked(true)

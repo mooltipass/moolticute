@@ -3,7 +3,7 @@
 #include <QDebug>
 
 // Application
-#include "treeitem.h"
+#include "TreeItem.h"
 
 TreeItem::TreeItem(const QString &sName,
     const QDate &dCreatedDate, const QDate &dUpdatedDate, const QString &sDescription) :

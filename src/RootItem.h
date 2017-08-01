@@ -2,7 +2,7 @@
 #define ROOTITEM_H
 
 // Application
-#include "treeitem.h"
+#include "TreeItem.h"
 class ServiceItem;
 
 class RootItem : public TreeItem

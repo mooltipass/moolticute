@@ -32,15 +32,15 @@ SOURCES += src/main_gui.cpp \
     src/zxcvbn-c/zxcvbn.c \
     src/FilesManagement.cpp \
     src/SSHManagement.cpp \
+    src/CredentialView.cpp \
     src/CredentialModel.cpp \
     src/CredentialModelFilter.cpp \
-    src/CredentialView.cpp \
-    src/RootItem.cpp \
-    src/ServiceItem.cpp \
-    src/TreeItem.cpp \
-    src/AnimatedColorButton.cpp \
     src/ItemDelegate.cpp \
-    src/loginitem.cpp
+    src/LoginItem.cpp \
+    src/TreeItem.cpp \
+    src/ServiceItem.cpp \
+    src/RootItem.cpp \
+    src/AnimatedColorButton.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -60,15 +60,15 @@ HEADERS  += src/MainWindow.h \
     src/zxcvbn-c/zxcvbn.h \
     src/FilesManagement.h \
     src/SSHManagement.h \
-    src/CredentialModel.h \
-    src/CredentialModelFilter.h \
     src/CredentialView.h \
-    src/LoginItem.h \
-    src/RootItem.h \
     src/ServiceItem.h \
     src/TreeItem.h \
-    src/AnimatedColorButton.h \
-    src/ItemDelegate.h
+    src/RootItem.h \
+    src/LoginItem.h \
+    src/ItemDelegate.h \
+    src/CredentialModel.h \
+    src/CredentialModelFilter.h \
+    src/AnimatedColorButton.h
 
 mac {
     HEADERS += src/MacUtils.h

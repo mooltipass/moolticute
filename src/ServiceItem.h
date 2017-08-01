@@ -2,7 +2,7 @@
 #define SERVICEITEM_H
 
 // Application
-#include "treeitem.h"
+#include "TreeItem.h"
 class LoginItem;
 
 class ServiceItem : public TreeItem
