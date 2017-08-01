@@ -3,7 +3,7 @@
 #include <QPropertyAnimation>
 
 // Application
-#include "animatedcolorbutton.h"
+#include "AnimatedColorButton.h"
 #include "Common.h"
 
 AnimatedColorButton::AnimatedColorButton(QWidget *parent, const QString &sStartColor, const QString &sEndColor,

@@ -1,6 +1,6 @@
 // Application
-#include "serviceitem.h"
-#include "loginitem.h"
+#include "ServiceItem.h"
+#include "LoginItem.h"
 
 ServiceItem::ServiceItem(const QString &sServiceName) : TreeItem(sServiceName),
     m_bIsExpanded(false)

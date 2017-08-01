@@ -1,14 +1,14 @@
 // Qt
-#include "credentialmodelfilter.h"
+#include "CredentialModelFilter.h"
 #include <QApplication>
 #include <QPen>
 #include <QPainter>
 #include <QFontMetrics>
 
 // Application
-#include "itemdelegate.h"
-#include "serviceitem.h"
-#include "loginitem.h"
+#include "ItemDelegate.h"
+#include "ServiceItem.h"
+#include "LoginItem.h"
 #include "AppGui.h"
 
 ItemDelegate::ItemDelegate(QWidget* parent):

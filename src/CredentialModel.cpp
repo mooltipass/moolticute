@@ -5,11 +5,11 @@
 #include <QFont>
 
 // Application
-#include "credentialmodel.h"
-#include "rootitem.h"
-#include "serviceitem.h"
-#include "loginitem.h"
-#include "treeitem.h"
+#include "CredentialModel.h"
+#include "RootItem.h"
+#include "ServiceItem.h"
+#include "LoginItem.h"
+#include "TreeItem.h"
 #include "AppGui.h"
 
 CredentialModel::CredentialModel(QObject *parent) : QAbstractItemModel(parent)

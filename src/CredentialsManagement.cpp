@@ -19,14 +19,14 @@
 
 // Application
 #include "CredentialsManagement.h"
-#include "credentialmodel.h"
-#include "credentialmodelfilter.h"
+#include "CredentialModel.h"
+#include "CredentialModelFilter.h"
 #include "ui_CredentialsManagement.h"
 #include "Common.h"
 #include "AppGui.h"
-#include "treeitem.h"
-#include "loginitem.h"
-#include "serviceitem.h"
+#include "TreeItem.h"
+#include "LoginItem.h"
+#include "ServiceItem.h"
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
