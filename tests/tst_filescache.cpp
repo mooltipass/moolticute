@@ -22,7 +22,7 @@ TestsFilesCache::TestsFilesCache()
 void TestsFilesCache::testSaveAndLoadFileNames()
 {
     QStringList testFileNames = {"one", "two", "three"};
-    FilesCache cache("testCardCPZ");
+    FilesCache cache(Q_UINT64_C(0x0c2ad4a4acb9f023), "testCardCPZ");
 
     bool result = cache.save(testFileNames);
     QVERIFY(result);

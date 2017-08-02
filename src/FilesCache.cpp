@@ -6,12 +6,16 @@
 #include <QStandardPaths>
 #include <QCryptographicHash>
 
-FilesCache::FilesCache(QString cardCPZ, QObject *parent) : QObject(parent), m_cardCPZ(cardCPZ)
+FilesCache::FilesCache(qint64 uid, QByteArray cardCPZ, QObject *parent) : QObject(parent), m_cardCPZ(cardCPZ)
 {
-    QString fileName = QCryptographicHash::hash(m_cardCPZ.toLocal8Bit(), QCryptographicHash::Sha256);
+    QString fileName = QCryptographicHash::hash(m_cardCPZ, QCryptographicHash::Sha256);
 
     QDir dataDir(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
     m_filePath = dataDir.absoluteFilePath(fileName);
+
+    m_key = uid;
+    m_simpleCrypt.setKey(m_key);
+    m_simpleCrypt.setIntegrityProtectionMode(SimpleCrypt::ProtectionHash);
 }
 
 bool FilesCache::save(QStringList fileNames)
@@ -22,7 +26,7 @@ bool FilesCache::save(QStringList fileNames)
 
     QTextStream out(&file);
     for (auto fileName : fileNames)
-        out << fileName << '\n';
+        out << m_simpleCrypt.encryptToString(fileName) << '\n';
 
     return true;
 }
@@ -38,7 +42,7 @@ QStringList FilesCache::load()
 
     QTextStream in(&file);
     while (!in.atEnd()) {
-        QString line = in.readLine();
+        QString line = m_simpleCrypt.decryptToString(in.readLine());
         fileNames << line.trimmed();
     }
 

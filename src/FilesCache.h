@@ -2,12 +2,13 @@
 #define FILESCACHE_H
 
 #include <QObject>
+#include "SimpleCrypt/SimpleCrypt.h"
 
 class FilesCache : public QObject
 {
     Q_OBJECT
 public:
-    explicit FilesCache(QString cardCPZ, QObject *parent = nullptr);
+    explicit FilesCache(qint64 uid, QByteArray cardCPZ, QObject *parent = nullptr);
 
 signals:
 
@@ -17,8 +18,10 @@ public slots:
     bool erase();
 
 private:
-    QString m_cardCPZ;
+    QByteArray m_cardCPZ;
     QString m_filePath;
+    qint64 m_key;
+    SimpleCrypt m_simpleCrypt;
 };
 
 #endif // FILESCACHE_H

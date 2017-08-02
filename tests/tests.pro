@@ -28,9 +28,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     tst_filescache.cpp \
+    ../src/SimpleCrypt/SimpleCrypt.cpp \
     ../src/FilesCache.cpp
 
 HEADERS += \
+    ../src/SimpleCrypt/SimpleCrypt.h \
     ../src/FilesCache.h
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
