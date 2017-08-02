@@ -1,11 +1,14 @@
 #include "FilesCache.h"
 
+#include <algorithm>
+
 #include <QDir>
 #include <QFile>
 #include <QDebug>
 #include <QTextStream>
 #include <QStandardPaths>
 #include <QCryptographicHash>
+
 
 FilesCache::FilesCache(QByteArray cardCPZ, QObject *parent) : QObject(parent), m_cardCPZ(cardCPZ)
 {
@@ -14,12 +17,10 @@ FilesCache::FilesCache(QByteArray cardCPZ, QObject *parent) : QObject(parent), m
     QDir dataDir(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
     m_filePath = dataDir.absoluteFilePath(fileName);
 
-    bool ok;
-    m_key = cardCPZ.toLongLong(&ok, 16);
-    if (!ok) {
-        qWarning() << "Unable to generate the encryption key, using fallback.";
-        m_key = Q_UINT64_C(0x0c2ad4a4acb9f023);
-    }
+//    bool ok;
+    qint64 m_key = 0;
+    for (int i = 0; i < std::min(8, cardCPZ.size()) ; i ++)
+        m_key += (static_cast<unsigned int>(cardCPZ[i]) & 0xFF) << (i*8);
 
     m_simpleCrypt.setKey(m_key);
     m_simpleCrypt.setIntegrityProtectionMode(SimpleCrypt::ProtectionHash);

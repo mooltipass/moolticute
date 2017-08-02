@@ -21,13 +21,17 @@ TestsFilesCache::TestsFilesCache()
 
 void TestsFilesCache::testSaveAndLoadFileNames()
 {
-    QStringList testFileNames = {"one", "two", "three"};
-    FilesCache cache(Q_UINT64_C(0x0c2ad4a4acb9f023), "testCardCPZ");
+    QList<QPair<int, QString>> testFileNames;
+    testFileNames << QPair<int, QString>(3, "one");
+    testFileNames << QPair<int, QString>(1, "two");
+    testFileNames << QPair<int, QString>(3, "three");
+
+    FilesCache cache("cbe9cad108aad501");
 
     bool result = cache.save(testFileNames);
     QVERIFY(result);
 
-    QStringList fileNamesInCache = cache.load();
+    QList<QPair<int, QString>> fileNamesInCache = cache.load();
 
     QVERIFY(fileNamesInCache.size() == 3);
     for (int i = 0; i < testFileNames.size(); i ++)
