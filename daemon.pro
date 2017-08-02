@@ -60,7 +60,8 @@ SOURCES += src/main_daemon.cpp \
     src/http-parser/http_parser.c \
     src/HttpClient.cpp \
     src/HttpServer.cpp \
-    src/MooltipassCmds.cpp
+    src/MooltipassCmds.cpp \
+    src/FilesCache.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -77,7 +78,8 @@ HEADERS  += \
     src/MPDevice_emul.h \
     src/http-parser/http_parser.h \
     src/HttpClient.h \
-    src/HttpServer.h
+    src/HttpServer.h \
+    src/FilesCache.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \
