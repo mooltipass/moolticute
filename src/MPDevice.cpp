@@ -263,6 +263,18 @@ void MPDevice::runAndDequeueJobs()
     currentJobs->start();
 }
 
+void MPDevice::updateFilesCache()
+{
+    getStoredFiles([=](bool success, QStringList fileNames) {
+        QList<QPair<int, QString>> list;
+        for (auto fileName: fileNames)
+            list.append(QPair<int, QString>(0, fileName));
+
+        if (success)
+            filesCache.save(list);
+    });
+}
+
 bool MPDevice::isJobsQueueBusy()
 {
     return currentJobs;
@@ -6129,11 +6141,19 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
 
 QStringList MPDevice::getFilesCache()
 {
-    QStringList list = {"just one"};
     auto files = filesCache.load();
+    QStringList names;
+    // TODO: REMOVE!!!
+    names << "file 1" << "file 2";
     for (auto fileCache : files)
-    {
-        list.append(fileCache.second);
-    }
-    return list;
+        names.append(fileCache.second);
+    return names;
+}
+
+void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
+{
+    // TODO: IMPLEMENT
+    qWarning() << "NOT IMPLEMENTE YET";
+    QStringList list = {"testing 1", "testing 2"};
+    cb(true, list);
 }
