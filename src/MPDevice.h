@@ -25,6 +25,7 @@
 #include "QtHelper.h"
 #include "AsyncJobs.h"
 #include "MPNode.h"
+#include "FilesCache.h"
 
 typedef std::function<void(bool success, const QByteArray &data, bool &done)> MPCommandCb;
 
@@ -375,6 +376,8 @@ private:
     int progressCurrent;
     int progressCurrentLogin;
     int progressCurrentData;
+
+    FilesCache filesCache;
 };
 
 #endif // MPDEVICE_H

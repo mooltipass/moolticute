@@ -3363,6 +3363,7 @@ void MPDevice::getCurrentCardCPZ()
         {
             set_cardCPZ(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
             qDebug() << "Card CPZ: " << get_cardCPZ().toHex();
+            filesCache.setCardCPZ(get_cardCPZ());
             return true;
         }
     }));
@@ -6128,6 +6129,11 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
 
 QStringList MPDevice::getFilesCache()
 {
-    QStringList filesCache = {"one", "two", "tree"};
-    return filesCache;
+    QStringList list = {"just one"};
+    auto files = filesCache.load();
+    for (auto fileCache : files)
+    {
+        list.append(fileCache.second);
+    }
+    return list;
 }

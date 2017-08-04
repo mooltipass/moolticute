@@ -10,20 +10,13 @@
 #include <QCryptographicHash>
 
 
-FilesCache::FilesCache(QByteArray cardCPZ, QObject *parent) : QObject(parent), m_cardCPZ(cardCPZ)
+FilesCache::FilesCache(QObject *parent) : QObject(parent)
 {
-    QString fileName = QCryptographicHash::hash(m_cardCPZ, QCryptographicHash::Sha256);
+}
 
-    QDir dataDir(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
-    m_filePath = dataDir.absoluteFilePath(fileName);
-
-//    bool ok;
-    qint64 m_key = 0;
-    for (int i = 0; i < std::min(8, cardCPZ.size()) ; i ++)
-        m_key += (static_cast<unsigned int>(cardCPZ[i]) & 0xFF) << (i*8);
-
-    m_simpleCrypt.setKey(m_key);
-    m_simpleCrypt.setIntegrityProtectionMode(SimpleCrypt::ProtectionHash);
+QByteArray FilesCache::cardCPZ() const
+{
+    return m_cardCPZ;
 }
 
 bool FilesCache::save(QList<QPair<int, QString>> files)
@@ -64,4 +57,27 @@ bool FilesCache::erase()
 {
     QFile file(m_filePath);
     return file.remove();
+}
+
+void FilesCache::setCardCPZ(QByteArray cardCPZ)
+{
+    if (m_cardCPZ == cardCPZ)
+        return;
+
+    m_cardCPZ = cardCPZ;
+
+
+    QString fileName = QCryptographicHash::hash(m_cardCPZ, QCryptographicHash::Sha256);
+
+    QDir dataDir(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
+    m_filePath = dataDir.absoluteFilePath(fileName);
+
+    qint64 m_key = 0;
+    for (int i = 0; i < std::min(8, cardCPZ.size()) ; i ++)
+        m_key += (static_cast<unsigned int>(cardCPZ[i]) & 0xFF) << (i*8);
+
+    m_simpleCrypt.setKey(m_key);
+    m_simpleCrypt.setIntegrityProtectionMode(SimpleCrypt::ProtectionHash);
+
+    emit cardCPZChanged(m_cardCPZ);
 }

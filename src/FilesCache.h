@@ -10,16 +10,20 @@
 class FilesCache : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QByteArray cardCPZ READ cardCPZ WRITE setCardCPZ NOTIFY cardCPZChanged)
 public:
-    explicit FilesCache(QByteArray cardCPZ, QObject *parent = nullptr);
-
+    explicit FilesCache(QObject *parent = nullptr);
+    QByteArray cardCPZ() const;
 signals:
+
+    void cardCPZChanged(QByteArray cardCPZ);
 
 public slots:
     bool save(QList<QPair<int, QString>> files);
     QList<QPair<int, QString>> load();
     bool erase();
 
+    void setCardCPZ(QByteArray cardCPZ);
 private:
     QByteArray m_cardCPZ;
     QString m_filePath;

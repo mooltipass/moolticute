@@ -26,7 +26,8 @@ void TestsFilesCache::testSaveAndLoadFileNames()
     testFileNames << QPair<int, QString>(1, "two");
     testFileNames << QPair<int, QString>(3, "three");
 
-    FilesCache cache("cbe9cad108aad501");
+    FilesCache cache;
+    cache.setCardCPZ("cbe9cad108aad501");
 
     bool result = cache.save(testFileNames);
     QVERIFY(result);
