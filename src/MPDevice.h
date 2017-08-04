@@ -216,6 +216,8 @@ private slots:
 
     // TODO: Call from a context were is possible to read the stored file names
     void updateFilesCache();
+    void addFileToCache(QString fileName);
+    void removeFileFromCache(QString fileName);
 
 private:
     /* Platform function for starting a read, should be implemented in platform class */

@@ -275,6 +275,28 @@ void MPDevice::updateFilesCache()
     });
 }
 
+void MPDevice::addFileToCache(QString fileName)
+{
+    auto cache = filesCache.load();
+    cache.append(QPair<int,QString>(0, fileName));
+
+    filesCache.save(cache);
+}
+
+void MPDevice::removeFileFromCache(QString fileName)
+{
+    auto cache = filesCache.load();
+    int i = 0;
+    for (; i < cache.length(); i++)
+        if (cache.at(i).second.compare(fileName) == 0)
+            break;
+
+    if (i < cache.length())
+        cache.removeAt(i);
+
+    filesCache.save(cache);
+}
+
 bool MPDevice::isJobsQueueBusy()
 {
     return currentJobs;
