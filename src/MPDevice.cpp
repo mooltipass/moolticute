@@ -6125,3 +6125,9 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
         cb(false, errorString);
     }
 }
+
+QStringList MPDevice::getFilesCache()
+{
+    QStringList filesCache = {"one", "two", "tree"};
+    return filesCache;
+}

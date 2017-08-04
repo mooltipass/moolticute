@@ -248,6 +248,11 @@ void WSClient::onTextMessageReceived(const QString &message)
         if (!success)
             emit memMgmtModeFailed(o["error_code"].toInt(), o["error_message"].toString());
     }
+    else if (rootobj["msg"] == "list_files_cache")
+    {
+        filesCache = rootobj["data"].toArray();
+        emit filesCacheChanged();
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -398,4 +403,10 @@ void WSClient::importDbFile(const QByteArray &fileData, bool noDelete)
                      { "no_delete", noDelete }};
     sendJsonData({{ "msg", "import_database" },
                   { "data", d }});
+}
+
+void WSClient::sendListFilesCacheRequest()
+{
+    qDebug() << "Sending cache files request";
+    sendJsonData({{ "msg", "list_files_cache" }});
 }

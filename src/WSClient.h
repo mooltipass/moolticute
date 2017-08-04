@@ -71,6 +71,7 @@ public:
     void closeWebsocket();
 
     QJsonObject &getMemoryData() { return memData; }
+    QJsonArray &getFilesCache() { return filesCache; }
 
     bool isMPMini() const;
 
@@ -97,6 +98,8 @@ public:
     void exportDbFile();
     void importDbFile(const QByteArray &fileData, bool noDelete);
 
+    void sendListFilesCacheRequest();
+
 signals:
     void wsConnected();
     void wsDisconnected();
@@ -114,6 +117,7 @@ signals:
     void dbExported(const QByteArray &fileData, bool success);
     void dbImported(bool success);
     void memMgmtModeFailed(int errCode, QString errMsg);
+    void filesCacheChanged();
 
 public slots:
     void sendJsonData(const QJsonObject &data);
@@ -132,6 +136,7 @@ private:
     QWebSocket *wsocket = nullptr;
 
     QJsonObject memData;
+    QJsonArray filesCache;
 };
 
 #endif // WSCLIENT_H

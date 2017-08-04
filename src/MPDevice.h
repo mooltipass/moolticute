@@ -195,6 +195,8 @@ public:
     //true if device fw version is at least 1.2
     bool isFw12() { return isFw12Flag; }
 
+    QStringList getFilesCache();
+
 signals:
     /* Signal emited by platform code when new data comes from MP */
     /* A signal is used for platform code that uses a dedicated thread */

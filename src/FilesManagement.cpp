@@ -98,6 +98,8 @@ FilesManagement::FilesManagement(QWidget *parent) :
     filterModel->setSourceModel(filesModel);
     ui->filesListView->setModel(filterModel);
 
+    filesCacheModel = new QStandardItemModel(this);
+    ui->filesCacheListView->setModel(filesCacheModel);
     ui->progressBar->hide();
     ui->progressBarTop->hide();
 
@@ -123,6 +125,13 @@ void FilesManagement::setWsClient(WSClient *c)
     {
         loadModel();
         ui->lineEditFilterFiles->clear();
+    });
+    connect(wsClient, &WSClient::filesCacheChanged, [=]()
+    {
+        loadFilesCacheModel();
+    });
+    connect(wsClient, &WSClient::wsConnected, [=] () {
+        wsClient->sendListFilesCacheRequest();
     });
 }
 
@@ -168,6 +177,18 @@ void FilesManagement::loadModel()
         filesModel->appendRow(item);
     }
     deletedList.clear();
+}
+
+void FilesManagement::loadFilesCacheModel()
+{
+    filesCacheModel->clear();
+    for (auto entry : wsClient->getFilesCache())
+    {
+        qDebug() << entry;
+        QStandardItem *item = new QStandardItem(entry.toString());
+        item->setIcon(AppGui::qtAwesome()->icon(fa::fileo));
+        filesCacheModel->appendRow(item);
+    }
 }
 
 void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QModelIndex &)

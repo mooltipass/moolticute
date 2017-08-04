@@ -485,6 +485,17 @@ void WSServerCon::processMessage(const QString &message)
         },
         defaultProgressCb);
     }
+    else if (root["msg"] == "list_files_cache")
+    {
+        QJsonObject ores;
+        QJsonObject oroot = root;
+        ores["success"] = "true";
+        QJsonArray array;
+        for (QString fileName : mpdevice->getFilesCache())
+            array.append(fileName);
+        oroot["data"] = array;
+        sendJsonMessage(oroot);
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)
