@@ -745,7 +745,7 @@ void MPDevice::updateLockUnlockMode(int val)
     updateParam(MPParams::LOCK_UNLOCK_FEATURE_PARAM, val);
 }
 
-void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData)
+void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData, bool getDataChilds)
 {
     /* For when the MMM is left */
     cleanMMMVars();
@@ -927,7 +927,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                     if (!fullScan)
                     {
                         //full data nodes are not needed. Only parents for service name
-                        loadDataNode(jobs, startDataNode, true, cbProgress);
+                        loadDataNode(jobs, startDataNode, getDataChilds, cbProgress);
                     }
                 }
                 else
@@ -967,7 +967,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
     jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData);
+    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -1379,7 +1379,10 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             }
             else
             {
-                qDebug() << "Parent data node does not have childs.";
+                if (pnode->getStartChildAddress() == MPNode::EmptyAddress)
+                {
+                    qDebug() << "Parent data node does not have childs.";
+                }
             }
 
             //Load next parent
@@ -4120,7 +4123,7 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
 
     /* Re-scan the memory to take into account new changes that may have occured */
     cleanMMMVars();
-    memMgmtModeReadFlash(jobs, false, cbProgress, false, true);
+    memMgmtModeReadFlash(jobs, false, cbProgress, false, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -4790,7 +4793,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                                 Q_UNUSED(total);
                                 Q_UNUSED(current);
                             },
-                            true, true);
+                            true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -5582,7 +5585,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;    
 
     /* Load CTR, favorites, nodes... */
-    memMgmtModeReadFlash(jobs, true, cbProgress, true, true);
+    memMgmtModeReadFlash(jobs, true, cbProgress, true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
@@ -6070,7 +6073,7 @@ void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, Q
                                 Q_UNUSED(total);
                                 Q_UNUSED(current);
                             }
-                            , true, true);
+                            , true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
@@ -6174,8 +6177,54 @@ QStringList MPDevice::getFilesCache()
 
 void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
 {
-    // TODO: IMPLEMENT
-    qWarning() << "NOT IMPLEMENTE YET";
-    QStringList list = {"testing 1", "testing 2"};
-    cb(true, list);
+    /* New job for starting MMM */
+    AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
+
+    /* Ask device to go into MMM first */
+    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+
+    /* Load flash contents the usual way */
+    memMgmtModeReadFlash(jobs, false,
+                         [=](int total, int current)
+                         {
+                             Q_UNUSED(total);
+                             Q_UNUSED(current);
+                         }, false, true, false);
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+
+        /* List constructor */
+        QStringList list = QStringList();
+
+        /* Get file names */
+        for (auto &i: dataNodes)
+        {
+            list.append(i->getService());
+        }
+
+        /* Clean vars, exit mmm */
+        exitMemMgmtMode(false);
+        cleanMMMVars();
+
+        /* Callback */
+        cb(true, list);
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Setting device in MMM failed";
+        exitMemMgmtMode(false);
+
+        //TODO: the errCode parameter could be used as an
+        //identifier for a translated error message
+        //The string is used for client (CLI for ex.) that
+        //does not want to use the error code
+        cb(false, QStringList());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
