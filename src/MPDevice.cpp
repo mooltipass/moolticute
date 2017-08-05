@@ -21,7 +21,6 @@
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
-/// TODO (with help from raoul): query change numbers every time a credential/file gets modified
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
 {
