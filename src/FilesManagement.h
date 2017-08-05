@@ -90,7 +90,6 @@ private:
 
     FilesFilterModel *filterModel;
     QStandardItemModel *filesModel;
-    QStandardItemModel *filesCacheModel;
     QStandardItem *currentItem = nullptr;
     QString fileName;
 
