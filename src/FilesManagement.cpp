@@ -109,8 +109,11 @@ FilesManagement::FilesManagement(QWidget *parent) :
     connect(ui->filesListView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FilesManagement::currentSelectionChanged);
     currentSelectionChanged(QModelIndex(), QModelIndex());
     connect(ui->listFilesButton, &QPushButton::clicked, [=](){
-        loadFilesCacheModel();
+        if (wsClient)
+            wsClient->sendRefreshFilesCacheRequest();
     });
+
+    ui->filesCacheListWidget->setVisible(false);
 }
 
 FilesManagement::~FilesManagement()

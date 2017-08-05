@@ -198,6 +198,9 @@ public:
 
     QStringList getFilesCache();
     void getStoredFiles(std::function<void(bool success, QStringList filenames)> cb);
+    void updateFilesCache();
+    void addFileToCache(QString fileName);
+    void removeFileFromCache(QString fileName);
 
 signals:
     /* Signal emited by platform code when new data comes from MP */
@@ -206,7 +209,7 @@ signals:
 
     /* the command has failed in platform code */
     void platformFailed();
-
+    void filesCacheChanged();
 
 private slots:
     void newDataRead(const QByteArray &data);
@@ -214,10 +217,6 @@ private slots:
     void sendDataDequeue(); //execute commands from the command queue
     void runAndDequeueJobs(); //execute AsyncJobs from the jobs queues
 
-    // TODO: Call from a context were is possible to read the stored file names
-    void updateFilesCache();
-    void addFileToCache(QString fileName);
-    void removeFileFromCache(QString fileName);
 
 private:
     /* Platform function for starting a read, should be implemented in platform class */

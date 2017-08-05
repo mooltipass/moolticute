@@ -99,6 +99,7 @@ public:
     void importDbFile(const QByteArray &fileData, bool noDelete);
 
     void sendListFilesCacheRequest();
+    void sendRefreshFilesCacheRequest();
 
 signals:
     void wsConnected();

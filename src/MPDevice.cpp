@@ -270,8 +270,10 @@ void MPDevice::updateFilesCache()
         for (auto fileName: fileNames)
             list.append(QPair<int, QString>(0, fileName));
 
-        if (success)
+        if (success) {
             filesCache.save(list);
+            emit filesCacheChanged();
+        }
     });
 }
 
@@ -6168,8 +6170,6 @@ QStringList MPDevice::getFilesCache()
 {
     auto files = filesCache.load();
     QStringList names;
-    // TODO: REMOVE!!!
-    names << "file 1" << "file 2";
     for (auto fileCache : files)
         names.append(fileCache.second);
     return names;

@@ -248,7 +248,7 @@ void WSClient::onTextMessageReceived(const QString &message)
         if (!success)
             emit memMgmtModeFailed(o["error_code"].toInt(), o["error_message"].toString());
     }
-    else if (rootobj["msg"] == "list_files_cache")
+    else if (rootobj["msg"] == "files_cache_list")
     {
         filesCache = rootobj["data"].toArray();
         emit filesCacheChanged();
@@ -409,4 +409,9 @@ void WSClient::sendListFilesCacheRequest()
 {
     qDebug() << "Sending cache files request";
     sendJsonData({{ "msg", "list_files_cache" }});
+}
+
+void WSClient::sendRefreshFilesCacheRequest()
+{
+    sendJsonData({{ "msg", "refresh_files_cache" }});
 }

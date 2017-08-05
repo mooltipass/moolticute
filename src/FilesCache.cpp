@@ -22,11 +22,13 @@ QByteArray FilesCache::cardCPZ() const
 bool FilesCache::save(QList<QPair<int, QString>> files)
 {
     QFile file(m_filePath);
+
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         return false;
 
     QTextStream out(&file);
     for (QPair<int, QString> file : files) {
+        qDebug() << "Saving files to the cache " << file.second;
         out << m_simpleCrypt.encryptToString(QString::number(file.first)) + "\n";
         out << m_simpleCrypt.encryptToString(file.second) + "\n";
     }
@@ -67,9 +69,13 @@ void FilesCache::setCardCPZ(QByteArray cardCPZ)
     m_cardCPZ = cardCPZ;
 
 
-    QString fileName = QCryptographicHash::hash(m_cardCPZ, QCryptographicHash::Sha256);
+    QString fileName = QCryptographicHash::hash(m_cardCPZ, QCryptographicHash::Sha256).toHex().toHex();
+    fileName.truncate(30);
 
     QDir dataDir(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
+
+    dataDir.mkpath(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
+
     m_filePath = dataDir.absoluteFilePath(fileName);
 
     qint64 m_key = 0;
