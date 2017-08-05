@@ -6204,6 +6204,10 @@ void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
             list.append(i->getService());
         }
 
+        /* Clean vars, exit mmm */
+        exitMemMgmtMode(false);
+        cleanMMMVars();
+
         /* Callback */
         cb(true, list);
     });
@@ -6212,7 +6216,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
-        exitMemMgmtMode(true);
+        exitMemMgmtMode(false);
 
         //TODO: the errCode parameter could be used as an
         //identifier for a translated error message
