@@ -66,6 +66,10 @@ MPDevice::MPDevice(QObject *parent):
                         getCurrentCardCPZ();
                     });
                 }
+                else
+                {
+                    filesCache.resetState();
+                }
 
                 if (s == Common::Unlocked)
                 {
@@ -92,6 +96,7 @@ MPDevice::MPDevice(QObject *parent):
 
 MPDevice::~MPDevice()
 {
+    filesCache.resetState();
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
@@ -3402,7 +3407,11 @@ void MPDevice::getCurrentCardCPZ()
         {
             set_cardCPZ(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
             qDebug() << "Card CPZ: " << get_cardCPZ().toHex();
-            filesCache.setCardCPZ(get_cardCPZ());
+            if (filesCache.setCardCPZ(get_cardCPZ()))
+            {
+                qDebug() << "CPZ set to file cache, emitting file cache changed";
+                emit filesCacheChanged();
+            }
             return true;
         }
     }));
@@ -3446,6 +3455,11 @@ void MPDevice::getChangeNumbers()
             credentialsDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+1];
             set_dataDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]);
             dataDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
+            if (filesCache.setDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]))
+            {
+                qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
+                emit filesCacheChanged();
+            }
             qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
             qDebug() << "Data change number:" << get_dataDbChangeNumber();
             return true;

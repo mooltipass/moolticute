@@ -27,6 +27,7 @@ bool FilesCache::save(QList<QPair<int, QString>> files)
         return false;
 
     QTextStream out(&file);
+    out << m_simpleCrypt.encryptToString(QString::number(m_dbChangeNumber)) + "\n";
     for (QPair<int, QString> file : files) {
         qDebug() << "Saving files to the cache " << file.second;
         out << m_simpleCrypt.encryptToString(QString::number(file.first)) + "\n";
@@ -38,21 +39,39 @@ bool FilesCache::save(QList<QPair<int, QString>> files)
 
 QList<QPair<int, QString>> FilesCache::load()
 {
-    QList<QPair<int, QString>> files;
-
-    QFile file(m_filePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return files;
-
-
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString number = m_simpleCrypt.decryptToString(in.readLine());
-        QString file_name = m_simpleCrypt.decryptToString(in.readLine());
-        files << QPair<int, QString>(number.toInt(), file_name);
+    if (!m_dbChangeNumberSet || m_cardCPZ.isNull())
+    {
+        qDebug() << "dbChangeNumberSet not set or null CPZ";
+        return QList<QPair<int, QString>>();
     }
+    else
+    {
+        QList<QPair<int, QString>> files;
 
-    return files;
+        QFile file(m_filePath);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            return files;
+
+
+        QTextStream in(&file);
+        qint8 cacheDbChangeNumber = m_simpleCrypt.decryptToString(in.readLine()).toInt();
+        if (cacheDbChangeNumber != m_dbChangeNumber)
+        {
+            qDebug() << "dbChangeNumber miss";
+        }
+        else
+        {
+            qDebug() << "dbChangeNumber match";
+            while (!in.atEnd())
+            {
+                QString number = m_simpleCrypt.decryptToString(in.readLine());
+                QString file_name = m_simpleCrypt.decryptToString(in.readLine());
+                files << QPair<int, QString>(number.toInt(), file_name);
+            }
+        }
+
+        return files;
+    }
 }
 
 bool FilesCache::erase()
@@ -61,13 +80,29 @@ bool FilesCache::erase()
     return file.remove();
 }
 
-void FilesCache::setCardCPZ(QByteArray cardCPZ)
+void FilesCache::resetState()
+{
+    m_dbChangeNumberSet = false;
+    m_cardCPZ = QByteArray();
+}
+
+bool FilesCache::setDbChangeNumber(quint8 changeNumber)
+{
+    m_dbChangeNumber = changeNumber;
+    m_dbChangeNumberSet = true;
+
+    if (!m_cardCPZ.isNull())
+        return true;
+    else
+        return false;
+}
+
+bool FilesCache::setCardCPZ(QByteArray cardCPZ)
 {
     if (m_cardCPZ == cardCPZ)
-        return;
+        return false;
 
     m_cardCPZ = cardCPZ;
-
 
     QString fileName = QCryptographicHash::hash(m_cardCPZ, QCryptographicHash::Sha256).toHex().toHex();
     fileName.truncate(30);
@@ -85,5 +120,8 @@ void FilesCache::setCardCPZ(QByteArray cardCPZ)
     m_simpleCrypt.setKey(m_key);
     m_simpleCrypt.setIntegrityProtectionMode(SimpleCrypt::ProtectionHash);
 
-    emit cardCPZChanged(m_cardCPZ);
+    if (m_dbChangeNumberSet)
+        return true;
+    else
+        return false;
 }

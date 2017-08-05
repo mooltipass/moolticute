@@ -23,11 +23,15 @@ public slots:
     QList<QPair<int, QString>> load();
     bool erase();
 
-    void setCardCPZ(QByteArray cardCPZ);
+    void resetState();
+    bool setCardCPZ(QByteArray cardCPZ);
+    bool setDbChangeNumber(quint8 changeNumber);
 private:
     QByteArray m_cardCPZ;
     QString m_filePath;
     qint64 m_key;
+    bool m_dbChangeNumberSet = false;
+    quint8 m_dbChangeNumber;
     SimpleCrypt m_simpleCrypt;
 };
 

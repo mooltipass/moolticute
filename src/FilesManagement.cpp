@@ -202,7 +202,7 @@ void FilesManagement::loadFilesCacheModel()
         button->setIcon(AppGui::qtAwesome()->icon(fa::save));
 
         connect(button, &QToolButton::clicked, [=]() {
-            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."));
+            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), entry.toString());
 
             if (fileName.isEmpty())
                 return;
