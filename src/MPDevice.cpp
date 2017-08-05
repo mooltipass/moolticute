@@ -284,10 +284,21 @@ void MPDevice::updateFilesCache()
 
 void MPDevice::addFileToCache(QString fileName)
 {
+    // Add file name at proper position
     auto cache = filesCache.load();
+    for (qint32 i = 0; i < cache.length(); i++)
+    {
+        if (cache[i].second.compare(fileName) > 0)
+        {
+            cache.insert(i, QPair<int,QString>(0, fileName));
+            filesCache.save(cache);
+            emit filesCacheChanged();
+            return;
+        }
+    }
     cache.append(QPair<int,QString>(0, fileName));
-
     filesCache.save(cache);
+    emit filesCacheChanged();
 }
 
 void MPDevice::removeFileFromCache(QString fileName)
@@ -302,6 +313,7 @@ void MPDevice::removeFileFromCache(QString fileName)
         cache.removeAt(i);
 
     filesCache.save(cache);
+    emit filesCacheChanged();
 }
 
 bool MPDevice::isJobsQueueBusy()
@@ -4107,6 +4119,15 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
         //all jobs finished success
         qInfo() << "set_data_node success";
         cb(true, QString());
+
+        // update file cache
+        addFileToCache(service);
+
+        // request change numbers in case they changed
+        if (isFw12())
+        {
+            getChangeNumbers();
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -4182,6 +4203,15 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
             exitMemMgmtMode(true);
             qInfo() << "Save operations succeeded!";
             cb(true, "Successfully Saved File Database");
+
+            /* Update file cache */
+            for (qint32 i = 0; i < services.size(); i++)
+            {
+                /// Improvement: only trigger file storage after we have removed all files
+                removeFileFromCache(services[i]);
+            }
+
+            // todo: update db change number
             return;
         });
         connect(saveJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -5262,6 +5292,17 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                     connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
                     {
                         Q_UNUSED(data);
+
+                        /* Update file cache */
+                        QList<QPair<int, QString>> list;
+                        for (auto &i: dataNodes)
+                        {
+                            list.append(QPair<int, QString>(0, i->getService()));
+                        }
+                        filesCache.save(list);
+                        filesCache.setDbChangeNumber(importedDataDbChangeNumber);
+                        emit filesCacheChanged();
+
                         cleanImportedVars();
                         exitMemMgmtMode(false);
                         qInfo() << "Merge operations succeeded!";
@@ -5319,6 +5360,17 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                 connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
                 {
                     Q_UNUSED(data);
+
+                    /* Update file cache */
+                    QList<QPair<int, QString>> list;
+                    for (auto &i: dataNodes)
+                    {
+                        list.append(QPair<int, QString>(0, i->getService()));
+                    }
+                    filesCache.save(list);
+                    filesCache.setDbChangeNumber(importedDataDbChangeNumber);
+                    emit filesCacheChanged();
+
                     cleanImportedVars();
                     exitMemMgmtMode(false);
                     qInfo() << "Merge operations succeeded!";

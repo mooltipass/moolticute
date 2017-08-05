@@ -88,6 +88,15 @@ void FilesCache::resetState()
 
 bool FilesCache::setDbChangeNumber(quint8 changeNumber)
 {
+    if (m_dbChangeNumberSet && m_dbChangeNumber != changeNumber && !m_cardCPZ.isNull())
+    {
+        qDebug() << "dbChangeNumber updated, triggering file storage";
+        auto tempDb = load();
+        m_dbChangeNumber = changeNumber;
+        save(tempDb);
+        return false;
+    }
+
     m_dbChangeNumber = changeNumber;
     m_dbChangeNumberSet = true;
 
