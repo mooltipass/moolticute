@@ -108,6 +108,12 @@ FilesManagement::FilesManagement(QWidget *parent) :
 
     connect(ui->filesListView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FilesManagement::currentSelectionChanged);
     currentSelectionChanged(QModelIndex(), QModelIndex());
+    connect(ui->listFilesButton, &QPushButton::clicked, [=](){
+        if (wsClient)
+            wsClient->sendRefreshFilesCacheRequest();
+    });
+
+    ui->filesCacheListWidget->setVisible(false);
 }
 
 FilesManagement::~FilesManagement()
@@ -123,6 +129,13 @@ void FilesManagement::setWsClient(WSClient *c)
     {
         loadModel();
         ui->lineEditFilterFiles->clear();
+    });
+    connect(wsClient, &WSClient::filesCacheChanged, [=]()
+    {
+        loadFilesCacheModel();
+    });
+    connect(wsClient, &WSClient::wsConnected, [=] () {
+        wsClient->sendListFilesCacheRequest();
     });
 }
 
@@ -168,6 +181,59 @@ void FilesManagement::loadModel()
         filesModel->appendRow(item);
     }
     deletedList.clear();
+}
+
+void FilesManagement::loadFilesCacheModel()
+{
+    QListWidget * listWidget = ui->filesCacheListWidget;
+    listWidget->clear();
+    for (auto entry : wsClient->getFilesCache())
+    {
+
+        QWidget* w = new QWidget();
+        QHBoxLayout *rowLayout = new QHBoxLayout(listWidget);
+        QLabel *icon = new QLabel(listWidget);
+        icon->setPixmap(AppGui::qtAwesome()->icon(fa::fileo).pixmap(18, 18));
+        rowLayout->addWidget(icon);
+        rowLayout->addWidget(new QLabel(entry.toString()));
+
+        QToolButton *button = new QToolButton;
+        button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        button->setIcon(AppGui::qtAwesome()->icon(fa::save));
+
+        connect(button, &QToolButton::clicked, [=]() {
+            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."));
+
+            if (fileName.isEmpty())
+                return;
+
+//            ui->progressBar->setMinimum(0);
+//            ui->progressBar->setMaximum(0);
+//            ui->progressBar->setValue(0);
+//            ui->progressBar->show();
+//            updateButtonsUI();
+
+            connect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
+//            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
+
+            wsClient->requestDataFile(entry.toString());
+        });
+
+        rowLayout->addWidget(button, 1, Qt::AlignRight);
+        rowLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
+        rowLayout->setMargin(0);
+        rowLayout->setContentsMargins(6,1,4,1);
+        w->setLayout(rowLayout);
+
+
+        QListWidgetItem *item = new QListWidgetItem();
+        item->setSizeHint( w->sizeHint() );
+        listWidget->addItem(item);
+        listWidget->setItemWidget(item,w);
+    }
+
+    listWidget->setVisible(listWidget->count() > 0);
+    ui->listFilesButton->setVisible(listWidget->count() <= 0);
 }
 
 void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QModelIndex &)

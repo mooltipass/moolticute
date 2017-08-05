@@ -485,6 +485,14 @@ void WSServerCon::processMessage(const QString &message)
         },
         defaultProgressCb);
     }
+    else if (root["msg"] == "refresh_files_cache")
+    {
+        mpdevice->updateFilesCache();
+    }
+    else if (root["msg"] == "list_files_cache")
+    {
+        sendFilesCache();
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)
@@ -542,6 +550,8 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(delayAfterKeyEntryChanged(int)), this, SLOT(sendDelayAfterKeyEntry()));
 
     connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
+
+    connect(mpdevice, &MPDevice::filesCacheChanged, this, &WSServerCon::sendFilesCache);
 }
 
 void WSServerCon::statusChanged()
@@ -828,6 +838,18 @@ void WSServerCon::sendDeviceUID()
     sendJsonMessage({{ "msg", "device_uid" },
                      { "data", QJsonObject{ {"uid", mpdevice->get_uid()} } }
                     });
+}
+
+void WSServerCon::sendFilesCache()
+{
+    qDebug() << "Sending files cache";
+    QJsonObject oroot = { {"msg", "files_cache_list"} };
+    QJsonArray array;
+    for (QString fileName : mpdevice->getFilesCache())
+        array.append(fileName);
+
+    oroot["data"] = array;
+    sendJsonMessage(oroot);
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

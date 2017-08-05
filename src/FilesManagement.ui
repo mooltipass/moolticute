@@ -166,7 +166,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageLocked">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -187,14 +187,50 @@ border-right: none;
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="../img/images.qrc">:/management-mode.png</pixmap>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QListWidget" name="filesCacheListWidget"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="listFilesButton">
+           <property name="minimumSize">
+            <size>
+             <width>208</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>List Files</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -558,10 +594,6 @@ padding: 2px;
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../img/images.qrc"/>
-  <include location="../img/images.qrc"/>
-  <include location="../img/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
