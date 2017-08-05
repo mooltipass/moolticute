@@ -108,6 +108,9 @@ FilesManagement::FilesManagement(QWidget *parent) :
 
     connect(ui->filesListView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FilesManagement::currentSelectionChanged);
     currentSelectionChanged(QModelIndex(), QModelIndex());
+    connect(ui->listFilesButton, &QPushButton::clicked, [=](){
+        loadFilesCacheModel();
+    });
 }
 
 FilesManagement::~FilesManagement()
@@ -225,6 +228,9 @@ void FilesManagement::loadFilesCacheModel()
         listWidget->addItem(item);
         listWidget->setItemWidget(item,w);
     }
+
+    listWidget->setVisible(listWidget->count() > 0);
+    ui->listFilesButton->setVisible(listWidget->count() <= 0);
 }
 
 void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QModelIndex &)
