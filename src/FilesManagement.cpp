@@ -98,8 +98,6 @@ FilesManagement::FilesManagement(QWidget *parent) :
     filterModel->setSourceModel(filesModel);
     ui->filesListView->setModel(filterModel);
 
-    filesCacheModel = new QStandardItemModel(this);
-    ui->filesCacheListView->setModel(filesCacheModel);
     ui->progressBar->hide();
     ui->progressBarTop->hide();
 
@@ -181,13 +179,51 @@ void FilesManagement::loadModel()
 
 void FilesManagement::loadFilesCacheModel()
 {
-    filesCacheModel->clear();
+    QListWidget * listWidget = ui->filesCacheListWidget;
+    listWidget->clear();
     for (auto entry : wsClient->getFilesCache())
     {
-        qDebug() << entry;
-        QStandardItem *item = new QStandardItem(entry.toString());
-        item->setIcon(AppGui::qtAwesome()->icon(fa::fileo));
-        filesCacheModel->appendRow(item);
+
+        QWidget* w = new QWidget();
+        QHBoxLayout *rowLayout = new QHBoxLayout(listWidget);
+        QLabel *icon = new QLabel(listWidget);
+        icon->setPixmap(AppGui::qtAwesome()->icon(fa::fileo).pixmap(18, 18));
+        rowLayout->addWidget(icon);
+        rowLayout->addWidget(new QLabel(entry.toString()));
+
+        QToolButton *button = new QToolButton;
+        button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        button->setIcon(AppGui::qtAwesome()->icon(fa::save));
+
+        connect(button, &QToolButton::clicked, [=]() {
+            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."));
+
+            if (fileName.isEmpty())
+                return;
+
+//            ui->progressBar->setMinimum(0);
+//            ui->progressBar->setMaximum(0);
+//            ui->progressBar->setValue(0);
+//            ui->progressBar->show();
+//            updateButtonsUI();
+
+            connect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
+//            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
+
+            wsClient->requestDataFile(entry.toString());
+        });
+
+        rowLayout->addWidget(button, 1, Qt::AlignRight);
+        rowLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
+        rowLayout->setMargin(0);
+        rowLayout->setContentsMargins(6,1,4,1);
+        w->setLayout(rowLayout);
+
+
+        QListWidgetItem *item = new QListWidgetItem();
+        item->setSizeHint( w->sizeHint() );
+        listWidget->addItem(item);
+        listWidget->setItemWidget(item,w);
     }
 }
 

@@ -166,7 +166,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageLocked">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -202,7 +202,7 @@ border-right: none;
           </spacer>
          </item>
          <item>
-          <widget class="QListView" name="filesCacheListView"/>
+          <widget class="QListWidget" name="filesCacheListWidget"/>
          </item>
          <item>
           <spacer name="verticalSpacer_4">
