@@ -81,6 +81,7 @@ private slots:
 
 private:
     void loadModel();
+    void loadFilesCacheModel();
     void addUpdateFile(QString service, QString filename, QProgressBar *pbar);
 
     Ui::FilesManagement *ui;

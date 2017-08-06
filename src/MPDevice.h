@@ -25,6 +25,7 @@
 #include "QtHelper.h"
 #include "AsyncJobs.h"
 #include "MPNode.h"
+#include "FilesCache.h"
 
 typedef std::function<void(bool success, const QByteArray &data, bool &done)> MPCommandCb;
 
@@ -195,6 +196,12 @@ public:
     //true if device fw version is at least 1.2
     bool isFw12() { return isFw12Flag; }
 
+    QStringList getFilesCache();
+    void getStoredFiles(std::function<void(bool success, QStringList filenames)> cb);
+    void updateFilesCache();
+    void addFileToCache(QString fileName);
+    void removeFileFromCache(QString fileName);
+
 signals:
     /* Signal emited by platform code when new data comes from MP */
     /* A signal is used for platform code that uses a dedicated thread */
@@ -202,12 +209,14 @@ signals:
 
     /* the command has failed in platform code */
     void platformFailed();
+    void filesCacheChanged();
 
 private slots:
     void newDataRead(const QByteArray &data);
     void commandFailed();
     void sendDataDequeue(); //execute commands from the command queue
     void runAndDequeueJobs(); //execute AsyncJobs from the jobs queues
+
 
 private:
     /* Platform function for starting a read, should be implemented in platform class */
@@ -235,7 +244,7 @@ private:
                        const QByteArray &data, bool &done);
 
     // Functions added by mathieu for MMM
-    void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData);
+    void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData, bool getDataChilds);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data);
@@ -373,6 +382,8 @@ private:
     int progressCurrent;
     int progressCurrentLogin;
     int progressCurrentData;
+
+    FilesCache filesCache;
 };
 
 #endif // MPDEVICE_H

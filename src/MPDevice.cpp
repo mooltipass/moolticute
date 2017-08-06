@@ -21,7 +21,6 @@
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
-/// TODO (with help from raoul): query change numbers every time a credential/file gets modified
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
 {
@@ -66,6 +65,10 @@ MPDevice::MPDevice(QObject *parent):
                         getCurrentCardCPZ();
                     });
                 }
+                else
+                {
+                    filesCache.resetState();
+                }
 
                 if (s == Common::Unlocked)
                 {
@@ -92,6 +95,7 @@ MPDevice::MPDevice(QObject *parent):
 
 MPDevice::~MPDevice()
 {
+    filesCache.resetState();
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
@@ -261,6 +265,56 @@ void MPDevice::runAndDequeueJobs()
     });
 
     currentJobs->start();
+}
+
+void MPDevice::updateFilesCache()
+{
+    getStoredFiles([=](bool success, QStringList fileNames)
+    {
+        QList<QPair<int, QString>> list;
+        for (auto fileName: fileNames)
+            list.append(QPair<int, QString>(0, fileName));
+
+        if (success)
+        {
+            filesCache.save(list);
+            emit filesCacheChanged();
+        }
+    });
+}
+
+void MPDevice::addFileToCache(QString fileName)
+{
+    // Add file name at proper position
+    auto cache = filesCache.load();
+    for (qint32 i = 0; i < cache.length(); i++)
+    {
+        if (cache[i].second.compare(fileName) > 0)
+        {
+            cache.insert(i, QPair<int,QString>(0, fileName));
+            filesCache.save(cache);
+            emit filesCacheChanged();
+            return;
+        }
+    }
+    cache.append(QPair<int,QString>(0, fileName));
+    filesCache.save(cache);
+    emit filesCacheChanged();
+}
+
+void MPDevice::removeFileFromCache(QString fileName)
+{
+    auto cache = filesCache.load();
+    int i = 0;
+    for (; i < cache.length(); i++)
+        if (cache.at(i).second.compare(fileName) == 0)
+            break;
+
+    if (i < cache.length())
+        cache.removeAt(i);
+
+    filesCache.save(cache);
+    emit filesCacheChanged();
 }
 
 bool MPDevice::isJobsQueueBusy()
@@ -711,7 +765,7 @@ void MPDevice::updateLockUnlockMode(int val)
     updateParam(MPParams::LOCK_UNLOCK_FEATURE_PARAM, val);
 }
 
-void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData)
+void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData, bool getDataChilds)
 {
     /* For when the MMM is left */
     cleanMMMVars();
@@ -893,7 +947,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                     if (!fullScan)
                     {
                         //full data nodes are not needed. Only parents for service name
-                        loadDataNode(jobs, startDataNode, true, cbProgress);
+                        loadDataNode(jobs, startDataNode, getDataChilds, cbProgress);
                     }
                 }
                 else
@@ -933,7 +987,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
     jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData);
+    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -1345,7 +1399,10 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             }
             else
             {
-                qDebug() << "Parent data node does not have childs.";
+                if (pnode->getStartChildAddress() == MPNode::EmptyAddress)
+                {
+                    qDebug() << "Parent data node does not have childs.";
+                }
             }
 
             //Load next parent
@@ -3363,6 +3420,11 @@ void MPDevice::getCurrentCardCPZ()
         {
             set_cardCPZ(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
             qDebug() << "Card CPZ: " << get_cardCPZ().toHex();
+            if (filesCache.setCardCPZ(get_cardCPZ()))
+            {
+                qDebug() << "CPZ set to file cache, emitting file cache changed";
+                emit filesCacheChanged();
+            }
             return true;
         }
     }));
@@ -3406,6 +3468,11 @@ void MPDevice::getChangeNumbers()
             credentialsDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+1];
             set_dataDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]);
             dataDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
+            if (filesCache.setDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]))
+            {
+                qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
+                emit filesCacheChanged();
+            }
             qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
             qDebug() << "Data change number:" << get_dataDbChangeNumber();
             return true;
@@ -4053,6 +4120,15 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
         //all jobs finished success
         qInfo() << "set_data_node success";
         cb(true, QString());
+
+        // update file cache
+        addFileToCache(service);
+
+        // request change numbers in case they changed
+        if (isFw12())
+        {
+            getChangeNumbers();
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -4085,7 +4161,7 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
 
     /* Re-scan the memory to take into account new changes that may have occured */
     cleanMMMVars();
-    memMgmtModeReadFlash(jobs, false, cbProgress, false, true);
+    memMgmtModeReadFlash(jobs, false, cbProgress, false, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -4128,6 +4204,15 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
             exitMemMgmtMode(true);
             qInfo() << "Save operations succeeded!";
             cb(true, "Successfully Saved File Database");
+
+            /* Update file cache */
+            for (qint32 i = 0; i < services.size(); i++)
+            {
+                /// Improvement: only trigger file storage after we have removed all files
+                removeFileFromCache(services[i]);
+            }
+
+            // todo: update db change number
             return;
         });
         connect(saveJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -4755,7 +4840,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                                 Q_UNUSED(total);
                                 Q_UNUSED(current);
                             },
-                            true, true);
+                            true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
@@ -5208,6 +5293,17 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                     connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
                     {
                         Q_UNUSED(data);
+
+                        /* Update file cache */
+                        QList<QPair<int, QString>> list;
+                        for (auto &i: dataNodes)
+                        {
+                            list.append(QPair<int, QString>(0, i->getService()));
+                        }
+                        filesCache.save(list);
+                        filesCache.setDbChangeNumber(importedDataDbChangeNumber);
+                        emit filesCacheChanged();
+
                         cleanImportedVars();
                         exitMemMgmtMode(false);
                         qInfo() << "Merge operations succeeded!";
@@ -5265,6 +5361,17 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                 connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
                 {
                     Q_UNUSED(data);
+
+                    /* Update file cache */
+                    QList<QPair<int, QString>> list;
+                    for (auto &i: dataNodes)
+                    {
+                        list.append(QPair<int, QString>(0, i->getService()));
+                    }
+                    filesCache.save(list);
+                    filesCache.setDbChangeNumber(importedDataDbChangeNumber);
+                    emit filesCacheChanged();
+
                     cleanImportedVars();
                     exitMemMgmtMode(false);
                     qInfo() << "Merge operations succeeded!";
@@ -5547,7 +5654,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;    
 
     /* Load CTR, favorites, nodes... */
-    memMgmtModeReadFlash(jobs, true, cbProgress, true, true);
+    memMgmtModeReadFlash(jobs, true, cbProgress, true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
@@ -6035,7 +6142,7 @@ void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, Q
                                 Q_UNUSED(total);
                                 Q_UNUSED(current);
                             }
-                            , true, true);
+                            , true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
@@ -6124,4 +6231,62 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
         /* Something went wrong during export file reading */
         cb(false, errorString);
     }
+}
+
+QStringList MPDevice::getFilesCache()
+{
+    auto files = filesCache.load();
+    QStringList names;
+    for (auto fileCache : files)
+        names.append(fileCache.second);
+    return names;
+}
+
+void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
+{
+    /* New job for starting MMM */
+    AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
+
+    /* Ask device to go into MMM first */
+    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+
+    /* Load flash contents the usual way */
+    memMgmtModeReadFlash(jobs, false,
+                         [=](int total, int current)
+                         {
+                             Q_UNUSED(total);
+                             Q_UNUSED(current);
+                         }, false, true, false);
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+
+        /* List constructor */
+        QStringList list = QStringList();
+
+        /* Get file names */
+        for (auto &i: dataNodes)
+        {
+            list.append(i->getService());
+        }
+
+        /* Clean vars, exit mmm */
+        exitMemMgmtMode(false);
+        cleanMMMVars();
+
+        /* Callback */
+        cb(true, list);
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Setting device in MMM failed";
+        exitMemMgmtMode(false);
+        cb(false, QStringList());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
