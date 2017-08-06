@@ -28,7 +28,8 @@ bool FilesCache::save(QList<QPair<int, QString>> files)
 
     QTextStream out(&file);
     out << m_simpleCrypt.encryptToString(QString::number(m_dbChangeNumber)) + "\n";
-    for (QPair<int, QString> file : files) {
+    for (QPair<int, QString> file : files)
+    {
         qDebug() << "Saving files to the cache " << file.second;
         out << m_simpleCrypt.encryptToString(QString::number(file.first)) + "\n";
         out << m_simpleCrypt.encryptToString(file.second) + "\n";

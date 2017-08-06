@@ -108,7 +108,8 @@ FilesManagement::FilesManagement(QWidget *parent) :
 
     connect(ui->filesListView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FilesManagement::currentSelectionChanged);
     currentSelectionChanged(QModelIndex(), QModelIndex());
-    connect(ui->listFilesButton, &QPushButton::clicked, [=](){
+    connect(ui->listFilesButton, &QPushButton::clicked, [=]()
+    {
         if (wsClient)
             wsClient->sendRefreshFilesCacheRequest();
     });
@@ -134,7 +135,8 @@ void FilesManagement::setWsClient(WSClient *c)
     {
         loadFilesCacheModel();
     });
-    connect(wsClient, &WSClient::wsConnected, [=] () {
+    connect(wsClient, &WSClient::wsConnected, [=] ()
+    {
         wsClient->sendListFilesCacheRequest();
     });
 }
@@ -201,12 +203,14 @@ void FilesManagement::loadFilesCacheModel()
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
         button->setIcon(AppGui::qtAwesome()->icon(fa::save));
 
-        connect(button, &QToolButton::clicked, [=]() {
+        connect(button, &QToolButton::clicked, [=]()
+        {
             fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), entry.toString());
 
             if (fileName.isEmpty())
                 return;
 
+// todo: reuse progress bar to indicate dl progress
 //            ui->progressBar->setMinimum(0);
 //            ui->progressBar->setMaximum(0);
 //            ui->progressBar->setValue(0);

@@ -269,12 +269,14 @@ void MPDevice::runAndDequeueJobs()
 
 void MPDevice::updateFilesCache()
 {
-    getStoredFiles([=](bool success, QStringList fileNames) {
+    getStoredFiles([=](bool success, QStringList fileNames)
+    {
         QList<QPair<int, QString>> list;
         for (auto fileName: fileNames)
             list.append(QPair<int, QString>(0, fileName));
 
-        if (success) {
+        if (success)
+        {
             filesCache.save(list);
             emit filesCacheChanged();
         }
@@ -6282,11 +6284,6 @@ void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
         exitMemMgmtMode(false);
-
-        //TODO: the errCode parameter could be used as an
-        //identifier for a translated error message
-        //The string is used for client (CLI for ex.) that
-        //does not want to use the error code
         cb(false, QStringList());
     });
 
