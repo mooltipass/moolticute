@@ -207,6 +207,15 @@ void MPDevice::newDataRead(const QByteArray &data)
 
     bool success = true;
 
+    // Special case: if command check was requested but the device returned a mooltipass status (user entering his PIN), resend packet
+    if (currentCmd.checkReturn && MPCmd::from(currentCmd.data.at(MP_CMD_FIELD_INDEX)) != MPCmd::MOOLTIPASS_STATUS && MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::MOOLTIPASS_STATUS)
+    {
+        qDebug() << MPCmd::printCmd(data) << " received, resending command " << MPCmd::printCmd(commandQueue.head().data);
+        platformWrite(commandQueue.head().data);
+        commandQueue.head().timerTimeout->start(); //restart timer
+        return;
+    }
+
     //Only check returned command if it was asked
     //If the returned command does not match, fail
     if (currentCmd.checkReturn &&
@@ -1025,7 +1034,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
         //identifier for a translated error message
         //The string is used for client (CLI for ex.) that
         //does not want to use the error code
-        cbFailure(0, "Couldn't Load Database (Device Disconnected?)");
+        cbFailure(0, "Couldn't Load Database, Please Approve Prompt On Device");
     });
 
     jobsQueue.enqueue(jobs);
@@ -1409,6 +1418,18 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
             {
                 loadDataNode(jobs, pnode->getNextParentAddress(), load_childs, cbProgress);
+            }
+            else
+            {
+                // No next parent, fill our file cache
+                QList<QPair<int, QString>> list;
+                for (auto &i: dataNodes)
+                {
+                    list.append(QPair<int, QString>(0, i->getService()));
+                }
+                filesCache.save(list);
+                filesCache.setDbChangeNumber(get_dataDbChangeNumber());
+                emit filesCacheChanged();
             }
         }
 
@@ -4224,7 +4245,20 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
             return;
         });
         if (generateSavePackets(saveJobs, false, true))
-        {
+        {            
+            /* Increment db change number */
+            if (services.size() > 0)
+            {
+                set_dataDbChangeNumber(get_dataDbChangeNumber() + 1);
+                dataDbChangeNumberClone = get_dataDbChangeNumber();
+                filesCache.setDbChangeNumber(get_dataDbChangeNumber());
+                QByteArray updateChangeNumbersPacket = QByteArray();
+                updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
+                updateChangeNumbersPacket.append(get_dataDbChangeNumber());
+                saveJobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+            }
+
+            /* Run jobs */
             jobsQueue.enqueue(saveJobs);
             runAndDequeueJobs();
         }
@@ -5971,7 +6005,15 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         return;
     }
 
-    /* Out of pure coding laziness, ask free addresses even if we don't need */
+    /* Increment db change numbers */
+    set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
+    credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
+    QByteArray updateChangeNumbersPacket = QByteArray();
+    updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
+    updateChangeNumbersPacket.append(get_dataDbChangeNumber());
+    jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+
+    /* Out of pure coding laziness, ask free addresses even if we don't need them */
     loadFreeAddresses(jobs, MPNode::EmptyAddress, false);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
