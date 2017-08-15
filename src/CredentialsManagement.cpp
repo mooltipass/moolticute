@@ -135,6 +135,8 @@ void CredentialsManagement::enableCredentialsManagement(bool enable)
         ui->stackedWidget->setCurrentWidget(ui->pageUnlocked);
     else
         ui->stackedWidget->setCurrentWidget(ui->pageLocked);
+
+    ui->pageUnlocked->setFocus();
 }
 
 void CredentialsManagement::updateQuickAddCredentialsButtonState()
