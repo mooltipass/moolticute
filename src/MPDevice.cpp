@@ -6213,7 +6213,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             Q_UNUSED(failedJob);
             exitMemMgmtMode(true);
             qCritical() << "Merge operations failed!";
-            cb(false, "Couldn't Import Database: Device Unplugged?");
+            cb(false, "Couldn't Apply Modifications: Device Unplugged?");
             return;
         });
 
@@ -6286,6 +6286,10 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                               std::function<void(int total, int current)> cbProgress)
 {
     QString errorString;
+
+    /* Reset temp vars */
+    newAddressesNeededCounter = 0;
+    newAddressesReceivedCounter = 0;
 
     /* Try to read the export file */
     if (readExportFile(fileData, errorString))
