@@ -433,6 +433,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     event->accept();
     emit windowCloseRequested();
+
+    // Leave MMM on main window closed
+    if (wsClient != NULL && wsClient->get_memMgmtMode())
+        wsClient->sendLeaveMMRequest();
 }
 
 void MainWindow::updatePage()
