@@ -327,3 +327,12 @@ void Common::releaseUid(QString uid)
     //delete this id from the list so it could be used again
     commonExistingUid.remove(uid);
 }
+
+QString Common::maskLog(const QString &rawJson)
+{
+    QString logMsg = rawJson;
+    logMsg.replace(QRegularExpression("\"password\"\\s*:\\s*\"[^\"-\"]+\""), "\"password\":\"<masked>\"");
+    logMsg.replace(QRegularExpression("\"file_data\"\\s*:\\s*\"[^\"-\"]+\""), "\"file_data\":\"<base64_data>\"");
+    logMsg.replace(QRegularExpression("\"node_data\"\\s*:\\s*\"[^\"-\"]+\""), "\"node_data\":\"<base64_data>\"");
+    return logMsg;
+}

@@ -121,8 +121,7 @@ void WSClient::onTextMessageReceived(const QString &message)
         return;
     }
     QJsonObject rootobj = jdoc.object();
-
-    qDebug().noquote() << "New message: " << rootobj;
+    qDebug().noquote() << "New message: " << Common::maskLog(message);
 
     if (rootobj["msg"] == "mp_connected")
     {

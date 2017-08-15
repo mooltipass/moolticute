@@ -145,6 +145,9 @@ public:
     //release the unique id and remove it from the list
     static void releaseUid(QString uid);
 
+    //mask log by removing passwords and data from log
+    static QString maskLog(const QString &rawJson);
+
     typedef enum
     {
         MP_Classic = 0,
