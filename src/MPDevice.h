@@ -124,7 +124,7 @@ public:
     //cbFailure is used to propagate an error to clients when entering mmm
     void startMemMgmtMode(bool wantData,
                           std::function<void(int total, int current)> cbProgress,
-                          std::function<void(int errCode, QString errMsg)> cbFailure);
+                          std::function<void(bool success, int errCode, QString errMsg)> cb);
     void exitMemMgmtMode(bool setMMMBool = true);
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);
@@ -149,6 +149,11 @@ public:
     void setCredential(const QString &service, const QString &login,
                        const QString &pass, const QString &description, bool setDesc,
                        std::function<void(bool success, QString errstr)> cb);
+
+    //Delete credential in MMM and leave
+    void delCredentialAndLeave(const QString &service, const QString &login,
+                               std::function<void(int total, int current)> cbProgress,
+                               std::function<void(bool success, QString errstr)> cb);
 
     //get 32 random bytes from device
     void getRandomNumber(std::function<void(bool success, QString errstr, const QByteArray &nums)> cb);

@@ -113,14 +113,17 @@ void WSServerCon::processMessage(const QString &message)
         //send command to start MMM
         mpdevice->startMemMgmtMode(o["want_data"].toBool(),
                 defaultProgressCb,
-                [=](int errCode, QString errMsg)
+                [=](bool success, int errCode, QString errMsg)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
-            QJsonObject oroot = root;
-            oroot["msg"] = "failed_memorymgmt";
-            sendFailedJson(oroot, errMsg, errCode);
+            if (!success)
+            {
+                QJsonObject oroot = root;
+                oroot["msg"] = "failed_memorymgmt";
+                sendFailedJson(oroot, errMsg, errCode);
+            }
         });
     }
     else if (root["msg"] == "exit_memorymgmt")
@@ -205,6 +208,27 @@ void WSServerCon::processMessage(const QString &message)
             QJsonObject ores = o;
             QJsonObject oroot = root;
             oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "del_credential")
+    {
+        QJsonObject o = root["data"].toObject();
+        mpdevice->delCredentialAndLeave(o["service"].toString(), o["login"].toString(),
+                defaultProgressCb,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            oroot["data"] = QJsonObject({{ "success", true }});
             sendJsonMessage(oroot);
         });
     }
@@ -335,14 +359,15 @@ void WSServerCon::processMessage(const QString &message)
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
-            //If not success send an error json
-            //if success, don't do anything, the mmm mode will
-            //be disabled automatically
             if (!success)
             {
                 sendFailedJson(root, errstr);
                 return;
             }
+
+            QJsonObject oroot = root;
+            oroot["data"] = QJsonObject({{ "success", true }});
+            sendJsonMessage(oroot);
         },
         defaultProgressCb);
     }

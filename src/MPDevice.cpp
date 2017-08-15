@@ -979,7 +979,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
 
 void MPDevice::startMemMgmtMode(bool wantData,
                                 std::function<void(int total, int current)> cbProgress,
-                                std::function<void(int errCode, QString errMsg)> cbFailure)
+                                std::function<void(bool success, int errCode, QString errMsg)> cb)
 {
     /* Start MMM here, and load all memory data from the device */
 
@@ -1010,6 +1010,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
         {
             qInfo() << "Mem management mode enabled, DB checked";
             force_memMgmtMode(true);
+            cb(true, 0, QString());
         }
         else
         {
@@ -1020,7 +1021,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
             //identifier for a translated error message
             //The string is used for client (CLI for ex.) that
             //does not want to use the error code
-            cbFailure(0, "Database Contains Errors, Please Run Integrity Check");
+            cb(false, 0, "Database Contains Errors, Please Run Integrity Check");
         }
     });
 
@@ -1034,7 +1035,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
         //identifier for a translated error message
         //The string is used for client (CLI for ex.) that
         //does not want to use the error code
-        cbFailure(0, "Couldn't Load Database, Please Approve Prompt On Device");
+        cb(false, 0, "Couldn't Load Database, Please Approve Prompt On Device");
     });
 
     jobsQueue.enqueue(jobs);
@@ -3696,6 +3697,69 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
     runAndDequeueJobs();
 }
 
+void MPDevice::delCredentialAndLeave(const QString &service, const QString &login,
+                                     std::function<void(int total, int current)> cbProgress,
+                                     std::function<void(bool success, QString errstr)> cb)
+{
+    auto deleteCred = [=]()
+    {
+        QJsonArray allCreds;
+        bool found = false;
+        foreach (MPNode *n, getLoginNodes())
+        {
+            if (n->getType() == MPNode::NodeParent)
+            {
+                foreach (MPNode *child, n->getChildNodes())
+                {
+                    if (n->getService() == service &&
+                        child->getLogin() == login)
+                    {
+                        found = true;
+                        continue;
+                    }
+
+                    QJsonObject o = {{ "address", QJsonArray({{ child->getAddress().at(0) },
+                                                              { child->getAddress().at(1) }}) },
+                                     { "description", child->getDescription() },
+                                     { "favorite", child->getFavoriteProperty() },
+                                     { "login", child->getLogin() },
+                                     { "password", "" },
+                                     { "service", n->getService() }};
+
+                    allCreds.append(o);
+                }
+            }
+        }
+
+        if (!found)
+        {
+            exitMemMgmtMode();
+            cb(false, "Credential was not found in database");
+        }
+        else
+            setMMCredentials(allCreds, [=](bool success, QString errstr)
+            {
+                exitMemMgmtMode(); //just in case
+                cb(success, errstr);
+            });
+    };
+
+    if (!get_memMgmtMode())
+    {
+        startMemMgmtMode(false,
+                         cbProgress,
+                         [=](bool success, int, QString errMsg)
+        {
+            if (!success)
+                cb(success, errMsg);
+            else
+                deleteCred();
+        });
+    }
+    else
+        deleteCred();
+}
+
 void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, const QByteArray &nums)> cb)
 {
     AsyncJobs *jobs = new AsyncJobs("Get random numbers from device", this);
@@ -5818,7 +5882,9 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         /* Check format */
         if (qjobject.size() != 6)
         {
-            qCritical() << "Unknown JSON return format";
+            qCritical() << "Unknown JSON return format:" << qjobject;
+            cb(false, "Wrong JSON formated credential list");
+            return;
         }
         else
         {
@@ -6065,8 +6131,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 
                     //First query if context exist
                     pwdChangeJobs->append(new MPCommandJob(this, MPCmd::CONTEXT,
-                                                  sdata,
-                                                  [=](const QByteArray &data, bool &) -> bool
+                                                           sdata,
+                                                           [=](const QByteArray &data, bool &) -> bool
                     {
                         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
                         {
