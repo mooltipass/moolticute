@@ -489,6 +489,9 @@ QtAwesome *AppGui::qtAwesome()
 
 void AppGui::checkUpdate()
 {
+    if (QStringLiteral(APP_VERSION) == "git")
+        return;
+
     auto u = QSimpleUpdater::getInstance();
     u->setModuleVersion(MC_UPDATE_URL, APP_VERSION);
     u->setNotifyOnUpdate(MC_UPDATE_URL, true);
