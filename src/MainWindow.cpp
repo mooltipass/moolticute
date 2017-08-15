@@ -346,6 +346,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::lockUnlockModeChanged, [=]()
     {
         updateComboBoxIndex(ui->lockUnlockModeComboBox, wsClient->get_lockUnlockMode());
+        checkSettingsChanged();
     });
 
 
