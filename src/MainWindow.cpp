@@ -421,6 +421,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
 
+    updateSerialInfos();
     updatePage();
 }
 
@@ -540,14 +541,22 @@ void MainWindow::enableKnockSettings(bool enable)
 }
 
 void MainWindow::updateSerialInfos() {
-    ui->labelAbouHwSerial->setText(tr("Device Serial: %1").arg(wsClient->get_hwSerial()));
-    ui->labelAboutFwVers->setText(tr("Device Firmware version: %1").arg(wsClient->get_fwVersion()));
-
     const bool connected = wsClient->get_connected();
 
-    ui->labelAboutFwVers->setVisible(connected);
-    ui->labelAbouHwSerial->setVisible(connected && wsClient->get_hwSerial() > 0);
-    ui->labelAbouHwMemory->setText(tr("Device Serial: %1Mb").arg(wsClient->get_hwMemory()));
+    ui->deviceInfoWidget->setVisible(connected);
+
+    if(connected)
+    {
+        ui->labelAboutFwVersValue->setText(wsClient->get_fwVersion());
+        ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? QString::number(wsClient->get_hwSerial()) : tr("None"));
+        ui->labelAbouHwMemoryValue->setText(tr("%1Mb").arg(wsClient->get_hwMemory()));
+    }
+    else
+    {
+        ui->labelAboutFwVersValue->setText(tr("None"));
+        ui->labelAbouHwSerialValue->setText(tr("None"));
+        ui->labelAbouHwMemoryValue->setText(tr("None"));
+    }
 }
 
 void MainWindow::checkSettingsChanged()
