@@ -78,6 +78,14 @@ void WSServer::socketDisconnected()
     if (wsocket && wsClients.contains(wsocket))
     {
         qDebug() << "Connection closed " << wsClients[wsocket];
+
+        if (isMemModeLocked() &&
+            lockedUid == wsClients[wsocket]->getClientUid())
+        {
+            qWarning() << "Exiting MMM because client exits without doing it.";
+            device->exitMemMgmtMode();
+        }
+
         wsClients[wsocket]->deleteLater();
         wsClientsReverse.remove(wsClients[wsocket]);
         wsClients.remove(wsocket);
