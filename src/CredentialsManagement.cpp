@@ -224,13 +224,11 @@ void CredentialsManagement::on_addCredentialButton_clicked()
         {
             disconnect(*conn);
             ui->gridLayoutAddCred->setEnabled(true);
-            if (!success)
-            {
-                QMessageBox::warning(this, tr("Failure"), tr("Unable to set credential %1/%2!").arg(service, login));
-                return;
-            }
+            if (success)
+                QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(service, login));
+            else
+                QMessageBox::warning(this, tr("Failure"), tr("Couldn't Add New Credential to Device"));
 
-            QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(service, login));
             ui->addCredServiceInput->clear();
             ui->addCredLoginInput->clear();
             ui->addCredPasswordInput->clear();
