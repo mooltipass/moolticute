@@ -205,6 +205,16 @@ border-right: none;
           <widget class="QListWidget" name="filesCacheListWidget"/>
          </item>
          <item>
+          <widget class="QLabel" name="emptyCacheLabel">
+           <property name="text">
+            <string>No Files In The Device</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="listFilesButton">
            <property name="minimumSize">
             <size>

@@ -6354,6 +6354,11 @@ QStringList MPDevice::getFilesCache()
     return names;
 }
 
+bool MPDevice::hasFilesCache()
+{
+    return filesCache.exist();
+}
+
 void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
 {
     /* New job for starting MMM */
