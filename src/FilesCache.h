@@ -26,6 +26,7 @@ public slots:
     void resetState();
     bool setCardCPZ(QByteArray cardCPZ);
     bool setDbChangeNumber(quint8 changeNumber);
+    bool exist();
 private:
     QByteArray m_cardCPZ;
     QString m_filePath;

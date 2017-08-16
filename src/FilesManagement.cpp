@@ -115,6 +115,7 @@ FilesManagement::FilesManagement(QWidget *parent) :
     });
 
     ui->filesCacheListWidget->setVisible(false);
+    ui->emptyCacheLabel->setVisible(false);
 }
 
 FilesManagement::~FilesManagement()
@@ -237,7 +238,8 @@ void FilesManagement::loadFilesCacheModel()
     }
 
     listWidget->setVisible(listWidget->count() > 0);
-    ui->listFilesButton->setVisible(listWidget->count() <= 0);
+    ui->emptyCacheLabel->setVisible(listWidget->count() == 0);
+    ui->listFilesButton->setVisible(false);
 }
 
 void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QModelIndex &)

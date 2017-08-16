@@ -202,6 +202,7 @@ public:
     bool isFw12() { return isFw12Flag; }
 
     QStringList getFilesCache();
+    bool hasFilesCache();
     void getStoredFiles(std::function<void(bool success, QStringList filenames)> cb);
     void updateFilesCache();
     void addFileToCache(QString fileName);

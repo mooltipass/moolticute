@@ -107,6 +107,12 @@ bool FilesCache::setDbChangeNumber(quint8 changeNumber)
         return false;
 }
 
+bool FilesCache::exist()
+{
+    QFile cache_file(m_filePath);
+    return cache_file.exists();
+}
+
 bool FilesCache::setCardCPZ(QByteArray cardCPZ)
 {
     if (m_cardCPZ == cardCPZ)
