@@ -5248,6 +5248,10 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                                         qDebug() << "Data child node mismatch for " << importedDataNodes[i]->getService();
                                         data_match_ongoing = false;
                                     }
+                                    else
+                                    {
+                                        matched_child_node->setMergeTagged();
+                                    }
                                 }
                             }
 
