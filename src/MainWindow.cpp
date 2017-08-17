@@ -782,6 +782,7 @@ void MainWindow::wantImportDatabase()
 
 void MainWindow::wantExportDatabase()
 {
+    ui->widgetHeader->setEnabled(false);
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
@@ -923,6 +924,7 @@ void MainWindow::on_pushButtonImportFile_clicked()
         QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
         return;
     }
+    ui->widgetHeader->setEnabled(false);
     wsClient->importDbFile(f.readAll(), ui->checkBoxImport->isChecked());
     connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
     wantImportDatabase();
@@ -930,6 +932,7 @@ void MainWindow::on_pushButtonImportFile_clicked()
 
 void MainWindow::dbExported(const QByteArray &d, bool success)
 {
+    ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
     if (!success)
         QMessageBox::warning(this, tr("Error"), tr("Failed to export the database, an error occured. Please check the log."));
@@ -953,6 +956,7 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
 
 void MainWindow::dbImported(bool success)
 {
+    ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
     if (!success)
         QMessageBox::warning(this, tr("Error"), tr("Failed to import the database, an error occured. Please check the log."));
