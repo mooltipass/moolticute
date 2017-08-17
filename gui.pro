@@ -40,7 +40,8 @@ SOURCES += src/main_gui.cpp \
     src/TreeItem.cpp \
     src/ServiceItem.cpp \
     src/RootItem.cpp \
-    src/AnimatedColorButton.cpp
+    src/AnimatedColorButton.cpp \
+    src/PasswordProfilesModel.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -68,7 +69,8 @@ HEADERS  += src/MainWindow.h \
     src/ItemDelegate.h \
     src/CredentialModel.h \
     src/CredentialModelFilter.h \
-    src/AnimatedColorButton.h
+    src/AnimatedColorButton.h \
+    src/PasswordProfilesModel.h
 
 mac {
     HEADERS += src/MacUtils.h

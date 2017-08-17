@@ -22,6 +22,7 @@
 #include "AutoStartup.h"
 #include "Common.h"
 #include "AppGui.h"
+#include "PasswordProfilesModel.h"
 
 template <typename T>
 static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
@@ -39,7 +40,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     bFilesAndSSHKeyTabsVisible(false),
     bAdvancedTabVisible(false),
     bFilesAndSSHKeysTabsVisibleOnDemand(true),
-    previousWidget(nullptr)
+    previousWidget(nullptr),
+    m_passwordProfilesModel(new PasswordProfilesModel(this))
 {
     QSettings s;
     bFilesAndSSHKeysTabsVisibleOnDemand = s.value("settings/FilesAndSSHKeysTabsVisibleOnDemand").toBool();
@@ -63,6 +65,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->widgetCredentials->setWsClient(wsClient);
     ui->widgetFiles->setWsClient(wsClient);
     ui->widgetSSH->setWsClient(wsClient);
+
+    ui->widgetCredentials->setPasswordProfilesModel(m_passwordProfilesModel);
 
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
 

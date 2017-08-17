@@ -25,10 +25,13 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QProgressBar>
+#include <QComboBox>
 #include <array>
 #include "QtAwesome.h"
 #include "zxcvbn.h"
 #include <QDebug>
+
+#include "PasswordProfilesModel.h"
 
 #define PROGRESS_STYLE \
     "QProgressBar {" \
@@ -43,9 +46,11 @@
     "border-radius: 2px;" \
     "}"
 
+static const QString kCustomPasswordItem(QObject::tr("One time custom password"));
+
 PasswordLineEdit::PasswordLineEdit(QWidget* parent)
- : QLineEdit(parent)
- , m_passwordOptionsPopup(nullptr)
+ : QLineEdit(parent),
+   m_passwordOptionsPopup(nullptr)
 
 {
 
@@ -70,9 +75,19 @@ PasswordLineEdit::PasswordLineEdit(QWidget* parent)
     this->addAction(m_showPassword, QLineEdit::TrailingPosition);
 }
 
+void PasswordLineEdit::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
+{
+    m_passwordProfilesModel = passwordProfilesModel;
+
+    if(m_passwordOptionsPopup)
+    {
+        m_passwordOptionsPopup->setPasswordProfilesModel(passwordProfilesModel);
+    }
+}
+
 void PasswordLineEdit::showPasswordOptions() {
     if(!m_passwordOptionsPopup) {
-        m_passwordOptionsPopup = new PasswordOptionsPopup(this);
+        m_passwordOptionsPopup = new PasswordOptionsPopup(m_passwordProfilesModel, this);
         connect(m_passwordOptionsPopup, &PasswordOptionsPopup::passwordGenerated,
                 this, &QLineEdit::setText);
         connect(m_passwordOptionsPopup, &PasswordOptionsPopup::passwordGenerated,
@@ -99,10 +114,9 @@ void PasswordLineEdit::setPasswordVisible(bool visible) {
     setEchoMode(visible ? QLineEdit::Normal: QLineEdit::Password);
 }
 
-PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
+PasswordOptionsPopup::PasswordOptionsPopup(PasswordProfilesModel *passwordProfilesModel, QWidget* parent)
     : QFrame(parent, Qt::Popup)
 {
-
     setFrameShadow(QFrame::Plain);
     setFrameShape(QFrame::Panel);
 
@@ -130,6 +144,13 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
     m_symbolsCB = new QCheckBox(tr("Symbols && specials characters"));
     m_symbolsCB->setChecked(true);
 
+    m_customPasswordControls = new QWidget;
+    m_customPasswordControls->setLayout(new QVBoxLayout);
+    m_customPasswordControls->layout()->addWidget(m_lowerCaseCB);
+    m_customPasswordControls->layout()->addWidget(m_upperCaseCB);
+    m_customPasswordControls->layout()->addWidget(m_digitsCB);
+    m_customPasswordControls->layout()->addWidget(m_symbolsCB);
+
     m_fillBtn = new QPushButton(tr("Fill"));
     m_fillBtn->setShortcut(QKeySequence(Qt::Key_Return));
 
@@ -146,10 +167,16 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
     m_strengthBar->setMaximum(200);
     m_strengthBar->setTextVisible(false);
 
+    m_passwordProfileLabel = new QLabel(tr("Password Profile:"));
+    m_passwordProfileCMB = new QComboBox;
+    setPasswordProfilesModel(passwordProfilesModel);
+    onPasswordProfileChanged(m_passwordProfileCMB->currentIndex());
+
     QVBoxLayout* mainLayout = new QVBoxLayout;
     QHBoxLayout* buttonLayout = new QHBoxLayout;
     QHBoxLayout* sliderLayout = new QHBoxLayout;
     QHBoxLayout* qualityLayout = new QHBoxLayout;
+    QHBoxLayout *profileLayout = new QHBoxLayout;
 
     buttonLayout->addWidget(m_refreshBtn);
     buttonLayout->addWidget(m_fillBtn);
@@ -172,10 +199,10 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
 
     mainLayout->addSpacing(10);
 
-    mainLayout->addWidget(m_lowerCaseCB);
-    mainLayout->addWidget(m_upperCaseCB);
-    mainLayout->addWidget(m_digitsCB);
-    mainLayout->addWidget(m_symbolsCB);
+    profileLayout->addWidget(m_passwordProfileLabel);
+    profileLayout->addWidget(m_passwordProfileCMB);
+    mainLayout->addLayout(profileLayout);
+    mainLayout->addWidget(m_customPasswordControls);
 
     mainLayout->addSpacing(10);
 
@@ -191,6 +218,8 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
 
     connect(m_fillBtn, &QPushButton::clicked, this, &PasswordOptionsPopup::emitPassword);
 
+    connect(m_passwordProfileCMB, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &PasswordOptionsPopup::onPasswordProfileChanged);
+
     auto p = this->palette();
     p.setColor(QPalette::Window, Qt::white);
     setPalette(p);
@@ -199,12 +228,27 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
 
 }
 
+void PasswordOptionsPopup::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
+{
+    m_passwordProfileCMB->setModel(passwordProfilesModel);
+    m_passwordProfileCMB->addItem(kCustomPasswordItem);
+}
+
 void PasswordOptionsPopup::updatePasswordLength(int length) {
     m_sliderLengthLabel->setText(tr("Length: %1 ").arg(length));
 }
 
 void PasswordOptionsPopup::emitPassword() {
     Q_EMIT passwordGenerated(m_passwordLabel->text());
+}
+
+void PasswordOptionsPopup::onPasswordProfileChanged(int index)
+{
+    Q_UNUSED(index)
+    bool visible = m_passwordProfileCMB->currentText() == kCustomPasswordItem;
+    m_customPasswordControls->setVisible(visible);
+
+    generatePassword();
 }
 
 void PasswordOptionsPopup::showEvent(QShowEvent* e) {
@@ -251,76 +295,18 @@ void LockedPasswordLineEdit::setLocked(bool locked) {
 
 
 void PasswordOptionsPopup::generatePassword() {
-
-    static bool init = false;
-    static std::array<char, 26> upperLetters;
-    static std::array<char, 26> lowerLetters;
-    static std::array<char, 10> digits;
-    static std::array<char, 29> symbols{{ '~', '!', '@', '#', '$', '%', '^', '&', '*',
-            '(', ')', '-', '_', '+', '=', '{', '}', '[', ']', '\\', '|', ':', ';', '<', '>', ',', '.', '?', '/' }};
-
-    if(!init) {
-        //Create list of all possible characters
-
-        char begin = 'A';
-        std::generate(std::begin(upperLetters), std::end(upperLetters), [&begin]() { return begin++;});
-        begin = 'a';
-        std::generate(std::begin(lowerLetters), std::end(lowerLetters), [&begin]() { return begin++;});
-        begin = '0';
-        std::generate(std::begin(digits), std::end(digits), [&begin]() { return begin++;});
-        init = true;
-    }
-
-    //Initialize a mersen twister engine
-    if(m_random_generator == std::mt19937{}) {
-        std::random_device r;
-        std::seed_seq seed{r(), r(), r(), r(), r(), r(), r(), r()};
-        m_random_generator.seed(seed);
-    }
-
-    const bool useUpper   = m_upperCaseCB->isChecked();
-    const bool useLower   = m_lowerCaseCB->isChecked();
-    const bool useDigits  = m_digitsCB->isChecked();
-    const bool useSymbols = m_symbolsCB->isChecked();
-    const int length = m_lengthSlider->value();
-
-    //compute the size of the character pool based on the user input
-
-    int poolSize = 0;
-    if(useUpper)
-        poolSize += upperLetters.size();
-    if(useLower)
-        poolSize += lowerLetters.size();
-    if(useDigits)
-        poolSize += digits.size();
-    if(useSymbols)
-        poolSize += symbols.size();
-
-    if(poolSize == 0  || length <= 0)
+    PasswordProfile *profile = static_cast<PasswordProfilesModel*>(m_passwordProfileCMB->model())->getProfile(m_passwordProfileCMB->currentIndex());
+    if(!profile)
         return;
 
-    std::vector<char> pool(poolSize);
-
-    //Fill the pool
-    auto it = std::begin(pool);
-    if(useUpper)
-        it = std::copy(std::begin(upperLetters), std::end(upperLetters), it);
-    if(useLower)
-        it = std::copy(std::begin(lowerLetters), std::end(lowerLetters), it);
-    if(useDigits)
-        it = std::copy(std::begin(digits), std::end(digits), it);
-    if(useSymbols)
-        it = std::copy(std::begin(symbols), std::end(symbols), it);
-
-
-    // Suffling the pool one doesn't hurts and offer a second level of randomization
-    std::shuffle(std::begin(pool), std::end(pool), m_random_generator);
+    std::vector<char> pool = profile->getPool();
+    const int length = m_lengthSlider->value();
 
     QByteArray result;
     result.resize(length);
 
     // Create a distribution based on the pool size
-    std::uniform_int_distribution<char> distribution(0, poolSize-1);
+    std::uniform_int_distribution<char> distribution(0, pool.size() - 1);
 
     //Fill the password with random characters
     for(int i = 0; i < length; i++) {
