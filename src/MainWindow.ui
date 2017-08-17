@@ -488,8 +488,8 @@ QWidget {background-color: #EFEFEF;}</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>720</width>
-             <height>597</height>
+             <width>839</width>
+             <height>768</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1099,16 +1099,43 @@ QWidget {background-color: #EFEFEF;}</string>
          <number>50</number>
         </property>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <property name="spacing">
-           <number>30</number>
+         <layout class="QFormLayout" name="formLayout">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetNoConstraint</enum>
           </property>
-          <item>
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          </property>
+          <property name="labelAlignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="formAlignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="horizontalSpacing">
+           <number>60</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>40</number>
+          </property>
+          <property name="leftMargin">
+           <number>60</number>
+          </property>
+          <property name="topMargin">
+           <number>40</number>
+          </property>
+          <property name="rightMargin">
+           <number>60</number>
+          </property>
+          <item row="0" column="0">
            <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
             <item>
              <widget class="QLabel" name="label_13">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -1117,12 +1144,6 @@ QWidget {background-color: #EFEFEF;}</string>
                <size>
                 <width>300</width>
                 <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>300</width>
-                <height>16777215</height>
                </size>
               </property>
               <property name="font">
@@ -1140,7 +1161,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QLabel" name="label_14">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -1149,12 +1170,6 @@ QWidget {background-color: #EFEFEF;}</string>
                <size>
                 <width>300</width>
                 <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>300</width>
-                <height>16777215</height>
                </size>
               </property>
               <property name="text">
@@ -1167,12 +1182,24 @@ QWidget {background-color: #EFEFEF;}</string>
             </item>
            </layout>
           </item>
-          <item>
+          <item row="0" column="1">
            <widget class="QPushButton" name="pushButtonExportFile">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
               <width>150</width>
               <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
              </size>
             </property>
             <property name="text">
@@ -1180,32 +1207,15 @@ QWidget {background-color: #EFEFEF;}</string>
             </property>
            </widget>
           </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_12">
-          <property name="spacing">
-           <number>30</number>
-          </property>
-          <item>
+          <item row="1" column="0">
            <layout class="QVBoxLayout" name="verticalLayout_22">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
             <item>
              <widget class="QLabel" name="label_24">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -1214,12 +1224,6 @@ QWidget {background-color: #EFEFEF;}</string>
                <size>
                 <width>300</width>
                 <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>300</width>
-                <height>16777215</height>
                </size>
               </property>
               <property name="font">
@@ -1248,12 +1252,6 @@ QWidget {background-color: #EFEFEF;}</string>
                 <height>0</height>
                </size>
               </property>
-              <property name="maximumSize">
-               <size>
-                <width>300</width>
-                <height>16777215</height>
-               </size>
-              </property>
               <property name="text">
                <string>Restore your database from a file</string>
               </property>
@@ -1265,7 +1263,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QCheckBox" name="checkBoxImport">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -1277,45 +1275,15 @@ QWidget {background-color: #EFEFEF;}</string>
             </item>
            </layout>
           </item>
-          <item>
-           <widget class="QPushButton" name="pushButtonImportFile">
-            <property name="minimumSize">
-             <size>
-              <width>150</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Import from file</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_23">
-          <property name="spacing">
-           <number>30</number>
-          </property>
-          <item>
+          <item row="2" column="0">
            <layout class="QVBoxLayout" name="verticalLayout_18">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
             <item>
              <widget class="QLabel" name="label_27">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -1324,12 +1292,6 @@ QWidget {background-color: #EFEFEF;}</string>
                <size>
                 <width>300</width>
                 <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>300</width>
-                <height>16777215</height>
                </size>
               </property>
               <property name="font">
@@ -1347,7 +1309,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QLabel" name="label_29">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -1356,12 +1318,6 @@ QWidget {background-color: #EFEFEF;}</string>
                <size>
                 <width>300</width>
                 <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>300</width>
-                <height>16777215</height>
                </size>
               </property>
               <property name="text">
@@ -1374,12 +1330,24 @@ QWidget {background-color: #EFEFEF;}</string>
             </item>
            </layout>
           </item>
-          <item>
+          <item row="2" column="1">
            <widget class="QPushButton" name="pushButtonIntegrity">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
               <width>150</width>
               <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
              </size>
             </property>
             <property name="text">
@@ -1387,18 +1355,30 @@ QWidget {background-color: #EFEFEF;}</string>
             </property>
            </widget>
           </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="pushButtonImportFile">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="sizeHint" stdset="0">
+            <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>20</height>
+              <width>150</width>
+              <height>0</height>
              </size>
             </property>
-           </spacer>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Import from file</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
