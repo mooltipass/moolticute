@@ -443,6 +443,16 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::updatePage()
 {
+    // Enable or Disable tabs according to the device status
+    bool isCardUnknown = wsClient->get_status() == Common::UnkownSmartcad;
+
+    ui->pushButtonCred->setEnabled(!isCardUnknown);
+    ui->pushButtonFiles->setEnabled(!isCardUnknown);
+    ui->pushButtonSSH->setEnabled(!isCardUnknown);
+    ui->pushButtonExportFile->setEnabled(!isCardUnknown);
+    ui->pushButtonIntegrity->setEnabled(!isCardUnknown);
+
+
     if ((ui->stackedWidget->currentWidget() == ui->pageCredentials ||
          ui->stackedWidget->currentWidget() == ui->pageFiles) &&
             wsClient->get_memMgmtMode())
