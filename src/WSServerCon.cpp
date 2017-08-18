@@ -129,7 +129,11 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "exit_memorymgmt")
     {
         //send command to exit MMM
-        mpdevice->exitMemMgmtMode();
+        auto cb = [=](bool success, int errCode, QString errMsg) {
+            // TODO: notify all clients about the error.
+        };
+
+        mpdevice->exitMemMgmtMode(true, cb);
     }
     else if (root["msg"] == "start_memcheck")
     {

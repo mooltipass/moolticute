@@ -125,7 +125,10 @@ public:
     void startMemMgmtMode(bool wantData,
                           std::function<void(int total, int current)> cbProgress,
                           std::function<void(bool success, int errCode, QString errMsg)> cb);
-    void exitMemMgmtMode(bool setMMMBool = true);
+
+    void exitMemMgmtMode(bool setMMMBool = true,
+                         std::function<void(bool success, int errCode, QString errMsg)> cb = NULL);
+
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
                              std::function<void(int total, int current)> cbProgress);
 
