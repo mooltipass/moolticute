@@ -3318,7 +3318,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     return diagSavePacketsGenerated;
 }
 
-void MPDevice::exitMemMgmtMode(bool setMMMBool, std::function<void(bool success, int errCode, QString errMsg)> cb)
+void MPDevice::exitMemMgmtMode(bool setMMMBool)
 {
     AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
@@ -3332,8 +3332,6 @@ void MPDevice::exitMemMgmtMode(bool setMMMBool, std::function<void(bool success,
         {
             force_memMgmtMode(false);
         }
-        if (cb != NULL)
-            cb(true, 0, "");
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
@@ -3344,9 +3342,6 @@ void MPDevice::exitMemMgmtMode(bool setMMMBool, std::function<void(bool success,
         {
             force_memMgmtMode(false);
         }
-
-        if (cb != NULL)
-            cb(false, 1, "Failed to exit MMM");
     });
 
     jobsQueue.enqueue(jobs);
