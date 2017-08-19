@@ -782,6 +782,18 @@ void MainWindow::wantSaveCredentialManagement()
     ui->progressBarWait->hide();
 
     connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+
+    auto conn = std::make_shared<QMetaObject::Connection>();
+    *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & service, const QString & login, const QString & message, bool success)
+    {
+        qDebug() << "set_credentials success" << success << message;
+        disconnect(*conn);
+
+        if (!success) {
+            QMessageBox::warning(this, tr("Failure"), tr("Couldn't Save Credentials to Device"));
+            ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+        }
+    });
 }
 
 void MainWindow::wantImportDatabase()

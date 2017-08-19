@@ -170,11 +170,12 @@ void WSClient::onTextMessageReceived(const QString &message)
         set_hwSerial(o["hw_serial"].toInt());
         set_hwMemory(o["flash_size"].toInt());
     }
-    else if (rootobj["msg"] == "set_credential")
+    else if (rootobj["msg"] == "set_credentials")
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o["failed"].toBool();
-        credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
+        auto message = success ? o["description"].toString() : o["error_message"].toString();
+        emit credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
     }
     else if (rootobj["msg"] == "show_app")
     {
