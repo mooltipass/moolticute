@@ -784,13 +784,12 @@ void MainWindow::wantSaveCredentialManagement()
     connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
 
     auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & service, const QString & login, const QString & message, bool success)
+    *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & , const QString &, const QString &, bool success)
     {
-        qDebug() << "set_credentials success" << success << message;
         disconnect(*conn);
 
         if (!success) {
-            QMessageBox::warning(this, tr("Failure"), tr("Couldn't Save Credentials to Device"));
+            QMessageBox::warning(this, tr("Failure"), tr("Couldn't save credentials, please contact the support team with moolticute's log"));
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         }
     });

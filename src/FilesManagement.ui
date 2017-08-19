@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>691</width>
-    <height>597</height>
+    <height>643</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -389,7 +389,6 @@ border-right: none;
                <height>20</height>
               </size>
              </property>
-             <zorder></zorder>
             </widget>
            </item>
            <item>
@@ -442,7 +441,7 @@ border-right: none;
                </spacer>
               </item>
               <item>
-               <layout class="QVBoxLayout" name="verticalLayout_7">
+               <layout class="QVBoxLayout" name="verticalLayout_8">
                 <property name="spacing">
                  <number>14</number>
                 </property>
