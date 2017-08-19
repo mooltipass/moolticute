@@ -4297,7 +4297,6 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
                 removeFileFromCache(services[i]);
             }
 
-            // todo: update db change number
             return;
         });
         connect(saveJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -5274,6 +5273,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                                 {
                                     /* First node */
                                     dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress, newAddressesNeededCounter);
+                                    prev_matched_child_node = newDataChildNodePt;
                                 }
                                 else
                                 {
