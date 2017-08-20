@@ -245,7 +245,7 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
 {
     if (!success)
     {
-        QMessageBox::warning(this, tr("Failure"), tr("Unable to query password!"));
+        ui->credDisplayPasswordInput->setPlaceholderText("Password Query Was Denied");
         return;
     }
 
