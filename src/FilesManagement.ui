@@ -166,7 +166,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageLocked">
       <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -234,17 +234,27 @@ border-right: none;
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="listFilesButton">
-           <property name="minimumSize">
-            <size>
-             <width>208</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>List Files</string>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QPushButton" name="listFilesButton">
+             <property name="minimumSize">
+              <size>
+               <width>208</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>300</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>List Files</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <spacer name="verticalSpacer_4">
@@ -310,17 +320,27 @@ border-right: none;
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButtonEnterMMM">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Enter Files Management Mode</string>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QPushButton" name="pushButtonEnterMMM">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>300</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Enter Files Management Mode</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <spacer name="verticalSpacer_6">
@@ -453,6 +473,12 @@ border-right: none;
                 </property>
                 <item>
                  <widget class="QPushButton" name="pushButtonSaveFile">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>Export file...</string>
                   </property>
@@ -460,6 +486,12 @@ border-right: none;
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButtonUpdateFile">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>Update file...</string>
                   </property>
@@ -472,6 +504,12 @@ border-right: none;
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
                   </property>
                   <property name="text">
                    <string>Delete file</string>
