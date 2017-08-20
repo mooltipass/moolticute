@@ -327,9 +327,9 @@ void FilesManagement::dataFileRequested(const QString &service, const QByteArray
     if (!success)
     {
         if (currentItem)
-            QMessageBox::warning(this, tr("Failure"), tr("Data sending was denied for '%1'!").arg(currentItem->text()));
+            QMessageBox::warning(this, tr("Failure"), tr("Data Fetch Denied for '%1'!").arg(currentItem->text()));
         else
-            QMessageBox::warning(this, tr("Failure"), tr("Data sending was denied!"));
+            QMessageBox::warning(this, tr("Failure"), tr("Data Fetch Denied!"));
         return;
     }
 
