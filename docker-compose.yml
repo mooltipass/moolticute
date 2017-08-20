@@ -1,0 +1,14 @@
+version: '2'
+services:
+  ubuntu:
+    container_name: moolticute
+    image: tomaszjaniczek/moolticute
+    volumes:
+      - ./:/app
+    stdin_open: true
+    tty: true
+    working_dir: /app
+    environment:
+      - GITHUB_LOGIN=${GITHUB_LOGIN}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_REPO=${GITHUB_REPO}
