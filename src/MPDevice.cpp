@@ -1003,7 +1003,10 @@ void MPDevice::startMemMgmtMode(bool wantData,
         Q_UNUSED(data);
 
         /* Tag favorites */
-        tagFavoriteNodes();
+        if (!wantData)
+        {
+            tagFavoriteNodes();
+        }
 
         /* Check DB */
         if (checkLoadedNodes(!wantData, wantData, false))
@@ -3089,7 +3092,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             diagSavePacketsGenerated = true;
             qDebug() << "Updating cred & data change numbers";
             qDebug() << "Cred DB: " << get_credentialsDbChangeNumber() << " clone: " << credentialsDbChangeNumberClone;
-            qDebug() << "Cred DB: " << get_dataDbChangeNumber() << " clone: " << dataDbChangeNumberClone;
+            qDebug() << "Data cred DB: " << get_dataDbChangeNumber() << " clone: " << dataDbChangeNumberClone;
             QByteArray updateChangeNumbersPacket = QByteArray();
             updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
             updateChangeNumbersPacket.append(get_dataDbChangeNumber());
@@ -4649,6 +4652,7 @@ QByteArray MPDevice::generateExportFileData(void)
 bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
 {    
     /* When we add nodes, we give them an address based on this counter */
+    cleanMMMVars();
     cleanImportedVars();
 
     /* Local vars */
@@ -5246,6 +5250,29 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                                     {
                                         qDebug() << "Data child node mismatch for " << importedDataNodes[i]->getService();
                                         data_match_ongoing = false;
+
+                                        /* Chain broken, delete all following data blocks */
+                                        while ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0))
+                                        {
+                                            matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
+
+                                            // Check if we actually found the node
+                                            if (!matched_child_node)
+                                            {
+                                                cleanImportedVars();
+                                                exitMemMgmtMode(false);
+                                                cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                                                qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
+                                                return;
+                                            }
+
+                                            /* Next item */
+                                            cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
+                                            cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
+
+                                            /* Delete current block */
+                                            dataChildNodes.removeOne(matched_child_node);
+                                        }
                                     }
                                     else
                                     {
@@ -5272,13 +5299,15 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                                 if (!prev_matched_child_node)
                                 {
                                     /* First node */
-                                    dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress, newAddressesNeededCounter);
-                                    prev_matched_child_node = newDataChildNodePt;
+                                    dataNodes[j]->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
                                 }
                                 else
                                 {
-                                    prev_matched_child_node->setNextChildDataAddress(MPNode::EmptyAddress, newAddressesNeededCounter);
+                                    prev_matched_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
                                 }
+
+                                /* Update prev matched child node */
+                                prev_matched_child_node = newDataChildNodePt;
                             }
 
                             // Fetch next matched child if comparison is still ongoing
@@ -5584,6 +5613,7 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
             if (curChildNodeAddr == MPNode::EmptyAddress)
             {
                 /* Remove parent */
+                qDebug() << "Empty data parent " << nodeItem->getService() << " detected, deleting it...";
                 removeEmptyParentFromDB(nodeItem, true);
             }
 
@@ -5611,13 +5641,13 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
                     if (curNode->getAddress() == nodeItem->getStartChildAddress())
                     {
                         nodeItem->setStartChildAddress(MPNode::EmptyAddress);
+
+                        /* Remove parent */
+                        removeEmptyParentFromDB(nodeItem, true);
                     }
                     dataChildNodes.removeOne(curNode);
                 }
             }
-
-            /* Remove parent */
-            removeEmptyParentFromDB(nodeItem, true);
         }
     }
 
