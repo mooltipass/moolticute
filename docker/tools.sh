@@ -51,6 +51,35 @@ function get_release_id_by_name()
     ok.sh list_releases "$GITHUB_LOGIN" "$GITHUB_REPO" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME" | awk '{ print $2 }'
 }
 
+# Get all draft releases
+#
+# Usage:
+#
+#     get_draft_releases
+#
+function get_draft_releases()
+{
+    local DRAFTS=$(ok.sh list_releases "$GITHUB_LOGIN" "$GITHUB_REPO" _filter='.[] | select(.draft == true and (.assets | length == 0))')
+    local ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+    for R in ${DRAFTS[@]}
+    do
+        RELEASE_TAG=$(echo "$R" | jq -r '.tag_name')
+
+        echo "$ORIGINAL_BRANCH / $RELEASE_TAG"
+
+        git stash
+
+        git pull --tags || true
+        git checkout tags/$RELEASE_TAG
+
+        make debian || true
+
+        git checkout $ORIGINAL_BRANCH
+        git stash pop
+    done
+}
+
 # Get a release asset ID specifying its name
 #
 # Usage:
