@@ -8,6 +8,8 @@ QT       += testlib
 
 QT       -= gui
 
+QMAKE_CXXFLAGS += -std=c++0x
+
 TARGET = tst_testsfilescache
 CONFIG   += console
 CONFIG   -= app_bundle

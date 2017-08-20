@@ -1,8 +1,8 @@
 PROJECT_NAME := moolticute
 
 TRAVIS_BUILD_DIR := $(shell pwd)
-TRAVIS_TAG := $(shell git describe --tags --abbrev=0)
-TRAVIS_COMMIT ?= $(shell git log -1 $(TRAVIS_TAG) | head -n 1 | awk '{ print $$2 }')
+TRAVIS_TAG := $(shell git describe --tags $$(git rev-list --tags --max-count=1))
+TRAVIS_COMMIT := $(shell git log -1 $(TRAVIS_TAG) | head -n 1 | awk '{ print $$2 }')
 
 CONTAINER_NAME := $(PROJECT_NAME)
 DOCKER_EXEC := docker exec $(CONTAINER_NAME) /bin/bash -c
@@ -35,7 +35,7 @@ docker_image:
 
 # GitHub
 github_upload:
-	$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && create_release_and_upload_asset $(TRAVIS_TAG) $(DEB_NAME) $(DEB_MIME)"
+	-$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && create_release_and_upload_asset $(TRAVIS_TAG) $(DEB_NAME) $(DEB_MIME)"
 
 # Git
 git_setup:
@@ -51,6 +51,7 @@ deb_clean:
 	$(DOCKER_EXEC) "dh_clean"
 
 deb_changelog: git_setup
+	@echo "Generating changelog for tag $(TRAVIS_TAG) [$(TRAVIS_COMMIT)]"
 	$(DOCKER_EXEC) 'gbp dch --debian-tag="%(version)s" --new-version=$(DEB_VERSION) --debian-branch $(TRAVIS_BRANCH) \
 	 --git-author --distribution="stable" --force-distribution \
 	 --commit --since=$(TRAVIS_COMMIT) --release --spawn-editor=never --ignore-branch'
