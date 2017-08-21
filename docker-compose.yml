@@ -2,7 +2,7 @@ version: '2'
 services:
   ubuntu:
     container_name: moolticute
-    image: tomaszjaniczek/moolticute
+    image: limpkin/moolticute
     volumes:
       - ./:/app
     stdin_open: true
