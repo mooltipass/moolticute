@@ -459,24 +459,21 @@ void MainWindow::updatePage()
     {
         if (!ui->widgetCredentials->confirmDiscardUneditedCredentialChanges())
             return;
+        if (QMessageBox::question(this,
+                                  tr("Exit the credentials manager?"),
+                                  tr("Switching tabs will lock out the credentials management mode. Are you sure you want to switch tab ?"),
+                                  QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::Yes) == QMessageBox::No)
+        {
+            //Force the selected button to go back to the correct state
+            //when we pressed "No"
+            if (ui->stackedWidget->currentWidget() == ui->pageCredentials)
+                ui->pushButtonCred->setChecked(true);
+            else if (ui->stackedWidget->currentWidget() == ui->pageFiles)
+                ui->pushButtonFiles->setChecked(true);
 
-        // Remove the warning about tab switching
-        // Just letting the code commented for the case of a mind change
-//        if (QMessageBox::question(this,
-//                                  tr("Exit the credentials manager?"),
-//                                  tr("Switching tabs will lock out the credentials management mode. Are you sure you want to switch tab ?"),
-//                                  QMessageBox::Yes | QMessageBox::No,
-//                                  QMessageBox::Yes) == QMessageBox::No)
-//        {
-//            //Force the selected button to go back to the correct state
-//            //when we pressed "No"
-//            if (ui->stackedWidget->currentWidget() == ui->pageCredentials)
-//                ui->pushButtonCred->setChecked(true);
-//            else if (ui->stackedWidget->currentWidget() == ui->pageFiles)
-//                ui->pushButtonFiles->setChecked(true);
-
-//            return;
-//        }
+            return;
+        }
 
         wsClient->sendLeaveMMRequest();
     }
