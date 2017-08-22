@@ -201,8 +201,10 @@ void CredentialsManagement::requestPasswordForSelectedItem()
     {
         // Retrieve parent
         TreeItem *pItem = pLoginItem->parentItem();
-        if (pItem != nullptr)
+        if (pItem != nullptr) {
             wsClient->requestPassword(pItem->name(), pLoginItem->name());
+            ui->credDisplayPasswordInput->setPlaceholderText("Please Approve On Device");
+        }
     }
 }
 

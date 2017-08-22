@@ -166,28 +166,21 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageLocked">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_7">
        <property name="spacing">
         <number>35</number>
        </property>
        <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>64</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
         <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="leftMargin">
+          <number>40</number>
+         </property>
+         <property name="rightMargin">
+          <number>40</number>
+         </property>
          <item>
           <spacer name="verticalSpacer">
            <property name="orientation">
@@ -202,10 +195,36 @@ border-right: none;
           </spacer>
          </item>
          <item>
+          <widget class="QLabel" name="label_5">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Quick File Access</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QListWidget" name="filesCacheListWidget"/>
          </item>
          <item>
           <widget class="QLabel" name="emptyCacheLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>No Files In The Device</string>
            </property>
@@ -247,6 +266,12 @@ border-right: none;
          <property name="spacing">
           <number>30</number>
          </property>
+         <property name="leftMargin">
+          <number>40</number>
+         </property>
+         <property name="rightMargin">
+          <number>40</number>
+         </property>
          <item>
           <spacer name="verticalSpacer_5">
            <property name="orientation">
@@ -287,7 +312,7 @@ border-right: none;
          <item>
           <widget class="QPushButton" name="pushButtonEnterMMM">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -311,19 +336,6 @@ border-right: none;
           </spacer>
          </item>
         </layout>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>63</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -377,6 +389,7 @@ border-right: none;
                <height>20</height>
               </size>
              </property>
+             <zorder></zorder>
             </widget>
            </item>
            <item>
@@ -405,7 +418,7 @@ border-right: none;
                  <bool>false</bool>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 <set>Qt::AlignCenter</set>
                 </property>
                 <property name="readOnly">
                  <bool>true</bool>
@@ -429,7 +442,7 @@ border-right: none;
                </spacer>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <layout class="QVBoxLayout" name="verticalLayout_7">
                 <property name="spacing">
                  <number>14</number>
                 </property>
@@ -439,13 +452,6 @@ border-right: none;
                 <property name="rightMargin">
                  <number>10</number>
                 </property>
-                <item>
-                 <widget class="QPushButton" name="pushButtonUpdateFile">
-                  <property name="text">
-                   <string>Update file...</string>
-                  </property>
-                 </widget>
-                </item>
                 <item>
                  <widget class="QPushButton" name="pushButtonSaveFile">
                   <property name="text">
@@ -453,31 +459,12 @@ border-right: none;
                   </property>
                  </widget>
                 </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_6">
-                <property name="spacing">
-                 <number>14</number>
-                </property>
-                <property name="leftMargin">
-                 <number>10</number>
-                </property>
-                <property name="rightMargin">
-                 <number>10</number>
-                </property>
                 <item>
-                 <spacer name="horizontalSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                 <widget class="QPushButton" name="pushButtonUpdateFile">
+                  <property name="text">
+                   <string>Update file...</string>
                   </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
+                 </widget>
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButtonDelFile">
@@ -491,19 +478,6 @@ border-right: none;
                    <string>Delete file</string>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </item>

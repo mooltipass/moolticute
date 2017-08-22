@@ -184,6 +184,12 @@ void FilesManagement::loadModel()
         filesModel->appendRow(item);
     }
     deletedList.clear();
+
+    // Select first item by default
+    auto selectionModel = ui->filesListView->selectionModel();
+    auto index = filesModel->index(0,0);
+    selectionModel->select(index, QItemSelectionModel::ClearAndSelect);
+    currentSelectionChanged(index, QModelIndex());
 }
 
 void FilesManagement::loadFilesCacheModel()
@@ -244,6 +250,7 @@ void FilesManagement::loadFilesCacheModel()
 
 void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QModelIndex &)
 {
+    qDebug() << "Selection changed";
     if (!curr.isValid())
     {
         ui->filesDisplayFrame->hide();
@@ -319,7 +326,10 @@ void FilesManagement::dataFileRequested(const QString &service, const QByteArray
 
     if (!success)
     {
-        QMessageBox::warning(this, tr("Failure"), tr("Data sending was denied for '%1'!").arg(currentItem->text()));
+        if (currentItem)
+            QMessageBox::warning(this, tr("Failure"), tr("Data sending was denied for '%1'!").arg(currentItem->text()));
+        else
+            QMessageBox::warning(this, tr("Failure"), tr("Data sending was denied!"));
         return;
     }
 
