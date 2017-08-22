@@ -29,12 +29,13 @@ class QLabel;
 class QProgressBar;
 class QComboBox;
 class PasswordProfilesModel;
+class PasswordProfile;
 
 class PasswordOptionsPopup : public QFrame {
     Q_OBJECT
 
 public:
-    PasswordOptionsPopup(PasswordProfilesModel *passwordProfilesModel, QWidget* parent);
+    PasswordOptionsPopup(QWidget* parent);
     void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);
 
 Q_SIGNALS:
@@ -42,6 +43,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void generatePassword();
+    std::vector<char> generateCustomPasswordPool();
     void updatePasswordLength(int);
     void emitPassword();
     void onPasswordProfileChanged(int index);

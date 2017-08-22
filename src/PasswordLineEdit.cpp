@@ -46,8 +46,6 @@
     "border-radius: 2px;" \
     "}"
 
-static const QString kCustomPasswordItem(QObject::tr("One time custom password"));
-
 PasswordLineEdit::PasswordLineEdit(QWidget* parent)
  : QLineEdit(parent),
    m_passwordOptionsPopup(nullptr)
@@ -80,14 +78,13 @@ void PasswordLineEdit::setPasswordProfilesModel(PasswordProfilesModel *passwordP
     m_passwordProfilesModel = passwordProfilesModel;
 
     if(m_passwordOptionsPopup)
-    {
         m_passwordOptionsPopup->setPasswordProfilesModel(passwordProfilesModel);
-    }
 }
 
 void PasswordLineEdit::showPasswordOptions() {
     if(!m_passwordOptionsPopup) {
-        m_passwordOptionsPopup = new PasswordOptionsPopup(m_passwordProfilesModel, this);
+        m_passwordOptionsPopup = new PasswordOptionsPopup(this);
+        m_passwordOptionsPopup->setPasswordProfilesModel(m_passwordProfilesModel);
         connect(m_passwordOptionsPopup, &PasswordOptionsPopup::passwordGenerated,
                 this, &QLineEdit::setText);
         connect(m_passwordOptionsPopup, &PasswordOptionsPopup::passwordGenerated,
@@ -114,7 +111,7 @@ void PasswordLineEdit::setPasswordVisible(bool visible) {
     setEchoMode(visible ? QLineEdit::Normal: QLineEdit::Password);
 }
 
-PasswordOptionsPopup::PasswordOptionsPopup(PasswordProfilesModel *passwordProfilesModel, QWidget* parent)
+PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
     : QFrame(parent, Qt::Popup)
 {
     setFrameShadow(QFrame::Plain);
@@ -169,8 +166,6 @@ PasswordOptionsPopup::PasswordOptionsPopup(PasswordProfilesModel *passwordProfil
 
     m_passwordProfileLabel = new QLabel(tr("Password Profile:"));
     m_passwordProfileCMB = new QComboBox;
-    setPasswordProfilesModel(passwordProfilesModel);
-    onPasswordProfileChanged(m_passwordProfileCMB->currentIndex());
 
     QVBoxLayout* mainLayout = new QVBoxLayout;
     QHBoxLayout* buttonLayout = new QHBoxLayout;
@@ -231,7 +226,6 @@ PasswordOptionsPopup::PasswordOptionsPopup(PasswordProfilesModel *passwordProfil
 void PasswordOptionsPopup::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
 {
     m_passwordProfileCMB->setModel(passwordProfilesModel);
-    m_passwordProfileCMB->addItem(kCustomPasswordItem);
 }
 
 void PasswordOptionsPopup::updatePasswordLength(int length) {
@@ -245,8 +239,11 @@ void PasswordOptionsPopup::emitPassword() {
 void PasswordOptionsPopup::onPasswordProfileChanged(int index)
 {
     Q_UNUSED(index)
+    qDebug() << "onPasswordProfileChanged";
+
     bool visible = m_passwordProfileCMB->currentText() == kCustomPasswordItem;
     m_customPasswordControls->setVisible(visible);
+    adjustSize();
 
     generatePassword();
 }
@@ -299,14 +296,22 @@ void PasswordOptionsPopup::generatePassword() {
     if(!profile)
         return;
 
-    std::vector<char> pool = profile->getPool();
+    std::vector<char> pool;
+    if(profile->getName() == kCustomPasswordItem)
+        pool = generateCustomPasswordPool();
+    else
+        pool = profile->getPool();
+
+    if(pool.empty())
+        return;
+
     const int length = m_lengthSlider->value();
 
     QByteArray result;
     result.resize(length);
 
     // Create a distribution based on the pool size
-    std::uniform_int_distribution<char> distribution(0, pool.size() - 1);
+    std::uniform_int_distribution<int> distribution(0, pool.size() - 1);
 
     //Fill the password with random characters
     for(int i = 0; i < length; i++) {
@@ -344,4 +349,51 @@ void PasswordOptionsPopup::generatePassword() {
         m_strengthBar->setStyleSheet(style.arg("#27ae60"));
         m_quality->setText(tr("Password Quality: %1").arg(tr("Excellent")));
     }
+}
+
+std::vector<char> PasswordOptionsPopup::generateCustomPasswordPool()
+{
+    PasswordProfile::initArrays();
+
+    std::vector<char> pool;
+
+    int poolSize = 0;
+    if(m_upperCaseCB->isChecked())
+        poolSize += PasswordProfile::upperLetters.size();
+    if(m_lowerCaseCB->isChecked())
+        poolSize += PasswordProfile::lowerLetters.size();
+    if(m_digitsCB->isChecked())
+        poolSize += PasswordProfile::digits.size();
+    if(m_symbolsCB->isChecked())
+    {
+        poolSize += kSymbols.size();
+    }
+
+    pool.resize(poolSize);
+    //Fill the pool
+    auto it = std::begin(pool);
+    if(m_upperCaseCB->isChecked())
+        it = std::copy(std::begin(PasswordProfile::upperLetters), std::end(PasswordProfile::upperLetters), it);
+    if(m_lowerCaseCB->isChecked())
+        it = std::copy(std::begin(PasswordProfile::lowerLetters), std::end(PasswordProfile::lowerLetters), it);
+    if(m_digitsCB->isChecked())
+        it = std::copy(std::begin(PasswordProfile::digits), std::end(PasswordProfile::digits), it);
+    if(m_symbolsCB->isChecked())
+    {
+        std::string str = kSymbols.toStdString();
+        it = std::copy(std::begin(str), std::end(str), it);
+    }
+
+    //Initialize a mersen twister engine
+    std::mt19937 random_generator;
+    if(random_generator == std::mt19937{}) {
+        std::random_device r;
+        std::seed_seq seed{r(), r(), r(), r(), r(), r(), r(), r()};
+        random_generator.seed(seed);
+    }
+
+    // Suffling the pool one doesn't hurts and offer a second level of randomization
+    std::shuffle(std::begin(pool), std::end(pool), random_generator);
+
+    return pool;
 }

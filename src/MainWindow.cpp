@@ -23,6 +23,7 @@
 #include "Common.h"
 #include "AppGui.h"
 #include "PasswordProfilesModel.h"
+#include "PassGenerationProfilesDialog.h"
 
 template <typename T>
 static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
@@ -119,6 +120,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(AppGui::qtAwesome()->icon(fa::undo, whiteButtons));
@@ -133,6 +135,12 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->pushButtonFiles, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonSSH, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonAdvanced, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->btnPassGenerationProfiles, &QPushButton::clicked, [this]()
+    {
+        PassGenerationProfilesDialog dlg(this);
+        dlg.setPasswordProfilesModel(m_passwordProfilesModel);
+        dlg.exec();
+    });
 
     ui->pushButtonDevSettings->setChecked(false);
 
@@ -484,16 +492,16 @@ void MainWindow::updatePage()
         return;
     }
 
-    if(!wsClient->isConnected()) {
-        ui->stackedWidget->setCurrentWidget(ui->pageNoDaemon);
-        return;
-    }
+//    if(!wsClient->isConnected()) {
+//        ui->stackedWidget->setCurrentWidget(ui->pageNoDaemon);
+//        return;
+//    }
 
-    if (!wsClient->get_connected())
-    {
-        ui->stackedWidget->setCurrentWidget(ui->pageNoConnect);
-        return;
-    }
+//    if (!wsClient->get_connected())
+//    {
+//        ui->stackedWidget->setCurrentWidget(ui->pageNoConnect);
+//        return;
+//    }
 
     if (ui->pushButtonDevSettings->isChecked()) {
         ui->stackedWidget->setCurrentWidget(ui->pageSettings);
@@ -505,18 +513,18 @@ void MainWindow::updatePage()
         return;
     }
 
-    if (wsClient->get_status() == Common::NoCardInserted)
-    {
-        ui->stackedWidget->setCurrentWidget(ui->pageMissingSecurityCard);
-        return;
-    }
+//    if (wsClient->get_status() == Common::NoCardInserted)
+//    {
+//        ui->stackedWidget->setCurrentWidget(ui->pageMissingSecurityCard);
+//        return;
+//    }
 
-    if (wsClient->get_status() == Common::Locked ||
-            wsClient->get_status() == Common::LockedScreen)
-    {
-        ui->stackedWidget->setCurrentWidget(ui->pageDeviceLocked);
-        return;
-    }
+//    if (wsClient->get_status() == Common::Locked ||
+//            wsClient->get_status() == Common::LockedScreen)
+//    {
+//        ui->stackedWidget->setCurrentWidget(ui->pageDeviceLocked);
+//        return;
+//    }
 
     else if (ui->pushButtonCred->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
