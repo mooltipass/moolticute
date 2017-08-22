@@ -53,7 +53,6 @@ PassGenerationProfilesDialog::PassGenerationProfilesDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PassGenerationProfilesDialog),
     m_specialSymbolsGroup(new QButtonGroup(this)),
-    //m_passwordProfilesModel(nullptr),
     m_filterModel(new FilterCustomPasswordItemModel(this))
 {
     ui->setupUi(this);

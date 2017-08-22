@@ -15,11 +15,11 @@ static const QString kSymbolsKey("symbols");
 
 #define setProfileBoolValue(profile, value, parameter, changed) \
 { \
-    bool newValue = ##value##.toBool(); \
-    if(##profile##->get##parameter##() == newValue) \
+    bool newValue = value.toBool(); \
+    if(profile->get##parameter() == newValue) \
     break; \
-    ##profile##->set##parameter##(newValue); \
-    ##changed = ##profile##->get##parameter##() == newValue; \
+    profile->set##parameter(newValue); \
+    changed = profile->get##parameter() == newValue; \
     }
 
 static const QVector<QString> kBuiltInProfilesNames = {kCustomPasswordItem, "Lower & upper letters", "Letters & digits", "All"};
@@ -99,20 +99,21 @@ PasswordProfile::PasswordProfile(const QString &name,
                                  bool useLowercase, bool useUppercase,
                                  bool useDigits, bool useSymbols,
                                  const QString &symbols) :
-    m_name(name),
+
     m_editable(false),
     m_useLowercase(useLowercase),
     m_useUppercase(useUppercase),
     m_useDigits(useDigits),
     m_useSymbols(useSymbols),
-    m_symbols(symbols)
+    m_symbols(symbols),
+    m_name(name)
 {
     init();
 }
 
 PasswordProfile::PasswordProfile(const QString &name) :
-    m_name(name),
-    m_editable(true)
+    m_editable(true),
+    m_name(name)
 {
     QSettings s;
 
@@ -324,6 +325,7 @@ PasswordProfile* PasswordProfilesModel::getProfile(int index) const
 
 int PasswordProfilesModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
     return m_profiles.size();
 }
 

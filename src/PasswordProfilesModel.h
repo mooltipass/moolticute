@@ -78,7 +78,7 @@ public:
 
 private:
     bool m_editable;    /*! False for builtin profiles, true for user created profiles */
-    bool m_useUppercase, m_useLowercase, m_useDigits, m_useSymbols;
+    bool m_useLowercase, m_useUppercase, m_useDigits, m_useSymbols;
     QString m_symbols;
     QString m_name;
     std::vector<char> m_pool;
