@@ -18,6 +18,25 @@ USER_EMAIL ?= limpkin@limpkin.fr
 
 export GITHUB_REPO := $(shell echo "$(TRAVIS_REPO_SLUG)" | rev | cut -d "/" -f1 | rev)
 
+# Debug mode
+ifeq ($(DEBUG),1)
+$(info PROJECT_NAME = [$(PROJECT_NAME)])
+$(info TRAVIS_BUILD_DIR = [$(TRAVIS_BUILD_DIR)])
+$(info TRAVIS_TAG = [$(TRAVIS_TAG)])
+$(info TRAVIS_COMMIT = [$(TRAVIS_COMMIT)])
+$(info CONTAINER_NAME = [$(CONTAINER_NAME)])
+$(info DOCKER_EXEC = [$(DOCKER_EXEC)])
+$(info BUILD_DIR = [$(BUILD_DIR)])
+$(info DEB_VERSION = [$(DEB_VERSION)])
+$(info DEB_NAME = [$(DEB_NAME)])
+$(info DEB_FILE = [$(DEB_FILE)])
+$(info DEB_MIME = [$(DEB_MIME)])
+$(info USER_EMAIL = [$(USER_EMAIL)])
+$(info GITHUB_REPO = [$(GITHUB_REPO)])
+$(info GITHUB_LOGIN = [$(GITHUB_LOGIN)])
+$(info GITHUB_TOKEN = [$(GITHUB_TOKEN)])
+endif
+
 .PHONY: build docker_prepare docker_image github_upload git_setup deb_init deb_clean deb_changelog deb_package debian
 
 # Builds
@@ -59,6 +78,13 @@ deb_changelog: git_setup
 deb_package:
 	$(DOCKER_EXEC) "cp -f README.md debian/README"
 	$(DOCKER_EXEC) "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
+
+foo: git_setup
+	-$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && get_draft_releases"
+
+# Custom upload
+custom_upload:
+	-. scripts/ci/funcs.sh && upload_file build-linux/deb/$(DEB_NAME) $(sha256sum build-linux/deb/$(DEB_NAME) | cut -d' ' -f1) "linux"
 
 # Build a complete Debian package
 debian: build deb_changelog deb_package
