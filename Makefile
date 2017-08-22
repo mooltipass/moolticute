@@ -61,9 +61,6 @@ docker_image:
 github_upload:
 	-$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && create_release_and_upload_asset $(TRAVIS_TAG) $(DEB_NAME) $(DEB_MIME)"
 
-foo:
-	-$(DOCKER_EXEC) "ok.sh list_releases limpkin moolticute"
-
 # Git
 git_setup:
 	$(DOCKER_EXEC) "git config --global user.email '$(USER_EMAIL)'"
@@ -87,6 +84,10 @@ deb_package:
 	$(DOCKER_EXEC) "cp -f README.md debian/README"
 	$(DOCKER_EXEC) "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
 	
+# Custom upload
+custom_upload:
+	-. scripts/ci/funcs.sh && upload_file build-linux/deb/$(DEB_NAME) $(sha256sum build-linux/deb/$(DEB_NAME) | cut -d' ' -f1) "linux"
+
 # Custom upload
 custom_upload:
 	-. scripts/ci/funcs.sh && upload_file build-linux/deb/$(DEB_NAME) $(sha256sum build-linux/deb/$(DEB_NAME) | cut -d' ' -f1) "linux"
