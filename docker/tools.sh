@@ -48,6 +48,9 @@ function get_release_id_by_name()
 {
     local NAME="${1:?Release name required.}"
 
+    echo "USING GITHUB LOGIN: [${GITHUB_LOGIN}]"
+    echo "USING GITHUB REPO: [${GITHUB_REPO}]"
+
     ok.sh list_releases "$GITHUB_LOGIN" "$GITHUB_REPO" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME" | awk '{ print $2 }'
 }
 

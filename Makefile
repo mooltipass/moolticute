@@ -61,6 +61,9 @@ docker_image:
 github_upload:
 	-$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && create_release_and_upload_asset $(TRAVIS_TAG) $(DEB_NAME) $(DEB_MIME)"
 
+foo:
+	-$(DOCKER_EXEC) "ok.sh list_releases limpkin moolticute"
+
 # Git
 git_setup:
 	$(DOCKER_EXEC) "git config --global user.email '$(USER_EMAIL)'"
