@@ -12,10 +12,10 @@ before_install:
   - ". scripts/ci/$TRAVIS_OS_NAME/before_install.sh"
 install: ". scripts/ci/$TRAVIS_OS_NAME/install.sh"
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make debian ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make debian DEBUG=1; fi
   - ". scripts/ci/$TRAVIS_OS_NAME/script.sh"
 after_success:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make github_upload ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make github_upload DEBUG=1; fi
   - ". scripts/ci/$TRAVIS_OS_NAME/after_success.sh"
 env:
   global:
