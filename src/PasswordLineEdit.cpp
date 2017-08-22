@@ -239,8 +239,6 @@ void PasswordOptionsPopup::emitPassword() {
 void PasswordOptionsPopup::onPasswordProfileChanged(int index)
 {
     Q_UNUSED(index)
-    qDebug() << "onPasswordProfileChanged";
-
     bool visible = m_passwordProfileCMB->currentText() == kCustomPasswordItem;
     m_customPasswordControls->setVisible(visible);
     adjustSize();

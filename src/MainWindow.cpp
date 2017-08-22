@@ -492,16 +492,16 @@ void MainWindow::updatePage()
         return;
     }
 
-//    if(!wsClient->isConnected()) {
-//        ui->stackedWidget->setCurrentWidget(ui->pageNoDaemon);
-//        return;
-//    }
+    if(!wsClient->isConnected()) {
+        ui->stackedWidget->setCurrentWidget(ui->pageNoDaemon);
+        return;
+    }
 
-//    if (!wsClient->get_connected())
-//    {
-//        ui->stackedWidget->setCurrentWidget(ui->pageNoConnect);
-//        return;
-//    }
+    if (!wsClient->get_connected())
+    {
+        ui->stackedWidget->setCurrentWidget(ui->pageNoConnect);
+        return;
+    }
 
     if (ui->pushButtonDevSettings->isChecked()) {
         ui->stackedWidget->setCurrentWidget(ui->pageSettings);
@@ -513,18 +513,18 @@ void MainWindow::updatePage()
         return;
     }
 
-//    if (wsClient->get_status() == Common::NoCardInserted)
-//    {
-//        ui->stackedWidget->setCurrentWidget(ui->pageMissingSecurityCard);
-//        return;
-//    }
+    if (wsClient->get_status() == Common::NoCardInserted)
+    {
+        ui->stackedWidget->setCurrentWidget(ui->pageMissingSecurityCard);
+        return;
+    }
 
-//    if (wsClient->get_status() == Common::Locked ||
-//            wsClient->get_status() == Common::LockedScreen)
-//    {
-//        ui->stackedWidget->setCurrentWidget(ui->pageDeviceLocked);
-//        return;
-//    }
+    if (wsClient->get_status() == Common::Locked ||
+            wsClient->get_status() == Common::LockedScreen)
+    {
+        ui->stackedWidget->setCurrentWidget(ui->pageDeviceLocked);
+        return;
+    }
 
     else if (ui->pushButtonCred->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
