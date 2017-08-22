@@ -28,6 +28,7 @@ namespace Ui {
 class MainWindow;
 }
 class QShortcut;
+class PasswordProfilesModel;
 
 class MainWindow : public QMainWindow
 {
@@ -115,6 +116,7 @@ private:
     QShortcut *m_advancedTabShortcut;
     QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;
+    PasswordProfilesModel *m_passwordProfilesModel;
 };
 
 #endif // MAINWINDOW_H

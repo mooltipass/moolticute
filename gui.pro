@@ -40,7 +40,9 @@ SOURCES += src/main_gui.cpp \
     src/TreeItem.cpp \
     src/ServiceItem.cpp \
     src/RootItem.cpp \
-    src/AnimatedColorButton.cpp
+    src/AnimatedColorButton.cpp \
+    src/PasswordProfilesModel.cpp \
+    src/PassGenerationProfilesDialog.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -68,7 +70,9 @@ HEADERS  += src/MainWindow.h \
     src/ItemDelegate.h \
     src/CredentialModel.h \
     src/CredentialModelFilter.h \
-    src/AnimatedColorButton.h
+    src/AnimatedColorButton.h \
+    src/PasswordProfilesModel.h \
+    src/PassGenerationProfilesDialog.h
 
 mac {
     HEADERS += src/MacUtils.h
@@ -82,7 +86,8 @@ FORMS    += src/MainWindow.ui \
     src/WindowLog.ui \
     src/CredentialsManagement.ui \
     src/FilesManagement.ui \
-    src/SSHManagement.ui
+    src/SSHManagement.ui \
+    src/PassGenerationProfilesDialog.ui
 
 RESOURCES += \
     img/images.qrc

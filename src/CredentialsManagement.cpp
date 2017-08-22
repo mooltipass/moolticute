@@ -129,6 +129,11 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
 }
 
+void CredentialsManagement::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
+{
+    ui->addCredPasswordInput->setPasswordProfilesModel(passwordProfilesModel);
+}
+
 void CredentialsManagement::enableCredentialsManagement(bool enable)
 {
     if (enable)

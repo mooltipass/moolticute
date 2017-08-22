@@ -31,6 +31,7 @@ class CredentialsManagement;
 class CredentialModel;
 class CredentialModelFilter;
 class LoginItem;
+class PasswordProfilesModel;
 
 class CredentialsManagement : public QWidget
 {
@@ -40,6 +41,7 @@ public:
     explicit CredentialsManagement(QWidget *parent = 0);
     ~CredentialsManagement();
     void setWsClient(WSClient *c);
+    void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);
 
 public slots:
     bool confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex = {});

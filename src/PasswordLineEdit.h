@@ -27,19 +27,26 @@ class QSlider;
 class QCheckBox;
 class QLabel;
 class QProgressBar;
+class QComboBox;
+class PasswordProfilesModel;
+class PasswordProfile;
 
 class PasswordOptionsPopup : public QFrame {
     Q_OBJECT
 
 public:
     PasswordOptionsPopup(QWidget* parent);
+    void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);
+
 Q_SIGNALS:
     void passwordGenerated(const QString & password);
 
 private Q_SLOTS:
     void generatePassword();
+    std::vector<char> generateCustomPasswordPool();
     void updatePasswordLength(int);
     void emitPassword();
+    void onPasswordProfileChanged(int index);
 
 protected:
     void showEvent(QShowEvent* e) override;
@@ -48,9 +55,11 @@ private:
     QPushButton* m_refreshBtn, *m_fillBtn;
     QSlider* m_lengthSlider;
     QCheckBox *m_upperCaseCB, *m_lowerCaseCB, *m_digitsCB, *m_symbolsCB;
-    QLabel *m_passwordLabel, * m_sliderLengthLabel;
+    QLabel *m_passwordLabel, *m_sliderLengthLabel, *m_passwordProfileLabel;
     QProgressBar *m_strengthBar;
     QLabel *m_quality, *m_entropy;
+    QComboBox *m_passwordProfileCMB;
+    QWidget *m_customPasswordControls;
 
     std::mt19937 m_random_generator;
 };
@@ -62,6 +71,7 @@ class PasswordLineEdit : public QLineEdit
     Q_OBJECT
 public:
     PasswordLineEdit(QWidget* parent = nullptr);
+    void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);
 
 protected:
     QAction *m_showPassword, *m_hidePassword;
@@ -69,7 +79,8 @@ protected:
 
 private:
     QAction *m_generateRandom;
-    PasswordOptionsPopup* m_passwordOptionsPopup;
+    PasswordProfilesModel *m_passwordProfilesModel;
+    PasswordOptionsPopup *m_passwordOptionsPopup;
     void showPasswordOptions();
 };
 
