@@ -20,6 +20,7 @@ export GITHUB_REPO := $(shell echo "$(TRAVIS_REPO_SLUG)" | rev | cut -d "/" -f1 
 
 # Debug mode
 ifeq ($(DEBUG),1)
+$(info TRAVIS_REPO_SLUG = [$(TRAVIS_REPO_SLUG)])
 $(info PROJECT_NAME = [$(PROJECT_NAME)])
 $(info TRAVIS_BUILD_DIR = [$(TRAVIS_BUILD_DIR)])
 $(info TRAVIS_TAG = [$(TRAVIS_TAG)])
@@ -47,7 +48,11 @@ build: docker_prepare
 docker_prepare:
 	echo "Build directory: $(TRAVIS_BUILD_DIR)"
 	-mkdir -p $(BUILD_DIR)/deb
-	docker-compose up -d
+	GITHUB_LOGIN=$(GITHUB_LOGIN) GITHUB_TOKEN=$(GITHUB_TOKEN) GITHUB_REPO=$(GITHUB_REPO) docker-compose up --force-recreate -d
+ifeq ($(DEBUG),1)
+	-docker inspect $(CONTAINER_NAME)
+	-$(DOCKER_EXEC) "cat ~/.netrc"
+endif
 
 docker_image:
 	docker build -t $(IMAGE_NAME) ./docker
@@ -78,10 +83,7 @@ deb_changelog: git_setup
 deb_package:
 	$(DOCKER_EXEC) "cp -f README.md debian/README"
 	$(DOCKER_EXEC) "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
-
-foo: git_setup
-	-$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && get_draft_releases"
-
+	
 # Custom upload
 custom_upload:
 	-. scripts/ci/funcs.sh && upload_file build-linux/deb/$(DEB_NAME) $(sha256sum build-linux/deb/$(DEB_NAME) | cut -d' ' -f1) "linux"
