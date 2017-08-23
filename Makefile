@@ -17,6 +17,7 @@ DEB_MIME := application/vnd.debian.binary-package
 USER_EMAIL ?= limpkin@limpkin.fr
 
 export GITHUB_REPO := $(shell echo "$(TRAVIS_REPO_SLUG)" | rev | cut -d "/" -f1 | rev)
+export GITHUB_ACCOUNT := $(shell echo "$(TRAVIS_REPO_SLUG)" | rev | cut -d "/" -f2 | rev)
 
 # Debug mode
 ifeq ($(DEBUG),1)
@@ -33,6 +34,7 @@ $(info DEB_NAME = [$(DEB_NAME)])
 $(info DEB_FILE = [$(DEB_FILE)])
 $(info DEB_MIME = [$(DEB_MIME)])
 $(info USER_EMAIL = [$(USER_EMAIL)])
+$(info GITHUB_ACCOUNT = [$(GITHUB_ACCOUNT)])
 $(info GITHUB_REPO = [$(GITHUB_REPO)])
 $(info GITHUB_LOGIN = [$(GITHUB_LOGIN)])
 $(info GITHUB_TOKEN = [$(GITHUB_TOKEN)])
@@ -46,9 +48,8 @@ build: docker_prepare
 
 # Docker
 docker_prepare:
-	echo "Build directory: $(TRAVIS_BUILD_DIR)"
 	-mkdir -p $(BUILD_DIR)/deb
-	GITHUB_LOGIN=$(GITHUB_LOGIN) GITHUB_TOKEN=$(GITHUB_TOKEN) GITHUB_REPO=$(GITHUB_REPO) docker-compose up --force-recreate -d
+	docker-compose up --force-recreate -d
 ifeq ($(DEBUG),1)
 	-docker inspect $(CONTAINER_NAME)
 	-$(DOCKER_EXEC) "cat ~/.netrc"
@@ -59,7 +60,10 @@ docker_image:
 
 # GitHub
 github_upload:
-	-$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && create_release_and_upload_asset $(TRAVIS_TAG) $(DEB_NAME) $(DEB_MIME)"
+	$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && create_release_and_upload_asset $(TRAVIS_TAG) $(DEB_NAME) $(DEB_MIME)"
+
+github_access_test:
+	$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && ok.sh list_releases $(GITHUB_ACCOUNT) $(GITHUB_REPO)"
 
 # Git
 git_setup:

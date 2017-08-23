@@ -47,40 +47,8 @@ function upload_asset_mime() {
 function get_release_id_by_name()
 {
     local NAME="${1:?Release name required.}"
-
-    echo "USING GITHUB LOGIN: [${GITHUB_LOGIN}]"
-    echo "USING GITHUB REPO: [${GITHUB_REPO}]"
-
-    ok.sh list_releases "$GITHUB_LOGIN" "$GITHUB_REPO" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME" | awk '{ print $2 }'
-}
-
-# Get all draft releases
-#
-# Usage:
-#
-#     get_draft_releases
-#
-function get_draft_releases()
-{
-    local DRAFTS=$(ok.sh list_releases "$GITHUB_LOGIN" "$GITHUB_REPO" _filter='.[] | select(.draft == true and (.assets | length == 0))')
-    local ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
-    for R in ${DRAFTS[@]}
-    do
-        RELEASE_TAG=$(echo "$R" | jq -r '.tag_name')
-
-        echo "$ORIGINAL_BRANCH / $RELEASE_TAG"
-
-        git stash
-
-        git pull --tags || true
-        git checkout tags/$RELEASE_TAG
-
-        make debian || true
-
-        git checkout $ORIGINAL_BRANCH
-        git stash pop
-    done
+	
+    ok.sh list_releases "$GITHUB_ACCOUNT" "$GITHUB_REPO" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME" | awk '{ print $2 }'
 }
 
 # Get a release asset ID specifying its name
@@ -96,7 +64,7 @@ function get_release_asset_id_by_name()
     local RELEASE_ID="${1:?Release ID name required.}"
     local NAME="${2:?Release asset name required.}"
 
-    ok.sh release_assets "$GITHUB_LOGIN" "$GITHUB_REPO" "$RELEASE_ID" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME" | awk '{ print $2 }'
+    ok.sh release_assets "$GITHUB_ACCOUNT" "$GITHUB_REPO" "$RELEASE_ID" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME" | awk '{ print $2 }'
 }
 
 # Delete a release asset ID by its ID
@@ -110,7 +78,7 @@ function get_release_asset_id_by_name()
 function delete_release_asset_by_id()
 {
     local ASSET_ID="${1:?Asset ID required.}"
-    local delete_url="/repos/${GITHUB_LOGIN}/${GITHUB_REPO}/releases/assets/${ASSET_ID}"
+    local delete_url="/repos/${GITHUB_ACCOUNT}/${GITHUB_REPO}/releases/assets/${ASSET_ID}"
 
     ok.sh _delete "$delete_url"
 }
@@ -135,7 +103,7 @@ function create_release_and_upload_asset()
 
     if [ -z "$RELEASE_ID" ]; then
         echo "Release for tag $TAG doesn't exist. Creating one..."
-        RELEASE_ID=$(ok.sh create_release "$GITHUB_LOGIN" "$GITHUB_REPO" "$TAG" name="$TAG" | awk '{print $2}')
+        RELEASE_ID=$(ok.sh create_release "$GITHUB_ACCOUNT" "$GITHUB_REPO" "$TAG" name="$TAG" | awk '{print $2}')
     else
         echo "Release for tag $TAG already exists. Using it."
     fi
@@ -156,6 +124,6 @@ function create_release_and_upload_asset()
 
      # We need to be in the directory or ok.sh goes crazy - seems it can't properly handle a file :(
     pushd $FILE_DIR
-    upload_asset_mime "$GITHUB_LOGIN" "$GITHUB_REPO" "$RELEASE_ID" "$FILE_NAME" "$MIME_TYPE" < ${FILE_NAME}
+    upload_asset_mime "$GITHUB_ACCOUNT" "$GITHUB_REPO" "$RELEASE_ID" "$FILE_NAME" "$MIME_TYPE" < ${FILE_NAME}
     popd
 }

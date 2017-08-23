@@ -1,5 +1,0 @@
-version: '2'
-services:
-  ubuntu:
-    volumes:
-      - ./docker/tools.sh:/usr/local/bin/tools.sh
