@@ -55,6 +55,7 @@ PassGenerationProfilesDialog::PassGenerationProfilesDialog(QWidget *parent) :
     m_specialSymbolsGroup(new QButtonGroup(this)),
     m_filterModel(new FilterCustomPasswordItemModel(this))
 {
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     ui->setupUi(this);
 
     ui->btnNewProfile->setStyleSheet(CSS_BLUE_BUTTON);
@@ -167,7 +168,7 @@ void PassGenerationProfilesDialog::createNewProfile()
 {
     // ask user for new profiles name
     bool ok;
-    QString name = QInputDialog::getText(this, tr("New Filter's Name"),
+    QString name = QInputDialog::getText(this, tr("New profile name"),
                                          tr("Name:"), QLineEdit::Normal,
                                          QString(), &ok);
 

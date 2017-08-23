@@ -238,7 +238,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>9</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -488,8 +488,8 @@ QWidget {background-color: #EFEFEF;}</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>839</width>
-             <height>768</height>
+             <width>720</width>
+             <height>597</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -2217,9 +2217,15 @@ QWidget {background-color: #EFEFEF;}</string>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_30">
             <item>
-             <widget class="QPushButton" name="btnPassGenerationProfiles">
+             <widget class="QLabel" name="label_38">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
-               <string>Password Generation...</string>
+               <string>Manage your password profiles</string>
               </property>
              </widget>
             </item>
@@ -2235,6 +2241,13 @@ QWidget {background-color: #EFEFEF;}</string>
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnPassGenerationProfiles">
+              <property name="text">
+               <string>Password profiles...</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
