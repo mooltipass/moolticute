@@ -1,7 +1,7 @@
 PROJECT_NAME := moolticute
 
 TRAVIS_BUILD_DIR := $(shell pwd)
-TRAVIS_TAG := $(shell git describe --tags $$(git rev-list --tags --max-count=1))
+TRAVIS_TAG := $(shell git describe --tags --abbrev=0)
 TRAVIS_COMMIT := $(shell git log -1 $(TRAVIS_TAG) | head -n 1 | awk '{ print $$2 }')
 
 CONTAINER_NAME := $(PROJECT_NAME)
@@ -60,7 +60,7 @@ docker_image:
 
 # GitHub
 github_upload:
-	$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && create_release_and_upload_asset $(TRAVIS_TAG) $(DEB_NAME) $(DEB_MIME)"
+	$(DOCKER_EXEC) ". /usr/local/bin/tools.sh && create_release_and_upload_asset $(TRAVIS_TAG) $(DEB_NAME) $(DEB_MIME)"
 
 github_access_test:
 	$(DOCKER_EXEC) "cd /app/build-linux/deb && . /usr/local/bin/tools.sh && ok.sh list_releases $(GITHUB_ACCOUNT) $(GITHUB_REPO)"
