@@ -4,19 +4,17 @@ services:
 dist: trusty
 os:
 - linux
-- osx
+#- osx
 language: cpp
 
 before_install:
-  - "git fetch --unshallow"
-  - ". scripts/ci/$TRAVIS_OS_NAME/before_install.sh"
-install: ". scripts/ci/$TRAVIS_OS_NAME/install.sh"
+  - make -f Makefile.travis before_install
+install:
+  - make -f Makefile.travis install
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make debian DEBUG=1; fi
-  - ". scripts/ci/$TRAVIS_OS_NAME/script.sh"
+  - make -f Makefile.travis script
 after_success:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make github_upload DEBUG=1; fi
-  - ". scripts/ci/$TRAVIS_OS_NAME/after_success.sh"
+  - make -f Makefile.travis after_success
 env:
   global:
     - secure: csOpCKoSd+khEKl3CG9+2MkK+9dMA2gu0HTDJ0cZ4hCYVyTs1i88uO/Pf9vcPqc5r2AbHpC+pmQH36Qkvb6JBJcWK9m3HTqdbBTrg2nKaaWniWXUZwD3bo4e/zX08mg7DG/HdGgplc/wkGn6gsois8somaVZmexA/LFY1OIKQUfVvs5SScpnYcDL/MzIuVv+jdgeaGCnubtFY0y5ZrlgRweHt4rCwV0Wxlozes7wn1fFwa5tHhAzbIBsj1pol/wqg6wGdhGguRY4GHgU1BK102ASGXxsG6XZuCIyhdWcAln+fcmrtovF1nWcpfucd49yp7Qvfev5sDK9Q4y1BUu3wC+FVps59m6o738vPNOTK6rLVSZ2zu+DLYcYjD1PZjoAwmvGxEWgKvhh1ZR3/Buq9ftEZE2pEKE9W/HJVXb0UZqDCez/ptEeERd0sE79c4OvOhep4iwbjFo9gnrceKczBI2XBODybk3BJkYipm62mi223ygr7iROchKEsaLREDOMiMj7SkqSzvqRkDUrqKLRFTQv4xVSzwttTQM43XWgNrfjJhivEAg7PsgKpEPHwbkNFTIMTOwnBYKq487AVUkLJpDnczJLq8brnS0DPZ0SrjQqJWxjc/FT+N9jPVXuxDLEkoTFSn5fqzxS32a7QMpa4kg3mYxRSgPwLXw/tHpsXfY=
@@ -26,4 +24,3 @@ branches:
   only:
     - /^v.*$/
     - master
-

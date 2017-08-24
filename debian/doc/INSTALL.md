@@ -1,12 +1,17 @@
 How it's working?
 =================
-After each successful build of the binaries a new Debian package is being generated (with an updated changelog based on 
-the git commit messages and authors).
-That package is being uploaded to GitHub as a release asset. The target release is named exactly the same as the 
-newest tag of the current version. If such a release does not yet exist, it will get automatically created.
+If:
 
-IMPORTANT: in the case when a release asset with the exact same name already exists (we're for example doing a rebuild), 
-it will get replaced with the newly generated file.
+* a successful build of the binaries took place
+* *the current build is tagged*
+
+a new Debian package will be generated (with an updated changelog based on the git commit messages and authors).
+
+The package will get uploaded to GitHub as a release asset. The target release is named exactly the same as the 
+build tag. If a release with such a name does not yet exist, it will get automatically created.
+
+IMPORTANT: in the case when a release asset with the exact same name already exists, it will get replaced with the 
+newly generated file.
 
 How to configure Travis and GitHub?
 ===================================
@@ -36,11 +41,12 @@ Travis
 1. Log in to your Travis account and add the project's repository to Travis the same way you would do with any other project
 2. Go to your project's option menu and select "Settings":
 ![Project settings](images/travis_settings.png)
-3. Scroll down to the "Environment Variables" section and add two new variables that will be used to access the GitHub
-repository of the project:
+3. Scroll down to the "Environment Variables" section and add the following variables that will be used to access the GitHub
+repository of the project and build the project:
   GITHUB_LOGIN which value should be set to the username/login of the GitHub account described earlier
   GITHUB_TOKEN which value should be set to that of the token you have recently created
-Make both variables secret ones - we don't want to show them to anyone (especially the token):
+  DOCKER_IMAGE which value should be set to the name of the Moolticute build environment image on DockerHub
+Make the first two variables secret ones - we don't want to show them to anyone (especially the token):
 ![Project environmental variables](images/travis_env.png)
 
 Voila! That should be enough for the scripts to be able to manage the releases of your project (including the assets 

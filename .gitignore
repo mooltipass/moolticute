@@ -37,3 +37,5 @@ build-linux
 .idea
 
 lang/*.qm
+
+.env
