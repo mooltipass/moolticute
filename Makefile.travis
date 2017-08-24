@@ -1,0 +1,25 @@
+SHELL := /bin/bash
+
+DEBUG:=1
+
+export
+
+.PHONY: before_install install script after_success
+
+before_install:
+	make docker_prepare
+	-git fetch --unshallow
+	source scripts/ci/$(TRAVIS_OS_NAME)/before_install.sh
+
+install:
+	source scripts/ci/$(TRAVIS_OS_NAME)/install.sh
+
+script:
+ifeq ($(TRAVIS_OS_NAME),linux)
+	make debian
+endif
+	source scripts/ci/$(TRAVIS_OS_NAME)/script.sh
+
+after_success:
+	source scripts/ci/$(TRAVIS_OS_NAME)/after_success.sh
+	make github_upload

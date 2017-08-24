@@ -35,3 +35,4 @@ ui_*.h
 build
 build-linux
 .idea
+.env
