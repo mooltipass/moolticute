@@ -99,6 +99,14 @@ function create_release_and_upload_asset()
     local FILE_NAME=$(basename $FILE_PATH)
     local FILE_DIR=$(dirname $FILE_PATH)
 
+    BUILD=$(git rev-list -n 1 $TAG)
+    HEAD=$(cat .git/HEAD)
+
+    if [ "$BUILD" != "$TAG"  ]; then
+        echo "Asset will not get uploaded as the current build is not for the latest tag ($BUILD vs $TAG)"
+        return 0
+    fi
+
     RELEASE_ID=$(get_release_id_by_name "$TAG")
 
     if [ -z "$RELEASE_ID" ]; then
