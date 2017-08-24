@@ -1,0 +1,11 @@
+version: '2'
+services:
+  ubuntu:
+    container_name: moolticute
+    image: ${DOCKER_IMAGE}
+    volumes:
+      - ./:/app
+      - ./docker/tools.sh:/usr/local/bin/tools.sh
+    stdin_open: true
+    tty: true
+    working_dir: /app

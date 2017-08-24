@@ -1,3 +1,489 @@
+moolticute (0.7.2) stable; urgency=medium
+
+  * UNRELEASED
+
+ -- root <root@f301d753b5d9>  Sat, 26 Aug 2017 06:23:52 +0000
+
+moolticute (0.7.1) stable; urgency=medium
+
+  * UNRELEASED
+
+ -- root <root@29b4f4db746d>  Sat, 26 Aug 2017 05:46:29 +0000
+
+moolticute (0.5.1-beta) stable; urgency=medium
+
+  [ Raoul Hecky ]
+  * Do not try to send something when no device is connected. Fix #14
+  * Send error message when device is not connected
+  * do not fail when description is not available
+  * update for new toolchain and qt5.7.1
+  * Fix qmake path for new toolchain
+
+  [ raoulh ]
+  * Qt5.6 requirement
+
+  [ Raoul Hecky ]
+  * Add 500mx delay at launch before starting MPManager
+  * Add show_app API command
+
+  [ Mathieu ]
+  * exitting MMM when a command sent during MMM entering fails
+  * more check for get cpz ctr
+  * loading change numbers, serial number if fw > 1.2
+  * loading serial number for mini v1.2 only
+  * better debug for load parent & child nodes
+  * adding node address to constructor,
+  * adding duplicate lists, used for save packet generation
+  * linked chain checking function
+  * checking returns for get params, set date, get serial, get change number
+
+  [ Raoul Hecky ]
+  * rewrite findNodeWithAddressInList(), add const qualifier to MPNode
+  * Fix return value if null
+  * add default values to properties
+
+  [ Quentin Bourgeois ]
+  * <systemd/service: Add and install a basic systemd user unit file>
+  * <Linux/XCB: Remove XCB dependencies for Linux builds>
+  * <HttpClient: Remove unused include>
+  * <udev: Add a udev rules that should benefit for systemd based system>
+  * <README/ubuntu: On Ubuntu 16.04 its recommanded to use apt>
+
+  [ Raoul Hecky ]
+  * Fix build
+  * Fix windows QApplication
+  * Fix ifdef OSX/WIN, include of qt should be done first. fix #24
+  * Fix bug when sending data node. EOD could be wrong in some cases
+
+  [ Nicolas Aguirre ]
+  * Code simplification for Paramters
+  * Add define for all parameters defined in mooltipass fw
+  * Add 6 more parameters to UI and server. New paramters are those defined with those following values
+
+  [ Raoul Hecky ]
+  * Finish work on missing paramaters from #13
+  * Fix name of signals for new parameters
+  * Display not implemented message with button import/export #13
+  * Fix crash when cancel_request id is invalid and not request are running. #13
+  * Display fw version in about #13
+  * Fix param debug. Send only changed parameters to daemon
+  * small refactor
+  * Disconnect current job when it's done to prevent wrong signal being emited after
+  * Implement UI for memcheck. core code can be easily integrated now.
+
+  [ Quentin Bourgeois ]
+  * Revert "<udev: Add a udev rules that should benefit for systemd based system>"
+  * <systemd: Move the systemd service file systemd wide>
+
+  [ Mathieu ]
+  * successfully browsing through the memory
+  * data reception speed diag
+  * correct clearing of nodes lists, linked list loop detect
+  * linked list check for data nodes
+  * trigger full scan after receiving data start node
+  * progress bar for integrity check, dedicated job for memory check and repair
+  * checking favorites
+  * function to generate save packets
+  * generatesave: diffing the remaining items
+  * following raoulh's comments
+  * functions to repair linked list
+  * removing iterator for favoriteaddrs
+  * double checking DB when performing DB changes
+  * using QDateTime::currentMSecsSinceEpoch() for diag purposes to stay compatible with qt5.6
+
+  [ Raoul Hecky ]
+  * Use QMetaEnum to get the text from enum
+
+  [ Mathieu ]
+  * setting jobs error messages for better user debug
+  * first function to add orphan parent node
+  * dedicated function for testing our db correction algos
+  * starting to introduce virtual addresses, add orphan parent implemented
+  * updating tagcheck to follow parent virtual addresses
+  * correct set service function
+  * function to replace virtual address with real addresses
+  * addorphan for data nodes, new checks for data node integrity check
+
+  [ Raoul Hecky ]
+  * Fix some small bugs from #13
+  * Display serial number in about. #13
+
+  [ Mathieu ]
+  * following raoul's comments
+
+  [ Corentin Jabot ]
+  * Fix compilation with VS2015
+  * On windows, require a double-click to show the window from the systray
+  * Mingw expects lowercase librairie names
+  * Improve the device detection code on linux.
+  * Fix a crash when getting a device description
+  * Implement WSClient::isMPMini()
+  * Show the device's state in the systray's tooltip.
+  * Allow changing settings while no card is inserted.
+  * Do not display the setting tab when no device is connected
+  * Add a tab that is displayed when the deamon is not connected
+  * Only hide the application window when launched automatically.
+  * Replace the top-right icon
+  * Load the device settings as soon as it is connected
+  * Fix inverted no deamon/no device tabs
+  * Do not display the serial when it is null
+  * Add ui elements for uid & request & advanced settings
+  * Wire the 'random starting pin' setting
+  * Wire the 'Display Hash' setting
+  * Wire the 'Lock/Unlock mode' setting
+  * Improve the way the combo box are set
+  * Implement the UID request feature.
+  * Fix compilation on windows
+  * Fix warning
+  * Fix The registery value for auto startup on windows
+  * Improve usb device management on linux
+  * Intoduce a QLineEdit-based widget for password input
+  * Add a random password generation widget.
+  * Start improving the credential managemzent UI
+  * Improve connections detection
+  * Quit credential management mode when deamon crash or disconnected
+  * Complete rework of the credential management mode
+  * Do not Capitalize the service name
+  * Display a message box when swutching from an unedited credential
+  * Fix creating empty row in the credential view
+  * Do not needlessly promt for unsaved items user when leaving MMM
+  * Preserve actions order when toogling password visibility
+  * Fix regression when adding a credential
+
+  [ Mathieu ]
+  * bug fix for current linux ci
+  * another try at ci build bug fix
+
+  [ Raoul Hecky ]
+  * Remove corruption test code
+  * Add get_application_id API
+  * Improve credentials UI
+  * Add password quality
+  * add missing dictionary for zxcvbn
+  * Disable fav icon in mmm for now
+
+  [ kazord ]
+  * Date conversion correction
+
+  [ Quentin Bourgeois ]
+  * <MainWindow: Change how Moolticute is written>
+
+  [ Daniel P. Seemuth ]
+  * Fix minor typo in main GUI
+
+  [ Raoul Hecky ]
+  * Update licence
+  * Fix emulation mode
+  * Do not check return value when exiting mmm at device connection
+  * first UI step for file management
+  * Force button state to default when clicking toolbar in mmm
+  * implement file management
+
+  [ kazord ]
+  * Change month RW to 0 indexed
+
+  [ Daniel P. Seemuth ]
+  * Fix tab stop order in credentials management window
+
+  [ Raoul Hecky ]
+  * Add software update
+  * Start ssh management UI
+  * Send get_login with payload
+  * fix osx ci script
+  * do not display message if no update available
+  * Add retry + timeout when sending commands
+  * Clear model
+  * Add retry + timeout for the command queue
+  * remove debug
+  * UI fixes
+  * remove debug
+  * Add service exists api
+  * fix
+
+  [ Mathieu ]
+  * correct progress callback for entering MMM
+  * clearing free addresses after entering / leaving mmm
+  * add orphan child to db function
+  * correct method to compare login names
+  * removing and adding child node functions (tested)
+  * changed addorphanparenttodb to avoid loops and to not rely on sorting
+  * added removeemptyparentfromdb
+  * deleting single cred test case
+  * intermediary commit: can successfully import MooltiApp json file
+  * changed command triggering based on state change, fixed correct json array ordering
+  * partial commit: adding pending merge job and merging cpz ctr
+
+  [ Raoul Hecky ]
+  * Test mm changes
+  * More work
+
+  [ Mathieu ]
+  * wip: merging service nodes
+  * adding unknown child node during import
+  * adding bools to check DB for credentials or data
+  * pointing childs to parents, bug fixing
+  * more safety checks, freeaddresses get job
+  * correctly deleting nodes at import
+  * favorite syncing done
+  * changed taggedpointed nodes to deal with virtual addresses, import functionality being tested
+  * bug fixing
+  * bug fixing (addings flags to nodes)
+  * function to set type to node
+  * bug fix
+  * export to json functionality
+  * syncing change numbers
+  * incorrect login written in json export
+
+  [ Raoul Hecky ]
+  * Send mmm credentials changes to backend
+  * Add favorite and remove buttons in mmm
+
+  [ Mathieu ]
+  * tagging favorites when entering MMM
+
+  [ Raoul Hecky ]
+  * Remove discard confirmation in mmm
+  * Fix layout for mmm
+  * Fix credential deletion prompt
+
+  [ Mathieu ]
+  * data merge import (additive) working
+  * data merge import (subtractive) working
+
+  [ Raoul Hecky ]
+  * Implement export/import in gui and websocket
+  * Add want_data boolean when requesting mmm
+  * Implement file delete API in gui and websocket
+
+  [ Mathieu ]
+  * import functionality integrated in GUI
+  * database import functionality implemented and tested
+  * quick bug fix
+  * export functionality implemented and tested
+  * MMM: save implemented and tested
+  * MMM: implemented login modification
+  * detecting password changes, but still need to prepare jobs
+
+  [ Raoul Hecky ]
+  * Fix credentials add in mmm
+
+  [ Mathieu ]
+  * jobs for password change
+
+  [ Raoul Hecky ]
+  * Fix crash
+  * Remove message when adding cred in mmm
+
+  [ Mathieu ]
+  * credential add implemented and tested
+  * favorite storage after mmm
+  * loading nodes from memory only when needed
+
+  [ Raoul Hecky ]
+  * Only send password in mm when it has actually changed
+  * Default to yes in delete confirmation in mmm
+
+  [ Mathieu ]
+  * finished integrity check
+
+  [ Raoul Hecky ]
+  * Some UI fixes
+  * Add callback to startMemMode for sending failure message
+
+  [ Mathieu ]
+  * correct text for failure callback
+
+  [ flegall2014 ]
+  * Implemented: a) choisir par défaut le premier credential plutot que de laisser désactiver la partie de droite. Dans le cas d'une base de donnée vide, laisser tout désactivé à droite
+  * Implemented: - ajouter un racourci clavier (du type ctrl-a-d-v) pour activer une nouvelle tab (à créer) intitulée "Advanced" - dans cette nouvelle tab "Advanced" ajouter une option pour laisser activé les tabs "Files" et "SSH Keys" sans racourci clavier Le raisonnement derrière ces changements: la plupart des utilisateurs ont une utilisation basique du mooltipass. Nous aimerions ainsi éviter de réaliser trop de support une fois que ceux ci commencent à toucher à ces tabs la. De plus, nous n'avons pas encore terminé le travail sur ces tabs.
+  * Fixed bug in MainWindow.ui
+
+  [ Mathieu ]
+  * only changing description when it's different than none
+
+  [ Raoul Hecky ]
+  * Postpone file deletion to be done when user exit Files management
+  * Lock mmm mode per client. Other requests are answered with an error
+  * Add filesize check when adding files
+  * Remove unused request id
+
+  [ Mathieu ]
+  * deleting files for file MMM
+  * [ci-ext] ci trigger for steam
+
+  [ flegall2014 ]
+  * Work on new TreeView logic
+
+  [ Raoul Hecky ]
+  * Some fixes in files/creds management mode
+
+  [ flegall2014 ]
+  * moving forward on treeview
+  * Moving forward on CredentialModel/CredentialModelFilter/TreeView
+  * moving forward on CredentialModel
+  * Added debug messages
+  * Merged local fork with Raoul's work
+  * Fixed bug in CredentialsManagement.cpp
+  * Work on merge
+  * Work on: - Removing all comments - "{" alignment
+  * Continuing on merge
+  * Fixed password issue
+  * Fixing password issue
+  * Work on treeview style
+  * Implemented: h) appuyer sur entrer quand on est dans le champs password pour valider, puis faire revenir le selecteur dans le champs service
+  * Dead code removal
+  * Removed unused <QUUid> include
+  * CTRL+SHIFT+F2: make sure we go back to previous tab after Advanced tab was hidden
+  * Store Files and SSH Keys tabs visibility in QSettings
+  * Implemented: "grouper" tout le bloc afin qu'il reste fixe quand on agrandit la fenetre, afin d'éviter que le texte reste tout à gauche et les boutons tout à droite
+
+  [ Mathieu ]
+  * bug solving in case description is empty
+
+  [ flegall2014 ]
+  * Work on AnimatedColorButton
+  * moving forward on animated color button
+  * Fixed bug in toJson
+  * Work in progress commit
+  * Implemented: g) ce qui serait vraiment bien: répliquer le comportement du "discard all" de notre app MooltiApp (appuyer longtemps pour valider)
+  * Implemented i) afficher des informations relatives aux logins, sous forme de tooltip, quand le service est ferme
+  * WIP commit
+  * Fixed bug in CredentialModel
+  * Moving forward on treeview
+  * Aligning logins to right
+  * Fixed bug in page navigation
+  * Working on login display
+  * Fixed bug in page navigation
+  * Ajout de: - affichage des favoris, - date alignee a droite - bouton Collapse All / Expand All
+  * ItemDelegate refactor
+  * Added start favorite display
+  * Fixed item removal bug
+  * Added setItemDelegate back
+
+  [ Mathieu ]
+  * implementing credential update in MMM if description is change
+  * bug fix: duplicate service on import, empty data parent node on import
+
+  [ flegall2014 ]
+  * Added favorite display inside star favorite icon
+  * Fix for: A la suppression d'un login, il serait bien de choisir le premier login suivant
+  * Fix for: question esthetique: pourrais tu mettre la case à cocher + texte "Do not delete credentials..." du tab synchronisation en dessous du texte "restore your database from a file"?
+  * Work on favorite display
+  * Cleanup itemdelegate.cpp
+  * Some code cleanup
+  * Fix for: aussi, quand on agrandit la fenetre moolticute, peut on garder la partie de droite avec une largeur fixe?
+  * Fix for: 1/ il faut toujours implémenter le "clic sur service, le premier login est choisi", pour rapidement l'éditer 2/ A la suppression d'un login, il serait bien de choisir le premier login suivant
+  * Fix for: il faut toujours implémenter le "clic sur service, le premier login est choisi", pour rapidement l'éditer
+  * Fix for: manque toujours les virgules entre les logins dans le texte grisé à droite du service
+  * Don't change selection after setting credential
+  * Added alternate row color for painting logins
+  * use alternate row color for full block (service/logins)
+  * making blue lighter
+  * Set a lighter blue for service/login delegates
+  * fix for: toto: Delete Credential titi ? Mathieu Stephan Yesterday 9:03 PM si toto et titi peuvent être en italique ca sera nickel
+  * Fix for: r exemple j'ai supprimé tout mes logins, j'ai quitté le management, quand je suis retourné dedans il m'affiche toujours le nom du dernier service sélectionné dans le panel de droite, qui étaient ainsi le nom du dernier service avant que je quitte le managemetn mode
+  * Fix for: r exemple j'ai supprimé tout mes logins, j'ai quitté le management, quand je suis retourné dedans il m'affiche toujours le nom du dernier service sélectionné dans le panel de droite, qui étaient ainsi le nom du dernier service avant que je quitte le managemetn mode
+  * fix for: 1) s'il est ouvert, on le ferme et on ne change aucune sélection s'il est fermé, on l'ouvre et on selection le premier login quand un service est fermé, à sa droite, on affiche un appercu des logins, en gris, tronqués en gros je dis qu'on peut se permettre de mettre un peu plus de texte
+  * Fix selection bug
+  * Fix for: item not being cleared from gui after exit CMM
+  * Fix for password fix (when adding a new credential, password should be visible)
+  * Fix item ordering when adding a new login
+  * Fix for password visibility bug
+  * Fix selection bug: when a credential is added, it should be automatically selected in treeview
+  * Fix for: Center service name in right part of UI
+  * Work on various UI improvements
+  * Fixes for selection bugs
+  * Fix for selection bugs/make confirm and cancel buttons look same
+  * Use an AnimatedColorButton for "discard all changes" button
+  * Fix STAR bug
+  * Fix button centering bug Fix discard all changes button
+
+  [ Mathieu ]
+  * removing old files
+  * removing files to readd them later
+  * readded files
+  * removed problematic files
+  * retrying
+
+  [ Alexis López Zubieta ]
+  * Fixing file names to allow build on linux.
+  * Renamaning files using CamelCase style.
+  * Initial darft of the files cache.
+  * Adding some simple encryption to the FileCache
+  * Adding revision code to the cache
+  * Correcting cache encryption key generation
+  * Files cache: connecting ui to daemon.
+  * Setting cardCPZ as FilesCache property.
+  * Implementing the update files cache db.
+  * Implementing add/remove single file to the cache
+
+  [ Mathieu ]
+  * function to list data files
+  * forgot call to exit mmm
+
+  [ Alexis López Zubieta ]
+  * Adding save button to the files cache list view
+  * Adding list files button.
+  * Implementing refresh files cache connections
+
+  [ Mathieu ]
+  * using dbchangenumber
+  * add, delete, import support for filecache
+  * removed useless todo
+  * following review
+  * increment change numbers when modifying DBs, resending command when receiving status message
+
+  [ Alexis López Zubieta ]
+  * Send leave Memory Management Mode Request on main window closed.
+  * fix error message on add new credential and always clear the input fields
+
+  [ Vitaly Medyakov ]
+  * Combine device information labels at one widget
+
+  [ Raoul Hecky ]
+  * Exit MMM when client disconnects if client did not do it
+  * Do not check for update if build from git
+  * Mask sensitive data in logs (passwords, binary data...)
+  * Add api for deleting a credential in one call (for CLI)
+
+  [ Mathieu ]
+  * resetting new address counter when importing DB
+
+  [ Alexis López Zubieta ]
+  * Call checkSettingsChanged when WSClient::keyAfterLoginSendEnableChanged is emited
+  * Update focus to the current widget on CredentialsManagement
+  * remove list files cache button and add a text when no files found
+  * Fix: app crashes on download file requested but denied at the device.
+  * Set aproval request message on password field when requested.
+  * Layout file management tab verticaly
+  * Files Tab: select first file (if exist)
+
+  [ Mathieu ]
+  * setting merge tagged flag when data match is ongoing
+
+  [ Alexis López Zubieta ]
+  * Files Tab: select first file (if exist)
+  * Setting file management action buttons in a vertical row
+  * Synchronisation tab: Center the complete block, put more space between the texts and the buttons
+
+  [ Mathieu ]
+  * bug fix: always changing start data child when importing data files
+  * fixing import bug when data are different
+
+  [ Tomasz Janiczek ]
+  * Initial .deb package generation
+  * Tests fix
+  * GitHub account/login divide
+  * Cleanup & docs update
+  * Generate the package only for the commits related to the latest tag
+  * Travis build update
+  * Travis build update
+  * WIP
+
+  [ root ]
+
+ -- root <root@10ce4749ac78>  Thu, 24 Aug 2017 19:25:38 +0000
+
 moolticute (0.5.1-beta) trusty; urgency=medium
 
   * Initial package
