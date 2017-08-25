@@ -46,6 +46,7 @@ signals:
 
 private slots:
     void enableCredentialsManagement(bool enable);
+    void updateTabButtons();
     void updatePage();
     void checkSettingsChanged();
     void enableKnockSettings(bool visible);
