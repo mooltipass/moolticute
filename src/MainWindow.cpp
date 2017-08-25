@@ -933,7 +933,7 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
     ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
     if (!success)
-        QMessageBox::warning(this, tr("Error"), tr("Failed to export the database, an error occured. Please check the log."));
+        QMessageBox::warning(this, tr("Error"), tr(d));
     else
     {
         QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),

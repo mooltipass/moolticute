@@ -239,7 +239,12 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o.value("failed").toBool();
-        QByteArray b = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
+        QByteArray b;
+        if (success)
+            b = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
+        else
+            b = o["error_message"].toString().toLocal8Bit();
+
         emit dbExported(b, success);
     }
     else if (rootobj["msg"] == "import_database")
