@@ -281,6 +281,15 @@ void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QMo
 
 void FilesManagement::on_pushButtonUpdateFile_clicked()
 {
+    auto selectionModel = ui->filesListView->selectionModel();
+    auto selectedIndexes = selectionModel->selectedIndexes();
+
+    if (selectedIndexes.length() <= 0)
+        return;
+
+    auto selectedIndex = selectedIndexes.first();
+    currentItem = filesModel->itemFromIndex(selectedIndex);
+
     if (!currentItem)
         return;
 
@@ -294,6 +303,15 @@ void FilesManagement::on_pushButtonUpdateFile_clicked()
 
 void FilesManagement::on_pushButtonSaveFile_clicked()
 {
+    auto selectionModel = ui->filesListView->selectionModel();
+    auto selectedIndexes = selectionModel->selectedIndexes();
+
+    if (selectedIndexes.length() <= 0)
+        return;
+
+    auto selectedIndex = selectedIndexes.first();
+    currentItem = filesModel->itemFromIndex(selectedIndex);
+
     if (!currentItem)
         return;
 
@@ -316,6 +334,15 @@ void FilesManagement::on_pushButtonSaveFile_clicked()
 
 void FilesManagement::on_pushButtonDelFile_clicked()
 {
+    auto selectionModel = ui->filesListView->selectionModel();
+    auto selectedIndexes = selectionModel->selectedIndexes();
+
+    if (selectedIndexes.length() <= 0)
+        return;
+
+    auto selectedIndex = selectedIndexes.first();
+    currentItem = filesModel->itemFromIndex(selectedIndex);
+
     if (!currentItem)
         return;
 
