@@ -1,0 +1,17 @@
+Source: moolticute
+Section: unknown
+Priority: optional
+Maintainer: Mathieu Limpkin <limpkin@limpkin.fr>
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.6
+Homepage: http://www.themooltipass.com/
+Vcs-Git: git@github.com:limpkin/moolticute.git
+Vcs-Browser: https://github.com/limpkin/moolticute
+
+Package: moolticute
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Mooltipass crossplatform daemon/tools
+ This project aims to be an easy companion to your Mooltipass device and extend the power of the device to more platform/tools. With it you can manage your Mooltipass with a crossplatform app, as well as provide a daemon service that handle all USB communication with the device.
+ This tool is written with a daemon that runs in background, and a user interface app to control you Mooltipass. Other clients could also connect and talk to the daemon (it uses a websocket connection and simple JSON messages). The official Mooltipass App only works with Chrome as it relies on USB HID library that is only implemented in Chrome. A Firefox (or any other browser) extension could easily be written by using the Moolticute daemon.
+ It is completely cross platform, and runs on Linux (using libusb), OS X (native IOKit API), and Windows (native HID API).
