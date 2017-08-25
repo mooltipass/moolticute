@@ -84,6 +84,10 @@ FilesManagement::FilesManagement(QWidget *parent) :
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->addFileButton->setStyleSheet(CSS_BLUE_BUTTON);
 
+    ui->buttonDiscard->setDefaultText(tr("Discard deletions"));
+    ui->buttonDiscard->setPressAndHoldText(tr("Hold to proceed"));
+    connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &FilesManagement::on_buttonDiscard_clicked);
+
     ui->buttonQuitMMM->setStyleSheet(CSS_GREY_BUTTON);
     ui->buttonQuitMMM->setIcon(AppGui::qtAwesome()->icon(fa::signout, whiteButtons));
     ui->pushButtonSaveFile->setStyleSheet(CSS_BLUE_BUTTON);
@@ -169,6 +173,16 @@ void FilesManagement::on_buttonQuitMMM_clicked()
         wsClient->deleteDataFilesAndLeave(deletedList);
     }
     else
+        wsClient->sendLeaveMMRequest();
+}
+
+void FilesManagement::on_buttonDiscard_clicked()
+{
+    int proceed = QMessageBox::question(this,
+                                         tr("Discard Modifications ?"),
+                                         tr("Do you want to discard the deletions "
+                                            "and exit files management mode?"));
+    if (proceed == QMessageBox::Yes)
         wsClient->sendLeaveMMRequest();
 }
 

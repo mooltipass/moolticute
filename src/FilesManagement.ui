@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>691</width>
-    <height>643</height>
+    <height>647</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,7 +166,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageLocked">
       <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -582,6 +582,24 @@ padding: 2px;
           </spacer>
          </item>
          <item>
+           <widget class="AnimatedColorButton" name="buttonDiscard" native="true">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>158</width>
+              <height>34</height>
+             </rect>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>158</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="buttonQuitMMM">
            <property name="minimumSize">
             <size>
@@ -615,6 +633,13 @@ padding: 2px;
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>AnimatedColorButton</class>
+   <extends>QWidget</extends>
+   <header>AnimatedColorButton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
