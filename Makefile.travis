@@ -7,8 +7,10 @@ export
 .PHONY: before_install install script after_success
 
 before_install:
-	make docker_prepare
 	-git fetch --unshallow
+ifeq ($(TRAVIS_OS_NAME),linux)
+	make docker_prepare
+endif
 	source scripts/ci/$(TRAVIS_OS_NAME)/before_install.sh
 
 install:
