@@ -66,7 +66,7 @@ private slots:
     void loadingProgress(int total, int current);
 
     void dbExported(const QByteArray &d, bool success);
-    void dbImported(bool success);
+    void dbImported(bool success, QString message);
 
     void memMgmtModeFailed(int errCode, QString errMsg);
 

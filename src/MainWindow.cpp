@@ -952,12 +952,12 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
     disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
 }
 
-void MainWindow::dbImported(bool success)
+void MainWindow::dbImported(bool success, QString message)
 {
     ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
     if (!success)
-        QMessageBox::warning(this, tr("Error"), tr("Failed to import the database, an error occured. Please check the log."));
+        QMessageBox::warning(this, tr("Error"), message);
     else
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
 

@@ -251,7 +251,10 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o.value("failed").toBool();
-        emit dbImported(success);
+        if (!success)
+            emit dbImported(success, o["error_message"].toString());
+        else
+            emit dbImported(success, "");
     }
     else if (rootobj["msg"] == "failed_memorymgmt")
     {
