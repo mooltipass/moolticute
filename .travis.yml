@@ -4,7 +4,7 @@ services:
 dist: trusty
 os:
 - linux
-#- osx
+- osx
 language: cpp
 
 before_install:

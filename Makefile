@@ -3,7 +3,7 @@ PROJECT_NAME := moolticute
 
 TRAVIS_BUILD_DIR := $(shell pwd)
 
-BUILD_TAG := $(shell git describe --exact-match HEAD)
+BUILD_TAG := $(shell git tag --points-at=HEAD --sort version:refname | head -n 1)
 
 CONTAINER_NAME := $(PROJECT_NAME)
 DOCKER_EXEC_ENV ?=
