@@ -178,12 +178,7 @@ void FilesManagement::on_buttonQuitMMM_clicked()
 
 void FilesManagement::on_buttonDiscard_clicked()
 {
-    int proceed = QMessageBox::question(this,
-                                         tr("Discard Modifications ?"),
-                                         tr("Do you want to discard the deletions "
-                                            "and exit files management mode?"));
-    if (proceed == QMessageBox::Yes)
-        wsClient->sendLeaveMMRequest();
+    wsClient->sendLeaveMMRequest();
 }
 
 void FilesManagement::loadModel()
