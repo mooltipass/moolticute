@@ -105,6 +105,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::statusChanged, [this]()
     {
         this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
+        if (wsClient->get_status() == Common::UnkownSmartcad) {
+            ui->stackedWidget->setCurrentWidget(ui->pageSync);
+        }
     });
 
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
@@ -445,8 +448,13 @@ void MainWindow::updatePage()
 {
     bool isCardUnknown = wsClient->get_status() == Common::UnkownSmartcad;
 
-    ui->pushButtonExportFile->setEnabled(!isCardUnknown);
-    ui->pushButtonIntegrity->setEnabled(!isCardUnknown);
+    ui->label_13->setVisible(!isCardUnknown);
+    ui->label_14->setVisible(!isCardUnknown);
+    ui->pushButtonExportFile->setVisible(!isCardUnknown);
+
+    ui->label_27->setVisible(!isCardUnknown);
+    ui->label_29->setVisible(!isCardUnknown);
+    ui->pushButtonIntegrity->setVisible(!isCardUnknown);
 
     updateTabButtons();
 
