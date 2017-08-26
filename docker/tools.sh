@@ -149,8 +149,8 @@ function create_github_release()
     local DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
     local DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
     local DEB_FILE="build-linux/deb/${DEB_NAME}"
-    local EXE_FILE="$(ls build/*.exe 2> /dev/null | head -n 1)"
-    local IMG_FILE="$(ls build/*.dmg 2> /dev/null | head -n 1)"
+    local EXE_FILE="$(ls win/build/*.exe 2> /dev/null | head -n 1)"
+    local DMG_FILE="$(ls build/*.dmg 2> /dev/null | head -n 1)"
 
     if [ -z "$VERSION" ]; then
         >&2 echo -e "Skipping GitHub release creation (current build does not have a tag)"
@@ -163,6 +163,6 @@ function create_github_release()
 	    create_release_and_upload_asset $VERSION $DEB_FILE
 	    create_release_and_upload_asset $VERSION $EXE_FILE
     elif [ "$TRAVIS_OS_NAME" == "osx" ]; then
-	    create_release_and_upload_asset $VERSION $IMG_FILE
+	    create_release_and_upload_asset $VERSION $DMG_FILE
     fi
 }
