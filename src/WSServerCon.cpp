@@ -872,6 +872,12 @@ void WSServerCon::sendFilesCache()
         return;
     }
 
+    auto deviceStatus = mpdevice->get_status();
+    if (deviceStatus != Common::Unlocked) {
+        qDebug() << "It's an unknown smartcard or it's locked, no need to search for files cache";
+        return;
+    }
+
     qDebug() << "Sending files cache";
     QJsonObject oroot = { {"msg", "files_cache_list"} };
     QJsonArray array;
