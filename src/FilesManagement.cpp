@@ -288,6 +288,9 @@ void FilesManagement::on_pushButtonUpdateFile_clicked()
         return;
 
     auto selectedIndex = selectedIndexes.first();
+    if (selectedIndex.model() == filterModel)
+        selectedIndex = filterModel->mapToSource(selectedIndex);
+
     currentItem = filesModel->itemFromIndex(selectedIndex);
 
     if (!currentItem)
@@ -310,6 +313,9 @@ void FilesManagement::on_pushButtonSaveFile_clicked()
         return;
 
     auto selectedIndex = selectedIndexes.first();
+    if (selectedIndex.model() == filterModel)
+        selectedIndex = filterModel->mapToSource(selectedIndex);
+
     currentItem = filesModel->itemFromIndex(selectedIndex);
 
     if (!currentItem)
@@ -341,6 +347,9 @@ void FilesManagement::on_pushButtonDelFile_clicked()
         return;
 
     auto selectedIndex = selectedIndexes.first();
+    if (selectedIndex.model() == filterModel)
+        selectedIndex = filterModel->mapToSource(selectedIndex);
+
     currentItem = filesModel->itemFromIndex(selectedIndex);
 
     if (!currentItem)
