@@ -238,7 +238,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>9</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -488,8 +488,8 @@ QWidget {background-color: #EFEFEF;}</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>839</width>
-             <height>768</height>
+             <width>720</width>
+             <height>597</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -2209,6 +2209,43 @@ QWidget {background-color: #EFEFEF;}</string>
              <widget class="QCheckBox" name="checkBoxDebugHttp">
               <property name="text">
                <string>Enable daemon web server</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_30">
+            <item>
+             <widget class="QLabel" name="label_38">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Manage your password profiles</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_14">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnPassGenerationProfiles">
+              <property name="text">
+               <string>Password profiles...</string>
               </property>
              </widget>
             </item>

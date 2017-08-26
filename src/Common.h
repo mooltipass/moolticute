@@ -198,6 +198,9 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                         "}" \
                         "QPushButton:pressed {" \
                             "background-color: #237C95;" \
+                        "}" \
+                        "QPushButton:!enabled {" \
+                            "background-color: #cee8ef;" \
                         "}"
 
 #define CSS_GREY_BUTTON "QPushButton {" \

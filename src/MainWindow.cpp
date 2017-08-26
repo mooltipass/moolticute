@@ -22,6 +22,8 @@
 #include "AutoStartup.h"
 #include "Common.h"
 #include "AppGui.h"
+#include "PasswordProfilesModel.h"
+#include "PassGenerationProfilesDialog.h"
 
 template <typename T>
 static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
@@ -39,7 +41,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     bFilesAndSSHKeyTabsVisible(false),
     bAdvancedTabVisible(false),
     bFilesAndSSHKeysTabsVisibleOnDemand(true),
-    previousWidget(nullptr)
+    previousWidget(nullptr),
+    m_passwordProfilesModel(new PasswordProfilesModel(this))
 {
     QSettings s;
     bFilesAndSSHKeysTabsVisibleOnDemand = s.value("settings/FilesAndSSHKeysTabsVisibleOnDemand").toBool();
@@ -63,6 +66,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->widgetCredentials->setWsClient(wsClient);
     ui->widgetFiles->setWsClient(wsClient);
     ui->widgetSSH->setWsClient(wsClient);
+
+    ui->widgetCredentials->setPasswordProfilesModel(m_passwordProfilesModel);
 
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
 
@@ -115,6 +120,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(AppGui::qtAwesome()->icon(fa::undo, whiteButtons));
@@ -129,6 +135,12 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(ui->pushButtonFiles, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonSSH, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonAdvanced, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->btnPassGenerationProfiles, &QPushButton::clicked, [this]()
+    {
+        PassGenerationProfilesDialog dlg(this);
+        dlg.setPasswordProfilesModel(m_passwordProfilesModel);
+        dlg.exec();
+    });
 
     ui->pushButtonDevSettings->setChecked(false);
 
