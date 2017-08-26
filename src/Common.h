@@ -201,8 +201,8 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                         "}"
 
 #define CSS_GREY_BUTTON "QPushButton {" \
-                            "color: #888888;" \
-                            "background-color: #E7E7E7;" \
+                            "color: #000000;" \
+                            "background-color: #D3D3D3;" \
                             "padding: 12px;" \
                             "border: none;" \
                         "}" \

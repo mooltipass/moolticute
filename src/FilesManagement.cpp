@@ -88,7 +88,7 @@ FilesManagement::FilesManagement(QWidget *parent) :
     ui->buttonDiscard->setPressAndHoldText(tr("Hold to proceed"));
     connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &FilesManagement::on_buttonDiscard_clicked);
 
-    ui->buttonQuitMMM->setStyleSheet(CSS_GREY_BUTTON);
+    ui->buttonQuitMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->buttonQuitMMM->setIcon(AppGui::qtAwesome()->icon(fa::signout, whiteButtons));
     ui->pushButtonSaveFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSaveFile->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
@@ -271,7 +271,7 @@ void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QMo
 
     currentItem = filesModel->itemFromIndex(filesModel->index(filterModel->indexToSource(curr.row()), 0));
 
-    ui->fileDisplayServiceInput->setText(currentItem->text());
+//    ui->fileDisplayServiceInput->setText(currentItem->text());
 }
 
 void FilesManagement::on_pushButtonUpdateFile_clicked()
