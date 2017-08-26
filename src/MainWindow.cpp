@@ -1070,7 +1070,10 @@ void MainWindow::updateTabButtons()
 
         ui->pushButtonCred->setEnabled(ui->stackedWidget->currentWidget() == ui->pageCredentials);
         ui->pushButtonFiles->setEnabled(ui->stackedWidget->currentWidget() == ui->pageFiles);
+        return;
     }
+
+    setEnabledToAllTabButtons(true);
 }
 
 void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
