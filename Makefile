@@ -87,10 +87,6 @@ deb_changelog: git_setup
 deb_package:
 	$(DOCKER_EXEC) "cp -f README.md debian/README"
 	$(DOCKER_EXEC) "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
-	
-# Custom upload
-custom_upload:
-	-. scripts/ci/funcs.sh && upload_file build-linux/deb/$(DEB_NAME) $(sha256sum build-linux/deb/$(DEB_NAME) | cut -d' ' -f1) "linux"
 
 # Custom upload
 custom_upload:
