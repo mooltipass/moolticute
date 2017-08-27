@@ -47,7 +47,7 @@ function upload_asset_mime() {
 function get_release_id_by_name()
 {
     local NAME="${1:?Release name required.}"
-	
+
     ok.sh list_releases "$GITHUB_ACCOUNT" "$GITHUB_REPO" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME" | awk '{ print $2 }'
 }
 
