@@ -84,7 +84,11 @@ FilesManagement::FilesManagement(QWidget *parent) :
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->addFileButton->setStyleSheet(CSS_BLUE_BUTTON);
 
-    ui->buttonQuitMMM->setStyleSheet(CSS_GREY_BUTTON);
+    ui->buttonDiscard->setDefaultText(tr("Discard deletions"));
+    ui->buttonDiscard->setPressAndHoldText(tr("Hold to proceed"));
+    connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &FilesManagement::on_buttonDiscard_clicked);
+
+    ui->buttonQuitMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->buttonQuitMMM->setIcon(AppGui::qtAwesome()->icon(fa::signout, whiteButtons));
     ui->pushButtonSaveFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSaveFile->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
@@ -170,6 +174,11 @@ void FilesManagement::on_buttonQuitMMM_clicked()
     }
     else
         wsClient->sendLeaveMMRequest();
+}
+
+void FilesManagement::on_buttonDiscard_clicked()
+{
+    wsClient->sendLeaveMMRequest();
 }
 
 void FilesManagement::loadModel()
@@ -262,11 +271,23 @@ void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QMo
 
     currentItem = filesModel->itemFromIndex(filesModel->index(filterModel->indexToSource(curr.row()), 0));
 
-    ui->fileDisplayServiceInput->setText(currentItem->text());
+//    ui->fileDisplayServiceInput->setText(currentItem->text());
 }
 
 void FilesManagement::on_pushButtonUpdateFile_clicked()
 {
+    auto selectionModel = ui->filesListView->selectionModel();
+    auto selectedIndexes = selectionModel->selectedIndexes();
+
+    if (selectedIndexes.length() <= 0)
+        return;
+
+    auto selectedIndex = selectedIndexes.first();
+    if (selectedIndex.model() == filterModel)
+        selectedIndex = filterModel->mapToSource(selectedIndex);
+
+    currentItem = filesModel->itemFromIndex(selectedIndex);
+
     if (!currentItem)
         return;
 
@@ -280,6 +301,18 @@ void FilesManagement::on_pushButtonUpdateFile_clicked()
 
 void FilesManagement::on_pushButtonSaveFile_clicked()
 {
+    auto selectionModel = ui->filesListView->selectionModel();
+    auto selectedIndexes = selectionModel->selectedIndexes();
+
+    if (selectedIndexes.length() <= 0)
+        return;
+
+    auto selectedIndex = selectedIndexes.first();
+    if (selectedIndex.model() == filterModel)
+        selectedIndex = filterModel->mapToSource(selectedIndex);
+
+    currentItem = filesModel->itemFromIndex(selectedIndex);
+
     if (!currentItem)
         return;
 
@@ -302,6 +335,18 @@ void FilesManagement::on_pushButtonSaveFile_clicked()
 
 void FilesManagement::on_pushButtonDelFile_clicked()
 {
+    auto selectionModel = ui->filesListView->selectionModel();
+    auto selectedIndexes = selectionModel->selectedIndexes();
+
+    if (selectedIndexes.length() <= 0)
+        return;
+
+    auto selectedIndex = selectedIndexes.first();
+    if (selectedIndex.model() == filterModel)
+        selectedIndex = filterModel->mapToSource(selectedIndex);
+
+    currentItem = filesModel->itemFromIndex(selectedIndex);
+
     if (!currentItem)
         return;
 
@@ -327,9 +372,9 @@ void FilesManagement::dataFileRequested(const QString &service, const QByteArray
     if (!success)
     {
         if (currentItem)
-            QMessageBox::warning(this, tr("Failure"), tr("Data sending was denied for '%1'!").arg(currentItem->text()));
+            QMessageBox::warning(this, tr("Failure"), tr("Data Fetch Denied for '%1'!").arg(currentItem->text()));
         else
-            QMessageBox::warning(this, tr("Failure"), tr("Data sending was denied!"));
+            QMessageBox::warning(this, tr("Failure"), tr("Data Fetch Denied!"));
         return;
     }
 

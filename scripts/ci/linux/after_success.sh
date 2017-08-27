@@ -59,4 +59,9 @@ EOF
 upload_file build/$FILENAME.exe $(sha256sum build/$FILENAME.exe | cut -d' ' -f1) "windows"
 upload_file build/updater.json $(sha256sum build/updater.json | cut -d' ' -f1) "windows"
 
+#DEB_PATH = $(cat /tmp/deb_name)
+#DEB_NAME = $(basename $DEB_PATH)
+
+#upload_file build-linux/deb/$DEB_NAME $(sha256sum build-linux/deb/$DEB_NAME | cut -d' ' -f1) "linux"
+
 popd

@@ -47,6 +47,7 @@ signals:
 
 private slots:
     void enableCredentialsManagement(bool enable);
+    void updateTabButtons();
     void updatePage();
     void checkSettingsChanged();
     void enableKnockSettings(bool visible);
@@ -66,7 +67,7 @@ private slots:
     void loadingProgress(int total, int current);
 
     void dbExported(const QByteArray &d, bool success);
-    void dbImported(bool success);
+    void dbImported(bool success, QString message);
 
     void memMgmtModeFailed(int errCode, QString errMsg);
 

@@ -116,7 +116,7 @@ signals:
     void credentialsExists(const QString &service, bool exists);
     void dataNodeExists(const QString &service, bool exists);
     void dbExported(const QByteArray &fileData, bool success);
-    void dbImported(bool success);
+    void dbImported(bool success, QString message);
     void memMgmtModeFailed(int errCode, QString errMsg);
     void filesCacheChanged();
 

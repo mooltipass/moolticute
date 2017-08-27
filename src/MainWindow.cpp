@@ -110,6 +110,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::statusChanged, [this]()
     {
         this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
+        if (wsClient->get_status() == Common::UnkownSmartcad) {
+            ui->stackedWidget->setCurrentWidget(ui->pageSync);
+        }
     });
 
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
@@ -455,30 +458,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::updatePage()
 {
-    if ((ui->stackedWidget->currentWidget() == ui->pageCredentials ||
-         ui->stackedWidget->currentWidget() == ui->pageFiles) &&
-            wsClient->get_memMgmtMode())
-    {
-        if (!ui->widgetCredentials->confirmDiscardUneditedCredentialChanges())
-            return;
-        if (QMessageBox::question(this,
-                                  tr("Exit the credentials manager?"),
-                                  tr("Switching tabs will lock out the credentials management mode. Are you sure you want to switch tab ?"),
-                                  QMessageBox::Yes | QMessageBox::No,
-                                  QMessageBox::Yes) == QMessageBox::No)
-        {
-            //Force the selected button to go back to the correct state
-            //when we pressed "No"
-            if (ui->stackedWidget->currentWidget() == ui->pageCredentials)
-                ui->pushButtonCred->setChecked(true);
-            else if (ui->stackedWidget->currentWidget() == ui->pageFiles)
-                ui->pushButtonFiles->setChecked(true);
+    bool isCardUnknown = wsClient->get_status() == Common::UnkownSmartcad;
 
-            return;
-        }
+    ui->label_13->setVisible(!isCardUnknown);
+    ui->label_14->setVisible(!isCardUnknown);
+    ui->pushButtonExportFile->setVisible(!isCardUnknown);
 
-        wsClient->sendLeaveMMRequest();
-    }
+    ui->label_27->setVisible(!isCardUnknown);
+    ui->label_29->setVisible(!isCardUnknown);
+    ui->pushButtonIntegrity->setVisible(!isCardUnknown);
+
+    updateTabButtons();
 
     if (ui->pushButtonAbout->isChecked())
     {
@@ -772,6 +762,8 @@ void MainWindow::wantEnterCredentialManagement()
     ui->progressBarWait->hide();
 
     connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+
+    updateTabButtons();
 }
 
 void MainWindow::wantSaveCredentialManagement()
@@ -781,6 +773,18 @@ void MainWindow::wantSaveCredentialManagement()
     ui->progressBarWait->hide();
 
     connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+
+    auto conn = std::make_shared<QMetaObject::Connection>();
+    *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & , const QString &, const QString &, bool success)
+    {
+        disconnect(*conn);
+        if (!success) {
+            QMessageBox::warning(this, tr("Failure"), tr("Couldn't save credentials, please contact the support team with moolticute's log"));
+            ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+        }
+
+        updateTabButtons();
+    });
 }
 
 void MainWindow::wantImportDatabase()
@@ -794,6 +798,7 @@ void MainWindow::wantImportDatabase()
 
 void MainWindow::wantExportDatabase()
 {
+    ui->widgetHeader->setEnabled(false);
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
@@ -808,6 +813,8 @@ void MainWindow::wantExitFilesManagement()
     ui->progressBarWait->hide();
 
     connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+
+    updateTabButtons();
 }
 
 void MainWindow::loadingProgress(int total, int current)
@@ -935,6 +942,7 @@ void MainWindow::on_pushButtonImportFile_clicked()
         QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
         return;
     }
+    ui->widgetHeader->setEnabled(false);
     wsClient->importDbFile(f.readAll(), ui->checkBoxImport->isChecked());
     connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
     wantImportDatabase();
@@ -942,9 +950,10 @@ void MainWindow::on_pushButtonImportFile_clicked()
 
 void MainWindow::dbExported(const QByteArray &d, bool success)
 {
+    ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
     if (!success)
-        QMessageBox::warning(this, tr("Error"), tr("Failed to export the database, an error occured. Please check the log."));
+        QMessageBox::warning(this, tr("Error"), tr(d));
     else
     {
         QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),
@@ -963,11 +972,12 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
     disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
 }
 
-void MainWindow::dbImported(bool success)
+void MainWindow::dbImported(bool success, QString message)
 {
+    ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
     if (!success)
-        QMessageBox::warning(this, tr("Error"), tr("Failed to import the database, an error occured. Please check the log."));
+        QMessageBox::warning(this, tr("Error"), message);
     else
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
 
@@ -1034,6 +1044,48 @@ void MainWindow::enableCredentialsManagement(bool enable)
 
     if (!enable)
         updatePage();
+
+    updateTabButtons();
+}
+
+void MainWindow::updateTabButtons()
+{
+    auto setEnabledToAllTabButtons = [=](bool enabled) {
+        for (QObject * object: ui->widgetHeader->children()) {
+            if (typeid(*object) ==  typeid(QPushButton)) {
+                QAbstractButton *tabButton = (QAbstractButton *) object;
+                tabButton->setEnabled(enabled);
+            }
+        }
+    };
+
+    if (ui->stackedWidget->currentWidget() == ui->pageWaiting) {
+        setEnabledToAllTabButtons(false);
+    } else
+        setEnabledToAllTabButtons(true);
+
+    // Enable or Disable tabs according to the device status
+    if (wsClient->get_status() == Common::UnkownSmartcad) {
+        // Enable all tab buttons
+        setEnabledToAllTabButtons(true);
+
+        ui->pushButtonCred->setEnabled(false);
+        ui->pushButtonFiles->setEnabled(false);
+        ui->pushButtonSSH->setEnabled(false);
+
+        return;
+    }
+
+    if (wsClient->get_memMgmtMode()) {
+        // Disable all tab buttons
+        setEnabledToAllTabButtons(false);
+
+        ui->pushButtonCred->setEnabled(ui->stackedWidget->currentWidget() == ui->pageCredentials);
+        ui->pushButtonFiles->setEnabled(ui->stackedWidget->currentWidget() == ui->pageFiles);
+        return;
+    }
+
+    setEnabledToAllTabButtons(true);
 }
 
 void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
