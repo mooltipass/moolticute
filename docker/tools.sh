@@ -96,14 +96,15 @@ function create_release_and_upload_asset()
 {
     local TAG=$1
     local FILE_PATH=$2
-    local MIME_TYPE=$(file --mime-type $FILE_PATH)
-    local FILE_NAME=$(basename $FILE_PATH)
-    local FILE_DIR=$(dirname $FILE_PATH)
 
     if [ ! -f "$FILE_PATH" ]; then
        echo "The file $FILE_PATH does not exist so it can't be uploaded"
        return 0
     fi
+
+    local MIME_TYPE=$(file --mime-type $FILE_PATH)
+    local FILE_NAME=$(basename $FILE_PATH)
+    local FILE_DIR=$(dirname $FILE_PATH)
 
     RELEASE_ID=$(get_release_id_by_name "$TAG")
 
@@ -165,4 +166,23 @@ function create_github_release()
     elif [ "$TRAVIS_OS_NAME" == "osx" ]; then
 	    create_release_and_upload_asset $VERSION $DMG_FILE
     fi
+}
+
+function osx_setup_fake_home()
+{
+    local DIR="${1:?Directory path required.}"
+
+    cp docker/config/.netrc $DIR
+
+    sed -i'' -e "s/<username>/${GITHUB_LOGIN}/g" $DIR/.netrc
+    sed -i'' -e "s/<token>/${GITHUB_TOKEN}/g" $DIR/.netrc
+
+    chmod 600 ${DIR}/.netrc
+}
+
+function osx_clean_fake_home()
+{
+    local DIR="${1:?Directory path required.}"
+
+    rm $DIR/.netrc
 }
