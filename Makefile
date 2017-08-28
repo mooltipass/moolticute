@@ -92,9 +92,5 @@ deb_package:
 custom_upload:
 	-. scripts/ci/funcs.sh && upload_file build-linux/deb/$(DEB_NAME) $(sha256sum build-linux/deb/$(DEB_NAME) | cut -d' ' -f1) "linux"
 
-# Custom upload
-custom_upload:
-	-. scripts/ci/funcs.sh && upload_file build-linux/deb/$(DEB_NAME) $(sha256sum build-linux/deb/$(DEB_NAME) | cut -d' ' -f1) "linux"
-
 # Build a complete Debian package
 debian: build deb_changelog deb_package
