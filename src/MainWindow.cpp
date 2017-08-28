@@ -34,18 +34,20 @@ static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx =
     cb->setCurrentIndex(idx);
 }
 
+const QString MainWindow::SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY = "settings/SSHKeysTabsVisibleOnDemand";
+
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     wsClient(client),
-    bFilesAndSSHKeyTabsVisible(false),
+    bSSHKeyTabVisible(false),
     bAdvancedTabVisible(false),
-    bFilesAndSSHKeysTabsVisibleOnDemand(true),
+    bSSHKeysTabVisibleOnDemand(true),
     previousWidget(nullptr),
     m_passwordProfilesModel(new PasswordProfilesModel(this))
 {
     QSettings s;
-    bFilesAndSSHKeysTabsVisibleOnDemand = s.value("settings/FilesAndSSHKeysTabsVisibleOnDemand").toBool();
+    bSSHKeysTabVisibleOnDemand = s.value(SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY).toBool();
 
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
@@ -74,8 +76,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     //Disable this option for now, firmware does not support it
     ui->checkBoxInput->setEnabled(false);
 
-    ui->radioButtonFilesAndSSHKeysTabsAlwaysVisible->setChecked(!bFilesAndSSHKeysTabsVisibleOnDemand);
-    ui->radioButtonTabsAndSSHKeyTabsVisibleOnDemand->setChecked(bFilesAndSSHKeysTabsVisibleOnDemand);
+    ui->radioButtonSSHTabAlways->setChecked(!bSSHKeysTabVisibleOnDemand);
+    ui->radioButtonSSHTabOnDemand->setChecked(bSSHKeysTabVisibleOnDemand);
 
     ui->pushButtonDevSettings->setIcon(AppGui::qtAwesome()->icon(fa::wrench));
     ui->pushButtonCred->setIcon(AppGui::qtAwesome()->icon(fa::key));
@@ -83,16 +85,16 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAppSettings->setIcon(AppGui::qtAwesome()->icon(fa::cogs));
     ui->pushButtonAbout->setIcon(AppGui::qtAwesome()->icon(fa::info));
     ui->pushButtonFiles->setIcon(AppGui::qtAwesome()->icon(fa::file));
-    ui->pushButtonFiles->setVisible(!bFilesAndSSHKeysTabsVisibleOnDemand || bFilesAndSSHKeyTabsVisible);
+
     ui->pushButtonSSH->setIcon(AppGui::qtAwesome()->icon(fa::key));    
-    ui->pushButtonSSH->setVisible(!bFilesAndSSHKeysTabsVisibleOnDemand || bFilesAndSSHKeyTabsVisible);
+    ui->pushButtonSSH->setVisible(!bSSHKeysTabVisibleOnDemand || bSSHKeyTabVisible);
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
     ui->pushButtonAdvanced->setVisible(bAdvancedTabVisible);
 
     m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F1), this);
-    setFilesAndSSHKeysTabsVisibleOnDemand(bFilesAndSSHKeysTabsVisibleOnDemand);
-    connect(ui->radioButtonFilesAndSSHKeysTabsAlwaysVisible, &QRadioButton::toggled, this, &MainWindow::onRadioButtonFilesAndSSHKeysTabsAlwaysVisibleToggled);
+    setKeysTabVisibleOnDemand(bSSHKeysTabVisibleOnDemand);
+    connect(ui->radioButtonSSHTabAlways, &QRadioButton::toggled, this, &MainWindow::onRadioButtonSSHTabsAlwaysToggled);
     m_advancedTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F2), this);
     connect(m_advancedTabShortcut, SIGNAL(activated()), this, SLOT(onAdvancedTabShortcutActivated()));
 
@@ -706,11 +708,10 @@ void MainWindow::on_pushButtonSettingsSave_clicked()
 
 void MainWindow::onFilesAndSSHTabsShortcutActivated()
 {
-    bFilesAndSSHKeyTabsVisible = !bFilesAndSSHKeyTabsVisible;
-    ui->pushButtonFiles->setVisible(bFilesAndSSHKeyTabsVisible);
-    ui->pushButtonSSH->setVisible(bFilesAndSSHKeyTabsVisible);
+    bSSHKeyTabVisible = !bSSHKeyTabVisible;
+    ui->pushButtonSSH->setVisible(bSSHKeyTabVisible);
 
-    if (bFilesAndSSHKeyTabsVisible) {
+    if (bSSHKeyTabVisible) {
         previousWidget = ui->stackedWidget->currentWidget();
     }
     else
@@ -738,9 +739,9 @@ void MainWindow::onAdvancedTabShortcutActivated()
     }
 }
 
-void MainWindow::onRadioButtonFilesAndSSHKeysTabsAlwaysVisibleToggled(bool bChecked)
+void MainWindow::onRadioButtonSSHTabsAlwaysToggled(bool bChecked)
 {
-    setFilesAndSSHKeysTabsVisibleOnDemand(!bChecked);
+    setKeysTabVisibleOnDemand(!bChecked);
 }
 
 void MainWindow::onCurrentTabChanged(int)
@@ -859,27 +860,26 @@ void MainWindow::checkAutoStart()
         ui->pushButtonAutoStart->setText(tr("Enable"));
 }
 
-void MainWindow::setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue)
+void MainWindow::setKeysTabVisibleOnDemand(bool bValue)
 {
-    bFilesAndSSHKeysTabsVisibleOnDemand = bValue;
+    bSSHKeysTabVisibleOnDemand = bValue;
 
     // Save in settings
     QSettings s;
-    s.setValue("settings/FilesAndSSHKeysTabsVisibleOnDemand", bValue);
+    s.setValue(SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY, bValue);
 
-    // Files and SSH keys tabs will show up only after activating the CTRL+SHIFT+F1 shortcut
-    if (bFilesAndSSHKeysTabsVisibleOnDemand) {
-        bFilesAndSSHKeyTabsVisible = false;
+    // SSH keys tab will show up only after activating the CTRL+SHIFT+F1 shortcut
+    if (bSSHKeysTabVisibleOnDemand) {
+        bSSHKeyTabVisible = false;
         connect(m_FilesAndSSHKeysTabsShortcut, &QShortcut::activated, this, &MainWindow::onFilesAndSSHTabsShortcutActivated);
     }
-    // Files and SSH key tabs always visible
+    // SSH key tab always visible
     else {
-        bFilesAndSSHKeyTabsVisible = true;
+        bSSHKeyTabVisible = true;
         disconnect(m_FilesAndSSHKeysTabsShortcut, &QShortcut::activated, this, &MainWindow::onFilesAndSSHTabsShortcutActivated);
     }
 
-    ui->pushButtonFiles->setVisible(bFilesAndSSHKeyTabsVisible);
-    ui->pushButtonSSH->setVisible(bFilesAndSSHKeyTabsVisible);
+    ui->pushButtonSSH->setVisible(bSSHKeyTabVisible);
 }
 
 void MainWindow::daemonLogAppend(const QByteArray &logdata)
