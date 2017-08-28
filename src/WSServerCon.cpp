@@ -867,13 +867,15 @@ void WSServerCon::sendDeviceUID()
 
 void WSServerCon::sendFilesCache()
 {
-    if (!mpdevice->hasFilesCache()) {
+    if (!mpdevice->hasFilesCache())
+    {
         qDebug() << "There is fo files cache to send";
         return;
     }
 
     auto deviceStatus = mpdevice->get_status();
-    if (deviceStatus != Common::Unlocked) {
+    if (deviceStatus != Common::Unlocked)
+    {
         qDebug() << "It's an unknown smartcard or it's locked, no need to search for files cache";
         return;
     }

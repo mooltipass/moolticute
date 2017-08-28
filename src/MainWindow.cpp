@@ -110,9 +110,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::statusChanged, [this]()
     {
         this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
-        if (wsClient->get_status() == Common::UnkownSmartcad) {
+        if (wsClient->get_status() == Common::UnkownSmartcad)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
-        }
     });
 
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
@@ -778,7 +777,8 @@ void MainWindow::wantSaveCredentialManagement()
     *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & , const QString &, const QString &, bool success)
     {
         disconnect(*conn);
-        if (!success) {
+        if (!success)
+	{
             QMessageBox::warning(this, tr("Failure"), tr("Couldn't save credentials, please contact the support team with moolticute's log"));
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         }
@@ -1050,22 +1050,26 @@ void MainWindow::enableCredentialsManagement(bool enable)
 
 void MainWindow::updateTabButtons()
 {
-    auto setEnabledToAllTabButtons = [=](bool enabled) {
-        for (QObject * object: ui->widgetHeader->children()) {
-            if (typeid(*object) ==  typeid(QPushButton)) {
+    auto setEnabledToAllTabButtons = [=](bool enabled)
+    {
+        for (QObject * object: ui->widgetHeader->children())
+	{
+            if (typeid(*object) ==  typeid(QPushButton))
+	    {
                 QAbstractButton *tabButton = (QAbstractButton *) object;
                 tabButton->setEnabled(enabled);
             }
         }
     };
 
-    if (ui->stackedWidget->currentWidget() == ui->pageWaiting) {
+    if (ui->stackedWidget->currentWidget() == ui->pageWaiting)
         setEnabledToAllTabButtons(false);
-    } else
+    else
         setEnabledToAllTabButtons(true);
 
     // Enable or Disable tabs according to the device status
-    if (wsClient->get_status() == Common::UnkownSmartcad) {
+    if (wsClient->get_status() == Common::UnkownSmartcad)
+    {
         // Enable all tab buttons
         setEnabledToAllTabButtons(true);
 
@@ -1076,7 +1080,8 @@ void MainWindow::updateTabButtons()
         return;
     }
 
-    if (wsClient->get_memMgmtMode()) {
+    if (wsClient->get_memMgmtMode())
+    {
         // Disable all tab buttons
         setEnabledToAllTabButtons(false);
 
