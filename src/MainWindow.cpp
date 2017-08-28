@@ -42,12 +42,11 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     wsClient(client),
     bSSHKeyTabVisible(false),
     bAdvancedTabVisible(false),
-    bSSHKeysTabVisibleOnDemand(true),
     previousWidget(nullptr),
     m_passwordProfilesModel(new PasswordProfilesModel(this))
 {
     QSettings s;
-    bSSHKeysTabVisibleOnDemand = s.value(SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY).toBool();
+    bSSHKeysTabVisibleOnDemand = s.value(SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY, true).toBool();
 
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
