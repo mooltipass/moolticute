@@ -774,7 +774,9 @@ void MPDevice::updateLockUnlockMode(int val)
     updateParam(MPParams::LOCK_UNLOCK_FEATURE_PARAM, val);
 }
 
-void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData, bool getDataChilds)
+void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
+                                    MPDeviceProgressCb cbProgress,bool getCreds,
+                                    bool getData, bool getDataChilds)
 {
     /* For when the MMM is left */
     cleanMMMVars();
@@ -807,7 +809,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
             progressCurrent = 0;
             progressCurrentLogin = 0;
             progressCurrentData = 0;
-            cbProgress(progressTotal, progressCurrent);
+            // TODO: send a more significative status message
+            cbProgress(progressTotal, progressCurrent, "Working");
             return true;
         }
     }));
@@ -879,7 +882,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                 favoritesAddrsClone.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
 
                 progressCurrent++;
-                cbProgress(progressTotal, progressCurrent);
+                // TODO: send a more significative status message
+                cbProgress(progressTotal, progressCurrent, "WORKING");
 
                 return true;
             }
@@ -978,7 +982,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
 }
 
 void MPDevice::startMemMgmtMode(bool wantData,
-                                std::function<void(int total, int current)> cbProgress,
+                                std::function<void(int, int, QString)> cbProgress,
                                 std::function<void(bool success, int errCode, QString errMsg)> cb)
 {
     /* Start MMM here, and load all memory data from the device */
@@ -1114,7 +1118,7 @@ QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
     return return_data;
 }
 
-void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, std::function<void(int total, int current)> cbProgress)
+void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
 {
     /* Because of recursive calls, make sure we haven't reached the end of the memory */
     if (getFlashPageFromAddress(address) == getNumberOfPages())
@@ -1127,7 +1131,8 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     if (getFlashPageFromAddress(address) != lastFlashPageScanned)
     {
         lastFlashPageScanned = getFlashPageFromAddress(address);
-        cbProgress(getNumberOfPages(), lastFlashPageScanned);
+        // TODO: add a more significative messate
+        cbProgress(getNumberOfPages(), lastFlashPageScanned, "WORKING on loadSingleNodeAndScan");
     }
 
     //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address);
@@ -1232,7 +1237,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
-void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, std::function<void(int total, int current)> cbProgress)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
 {    
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
@@ -1277,7 +1282,8 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, std::fu
                         currentFirstCharVal = 'a';
                     progressCurrentLogin = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
                     progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
-                    cbProgress(progressTotal, progressCurrent);
+                    // TODO: Add a more significative message
+                    cbProgress(progressTotal, progressCurrent, "WORKING on loadLoginNode");
                 }
 
                 //Node is loaded
@@ -1357,7 +1363,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     }));
 }
 
-void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, std::function<void(int total, int current)> cbProgress)
+void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, MPDeviceProgressCb cbProgress)
 {
     MPNode *pnode = new MPNode(this, address);
     dataNodes.append(pnode);
@@ -1398,7 +1404,8 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
                     currentFirstCharVal = 'a';
                 progressCurrentData = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
                 progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
-                cbProgress(progressTotal, progressCurrent);
+                // TODO: add a more significative message
+                cbProgress(progressTotal, progressCurrent, "WORKING on loadDataNode");
             }
 
             //Node is loaded
@@ -3701,7 +3708,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
 }
 
 void MPDevice::delCredentialAndLeave(const QString &service, const QString &login,
-                                     std::function<void(int total, int current)> cbProgress,
+                                     MPDeviceProgressCb cbProgress,
                                      std::function<void(bool success, QString errstr)> cb)
 {
     auto deleteCred = [=]()
@@ -3961,7 +3968,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
 }
 
 bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
-                             std::function<void(int total, int current)> cbProgress,
+                             MPDeviceProgressCb cbProgress,
                              const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
@@ -3992,12 +3999,14 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
             ba.append(data.mid(MP_PAYLOAD_FIELD_INDEX, (int)data.at(0)));
             quint32 sz = qFromBigEndian<quint32>((quint8 *)ba.data());
             m["progress_total"] = sz;
-            cbProgress((int)sz, ba.size() - 4);
+            // TODO: send a more significative message
+            cbProgress((int)sz, ba.size() - 4, "WORKING on getDataNodeCb");
         }
         else
         {
             ba.append(data.mid(MP_PAYLOAD_FIELD_INDEX, (int)data.at(0)));
-            cbProgress(m["progress_total"].toInt(), ba.size() - 4);
+            // TODO: send a more significative message
+            cbProgress(m["progress_total"].toInt(), ba.size() - 4, "WORKING on getDataNodeCb");
         }
 
         m["data"] = ba;
@@ -4013,7 +4022,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
 
 void MPDevice::getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
                            std::function<void(bool success, QString errstr, QString serv, QByteArray rawData)> cb,
-                           std::function<void(int total, int current)> cbProgress)
+                           MPDeviceProgressCb cbProgress)
 {
     if (service.isEmpty())
     {
@@ -4108,7 +4117,7 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
 }
 
 bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
-                             std::function<void(int total, int current)> cbProgress,
+                             MPDeviceProgressCb cbProgress,
                              const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
@@ -4133,7 +4142,8 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
     packet.append(currentDataNode.mid(current, MOOLTIPASS_BLOCK_SIZE));
     packet.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
-    cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, current + MOOLTIPASS_BLOCK_SIZE);
+    // TODO: Send more significative message
+    cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, current + MOOLTIPASS_BLOCK_SIZE, "WORKING on setDataNodeCb");
 
     //send 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
@@ -4147,7 +4157,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 
 void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
                            std::function<void(bool success, QString errstr)> cb,
-                           std::function<void(int total, int current)> cbProgress)
+                           MPDeviceProgressCb cbProgress)
 {
     if (service.isEmpty())
     {
@@ -4231,7 +4241,7 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
 
 void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
                                         std::function<void(bool success, QString errstr)> cb,
-                                        std::function<void(int total, int current)> cbProgress)
+                                        MPDeviceProgressCb cbProgress)
 {
     // TODO for the future:
     // When scanning the parent nodes, store their file sizes
@@ -4936,10 +4946,11 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
-                            [=](int total, int current)
+                            [=](int total, int current, QString msg)
                             {
                                 Q_UNUSED(total);
                                 Q_UNUSED(current);
+                                // TODO: shal we do something with the msg
                             },
                             true, true, true);
 
@@ -5772,7 +5783,7 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
 }
 
 void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
-                                   std::function<void(int total, int current)> cbProgress)
+                                   MPDeviceProgressCb cbProgress)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting integrity check", this);
@@ -5783,7 +5794,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     /* Setup global vars dedicated to speed diagnostics */
     diagNbBytesRec = 0;
     lastFlashPageScanned = 0;
-    diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;    
+    diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
 
     /* Load CTR, favorites, nodes... */
     memMgmtModeReadFlash(jobs, true, cbProgress, true, true, true);
@@ -6269,7 +6280,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 }
 
 void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
-                              std::function<void(int total, int current)> cbProgress)
+                              MPDeviceProgressCb cbProgress)
 {
     Q_UNUSED(cbProgress)
     /* New job for starting MMM */
@@ -6280,10 +6291,11 @@ void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, Q
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
-                            [=](int total, int current)
+                            [=](int total, int current, QString msg)
                             {
                                 Q_UNUSED(total);
                                 Q_UNUSED(current);
+                                // TODO: shal we do something with the msg
                             }
                             , true, true, true);
 
@@ -6318,7 +6330,7 @@ void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, Q
 
 void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                               std::function<void(bool success, QString errstr)> cb,
-                              std::function<void(int total, int current)> cbProgress)
+                              MPDeviceProgressCb cbProgress)
 {
     Q_UNUSED(cbProgress)
     QString errorString;
@@ -6405,10 +6417,11 @@ void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
-                         [=](int total, int current)
+                         [=](int total, int current, QString msg)
                          {
                              Q_UNUSED(total);
                              Q_UNUSED(current);
+                            // TODO: shal we do something with the msg
                          }, false, true, false);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)

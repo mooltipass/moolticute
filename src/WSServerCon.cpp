@@ -74,7 +74,7 @@ void WSServerCon::processMessage(const QString &message)
     }
 
     //Default progress callback handling
-    auto defaultProgressCb = [=](int total, int current)
+    auto defaultProgressCb = [=](int total, int current, QString msg)
     {
         if (!WSServer::Instance()->checkClientExists(this))
             return;
@@ -86,6 +86,7 @@ void WSServerCon::processMessage(const QString &message)
         QJsonObject oroot = root;
         ores["progress_total"] = total;
         ores["progress_current"] = current;
+        ores["progress_message"] = msg;
         oroot["data"] = ores;
         oroot["msg"] = "progress"; //change msg to avoid breaking of client waiting of the response
         sendJsonMessage(oroot);

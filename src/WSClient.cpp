@@ -199,7 +199,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "progress")
     {
         QJsonObject o = rootobj["data"].toObject();
-        emit progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt());
+        emit progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt(), o["progress_message"].toString());
     }
     else if (rootobj["msg"] == "device_uid")
     {

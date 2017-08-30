@@ -28,6 +28,7 @@
 #include "FilesCache.h"
 
 typedef std::function<void(bool success, const QByteArray &data, bool &done)> MPCommandCb;
+typedef std::function<void(int total, int current, QString statusMsg)> MPDeviceProgressCb;
 
 class MPCommand
 {
@@ -123,11 +124,11 @@ public:
     //mem mgmt mode
     //cbFailure is used to propagate an error to clients when entering mmm
     void startMemMgmtMode(bool wantData,
-                          std::function<void(int total, int current)> cbProgress,
+                          std::function<void(int total, int current, QString statusMsg)> cbProgress,
                           std::function<void(bool success, int errCode, QString errMsg)> cb);
     void exitMemMgmtMode(bool setMMMBool = true);
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
-                             std::function<void(int total, int current)> cbProgress);
+                             MPDeviceProgressCb cbProgress);
 
     //reload parameters from MP
     void loadParameters();
@@ -152,7 +153,7 @@ public:
 
     //Delete credential in MMM and leave
     void delCredentialAndLeave(const QString &service, const QString &login,
-                               std::function<void(int total, int current)> cbProgress,
+                               MPDeviceProgressCb cbProgress,
                                std::function<void(bool success, QString errstr)> cb);
 
     //get 32 random bytes from device
@@ -164,17 +165,17 @@ public:
     //Request for a raw data node from the device
     void getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
                      std::function<void(bool success, QString errstr, QString service, QByteArray rawData)> cb,
-                     std::function<void(int total, int current)> cbProgress);
+                     MPDeviceProgressCb cbProgress);
 
     //Set data to a context on the device
     void setDataNode(const QString &service, const QByteArray &nodeData,
                      std::function<void(bool success, QString errstr)> cb,
-                     std::function<void(int total, int current)> cbProgress);
+                     MPDeviceProgressCb cbProgress);
 
     //Delete a data context from the device
     void deleteDataNodesAndLeave(const QStringList &services,
                                  std::function<void(bool success, QString errstr)> cb,
-                                 std::function<void(int total, int current)> cbProgress);
+                                 MPDeviceProgressCb cbProgress);
 
     //Check is credential/data node exists
     void serviceExists(bool isDatanode, const QString &service, const QString &reqid,
@@ -186,11 +187,11 @@ public:
 
     //Export database
     void exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
-                        std::function<void(int total, int current)> cbProgress);
+                        MPDeviceProgressCb cbProgress);
     //Import database
     void importDatabase(const QByteArray &fileData, bool noDelete,
                         std::function<void(bool success, QString errstr)> cb,
-                        std::function<void(int total, int current)> cbProgress);
+                        MPDeviceProgressCb cbProgress);
 
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
@@ -232,25 +233,25 @@ private:
     virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
 
     void loadLoginNode(AsyncJobs *jobs, const QByteArray &address,
-                       std::function<void(int total, int current)> cbProgress);
+                       MPDeviceProgressCb cbProgress);
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
-                      std::function<void(int total, int current)> cbProgress);
+                      MPDeviceProgressCb cbProgress);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
-                               std::function<void(int total, int current)> cbProgress);
+                               MPDeviceProgressCb cbProgress);
 
     void createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode = false);
 
     bool getDataNodeCb(AsyncJobs *jobs,
-                       std::function<void(int total, int current)> cbProgress,
+                       MPDeviceProgressCb cbProgress,
                        const QByteArray &data, bool &done);
     bool setDataNodeCb(AsyncJobs *jobs, int current,
-                       std::function<void(int total, int current)> cbProgress,
+                       MPDeviceProgressCb cbProgress,
                        const QByteArray &data, bool &done);
 
     // Functions added by mathieu for MMM
-    void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData, bool getDataChilds);
+    void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, MPDeviceProgressCb cbProgress, bool getCreds, bool getData, bool getDataChilds);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data);
