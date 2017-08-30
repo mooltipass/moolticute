@@ -518,6 +518,14 @@ void WSServerCon::processMessage(const QString &message)
     {
         sendFilesCache();
     }
+    else if (root["msg"] == "get_db_backup_folder")
+    {
+        sendDBBackupFolder();
+    }
+    else if (root["msg"] == "set_db_backup_folder")
+    {
+        setDBBackupFolder(root["data"].toString());
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)
@@ -577,6 +585,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
 
     connect(mpdevice, &MPDevice::filesCacheChanged, this, &WSServerCon::sendFilesCache);
+    connect(mpdevice, &MPDevice::hashedCardCPZChanged, this, &WSServerCon::sendDBBackupFolder);
 }
 
 void WSServerCon::statusChanged()
@@ -888,6 +897,25 @@ void WSServerCon::sendFilesCache()
 
     oroot["data"] = array;
     sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendDBBackupFolder()
+{
+    if (!mpdevice)
+        return;
+
+    QString backupFolder = mpdevice->getDBBackupFolder();
+
+    sendJsonMessage({{ "msg", "db_backup_folder" },
+                    { "data", backupFolder }});
+}
+
+void WSServerCon::setDBBackupFolder(const QString &backupFolder)
+{
+    if (!mpdevice)
+        return;
+
+    mpdevice->setDBBackupFolder(backupFolder);
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

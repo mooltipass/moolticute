@@ -207,6 +207,8 @@ public:
     void updateFilesCache();
     void addFileToCache(QString fileName);
     void removeFileFromCache(QString fileName);
+    QString getDBBackupFolder();
+    void setDBBackupFolder(const QString &backupFolder);
 
 signals:
     /* Signal emited by platform code when new data comes from MP */
@@ -216,6 +218,7 @@ signals:
     /* the command has failed in platform code */
     void platformFailed();
     void filesCacheChanged();
+    void hashedCardCPZChanged();
 
 private slots:
     void newDataRead(const QByteArray &data);

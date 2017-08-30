@@ -217,5 +217,11 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                             "background-color: #E57373;" \
                         "}"
 
+#define CSS_BLUE_LINEEDIT   "QLineEdit {" \
+                                "border: 2px solid #60B1C7;" \
+                                "background: #cee8ef;" \
+                                "selection-background-color: #3d96af;" \
+                            "}" \
+                            "QLineEdit:focus { border: 2px solid #3d96af; }"
 #endif // COMMON_H
 

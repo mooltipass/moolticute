@@ -14,6 +14,8 @@ class FilesCache : public QObject
 public:
     explicit FilesCache(QObject *parent = nullptr);
     QByteArray cardCPZ() const;
+    QString filePath() const { return m_filePath; }
+
 signals:
 
     void cardCPZChanged(QByteArray cardCPZ);

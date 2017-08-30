@@ -73,6 +73,8 @@ private slots:
     void sendDelayAfterKeyEntry();
     void sendDeviceUID();
     void sendFilesCache();
+    void sendDBBackupFolder();
+    void setDBBackupFolder(const QString &backupFolder);
 
 private:
     bool checkMemModeEnabled(const QJsonObject &root);

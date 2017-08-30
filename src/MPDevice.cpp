@@ -87,6 +87,7 @@ MPDevice::MPDevice(QObject *parent):
     });
 
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
+    connect(&filesCache, &FilesCache::cardCPZChanged, this, &MPDevice::hashedCardCPZChanged);
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
 
@@ -324,6 +325,35 @@ void MPDevice::removeFileFromCache(QString fileName)
 
     filesCache.save(cache);
     emit filesCacheChanged();
+}
+
+QString MPDevice::getDBBackupFolder()
+{
+    if(filesCache.filePath().isEmpty())
+        return QString();
+
+    QFileInfo fileInfo(filesCache.filePath());
+
+    // get backup folder for hashed card CPZ
+    QSettings settings;
+    settings.beginGroup("users");
+    QString backupFolder = settings.value(fileInfo.baseName()).toString();
+    settings.endGroup();
+
+    return backupFolder;
+}
+
+void MPDevice::setDBBackupFolder(const QString &backupFolder)
+{
+    if(filesCache.filePath().isEmpty())
+        return;
+
+    QFileInfo fileInfo(filesCache.filePath());
+
+    QSettings settings;
+    settings.beginGroup("users");
+    settings.setValue(fileInfo.baseName(), backupFolder);
+    settings.endGroup();
 }
 
 bool MPDevice::isJobsQueueBusy()
