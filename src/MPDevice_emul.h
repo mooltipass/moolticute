@@ -33,6 +33,8 @@ private:
     QHash<QString, QString> logins;
     QHash<QString, QString> descriptions;
     QString context;
+    QByteArray m_data;
+    QByteArray m_defaultCPZ;
 };
 
 #endif // MPDEVICE_EMUL_H
