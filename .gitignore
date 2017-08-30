@@ -39,3 +39,4 @@ build-linux
 lang/*.qm
 
 .env
+debian/changelog

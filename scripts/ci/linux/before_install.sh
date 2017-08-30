@@ -1,6 +1,9 @@
 #!/bin/bash
 set -ev
 
+SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source $SCRIPTDIR/../funcs.sh
+
 sudo add-apt-repository -y ppa:ubuntu-wine/ppa
 sudo dpkg --add-architecture i386
 sudo apt-get update -qq
@@ -22,3 +25,10 @@ if [ "$HOME" != "/home/ubuntu" ] ; then
      sudo ln -s $(basename $HOME) ubuntu)
 fi
 
+# Docker
+mkdir -p ${BUILD_DIR}/deb
+docker-compose $DOCKER_COMPOSE_CONFIG up --force-recreate -d
+
+# git setup
+$DOCKER_EXEC "git config --global user.email '${USER_EMAIL}'"
+$DOCKER_EXEC "git config --global user.name '${USER}'"

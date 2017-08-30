@@ -72,5 +72,7 @@ EOF
 upload_file build/$APP-$VERSION.dmg $(shasum -a 256 build/$APP-$VERSION.dmg | cut -d' ' -f1) "macos"
 upload_file build/updater.json $(shasum -a 256 build/updater.json | cut -d' ' -f1) "macos"
 
+PATH=${PATH}:$(pwd)/scripts/lib create_github_release ${BUILD_TAG}
+
 exit 0
 

@@ -6,6 +6,7 @@ if [[ "${TRAVIS_OS_NAME}" == "osx"  ]]; then
 fi
 
 rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install6
+
 npm install npm
 mv node_modules npm
 npm/.bin/npm --version
@@ -13,6 +14,11 @@ nvm install v6.4.0
 nvm use 6.4.0
 npm/.bin/npm --version
 node --version
+
+SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source $SCRIPTDIR/../funcs.sh
+
+osx_setup_netrc $HOME
 
 #openssl aes-256-cbc \
 #    -K $encrypted_7917762619ed_key \
