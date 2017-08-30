@@ -13,7 +13,7 @@ unzip $HOME/InnoSetup5.zip
 popd
 
 pushd $HOME
-wget https://calaos.fr/download/misc/mxe_qt57.tar.xz
+wget https://calaos.fr/download/misc/mxe_qt591.tar.xz
 popd
 
 if [ "$HOME" != "/home/ubuntu" ] ; then
