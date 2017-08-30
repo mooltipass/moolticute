@@ -59,6 +59,9 @@ Name: "moolticute"; Description: "Moolticute"; Types: Full
 ;Filename: "{app}\redist\Win32OpenSSL_Light-1_0_1L.exe"; Parameters: "/silent /verysilent /sp- /suppressmsgboxes"; WorkingDir: "{app}\redist"; StatusMsg: "Installing OpenSSL libraries..."; Components: moolticute
 Filename: "{app}\MoolticuteApp.exe"; WorkingDir: "{app}"; Description: "Start Moolticute"; Flags: postinstall nowait skipifsilent runascurrentuser  
 
+[Registry]
+Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Moolticute"; ValueData: "{app}\MoolticuteApp.exe --autolaunched"; Flags: uninsdeletevalue
+
 [Code]
 // function IsModuleLoaded to call at install time
 // added also setuponly flag
