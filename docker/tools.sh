@@ -14,7 +14,8 @@
 #
 # Positional arguments
 #
-function upload_asset_mime() {
+function upload_asset_mime()
+{
     local owner="${1:?Owner name required.}"
     #   A GitHub user or organization.
     local repo="${2:?Repo name required.}"
@@ -87,7 +88,7 @@ function delete_release_asset_by_id()
 #
 # Usage:
 #
-#     create_release_and_upload_asset reponame filepath mimetype
+#     create_release_and_upload_asset reponame filepath
 #
 # Positional arguments
 #
@@ -95,17 +96,15 @@ function create_release_and_upload_asset()
 {
     local TAG=$1
     local FILE_PATH=$2
-    local MIME_TYPE=$3
+
+    if [ ! -f "$FILE_PATH" ]; then
+       echo "The file $FILE_PATH does not exist so it can't be uploaded"
+       return 0
+    fi
+
+    local MIME_TYPE=$(file --mime-type $FILE_PATH)
     local FILE_NAME=$(basename $FILE_PATH)
     local FILE_DIR=$(dirname $FILE_PATH)
-
-    BUILD=$(git rev-list -n 1 $TAG)
-    HEAD=$(cat .git/HEAD)
-
-    if [ "$BUILD" != "$TAG"  ]; then
-        echo "Asset will not get uploaded as the current build is not for the latest tag ($BUILD vs $TAG)"
-        return 0
-    fi
 
     RELEASE_ID=$(get_release_id_by_name "$TAG")
 
@@ -130,8 +129,60 @@ function create_release_and_upload_asset()
 
     echo "Uploading new asset $FILE_NAME to release ID $RELEASE_ID..."
 
-     # We need to be in the directory or ok.sh goes crazy - seems it can't properly handle a file :(
-    pushd $FILE_DIR
+    # We need to be in the directory or ok.sh goes crazy - seems it can't properly handle a file :(
+    pushd $FILE_DIR > /dev/null
     upload_asset_mime "$GITHUB_ACCOUNT" "$GITHUB_REPO" "$RELEASE_ID" "$FILE_NAME" "$MIME_TYPE" < ${FILE_NAME}
-    popd
+    popd > /dev/null
+}
+
+
+# Create a a GitHub release for the specified version and upload all applicable assets
+#
+# Usage:
+#
+#     create_github_release reponame osname version
+#
+# Positional arguments
+#
+function create_github_release()
+{
+    local VERSION="${1:?Release version required.}"
+    local DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
+    local DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
+    local DEB_FILE="build-linux/deb/${DEB_NAME}"
+    local EXE_FILE="$(ls win/build/*.exe 2> /dev/null | head -n 1)"
+    local DMG_FILE="$(ls build/*.dmg 2> /dev/null | head -n 1)"
+
+    if [ -z "$VERSION" ]; then
+        >&2 echo -e "Skipping GitHub release creation (current build does not have a tag)"
+        return 0
+    fi
+
+    >&2 echo -e "Creating GitHub release (tag: $VERSION)"
+
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+	    create_release_and_upload_asset $VERSION $DEB_FILE
+	    create_release_and_upload_asset $VERSION $EXE_FILE
+    elif [ "$TRAVIS_OS_NAME" == "osx" ]; then
+	    create_release_and_upload_asset $VERSION $DMG_FILE
+    fi
+}
+
+function osx_setup_fake_home()
+{
+    local DIR="${1:?Directory path required.}"
+
+    cp docker/config/.netrc $DIR
+
+    sed -i'' -e "s/<username>/${GITHUB_LOGIN}/g" $DIR/.netrc
+    sed -i'' -e "s/<token>/${GITHUB_TOKEN}/g" $DIR/.netrc
+
+    chmod 600 ${DIR}/.netrc
+}
+
+function osx_clean_fake_home()
+{
+    local DIR="${1:?Directory path required.}"
+
+    rm $DIR/.netrc
 }
