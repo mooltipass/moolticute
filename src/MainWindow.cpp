@@ -759,8 +759,9 @@ void MainWindow::wantEnterCredentialManagement()
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Wait for device confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     updateTabButtons();
 }
@@ -770,8 +771,9 @@ void MainWindow::wantSaveCredentialManagement()
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     auto conn = std::make_shared<QMetaObject::Connection>();
     *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & , const QString &, const QString &, bool success)
@@ -792,8 +794,9 @@ void MainWindow::wantImportDatabase()
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Importing and merging file to device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
 void MainWindow::wantExportDatabase()
@@ -802,8 +805,9 @@ void MainWindow::wantExportDatabase()
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
 void MainWindow::wantExitFilesManagement()
@@ -811,17 +815,26 @@ void MainWindow::wantExitFilesManagement()
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     updateTabButtons();
 }
 
-void MainWindow::loadingProgress(int total, int current)
+void MainWindow::loadingProgress(int total, int current, QString message)
 {
     ui->progressBarWait->show();
     ui->progressBarWait->setMaximum(total);
     ui->progressBarWait->setValue(current);
+
+    if (!message.isEmpty())
+    {
+        ui->labelProgressMessage->setVisible(true);
+        ui->labelProgressMessage->setText(message);
+    }
+    else
+        ui->labelProgressMessage->setVisible(false);
 }
 
 void MainWindow::on_pushButtonAutoStart_clicked()
@@ -968,7 +981,8 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
         }
     }
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
-    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
 void MainWindow::dbImported(bool success, QString message)
@@ -981,7 +995,8 @@ void MainWindow::dbImported(bool success, QString message)
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
 
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
-    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
 void MainWindow::on_pushButtonIntegrity_clicked()
@@ -1031,7 +1046,7 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
 
 void MainWindow::enableCredentialsManagement(bool enable)
 {
-    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     if (enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
     {

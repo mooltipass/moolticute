@@ -1658,6 +1658,28 @@ QWidget {background-color: #EFEFEF;}</string>
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="labelProgressMessage">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Working</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_17">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
