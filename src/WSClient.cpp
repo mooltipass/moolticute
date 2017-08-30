@@ -174,7 +174,15 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o["failed"].toBool();
-        credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
+        auto message = success ? o["description"].toString() : o["error_message"].toString();
+        emit credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
+    }
+    else if (rootobj["msg"] == "set_credentials")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o["failed"].toBool();
+        auto message = success ? o["description"].toString() : o["error_message"].toString();
+        emit credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
     }
     else if (rootobj["msg"] == "show_app")
     {
@@ -231,14 +239,22 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o.value("failed").toBool();
-        QByteArray b = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
+        QByteArray b;
+        if (success)
+            b = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
+        else
+            b = o["error_message"].toString().toLocal8Bit();
+
         emit dbExported(b, success);
     }
     else if (rootobj["msg"] == "import_database")
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o.value("failed").toBool();
-        emit dbImported(success);
+        if (!success)
+            emit dbImported(success, o["error_message"].toString());
+        else
+            emit dbImported(success, "");
     }
     else if (rootobj["msg"] == "failed_memorymgmt")
     {

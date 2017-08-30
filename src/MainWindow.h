@@ -47,6 +47,7 @@ signals:
 
 private slots:
     void enableCredentialsManagement(bool enable);
+    void updateTabButtons();
     void updatePage();
     void checkSettingsChanged();
     void enableKnockSettings(bool visible);
@@ -66,7 +67,7 @@ private slots:
     void loadingProgress(int total, int current);
 
     void dbExported(const QByteArray &d, bool success);
-    void dbImported(bool success);
+    void dbImported(bool success, QString message);
 
     void memMgmtModeFailed(int errCode, QString errMsg);
 
@@ -85,7 +86,7 @@ private slots:
 
     void onFilesAndSSHTabsShortcutActivated();
     void onAdvancedTabShortcutActivated();
-    void onRadioButtonFilesAndSSHKeysTabsAlwaysVisibleToggled(bool bChecked);
+    void onRadioButtonSSHTabsAlwaysToggled(bool bChecked);
     void onCurrentTabChanged(int);
 
 private:
@@ -95,7 +96,7 @@ private:
 
     void checkAutoStart();
 
-    void setFilesAndSSHKeysTabsVisibleOnDemand(bool bValue);
+    void setKeysTabVisibleOnDemand(bool bValue);
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;
@@ -108,15 +109,17 @@ private:
     QMovie* gb_spinner;
 
     QShortcut *keyboardShortcut;
-    bool bFilesAndSSHKeyTabsVisible;
+    bool bSSHKeyTabVisible;
     bool bAdvancedTabVisible;
-    bool bFilesAndSSHKeysTabsVisibleOnDemand;
+    bool bSSHKeysTabVisibleOnDemand;
 
     QShortcut *m_FilesAndSSHKeysTabsShortcut;
     QShortcut *m_advancedTabShortcut;
     QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;
     PasswordProfilesModel *m_passwordProfilesModel;
+
+    static const QString SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY;
 };
 
 #endif // MAINWINDOW_H

@@ -6271,6 +6271,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                               std::function<void(int total, int current)> cbProgress)
 {
+    Q_UNUSED(cbProgress)
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for export file generation", this);
 
@@ -6319,6 +6320,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                               std::function<void(bool success, QString errstr)> cb,
                               std::function<void(int total, int current)> cbProgress)
 {
+    Q_UNUSED(cbProgress)
     QString errorString;
 
     /* Reset temp vars */

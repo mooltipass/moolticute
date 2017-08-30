@@ -234,7 +234,7 @@ void CredentialsManagement::on_addCredentialButton_clicked()
             disconnect(*conn);
             ui->gridLayoutAddCred->setEnabled(true);
             if (success)
-                QMessageBox::information(this, tr("Moolticute"), tr("New credential %1/%2 added successfully.").arg(service, login));
+                QMessageBox::information(this, tr("Moolticute"), tr("%1: New Login %2 added.").arg(service, login));
             else
                 QMessageBox::warning(this, tr("Failure"), tr("Couldn't Add New Credential to Device"));
 
@@ -250,7 +250,7 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
 {
     if (!success)
     {
-        QMessageBox::warning(this, tr("Failure"), tr("Unable to query password!"));
+        ui->credDisplayPasswordInput->setPlaceholderText("Password Query Was Denied");
         return;
     }
 
