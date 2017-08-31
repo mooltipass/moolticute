@@ -32,6 +32,7 @@
 #define MOOLTIPASS_FAV_MAX      14
 #define MOOLTIPASS_ADDRESS_SIZE 4
 #define MP_NODE_SIZE            132
+#define MP_NODE_DATA_ENC_SIZE   128
 
 #define MOOLTIPASS_BLOCK_SIZE   32
 #define MOOLTIPASS_DESC_SIZE    23 //max size allowed for description

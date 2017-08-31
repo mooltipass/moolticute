@@ -798,19 +798,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             ctrValueClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             qDebug() << "CTR value:" << ctrValue.toHex();
 
-            if (getCreds && getData)
-            {
-                progressTotal = 200 + MOOLTIPASS_FAV_MAX;
-            }
-            else
-            {
-                progressTotal = 100 + MOOLTIPASS_FAV_MAX;
-            }
+            progressTotal = 100 + MOOLTIPASS_FAV_MAX;
             progressCurrent = 0;
-            progressCurrentLogin = 0;
-            progressCurrentData = 0;
-            // TODO: send a more significative status message
-            cbProgress(progressTotal, progressCurrent, "Working");
             return true;
         }
     }));
@@ -862,6 +851,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             if (i == 0)
             {
                 qInfo() << "Loading favorites...";
+                cbProgress(progressTotal, progressCurrent, "Loading Favorites...");
             }
             return true;
         },
@@ -882,8 +872,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                 favoritesAddrsClone.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
 
                 progressCurrent++;
-                // TODO: send a more significative status message
-                cbProgress(progressTotal, progressCurrent, "WORKING");
+                cbProgress(progressTotal, progressCurrent, "Favorite " + QString::number(i) + " loaded");
 
                 return true;
             }
@@ -1280,14 +1269,13 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDevic
                         currentFirstCharVal = 'z';
                     if (currentFirstCharVal < 'a')
                         currentFirstCharVal = 'a';
-                    progressCurrentLogin = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
-                    progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
-                    // TODO: Add a more significative message
-                    cbProgress(progressTotal, progressCurrent, "WORKING on loadLoginNode");
+                    progressCurrent = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
+                    progressCurrent += MOOLTIPASS_FAV_MAX;
                 }
 
                 //Node is loaded
                 qDebug() << address.toHex() << ": parent node loaded:" << pnode->getService();
+                cbProgress(progressTotal, progressCurrent, "Loading credentials for " + pnode->getService());
 
                 if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
                 {
@@ -1394,19 +1382,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
         }
         else
         {
-            QString srv = pnode->getService();
-            if (srv.size() > 0)
-            {
-                double currentFirstCharVal = srv.at(0).toLower().toLatin1();
-                if (currentFirstCharVal > 'z')
-                    currentFirstCharVal = 'z';
-                if (currentFirstCharVal < 'a')
-                    currentFirstCharVal = 'a';
-                progressCurrentData = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
-                progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
-                // TODO: add a more significative message
-                cbProgress(progressTotal, progressCurrent, "WORKING on loadDataNode");
-            }
+            cbProgress(-1, 0, "Loading data for " + pnode->getService());
 
             //Node is loaded
             qDebug() << "Parent data node loaded: " << pnode->getService();
@@ -1415,7 +1391,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             if (pnode->getStartChildAddress() != MPNode::EmptyAddress && load_childs)
             {
                 qDebug() << "Loading data child nodes...";
-                loadDataChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress());
+                loadDataChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress(), cbProgress);
             }
             else
             {
@@ -1448,7 +1424,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
     }));
 }
 
-void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address)
+void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, MPDeviceProgressCb cbProgress)
 {
     MPNode *cnode = new MPNode(this, address);
     parent->appendChildData(cnode);
@@ -1484,10 +1460,13 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
             //Node is loaded
             qDebug() << "Child data node loaded";
 
+            progressCurrent += MP_NODE_DATA_ENC_SIZE;
+            cbProgress(-1, 0, "Loading data for " + parent->getService() + ": " + QString::number(progressCurrent) + " encrypted bytes read");
+
             //Load next child
             if (cnode->getNextChildDataAddress() != MPNode::EmptyAddress)
             {
-                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress());
+                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress(), cbProgress);
             }
         }
 
