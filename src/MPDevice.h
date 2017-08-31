@@ -237,7 +237,7 @@ private:
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
                       MPDeviceProgressCb cbProgress);
-    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
+    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, MPDeviceProgressCb cbProgress);
     void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
                                MPDeviceProgressCb cbProgress);
 
@@ -387,8 +387,6 @@ private:
     //Used to maintain progression for current job
     int progressTotal;
     int progressCurrent;
-    int progressCurrentLogin;
-    int progressCurrentData;
 
     FilesCache filesCache;
 };
