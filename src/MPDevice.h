@@ -202,9 +202,9 @@ public:
     //true if device fw version is at least 1.2
     bool isFw12() { return isFw12Flag; }
 
-    QStringList getFilesCache();
+    QList<QVariantMap> getFilesCache();
     bool hasFilesCache();
-    void getStoredFiles(std::function<void(bool success, QStringList filenames)> cb);
+    void getStoredFiles(std::function<void(bool, QList<QVariantMap>)> cb);
     void updateFilesCache();
     void addFileToCache(QString fileName);
     void removeFileFromCache(QString fileName);

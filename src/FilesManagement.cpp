@@ -205,15 +205,18 @@ void FilesManagement::loadFilesCacheModel()
 {
     QListWidget * listWidget = ui->filesCacheListWidget;
     listWidget->clear();
-    for (auto entry : wsClient->getFilesCache())
+    for (auto jsonValue : wsClient->getFilesCache())
     {
+        QJsonObject jsonObject = jsonValue.toObject();
 
         QWidget* w = new QWidget();
         QHBoxLayout *rowLayout = new QHBoxLayout(listWidget);
         QLabel *icon = new QLabel(listWidget);
         icon->setPixmap(AppGui::qtAwesome()->icon(fa::fileo).pixmap(18, 18));
         rowLayout->addWidget(icon);
-        rowLayout->addWidget(new QLabel(entry.toString()));
+        rowLayout->addWidget(new QLabel(jsonObject.value("name").toString()));
+        QString sizeStr = QString("(%1 bytes)").arg(jsonObject.value("size").toInt());
+        rowLayout->addWidget(new QLabel(sizeStr));
 
         QToolButton *button = new QToolButton;
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -221,7 +224,7 @@ void FilesManagement::loadFilesCacheModel()
 
         connect(button, &QToolButton::clicked, [=]()
         {
-            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), entry.toString());
+            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), jsonValue.toString());
 
             if (fileName.isEmpty())
                 return;
@@ -236,7 +239,7 @@ void FilesManagement::loadFilesCacheModel()
             connect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
 //            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
 
-            wsClient->requestDataFile(entry.toString());
+            wsClient->requestDataFile(jsonValue.toString());
         });
 
         rowLayout->addWidget(button, 1, Qt::AlignRight);

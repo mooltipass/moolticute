@@ -885,8 +885,8 @@ void WSServerCon::sendFilesCache()
     qDebug() << "Sending files cache";
     QJsonObject oroot = { {"msg", "files_cache_list"} };
     QJsonArray array;
-    for (QString fileName : mpdevice->getFilesCache())
-        array.append(fileName);
+    for (QVariantMap item : mpdevice->getFilesCache())
+        array.append(QJsonDocument::fromVariant(item).object());
 
     oroot["data"] = array;
     sendJsonMessage(oroot);

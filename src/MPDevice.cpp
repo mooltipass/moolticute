@@ -278,15 +278,11 @@ void MPDevice::runAndDequeueJobs()
 
 void MPDevice::updateFilesCache()
 {
-    getStoredFiles([=](bool success, QStringList fileNames)
+    getStoredFiles([=](bool success, QList<QVariantMap> files)
     {
-        QList<QPair<int, QString>> list;
-        for (auto fileName: fileNames)
-            list.append(QPair<int, QString>(0, fileName));
-
         if (success)
         {
-            filesCache.save(list);
+            filesCache.save(files);
             emit filesCacheChanged();
         }
     });
@@ -294,19 +290,23 @@ void MPDevice::updateFilesCache()
 
 void MPDevice::addFileToCache(QString fileName)
 {
+    QVariantMap item;
+    item.insert("name", fileName);
+
     // Add file name at proper position
     auto cache = filesCache.load();
     for (qint32 i = 0; i < cache.length(); i++)
     {
-        if (cache[i].second.compare(fileName) > 0)
+        if (cache[i].value("name").toString().compare(fileName) > 0)
         {
-            cache.insert(i, QPair<int,QString>(0, fileName));
+            cache.insert(i, item);
             filesCache.save(cache);
             emit filesCacheChanged();
             return;
         }
     }
-    cache.append(QPair<int,QString>(0, fileName));
+
+    cache.append(item);
     filesCache.save(cache);
     emit filesCacheChanged();
 }
@@ -316,7 +316,7 @@ void MPDevice::removeFileFromCache(QString fileName)
     auto cache = filesCache.load();
     int i = 0;
     for (; i < cache.length(); i++)
-        if (cache.at(i).second.compare(fileName) == 0)
+        if (cache.at(i).value("name").toString().compare(fileName) == 0)
             break;
 
     if (i < cache.length())
@@ -1409,10 +1409,14 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             else
             {
                 // No next parent, fill our file cache
-                QList<QPair<int, QString>> list;
+                QList<QVariantMap> list;
                 for (auto &i: dataNodes)
                 {
-                    list.append(QPair<int, QString>(0, i->getService()));
+                    QVariantMap item;
+                    item.insert("revision", 0);
+                    item.insert("name", i->getService());
+                    item.insert("size", i->getDataNodeData().length());
+                    list.append(item);
                 }
                 filesCache.save(list);
                 filesCache.setDbChangeNumber(get_dataDbChangeNumber());
@@ -5411,10 +5415,14 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
                         Q_UNUSED(data);
 
                         /* Update file cache */
-                        QList<QPair<int, QString>> list;
+                        QList<QVariantMap> list;
                         for (auto &i: dataNodes)
                         {
-                            list.append(QPair<int, QString>(0, i->getService()));
+                            QVariantMap item;
+                            item.insert("revision", 0);
+                            item.insert("name", i->getService());
+                            item.insert("size", i->getDataNodeData().length());
+                            list.append(item);
                         }
                         filesCache.save(list);
                         filesCache.setDbChangeNumber(importedDataDbChangeNumber);
@@ -5479,10 +5487,14 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
                     Q_UNUSED(data);
 
                     /* Update file cache */
-                    QList<QPair<int, QString>> list;
+                    QList<QVariantMap> list;
                     for (auto &i: dataNodes)
                     {
-                        list.append(QPair<int, QString>(0, i->getService()));
+                        QVariantMap item;
+                        item.insert("revision", 0);
+                        item.insert("name", i->getService());
+                        item.insert("size", i->getDataNodeData().length());
+                        list.append(item);
                     }
                     filesCache.save(list);
                     filesCache.setDbChangeNumber(importedDataDbChangeNumber);
@@ -6366,13 +6378,9 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
     }
 }
 
-QStringList MPDevice::getFilesCache()
+QList<QVariantMap> MPDevice::getFilesCache()
 {
-    auto files = filesCache.load();
-    QStringList names;
-    for (auto fileCache : files)
-        names.append(fileCache.second);
-    return names;
+    return filesCache.load();
 }
 
 bool MPDevice::hasFilesCache()
@@ -6380,7 +6388,7 @@ bool MPDevice::hasFilesCache()
     return filesCache.exist();
 }
 
-void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
+void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
@@ -6402,12 +6410,18 @@ void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
         Q_UNUSED(data);
 
         /* List constructor */
-        QStringList list = QStringList();
+        QList<QVariantMap> list;
 
         /* Get file names */
         for (auto &i: dataNodes)
         {
-            list.append(i->getService());
+            QVariantMap item;
+            item.insert("name", i->getService());
+
+            // FIXME: This isn't the actual file size we should get the real one.
+            item.insert("size", i->getDataNodeData().length());
+
+            list.append(item);
         }
 
         /* Clean vars, exit mmm */
@@ -6423,7 +6437,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
         exitMemMgmtMode(false);
-        cb(false, QStringList());
+        cb(false, QList<QVariantMap>());
     });
 
     jobsQueue.enqueue(jobs);
