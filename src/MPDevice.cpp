@@ -3747,7 +3747,7 @@ void MPDevice::delCredentialAndLeave(const QString &service, const QString &logi
             cb(false, "Credential was not found in database");
         }
         else
-            setMMCredentials(allCreds, [=](bool success, QString errstr)
+            setMMCredentials(allCreds, cbProgress, [=](bool success, QString errstr)
             {
                 exitMemMgmtMode(); //just in case
                 cb(success, errstr);
@@ -5909,6 +5909,7 @@ void MPDevice::serviceExists(bool isDatanode, const QString &service, const QStr
 }
 
 void MPDevice::setMMCredentials(const QJsonArray &creds,
+                                MPDeviceProgressCb progressCb,
                                 std::function<void(bool success, QString errstr)> cb)
 {
     newAddressesNeededCounter = 0;
@@ -5918,6 +5919,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 
     /// TODO: sanitize inputs
 
+    progressCb(6, 1, "Looking for deleted or changed nodes");
     /* Look for deleted or changed nodes */
     for (qint32 i = 0; i < creds.size(); i++)
     {
@@ -6053,6 +6055,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         }
     }
 
+    progressCb(6, 2, "Finding not nonDeleted nodes");
     /* Browse through the memory contents to find not nonDeleted nodes */
     QListIterator<MPNode*> i(loginNodes);
     while (i.hasNext())
@@ -6098,6 +6101,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         }
     }
 
+    progressCb(6, 3, "Double check");
     /* Double check our work */
     if (!checkLoadedNodes(true, false, false))
     {
@@ -6107,6 +6111,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         return;
     }
 
+    progressCb(6, 5, "Generate save passwords");
     /* Generate save passwords */
     if (!packet_send_needed)
     {
@@ -6116,6 +6121,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
         return;
     }
 
+    progressCb(6, 6, "Incrementing db change numbers");
     /* Increment db change numbers */
     set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
     credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();

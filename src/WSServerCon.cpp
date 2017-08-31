@@ -440,6 +440,7 @@ void WSServerCon::processMessage(const QString &message)
 
         mpdevice->setMMCredentials(
                     root["data"].toArray(),
+                    defaultProgressCb,
                     [=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))

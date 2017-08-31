@@ -182,7 +182,7 @@ public:
                        std::function<void(bool success, QString errstr, QString service, bool exists)> cb);
 
     //Set full list of credentials in MMM
-    void setMMCredentials(const QJsonArray &creds,
+    void setMMCredentials(const QJsonArray &creds, MPDeviceProgressCb progressCb,
                           std::function<void(bool success, QString errstr)> cb);
 
     //Export database
