@@ -4936,7 +4936,7 @@ void MPDevice::cleanMMMVars(void)
     freeAddresses.clear();
 }
 
-void MPDevice::startImportFileMerging(std::function<void(bool success, QString errstr)> cb, bool noDelete)
+void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::function<void(bool success, QString errstr)> cb, bool noDelete)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
@@ -4946,12 +4946,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
-                            [=](int total, int current, QString msg)
-                            {
-                                Q_UNUSED(total);
-                                Q_UNUSED(current);
-                                // TODO: shal we do something with the msg
-                            },
+                            cbProgress,
                             true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
@@ -6288,7 +6283,6 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                               MPDeviceProgressCb cbProgress)
 {
-    Q_UNUSED(cbProgress)
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for export file generation", this);
 
@@ -6297,12 +6291,7 @@ void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, Q
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
-                            [=](int total, int current, QString msg)
-                            {
-                                Q_UNUSED(total);
-                                Q_UNUSED(current);
-                                // TODO: shal we do something with the msg
-                            }
+                            cbProgress
                             , true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
@@ -6338,7 +6327,6 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                               std::function<void(bool success, QString errstr)> cb,
                               MPDeviceProgressCb cbProgress)
 {
-    Q_UNUSED(cbProgress)
     QString errorString;
 
     /* Reset temp vars */
@@ -6373,7 +6361,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                 qInfo() << "CPZ/CTR Added";
 
                 /* Unknown card added, start merging */
-                startImportFileMerging(cb, noDelete);
+                startImportFileMerging(cbProgress, cb, noDelete);
             });
 
             connect(addcpzjobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -6389,7 +6377,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
         else
         {
             /* Start merging */
-            startImportFileMerging(cb, noDelete);
+            startImportFileMerging(cbProgress, cb, noDelete);
         }
     }
     else
