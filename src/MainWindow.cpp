@@ -756,6 +756,7 @@ void MainWindow::onCurrentTabChanged(int)
 
 void MainWindow::wantEnterCredentialManagement()
 {
+    ui->labelWait->show();
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Wait for device confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
@@ -768,6 +769,7 @@ void MainWindow::wantEnterCredentialManagement()
 
 void MainWindow::wantSaveCredentialManagement()
 {
+    ui->labelWait->show();
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
@@ -791,6 +793,7 @@ void MainWindow::wantSaveCredentialManagement()
 
 void MainWindow::wantImportDatabase()
 {
+    ui->labelWait->show();
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Importing and merging file to device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
@@ -802,6 +805,7 @@ void MainWindow::wantImportDatabase()
 void MainWindow::wantExportDatabase()
 {
     ui->widgetHeader->setEnabled(false);
+    ui->labelWait->show();
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
@@ -812,6 +816,7 @@ void MainWindow::wantExportDatabase()
 
 void MainWindow::wantExitFilesManagement()
 {
+    ui->labelWait->show();
     ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
@@ -824,9 +829,17 @@ void MainWindow::wantExitFilesManagement()
 
 void MainWindow::loadingProgress(int total, int current, QString message)
 {
-    ui->progressBarWait->show();
-    ui->progressBarWait->setMaximum(total);
-    ui->progressBarWait->setValue(current);
+    if (total != -1)
+    {
+        ui->progressBarWait->show();
+        ui->progressBarWait->setMaximum(total);
+        ui->progressBarWait->setValue(current);
+    }
+    else
+    {
+        ui->progressBarWait->setMinimum(0);
+        ui->progressBarWait->setMaximum(0);
+    }
 
     if (!message.isEmpty())
     {
@@ -835,6 +848,11 @@ void MainWindow::loadingProgress(int total, int current, QString message)
     }
     else
         ui->labelProgressMessage->setVisible(false);
+
+    if (ui->labelWait->text().contains("Wait for device confirmation"))
+        ui->labelWait->hide();
+    else
+        ui->labelWait->show();
 }
 
 void MainWindow::on_pushButtonAutoStart_clicked()
