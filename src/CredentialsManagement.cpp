@@ -203,7 +203,7 @@ void CredentialsManagement::requestPasswordForSelectedItem()
         TreeItem *pItem = pLoginItem->parentItem();
         if (pItem != nullptr) {
             wsClient->requestPassword(pItem->name(), pLoginItem->name());
-            ui->credDisplayPasswordInput->setPlaceholderText("Please Approve On Device");
+            ui->credDisplayPasswordInput->setPlaceholderText(tr("Please Approve On Device"));
         }
     }
 }
@@ -234,7 +234,7 @@ void CredentialsManagement::on_addCredentialButton_clicked()
             disconnect(*conn);
             ui->gridLayoutAddCred->setEnabled(true);
             if (success)
-                QMessageBox::information(this, tr("Moolticute"), tr("%1: New Login %2 added.").arg(service, login));
+                QMessageBox::information(this, "Moolticute", tr("%1: New Login %2 added.").arg(service, login));
             else
                 QMessageBox::warning(this, tr("Failure"), tr("Couldn't Add New Credential to Device"));
 
@@ -250,7 +250,7 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
 {
     if (!success)
     {
-        ui->credDisplayPasswordInput->setPlaceholderText("Password Query Was Denied");
+        ui->credDisplayPasswordInput->setPlaceholderText(tr("Password Query Was Denied"));
         return;
     }
 
@@ -460,7 +460,8 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
     // Retrieve login item
     LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
 
-    if (pLoginItem != nullptr) {
+    if (pLoginItem != nullptr)
+    {
         m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteRole, iFavorite);
         ui->credentialTreeView->refreshLoginItem(srcIndex, true);
     }
@@ -664,4 +665,11 @@ void CredentialsManagement::onSelectLoginTimerTimeOut()
         }
         m_pAddedLoginItem = nullptr;
     }
+}
+
+void CredentialsManagement::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+        ui->retranslateUi(this);
+    QWidget::changeEvent(event);
 }

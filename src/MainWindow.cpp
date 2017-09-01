@@ -53,6 +53,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
                                 { "color-active", QColor(Qt::white) }};
 
     ui->setupUi(this);
+    setupLanguages();
 
     m_tabMap[ui->pageAbout] = ui->pushButtonAbout;
     m_tabMap[ui->pageAppSettings] = ui->pushButtonAppSettings;
@@ -191,9 +192,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->comboBoxScreenBrightness->addItem("65%", 166);
     ui->comboBoxScreenBrightness->addItem("80%", 204);
     ui->comboBoxScreenBrightness->addItem("100%", 255);
-    ui->comboBoxKnock->addItem("Low", 0);
-    ui->comboBoxKnock->addItem("Medium", 1);
-    ui->comboBoxKnock->addItem("High", 2);
+    ui->comboBoxKnock->addItem(tr("Low"), 0);
+    ui->comboBoxKnock->addItem(tr("Medium"), 1);
+    ui->comboBoxKnock->addItem(tr("High"), 2);
     ui->comboBoxLoginOutput->addItem(tr("Tab"), 43);
     ui->comboBoxLoginOutput->addItem(tr("Enter"), 40);
     ui->comboBoxLoginOutput->addItem(tr("Space"), 44);
@@ -454,6 +455,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     // Leave MMM on main window closed
     if (wsClient != NULL && wsClient->get_memMgmtMode())
         wsClient->sendLeaveMMRequest();
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+        ui->retranslateUi(this);
+    QMainWindow::changeEvent(event);
 }
 
 void MainWindow::updatePage()
@@ -852,7 +860,7 @@ void MainWindow::checkAutoStart()
     bool en = s.value("settings/auto_start").toBool();
 
     AutoStartup::enableAutoStartup(en);
-    ui->labelAutoStart->setText(tr("Start Moolticute with the computer: %1").arg((en?"Enabled":"Disabled")));
+    ui->labelAutoStart->setText(tr("Start Moolticute with the computer: %1").arg((en?tr("Enabled"):tr("Disabled"))));
     if (en)
         ui->pushButtonAutoStart->setText(tr("Disable"));
     else
@@ -1015,18 +1023,17 @@ void MainWindow::integrityFinished(bool success)
     if (!success)
         QMessageBox::warning(this, "Moolticute", tr("Memory integrity check failed!"));
     else
-        QMessageBox::information(this, "Moolticute", "Memory integrity check done successfully");
+        QMessageBox::information(this, "Moolticute", tr("Memory integrity check done successfully"));
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
     ui->widgetHeader->setEnabled(true);
 }
 
 void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
 {
-    ui->UIDRequestLabel->setText(tr(R"(
-                                    To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.<ol>
-                                    <li>Get the serial number from the back of your device.</li>
-                                    <li>&shy;<a href="mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1">Send us an email</a> with the serial number, requesting the password.</li>
-                                    <li>Enter the password you received from us</li></ol>)").arg(id));
+    ui->UIDRequestLabel->setText(tr("To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.<ol>"
+                                    "<li>Get the serial number from the back of your device.</li>"
+                                    "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1\">Send us an email</a> with the serial number, requesting the password.</li>"
+                                    "<li>Enter the password you received from us</li></ol>").arg(id));
 }
 
 void MainWindow::enableCredentialsManagement(bool enable)
@@ -1098,4 +1105,65 @@ void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
     QMessageBox::warning(this,
                          tr("Memory Management Error"),
                          tr("An error occured when trying to go into Memory Management mode.\n\n%1").arg(errMsg));
+}
+
+void MainWindow::setupLanguages()
+{
+    QSettings settings;
+    QString language = settings.value("settings/lang").toString();
+
+    //Fill the language combobox from available *.qm files in the ressource
+    ui->comboBoxAppLang->addItem(tr("System default language"), QStringLiteral(""));
+    ui->comboBoxAppLang->addItem(QLocale::languageToString(QLocale::English), QStringLiteral("en"));
+    if (language == "en") ui->comboBoxAppLang->setCurrentIndex(ui->comboBoxAppLang->count() - 1);
+
+    /*
+      Languages:
+      the files contained into the .qrc ressources a automatically parsed to populate the UI.
+      The filename of the translation files should have correct ISO 639 codes like:
+          mc_CODE.qm
+      for chinese, we need traditional chinese and simplified chinese. We need to use the following codes:
+        mc_zh_HANS.qm for (generic) simplified Chinese characters
+        mc_zh_HANT.qm for traditional Chinese characters
+      other languages like french or german would only be:
+        mc_fr.qm
+        mc_de.qm
+    */
+
+    QDirIterator it(":/lang", QDirIterator::Subdirectories);
+    while (it.hasNext())
+    {
+        //havoc_LANG.qm
+        QString fname = it.next();
+        if (!fname.startsWith(":/lang/mc_")) continue;
+        QString llang = fname.section('_', 1).section('.', 0, 0);
+        QLocale locale(llang);
+
+        QString ln;
+        if (locale.language() == QLocale::Chinese)
+            ln = QString("%1 (%2)")
+                    .arg(QLocale::languageToString(locale.language()))
+                    .arg(QLocale::scriptToString(locale.script()));
+        else
+            ln = QLocale::languageToString(locale.language());
+
+        ui->comboBoxAppLang->addItem(ln, llang);
+
+        if (language == llang) ui->comboBoxAppLang->setCurrentIndex(ui->comboBoxAppLang->count() - 1);
+    }
+}
+
+void MainWindow::on_comboBoxAppLang_currentIndexChanged(int index)
+{
+    QSettings settings;
+    QString language = settings.value("settings/lang").toString();
+    QString lang = ui->comboBoxAppLang->itemData(index).toString();
+
+    if (language != lang)
+    {
+        settings.setValue("settings/lang", lang);
+
+        AppGui *a = qobject_cast<AppGui *>(qApp);
+        a->setupLanguage();
+    }
 }

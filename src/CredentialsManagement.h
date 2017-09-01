@@ -81,6 +81,8 @@ private:
 
 private:
     void changeCurrentFavorite(int iFavorite);
+    virtual void changeEvent(QEvent *event);
+
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;

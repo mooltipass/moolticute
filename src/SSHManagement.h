@@ -50,12 +50,15 @@ private slots:
     void on_pushButtonImport_clicked();
 
 private:
+    virtual void changeEvent(QEvent *event);
+
     Ui::SSHManagement *ui;
 
     QProcess *sshProcess = nullptr;
     bool loaded = false;
 
-    enum {
+    enum
+    {
         RolePublicKey = Qt::UserRole + 1,
         RolePrivateKey,
     };

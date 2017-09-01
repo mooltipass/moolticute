@@ -9,7 +9,6 @@ RootItem::RootItem()
 
 RootItem::~RootItem()
 {
-
 }
 
 ServiceItem *RootItem::addService(const QString &sServiceName)

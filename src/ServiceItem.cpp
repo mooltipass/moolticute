@@ -2,15 +2,14 @@
 #include "ServiceItem.h"
 #include "LoginItem.h"
 
-ServiceItem::ServiceItem(const QString &sServiceName) : TreeItem(sServiceName),
+ServiceItem::ServiceItem(const QString &sServiceName):
+    TreeItem(sServiceName),
     m_bIsExpanded(false)
 {
-
 }
 
 ServiceItem::~ServiceItem()
 {
-
 }
 
 LoginItem *ServiceItem::addLogin(const QString &sLoginName)
@@ -55,8 +54,7 @@ QString ServiceItem::logins() const
             sName += "...";
         sLogins = sName;
     }
-    else
-    if ((nLogins >= 1) && (nLogins <=3))
+    else if ((nLogins >= 1) && (nLogins <=3))
     {
         QStringList lLogins;
         foreach (TreeItem *pItem, m_vChilds)

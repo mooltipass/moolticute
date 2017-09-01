@@ -31,7 +31,8 @@ class QComboBox;
 class PasswordProfilesModel;
 class PasswordProfile;
 
-class PasswordOptionsPopup : public QFrame {
+class PasswordOptionsPopup : public QFrame
+{
     Q_OBJECT
 
 public:

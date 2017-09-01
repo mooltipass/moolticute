@@ -35,3 +35,5 @@ ui_*.h
 build
 build-linux
 .idea
+
+lang/*.ts

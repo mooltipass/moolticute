@@ -47,6 +47,8 @@ bool AppGui::initialize()
 
     Common::installMessageOutputHandler();
 
+    setupLanguage();
+
     QSimpleUpdater::getInstance();
 
     setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -72,7 +74,7 @@ bool AppGui::initialize()
     systray->setIcon(icon);
     systray->show();
 
-    showConfigApp = new QAction(tr("&Show Moolticute configurator"), this);
+    showConfigApp = new QAction(tr("&Show Moolticute Application"), this);
     connect(showConfigApp, &QAction::triggered, [=]()
     {
         if (win->isHidden())
@@ -290,7 +292,7 @@ void AppGui::updateSystrayTooltip()
 
     const auto status = wsClient->get_status();
 
-    const QString device_name = wsClient->isMPMini() ? tr("Mooltipass Mini") : tr("Mooltipass");
+    const QString device_name = wsClient->isMPMini() ? "Mooltipass Mini": "Mooltipass";
 
     QString msg;
     switch(status) {
@@ -498,4 +500,38 @@ void AppGui::checkUpdate()
     u->setDownloaderEnabled(MC_UPDATE_URL, true);
 
     u->checkForUpdates(MC_UPDATE_URL);
+}
+
+void AppGui::setupLanguage()
+{
+    QString locale;
+    {
+        QSettings settings;
+        QString lang = settings.value("settings/lang").toString();
+        if (lang != "")
+        {
+            //set language from config
+            locale = lang;
+        }
+        else
+        {
+            //set default system language
+            locale = QLocale::system().name().section('_', 0, 0);
+            qDebug() << "System locale: " << QLocale::system();
+        }
+    }
+
+    delete translator;
+    translator = new QTranslator(this);
+
+    //Set language
+    QString langfile = QString(":/lang/mc_%1.qm").arg(locale);
+    qDebug() << "Trying to set language: " << langfile;
+    if (QFile::exists(langfile))
+    {
+        translator->load(langfile);
+        if (!installTranslator(translator))
+            qCritical() << "Failed to install " << langfile;
+        qDebug() << "Translator installed";
+    }
 }

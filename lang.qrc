@@ -1,0 +1,31 @@
+<RCC>
+    <qresource prefix="/">
+        <file>lang/mc_de.qm</file>
+        <file>lang/mc_fr.qm</file>
+        <file>lang/qt_ar.qm</file>
+        <file>lang/qt_ca.qm</file>
+        <file>lang/qt_cs.qm</file>
+        <file>lang/qt_da.qm</file>
+        <file>lang/qt_de.qm</file>
+        <file>lang/qt_es.qm</file>
+        <file>lang/qt_fa.qm</file>
+        <file>lang/qt_fi.qm</file>
+        <file>lang/qt_fr.qm</file>
+        <file>lang/qt_gl.qm</file>
+        <file>lang/qt_he.qm</file>
+        <file>lang/qt_hu.qm</file>
+        <file>lang/qt_it.qm</file>
+        <file>lang/qt_ja.qm</file>
+        <file>lang/qt_ko.qm</file>
+        <file>lang/qt_lt.qm</file>
+        <file>lang/qt_pl.qm</file>
+        <file>lang/qt_pt.qm</file>
+        <file>lang/qt_ru.qm</file>
+        <file>lang/qt_sk.qm</file>
+        <file>lang/qt_sl.qm</file>
+        <file>lang/qt_sv.qm</file>
+        <file>lang/qt_uk.qm</file>
+        <file>lang/qt_zh_CN.qm</file>
+        <file>lang/qt_zh_TW.qm</file>
+    </qresource>
+</RCC>

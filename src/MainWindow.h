@@ -89,14 +89,19 @@ private slots:
     void onRadioButtonSSHTabsAlwaysToggled(bool bChecked);
     void onCurrentTabChanged(int);
 
+    void on_comboBoxAppLang_currentIndexChanged(int index);
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
     virtual void closeEvent(QCloseEvent *event);
+    virtual void changeEvent(QEvent *event);
 
     void checkAutoStart();
 
     void setKeysTabVisibleOnDemand(bool bValue);
+
+    void setupLanguages();
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;

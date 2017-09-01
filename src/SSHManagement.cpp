@@ -241,3 +241,10 @@ void SSHManagement::on_pushButtonImport_clicked()
 {
     QMessageBox::information(this, "moolticute", "Not implemented yet!");
 }
+
+void SSHManagement::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+        ui->retranslateUi(this);
+    QWidget::changeEvent(event);
+}

@@ -497,3 +497,10 @@ void FilesManagement::on_pushButtonFilename_clicked()
 
     ui->lineEditFilename->setText(fileName);
 }
+
+void FilesManagement::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+        ui->retranslateUi(this);
+    QWidget::changeEvent(event);
+}

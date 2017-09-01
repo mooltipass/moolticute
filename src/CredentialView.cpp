@@ -44,7 +44,8 @@ void CredentialView::onModelLoaded(bool bClearLoginDescription)
 {
     Q_UNUSED(bClearLoginDescription)
     QModelIndex firstServiceIndex = model()->index(0, 0, QModelIndex());
-    if (firstServiceIndex.isValid()) {
+    if (firstServiceIndex.isValid())
+    {
         selectionModel()->setCurrentIndex(firstServiceIndex, QItemSelectionModel::ClearAndSelect);
         onToggleExpandedState(firstServiceIndex);
     }
@@ -59,7 +60,8 @@ void CredentialView::onToggleExpandedState(const QModelIndex &proxyIndex)
     if (pServiceItem != nullptr)
     {
         m_pCurrentServiceItem = pServiceItem;
-        if (!isExpanded(proxyIndex)) {
+        if (!isExpanded(proxyIndex))
+        {
             expand(proxyIndex);
             if (pServiceItem->childCount() > 0)
                 m_tSelectionTimer.start();

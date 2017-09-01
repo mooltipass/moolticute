@@ -22,7 +22,13 @@ static const QString kSymbolsKey("symbols");
     changed = profile->get##parameter() == newValue; \
     }
 
-static const QVector<QString> kBuiltInProfilesNames = {kCustomPasswordItem, "Lower & upper letters", "Letters & digits", "All"};
+static const QVector<QString> kBuiltInProfilesNames =
+{
+    kCustomPasswordItem,
+    QObject::tr("Lower & upper letters"),
+    QObject::tr("Letters & digits"),
+    QObject::tr("All")
+};
 
 QVector<PasswordProfile*> createBuiltInProfiles()
 {
@@ -58,14 +64,14 @@ QVector<PasswordProfile*> readSavedProfiles()
     s.beginGroup(kSettingsName);
     s.beginGroup(kPasswordGenerationGroup);
 
-    if(s.childGroups().contains(kProfilesGroupName))
+    if (s.childGroups().contains(kProfilesGroupName))
     {
         s.beginGroup(kProfilesGroupName);
 
-        for(auto group : s.childGroups())
+        for (auto group : s.childGroups())
         {
             // Skip groups with the same name as built in profiles
-            if(kBuiltInProfilesNames.contains(group))
+            if (kBuiltInProfilesNames.contains(group))
                 continue;
 
             savedProfiles << new PasswordProfile(group);
@@ -119,7 +125,7 @@ PasswordProfile::PasswordProfile(const QString &name) :
 
     beginProfilesGroup(s);
 
-    if(s.childGroups().contains(name))
+    if (s.childGroups().contains(name))
     {
         s.beginGroup(name);
         m_useUppercase = s.value(kUseUppercaseKey, true).toBool();
@@ -142,7 +148,7 @@ PasswordProfile::PasswordProfile(const QString &name) :
 
 void PasswordProfile::setName(const QString &name)
 {
-    if(m_name == name)
+    if (m_name == name)
         return;
 
     QString oldName = m_name;
@@ -161,7 +167,7 @@ void PasswordProfile::setName(const QString &name)
     s.endGroup();
 
     // Remove profile with old name
-    if(!oldName.isEmpty())
+    if (!oldName.isEmpty())
         s.remove(oldName);
 
     endProfilesGroup(s);
@@ -169,7 +175,7 @@ void PasswordProfile::setName(const QString &name)
 
 void PasswordProfile::setUseUppercase(bool use)
 {
-    if(m_useUppercase == use || !m_editable)
+    if (m_useUppercase == use || !m_editable)
         return;
 
     m_useUppercase = use;
@@ -179,7 +185,7 @@ void PasswordProfile::setUseUppercase(bool use)
 
 void PasswordProfile::setUseLowercase(bool use)
 {
-    if(m_useLowercase == use || !m_editable)
+    if (m_useLowercase == use || !m_editable)
         return;
 
     m_useLowercase = use;
@@ -189,7 +195,7 @@ void PasswordProfile::setUseLowercase(bool use)
 
 void PasswordProfile::setUseDigits(bool use)
 {
-    if(m_useDigits == use || !m_editable)
+    if (m_useDigits == use || !m_editable)
         return;
 
     m_useDigits = use;
@@ -199,7 +205,7 @@ void PasswordProfile::setUseDigits(bool use)
 
 void PasswordProfile::setUseSymbols(bool use)
 {
-    if(m_useSymbols == use || !m_editable)
+    if (m_useSymbols == use || !m_editable)
         return;
 
     m_useSymbols = use;
@@ -209,7 +215,7 @@ void PasswordProfile::setUseSymbols(bool use)
 
 bool PasswordProfile::addSymbol(QChar symbol)
 {
-    if(m_symbols.contains(symbol) || !m_editable)
+    if (m_symbols.contains(symbol) || !m_editable)
         return false;
 
     saveKey(kSymbolsKey, m_symbols.append(symbol));
@@ -218,7 +224,7 @@ bool PasswordProfile::addSymbol(QChar symbol)
 
 bool PasswordProfile::removeSymbol(QChar symbol)
 {
-    if(!m_symbols.contains(symbol) || !m_editable)
+    if (!m_symbols.contains(symbol) || !m_editable)
         return false;
 
     saveKey(kSymbolsKey,  m_symbols.remove(symbol));
@@ -227,7 +233,7 @@ bool PasswordProfile::removeSymbol(QChar symbol)
 
 void PasswordProfile::initArrays()
 {
-    if(!PasswordProfile::arraysInitialized)
+    if (!PasswordProfile::arraysInitialized)
     {
         //Create list of all possible characters
         char begin = 'A';
@@ -242,35 +248,35 @@ void PasswordProfile::initArrays()
 
 void PasswordProfile::init()
 {
-    if(!m_pool.empty())
+    if (!m_pool.empty())
         m_pool.clear();
 
     initArrays();
 
     int poolSize = 0;
-    if(m_useUppercase)
+    if (m_useUppercase)
         poolSize += upperLetters.size();
-    if(m_useLowercase)
+    if (m_useLowercase)
         poolSize += lowerLetters.size();
-    if(m_useDigits)
+    if (m_useDigits)
         poolSize += digits.size();
-    if(m_useSymbols)
+    if (m_useSymbols)
         poolSize += m_symbols.size();
 
-    if(poolSize == 0)
+    if (poolSize == 0)
         return;
 
     m_pool.resize(poolSize);
 
     //Fill the pool
     auto it = std::begin(m_pool);
-    if(m_useUppercase)
+    if (m_useUppercase)
         it = std::copy(std::begin(upperLetters), std::end(upperLetters), it);
-    if(m_useLowercase)
+    if (m_useLowercase)
         it = std::copy(std::begin(lowerLetters), std::end(lowerLetters), it);
-    if(m_useDigits)
+    if (m_useDigits)
         it = std::copy(std::begin(digits), std::end(digits), it);
-    if(m_useSymbols)
+    if (m_useSymbols)
     {
         std::string str = m_symbols.toStdString();
         it = std::copy(std::begin(str), std::end(str), it);
@@ -278,7 +284,8 @@ void PasswordProfile::init()
 
     //Initialize a mersen twister engine
     std::mt19937 random_generator;
-    if(random_generator == std::mt19937{}) {
+    if (random_generator == std::mt19937{})
+    {
         std::random_device r;
         std::seed_seq seed{r(), r(), r(), r(), r(), r(), r(), r()};
         random_generator.seed(seed);
@@ -317,7 +324,7 @@ PasswordProfilesModel::~PasswordProfilesModel()
 
 PasswordProfile* PasswordProfilesModel::getProfile(int index) const
 {
-    if(index < 0 || index >= m_profiles.size())
+    if (index < 0 || index >= m_profiles.size())
         return nullptr;
 
     return m_profiles.at(index);
@@ -331,11 +338,11 @@ int PasswordProfilesModel::rowCount(const QModelIndex &parent) const
 
 QVariant PasswordProfilesModel::data(const QModelIndex &index, int role) const
 {
-    if(!index.isValid())
+    if (!index.isValid())
         return QVariant();
 
     PasswordProfile *profile = m_profiles.at(index.row());
-    if(profile)
+    if (profile)
     {
         switch(role)
         {
@@ -358,11 +365,11 @@ QVariant PasswordProfilesModel::data(const QModelIndex &index, int role) const
 
 bool PasswordProfilesModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if(!index.isValid() || !value.isValid())
+    if (!index.isValid() || !value.isValid())
         return false;
 
     PasswordProfile *profile = m_profiles.at(index.row());
-    if(profile)
+    if (profile)
     {
         bool changed = false;
         switch(role)
@@ -370,7 +377,7 @@ bool PasswordProfilesModel::setData(const QModelIndex &index, const QVariant &va
         case Qt::DisplayRole:
         {
             QString newName = value.toString();
-            if(profile->getName() == newName)
+            if (profile->getName() == newName)
                 break;
 
             profile->setName(newName);
@@ -397,7 +404,7 @@ bool PasswordProfilesModel::setData(const QModelIndex &index, const QVariant &va
             break;
         }
 
-        if(changed)
+        if (changed)
         {
             emit dataChanged(index, index);
             return true;
@@ -409,9 +416,9 @@ bool PasswordProfilesModel::setData(const QModelIndex &index, const QVariant &va
 
 bool PasswordProfilesModel::addProfile(const QString &name)
 {
-    for(auto profile : m_profiles)
+    for (auto profile : m_profiles)
     {
-        if(profile->getName() == name)
+        if (profile->getName() == name)
             return false;
     }
 
@@ -427,13 +434,12 @@ bool PasswordProfilesModel::addProfile(const QString &name)
 
 void PasswordProfilesModel::removeProfile(const QString &name)
 {
-
-    for(auto it = m_profiles.begin(); it != m_profiles.end();)
+    for (auto it = m_profiles.begin(); it != m_profiles.end();)
     {
         PasswordProfile *profile = *it;
-        if(profile)
+        if (profile)
         {
-            if(profile->getName() == name && profile->isEditable())
+            if (profile->getName() == name && profile->isEditable())
             {
                 int index = it - m_profiles.begin();
 

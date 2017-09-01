@@ -46,6 +46,8 @@ public:
     void enableDaemon();
     void disableDaemon();
 
+    void setupLanguage();
+
     static QtAwesome *qtAwesome();
 
 private slots:
@@ -81,6 +83,8 @@ private:
 
      //This socket gives us access to the daemon log
      QLocalSocket *logSocket = nullptr;
+
+     QTranslator *translator = nullptr;
 
      bool createSingleApplication();
      void startSSHAgent();

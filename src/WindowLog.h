@@ -36,6 +36,9 @@ public:
 
     void appendData(const QByteArray &logdata);
 
+private:
+    virtual void changeEvent(QEvent *event);
+
 private slots:
     void on_pushButtonClose_clicked();
 

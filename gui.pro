@@ -90,7 +90,8 @@ FORMS    += src/MainWindow.ui \
     src/PassGenerationProfilesDialog.ui
 
 RESOURCES += \
-    img/images.qrc
+    img/images.qrc \
+    lang.qrc
 
 win32 {
     RC_FILE = win/windows_res.rc
@@ -125,3 +126,19 @@ unix {
     INSTALLS += ico
 }
 
+TRANSLATIONS = \
+    lang/mc_fr.ts \
+    lang/mc_de.ts
+
+#Build *.qm translation files automatically
+
+isEmpty(QMAKE_LRELEASE) {
+    QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+}
+
+updateqm.input = TRANSLATIONS
+updateqm.output = ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.qm
+updateqm.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.qm
+updateqm.CONFIG += no_link
+QMAKE_EXTRA_COMPILERS += updateqm
+PRE_TARGETDEPS += compiler_updateqm_make_all
