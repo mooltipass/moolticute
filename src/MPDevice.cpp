@@ -288,15 +288,23 @@ void MPDevice::updateFilesCache()
     });
 }
 
-void MPDevice::addFileToCache(QString fileName)
+void MPDevice::addFileToCache(QString fileName, int size)
 {
     QVariantMap item;
     item.insert("name", fileName);
+    item.insert("size", size);
 
     // Add file name at proper position
     auto cache = filesCache.load();
     for (qint32 i = 0; i < cache.length(); i++)
     {
+        if (cache[i].value("name").toString().compare(fileName) == 0)
+        {
+            // the file is already in cache, this is just and update
+            return;
+        }
+
+
         if (cache[i].value("name").toString().compare(fileName) > 0)
         {
             cache.insert(i, item);
@@ -4203,7 +4211,8 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
         cb(true, QString());
 
         // update file cache
-        addFileToCache(service);
+        // FIXME: Set the real file size
+        addFileToCache(service, 0);
 
         // request change numbers in case they changed
         if (isFw12())
