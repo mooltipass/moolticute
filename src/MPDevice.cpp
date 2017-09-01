@@ -319,6 +319,31 @@ void MPDevice::addFileToCache(QString fileName, int size)
     emit filesCacheChanged();
 }
 
+void MPDevice::updateFileInCache(QString fileName, int size)
+{
+    auto cache = filesCache.load();
+    bool updated = false;
+    for (int i = 0; i < cache.length() && !updated; i ++)
+    {
+        auto item = cache.at(i);
+        if (item.value("name").toString().compare(fileName) == 0)
+        {
+            int revision = item.value("revision").toInt();
+            item.insert("revision", revision  + 1);
+            item.insert("size", size);
+
+            cache.replace(i, item);
+            updated = true;
+        }
+    }
+
+    if (updated)
+    {
+        filesCache.save(cache);
+        emit filesCacheChanged();
+    }
+}
+
 void MPDevice::removeFileFromCache(QString fileName)
 {
     auto cache = filesCache.load();

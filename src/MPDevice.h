@@ -207,6 +207,7 @@ public:
     void getStoredFiles(std::function<void(bool, QList<QVariantMap>)> cb);
     void updateFilesCache();
     void addFileToCache(QString fileName, int size);
+    void updateFileInCache(QString fileName, int size);
     void removeFileFromCache(QString fileName);
 
 signals:
