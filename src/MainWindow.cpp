@@ -101,14 +101,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
-    connect(wsClient, &WSClient::databaseBackupFolderChanged, [=](QString backupFolder){
-        // use some default folder
-        if(backupFolder.isEmpty())
-            backupFolder = QCoreApplication::applicationDirPath();
-
-        ui->lineEditDBFolder->setText(backupFolder);
-    });
-
+    connect(wsClient, &WSClient::databaseBackupFileChanged, ui->lineEditDBFile, &QLineEdit::setText);
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantSaveMemMode, this, &MainWindow::wantSaveCredentialManagement);
@@ -123,7 +116,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         ui->widgetDBFolderControls->setVisible(status == Common::Unlocked);
 
         if(status == Common::Unlocked)
-            wsClient->requestDBBackupFolder();
+            wsClient->requestDBBackupFile();
 
         if (status == Common::UnkownSmartcad)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
@@ -138,7 +131,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonDBFolder->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->lineEditDBFolder->setStyleSheet(CSS_BLUE_LINEEDIT);
+    ui->lineEditDBFile->setStyleSheet(CSS_BLUE_LINEEDIT);
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
@@ -160,7 +153,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         dlg.setPasswordProfilesModel(m_passwordProfilesModel);
         dlg.exec();
     });
-    connect(ui->pushButtonDBFolder, &QPushButton::clicked, this, &MainWindow::changeDBBackupFolder);
+    connect(ui->pushButtonDBFolder, &QPushButton::clicked, this, &MainWindow::changeDBBackupFile);
 
     ui->pushButtonDevSettings->setChecked(false);
 
@@ -823,13 +816,13 @@ void MainWindow::wantExportDatabase()
     connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
 }
 
-void MainWindow::changeDBBackupFolder()
+void MainWindow::changeDBBackupFile()
 {
-    QString folder = QFileDialog::getExistingDirectory(this, tr("Choose folder"),
-                                                       ui->lineEditDBFolder->text());
+    QString file = QFileDialog::getSaveFileName(this, tr("Choose file"),
+                                                ui->lineEditDBFile->text());
 
-    ui->lineEditDBFolder->setText(folder);
-    wsClient->sendDBBackupFolder(folder);
+    ui->lineEditDBFile->setText(file);
+    wsClient->sendDBBackupFile(file);
 }
 
 void MainWindow::wantExitFilesManagement()

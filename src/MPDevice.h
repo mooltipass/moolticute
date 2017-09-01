@@ -207,8 +207,8 @@ public:
     void updateFilesCache();
     void addFileToCache(QString fileName);
     void removeFileFromCache(QString fileName);
-    QString getDBBackupFolder();
-    void setDBBackupFolder(const QString &backupFolder);
+    QString getDBBackupFile();
+    void setDBBackupFile(const QString &backupFile);
 
 signals:
     /* Signal emited by platform code when new data comes from MP */

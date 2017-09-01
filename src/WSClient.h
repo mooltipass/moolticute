@@ -100,8 +100,8 @@ public:
 
     void sendListFilesCacheRequest();
     void sendRefreshFilesCacheRequest();
-    void requestDBBackupFolder();
-    void sendDBBackupFolder(const QString &backupFolder);
+    void requestDBBackupFile();
+    void sendDBBackupFile(const QString &backupFile);
 
 signals:
     void wsConnected();
@@ -121,7 +121,7 @@ signals:
     void dbImported(bool success, QString message);
     void memMgmtModeFailed(int errCode, QString errMsg);
     void filesCacheChanged();
-    void databaseBackupFolderChanged(QString backupFolder);
+    void databaseBackupFileChanged(QString backupFile);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

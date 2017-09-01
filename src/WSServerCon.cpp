@@ -518,13 +518,13 @@ void WSServerCon::processMessage(const QString &message)
     {
         sendFilesCache();
     }
-    else if (root["msg"] == "get_db_backup_folder")
+    else if (root["msg"] == "get_db_backup_file")
     {
-        sendDBBackupFolder();
+        sendDBBackupFile();
     }
-    else if (root["msg"] == "set_db_backup_folder")
+    else if (root["msg"] == "set_db_backup_file")
     {
-        setDBBackupFolder(root["data"].toString());
+        setDBBackupFile(root["data"].toString());
     }
 }
 
@@ -585,7 +585,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
 
     connect(mpdevice, &MPDevice::filesCacheChanged, this, &WSServerCon::sendFilesCache);
-    connect(mpdevice, &MPDevice::hashedCardCPZChanged, this, &WSServerCon::sendDBBackupFolder);
+    connect(mpdevice, &MPDevice::hashedCardCPZChanged, this, &WSServerCon::sendDBBackupFile);
 }
 
 void WSServerCon::statusChanged()
@@ -899,23 +899,23 @@ void WSServerCon::sendFilesCache()
     sendJsonMessage(oroot);
 }
 
-void WSServerCon::sendDBBackupFolder()
+void WSServerCon::sendDBBackupFile()
 {
     if (!mpdevice)
         return;
 
-    QString backupFolder = mpdevice->getDBBackupFolder();
+    QString backupFile = mpdevice->getDBBackupFile();
 
-    sendJsonMessage({{ "msg", "db_backup_folder" },
-                    { "data", backupFolder }});
+    sendJsonMessage({{ "msg", "db_backup_file" },
+                    { "data", backupFile }});
 }
 
-void WSServerCon::setDBBackupFolder(const QString &backupFolder)
+void WSServerCon::setDBBackupFile(const QString &backupFile)
 {
     if (!mpdevice)
         return;
 
-    mpdevice->setDBBackupFolder(backupFolder);
+    mpdevice->setDBBackupFile(backupFile);
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

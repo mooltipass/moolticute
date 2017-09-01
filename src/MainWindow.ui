@@ -1425,14 +1425,14 @@ QWidget {background-color: #EFEFEF;}</string>
                   </font>
                  </property>
                  <property name="text">
-                  <string>Database Folder:</string>
+                  <string>Database File:</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEditDBFolder">
+                <widget class="QLineEdit" name="lineEditDBFile">
                  <property name="text">
-                  <string>Some text text text text</string>
+                  <string/>
                  </property>
                  <property name="readOnly">
                   <bool>true</bool>

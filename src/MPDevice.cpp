@@ -327,7 +327,7 @@ void MPDevice::removeFileFromCache(QString fileName)
     emit filesCacheChanged();
 }
 
-QString MPDevice::getDBBackupFolder()
+QString MPDevice::getDBBackupFile()
 {
     if(filesCache.filePath().isEmpty())
         return QString();
@@ -337,13 +337,13 @@ QString MPDevice::getDBBackupFolder()
     // get backup folder for hashed card CPZ
     QSettings settings;
     settings.beginGroup("users");
-    QString backupFolder = settings.value(fileInfo.baseName()).toString();
+    QString backupFile = settings.value(fileInfo.baseName()).toString();
     settings.endGroup();
 
-    return backupFolder;
+    return backupFile;
 }
 
-void MPDevice::setDBBackupFolder(const QString &backupFolder)
+void MPDevice::setDBBackupFile(const QString &backupFile)
 {
     if(filesCache.filePath().isEmpty())
         return;
@@ -352,7 +352,7 @@ void MPDevice::setDBBackupFolder(const QString &backupFolder)
 
     QSettings settings;
     settings.beginGroup("users");
-    settings.setValue(fileInfo.baseName(), backupFolder);
+    settings.setValue(fileInfo.baseName(), backupFile);
     settings.endGroup();
 }
 

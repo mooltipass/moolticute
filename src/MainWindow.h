@@ -57,7 +57,7 @@ private slots:
     void wantExitFilesManagement();
     void wantImportDatabase();
     void wantExportDatabase();
-    void changeDBBackupFolder();
+    void changeDBBackupFile();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);

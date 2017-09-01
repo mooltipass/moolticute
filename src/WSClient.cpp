@@ -268,10 +268,10 @@ void WSClient::onTextMessageReceived(const QString &message)
         filesCache = rootobj["data"].toArray();
         emit filesCacheChanged();
     }
-    else if (rootobj["msg"] == "db_backup_folder")
+    else if (rootobj["msg"] == "db_backup_file")
     {
-        QString backupFolder = rootobj["data"].toString();
-        emit databaseBackupFolderChanged(backupFolder);
+        QString backupFile = rootobj["data"].toString();
+        emit databaseBackupFileChanged(backupFile);
     }
 }
 
@@ -436,13 +436,13 @@ void WSClient::sendRefreshFilesCacheRequest()
     sendJsonData({{ "msg", "refresh_files_cache" }});
 }
 
-void WSClient::requestDBBackupFolder()
+void WSClient::requestDBBackupFile()
 {
-    sendJsonData({{ "msg", "get_db_backup_folder" }});
+    sendJsonData({{ "msg", "get_db_backup_file" }});
 }
 
-void WSClient::sendDBBackupFolder(const QString &backupFolder)
+void WSClient::sendDBBackupFile(const QString &backupFile)
 {
-    sendJsonData({{ "msg", "set_db_backup_folder" },
-                  { "data", backupFolder }});
+    sendJsonData({{ "msg", "set_db_backup_file" },
+                  { "data", backupFile }});
 }
