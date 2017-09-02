@@ -134,6 +134,16 @@ void MPNode::setFavoriteProperty(const qint8 favId)
     favorite = favId;
 }
 
+quint32 MPNode::getEncDataSize() const
+{
+    return encDataSize;
+}
+
+void MPNode::setEncDataSize(const quint32 encSize)
+{
+    encDataSize = encSize;
+}
+
 QByteArray MPNode::getPreviousParentAddress() const
 {
     if (!isValid()) return QByteArray();

@@ -182,7 +182,7 @@ public:
                        std::function<void(bool success, QString errstr, QString service, bool exists)> cb);
 
     //Set full list of credentials in MMM
-    void setMMCredentials(const QJsonArray &creds, MPDeviceProgressCb progressCb,
+    void setMMCredentials(const QJsonArray &creds, MPDeviceProgressCb cbProgress,
                           std::function<void(bool success, QString errstr)> cb);
 
     //Export database
@@ -238,7 +238,7 @@ private:
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
                       MPDeviceProgressCb cbProgress);
-    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, MPDeviceProgressCb cbProgress);
+    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, MPDeviceProgressCb cbProgress, quint32 nbBytesFetched);
     void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
                                MPDeviceProgressCb cbProgress);
 
@@ -255,9 +255,9 @@ private:
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, MPDeviceProgressCb cbProgress, bool getCreds, bool getData, bool getDataChilds);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr);
-    void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data);
+    void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
     void startImportFileMerging(MPDeviceProgressCb progressCb, std::function<void(bool success, QString errstr)> cb, bool noDelete);
-    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr);
+    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, MPDeviceProgressCb cbProgress);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
     void deletePossibleFavorite(QByteArray parentAddr, QByteArray childAddr);
     bool finishImportFileMerging(QString &stringError, bool noDelete);
@@ -292,7 +292,7 @@ private:
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
 
     // Generate save packets
-    bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData);
+    bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, MPDeviceProgressCb cbProgress);
 
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
