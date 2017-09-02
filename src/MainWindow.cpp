@@ -757,7 +757,7 @@ void MainWindow::onCurrentTabChanged(int)
 void MainWindow::wantEnterCredentialManagement()
 {
     ui->labelWait->show();
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Wait for device confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
+    ui->labelWait->setText(tr("<html><!--enter_credentials_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Waiting For Device Confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
@@ -770,7 +770,7 @@ void MainWindow::wantEnterCredentialManagement()
 void MainWindow::wantSaveCredentialManagement()
 {
     ui->labelWait->show();
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device</span></p><p>Please wait.</p></body></html>"));
+    ui->labelWait->setText(tr("<html><!--save_credentials_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving Changes to Device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
@@ -817,7 +817,7 @@ void MainWindow::wantExportDatabase()
 void MainWindow::wantExitFilesManagement()
 {
     ui->labelWait->show();
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
+    ui->labelWait->setText(tr("<html><!--exit_file_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
@@ -850,12 +850,12 @@ void MainWindow::loadingProgress(int total, int current, QString message)
         ui->labelProgressMessage->setVisible(false);
 
     if (ui->labelWait->text().contains("export_db_job"))
-        ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
+        ui->labelWait->setText(tr("<html><!--export_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting Database from Device</span></p><p>Please wait.</p></body></html>"));
 
     if (ui->labelWait->text().contains("import_db_job"))
-        ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Importing and merging file to device</span></p><p>Please wait.</p></body></html>"));
+        ui->labelWait->setText(tr("<html><!--import_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Importing and Merging File to Device</span></p><p>Please wait.</p></body></html>"));
 
-    if (ui->labelWait->text().contains("Wait for device confirmation"))
+    if (ui->labelWait->text().contains("enter_credentials_mgm_job"))
         ui->labelWait->hide();
     else
         ui->labelWait->show();
