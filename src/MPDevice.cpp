@@ -1153,7 +1153,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     if (getFlashPageFromAddress(address) != lastFlashPageScanned)
     {
         lastFlashPageScanned = getFlashPageFromAddress(address);
-        cbProgress(getNumberOfPages(), lastFlashPageScanned, "Scanning Mooltipass Memory (Read Speed: " + QString::number(diagNbBytesRec) + "B/s)");
+        cbProgress(getNumberOfPages(), lastFlashPageScanned, "Scanning Mooltipass Memory (Read Speed: " + QString::number(diagLastNbBytesPSec) + "B/s)");
     }
 
     /* For performance diagnostics */
@@ -1161,6 +1161,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     {
         qInfo() << "Current transfer speed:" << diagNbBytesRec << "B/s";
         diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
+        diagLastNbBytesPSec = diagNbBytesRec;
         diagNbBytesRec = 0;
     }
 
@@ -5848,6 +5849,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
 
     /* Setup global vars dedicated to speed diagnostics */
     diagNbBytesRec = 0;
+    diagLastNbBytesPSec = 0;
     lastFlashPageScanned = 0;
     diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
 
