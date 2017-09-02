@@ -794,7 +794,7 @@ void MainWindow::wantSaveCredentialManagement()
 void MainWindow::wantImportDatabase()
 {
     ui->labelWait->show();
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Importing and merging file to device</span></p><p>Please wait.</p></body></html>"));
+    ui->labelWait->setText(tr("<html><!--import_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Please Approve Request On Device</span></p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
@@ -806,7 +806,7 @@ void MainWindow::wantExportDatabase()
 {
     ui->widgetHeader->setEnabled(false);
     ui->labelWait->show();
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
+    ui->labelWait->setText(tr("<html><!--export_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Please Approve Request On Device</span></p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
@@ -848,6 +848,12 @@ void MainWindow::loadingProgress(int total, int current, QString message)
     }
     else
         ui->labelProgressMessage->setVisible(false);
+
+    if (ui->labelWait->text().contains("export_db_job"))
+        ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
+
+    if (ui->labelWait->text().contains("import_db_job"))
+        ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Importing and merging file to device</span></p><p>Please wait.</p></body></html>"));
 
     if (ui->labelWait->text().contains("Wait for device confirmation"))
         ui->labelWait->hide();
