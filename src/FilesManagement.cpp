@@ -362,6 +362,11 @@ void FilesManagement::on_pushButtonDelFile_clicked()
 
     deletedList.append(currentItem->text());
     filesModel->removeRow(currentItem->row());
+
+    // Select another item
+    auto index = filesModel->index(std::min(selectedIndex.row(), filesModel->rowCount()-1),0);
+    selectionModel->select(index, QItemSelectionModel::ClearAndSelect);
+    currentSelectionChanged(index, QModelIndex());
 }
 
 void FilesManagement::dataFileRequested(const QString &service, const QByteArray &data, bool success)
