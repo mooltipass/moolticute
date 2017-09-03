@@ -309,6 +309,7 @@ private:
     //local vars for performance diagnostics
     qint64 diagLastSecs;
     quint32 diagNbBytesRec;
+    quint32 diagLastNbBytesPSec;
 
     //command queue
     QQueue<MPCommand> commandQueue;
