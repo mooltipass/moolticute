@@ -468,6 +468,12 @@ void MainWindow::updatePage()
     ui->label_29->setVisible(!isCardUnknown);
     ui->pushButtonIntegrity->setVisible(!isCardUnknown);
 
+    // When an import db operation is peformed in an unknown card
+    // don't change the page until the operation is finished
+    if (ui->stackedWidget->currentWidget() == ui->pageWaiting &&
+            ui->labelWait->text().contains("import_db_job"))
+        return;
+
     updateTabButtons();
 
     if (ui->pushButtonAbout->isChecked())
