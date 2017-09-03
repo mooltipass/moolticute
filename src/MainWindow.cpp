@@ -859,6 +859,8 @@ void MainWindow::loadingProgress(int total, int current, QString message)
         ui->labelWait->hide();
     else
         ui->labelWait->show();
+
+
 }
 
 void MainWindow::on_pushButtonAutoStart_clicked()
@@ -1029,19 +1031,33 @@ void MainWindow::on_pushButtonIntegrity_clicked()
     if (r == QMessageBox::Yes)
     {
         wsClient->sendJsonData({{ "msg", "start_memcheck" }});
+
+        connect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
+        connect(wsClient, &WSClient::progressChanged, this, &MainWindow::integrityProgress);
+
         ui->widgetHeader->setEnabled(false);
+        ui->labelWait->show();
+        ui->labelWait->setText(tr("<html><!--check_integrity_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Waiting For Device Confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
+        ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+        ui->progressBarWait->hide();
+        ui->labelProgressMessage->hide();
+        ui->integrityProgressMessageLabel->hide();
+    }
+}
+
+void MainWindow::integrityProgress(int total, int current, QString message)
+{
+    if (ui->stackedWidget->currentWidget() == ui->pageWaiting)
+    {
         ui->stackedWidget->setCurrentWidget(ui->pageIntegrity);
         ui->progressBarIntegrity->setMinimum(0);
         ui->progressBarIntegrity->setMaximum(0);
         ui->progressBarIntegrity->setValue(0);
 
-        connect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
-        connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(integrityProgress(int,int)));
+        ui->integrityProgressMessageLabel->show();
     }
-}
 
-void MainWindow::integrityProgress(int total, int current)
-{
+    ui->integrityProgressMessageLabel->setText(message);
     ui->progressBarIntegrity->setMaximum(total);
     ui->progressBarIntegrity->setValue(current);
 }
@@ -1049,7 +1065,7 @@ void MainWindow::integrityProgress(int total, int current)
 void MainWindow::integrityFinished(bool success)
 {
     disconnect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
-    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(integrityProgress(int,int)));
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::integrityProgress);
 
     if (!success)
         QMessageBox::warning(this, "Moolticute", tr("Memory integrity check failed!"));
