@@ -36,4 +36,4 @@ build
 build-linux
 .idea
 
-lang/*.ts
+lang/*.qm
