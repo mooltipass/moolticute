@@ -74,5 +74,12 @@ upload_file build/updater.json $(shasum -a 256 build/updater.json | cut -d' ' -f
 
 PATH=${PATH}:$(pwd)/scripts/lib create_github_release ${BUILD_TAG}
 
+# GitHub release
+$DOCKER_EXEC \
+    "export TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG} PROJECT_NAME=${PROJECT_NAME} TRAVIS_OS_NAME=${TRAVIS_OS_NAME} \
+    DEB_VERSION=${DEB_VERSION}; \
+    source /usr/local/bin/tools.sh; \
+    create_github_release_osx ${BUILD_TAG}"
+
 exit 0
 

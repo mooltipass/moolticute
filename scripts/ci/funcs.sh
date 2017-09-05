@@ -197,22 +197,44 @@ function create_release_and_upload_asset()
     popd > /dev/null
 }
 
-
 # Create a a GitHub release for the specified version and upload all applicable assets
 #
 # Usage:
 #
-#     create_github_release reponame osname version
+#     create_github_release_linux version
 #
 # Positional arguments
 #
-function create_github_release()
+function create_github_release_linux()
 {
     local VERSION="${1:?Release version required.}"
     local DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
     local DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
     local DEB_FILE="build-linux/deb/${DEB_NAME}"
     local EXE_FILE="$(ls win/build/*.exe 2> /dev/null | head -n 1)"
+
+    if [ -z "$VERSION" ]; then
+        >&2 echo -e "Skipping GitHub release creation (current build does not have a tag)"
+        return 0
+    fi
+
+    >&2 echo -e "Creating (Linux) GitHub release (tag: $VERSION)"
+
+	create_release_and_upload_asset $VERSION $DEB_FILE
+    create_release_and_upload_asset $VERSION $EXE_FILE
+}
+
+# Create a a GitHub release for the specified version and upload all applicable assets
+#
+# Usage:
+#
+#     create_github_release_osx version
+#
+# Positional arguments
+#
+function create_github_release_osx()
+{
+    local VERSION="${1:?Release version required.}"
     local DMG_FILE="$(ls build/*.dmg 2> /dev/null | head -n 1)"
 
     if [ -z "$VERSION" ]; then
@@ -220,14 +242,9 @@ function create_github_release()
         return 0
     fi
 
-    >&2 echo -e "Creating GitHub release (tag: $VERSION)"
+    >&2 echo -e "Creating (OSX) GitHub release (tag: $VERSION)"
 
-    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-	    create_release_and_upload_asset $VERSION $DEB_FILE
-	    create_release_and_upload_asset $VERSION $EXE_FILE
-    elif [ "$TRAVIS_OS_NAME" == "osx" ]; then
-	    create_release_and_upload_asset $VERSION $DMG_FILE
-    fi
+    create_release_and_upload_asset $VERSION $DMG_FILE
 }
 
 function osx_setup_netrc()
