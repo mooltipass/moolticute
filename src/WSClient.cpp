@@ -196,10 +196,32 @@ void WSClient::onTextMessageReceived(const QString &message)
         else
             emit memcheckFinished(true);
     }
-    else if (rootobj["msg"] == "progress")
+//    messages with the simple style will be ignored
+//    else if (rootobj["msg"] == "progress")
+    else if (rootobj["msg"] == "progress_datailed")
     {
         QJsonObject o = rootobj["data"].toObject();
-        emit progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt(), o["progress_message"].toString());
+        QString progressString = o["progress_message"].toString();
+        // TODO: Add internationalization code here
+        QJsonArray progressStringArgs = o["progress_message_args"].toArray();
+        for (QJsonValue arg: progressStringArgs)
+        {
+            switch (arg.type()) {
+            case QJsonValue::Bool:
+                progressString = progressString.arg(arg.toBool());
+                break;
+            case QJsonValue::Double:
+                progressString = progressString.arg(arg.toDouble(), 0, 'g', -1);
+                break;
+            case QJsonValue::String:
+                progressString = progressString.arg(arg.toString());
+                break;
+            default:
+                qWarning() << "Usuported argument in progress message: " << arg;
+                break;
+            }
+        }
+        emit progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt(), progressString);
     }
     else if (rootobj["msg"] == "device_uid")
     {

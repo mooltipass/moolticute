@@ -28,7 +28,15 @@
 #include "FilesCache.h"
 
 typedef std::function<void(bool success, const QByteArray &data, bool &done)> MPCommandCb;
-typedef std::function<void(int total, int current, QString statusMsg)> MPDeviceProgressCb;
+typedef std::function<void(const QVariantMap &data)> MPDeviceProgressCb;
+/* Example usage of the above function
+ * MPDeviceProgressCb cb;
+ * QVariantMap progressData = { {"total", 100},
+ *                      {"current", 2},
+ *                      {"msg", "message with %1 arguments: %2 %3"},
+ *                      {"msg_args", QVariantList({1, "23", "23423"})}};
+ * cb(data)
+*/
 
 class MPCommand
 {
@@ -124,7 +132,7 @@ public:
     //mem mgmt mode
     //cbFailure is used to propagate an error to clients when entering mmm
     void startMemMgmtMode(bool wantData,
-                          std::function<void(int total, int current, QString statusMsg)> cbProgress,
+                          MPDeviceProgressCb cbProgress,
                           std::function<void(bool success, int errCode, QString errMsg)> cb);
     void exitMemMgmtMode(bool setMMMBool = true);
     void startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
