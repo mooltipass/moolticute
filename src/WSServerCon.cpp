@@ -74,10 +74,13 @@ void WSServerCon::processMessage(const QString &message)
     }
 
     //Default progress callback handling
-    auto defaultProgressCb = [=](int total, int current)
+    auto defaultProgressCb = [=](QVariantMap progressData)
     {
         if (!WSServer::Instance()->checkClientExists(this))
             return;
+
+        int total = progressData.value("total", QVariant(-1)).toInt();
+        int current = progressData.value("current", QVariant(-1)).toInt();
 
         if (current > total)
             current = total;
@@ -86,8 +89,22 @@ void WSServerCon::processMessage(const QString &message)
         QJsonObject oroot = root;
         ores["progress_total"] = total;
         ores["progress_current"] = current;
-        oroot["data"] = ores;
+
         oroot["msg"] = "progress"; //change msg to avoid breaking of client waiting of the response
+        sendJsonMessage(oroot);
+
+        // New progress message
+        if (progressData.contains("msg")) {
+            ores["progress_message"] = progressData["msg"].toString();
+            if (progressData.contains("msg_args"))
+            {
+                auto message_args = progressData["msg_args"].toList();
+                auto message_args_json = QJsonValue::fromVariant(message_args);
+                ores["progress_message_args"] = message_args_json;
+            }
+        }
+        oroot["data"] = ores;
+        oroot["msg"] = "progress_datailed"; //change msg to avoid breaking of client waiting of the response
         sendJsonMessage(oroot);
     };
 
@@ -439,6 +456,7 @@ void WSServerCon::processMessage(const QString &message)
 
         mpdevice->setMMCredentials(
                     root["data"].toArray(),
+                    defaultProgressCb,
                     [=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))
@@ -883,8 +901,8 @@ void WSServerCon::sendFilesCache()
     qDebug() << "Sending files cache";
     QJsonObject oroot = { {"msg", "files_cache_list"} };
     QJsonArray array;
-    for (QString fileName : mpdevice->getFilesCache())
-        array.append(fileName);
+    for (QVariantMap item : mpdevice->getFilesCache())
+        array.append(QJsonDocument::fromVariant(item).object());
 
     oroot["data"] = array;
     sendJsonMessage(oroot);

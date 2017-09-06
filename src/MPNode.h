@@ -89,6 +89,8 @@ public:
     QDate getDateLastUsed() const;
     void setFavoriteProperty(const qint8 favId);
     qint8 getFavoriteProperty() const;
+    quint32 getEncDataSize() const;
+    void setEncDataSize(const quint32 encSize);
 
     //Data node address
     //Address in data node is not at the same position as cred nodes
@@ -142,6 +144,7 @@ private:
     bool prevVirtualAddressSet = false;
     quint32 prevVirtualAddress = 0;
     quint32 virtualAddress = 0;
+    quint32 encDataSize = 0;
     qint8 favorite = Common::FAV_NOT_SET;
 
     QList<MPNode *> childNodes;

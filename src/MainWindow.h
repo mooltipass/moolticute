@@ -61,10 +61,10 @@ private slots:
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
 
-    void integrityProgress(int total, int current);
+    void integrityProgress(int total, int current, QString message);
     void integrityFinished(bool success);
 
-    void loadingProgress(int total, int current);
+    void loadingProgress(int total, int current, QString message);
 
     void dbExported(const QByteArray &d, bool success);
     void dbImported(bool success, QString message);
