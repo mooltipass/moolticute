@@ -40,8 +40,8 @@ rm -f build/$APP.app/Contents/Info.plist-e
 cp build/moolticuted build/$APP.app/Contents/MacOS/
 
 #Get 3rd party tools
-curl https://calaos.fr/mooltipass/tools/macos/moolticute_ssh-agent -o build/$APP.app/Contents/MacOS/moolticute_ssh-agent
-curl https://calaos.fr/mooltipass/tools/macos/moolticute-cli -o build/$APP.app/Contents/MacOS/moolticute-cli
+wget_retry https://calaos.fr/mooltipass/tools/macos/moolticute_ssh-agent -O build/$APP.app/Contents/MacOS/moolticute_ssh-agent
+wget_retry https://calaos.fr/mooltipass/tools/macos/moolticute-cli -O build/$APP.app/Contents/MacOS/moolticute-cli
 
 # use macdeployqt to deploy the application
 #echo "Calling macdeployqt and code signing application"
@@ -56,7 +56,7 @@ if [ "$?" -ne "0" ]; then
 fi
 
 #Call fix to change all rpath
-wget https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
+wget_retry https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
 python macdeployqtfix.py build/$APP.app/Contents/MacOS/MoolticuteApp /usr/local/Cellar/qt5/5.*/
 python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /usr/local/Cellar/qt5/5.*/
 

@@ -20,8 +20,8 @@ fi
 mkdir -p $WDIR
 
 #Get 3rd party tools
-curl https://calaos.fr/mooltipass/tools/windows/moolticute_ssh-agent.exe -o $WDIR/moolticute_ssh-agent.exe
-curl https://calaos.fr/mooltipass/tools/windows/moolticute-cli.exe -o $WDIR/moolticute-cli.exe
+wget_retry https://calaos.fr/mooltipass/tools/windows/moolticute_ssh-agent.exe -O $WDIR/moolticute_ssh-agent.exe
+wget_retry https://calaos.fr/mooltipass/tools/windows/moolticute-cli.exe -O $WDIR/moolticute-cli.exe
 
 for f in $MXE_BIN/bin/libgcc_s_sjlj-1.dll \
          $MXE_BIN/bin/libstdc++-6.dll \
