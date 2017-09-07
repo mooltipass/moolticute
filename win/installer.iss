@@ -55,8 +55,8 @@ Name: "Full"; Description: "Full installation"
 Name: "moolticute"; Description: "Moolticute"; Types: Full
 
 [Run]
-;Filename: "{app}\redist\vcredist_sp1_x86.exe"; Parameters: "/q /NoSetupVersionCheck"; WorkingDir: "{app}\redist"; StatusMsg: "Installing Visual Studio 2010 C++ CRT Libraries..."; Components: moolticute
-;Filename: "{app}\redist\Win32OpenSSL_Light-1_0_1L.exe"; Parameters: "/silent /verysilent /sp- /suppressmsgboxes"; WorkingDir: "{app}\redist"; StatusMsg: "Installing OpenSSL libraries..."; Components: moolticute
+Filename: "{app}\redist\vcredist_sp1_x86.exe"; Parameters: "/q /NoSetupVersionCheck"; WorkingDir: "{app}\redist"; StatusMsg: "Installing Visual Studio 2010 C++ CRT Libraries..."; Components: moolticute
+Filename: "{app}\redist\Win32OpenSSL_Light-1_0_2L.exe"; Parameters: "/silent /verysilent /sp- /suppressmsgboxes"; WorkingDir: "{app}\redist"; StatusMsg: "Installing OpenSSL libraries..."; Components: moolticute
 Filename: "{app}\MoolticuteApp.exe"; WorkingDir: "{app}"; Description: "Start Moolticute"; Flags: postinstall nowait skipifsilent runascurrentuser  
 
 [Registry]

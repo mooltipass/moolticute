@@ -17,11 +17,13 @@ if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
     return 0
 fi
 
-mkdir -p $WDIR
+mkdir -p $WDIR/redist
 
 #Get 3rd party tools
 wget_retry https://calaos.fr/mooltipass/tools/windows/moolticute_ssh-agent.exe -O $WDIR/moolticute_ssh-agent.exe
 wget_retry https://calaos.fr/mooltipass/tools/windows/moolticute-cli.exe -O $WDIR/moolticute-cli.exe
+wget_retry https://calaos.fr/download/misc/redist/Win32OpenSSL_Light-1_0_2L.exe -O $WDIR/redist/Win32OpenSSL_Light-1_0_2L.exe
+wget_retry https://calaos.fr/download/misc/redist/vcredist_sp1_x86.exe -O $WDIR/redist/vcredist_sp1_x86.exe
 
 for f in $MXE_BIN/bin/libgcc_s_sjlj-1.dll \
          $MXE_BIN/bin/libstdc++-6.dll \
