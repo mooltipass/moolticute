@@ -134,6 +134,10 @@ bool AppGui::initialize()
     connectedChanged();
 
     win = new MainWindow(wsClient);
+    connect(win, &MainWindow::destroyed, [this](QObject *)
+    {
+        win = nullptr;
+    });
     connect(win, &MainWindow::windowCloseRequested, [=]()
     {
         mainWindowHide();

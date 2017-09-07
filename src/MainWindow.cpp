@@ -126,6 +126,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
 
+    ui->pushButtonCheckUpdate->setStyleSheet(CSS_BLUE_BUTTON);
+
     ui->pushButtonSettingsSave->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(AppGui::qtAwesome()->icon(fa::undo, whiteButtons));
     ui->pushButtonSettingsSave->setVisible(false);

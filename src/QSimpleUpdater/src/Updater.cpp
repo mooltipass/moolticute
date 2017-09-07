@@ -371,7 +371,7 @@ void Updater::onReply (QNetworkReply* reply)
     m_latestVersion = platform.value ("latest-version").toString();
 
     /* Compare latest and current version */
-    setUpdateAvailable (compare (latestVersion(), moduleVersion()));
+    setUpdateAvailable (latestVersion() != moduleVersion());
     emit checkingFinished (url());
 }
 
