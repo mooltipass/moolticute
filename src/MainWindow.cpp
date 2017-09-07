@@ -462,7 +462,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LanguageChange)
+    {
         ui->retranslateUi(this);
+        retranslateUi();
+    }
     QMainWindow::changeEvent(event);
 }
 
@@ -1235,4 +1238,10 @@ void MainWindow::on_pushButtonCheckUpdate_clicked()
 {
     AppGui *a = qobject_cast<AppGui *>(qApp);
     a->checkUpdate(true);
+}
+
+void MainWindow::retranslateUi()
+{
+    ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
+    updateSerialInfos();
 }

@@ -105,6 +105,8 @@ private:
 
     void setupLanguages();
 
+    void retranslateUi();
+
     Ui::MainWindow *ui;
     QtAwesome* awesome;
 
