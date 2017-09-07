@@ -40,6 +40,8 @@ AppGui::AppGui(int & argc, char ** argv) :
 
 bool AppGui::initialize()
 {
+    qsrand(time(NULL));
+
     QCoreApplication::setOrganizationName("Raoulh");
     QCoreApplication::setOrganizationDomain("raoulh.org");
     QCoreApplication::setApplicationName("Moolticute");
@@ -509,6 +511,10 @@ void AppGui::checkUpdate(bool displayMessage)
     u->setNotifyOnFinish(MC_UPDATE_URL, displayMessage);
 
     u->checkForUpdates(MC_UPDATE_URL);
+
+    //Recheck in at least 30minutes plus some random time
+    if (!displayMessage)
+        QTimer::singleShot(1000 * 60 * 60 * 30 + qrand() % 240, [this]() { checkUpdate(false); });
 }
 
 void AppGui::setupLanguage()
