@@ -221,6 +221,7 @@ bool Updater::useCustomInstallProcedures() const
  */
 void Updater::checkForUpdates()
 {
+    qInfo() << "Checking software updates from " << url();
     m_manager->get (QNetworkRequest (url()));
 }
 
@@ -333,6 +334,7 @@ void Updater::onReply (QNetworkReply* reply)
     /* There was a network error */
     if (reply->error() != QNetworkReply::NoError)
     {
+        qWarning() << "Network error when checking for update: " << reply->errorString();
         setUpdateAvailable(false);
         emit checkingFinished (url());
         return;
@@ -346,11 +348,13 @@ void Updater::onReply (QNetworkReply* reply)
     }
 
     /* Try to create a JSON document from downloaded data */
-    QJsonDocument document = QJsonDocument::fromJson (reply->readAll());
+    QJsonParseError jerr;
+    QJsonDocument document = QJsonDocument::fromJson (reply->readAll(), &jerr);
 
     /* JSON is invalid */
     if (document.isNull())
     {
+        qWarning() << "Invalid JSON when checking for update: " << jerr.errorString();
         setUpdateAvailable(false);
         emit checkingFinished (url());
         return;

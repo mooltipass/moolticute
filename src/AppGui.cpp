@@ -45,7 +45,11 @@ bool AppGui::initialize()
     QCoreApplication::setApplicationName("Moolticute");
     QCoreApplication::setApplicationVersion(APP_VERSION);
 
-    Common::installMessageOutputHandler();
+    Common::installMessageOutputHandler(nullptr, [this](const QByteArray &d)
+    {
+        if (win)
+            win->daemonLogAppend(d);
+    });
 
     setupLanguage();
 
@@ -147,12 +151,12 @@ bool AppGui::initialize()
     QStringList arguments;
     // TODO handle Debug arguments
     //arguments << "-e" <<  "-s 8080";
-    qDebug() << "Running " << program << " " << arguments;
+    qInfo() << "Running " << program << " " << arguments;
 
     connect(daemonProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
         [=](int exitCode, QProcess::ExitStatus exitStatus)
     {
-        qDebug() << "Daemon exits with error code " << exitCode << " Exit Status : " << exitStatus;
+        qWarning() << "Daemon exits with error code " << exitCode << " Exit Status : " << exitStatus;
 
         if (aboutToQuit)
             return;
@@ -173,7 +177,7 @@ bool AppGui::initialize()
 
     connect(daemonProcess, &QProcess::started, [=]()
     {
-        qDebug() << "Daemon started";
+        qInfo() << "Daemon started";
         if (aboutToQuit)
             return;
 
@@ -219,7 +223,7 @@ bool AppGui::initialize()
 
     startSSHAgent();
 
-    QTimer::singleShot(15000, this, &AppGui::checkUpdate);
+    QTimer::singleShot(15000, [this]() { checkUpdate(false); });
 
     return true;
 }
@@ -236,12 +240,12 @@ void AppGui::startSSHAgent()
 #ifndef Q_OS_WIN
         arguments << "--no-fork";
 #endif
-        qDebug() << "Running " << program << " " << arguments;
+        qInfo() << "Running " << program << " " << arguments;
 
         connect(sshAgentProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
-            qDebug() << "SSH agent exits with error code " << exitCode << " Exit Status : " << exitStatus;
+            qWarning() << "SSH agent exits with error code " << exitCode << " Exit Status : " << exitStatus;
 
             //Restart agent
             QTimer::singleShot(500, [=]()
@@ -489,7 +493,7 @@ QtAwesome *AppGui::qtAwesome()
     return a;
 }
 
-void AppGui::checkUpdate()
+void AppGui::checkUpdate(bool displayMessage)
 {
     if (QStringLiteral(APP_VERSION) == "git")
         return;
@@ -498,6 +502,7 @@ void AppGui::checkUpdate()
     u->setModuleVersion(MC_UPDATE_URL, APP_VERSION);
     u->setNotifyOnUpdate(MC_UPDATE_URL, true);
     u->setDownloaderEnabled(MC_UPDATE_URL, true);
+    u->setNotifyOnFinish(MC_UPDATE_URL, displayMessage);
 
     u->checkForUpdates(MC_UPDATE_URL);
 }
@@ -526,7 +531,7 @@ void AppGui::setupLanguage()
 
     //Set language
     QString langfile = QString(":/lang/mc_%1.qm").arg(locale);
-    qDebug() << "Trying to set language: " << langfile;
+    qInfo() << "Trying to set language: " << langfile;
     if (QFile::exists(langfile))
     {
         translator->load(langfile);

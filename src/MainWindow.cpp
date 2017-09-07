@@ -1228,3 +1228,9 @@ void MainWindow::on_comboBoxAppLang_currentIndexChanged(int index)
         a->setupLanguage();
     }
 }
+
+void MainWindow::on_pushButtonCheckUpdate_clicked()
+{
+    AppGui *a = qobject_cast<AppGui *>(qApp);
+    a->checkUpdate(true);
+}

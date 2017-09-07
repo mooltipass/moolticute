@@ -50,13 +50,14 @@ public:
 
     static QtAwesome *qtAwesome();
 
+    void checkUpdate(bool displayMessage);
+
 private slots:
     void connectedChanged();
     void updateSystrayTooltip();
     void searchDaemonTick();
     void slotConnectionEstablished();
     void daemonLogRead();
-    void checkUpdate();
 
 private:
      MainWindow *win = nullptr;

@@ -100,11 +100,11 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
                   << "-c"
                   << "list";
 
-        qDebug() << "Running " << program << " " << arguments;
+        qInfo() << "Running " << program << " " << arguments;
         connect(sshProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
-            qDebug() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
+            qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
 
             if (loaded)
                 ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);

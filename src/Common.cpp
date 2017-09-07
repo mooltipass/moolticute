@@ -20,6 +20,7 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <time.h>
+#include "version.h"
 
 #ifndef Q_OS_WIN
 #include <stdio.h>
@@ -102,6 +103,7 @@ Common::MPStatus Common::statusFromString(const QString &st)
 
 static QLocalServer *debugLogServer = nullptr;
 static QList<QLocalSocket *> debugLogClients;
+static Common::GuiLogCallback guiLogCallback = [](const QByteArray &) {};
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QString fname = context.file;
@@ -142,6 +144,14 @@ static void _messageOutput(QtMsgType type, const QMessageLogContext &context, co
         printf("%s", qPrintable(s));
         fflush(stdout);
 
+        //In release, do not display qDebug messages from GUI
+        if (QStringLiteral(APP_VERSION) == "git" ||
+            type == QtFatalMsg ||
+            type == QtCriticalMsg ||
+            type == QtWarningMsg ||
+            type == QtInfoMsg)
+            guiLogCallback(s.toUtf8());
+
         for (QLocalSocket *sock: debugLogClients)
         {
             sock->write(s.toUtf8());
@@ -150,7 +160,7 @@ static void _messageOutput(QtMsgType type, const QMessageLogContext &context, co
     }
 }
 
-void Common::installMessageOutputHandler(QLocalServer *logServer)
+void Common::installMessageOutputHandler(QLocalServer *logServer, GuiLogCallback guicb)
 {
     debugLogServer = logServer;
     if (debugLogServer)
@@ -173,6 +183,7 @@ void Common::installMessageOutputHandler(QLocalServer *logServer)
             });
         });
     }
+    guiLogCallback = guicb;
     qInstallMessageHandler(_messageOutput);
 }
 

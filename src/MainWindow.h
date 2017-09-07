@@ -91,6 +91,8 @@ private slots:
 
     void on_comboBoxAppLang_currentIndexChanged(int index);
 
+    void on_pushButtonCheckUpdate_clicked();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 

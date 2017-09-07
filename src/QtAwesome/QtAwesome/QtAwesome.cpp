@@ -908,7 +908,7 @@ bool QtAwesome::initFontAwesome( )
         // load the font file
         QFile res(":/fonts/fontawesome-4.6.1.ttf");
         if(!res.open(QIODevice::ReadOnly)) {
-            qDebug() << "Font awesome font could not be loaded!";
+            qCritical() << "Font awesome font could not be loaded!";
             return false;
         }
         QByteArray fontData( res.readAll() );
@@ -922,7 +922,7 @@ bool QtAwesome::initFontAwesome( )
     if( !loadedFontFamilies.empty() ) {
         fontName_= loadedFontFamilies.at(0);
     } else {
-        qDebug() << "Font awesome font is empty?!";
+        qCritical() << "Font awesome font is empty?!";
         fontAwesomeFontId = -1; // restore the font-awesome id
         return false;
     }

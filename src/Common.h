@@ -109,7 +109,9 @@ T const& qAsConst(T&t){return t;}
 class Common
 {
 public:
-    static void installMessageOutputHandler(QLocalServer *logServer = nullptr);
+    typedef std::function<void(const QByteArray &)> GuiLogCallback;
+
+    static void installMessageOutputHandler(QLocalServer *logServer = nullptr, GuiLogCallback guicb = [](const QByteArray &){});
 
     Q_ENUMS(MPStatus)
     typedef enum
