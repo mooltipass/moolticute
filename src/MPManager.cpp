@@ -47,9 +47,6 @@ bool MPManager::initialize()
         connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
 
 #elif defined(Q_OS_LINUX)
-        UsbMonitor_linux::Instance()->filterVendorId(MOOLTIPASS_VENDORID);
-        UsbMonitor_linux::Instance()->filterProductId(MOOLTIPASS_PRODUCTID);
-
         //Opening a device from the hotplug events handler can lead to recursive call withing the libusb. This can lead to libusb
         //Not detecting hotplugged devices and other libusb-related error.
         //To avoid this, we simply reenter Qt's event loop before enumerating & handling the changed devices.
