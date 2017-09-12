@@ -27,6 +27,7 @@
  * Fix the problem yourself. A non-dick would submit the fix back.
  */
 
+#include <QDebug>
 #include <QJsonValue>
 #include <QJsonObject>
 #include <QMessageBox>
