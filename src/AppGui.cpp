@@ -95,8 +95,12 @@ bool AppGui::initialize()
     QMenu *systrayMenu = new QMenu();
 
     daemonAction = new DaemonMenuAction(systrayMenu);
-    systrayMenu->addAction(daemonAction);
-    systrayMenu->addSeparator();
+    // FIXME: Shall we add a fallback for linux and MacOs?
+    #ifdef Q_OS_WIN
+        // Custom systray widgets are only working on Windows
+        systrayMenu->addAction(daemonAction);
+        systrayMenu->addSeparator();
+    #endif
     systrayMenu->addAction(showConfigApp);
     systrayMenu->addSeparator();
     systrayMenu->addAction(quitAction);
