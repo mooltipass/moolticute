@@ -89,12 +89,15 @@ bool AppGui::initialize()
     QMenu *systrayMenu = new QMenu();
 
     daemonAction = new DaemonMenuAction(systrayMenu);
-    // FIXME: Shall we add a fallback for linux and MacOs?
-    #ifdef Q_OS_WIN
-        // Custom systray widgets are only working on Windows
+    #ifdef Q_OS_LINUX
+        // Custom systray widgets are don't work on linux
+        restartDaemonAction = new QAction(this);
+        connect(restartDaemonAction, &QAction::triggered, this, &AppGui::restartDaemon);
+        systrayMenu->addAction(restartDaemonAction);
+    #else
         systrayMenu->addAction(daemonAction);
-        systrayMenu->addSeparator();
     #endif
+        systrayMenu->addSeparator();
     systrayMenu->addAction(showConfigApp);
     systrayMenu->addSeparator();
     systrayMenu->addAction(quitAction);
@@ -191,31 +194,7 @@ bool AppGui::initialize()
     if (!foundDaemon)
         daemonProcess->start(program, arguments);
 
-    connect(daemonAction, &DaemonMenuAction::restartClicked, [=]()
-    {
-        //We don't have control over daemon process, cannot restart it
-        if (daemonProcess->state() != QProcess::Running && foundDaemon)
-        {
-            QMessageBox::information(nullptr, "Moolticute",
-                                     tr("Can't restart daemon, it was started by hand and not using this App."));
-            return;
-        }
-
-        if (dRunning)
-        {
-            daemonProcess->kill();
-            needRestart = true;
-        }
-        else
-        {
-            QTimer::singleShot(1500, [=]()
-            {
-                QStringList args = arguments;
-                args << "-s 8484";
-                daemonProcess->start(program, args);
-            });
-        }
-    });
+    connect(daemonAction, &DaemonMenuAction::restartClicked, this, &AppGui::restartDaemon);
 
     timerDaemon = new QTimer(this);
     connect(timerDaemon, SIGNAL(timeout()), SLOT(searchDaemonTick()));
@@ -394,13 +373,20 @@ void AppGui::searchDaemonTick()
         return;
     foundDaemon = search;
 
+#ifdef Q_OS_LINUX
+    restartDaemonAction->setEnabled(foundDaemon && !needRestart);
+    if (!foundDaemon && needRestart)
+        restartDaemonAction->setText("Restarting daemon...");
+    else
+        restartDaemonAction->setText("&Restart daemon");
+#else
     if (foundDaemon)
         daemonAction->updateStatus(DaemonMenuAction::StatusRunning);
     else if (needRestart)
         daemonAction->updateStatus(DaemonMenuAction::StatusRestarting);
     else
         daemonAction->updateStatus(DaemonMenuAction::StatusStopped);
-
+#endif
     if (foundDaemon)
     {
         delete logSocket;
@@ -491,6 +477,32 @@ QtAwesome *AppGui::qtAwesome()
 {
     static QtAwesome *a = new QtAwesome(qApp);
     return a;
+}
+
+void AppGui::restartDaemon()
+{
+    //We don't have control over daemon process, cannot restart it
+    if (daemonProcess->state() != QProcess::Running && foundDaemon)
+    {
+        QMessageBox::information(nullptr, "Moolticute",
+                                 tr("Can't restart daemon, it was started by hand and not using this App."));
+        return;
+    }
+
+    if (dRunning)
+    {
+        daemonProcess->kill();
+        needRestart = true;
+    }
+    else
+    {
+        QTimer::singleShot(1500, [=]()
+        {
+            QStringList args = daemonProcess->arguments();
+            args << "-s 8484";
+            daemonProcess->start(daemonProcess->program(), args);
+        });
+    }
 }
 
 void AppGui::checkUpdate()

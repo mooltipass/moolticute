@@ -45,12 +45,12 @@ public:
     void mainWindowHide();
     void enableDaemon();
     void disableDaemon();
-
     void setupLanguage();
 
     static QtAwesome *qtAwesome();
 
 private slots:
+    void restartDaemon();
     void connectedChanged();
     void updateSystrayTooltip();
     void searchDaemonTick();
@@ -64,6 +64,9 @@ private:
      WSClient *wsClient = nullptr;
      QAction *showConfigApp = nullptr;
      DaemonMenuAction *daemonAction = nullptr;
+#ifdef Q_OS_LINUX
+     QAction *restartDaemonAction;
+#endif
 
      QProcess *daemonProcess = nullptr;
      QProcess *sshAgentProcess = nullptr;
