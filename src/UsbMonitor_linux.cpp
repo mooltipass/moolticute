@@ -224,7 +224,16 @@ void LibUSBWorker::createSocketMonitor(int fd)
                 if (!libusb_event_handling_ok(usb_ctx))
                     libusb_unlock_events(usb_ctx);
                 else
+                {
                     emit this->eventsAvailable();
+                    // Consume events in this context
+                    int completed = 0;
+                    while (!completed)
+                        libusb_handle_events_completed(usb_ctx, &completed);
+                    // New events can happen during this context events are being
+                    // consumed so we need to notify again
+                    emit this->eventsAvailable();
+                }
             }
         });
         m_fdMonitors[fd] = sn;
