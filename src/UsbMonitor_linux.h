@@ -26,31 +26,33 @@
 
 #include "MPDevice_linux.h"
 
+/*
+ * Helper class to run the libusb events loops in a separated thread
+ * and avoid it to be interfering with the Qt events loop.
+ */
 class LibUSBWorker: public QObject {
     Q_OBJECT
 public:
-    LibUSBWorker();
     ~LibUSBWorker();
 public slots:
     void start();
     void stop();
 
-    // Every time the worker founds an event it get locked (pause)
-    // until continue is being called;
+    // Every time the worker founds an event it get locked (paused)
+    // until unlock is being called, this must be executed in the
+    // same thread as the 'start' was called
     void unlock();
 
 signals:
     void eventsAvailable();
 
 private:
-    void attachCbs();
-    void releaseCbs();
+    void attachCallbacks();
+    void releaseCallbacks();
     void createSocketMonitor(int fd);
     void releaseSocketMonitor(int fd);
 
     libusb_context *usb_ctx = nullptr;
-    libusb_device_handle *handle = nullptr;
-
     QMap<intptr_t, QSocketNotifier*> m_fdMonitors;
 
     friend void libusb_fd_add_cb(int fd, short events, void *user_data);
@@ -77,6 +79,7 @@ public slots:
 signals:
     void usbDeviceAdded();
     void usbDeviceRemoved();
+
     void startWorker();
     void stopWorker();
     void resumeWorker();
@@ -86,9 +89,10 @@ private:
     void relaseCallbacks();
     UsbMonitor_linux();
 
-    libusb_context *usb_ctx = nullptr;
     QThread m_workerThread;
     LibUSBWorker* m_worker;
+
+    libusb_context *usb_ctx = nullptr;
     libusb_hotplug_callback_handle cbaddhandle;
     libusb_hotplug_callback_handle cbdelhandle;
 

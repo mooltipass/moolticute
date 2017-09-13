@@ -59,7 +59,6 @@ int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug
     int rc;
 
     rc = libusb_get_device_descriptor(dev, &desc);
-    qDebug() << rc;
     if (rc != LIBUSB_SUCCESS)
         qWarning() << "Error getting device descriptor";
     else
@@ -70,12 +69,14 @@ int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug
     return 0;
 }
 
-void libusb_fd_add_cb(int fd, short, void *user_data) {
+void libusb_fd_add_cb(int fd, short, void *user_data)
+{
     LibUSBWorker * um = reinterpret_cast<LibUSBWorker *>(user_data);
     um->createSocketMonitor(fd);
 }
 
-void libusb_fd_del_cb(int fd, void *user_data) {
+void libusb_fd_del_cb(int fd, void *user_data)
+{
      LibUSBWorker * um = reinterpret_cast<LibUSBWorker *>(user_data);
      um->releaseSocketMonitor(fd);
 }
@@ -105,7 +106,6 @@ UsbMonitor_linux::UsbMonitor_linux()
 
 void UsbMonitor_linux::start()
 {
-    qDebug() << "Emiting start monitor";
     attachCallbacks();
     emit startWorker();
    // libusb_set_debug(usb_ctx, 4);
@@ -119,9 +119,9 @@ void UsbMonitor_linux::stop()
 
 void UsbMonitor_linux::handleEvents()
 {
-//    qDebug() << "Handling events in " << QThread::currentThread();
     int completed = 0;
-    while (!completed){
+    while (!completed)
+    {
         libusb_handle_events_completed(usb_ctx, &completed);
         qApp->processEvents();
     }
@@ -168,11 +168,6 @@ UsbMonitor_linux::~UsbMonitor_linux()
     libusb_exit(usb_ctx);
 }
 
-LibUSBWorker::LibUSBWorker()
-{
-    qDebug() << "Monitor worker created";
-}
-
 LibUSBWorker::~LibUSBWorker()
 {
     stop();
@@ -180,9 +175,6 @@ LibUSBWorker::~LibUSBWorker()
 
 void LibUSBWorker::start()
 {
-    qDebug() << "Starting monitor in "  << QThread::currentThread();
-    qRegisterMetaType<struct libusb_transfer *>();
-
     int err = libusb_init(&usb_ctx);
     if (err < 0 || !usb_ctx)
         qWarning() << "Failed to initialise libusb: " << libusb_error_name(err);
@@ -191,12 +183,12 @@ void LibUSBWorker::start()
         qDebug() << "libusb Hotplug capabilites are not supported on this platform";
 
     libusb_set_debug(usb_ctx, LIBUSB_LOG_LEVEL_ERROR);
-    attachCbs();
+    attachCallbacks();
 }
 
 void LibUSBWorker::stop()
 {
-    releaseCbs();
+    releaseCallbacks();
     libusb_exit(usb_ctx);
 }
 
@@ -206,9 +198,8 @@ void LibUSBWorker::unlock()
     libusb_unlock_events(usb_ctx);
 }
 
-void LibUSBWorker::attachCbs()
+void LibUSBWorker::attachCallbacks()
 {
-//    libusb_lock_events(usb_ctx);
     libusb_set_pollfd_notifiers(usb_ctx, libusb_fd_add_cb, libusb_fd_del_cb, this);
 
     auto fds = libusb_get_pollfds(usb_ctx);
@@ -216,7 +207,7 @@ void LibUSBWorker::attachCbs()
         createSocketMonitor((*fds)->fd);
 }
 
-void LibUSBWorker::releaseCbs()
+void LibUSBWorker::releaseCallbacks()
 {
     qDeleteAll(m_fdMonitors.values());
     m_fdMonitors.clear();
@@ -226,19 +217,14 @@ void LibUSBWorker::createSocketMonitor(int fd)
 {
     if (!m_fdMonitors.contains(fd)) {
         QSocketNotifier* sn = new QSocketNotifier(fd, QSocketNotifier::Read);
-        connect(sn, &QSocketNotifier::activated, [=]() {
-//            qDebug() << "Event received";
-
+        connect(sn, &QSocketNotifier::activated, [=]()
+        {
             if (libusb_try_lock_events(usb_ctx) == 0)
             {
-                if (!libusb_event_handling_ok(usb_ctx)) {
+                if (!libusb_event_handling_ok(usb_ctx))
                     libusb_unlock_events(usb_ctx);
-                }
                 else
-                {
-                    qDebug() << "libusb locked " << QThread::currentThread();
                     emit this->eventsAvailable();
-                }
             }
         });
         m_fdMonitors[fd] = sn;
@@ -255,4 +241,3 @@ void LibUSBWorker::releaseSocketMonitor(int fd)
         m_fdMonitors.remove(fd);
     }
 }
-
