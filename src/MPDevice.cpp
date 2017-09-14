@@ -6532,7 +6532,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
     jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false, [](QVariant) {}, false, true, false);
+    memMgmtModeReadFlash(jobs, false, [](QVariant) {}, false, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
