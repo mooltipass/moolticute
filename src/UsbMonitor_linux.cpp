@@ -19,7 +19,8 @@
 #include "UsbMonitor_linux.h"
 #include <QSocketNotifier>
 
-static inline QString fmtId(int id) {
+static inline QString fmtId(int id)
+{
     return QString("0x%1").arg(id, 1, 16);
 }
 
@@ -63,14 +64,16 @@ int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug
     return 0;
 }
 
-void libusb_fd_add_cb(int fd, short, void *user_data) {
+void libusb_fd_add_cb(int fd, short, void *user_data)
+{
     UsbMonitor_linux * um = reinterpret_cast<UsbMonitor_linux *>(user_data);
-    um->startMonitoringFd(fd);
+    um->createSocketMonitor(fd);
 }
 
-void libusb_fd_del_cb(int fd, void *user_data) {
+void libusb_fd_del_cb(int fd, void *user_data)
+{
      UsbMonitor_linux * um = reinterpret_cast<UsbMonitor_linux *>(user_data);
-     um->stopMonitoringFd(fd);
+     um->releaseSocketMonitor(fd);
 }
 
 UsbMonitor_linux::UsbMonitor_linux()
@@ -89,12 +92,31 @@ UsbMonitor_linux::UsbMonitor_linux()
 
 void UsbMonitor_linux::start()
 {
+    attachCallbacks();
+   // libusb_set_debug(usb_ctx, 4);
+}
+
+void UsbMonitor_linux::stop()
+{
+    relaseCallbacks();
+}
+
+void UsbMonitor_linux::handleEvents()
+{
+    timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 1000;
+    libusb_handle_events_timeout(usb_ctx, &timeout);
+}
+
+void UsbMonitor_linux::attachCallbacks()
+{
     int err;
     err = libusb_hotplug_register_callback(usb_ctx,
                                            LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
                                            (libusb_hotplug_flag)0,
-                                           vendorId,
-                                           productId,
+                                           MOOLTIPASS_VENDORID,
+                                           MOOLTIPASS_PRODUCTID,
                                            LIBUSB_HOTPLUG_MATCH_ANY,
                                            libusb_device_add_cb,
                                            this,
@@ -105,8 +127,8 @@ void UsbMonitor_linux::start()
     err = libusb_hotplug_register_callback(usb_ctx,
                                            LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
                                            (libusb_hotplug_flag)0,
-                                           vendorId,
-                                           productId,
+                                           MOOLTIPASS_VENDORID,
+                                           MOOLTIPASS_PRODUCTID,
                                            LIBUSB_HOTPLUG_MATCH_ANY,
                                            libusb_device_del_cb,
                                            this,
@@ -114,53 +136,46 @@ void UsbMonitor_linux::start()
     if (err != LIBUSB_SUCCESS)
         qWarning() << "Failed to register LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT callback";
 
-
     libusb_set_pollfd_notifiers(usb_ctx, libusb_fd_add_cb, libusb_fd_del_cb, this);
 
     auto fds = libusb_get_pollfds(usb_ctx);
-    while(fds && *fds) {
-        startMonitoringFd((*fds++)->fd);
-    }
-
-   // libusb_set_debug(usb_ctx, 4);
+    for (;fds && *fds; fds ++)
+        createSocketMonitor((*fds)->fd);
 }
 
-void UsbMonitor_linux::handleEvents() {
-    libusb_handle_events(usb_ctx);
-}
-
-void UsbMonitor_linux::stop()
+void UsbMonitor_linux::relaseCallbacks()
 {
-    if (!run) return;
-    {
-        QMutexLocker l(&mutex);
-        run = false;
-    }
-    qDeleteAll(monitoredFds);
-    monitoredFds.clear();
     libusb_hotplug_deregister_callback(usb_ctx, cbaddhandle);
     libusb_hotplug_deregister_callback(usb_ctx, cbdelhandle);
-}
 
-void UsbMonitor_linux::startMonitoringFd(int fd) {
-    const auto begin = std::begin(monitoredFds);
-    const auto end = std::end(monitoredFds);
-
-    if (end == std::find_if(begin, end, [fd](QSocketNotifier* sn) { return sn->socket() == fd; })) {
-        QSocketNotifier* sn = new QSocketNotifier(fd, QSocketNotifier::Read);
-        connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents, Qt::QueuedConnection);
-        this->monitoredFds << sn;
-    }
-}
-
-void UsbMonitor_linux::stopMonitoringFd(int fd) {
-    const auto begin = std::begin(monitoredFds);
-    const auto end = std::end(monitoredFds);
-    monitoredFds.erase(std::remove_if(begin, end, [fd](QSocketNotifier* sn) { return sn->socket() == fd; }), end);
+    qDeleteAll(m_fdMonitors.values());
+    m_fdMonitors.clear();
 }
 
 UsbMonitor_linux::~UsbMonitor_linux()
 {
-    stop();
+    relaseCallbacks();
     libusb_exit(usb_ctx);
+}
+
+void UsbMonitor_linux::createSocketMonitor(int fd)
+{
+    if (!m_fdMonitors.contains(fd))
+    {
+        QSocketNotifier* sn = new QSocketNotifier(fd, QSocketNotifier::Read);
+        connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents);
+        m_fdMonitors[fd] = sn;
+    }
+}
+
+void UsbMonitor_linux::releaseSocketMonitor(int fd)
+{
+    if (m_fdMonitors.contains(fd))
+    {
+        QSocketNotifier* sn = m_fdMonitors[fd];
+        sn->disconnect();
+        sn->deleteLater();
+
+        m_fdMonitors.remove(fd);
+    }
 }
