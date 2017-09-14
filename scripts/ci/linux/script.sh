@@ -14,10 +14,10 @@ $DOCKER_EXEC "mkdir -p /app/build-linux || true && cd /app/build-linux && qmake 
 mkdir build
 pushd build
 
-unset `env | \
-grep -vi '^EDITOR=\|^HOME=\|^LANG=\|MXE\|^PATH=' | \
-grep -vi 'PKG_CONFIG\|PROXY\|^PS1=\|^TERM=\|^TRAVIS_OS_NAME=\|^UPLOAD_KEY=' | \
-   cut -d '=' -f1 | tr '\n' ' '`
+#unset `env | \
+#grep -vi '^EDITOR=\|^HOME=\|^LANG=\|MXE\|^PATH=' | \
+#grep -vi 'PKG_CONFIG\|PROXY\|^PS1=\|^TERM=\|^TRAVIS_OS_NAME=\|^UPLOAD_KEY=' | \
+#   cut -d '=' -f1 | tr '\n' ' '`
 
 export PATH=$HOME/mxe/usr/bin:$PATH
 export MXE_BASE=$HOME/mxe
