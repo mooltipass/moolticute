@@ -19,7 +19,8 @@
 #include "UsbMonitor_linux.h"
 #include <QSocketNotifier>
 
-static inline QString fmtId(int id) {
+static inline QString fmtId(int id)
+{
     return QString("0x%1").arg(id, 1, 16);
 }
 
@@ -159,7 +160,8 @@ UsbMonitor_linux::~UsbMonitor_linux()
 
 void UsbMonitor_linux::createSocketMonitor(int fd)
 {
-    if (!m_fdMonitors.contains(fd)) {
+    if (!m_fdMonitors.contains(fd))
+    {
         QSocketNotifier* sn = new QSocketNotifier(fd, QSocketNotifier::Read);
         connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents);
         m_fdMonitors[fd] = sn;
@@ -168,7 +170,8 @@ void UsbMonitor_linux::createSocketMonitor(int fd)
 
 void UsbMonitor_linux::releaseSocketMonitor(int fd)
 {
-    if (m_fdMonitors.contains(fd)) {
+    if (m_fdMonitors.contains(fd))
+    {
         QSocketNotifier* sn = m_fdMonitors[fd];
         sn->disconnect();
         sn->deleteLater();
