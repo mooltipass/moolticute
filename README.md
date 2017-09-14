@@ -53,7 +53,7 @@ For now, no binary releases are out yet. You will need to build the software by 
 
 Two method can be used to build, by using QtCreator IDE, or from command line (typically on Linux). After the build succeeded, two executable are created:
  - moolticuted (the daemon process)
- - MoolticuteApp (the main GUI app)
+ - moolticute (the main GUI app)
 
 ##### Using Qt SDK
 

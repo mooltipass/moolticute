@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
 Encoding=UTF-8
-Name=MoolticuteApp
+Name=Moolticute
 Comment=Start Moolticute daemon and App
-Exec=/usr/bin/MoolticuteApp
+Exec=/usr/bin/moolticute
 Icon=/usr/share/icons/moolticute.png
 Terminal=false
 Categories=Utility

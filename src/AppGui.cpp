@@ -42,9 +42,9 @@ bool AppGui::initialize()
 {
     qsrand(time(NULL));
 
-    QCoreApplication::setOrganizationName("Raoulh");
-    QCoreApplication::setOrganizationDomain("raoulh.org");
-    QCoreApplication::setApplicationName("Moolticute");
+    QCoreApplication::setOrganizationName("mooltipass");
+    QCoreApplication::setOrganizationDomain("themooltipass.com");
+    QCoreApplication::setApplicationName("moolticute");
     QCoreApplication::setApplicationVersion(APP_VERSION);
 
     Common::installMessageOutputHandler(nullptr, [this](const QByteArray &d)
@@ -241,7 +241,7 @@ void AppGui::startSSHAgent()
     if (s.value("settings/auto_start_ssh").toBool())
     {
         sshAgentProcess = new QProcess(this);
-        QString program = QCoreApplication::applicationDirPath () + "/moolticute_ssh-agent";
+        QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
         QStringList arguments;
 #ifndef Q_OS_WIN
         arguments << "--no-fork";

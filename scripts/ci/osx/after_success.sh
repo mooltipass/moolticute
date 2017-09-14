@@ -18,7 +18,7 @@ if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
 fi
 
 QTDIR="/usr/local/opt/qt5"
-APP=MoolticuteApp
+APP=Moolticute
 # this directory name will also be shown in the title when the DMG is mounted
 TEMPDIR=build/$APP
 SIGNATURE="Raoul Hecky"
@@ -40,8 +40,8 @@ rm -f build/$APP.app/Contents/Info.plist-e
 cp build/moolticuted build/$APP.app/Contents/MacOS/
 
 #Get 3rd party tools
-wget_retry https://calaos.fr/mooltipass/tools/macos/moolticute_ssh-agent -O build/$APP.app/Contents/MacOS/moolticute_ssh-agent
-wget_retry https://calaos.fr/mooltipass/tools/macos/moolticute-cli -O build/$APP.app/Contents/MacOS/moolticute-cli
+wget_retry https://calaos.fr/mooltipass/tools/macos/mc-agent -O build/$APP.app/Contents/MacOS/mc-agent
+wget_retry https://calaos.fr/mooltipass/tools/macos/mc-cli -O build/$APP.app/Contents/MacOS/mc-cli
 
 # use macdeployqt to deploy the application
 #echo "Calling macdeployqt and code signing application"

@@ -27,7 +27,7 @@ AppCopyright=Copyright (c) Raoul Hecky and contributors
 ;WizardImageFile=calaos.bmp
 WizardSmallImageFile=WizModernSmallImage-IS.bmp
 SetupIconFile=Setup.ico
-UninstallDisplayIcon={app}\MoolticuteApp.exe
+UninstallDisplayIcon={app}\moolticute.exe
 MinVersion=0,5.01sp3
 PrivilegesRequired=admin
 
@@ -42,9 +42,9 @@ Source: "C:\moolticute_build\*"; DestDir: "{app}"; Flags: ignoreversion recurses
 Source: "psvince.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: moolticute;
 
 [Icons]
-Name: "{group}\Moolticute"; Filename: "{app}\MoolticuteApp.exe"; Components: moolticute
+Name: "{group}\Moolticute"; Filename: "{app}\moolticute.exe"; Components: moolticute
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\Moolticute"; Filename: "{app}\MoolticuteApp.exe"; Components: moolticute; Tasks: desktopicon
+Name: "{commondesktop}\Moolticute"; Filename: "{app}\moolticute.exe"; Components: moolticute; Tasks: desktopicon
 Name: "{group}\Mooltipass"; Filename: "http://themooltipass.com"; Components: moolticute; IconFilename: "{app}\question.ico";
 Name: "{group}\Moolticute Github"; Filename: "http://github.com/raoulh/moolticute"; Components: moolticute; IconFilename: "{app}\question.ico";
 
@@ -57,10 +57,10 @@ Name: "moolticute"; Description: "Moolticute"; Types: Full
 [Run]
 Filename: "{app}\redist\vcredist_sp1_x86.exe"; Parameters: "/q /NoSetupVersionCheck"; WorkingDir: "{app}\redist"; StatusMsg: "Installing Visual Studio 2010 C++ CRT Libraries..."; Components: moolticute
 Filename: "{app}\redist\Win32OpenSSL_Light-1_0_2L.exe"; Parameters: "/silent /verysilent /sp- /suppressmsgboxes"; WorkingDir: "{app}\redist"; StatusMsg: "Installing OpenSSL libraries..."; Components: moolticute
-Filename: "{app}\MoolticuteApp.exe"; WorkingDir: "{app}"; Description: "Start Moolticute"; Flags: postinstall nowait skipifsilent runascurrentuser  
+Filename: "{app}\moolticute.exe"; WorkingDir: "{app}"; Description: "Start Moolticute"; Flags: postinstall nowait skipifsilent runascurrentuser  
 
 [Registry]
-Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Moolticute"; ValueData: "{app}\MoolticuteApp.exe --autolaunched"; Flags: uninsdeletevalue
+Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Moolticute"; ValueData: "{app}\moolticute.exe --autolaunched"; Flags: uninsdeletevalue
 
 [Code]
 // function IsModuleLoaded to call at install time
@@ -95,7 +95,7 @@ var
   uninstaller: String;
   ErrorCode: Integer;
 begin
-  if IsModuleLoaded( 'MoolticuteApp.exe' ) or IsModuleLoaded( 'moolticuted.exe' ) then
+  if IsModuleLoaded( 'moolticute.exe' ) or IsModuleLoaded( 'moolticuted.exe' ) then
   begin
     MsgBox( 'Moolticute is running, please close it and run setup again.',
              mbError, MB_OK );
@@ -150,7 +150,7 @@ end;
 function InitializeUninstall(): Boolean;
 begin
  
-  if IsModuleLoadedU( 'MoolticuteApp.exe' ) or IsModuleLoadedU( 'moolticuted.exe' ) then
+  if IsModuleLoadedU( 'moolticute.exe' ) or IsModuleLoadedU( 'moolticuted.exe' ) then
   begin
     MsgBox( 'Moolticute is running, please close it and run again uninstall.',
              mbError, MB_OK );

@@ -2,7 +2,7 @@ QT       += core network websockets gui widgets
 
 TEMPLATE = app
 
-TARGET = MoolticuteApp
+TARGET = moolticute
 
 CONFIG += c++11
 

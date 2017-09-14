@@ -94,7 +94,7 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
     if (exists)
     {
         sshProcess = new QProcess(this);
-        QString program = QCoreApplication::applicationDirPath () + "/moolticute_ssh-agent";
+        QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
         QStringList arguments;
         arguments << "--output_progress"
                   << "-c"

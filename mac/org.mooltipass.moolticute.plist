@@ -6,7 +6,7 @@
     <string>org.mooltipass.moolticute</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/Applications/MoolticuteApp.app/Contents/MacOS/MoolticuteApp</string>
+        <string>/Applications/Moolticute.app/Contents/MacOS/moolticute</string>
     </array>
     <key>KeepAlive</key>
     <true/>

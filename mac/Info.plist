@@ -11,7 +11,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleExecutable</key>
-	<string>MoolticuteApp</string>
+	<string>moolticute</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.raoulh.moolticute</string>
 	<key>NOTE</key>
