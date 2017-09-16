@@ -32,6 +32,7 @@
 #include <QDebug>
 
 #include "PasswordProfilesModel.h"
+#include "AppGui.h"
 
 #define PROGRESS_STYLE \
     "QProgressBar {" \
@@ -51,8 +52,8 @@ PasswordLineEdit::PasswordLineEdit(QWidget* parent):
     m_passwordOptionsPopup(nullptr)
 
 {
-    QtAwesome *awesome = new QtAwesome(this);
-    Q_ASSERT(awesome->initFontAwesome());
+    AppGui *appGui = dynamic_cast<AppGui*> qApp;
+    QtAwesome *awesome = appGui->qtAwesome();
 
     m_showPassword = new QAction(awesome->icon(fa::eye), tr("Show Password"), this);
     m_hidePassword = new QAction(awesome->icon(fa::eyeslash), tr("Hide Password"), this);
