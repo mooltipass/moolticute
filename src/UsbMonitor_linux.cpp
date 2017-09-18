@@ -103,10 +103,14 @@ void UsbMonitor_linux::stop()
 
 void UsbMonitor_linux::handleEvents()
 {
-    timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 1000;
-    libusb_handle_events_timeout(usb_ctx, &timeout);
+    if (libusb_try_lock_events(usb_ctx) == 0)
+    {
+        timeval timeout;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 10;
+        libusb_handle_events_locked(usb_ctx, &timeout);
+        libusb_unlock_events(usb_ctx);
+    }
 }
 
 void UsbMonitor_linux::attachCallbacks()
@@ -163,7 +167,7 @@ void UsbMonitor_linux::createSocketMonitor(int fd)
     if (!m_fdMonitors.contains(fd))
     {
         QSocketNotifier* sn = new QSocketNotifier(fd, QSocketNotifier::Read);
-        connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents);
+        connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents, Qt::QueuedConnection);
         m_fdMonitors[fd] = sn;
     }
 }

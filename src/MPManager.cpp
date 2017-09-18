@@ -47,9 +47,9 @@ bool MPManager::initialize()
         connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
 
 #elif defined(Q_OS_LINUX)
-        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
-        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
-        UsbMonitor_linux::Instance()->start();
+        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()), Qt::QueuedConnection);
+        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()), Qt::QueuedConnection);
+        QMetaObject::invokeMethod(UsbMonitor_linux::Instance(), "start" ,Qt::QueuedConnection);
 #endif
     }
 
