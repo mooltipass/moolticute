@@ -39,7 +39,8 @@ inline bool operator!=(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { ret
 
 class USBTransfer;
 
-class TransferWorker : public QObject {
+class TransferWorker : public QObject
+{
     Q_OBJECT
 public:
     TransferWorker(libusb_context *usb_ctx);
