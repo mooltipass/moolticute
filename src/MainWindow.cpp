@@ -485,64 +485,46 @@ void MainWindow::updatePage()
     // don't change the page until the operation is finished
     if (ui->stackedWidget->currentWidget() == ui->pageWaiting &&
             ui->labelWait->text().contains("import_db_job"))
-        return;
+        ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
 
-    updateTabButtons();
-
-    if (ui->pushButtonAbout->isChecked())
-    {
+    else if (ui->pushButtonAbout->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageAbout);
-        return;
-    }
 
-    if (ui->pushButtonAppSettings->isChecked())
-    {
+    else if (ui->pushButtonAppSettings->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageAppSettings);
-        return;
-    }
 
-    if(!wsClient->isConnected()) {
+    else if(!wsClient->isConnected())
         ui->stackedWidget->setCurrentWidget(ui->pageNoDaemon);
-        return;
-    }
 
-    if (!wsClient->get_connected())
-    {
+    else if (!wsClient->get_connected())
         ui->stackedWidget->setCurrentWidget(ui->pageNoConnect);
-        return;
-    }
 
-    if (ui->pushButtonDevSettings->isChecked()) {
+    else if (ui->pushButtonDevSettings->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageSettings);
-        return;
-    }
 
-    if (ui->pushButtonAdvanced->isChecked()) {
+    else if (ui->pushButtonAdvanced->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageAdvanced);
-        return;
-    }
 
-    if (wsClient->get_status() == Common::NoCardInserted)
-    {
+    else if (wsClient->get_status() == Common::NoCardInserted)
         ui->stackedWidget->setCurrentWidget(ui->pageMissingSecurityCard);
-        return;
-    }
 
-    if (wsClient->get_status() == Common::Locked ||
+    else if (wsClient->get_status() == Common::Locked ||
             wsClient->get_status() == Common::LockedScreen)
-    {
         ui->stackedWidget->setCurrentWidget(ui->pageDeviceLocked);
-        return;
-    }
 
     else if (ui->pushButtonCred->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+
     else if (ui->pushButtonSync->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageSync);
+
     else if (ui->pushButtonFiles->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageFiles);
+
     else if (ui->pushButtonSSH->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageSSH);
+
+    updateTabButtons();
 }
 
 void MainWindow::enableKnockSettings(bool enable)
@@ -1124,6 +1106,7 @@ void MainWindow::updateTabButtons()
 {
     auto setEnabledToAllTabButtons = [=](bool enabled)
     {
+        ui->widgetHeader->setEnabled(enabled);
         for (QObject * object: ui->widgetHeader->children())
 	{
             if (typeid(*object) ==  typeid(QPushButton))
@@ -1136,8 +1119,6 @@ void MainWindow::updateTabButtons()
 
     if (ui->stackedWidget->currentWidget() == ui->pageWaiting)
         setEnabledToAllTabButtons(false);
-    else
-        setEnabledToAllTabButtons(true);
 
     // Enable or Disable tabs according to the device status
     if (wsClient->get_status() == Common::UnkownSmartcad)
@@ -1152,13 +1133,17 @@ void MainWindow::updateTabButtons()
         return;
     }
 
-    if (wsClient->get_memMgmtMode())
+    if ((ui->stackedWidget->currentWidget() == ui->pageFiles
+         || ui->stackedWidget->currentWidget() == ui->pageCredentials
+         || ui->stackedWidget->currentWidget() == ui->pageIntegrity) &&
+            wsClient->get_memMgmtMode())
     {
         // Disable all tab buttons
         setEnabledToAllTabButtons(false);
 
         ui->pushButtonCred->setEnabled(ui->stackedWidget->currentWidget() == ui->pageCredentials);
         ui->pushButtonFiles->setEnabled(ui->stackedWidget->currentWidget() == ui->pageFiles);
+
         return;
     }
 
