@@ -19,34 +19,7 @@
 #include "MPDevice_linux.h"
 #include "UsbMonitor_linux.h"
 
-MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef):
-    MPDevice(parent),
-    usb_ctx(platformDef.ctx),
-    device(platformDef.dev)
-{
-    int res = libusb_open(device, &devicefd);
-    if (res < 0)
-        qWarning() << "Error opening usb device: " << libusb_strerror((enum libusb_error)res);
-    else
-    {
-        if (libusb_kernel_driver_active(devicefd, 0))
-        {
-            detached_kernel = true;
-            libusb_detach_kernel_driver(devicefd, 0);
-        }
-        libusb_claim_interface(devicefd, 0);
-
-        platformRead();
-    }
-}
-
-MPDevice_linux::~MPDevice_linux()
-{
-    libusb_release_interface(devicefd, 0);
-    if (detached_kernel)
-        libusb_attach_kernel_driver(devicefd, 0);
-    libusb_close(devicefd);
-}
+void _usbReceiveCallback(struct libusb_transfer *trf);
 
 /* Helper class to handle transfer
  */
@@ -68,46 +41,55 @@ public:
     QByteArray recvData;
 };
 
+Q_DECLARE_METATYPE(USBTransfer*)
+
+MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef):
+    MPDevice(parent),
+    usb_ctx(platformDef.ctx),
+    device(platformDef.dev)
+{
+    qRegisterMetaType<USBTransfer *>("USBTransferPtr");
+    worker = new TransferWorker(usb_ctx);
+    worker->moveToThread(&workerThread);
+    connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
+    workerThread.start();
+    QMetaObject::invokeMethod(worker, "loop", Qt::QueuedConnection);
+
+    int res = libusb_open(device, &devicefd);
+    if (res < 0)
+        qWarning() << "Error opening usb device: " << libusb_strerror((enum libusb_error)res);
+    else
+    {
+        if (libusb_kernel_driver_active(devicefd, 0))
+        {
+            detached_kernel = true;
+            libusb_detach_kernel_driver(devicefd, 0);
+        }
+        libusb_claim_interface(devicefd, 0);
+
+        platformRead();
+    }
+}
+
+MPDevice_linux::~MPDevice_linux()
+{
+    workerThread.requestInterruption();
+    workerThread.quit();
+    workerThread.wait();
+
+    libusb_release_interface(devicefd, 0);
+    if (detached_kernel)
+        libusb_attach_kernel_driver(devicefd, 0);
+    libusb_close(devicefd);
+}
+
 //Called when a send transfer has completed
 void _usbSendCallback(struct libusb_transfer *trf)
 {
 //    qDebug() << "Send callback";
 
-    // /!\ every libusb callbacks are running on the libusb thread!
-    USBTransfer *t = reinterpret_cast<USBTransfer *>(trf->user_data);
-    QMetaObject::invokeMethod(t->device, "usbSendCb",
-                              Qt::QueuedConnection,
-                              Q_ARG(struct libusb_transfer *, trf));
-}
-
-//Start a send request, _usbSendCallback will be called after completion
-void MPDevice_linux::platformWrite(const QByteArray &ba)
-{
-    struct libusb_transfer *trf = libusb_alloc_transfer(1);
-
-    //Our qobject wrapper to maintain data and pass over threads
-    USBTransfer *transfer = new USBTransfer(devicefd, 0, this);
-
-    //Send data
-    libusb_fill_interrupt_transfer(trf,
-                                   devicefd,
-                                   LIBUSB_ENDPOINT_OUT | 2,
-                                   (unsigned char *)ba.data(),
-                                   ba.size(),
-                                   _usbSendCallback,
-                                   transfer,
-                                   50);
-
-    int err = libusb_submit_transfer(trf);
-    if (err)
-        qWarning() << "Error sending data: " << libusb_strerror((enum libusb_error)err);
-}
-
-void MPDevice_linux::usbSendCb(libusb_transfer *trf)
-{
-//    qDebug() << "Send callback main thread";
-
-    USBTransfer *transfer = reinterpret_cast<USBTransfer *>(trf->user_data);
+    USBTransfer *t = static_cast<USBTransfer *>(trf->user_data);
+    MPDevice_linux *device = static_cast<MPDevice_linux *>(t->device);
 
     bool error = false;
     if (trf->status != LIBUSB_TRANSFER_COMPLETED)
@@ -117,56 +99,46 @@ void MPDevice_linux::usbSendCb(libusb_transfer *trf)
     }
 
     libusb_free_transfer(trf);
-    delete transfer;
+    delete t;
 
     if (error)
-        emit platformFailed();
+        emit device->platformFailed();
+}
+
+//Start a send request, _usbSendCallback will be called after completion
+void MPDevice_linux::platformWrite(const QByteArray &ba)
+{
+    //Our qobject wrapper to maintain data and pass over threads
+    USBTransfer *transfer = new USBTransfer(devicefd, 0, this);
+    QMetaObject::invokeMethod(worker, "write",
+                              Qt::QueuedConnection,
+                              Q_ARG(USBTransfer *, transfer),
+                              Q_ARG(const QByteArray &, ba));
 }
 
 //Called when a receive transfer has completed
 void _usbReceiveCallback(struct libusb_transfer *trf)
 {
-    // /!\ every libusb callbacks are running on the libusb thread!
-    USBTransfer *t = reinterpret_cast<USBTransfer *>(trf->user_data);
-    QMetaObject::invokeMethod(t->device, "usbReceiveCb",
-                              Qt::QueuedConnection,
-                              Q_ARG(struct libusb_transfer *, trf));
+    USBTransfer *t = static_cast<USBTransfer *>(trf->user_data);
+    MPDevice_linux *device = static_cast<MPDevice_linux *>(t->device);
+
+    if (trf->status == LIBUSB_TRANSFER_COMPLETED)
+        emit device->platformDataRead(t->recvData);
+    else
+        emit device->platformFailed();
+
+    delete t;
+    libusb_free_transfer(trf);
+    QMetaObject::invokeMethod(device, "platformRead", Qt::QueuedConnection);
 }
 
 void MPDevice_linux::platformRead()
 {
     //Our qobject wrapper to maintain data and pass over threads
     USBTransfer *transfer = new USBTransfer(devicefd, 0, this);
-
-    struct libusb_transfer *trf = libusb_alloc_transfer(1);
-
-    //Receive data
-    libusb_fill_interrupt_transfer(trf,
-                                   devicefd,
-                                   LIBUSB_ENDPOINT_IN | 1,
-                                   (unsigned char *)transfer->recvData.data(),
-                                   transfer->recvData.size(),
-                                   _usbReceiveCallback,
-                                   transfer,
-                                   50); //small timeout
-
-    int err = libusb_submit_transfer(trf);
-    if (err)
-        qWarning() << "Error receiving data: " << libusb_strerror((enum libusb_error)err);
-}
-
-void MPDevice_linux::usbReceiveCb(libusb_transfer *trf)
-{
-    USBTransfer *transfer = reinterpret_cast<USBTransfer *>(trf->user_data);
-
-    if (trf->status == LIBUSB_TRANSFER_COMPLETED)
-        emit platformDataRead(transfer->recvData);
-    else
-        emit platformFailed();
-
-    delete transfer;
-    libusb_free_transfer(trf);
-    platformRead();
+    QMetaObject::invokeMethod(worker, "read",
+                              Qt::QueuedConnection,
+                              Q_ARG(USBTransfer *, transfer));
 }
 
 QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
@@ -247,4 +219,80 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
     libusb_free_device_list(list, 1);
 
     return devlist;
+}
+
+TransferWorker::TransferWorker(libusb_context *usb_ctx)
+{
+    usb_context = usb_ctx;
+}
+
+void TransferWorker::loop()
+{
+    auto threadEventsDispatcher = QAbstractEventDispatcher::instance(QThread::currentThread());
+    int res = 0;
+    timeval t;
+    t.tv_sec = 0;
+    t.tv_usec = 10;
+    while (!QThread::currentThread()->isInterruptionRequested() && res >= 0)
+    {
+        if (libusb_try_lock_events(usb_context) == 0)
+        {
+            res = libusb_handle_events_locked(usb_context, &t);
+            if (res < 0)
+            {
+                /* There was an error. */
+                qDebug() << "TransferWorker::loop(): libusb reports error # %d\n" << res;
+
+                /* Break out of this loop only on fatal error.*/
+                if (res != LIBUSB_ERROR_BUSY &&
+                        res != LIBUSB_ERROR_TIMEOUT &&
+                        res != LIBUSB_ERROR_OVERFLOW &&
+                        res != LIBUSB_ERROR_INTERRUPTED)
+                {
+                    libusb_unlock_events(usb_context);
+                    break;
+                }
+            }
+            libusb_unlock_events(usb_context);
+        }
+    threadEventsDispatcher->processEvents(QEventLoop::AllEvents);
+    }
+}
+
+void TransferWorker::read(USBTransfer *transfer)
+{
+    struct libusb_transfer *trf = libusb_alloc_transfer(1);
+
+    //Receive data
+    libusb_fill_interrupt_transfer(trf,
+                                   transfer->fd,
+                                   LIBUSB_ENDPOINT_IN | 1,
+                                   (unsigned char *)transfer->recvData.data(),
+                                   transfer->recvData.size(),
+                                   _usbReceiveCallback,
+                                   transfer,
+                                   50); //small timeout
+
+    int err = libusb_submit_transfer(trf);
+    if (err)
+        qWarning() << "Error receiving data: " << libusb_strerror((enum libusb_error)err);
+}
+
+void TransferWorker::write(USBTransfer *transfer, const QByteArray &ba)
+{
+    struct libusb_transfer *trf = libusb_alloc_transfer(1);
+
+    //Send data
+    libusb_fill_interrupt_transfer(trf,
+                              transfer->fd,
+                              LIBUSB_ENDPOINT_OUT | 2,
+                              (unsigned char *)ba.data(),
+                              ba.size(),
+                              _usbSendCallback,
+                              transfer,
+                              50);
+
+    int err = libusb_submit_transfer(trf);
+    if (err)
+        qWarning() << "Error sending data: " << libusb_strerror((enum libusb_error)err);
 }

@@ -37,11 +37,11 @@ public:
     }
     ~UsbMonitor_linux();
 
+    libusb_context *getUsbContext() { return usb_ctx; }
+public slots:
     void start();
     void stop();
 
-    libusb_context *getUsbContext() { return usb_ctx; }
-public slots:
     void handleEvents();
     void createSocketMonitor(int fd);
     void releaseSocketMonitor(int fd);
