@@ -48,7 +48,6 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
     usb_ctx(platformDef.ctx),
     device(platformDef.dev)
 {
-
     qRegisterMetaType<USBTransfer *>("USBTransferPtr");
     worker = new TransferWorker(usb_ctx);
     worker->moveToThread(&workerThread);
@@ -120,8 +119,6 @@ void MPDevice_linux::platformWrite(const QByteArray &ba)
 //Called when a receive transfer has completed
 void _usbReceiveCallback(struct libusb_transfer *trf)
 {
-    //    qDebug() << "Receive callback";
-
     USBTransfer *t = static_cast<USBTransfer *>(trf->user_data);
     MPDevice_linux *device = static_cast<MPDevice_linux *>(t->device);
 
@@ -133,7 +130,6 @@ void _usbReceiveCallback(struct libusb_transfer *trf)
     delete t;
     libusb_free_transfer(trf);
     QMetaObject::invokeMethod(device, "platformRead", Qt::QueuedConnection);
-//    device->platformRead();
 }
 
 void MPDevice_linux::platformRead()
@@ -237,7 +233,8 @@ void TransferWorker::loop()
     timeval t;
     t.tv_sec = 0;
     t.tv_usec = 10;
-    while (!QThread::currentThread()->isInterruptionRequested() && res >= 0) {
+    while (!QThread::currentThread()->isInterruptionRequested() && res >= 0)
+    {
         if (libusb_try_lock_events(usb_context) == 0)
         {
             res = libusb_handle_events_locked(usb_context, &t);
@@ -250,7 +247,10 @@ void TransferWorker::loop()
                 if (res != LIBUSB_ERROR_BUSY &&
                         res != LIBUSB_ERROR_TIMEOUT &&
                         res != LIBUSB_ERROR_OVERFLOW &&
-                        res != LIBUSB_ERROR_INTERRUPTED) {
+                        res != LIBUSB_ERROR_INTERRUPTED)
+                {
+                    libusb_unlock_events(usb_context);
+                    break;
                 }
             }
             libusb_unlock_events(usb_context);
@@ -259,7 +259,8 @@ void TransferWorker::loop()
     }
 }
 
-void TransferWorker::read(USBTransfer *transfer) {
+void TransferWorker::read(USBTransfer *transfer)
+{
     struct libusb_transfer *trf = libusb_alloc_transfer(1);
 
     //Receive data

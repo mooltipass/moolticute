@@ -4,7 +4,6 @@ Encoding=UTF-8
 Name=Moolticute
 Comment=Start Moolticute daemon and App
 Exec=/usr/bin/moolticute
-Icon=/usr/share/icons/moolticute.png
+Icon=moolticute
 Terminal=false
 Categories=Utility
-
