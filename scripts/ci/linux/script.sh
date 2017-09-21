@@ -14,6 +14,7 @@ $DOCKER_EXEC "mkdir -p /app/build-linux || true && cd /app/build-linux && qmake 
 mkdir build
 pushd build
 
+#Cleaning env make travis failed in some case
 #unset `env | \
 #grep -vi '^EDITOR=\|^HOME=\|^LANG=\|MXE\|^PATH=' | \
 #grep -vi 'PKG_CONFIG\|PROXY\|^PS1=\|^TERM=\|^TRAVIS_OS_NAME=\|^UPLOAD_KEY=' | \
