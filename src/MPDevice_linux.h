@@ -39,16 +39,13 @@ inline bool operator!=(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { ret
 
 class USBTransfer;
 
-class TransferWorker : public QObject
+class TransferThread : public QThread
 {
     Q_OBJECT
+    void run() override;
 public:
-    TransferWorker(libusb_context *usb_ctx);
-public slots:
-    void loop();
-    void read(USBTransfer *transfer);
-    void write(USBTransfer *transfer, const QByteArray &ba);
-
+    TransferThread(libusb_context *usb_ctx);
+    QAtomicInt keepWoorking;
 private:
     libusb_context *usb_context;
 };
@@ -65,6 +62,7 @@ public:
     static QList<MPPlatformDef> enumerateDevices();
 
 public slots:
+
     virtual void platformRead();
     virtual void platformWrite(const QByteArray &data);
 
@@ -74,8 +72,7 @@ private:
     libusb_device *device;
     libusb_device_handle *devicefd;
 
-    TransferWorker* worker;
-    QThread workerThread;
+    TransferThread* worker;
 
     void usbSendData(unsigned char cmd, const QByteArray &data = QByteArray());
     void usbRequestReceive();
