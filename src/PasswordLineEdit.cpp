@@ -49,6 +49,7 @@
 
 PasswordLineEdit::PasswordLineEdit(QWidget* parent):
     QLineEdit(parent),
+    m_passwordProfilesModel(nullptr),
     m_passwordOptionsPopup(nullptr)
 
 {
