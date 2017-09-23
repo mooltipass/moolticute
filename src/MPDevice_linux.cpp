@@ -71,14 +71,14 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
 
 MPDevice_linux::~MPDevice_linux()
 {
-    worker->keepWoorking = false;
-    worker->quit();
-    worker->wait();
-
     libusb_release_interface(devicefd, 0);
     if (detached_kernel)
         libusb_attach_kernel_driver(devicefd, 0);
     libusb_close(devicefd);
+
+    worker->keepWoorking = false;
+    worker->quit();
+    worker->wait();
 }
 
 //Called when a send transfer has completed
@@ -116,7 +116,7 @@ void MPDevice_linux::platformWrite(const QByteArray &ba)
                               ba.size(),
                               _usbSendCallback,
                               transfer,
-                              50);
+                              50000);
 
     int err = libusb_submit_transfer(trf);
     if (err)
@@ -153,7 +153,7 @@ void MPDevice_linux::platformRead()
                                    transfer->recvData.size(),
                                    _usbReceiveCallback,
                                    transfer,
-                                   50); //small timeout
+                                   50000);
 
     int err = libusb_submit_transfer(trf);
     if (err)
@@ -162,6 +162,7 @@ void MPDevice_linux::platformRead()
 
 QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
 {
+    Q_ASSERT(QThread::currentThread() == qApp->thread());
     QList<MPPlatformDef> devlist;
 
     // discover devices
@@ -177,6 +178,9 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
         int res;
 
         res = libusb_get_device_descriptor(dev, &desc);
+        if (desc.idVendor != MOOLTIPASS_VENDORID || desc.idProduct != MOOLTIPASS_PRODUCTID)
+            continue;
+
         res = libusb_get_active_config_descriptor(dev, &conf_desc);
         if (res < 0)
             libusb_get_config_descriptor(dev, 0, &conf_desc);
@@ -241,20 +245,26 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
 }
 
 
-void TransferThread::run() {
+void TransferThread::run()
+{
     int res = 0;
     timeval t;
-    t.tv_sec = 0;
-    t.tv_usec = 100;
+    t.tv_sec = 2;
+    t.tv_usec = 0;
     while (keepWoorking && res >= 0)
     {
         if (libusb_try_lock_events(usb_context) == 0)
         {
+            if (!libusb_event_handling_ok(usb_context))
+            {
+                libusb_unlock_events(usb_context);
+                continue;
+            }
             res = libusb_handle_events_locked(usb_context, &t);
             if (res < 0)
             {
                 /* There was an error. */
-                qDebug() << "TransferWorker::loop(): libusb reports error # %d\n" << res;
+                qWarning() << "TransferWorker::loop(): libusb reports error # %d\n" << res;
 
                 /* Break out of this loop only on fatal error.*/
                 if (res != LIBUSB_ERROR_BUSY &&
