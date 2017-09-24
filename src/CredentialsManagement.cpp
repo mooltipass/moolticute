@@ -132,6 +132,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
 void CredentialsManagement::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
 {
     ui->addCredPasswordInput->setPasswordProfilesModel(passwordProfilesModel);
+    ui->credDisplayPasswordInput->setPasswordProfilesModel(passwordProfilesModel);
 }
 
 void CredentialsManagement::enableCredentialsManagement(bool enable)
