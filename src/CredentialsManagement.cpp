@@ -40,17 +40,15 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     ui->pushButtonEnterMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->addCredentialButton->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->buttonDiscard->setDefaultText(tr("Discard all changes"));
-    ui->buttonDiscard->setPressAndHoldText(tr("Hold to discard all changes"));
+    ui->buttonDiscard->setText(tr("Discard all changes"));
     connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_buttonDiscard_clicked);
 
     ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
 
-    ui->pushButtonCancel->setDefaultText(tr("Discard changes"));
+    ui->pushButtonCancel->setText(tr("Discard changes"));
     ui->pushButtonCancel->setFixedWidth(108);
-    ui->pushButtonCancel->setPressAndHoldText(tr("Hold to discard"));
     connect(ui->pushButtonCancel, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_pushButtonCancel_clicked);
 
     ui->pushButtonDelete->setStyleSheet(CSS_BLUE_BUTTON);

@@ -84,8 +84,7 @@ FilesManagement::FilesManagement(QWidget *parent) :
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->addFileButton->setStyleSheet(CSS_BLUE_BUTTON);
 
-    ui->buttonDiscard->setDefaultText(tr("Discard deletions"));
-    ui->buttonDiscard->setPressAndHoldText(tr("Hold to proceed"));
+    ui->buttonDiscard->setText(tr("Discard deletions"));
     connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &FilesManagement::on_buttonDiscard_clicked);
 
     ui->buttonQuitMMM->setStyleSheet(CSS_BLUE_BUTTON);
