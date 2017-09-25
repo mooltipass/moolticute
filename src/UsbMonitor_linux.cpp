@@ -67,13 +67,17 @@ int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug
 void libusb_fd_add_cb(int fd, short, void *user_data)
 {
     UsbMonitor_linux * um = reinterpret_cast<UsbMonitor_linux *>(user_data);
-    um->createSocketMonitor(fd);
+    QMetaObject::invokeMethod(um, "createSocketMonitor",
+                              Qt::QueuedConnection,
+                              Q_ARG(int , fd));
 }
 
 void libusb_fd_del_cb(int fd, void *user_data)
 {
      UsbMonitor_linux * um = reinterpret_cast<UsbMonitor_linux *>(user_data);
-     um->releaseSocketMonitor(fd);
+     QMetaObject::invokeMethod(um, "releaseSocketMonitor",
+                               Qt::QueuedConnection,
+                               Q_ARG(int , fd));
 }
 
 UsbMonitor_linux::UsbMonitor_linux()
@@ -107,7 +111,7 @@ void UsbMonitor_linux::handleEvents()
     {
         timeval timeout;
         timeout.tv_sec = 0;
-        timeout.tv_usec = 10;
+        timeout.tv_usec = 0;
         libusb_handle_events_locked(usb_ctx, &timeout);
         libusb_unlock_events(usb_ctx);
     }
@@ -167,7 +171,7 @@ void UsbMonitor_linux::createSocketMonitor(int fd)
     if (!m_fdMonitors.contains(fd))
     {
         QSocketNotifier* sn = new QSocketNotifier(fd, QSocketNotifier::Read);
-        connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents, Qt::QueuedConnection);
+        connect(sn, &QSocketNotifier::activated, this, &UsbMonitor_linux::handleEvents);
         m_fdMonitors[fd] = sn;
     }
 }
@@ -177,9 +181,8 @@ void UsbMonitor_linux::releaseSocketMonitor(int fd)
     if (m_fdMonitors.contains(fd))
     {
         QSocketNotifier* sn = m_fdMonitors[fd];
+        m_fdMonitors.remove(fd);
         sn->disconnect();
         sn->deleteLater();
-
-        m_fdMonitors.remove(fd);
     }
 }
