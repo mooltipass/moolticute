@@ -16,6 +16,5 @@ RUN git clone https://github.com/whiteinge/ok.sh.git /usr/lib/ok.sh && chmod +x 
 
 ADD config/.netrc /root
 ADD entrypoint.sh /
-ADD tools.sh /usr/local/bin
 
 ENTRYPOINT ["/entrypoint.sh"]

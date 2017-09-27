@@ -5,17 +5,18 @@
 // Application
 #include "TreeItem.h"
 
-TreeItem::TreeItem(const QString &sName,
-    const QDate &dCreatedDate, const QDate &dUpdatedDate, const QString &sDescription) :
-    m_pParentItem(nullptr), m_eStatus(UNUSED),
-    m_sName(sName), m_dCreatedDate(dCreatedDate), m_dUpdatedDate(dUpdatedDate),
+TreeItem::TreeItem(const QString &sName, const QDate &dCreatedDate, const QDate &dUpdatedDate, const QString &sDescription) :
+    m_pParentItem(nullptr),
+    m_eStatus(UNUSED),
+    m_sName(sName),
+    m_dCreatedDate(dCreatedDate),
+    m_dUpdatedDate(dUpdatedDate),
     m_sDescription(sDescription)
 {
 }
 
 TreeItem::~TreeItem()
 {
-    qDebug() << "DESTROYING " << this;
     qDeleteAll(m_vChilds);
 }
 

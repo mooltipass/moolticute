@@ -46,3 +46,10 @@ void WindowLog::on_pushButtonClear_clicked()
 {
     ui->plainTextEdit->clear();
 }
+
+void WindowLog::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+        ui->retranslateUi(this);
+    QMainWindow::changeEvent(event);
+}

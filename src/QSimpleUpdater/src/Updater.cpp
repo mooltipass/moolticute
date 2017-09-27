@@ -27,6 +27,7 @@
  * Fix the problem yourself. A non-dick would submit the fix back.
  */
 
+#include <QDebug>
 #include <QJsonValue>
 #include <QJsonObject>
 #include <QMessageBox>
@@ -221,6 +222,7 @@ bool Updater::useCustomInstallProcedures() const
  */
 void Updater::checkForUpdates()
 {
+    qInfo() << "Checking software updates from " << url();
     m_manager->get (QNetworkRequest (url()));
 }
 
@@ -333,6 +335,7 @@ void Updater::onReply (QNetworkReply* reply)
     /* There was a network error */
     if (reply->error() != QNetworkReply::NoError)
     {
+        qWarning() << "Network error when checking for update: " << reply->errorString();
         setUpdateAvailable(false);
         emit checkingFinished (url());
         return;
@@ -346,11 +349,13 @@ void Updater::onReply (QNetworkReply* reply)
     }
 
     /* Try to create a JSON document from downloaded data */
-    QJsonDocument document = QJsonDocument::fromJson (reply->readAll());
+    QJsonParseError jerr;
+    QJsonDocument document = QJsonDocument::fromJson (reply->readAll(), &jerr);
 
     /* JSON is invalid */
     if (document.isNull())
     {
+        qWarning() << "Invalid JSON when checking for update: " << jerr.errorString();
         setUpdateAvailable(false);
         emit checkingFinished (url());
         return;
@@ -367,7 +372,7 @@ void Updater::onReply (QNetworkReply* reply)
     m_latestVersion = platform.value ("latest-version").toString();
 
     /* Compare latest and current version */
-    setUpdateAvailable (compare (latestVersion(), moduleVersion()));
+    setUpdateAvailable (latestVersion() != moduleVersion());
     emit checkingFinished (url());
 }
 

@@ -279,37 +279,70 @@ void MPDevice::runAndDequeueJobs()
 
 void MPDevice::updateFilesCache()
 {
-    getStoredFiles([=](bool success, QStringList fileNames)
+    getStoredFiles([=](bool success, QList<QVariantMap> files)
     {
-        QList<QPair<int, QString>> list;
-        for (auto fileName: fileNames)
-            list.append(QPair<int, QString>(0, fileName));
-
         if (success)
         {
-            filesCache.save(list);
+            filesCache.save(files);
             emit filesCacheChanged();
         }
     });
 }
 
-void MPDevice::addFileToCache(QString fileName)
+void MPDevice::addFileToCache(QString fileName, int size)
 {
+    QVariantMap item;
+    item.insert("name", fileName);
+    item.insert("size", size);
+
     // Add file name at proper position
     auto cache = filesCache.load();
     for (qint32 i = 0; i < cache.length(); i++)
     {
-        if (cache[i].second.compare(fileName) > 0)
+        if (cache[i].value("name").toString().compare(fileName) == 0)
         {
-            cache.insert(i, QPair<int,QString>(0, fileName));
+            // the file is already in cache, this is just and update
+            return;
+        }
+
+
+        if (cache[i].value("name").toString().compare(fileName) > 0)
+        {
+            cache.insert(i, item);
             filesCache.save(cache);
             emit filesCacheChanged();
             return;
         }
     }
-    cache.append(QPair<int,QString>(0, fileName));
+
+    cache.append(item);
     filesCache.save(cache);
     emit filesCacheChanged();
+}
+
+void MPDevice::updateFileInCache(QString fileName, int size)
+{
+    auto cache = filesCache.load();
+    bool updated = false;
+    for (int i = 0; i < cache.length() && !updated; i ++)
+    {
+        auto item = cache.at(i);
+        if (item.value("name").toString().compare(fileName) == 0)
+        {
+            int revision = item.value("revision").toInt();
+            item.insert("revision", revision  + 1);
+            item.insert("size", size);
+
+            cache.replace(i, item);
+            updated = true;
+        }
+    }
+
+    if (updated)
+    {
+        filesCache.save(cache);
+        emit filesCacheChanged();
+    }
 }
 
 void MPDevice::removeFileFromCache(QString fileName)
@@ -317,7 +350,7 @@ void MPDevice::removeFileFromCache(QString fileName)
     auto cache = filesCache.load();
     int i = 0;
     for (; i < cache.length(); i++)
-        if (cache.at(i).second.compare(fileName) == 0)
+        if (cache.at(i).value("name").toString().compare(fileName) == 0)
             break;
 
     if (i < cache.length())
@@ -804,7 +837,9 @@ void MPDevice::updateLockUnlockMode(int val)
     updateParam(MPParams::LOCK_UNLOCK_FEATURE_PARAM, val);
 }
 
-void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::function<void(int total, int current)> cbProgress, bool getCreds, bool getData, bool getDataChilds)
+void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
+                                    MPDeviceProgressCb cbProgress,bool getCreds,
+                                    bool getData, bool getDataChilds)
 {
     /* For when the MMM is left */
     cleanMMMVars();
@@ -826,18 +861,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
             ctrValueClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
             qDebug() << "CTR value:" << ctrValue.toHex();
 
-            if (getCreds && getData)
-            {
-                progressTotal = 200 + MOOLTIPASS_FAV_MAX;
-            }
-            else
-            {
-                progressTotal = 100 + MOOLTIPASS_FAV_MAX;
-            }
+            progressTotal = 100 + MOOLTIPASS_FAV_MAX;
             progressCurrent = 0;
-            progressCurrentLogin = 0;
-            progressCurrentData = 0;
-            cbProgress(progressTotal, progressCurrent);
             return true;
         }
     }));
@@ -889,6 +914,12 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
             if (i == 0)
             {
                 qInfo() << "Loading favorites...";
+                QVariantMap data = {
+                    {"total", progressTotal},
+                    {"current", progressCurrent},
+                    {"msg", "Loading Favorites..."}
+                };
+                cbProgress(data);
             }
             return true;
         },
@@ -909,7 +940,13 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
                 favoritesAddrsClone.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
 
                 progressCurrent++;
-                cbProgress(progressTotal, progressCurrent);
+                QVariantMap data = {
+                    {"total", progressTotal},
+                    {"current", progressCurrent},
+                    {"msg", "Favorite %1 loaded"},
+                    {"msg_args", QVariantList({i})}
+                };
+                cbProgress(data);
 
                 return true;
             }
@@ -1008,7 +1045,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, std::functio
 }
 
 void MPDevice::startMemMgmtMode(bool wantData,
-                                std::function<void(int total, int current)> cbProgress,
+                                MPDeviceProgressCb cbProgress,
                                 std::function<void(bool success, int errCode, QString errMsg)> cb)
 {
     /* Start MMM here, and load all memory data from the device */
@@ -1144,7 +1181,7 @@ QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
     return return_data;
 }
 
-void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, std::function<void(int total, int current)> cbProgress)
+void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
 {
     /* Because of recursive calls, make sure we haven't reached the end of the memory */
     if (getFlashPageFromAddress(address) == getNumberOfPages())
@@ -1157,17 +1194,21 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     if (getFlashPageFromAddress(address) != lastFlashPageScanned)
     {
         lastFlashPageScanned = getFlashPageFromAddress(address);
-        cbProgress(getNumberOfPages(), lastFlashPageScanned);
+        QVariantMap data = {
+            {"total", getNumberOfPages()},
+            {"current", lastFlashPageScanned},
+            {"msg", "Scanning Mooltipass Memory (Read Speed: %1B/s)"},
+            {"msg_args", QVariantList({diagLastNbBytesPSec})}
+        };
+        cbProgress(data);
     }
-
-    //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address);
-    Q_UNUSED(cbProgress);
 
     /* For performance diagnostics */
     if (diagLastSecs != QDateTime::currentMSecsSinceEpoch()/1000)
     {
         qInfo() << "Current transfer speed:" << diagNbBytesRec << "B/s";
         diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
+        diagLastNbBytesPSec = diagNbBytesRec;
         diagNbBytesRec = 0;
     }
 
@@ -1262,7 +1303,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
-void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, std::function<void(int total, int current)> cbProgress)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
 {    
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
@@ -1305,13 +1346,20 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, std::fu
                         currentFirstCharVal = 'z';
                     if (currentFirstCharVal < 'a')
                         currentFirstCharVal = 'a';
-                    progressCurrentLogin = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
-                    progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
-                    cbProgress(progressTotal, progressCurrent);
+                    progressCurrent = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
+                    progressCurrent += MOOLTIPASS_FAV_MAX;
                 }
 
                 //Node is loaded
                 qDebug() << address.toHex() << ": parent node loaded:" << pnode->getService();
+
+                QVariantMap data = {
+                    {"total", progressTotal},
+                    {"current", progressCurrent},
+                    {"msg", "Loading credentials for %1" },
+                    {"msg_args", QVariantList({pnode->getService()})}
+                };
+                cbProgress(data);
 
                 if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
                 {
@@ -1387,7 +1435,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     }));
 }
 
-void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, std::function<void(int total, int current)> cbProgress)
+void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, MPDeviceProgressCb cbProgress)
 {
     MPNode *pnode = new MPNode(this, address);
     dataNodes.append(pnode);
@@ -1418,18 +1466,13 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
         }
         else
         {
-            QString srv = pnode->getService();
-            if (srv.size() > 0)
-            {
-                double currentFirstCharVal = srv.at(0).toLower().toLatin1();
-                if (currentFirstCharVal > 'z')
-                    currentFirstCharVal = 'z';
-                if (currentFirstCharVal < 'a')
-                    currentFirstCharVal = 'a';
-                progressCurrentData = ((double)(currentFirstCharVal - 'a') / (double)('z' - 'a')) * 100;
-                progressCurrent = progressCurrentData + progressCurrentLogin + MOOLTIPASS_FAV_MAX;
-                cbProgress(progressTotal, progressCurrent);
-            }
+            QVariantMap data = {
+                {"total", -1},
+                {"current", 0},
+                {"msg", "Loading data for %1" },
+                {"msg_args", QVariantList({pnode->getService()})}
+            };
+            cbProgress(data);
 
             //Node is loaded
             qDebug() << "Parent data node loaded: " << pnode->getService();
@@ -1438,7 +1481,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             if (pnode->getStartChildAddress() != MPNode::EmptyAddress && load_childs)
             {
                 qDebug() << "Loading data child nodes...";
-                loadDataChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress());
+                loadDataChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress(), cbProgress, 0);
             }
             else
             {
@@ -1453,25 +1496,13 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             {
                 loadDataNode(jobs, pnode->getNextParentAddress(), load_childs, cbProgress);
             }
-            else
-            {
-                // No next parent, fill our file cache
-                QList<QPair<int, QString>> list;
-                for (auto &i: dataNodes)
-                {
-                    list.append(QPair<int, QString>(0, i->getService()));
-                }
-                filesCache.save(list);
-                filesCache.setDbChangeNumber(get_dataDbChangeNumber());
-                emit filesCacheChanged();
-            }
         }
 
         return true;
     }));
 }
 
-void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address)
+void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, MPDeviceProgressCb cbProgress, quint32 nbBytesFetched)
 {
     MPNode *cnode = new MPNode(this, address);
     parent->appendChildData(cnode);
@@ -1507,10 +1538,41 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
             //Node is loaded
             qDebug() << "Child data node loaded";
 
+            QVariantMap data = {
+                {"total", -1},
+                {"current", 0},
+                {"msg", "Loading data for %1: %2 encrypted bytes read" },
+                {"msg_args", QVariantList({parent->getService(), nbBytesFetched + MP_NODE_DATA_ENC_SIZE})}
+            };
+            cbProgress(data);
+
             //Load next child
             if (cnode->getNextChildDataAddress() != MPNode::EmptyAddress)
             {
-                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress());
+                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress(), cbProgress, nbBytesFetched + MP_NODE_DATA_ENC_SIZE);
+            }
+            else
+            {
+                parent->setEncDataSize(nbBytesFetched + MP_NODE_DATA_ENC_SIZE);
+                parentClone->setEncDataSize(nbBytesFetched + MP_NODE_DATA_ENC_SIZE);
+
+                /* and if our parent doesn't have next one... */
+                if (parent->getNextParentAddress() == MPNode::EmptyAddress)
+                {
+                    // No next parent, fill our file cache
+                    QList<QVariantMap> list;
+                    for (auto &i: dataNodes)
+                    {
+                        QVariantMap item;
+                        item.insert("revision", 0);
+                        item.insert("name", i->getService());
+                        item.insert("size", i->getEncDataSize());
+                        list.append(item);
+                    }
+                    filesCache.save(list);
+                    filesCache.setDbChangeNumber(get_dataDbChangeNumber());
+                    emit filesCacheChanged();
+                }
             }
         }
 
@@ -3088,7 +3150,7 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     return return_bool;
 }
 
-void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& address, const QByteArray& data)
+void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& address, const QByteArray& data, std::function<void(void)> writeCallback)
 {
     for (quint32 i = 0; i < 3; i++)
     {
@@ -3103,16 +3165,42 @@ void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& addres
         packetToSend.append(i);
         packetToSend.append(data.mid(i*59, payload_size-3));
         //qDebug() << "Write node packet #" << i << " : " << packetToSend.toHex();
-        jobs->append(new MPCommandJob(this, MPCmd::WRITE_FLASH_NODE, packetToSend, MPCommandJob::defaultCheckRet));
+        jobs->append(new MPCommandJob(this, MPCmd::WRITE_FLASH_NODE, packetToSend, [=](const QByteArray &data, bool &) -> bool
+        {
+            if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+            {
+                qCritical() << "Couldn't Write In Flash";
+                return false;
+            }
+            else
+            {
+                writeCallback();
+                return true;
+            }
+        }));
     }
 }
 
 /* Return true if packets need to be sent */
-bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData)
+bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, MPDeviceProgressCb cbProgress)
 {
     qInfo() << "Generating Save Packets...";
     bool diagSavePacketsGenerated = false;
     MPNode* temp_node_pointer;
+    progressCurrent = 0;
+    progressTotal = 0;
+
+    auto dataWriteProgressCb = [=](void)
+    {
+        QVariantMap data = {
+            {"total", progressTotal},
+            {"current", progressCurrent},
+            {"msg", "Writing Data To Device: %1/%2 Packets Sent" },
+            {"msg_args", QVariantList({progressCurrent, progressTotal})}
+        };
+        cbProgress(data);
+        progressCurrent++;
+    };
 
     /* Change numbers */
     if (isFw12())
@@ -3142,16 +3230,18 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             {
                 qDebug() << "Generating save packet for new service" << nodelist_iterator->getService();
                 //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
             else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
             {
                 qDebug() << "Generating save packet for updated service" << nodelist_iterator->getService();
                 //qDebug() << "Prev contents: " << temp_node_pointer->getNodeData().toHex();
                 //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(),dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
         }
         for (auto &nodelist_iterator: loginChildNodes)
@@ -3163,14 +3253,16 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             {
                 qDebug() << "Generating save packet for new login" << nodelist_iterator->getLogin();
                 //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
             else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
             {
                 qDebug() << "Generating save packet for updated login" << nodelist_iterator->getLogin();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
             else
             {
@@ -3189,14 +3281,16 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating save packet for new data service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
             else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
             {
                 qDebug() << "Generating save packet for updated data service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
         }
         for (auto &nodelist_iterator: dataChildNodes)
@@ -3207,16 +3301,18 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating save packet for new data child node";
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
             else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
             {
                 qDebug() << "Generating save packet for updated data child node";
                 qDebug() << "Prev contents: " << temp_node_pointer->getNodeData().toHex();
                 qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData());
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
         }
     }
@@ -3232,8 +3328,9 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF));
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
         }
         for (auto &nodelist_iterator: loginChildNodesClone)
@@ -3244,8 +3341,9 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF));
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
         }
 
@@ -3281,8 +3379,9 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted data service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF));
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
         }
         for (auto &nodelist_iterator: dataChildNodesClone)
@@ -3293,8 +3392,9 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted data child node";
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF));
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
+                progressTotal += 3;
             }
         }
 
@@ -3731,7 +3831,7 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
 }
 
 void MPDevice::delCredentialAndLeave(const QString &service, const QString &login,
-                                     std::function<void(int total, int current)> cbProgress,
+                                     MPDeviceProgressCb cbProgress,
                                      std::function<void(bool success, QString errstr)> cb)
 {
     auto deleteCred = [=]()
@@ -3770,7 +3870,7 @@ void MPDevice::delCredentialAndLeave(const QString &service, const QString &logi
             cb(false, "Credential was not found in database");
         }
         else
-            setMMCredentials(allCreds, [=](bool success, QString errstr)
+            setMMCredentials(allCreds, cbProgress, [=](bool success, QString errstr)
             {
                 exitMemMgmtMode(); //just in case
                 cb(success, errstr);
@@ -3991,7 +4091,7 @@ void MPDevice::setCredential(const QString &service, const QString &login,
 }
 
 bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
-                             std::function<void(int total, int current)> cbProgress,
+                             MPDeviceProgressCb cbProgress,
                              const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
@@ -4022,12 +4122,24 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
             ba.append(data.mid(MP_PAYLOAD_FIELD_INDEX, (int)data.at(0)));
             quint32 sz = qFromBigEndian<quint32>((quint8 *)ba.data());
             m["progress_total"] = sz;
-            cbProgress((int)sz, ba.size() - 4);
+            // TODO: send a more significative message
+            QVariantMap data = {
+                {"total", (int)sz},
+                {"current", ba.size() - 4},
+                {"msg", "WORKING on getDataNodeCb" }
+            };
+            cbProgress(data);
         }
         else
         {
             ba.append(data.mid(MP_PAYLOAD_FIELD_INDEX, (int)data.at(0)));
-            cbProgress(m["progress_total"].toInt(), ba.size() - 4);
+            // TODO: send a more significative message
+            QVariantMap data = {
+                {"total", m["progress_total"].toInt()},
+                {"current", ba.size() - 4},
+                {"msg", "WORKING on getDataNodeCb" }
+            };
+            cbProgress(data);
         }
 
         m["data"] = ba;
@@ -4043,7 +4155,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
 
 void MPDevice::getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
                            std::function<void(bool success, QString errstr, QString serv, QByteArray rawData)> cb,
-                           std::function<void(int total, int current)> cbProgress)
+                           MPDeviceProgressCb cbProgress)
 {
     if (service.isEmpty())
     {
@@ -4138,7 +4250,7 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
 }
 
 bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
-                             std::function<void(int total, int current)> cbProgress,
+                             MPDeviceProgressCb cbProgress,
                              const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
@@ -4163,7 +4275,13 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
     packet.append(currentDataNode.mid(current, MOOLTIPASS_BLOCK_SIZE));
     packet.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
-    cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, current + MOOLTIPASS_BLOCK_SIZE);
+    // TODO: Send more significative message
+    QVariantMap cbData = {
+        {"total", currentDataNode.size() - MP_DATA_HEADER_SIZE},
+        {"current", current + MOOLTIPASS_BLOCK_SIZE},
+        {"msg", "WORKING on setDataNodeCb"}
+    };
+    cbProgress(cbData);
 
     //send 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
@@ -4177,7 +4295,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 
 void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
                            std::function<void(bool success, QString errstr)> cb,
-                           std::function<void(int total, int current)> cbProgress)
+                           MPDeviceProgressCb cbProgress)
 {
     if (service.isEmpty())
     {
@@ -4240,7 +4358,8 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
         cb(true, QString());
 
         // update file cache
-        addFileToCache(service);
+        // FIXME: Set the real file size
+        addFileToCache(service, 0);
 
         // request change numbers in case they changed
         if (isFw12())
@@ -4261,7 +4380,7 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
 
 void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
                                         std::function<void(bool success, QString errstr)> cb,
-                                        std::function<void(int total, int current)> cbProgress)
+                                        MPDeviceProgressCb cbProgress)
 {
     // TODO for the future:
     // When scanning the parent nodes, store their file sizes
@@ -4340,7 +4459,7 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
             cb(false, "Couldn't Save File Database: Device Unplugged?");
             return;
         });
-        if (generateSavePackets(saveJobs, false, true))
+        if (generateSavePackets(saveJobs, false, true, cbProgress))
         {            
             /* Increment db change number */
             if (services.size() > 0)
@@ -4436,40 +4555,41 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     MPNode* temp_cnode;
     MPNode* temp_node;
 
+    auto ignoreProgressCb = [](QVariantMap){ };
     qInfo() << "testCodeAgainstCleanDBChanges called, performing tests on our correction algo...";
     qInfo() << "Starting with parent nodes changes...";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping one parent node link in chain...";
     loginNodes[1]->setNextParentAddress(loginNodes[3]->getAddress());
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Skipping one parent node link in chain: test failed!";return false;} else qInfo() << "Skipping one parent node link in chain: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping one parent node link in chain: test failed!";return false;} else qInfo() << "Skipping one parent node link in chain: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping first parent node";
     startNode = loginNodes[1]->getAddress();
     loginNodes[1]->setPreviousParentAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Skipping first parent node: test failed!";return false;} else qInfo() << "Skipping first parent node: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping first parent node: test failed!";return false;} else qInfo() << "Skipping first parent node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping last parent node";
     loginNodes[loginNodes.size()-2]->setNextParentAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Skipping last parent node: test failed!";return false;} else qInfo() << "Skipping last parent node: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping last parent node: test failed!";return false;} else qInfo() << "Skipping last parent node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Setting invalid startNode";
     startNode = invalidAddress;
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Setting invalid startNode: test failed!";return false;} else qInfo() << "Setting invalid startNode: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Setting invalid startNode: test failed!";return false;} else qInfo() << "Setting invalid startNode: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Setting parent node loop";
     loginNodes[5]->setPreviousParentAddress(loginNodes[2]->getAddress());
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Setting parent node loop: test failed!";return false;} else qInfo() << "Setting parent node loop: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Setting parent node loop: test failed!";return false;} else qInfo() << "Setting parent node loop: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Breaking linked list";
     loginNodes[5]->setPreviousParentAddress(invalidAddress);
     loginNodes[5]->setNextParentAddress(invalidAddress);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Breaking parent linked list: test failed!";return false;} else qInfo() << "Breaking parent linked list: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Breaking parent linked list: test failed!";return false;} else qInfo() << "Breaking parent linked list: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Changing valid address for virtual address";
     freeAddresses.append(QByteArray());
@@ -4479,7 +4599,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     loginNodes[2]->setPreviousParentAddress(QByteArray(), 1);
     changeVirtualAddressesToFreeAddresses();
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Changing valid address for virtual address: test failed!";return false;} else qInfo() << "Changing valid address for virtual address: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Changing valid address for virtual address: test failed!";return false;} else qInfo() << "Changing valid address for virtual address: passed!";
 
     qInfo() << "Parent node corruption tests passed...";
     qInfo() << "Starting data parent nodes changes...";
@@ -4487,34 +4607,34 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping one data parent node link in chain...";
     dataNodes[1]->setNextParentAddress(dataNodes[3]->getAddress());
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Skipping one data parent node link in chain: test failed!";return false;} else qInfo() << "Skipping one data parent node link in chain: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping one data parent node link in chain: test failed!";return false;} else qInfo() << "Skipping one data parent node link in chain: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping first data parent node";
     startDataNode = dataNodes[1]->getAddress();
     dataNodes[1]->setPreviousParentAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Skipping first data parent node: test failed!";return false;} else qInfo() << "Skipping first data parent node: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping first data parent node: test failed!";return false;} else qInfo() << "Skipping first data parent node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping last data parent node";
     dataNodes[dataNodes.size()-2]->setNextParentAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Skipping last data parent node: test failed!";return false;} else qInfo() << "Skipping last data parent node: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping last data parent node: test failed!";return false;} else qInfo() << "Skipping last data parent node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Setting invalid startNode";
     startDataNode = invalidAddress;
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Setting invalid data startNode: test failed!";return false;} else qInfo() << "Setting invalid data startNode: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Setting invalid data startNode: test failed!";return false;} else qInfo() << "Setting invalid data startNode: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Setting data parent node loop";
     dataNodes[5]->setPreviousParentAddress(dataNodes[2]->getAddress());
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Setting data parent node loop: test failed!";return false;} else qInfo() << "Setting data parent node loop: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Setting data parent node loop: test failed!";return false;} else qInfo() << "Setting data parent node loop: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Breaking data parent linked list";
     dataNodes[5]->setPreviousParentAddress(invalidAddress);
     dataNodes[5]->setNextParentAddress(invalidAddress);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Breaking data parent linked list: test failed!";return false;} else qInfo() << "Breaking data parent linked list: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Breaking data parent linked list: test failed!";return false;} else qInfo() << "Breaking data parent linked list: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Changing valid address for virtual address";
     freeAddresses.clear();
@@ -4525,14 +4645,14 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     dataNodes[2]->setPreviousParentAddress(QByteArray(), 1);
     changeVirtualAddressesToFreeAddresses();
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Changing valid address for virtual address: test failed!";return false;} else qInfo() << "Changing valid address for virtual address: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Changing valid address for virtual address: test failed!";return false;} else qInfo() << "Changing valid address for virtual address: passed!";
 
     qInfo() << "Starting child node corruption tests";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Creating orphan nodes";
     loginNodes[0]->setStartChildAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Creating orphan nodes: test failed!";return false;} else qInfo() << "Creating orphan nodes: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Creating orphan nodes: test failed!";return false;} else qInfo() << "Creating orphan nodes: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting first child node and adding it again";
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
@@ -4541,7 +4661,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Removing & Adding First Child Node: test failed!";return false;} else qInfo() << "Removing & Adding First Child Node: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Removing & Adding First Child Node: test failed!";return false;} else qInfo() << "Removing & Adding First Child Node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting middle child node and adding it again";
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
@@ -4551,7 +4671,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Removing & Adding Middle Child Node: test failed!";return false;} else qInfo() << "Removing & Adding Middle Child Node: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Removing & Adding Middle Child Node: test failed!";return false;} else qInfo() << "Removing & Adding Middle Child Node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting last child node and adding it again";
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
@@ -4562,7 +4682,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Removing & Adding Last Child Node: test failed!";return false;} else qInfo() << "Removing & Adding Last Child Node: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Removing & Adding Last Child Node: test failed!";return false;} else qInfo() << "Removing & Adding Last Child Node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting parent node with single child node and adding it again";
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[1]->getStartChildAddress(), loginNodes[1]->getStartChildVirtualAddress());
@@ -4575,7 +4695,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     loginChildNodes.append(temp_cnode);
     addChildToDB(temp_node, temp_cnode);
     checkLoadedNodes(true, true, true);
-    if (generateSavePackets(jobs, true, true)) {qCritical() << "Removing & Adding Single Child Node: test failed!";return false;} else qInfo() << "Removing & Adding Single Child Node: passed!";
+    if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Removing & Adding Single Child Node: test failed!";return false;} else qInfo() << "Removing & Adding Single Child Node: passed!";
 
     qInfo() << "All tests were successfully run!";
     return true;
@@ -4956,7 +5076,7 @@ void MPDevice::cleanMMMVars(void)
     freeAddresses.clear();
 }
 
-void MPDevice::startImportFileMerging(std::function<void(bool success, QString errstr)> cb, bool noDelete)
+void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::function<void(bool success, QString errstr)> cb, bool noDelete)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
@@ -4966,11 +5086,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
-                            [=](int total, int current)
-                            {
-                                Q_UNUSED(total);
-                                Q_UNUSED(current);
-                            },
+                            cbProgress,
                             true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
@@ -5210,6 +5326,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
             for (qint32 i = 0; i < importedDataNodes.size(); i++)
             {
                 bool service_node_found = false;
+                quint32 encDataSize = 0;
 
                 // Loop in the memory nodes to compare data
                 for (qint32 j = 0; j < dataNodes.size(); j++)
@@ -5241,6 +5358,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                         {
                             // Find the imported child node in our list
                             MPNode* imported_child_node = findNodeWithAddressInList(importedDataChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
+                            encDataSize += MP_NODE_DATA_ENC_SIZE;
 
                             // Check if we actually found the node
                             if (!imported_child_node)
@@ -5387,6 +5505,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                    {
                        /* Find node in list */
                        MPNode* curImportChildPt = findNodeWithAddressInList(importedDataChildNodes, curImportChildAddr);
+                       encDataSize += MP_NODE_DATA_ENC_SIZE;
 
                        if (!curImportChildPt)
                        {
@@ -5421,6 +5540,9 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                        curImportChildAddr = curImportChildPt->getNextChildDataAddress();
                        prev_added_child_node = newDataChildNodePt;
                    }
+
+                   /* Update data size property */
+                   newNodePt->setEncDataSize(encDataSize);
                 }
             }
         }
@@ -5434,7 +5556,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
             newAddressesNeededCounter++;
 
             AsyncJobs* getFreeAddressesJob = new AsyncJobs("Asking free adresses...", this);
-            loadFreeAddresses(getFreeAddressesJob, MPNode::EmptyAddress, false);
+            loadFreeAddresses(getFreeAddressesJob, MPNode::EmptyAddress, false, cbProgress);
 
             connect(getFreeAddressesJob, &AsyncJobs::finished, [=](const QByteArray &data)
             {
@@ -5456,10 +5578,14 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                         Q_UNUSED(data);
 
                         /* Update file cache */
-                        QList<QPair<int, QString>> list;
+                        QList<QVariantMap> list;
                         for (auto &i: dataNodes)
                         {
-                            list.append(QPair<int, QString>(0, i->getService()));
+                            QVariantMap item;
+                            item.insert("revision", 0);
+                            item.insert("name", i->getService());
+                            item.insert("size", i->getEncDataSize());
+                            list.append(item);
                         }
                         filesCache.save(list);
                         filesCache.setDbChangeNumber(importedDataDbChangeNumber);
@@ -5480,7 +5606,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                         cb(false, "Couldn't Import Database: Device Unplugged?");
                         return;
                     });
-                    if (generateSavePackets(mergeOperations, true, !isMooltiAppImportFile))
+                    if (generateSavePackets(mergeOperations, true, !isMooltiAppImportFile, cbProgress))
                     {
                         jobsQueue.enqueue(mergeOperations);
                         runAndDequeueJobs();
@@ -5524,10 +5650,14 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                     Q_UNUSED(data);
 
                     /* Update file cache */
-                    QList<QPair<int, QString>> list;
+                    QList<QVariantMap> list;
                     for (auto &i: dataNodes)
                     {
-                        list.append(QPair<int, QString>(0, i->getService()));
+                        QVariantMap item;
+                        item.insert("revision", 0);
+                        item.insert("name", i->getService());
+                        item.insert("size", i->getEncDataSize());
+                        list.append(item);
                     }
                     filesCache.save(list);
                     filesCache.setDbChangeNumber(importedDataDbChangeNumber);
@@ -5548,7 +5678,7 @@ void MPDevice::startImportFileMerging(std::function<void(bool success, QString e
                     cb(false, "Couldn't Import Database: Device Unplugged?");
                     return;
                 });
-                if (generateSavePackets(mergeOperations, true, !isMooltiAppImportFile))
+                if (generateSavePackets(mergeOperations, true, !isMooltiAppImportFile, cbProgress))
                 {
                     jobsQueue.enqueue(mergeOperations);
                     runAndDequeueJobs();
@@ -5741,7 +5871,7 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
     return true;
 }
 
-void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr)
+void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, MPDeviceProgressCb cbProgress)
 {
     qDebug() << "Loading free addresses from address:" << addressFrom.toHex();
 
@@ -5756,6 +5886,12 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
         }
 
         qDebug() << "Received " << nb_free_addresses_received << " free addresses";
+        QVariantMap progressData = { {"total", newAddressesNeededCounter},
+                                     {"current", newAddressesReceivedCounter + nb_free_addresses_received},
+                                     {"msg", "%1 Free Addresses Received"},
+                                     {"msg_args", QVariantList({newAddressesReceivedCounter})}
+                                   };
+        cbProgress(progressData);
 
         if (nb_free_addresses_received == 0)
         {
@@ -5793,7 +5929,7 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
             {
                 /* Ask more addresses */
                 qDebug() << "Still needing " << newAddressesNeededCounter - newAddressesReceivedCounter << " free addresses";
-                loadFreeAddresses(jobs, freeAddresses[freeAddresses.size()-1], true);
+                loadFreeAddresses(jobs, freeAddresses[freeAddresses.size()-1], true, cbProgress);
             }
 
             return true;
@@ -5802,7 +5938,7 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
 }
 
 void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
-                                   std::function<void(int total, int current)> cbProgress)
+                                   MPDeviceProgressCb cbProgress)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting integrity check", this);
@@ -5812,8 +5948,9 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
 
     /* Setup global vars dedicated to speed diagnostics */
     diagNbBytesRec = 0;
+    diagLastNbBytesPSec = 0;
     lastFlashPageScanned = 0;
-    diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;    
+    diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
 
     /* Load CTR, favorites, nodes... */
     memMgmtModeReadFlash(jobs, true, cbProgress, true, true, true);
@@ -5832,7 +5969,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         checkLoadedNodes(true, true, true);
 
         /* Generate save packets */
-        bool packets_generated = generateSavePackets(repairJobs, true, true);
+        bool packets_generated = generateSavePackets(repairJobs, true, true, [](QVariantMap){});
 
         /* Leave MMM */
         repairJobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
@@ -5928,6 +6065,7 @@ void MPDevice::serviceExists(bool isDatanode, const QString &service, const QStr
 }
 
 void MPDevice::setMMCredentials(const QJsonArray &creds,
+                                MPDeviceProgressCb cbProgress,
                                 std::function<void(bool success, QString errstr)> cb)
 {
     newAddressesNeededCounter = 0;
@@ -5935,7 +6073,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
     bool packet_send_needed = false;
     AsyncJobs *jobs = new AsyncJobs("Merging credentials changes", this);
 
-    /// TODO: sanitize inputs
+    /// TODO: sanitize inputs (or not, as it is done at the mpnode.cpp level)
 
     /* Look for deleted or changed nodes */
     for (qint32 i = 0; i < creds.size(); i++)
@@ -6144,7 +6282,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
     jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
 
     /* Out of pure coding laziness, ask free addresses even if we don't need them */
-    loadFreeAddresses(jobs, MPNode::EmptyAddress, false);
+    loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
     {
@@ -6281,7 +6419,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             return;
         });
 
-        generateSavePackets(mergeOperations, true, false);
+        generateSavePackets(mergeOperations, true, false, cbProgress);
         jobsQueue.enqueue(mergeOperations);
         runAndDequeueJobs();
     });
@@ -6299,9 +6437,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
 }
 
 void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
-                              std::function<void(int total, int current)> cbProgress)
+                              MPDeviceProgressCb cbProgress)
 {
-    Q_UNUSED(cbProgress)
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for export file generation", this);
 
@@ -6310,11 +6447,7 @@ void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, Q
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
-                            [=](int total, int current)
-                            {
-                                Q_UNUSED(total);
-                                Q_UNUSED(current);
-                            }
+                            cbProgress
                             , true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
@@ -6348,9 +6481,8 @@ void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, Q
 
 void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                               std::function<void(bool success, QString errstr)> cb,
-                              std::function<void(int total, int current)> cbProgress)
+                              MPDeviceProgressCb cbProgress)
 {
-    Q_UNUSED(cbProgress)
     QString errorString;
 
     /* Reset temp vars */
@@ -6385,7 +6517,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                 qInfo() << "CPZ/CTR Added";
 
                 /* Unknown card added, start merging */
-                startImportFileMerging(cb, noDelete);
+                startImportFileMerging(cbProgress, cb, noDelete);
             });
 
             connect(addcpzjobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -6401,7 +6533,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
         else
         {
             /* Start merging */
-            startImportFileMerging(cb, noDelete);
+            startImportFileMerging(cbProgress, cb, noDelete);
         }
     }
     else
@@ -6411,13 +6543,9 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
     }
 }
 
-QStringList MPDevice::getFilesCache()
+QList<QVariantMap> MPDevice::getFilesCache()
 {
-    auto files = filesCache.load();
-    QStringList names;
-    for (auto fileCache : files)
-        names.append(fileCache.second);
-    return names;
+    return filesCache.load();
 }
 
 bool MPDevice::hasFilesCache()
@@ -6425,7 +6553,7 @@ bool MPDevice::hasFilesCache()
     return filesCache.exist();
 }
 
-void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
+void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
@@ -6434,24 +6562,22 @@ void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
     jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false,
-                         [=](int total, int current)
-                         {
-                             Q_UNUSED(total);
-                             Q_UNUSED(current);
-                         }, false, true, false);
+    memMgmtModeReadFlash(jobs, false, [](QVariant) {}, false, true, true);
 
     connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
         Q_UNUSED(data);
 
         /* List constructor */
-        QStringList list = QStringList();
+        QList<QVariantMap> list;
 
         /* Get file names */
         for (auto &i: dataNodes)
         {
-            list.append(i->getService());
+            QVariantMap item;
+            item.insert("name", i->getService());
+            item.insert("size", i->getEncDataSize());
+            list.append(item);
         }
 
         /* Clean vars, exit mmm */
@@ -6467,7 +6593,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QStringList)> cb)
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
         exitMemMgmtMode(false);
-        cb(false, QStringList());
+        cb(false, QList<QVariantMap>());
     });
 
     jobsQueue.enqueue(jobs);

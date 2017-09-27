@@ -9,12 +9,10 @@
 LoginItem::LoginItem(const QString &sLoginName) : TreeItem(sLoginName),
     m_iFavorite(-1), m_sPassword(""), m_sPasswordOrig(""), m_bPasswordLocked(true)
 {
-
 }
 
 LoginItem::~LoginItem()
 {
-
 }
 
 const QByteArray &LoginItem::address() const
@@ -65,8 +63,6 @@ QJsonObject LoginItem::toJson() const
         addr.append((int)m_bAddress.at(0));
         addr.append((int)m_bAddress.at(1));
     }
-
-    qDebug() << "*** INPUT PASSWORDS ARE *** " << m_sPasswordOrig << m_sPassword;
 
     QString p;
     //Only send password if it has been changed by user

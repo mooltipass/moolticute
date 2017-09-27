@@ -53,6 +53,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
                                 { "color-active", QColor(Qt::white) }};
 
     ui->setupUi(this);
+    setupLanguages();
 
     m_tabMap[ui->pageAbout] = ui->pushButtonAbout;
     m_tabMap[ui->pageAppSettings] = ui->pushButtonAppSettings;
@@ -134,6 +135,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->lineEditDBFile->setStyleSheet(CSS_BLUE_LINEEDIT);
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
 
+    ui->pushButtonCheckUpdate->setStyleSheet(CSS_BLUE_BUTTON);
+
     ui->pushButtonSettingsSave->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(AppGui::qtAwesome()->icon(fa::undo, whiteButtons));
     ui->pushButtonSettingsSave->setVisible(false);
@@ -201,9 +204,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->comboBoxScreenBrightness->addItem("65%", 166);
     ui->comboBoxScreenBrightness->addItem("80%", 204);
     ui->comboBoxScreenBrightness->addItem("100%", 255);
-    ui->comboBoxKnock->addItem("Low", 0);
-    ui->comboBoxKnock->addItem("Medium", 1);
-    ui->comboBoxKnock->addItem("High", 2);
+    ui->comboBoxKnock->addItem(tr("Low"), 0);
+    ui->comboBoxKnock->addItem(tr("Medium"), 1);
+    ui->comboBoxKnock->addItem(tr("High"), 2);
     ui->comboBoxLoginOutput->addItem(tr("Tab"), 43);
     ui->comboBoxLoginOutput->addItem(tr("Enter"), 40);
     ui->comboBoxLoginOutput->addItem(tr("Space"), 44);
@@ -466,6 +469,16 @@ void MainWindow::closeEvent(QCloseEvent *event)
         wsClient->sendLeaveMMRequest();
 }
 
+void MainWindow::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+    {
+        ui->retranslateUi(this);
+        retranslateUi();
+    }
+    QMainWindow::changeEvent(event);
+}
+
 void MainWindow::updatePage()
 {
     bool isCardUnknown = wsClient->get_status() == Common::UnkownSmartcad;
@@ -478,62 +491,50 @@ void MainWindow::updatePage()
     ui->label_29->setVisible(!isCardUnknown);
     ui->pushButtonIntegrity->setVisible(!isCardUnknown);
 
-    updateTabButtons();
+    // When an import db operation is peformed in an unknown card
+    // don't change the page until the operation is finished
+    if (ui->stackedWidget->currentWidget() == ui->pageWaiting &&
+            ui->labelWait->text().contains("import_db_job"))
+        ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
 
-    if (ui->pushButtonAbout->isChecked())
-    {
+    else if (ui->pushButtonAbout->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageAbout);
-        return;
-    }
 
-    if (ui->pushButtonAppSettings->isChecked())
-    {
+    else if (ui->pushButtonAppSettings->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageAppSettings);
-        return;
-    }
 
-    if(!wsClient->isConnected()) {
+    else if(!wsClient->isConnected())
         ui->stackedWidget->setCurrentWidget(ui->pageNoDaemon);
-        return;
-    }
 
-    if (!wsClient->get_connected())
-    {
+    else if (!wsClient->get_connected())
         ui->stackedWidget->setCurrentWidget(ui->pageNoConnect);
-        return;
-    }
 
-    if (ui->pushButtonDevSettings->isChecked()) {
+    else if (ui->pushButtonDevSettings->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageSettings);
-        return;
-    }
 
-    if (ui->pushButtonAdvanced->isChecked()) {
+    else if (ui->pushButtonAdvanced->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageAdvanced);
-        return;
-    }
 
-    if (wsClient->get_status() == Common::NoCardInserted)
-    {
+    else if (wsClient->get_status() == Common::NoCardInserted)
         ui->stackedWidget->setCurrentWidget(ui->pageMissingSecurityCard);
-        return;
-    }
 
-    if (wsClient->get_status() == Common::Locked ||
+    else if (wsClient->get_status() == Common::Locked ||
             wsClient->get_status() == Common::LockedScreen)
-    {
         ui->stackedWidget->setCurrentWidget(ui->pageDeviceLocked);
-        return;
-    }
 
     else if (ui->pushButtonCred->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
+
     else if (ui->pushButtonSync->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageSync);
+
     else if (ui->pushButtonFiles->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageFiles);
+
     else if (ui->pushButtonSSH->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageSSH);
+
+    updateTabButtons();
 }
 
 void MainWindow::enableKnockSettings(bool enable)
@@ -766,22 +767,26 @@ void MainWindow::onCurrentTabChanged(int)
 
 void MainWindow::wantEnterCredentialManagement()
 {
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Wait for device confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--enter_credentials_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Waiting For Device Confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     updateTabButtons();
 }
 
 void MainWindow::wantSaveCredentialManagement()
 {
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device</span></p><p>Please wait.</p></body></html>"));
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--save_credentials_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving Changes to Device</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     auto conn = std::make_shared<QMetaObject::Connection>();
     *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & , const QString &, const QString &, bool success)
@@ -799,21 +804,25 @@ void MainWindow::wantSaveCredentialManagement()
 
 void MainWindow::wantImportDatabase()
 {
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Importing and merging file to device</span></p><p>Please wait.</p></body></html>"));
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--import_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Please Approve Request On Device</span></p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
 void MainWindow::wantExportDatabase()
 {
     ui->widgetHeader->setEnabled(false);
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting database from device</span></p><p>Please wait.</p></body></html>"));
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--export_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Please Approve Request On Device</span></p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
 void MainWindow::changeDBBackupFile()
@@ -827,20 +836,51 @@ void MainWindow::changeDBBackupFile()
 
 void MainWindow::wantExitFilesManagement()
 {
-    ui->labelWait->setText(tr("<html><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--exit_file_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
 
-    connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     updateTabButtons();
 }
 
-void MainWindow::loadingProgress(int total, int current)
+void MainWindow::loadingProgress(int total, int current, QString message)
 {
-    ui->progressBarWait->show();
-    ui->progressBarWait->setMaximum(total);
-    ui->progressBarWait->setValue(current);
+    if (total != -1)
+    {
+        ui->progressBarWait->show();
+        ui->progressBarWait->setMaximum(total);
+        ui->progressBarWait->setValue(current);
+    }
+    else
+    {
+        ui->progressBarWait->setMinimum(0);
+        ui->progressBarWait->setMaximum(0);
+    }
+
+    if (!message.isEmpty())
+    {
+        ui->labelProgressMessage->setVisible(true);
+        ui->labelProgressMessage->setText(message);
+    }
+    else
+        ui->labelProgressMessage->setVisible(false);
+
+    if (ui->labelWait->text().contains("export_db_job"))
+        ui->labelWait->setText(tr("<html><!--export_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Exporting Database from Device</span></p><p>Please wait.</p></body></html>"));
+
+    if (ui->labelWait->text().contains("import_db_job"))
+        ui->labelWait->setText(tr("<html><!--import_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Importing and Merging File to Device</span></p><p>Please wait.</p></body></html>"));
+
+    if (ui->labelWait->text().contains("enter_credentials_mgm_job"))
+        ui->labelWait->hide();
+    else
+        ui->labelWait->show();
+
+
 }
 
 void MainWindow::on_pushButtonAutoStart_clicked()
@@ -871,7 +911,7 @@ void MainWindow::checkAutoStart()
     bool en = s.value("settings/auto_start").toBool();
 
     AutoStartup::enableAutoStartup(en);
-    ui->labelAutoStart->setText(tr("Start Moolticute with the computer: %1").arg((en?"Enabled":"Disabled")));
+    ui->labelAutoStart->setText(tr("Start Moolticute with the computer: %1").arg((en?tr("Enabled"):tr("Disabled"))));
     if (en)
         ui->pushButtonAutoStart->setText(tr("Disable"));
     else
@@ -987,7 +1027,8 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
         }
     }
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
-    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
 void MainWindow::dbImported(bool success, QString message)
@@ -1000,7 +1041,8 @@ void MainWindow::dbImported(bool success, QString message)
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
 
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
-    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
 void MainWindow::on_pushButtonIntegrity_clicked()
@@ -1009,19 +1051,33 @@ void MainWindow::on_pushButtonIntegrity_clicked()
     if (r == QMessageBox::Yes)
     {
         wsClient->sendJsonData({{ "msg", "start_memcheck" }});
+
+        connect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
+        connect(wsClient, &WSClient::progressChanged, this, &MainWindow::integrityProgress);
+
         ui->widgetHeader->setEnabled(false);
+        ui->labelWait->show();
+        ui->labelWait->setText(tr("<html><!--check_integrity_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Waiting For Device Confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
+        ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+        ui->progressBarWait->hide();
+        ui->labelProgressMessage->hide();
+        ui->integrityProgressMessageLabel->hide();
+    }
+}
+
+void MainWindow::integrityProgress(int total, int current, QString message)
+{
+    if (ui->stackedWidget->currentWidget() == ui->pageWaiting)
+    {
         ui->stackedWidget->setCurrentWidget(ui->pageIntegrity);
         ui->progressBarIntegrity->setMinimum(0);
         ui->progressBarIntegrity->setMaximum(0);
         ui->progressBarIntegrity->setValue(0);
 
-        connect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
-        connect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(integrityProgress(int,int)));
+        ui->integrityProgressMessageLabel->show();
     }
-}
 
-void MainWindow::integrityProgress(int total, int current)
-{
+    ui->integrityProgressMessageLabel->setText(message);
     ui->progressBarIntegrity->setMaximum(total);
     ui->progressBarIntegrity->setValue(current);
 }
@@ -1029,28 +1085,27 @@ void MainWindow::integrityProgress(int total, int current)
 void MainWindow::integrityFinished(bool success)
 {
     disconnect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
-    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(integrityProgress(int,int)));
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::integrityProgress);
 
     if (!success)
         QMessageBox::warning(this, "Moolticute", tr("Memory integrity check failed!"));
     else
-        QMessageBox::information(this, "Moolticute", "Memory integrity check done successfully");
+        QMessageBox::information(this, "Moolticute", tr("Memory integrity check done successfully"));
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
     ui->widgetHeader->setEnabled(true);
 }
 
 void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
 {
-    ui->UIDRequestLabel->setText(tr(R"(
-                                    To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.<ol>
-                                    <li>Get the serial number from the back of your device.</li>
-                                    <li>&shy;<a href="mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1">Send us an email</a> with the serial number, requesting the password.</li>
-                                    <li>Enter the password you received from us</li></ol>)").arg(id));
+    ui->UIDRequestLabel->setText(tr("To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.<ol>"
+                                    "<li>Get the serial number from the back of your device.</li>"
+                                    "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1\">Send us an email</a> with the serial number, requesting the password.</li>"
+                                    "<li>Enter the password you received from us</li></ol>").arg(id));
 }
 
 void MainWindow::enableCredentialsManagement(bool enable)
 {
-    disconnect(wsClient, SIGNAL(progressChanged(int,int)), this, SLOT(loadingProgress(int,int)));
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     if (enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
     {
@@ -1070,6 +1125,7 @@ void MainWindow::updateTabButtons()
 {
     auto setEnabledToAllTabButtons = [=](bool enabled)
     {
+        ui->widgetHeader->setEnabled(enabled);
         for (QObject * object: ui->widgetHeader->children())
 	{
             if (typeid(*object) ==  typeid(QPushButton))
@@ -1082,8 +1138,6 @@ void MainWindow::updateTabButtons()
 
     if (ui->stackedWidget->currentWidget() == ui->pageWaiting)
         setEnabledToAllTabButtons(false);
-    else
-        setEnabledToAllTabButtons(true);
 
     // Enable or Disable tabs according to the device status
     if (wsClient->get_status() == Common::UnkownSmartcad)
@@ -1098,13 +1152,17 @@ void MainWindow::updateTabButtons()
         return;
     }
 
-    if (wsClient->get_memMgmtMode())
+    if ((ui->stackedWidget->currentWidget() == ui->pageFiles
+         || ui->stackedWidget->currentWidget() == ui->pageCredentials
+         || ui->stackedWidget->currentWidget() == ui->pageIntegrity) &&
+            wsClient->get_memMgmtMode())
     {
         // Disable all tab buttons
         setEnabledToAllTabButtons(false);
 
         ui->pushButtonCred->setEnabled(ui->stackedWidget->currentWidget() == ui->pageCredentials);
         ui->pushButtonFiles->setEnabled(ui->stackedWidget->currentWidget() == ui->pageFiles);
+
         return;
     }
 
@@ -1117,4 +1175,77 @@ void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
     QMessageBox::warning(this,
                          tr("Memory Management Error"),
                          tr("An error occured when trying to go into Memory Management mode.\n\n%1").arg(errMsg));
+}
+
+void MainWindow::setupLanguages()
+{
+    QSettings settings;
+    QString language = settings.value("settings/lang").toString();
+
+    //Fill the language combobox from available *.qm files in the ressource
+    ui->comboBoxAppLang->addItem(tr("System default language"), QStringLiteral(""));
+    ui->comboBoxAppLang->addItem(QLocale::languageToString(QLocale::English), QStringLiteral("en"));
+    if (language == "en") ui->comboBoxAppLang->setCurrentIndex(ui->comboBoxAppLang->count() - 1);
+
+    /*
+      Languages:
+      the files contained into the .qrc ressources a automatically parsed to populate the UI.
+      The filename of the translation files should have correct ISO 639 codes like:
+          mc_CODE.qm
+      for chinese, we need traditional chinese and simplified chinese. We need to use the following codes:
+        mc_zh_HANS.qm for (generic) simplified Chinese characters
+        mc_zh_HANT.qm for traditional Chinese characters
+      other languages like french or german would only be:
+        mc_fr.qm
+        mc_de.qm
+    */
+
+    QDirIterator it(":/lang", QDirIterator::Subdirectories);
+    while (it.hasNext())
+    {
+        //havoc_LANG.qm
+        QString fname = it.next();
+        if (!fname.startsWith(":/lang/mc_")) continue;
+        QString llang = fname.section('_', 1).section('.', 0, 0);
+        QLocale locale(llang);
+
+        QString ln;
+        if (locale.language() == QLocale::Chinese)
+            ln = QString("%1 (%2)")
+                    .arg(QLocale::languageToString(locale.language()))
+                    .arg(QLocale::scriptToString(locale.script()));
+        else
+            ln = QLocale::languageToString(locale.language());
+
+        ui->comboBoxAppLang->addItem(ln, llang);
+
+        if (language == llang) ui->comboBoxAppLang->setCurrentIndex(ui->comboBoxAppLang->count() - 1);
+    }
+}
+
+void MainWindow::on_comboBoxAppLang_currentIndexChanged(int index)
+{
+    QSettings settings;
+    QString language = settings.value("settings/lang").toString();
+    QString lang = ui->comboBoxAppLang->itemData(index).toString();
+
+    if (language != lang)
+    {
+        settings.setValue("settings/lang", lang);
+
+        AppGui *a = qobject_cast<AppGui *>(qApp);
+        a->setupLanguage();
+    }
+}
+
+void MainWindow::on_pushButtonCheckUpdate_clicked()
+{
+    AppGui *a = qobject_cast<AppGui *>(qApp);
+    a->checkUpdate(true);
+}
+
+void MainWindow::retranslateUi()
+{
+    ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
+    updateSerialInfos();
 }

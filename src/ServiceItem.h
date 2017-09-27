@@ -10,6 +10,7 @@ class ServiceItem : public TreeItem
 public:
     ServiceItem(const QString &sServiceName);
     virtual ~ServiceItem();
+
     LoginItem *addLogin(const QString &sLoginName);
     LoginItem *findLoginByName(const QString &sLoginName);
     bool isExpanded() const;

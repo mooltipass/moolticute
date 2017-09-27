@@ -85,6 +85,8 @@ private:
     void loadFilesCacheModel();
     void addUpdateFile(QString service, QString filename, QProgressBar *pbar);
 
+    virtual void changeEvent(QEvent *event);
+
     Ui::FilesManagement *ui;
 
     WSClient *wsClient = nullptr;

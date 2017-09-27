@@ -94,7 +94,8 @@ class PasswordProfilesModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    enum Roles{
+    enum Roles
+    {
         USE_LOWERCASE = Qt::UserRole + 1,
         USE_UPPERCASE,
         USE_DIGITS,
@@ -127,7 +128,7 @@ public:
     void removeProfile(const QString &name);
 
 private:
-    QVector<PasswordProfile*> m_profiles;  
+    QVector<PasswordProfile*> m_profiles;
 };
 
 static const QString kSymbols("~!@#$%^&*()-_+={}[]\\|:;<>,.?/");

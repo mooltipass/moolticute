@@ -14,7 +14,6 @@
 ItemDelegate::ItemDelegate(QWidget* parent):
     QStyledItemDelegate(parent)
 {
-
 }
 
 QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -68,8 +67,12 @@ void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewIte
         const QFontMetrics serviceMetrics = QFontMetrics{f};
 
         QRect dstRect = option.rect;
-        if (!pServiceItem->isExpanded()) {
-            QRect otherRect(dstRect.width()-serviceMetrics.width(sLogins), dstRect.y()+(dstRect.height()-serviceMetrics.height())/2, serviceMetrics.width(sLogins), dstRect.height());
+        if (!pServiceItem->isExpanded())
+        {
+            QRect otherRect(dstRect.width() - serviceMetrics.width(sLogins),
+                            dstRect.y() + (dstRect.height() - serviceMetrics.height()) / 2,
+                            serviceMetrics.width(sLogins),
+                            dstRect.height());
             pen.setColor(QColor("#666666"));
             painter->setFont(f);
             painter->setPen(pen);
@@ -97,7 +100,10 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
 
             QRect dstRect = option.rect;
             int delta = 4;
-            QRect otherRect(dstRect.width()-serviceMetrics.width(sDisplayedData)-delta, dstRect.y()+(dstRect.height()-serviceMetrics.height())/2, serviceMetrics.width(sDisplayedData)+delta, dstRect.height());
+            QRect otherRect(dstRect.width() - serviceMetrics.width(sDisplayedData) - delta,
+                            dstRect.y() + (dstRect.height() - serviceMetrics.height()) / 2,
+                            serviceMetrics.width(sDisplayedData) + delta,
+                            dstRect.height());
 
             pen.setColor(QColor("#666666"));
             painter->setFont(f);
@@ -128,8 +134,8 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
             else
                 bkgColor.setNamedColor("white");
         }
-        else
-        if (pLoginItem != nullptr) {
+        else if (pLoginItem != nullptr)
+        {
             if (index.parent().row()%2 == 0)
                 bkgColor.setNamedColor("#eef7fa");
             else
@@ -140,8 +146,8 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
         if ((pServiceItem != nullptr) && (!pServiceItem->isExpanded()))
             paintServiceItem(painter, option, pServiceItem);
-        else
-        if (pLoginItem != nullptr) {
+        else if (pLoginItem != nullptr)
+        {
             ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
             if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
                 paintLoginItem(painter, option, pLoginItem);

@@ -22,6 +22,8 @@
 #include <libusb.h>
 #include "MPDevice.h"
 
+#include <QThread>
+
 class MPPlatformDef
 {
 public:
@@ -37,6 +39,18 @@ inline bool operator!=(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { ret
 
 class USBTransfer;
 
+class TransferThread : public QThread
+{
+    Q_OBJECT
+    void run() override;
+public:
+    TransferThread(libusb_context *usb_ctx);
+    QAtomicInt keepWoorking;
+private:
+    libusb_context *usb_context;
+};
+
+
 class MPDevice_linux: public MPDevice
 {
     Q_OBJECT
@@ -47,18 +61,18 @@ public:
     //Static function for enumerating devices on platform
     static QList<MPPlatformDef> enumerateDevices();
 
-private slots:
-    void usbSendCb(struct libusb_transfer *trf);
-    void usbReceiveCb(struct libusb_transfer *trf);
+public slots:
 
-private:
     virtual void platformRead();
     virtual void platformWrite(const QByteArray &data);
 
+private:
     bool detached_kernel = false;
     libusb_context *usb_ctx;
     libusb_device *device;
     libusb_device_handle *devicefd;
+
+    TransferThread* worker;
 
     void usbSendData(unsigned char cmd, const QByteArray &data = QByteArray());
     void usbRequestReceive();

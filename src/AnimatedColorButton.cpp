@@ -6,43 +6,39 @@
 #include "AnimatedColorButton.h"
 #include "Common.h"
 
-AnimatedColorButton::AnimatedColorButton(QWidget *parent, const QString &sStartColor, const QString &sEndColor,
-                                         const QString &sDefaultText,
-                                         const QString &sPressAndHoldText,
-                                         int iAnimationDuration) : QPushButton(parent),
-    m_pAnimation(nullptr),
-    m_iAnimationDuration(iAnimationDuration),
-    m_sDefaultText(sDefaultText),
-    m_sPressAndHoldText(sPressAndHoldText)
+AnimatedColorButton::AnimatedColorButton(QWidget *parent, int iAnimationDuration):
+    QPushButton(parent),
+    m_iAnimationDuration(iAnimationDuration)
 {
+    setStyleSheet(CSS_GREY_BUTTON);
+
+    bar = new QWidget(this);
+    bar->setMinimumHeight(3);
+    bar->setMaximumHeight(3);
+    bar->setStyleSheet("QWidget { background-color: #60B1C7; }");
+
     m_tTimer.setSingleShot(true);
     m_tTimer.setInterval(iAnimationDuration);
     connect(&m_tTimer, &QTimer::timeout, this, &AnimatedColorButton::onTimeOut);
 
-    m_cStartColor.setNamedColor(sStartColor);
-    m_cEndColor.setNamedColor(sEndColor);
-    m_pAnimation = new QPropertyAnimation(this, "bkgColor");
+    m_pAnimation = new QPropertyAnimation(this, "progress");
     m_pAnimation->setDuration(iAnimationDuration);
-    m_pAnimation->setStartValue(m_cStartColor);
-    m_pAnimation->setEndValue(m_cEndColor);
+    m_pAnimation->setStartValue(0);
+    m_pAnimation->setEndValue(width());
 
     reset();
 }
 
-void AnimatedColorButton::setBkgColor(const QColor &color)
+void AnimatedColorButton::setProgress(int p)
 {
-    QString sButtonStyleSheet = QString("QPushButton {" \
-                                        "color: #000;" \
-                                        "background-color: rgb(%1, %2, %3);" \
-                                        "padding: 12px;" \
-                                        "border: none;" \
-                                        "}").arg(color.red()).arg(color.green()).arg(color.blue());
-    setStyleSheet(sButtonStyleSheet);
+    qDebug() << "progress: " << p;
+    bar->setMinimumWidth(p);
+    bar->setMaximumWidth(p);
 }
 
-QColor AnimatedColorButton::bkgColor()
+int AnimatedColorButton::getProgress()
 {
-    return Qt::black;
+    return bar->width();
 }
 
 void AnimatedColorButton::setAnimationDuration(int iAnimationDuration)
@@ -55,51 +51,9 @@ int AnimatedColorButton::animationDuration() const
     return m_iAnimationDuration;
 }
 
-void AnimatedColorButton::setDefaultText(const QString &sDefaultText)
-{
-    m_sDefaultText = sDefaultText;
-    setText(m_sDefaultText);
-}
-
-const QString &AnimatedColorButton::defaultText() const
-{
-    return m_sDefaultText;
-}
-
-void AnimatedColorButton::setPressAndHoldText(const QString &sPressAndHoldText)
-{
-    m_sPressAndHoldText = sPressAndHoldText;
-}
-
-const QString &AnimatedColorButton::pressAndHoldText() const
-{
-    return m_sPressAndHoldText;
-}
-
-void AnimatedColorButton::setStartColor(const QColor &cColor)
-{
-    m_cStartColor = cColor;
-}
-
-const QColor &AnimatedColorButton::startColor() const
-{
-    return m_cStartColor;
-}
-
-void AnimatedColorButton::setEndColor(const QColor &cEndColor)
-{
-    m_cEndColor = cEndColor;
-}
-
-const QColor &AnimatedColorButton::endColor() const
-{
-    return m_cEndColor;
-}
-
 void AnimatedColorButton::mousePressEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-    setText(m_sPressAndHoldText);
     if (!m_tTimer.isActive())
     {
         m_tTimer.start();
@@ -121,14 +75,14 @@ void AnimatedColorButton::onTimeOut()
 
 void AnimatedColorButton::reset()
 {
-    setText(m_sDefaultText);
     m_tTimer.stop();
     m_pAnimation->stop();
-    QString sButtonStyleSheet = QString("QPushButton {" \
-                                        "color: #000;" \
-                                        "background-color: %1;" \
-                                        "padding: 12px;" \
-                                        "border: none;" \
-                                        "}").arg(m_cStartColor.name());
-    setStyleSheet(sButtonStyleSheet);
+    bar->setMinimumWidth(0);
+    bar->setMaximumWidth(0);
+}
+
+void AnimatedColorButton::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+    m_pAnimation->setEndValue(width());
 }

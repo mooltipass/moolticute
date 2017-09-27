@@ -84,8 +84,7 @@ FilesManagement::FilesManagement(QWidget *parent) :
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->addFileButton->setStyleSheet(CSS_BLUE_BUTTON);
 
-    ui->buttonDiscard->setDefaultText(tr("Discard deletions"));
-    ui->buttonDiscard->setPressAndHoldText(tr("Hold to proceed"));
+    ui->buttonDiscard->setText(tr("Discard deletions"));
     connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &FilesManagement::on_buttonDiscard_clicked);
 
     ui->buttonQuitMMM->setStyleSheet(CSS_BLUE_BUTTON);
@@ -205,15 +204,18 @@ void FilesManagement::loadFilesCacheModel()
 {
     QListWidget * listWidget = ui->filesCacheListWidget;
     listWidget->clear();
-    for (auto entry : wsClient->getFilesCache())
+    for (auto jsonValue : wsClient->getFilesCache())
     {
+        QJsonObject jsonObject = jsonValue.toObject();
 
         QWidget* w = new QWidget();
         QHBoxLayout *rowLayout = new QHBoxLayout(listWidget);
         QLabel *icon = new QLabel(listWidget);
         icon->setPixmap(AppGui::qtAwesome()->icon(fa::fileo).pixmap(18, 18));
         rowLayout->addWidget(icon);
-        rowLayout->addWidget(new QLabel(entry.toString()));
+        rowLayout->addWidget(new QLabel(jsonObject.value("name").toString()));
+        QString sizeStr = QString("(%1 bytes)").arg(jsonObject.value("size").toInt());
+        rowLayout->addWidget(new QLabel(sizeStr));
 
         QToolButton *button = new QToolButton;
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -221,7 +223,7 @@ void FilesManagement::loadFilesCacheModel()
 
         connect(button, &QToolButton::clicked, [=]()
         {
-            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), entry.toString());
+            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), jsonValue.toString());
 
             if (fileName.isEmpty())
                 return;
@@ -236,7 +238,7 @@ void FilesManagement::loadFilesCacheModel()
             connect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
 //            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
 
-            wsClient->requestDataFile(entry.toString());
+            wsClient->requestDataFile(jsonValue.toString());
         });
 
         rowLayout->addWidget(button, 1, Qt::AlignRight);
@@ -359,6 +361,11 @@ void FilesManagement::on_pushButtonDelFile_clicked()
 
     deletedList.append(currentItem->text());
     filesModel->removeRow(currentItem->row());
+
+    // Select another item
+    auto index = filesModel->index(std::min(selectedIndex.row(), filesModel->rowCount()-1),0);
+    selectionModel->select(index, QItemSelectionModel::ClearAndSelect);
+    currentSelectionChanged(index, QModelIndex());
 }
 
 void FilesManagement::dataFileRequested(const QString &service, const QByteArray &data, bool success)
@@ -496,4 +503,11 @@ void FilesManagement::on_pushButtonFilename_clicked()
         return;
 
     ui->lineEditFilename->setText(fileName);
+}
+
+void FilesManagement::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+        ui->retranslateUi(this);
+    QWidget::changeEvent(event);
 }

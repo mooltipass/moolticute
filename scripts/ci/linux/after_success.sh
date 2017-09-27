@@ -17,11 +17,13 @@ if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
     return 0
 fi
 
-mkdir -p $WDIR
+mkdir -p $WDIR/redist
 
 #Get 3rd party tools
-curl https://calaos.fr/mooltipass/tools/windows/moolticute_ssh-agent.exe -o $WDIR/moolticute_ssh-agent.exe
-curl https://calaos.fr/mooltipass/tools/windows/moolticute-cli.exe -o $WDIR/moolticute-cli.exe
+wget_retry https://calaos.fr/mooltipass/tools/windows/mc-agent.exe -O $WDIR/mc-agent.exe
+wget_retry https://calaos.fr/mooltipass/tools/windows/mc-cli.exe -O $WDIR/mc-cli.exe
+wget_retry https://calaos.fr/download/misc/redist/Win32OpenSSL_Light-1_0_2L.exe -O $WDIR/redist/Win32OpenSSL_Light-1_0_2L.exe
+wget_retry https://calaos.fr/download/misc/redist/vcredist_sp1_x86.exe -O $WDIR/redist/vcredist_sp1_x86.exe
 
 for f in $MXE_BIN/bin/libgcc_s_sjlj-1.dll \
          $MXE_BIN/bin/libstdc++-6.dll \
@@ -38,7 +40,7 @@ for f in $MXE_BIN/bin/libgcc_s_sjlj-1.dll \
          $MXE_BIN/qt5/bin/Qt5WebSockets.dll \
          $MXE_BIN/qt5/plugins/imageformats \
          $MXE_BIN/qt5/plugins/platforms \
-         build/release/MoolticuteApp.exe \
+         build/release/moolticute.exe \
          build/release/moolticuted.exe
 do
     cp -R $f $WDIR
@@ -55,6 +57,26 @@ chmod +x iscc
 cat > build/updater.json <<EOF
 { "updates": { "windows": { "latest-version": "$VERSION", "download-url": "https://calaos.fr/mooltipass/windows/$FILENAME.exe" }}}
 EOF
+
+# Debian package
+echo "Generating changelog for tag ${BUILD_TAG} [${TRAVIS_COMMIT}]"
+
+rm -f debian/changelog
+
+$DOCKER_EXEC "DEBEMAIL=${USER_EMAIL} dch --create --distribution trusty --package \"moolticute\" \
+    --newversion ${DEB_VERSION} \"Release ${BUILD_TAG}\""
+
+echo "Building .deb package..."
+
+$DOCKER_EXEC "cp -f README.md debian/README"
+$DOCKER_EXEC "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
+
+# GitHub release
+$DOCKER_EXEC \
+    "export TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG} PROJECT_NAME=${PROJECT_NAME} TRAVIS_OS_NAME=${TRAVIS_OS_NAME} \
+    DEB_VERSION=${DEB_VERSION}; \
+    source /usr/local/bin/tools.sh; \
+    create_github_release_linux ${BUILD_TAG}"
 
 upload_file build/$FILENAME.exe $(sha256sum build/$FILENAME.exe | cut -d' ' -f1) "windows"
 upload_file build/updater.json $(sha256sum build/updater.json | cut -d' ' -f1) "windows"

@@ -6,6 +6,9 @@
 #include <QFile>
 #include <QDebug>
 #include <QTextStream>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include <QStandardPaths>
 #include <QCryptographicHash>
 
@@ -19,35 +22,42 @@ QByteArray FilesCache::cardCPZ() const
     return m_cardCPZ;
 }
 
-bool FilesCache::save(QList<QPair<int, QString>> files)
+bool FilesCache::save(QList<QVariantMap> files)
 {
     QFile file(m_filePath);
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         return false;
 
-    QTextStream out(&file);
-    out << m_simpleCrypt.encryptToString(QString::number(m_dbChangeNumber)) + "\n";
-    for (QPair<int, QString> file : files)
+    QJsonObject json;
+    json.insert("db_change_number", m_dbChangeNumber);
+
+    QJsonArray filesJson;
+    for (QVariantMap file : files)
     {
-        qDebug() << "Saving files to the cache " << file.second;
-        out << m_simpleCrypt.encryptToString(QString::number(file.first)) + "\n";
-        out << m_simpleCrypt.encryptToString(file.second) + "\n";
+        QJsonObject fileJson = QJsonDocument::fromVariant(file).object();
+        filesJson.append(fileJson);
     }
+
+    json.insert("files", filesJson);
+    QJsonDocument doc(json);
+
+    QTextStream out(&file);
+    out << m_simpleCrypt.encryptToString(doc.toJson());
 
     return true;
 }
 
-QList<QPair<int, QString>> FilesCache::load()
+QList<QVariantMap> FilesCache::load()
 {
     if (!m_dbChangeNumberSet || m_cardCPZ.isNull())
     {
         qDebug() << "dbChangeNumberSet not set or null CPZ";
-        return QList<QPair<int, QString>>();
+        return QList<QVariantMap>();
     }
     else
     {
-        QList<QPair<int, QString>> files;
+        QList<QVariantMap> files;
 
         QFile file(m_filePath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -55,7 +65,12 @@ QList<QPair<int, QString>> FilesCache::load()
 
 
         QTextStream in(&file);
-        qint8 cacheDbChangeNumber = m_simpleCrypt.decryptToString(in.readLine()).toInt();
+        QString encryptedData = in.readAll();
+        QString rawJSon = m_simpleCrypt.decryptToString(encryptedData);
+
+        QJsonObject jsonRoot = QJsonDocument::fromJson(rawJSon.toLocal8Bit()).object();
+
+        qint8 cacheDbChangeNumber = jsonRoot.value("db_change_number").toInt();
         if (cacheDbChangeNumber != m_dbChangeNumber)
         {
             qDebug() << "dbChangeNumber miss";
@@ -63,17 +78,18 @@ QList<QPair<int, QString>> FilesCache::load()
         else
         {
             qDebug() << "dbChangeNumber match";
-            while (!in.atEnd())
+            QJsonArray filesJson = jsonRoot.value("files").toArray();
+            for (QJsonValue file : filesJson)
             {
-                QString number = m_simpleCrypt.decryptToString(in.readLine());
-                QString file_name = m_simpleCrypt.decryptToString(in.readLine());
-                files << QPair<int, QString>(number.toInt(), file_name);
+                QVariant v = file.toVariant();
+                files.append(v.toMap());
             }
         }
 
         return files;
     }
 }
+
 
 bool FilesCache::erase()
 {

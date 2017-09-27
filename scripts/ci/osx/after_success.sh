@@ -18,7 +18,7 @@ if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
 fi
 
 QTDIR="/usr/local/opt/qt5"
-APP=MoolticuteApp
+APP=Moolticute
 # this directory name will also be shown in the title when the DMG is mounted
 TEMPDIR=build/$APP
 SIGNATURE="Raoul Hecky"
@@ -40,8 +40,8 @@ rm -f build/$APP.app/Contents/Info.plist-e
 cp build/moolticuted build/$APP.app/Contents/MacOS/
 
 #Get 3rd party tools
-curl https://calaos.fr/mooltipass/tools/macos/moolticute_ssh-agent -o build/$APP.app/Contents/MacOS/moolticute_ssh-agent
-curl https://calaos.fr/mooltipass/tools/macos/moolticute-cli -o build/$APP.app/Contents/MacOS/moolticute-cli
+wget_retry https://calaos.fr/mooltipass/tools/macos/mc-agent -O build/$APP.app/Contents/MacOS/mc-agent
+wget_retry https://calaos.fr/mooltipass/tools/macos/mc-cli -O build/$APP.app/Contents/MacOS/mc-cli
 
 # use macdeployqt to deploy the application
 #echo "Calling macdeployqt and code signing application"
@@ -56,7 +56,7 @@ if [ "$?" -ne "0" ]; then
 fi
 
 #Call fix to change all rpath
-wget https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
+wget_retry https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
 python macdeployqtfix.py build/$APP.app/Contents/MacOS/MoolticuteApp /usr/local/Cellar/qt5/5.*/
 python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /usr/local/Cellar/qt5/5.*/
 
@@ -71,6 +71,8 @@ EOF
 
 upload_file build/$APP-$VERSION.dmg $(shasum -a 256 build/$APP-$VERSION.dmg | cut -d' ' -f1) "macos"
 upload_file build/updater.json $(shasum -a 256 build/updater.json | cut -d' ' -f1) "macos"
+
+PATH=${PATH}:$(pwd)/scripts/lib create_github_release_osx ${BUILD_TAG}
 
 exit 0
 

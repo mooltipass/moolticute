@@ -94,17 +94,17 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
     if (exists)
     {
         sshProcess = new QProcess(this);
-        QString program = QCoreApplication::applicationDirPath () + "/moolticute_ssh-agent";
+        QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
         QStringList arguments;
         arguments << "--output_progress"
                   << "-c"
                   << "list";
 
-        qDebug() << "Running " << program << " " << arguments;
+        qInfo() << "Running " << program << " " << arguments;
         connect(sshProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
-            qDebug() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
+            qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
 
             if (loaded)
                 ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);
@@ -240,4 +240,11 @@ void SSHManagement::on_buttonSaveChanges_clicked()
 void SSHManagement::on_pushButtonImport_clicked()
 {
     QMessageBox::information(this, "moolticute", "Not implemented yet!");
+}
+
+void SSHManagement::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+        ui->retranslateUi(this);
+    QWidget::changeEvent(event);
 }

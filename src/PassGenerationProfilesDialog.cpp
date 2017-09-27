@@ -177,8 +177,8 @@ void PassGenerationProfilesDialog::createNewProfile()
 
     if(name.isEmpty())
     {
-        QMessageBox::critical(this, tr("Empty filter's name"),
-                              tr("You can't create profilr with mpty name"));
+        QMessageBox::critical(this, tr("Empty name"),
+                              tr("You can't create profile with an empty name"));
         return;
     }
 
@@ -187,7 +187,7 @@ void PassGenerationProfilesDialog::createNewProfile()
     if(!model->addProfile(name))
     {
         QMessageBox::critical(this, tr("Failed to create profile"),
-                              tr("Failed to create profile with name - %1").arg(name));
+                              tr("Failed to create profile with name: %1").arg(name));
         return;
     }
 }

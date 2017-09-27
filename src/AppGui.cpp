@@ -40,12 +40,20 @@ AppGui::AppGui(int & argc, char ** argv) :
 
 bool AppGui::initialize()
 {
-    QCoreApplication::setOrganizationName("Raoulh");
-    QCoreApplication::setOrganizationDomain("raoulh.org");
-    QCoreApplication::setApplicationName("Moolticute");
+    qsrand(time(NULL));
+
+    QCoreApplication::setOrganizationName("mooltipass");
+    QCoreApplication::setOrganizationDomain("themooltipass.com");
+    QCoreApplication::setApplicationName("moolticute");
     QCoreApplication::setApplicationVersion(APP_VERSION);
 
-    Common::installMessageOutputHandler();
+    Common::installMessageOutputHandler(nullptr, [this](const QByteArray &d)
+    {
+        if (win)
+            win->daemonLogAppend(d);
+    });
+
+    setupLanguage();
 
     QSimpleUpdater::getInstance();
 
@@ -72,7 +80,7 @@ bool AppGui::initialize()
     systray->setIcon(icon);
     systray->show();
 
-    showConfigApp = new QAction(tr("&Show Moolticute configurator"), this);
+    showConfigApp = new QAction(tr("&Show Moolticute Application"), this);
     connect(showConfigApp, &QAction::triggered, [=]()
     {
         if (win->isHidden())
@@ -87,7 +95,14 @@ bool AppGui::initialize()
     QMenu *systrayMenu = new QMenu();
 
     daemonAction = new DaemonMenuAction(systrayMenu);
+#ifdef Q_OS_LINUX
+    // Custom systray widgets are don't work on linux
+    restartDaemonAction = new QAction(this);
+    connect(restartDaemonAction, &QAction::triggered, this, &AppGui::restartDaemon);
+    systrayMenu->addAction(restartDaemonAction);
+#else
     systrayMenu->addAction(daemonAction);
+#endif
     systrayMenu->addSeparator();
     systrayMenu->addAction(showConfigApp);
     systrayMenu->addSeparator();
@@ -128,6 +143,10 @@ bool AppGui::initialize()
     connectedChanged();
 
     win = new MainWindow(wsClient);
+    connect(win, &MainWindow::destroyed, [this](QObject *)
+    {
+        win = nullptr;
+    });
     connect(win, &MainWindow::windowCloseRequested, [=]()
     {
         mainWindowHide();
@@ -145,12 +164,12 @@ bool AppGui::initialize()
     QStringList arguments;
     // TODO handle Debug arguments
     //arguments << "-e" <<  "-s 8080";
-    qDebug() << "Running " << program << " " << arguments;
+    qInfo() << "Running " << program << " " << arguments;
 
     connect(daemonProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
         [=](int exitCode, QProcess::ExitStatus exitStatus)
     {
-        qDebug() << "Daemon exits with error code " << exitCode << " Exit Status : " << exitStatus;
+        qWarning() << "Daemon exits with error code " << exitCode << " Exit Status : " << exitStatus;
 
         if (aboutToQuit)
             return;
@@ -171,7 +190,7 @@ bool AppGui::initialize()
 
     connect(daemonProcess, &QProcess::started, [=]()
     {
-        qDebug() << "Daemon started";
+        qInfo() << "Daemon started";
         if (aboutToQuit)
             return;
 
@@ -185,31 +204,7 @@ bool AppGui::initialize()
     if (!foundDaemon)
         daemonProcess->start(program, arguments);
 
-    connect(daemonAction, &DaemonMenuAction::restartClicked, [=]()
-    {
-        //We don't have control over daemon process, cannot restart it
-        if (daemonProcess->state() != QProcess::Running && foundDaemon)
-        {
-            QMessageBox::information(nullptr, "Moolticute",
-                                     tr("Can't restart daemon, it was started by hand and not using this App."));
-            return;
-        }
-
-        if (dRunning)
-        {
-            daemonProcess->kill();
-            needRestart = true;
-        }
-        else
-        {
-            QTimer::singleShot(1500, [=]()
-            {
-                QStringList args = arguments;
-                args << "-s 8484";
-                daemonProcess->start(program, args);
-            });
-        }
-    });
+    connect(daemonAction, &DaemonMenuAction::restartClicked, this, &AppGui::restartDaemon);
 
     timerDaemon = new QTimer(this);
     connect(timerDaemon, SIGNAL(timeout()), SLOT(searchDaemonTick()));
@@ -217,7 +212,7 @@ bool AppGui::initialize()
 
     startSSHAgent();
 
-    QTimer::singleShot(15000, this, &AppGui::checkUpdate);
+    QTimer::singleShot(15000, [this]() { checkUpdate(false); });
 
     return true;
 }
@@ -229,17 +224,17 @@ void AppGui::startSSHAgent()
     if (s.value("settings/auto_start_ssh").toBool())
     {
         sshAgentProcess = new QProcess(this);
-        QString program = QCoreApplication::applicationDirPath () + "/moolticute_ssh-agent";
+        QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
         QStringList arguments;
 #ifndef Q_OS_WIN
         arguments << "--no-fork";
 #endif
-        qDebug() << "Running " << program << " " << arguments;
+        qInfo() << "Running " << program << " " << arguments;
 
         connect(sshAgentProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
-            qDebug() << "SSH agent exits with error code " << exitCode << " Exit Status : " << exitStatus;
+            qWarning() << "SSH agent exits with error code " << exitCode << " Exit Status : " << exitStatus;
 
             //Restart agent
             QTimer::singleShot(500, [=]()
@@ -290,7 +285,7 @@ void AppGui::updateSystrayTooltip()
 
     const auto status = wsClient->get_status();
 
-    const QString device_name = wsClient->isMPMini() ? tr("Mooltipass Mini") : tr("Mooltipass");
+    const QString device_name = wsClient->isMPMini() ? "Mooltipass Mini": "Mooltipass";
 
     QString msg;
     switch(status) {
@@ -388,13 +383,20 @@ void AppGui::searchDaemonTick()
         return;
     foundDaemon = search;
 
+#ifdef Q_OS_LINUX
+    restartDaemonAction->setEnabled(foundDaemon && !needRestart);
+    if (!foundDaemon && needRestart)
+        restartDaemonAction->setText("Restarting daemon...");
+    else
+        restartDaemonAction->setText("&Restart daemon");
+#else
     if (foundDaemon)
         daemonAction->updateStatus(DaemonMenuAction::StatusRunning);
     else if (needRestart)
         daemonAction->updateStatus(DaemonMenuAction::StatusRestarting);
     else
         daemonAction->updateStatus(DaemonMenuAction::StatusStopped);
-
+#endif
     if (foundDaemon)
     {
         delete logSocket;
@@ -487,7 +489,33 @@ QtAwesome *AppGui::qtAwesome()
     return a;
 }
 
-void AppGui::checkUpdate()
+void AppGui::restartDaemon()
+{
+    //We don't have control over daemon process, cannot restart it
+    if (daemonProcess->state() != QProcess::Running && foundDaemon)
+    {
+        QMessageBox::information(nullptr, "Moolticute",
+                                 tr("Can't restart daemon, it was started by hand and not using this App."));
+        return;
+    }
+
+    if (dRunning)
+    {
+        daemonProcess->kill();
+        needRestart = true;
+    }
+    else
+    {
+        QTimer::singleShot(1500, [=]()
+        {
+            QStringList args = daemonProcess->arguments();
+            args << "-s 8484";
+            daemonProcess->start(daemonProcess->program(), args);
+        });
+    }
+}
+
+void AppGui::checkUpdate(bool displayMessage)
 {
     if (QStringLiteral(APP_VERSION) == "git")
         return;
@@ -496,6 +524,45 @@ void AppGui::checkUpdate()
     u->setModuleVersion(MC_UPDATE_URL, APP_VERSION);
     u->setNotifyOnUpdate(MC_UPDATE_URL, true);
     u->setDownloaderEnabled(MC_UPDATE_URL, true);
+    u->setNotifyOnFinish(MC_UPDATE_URL, displayMessage);
 
     u->checkForUpdates(MC_UPDATE_URL);
+
+    //Recheck in at least 30minutes plus some random time
+    if (!displayMessage)
+        QTimer::singleShot(1000 * 60 * 60 * 30 + qrand() % 240, [this]() { checkUpdate(false); });
+}
+
+void AppGui::setupLanguage()
+{
+    QString locale;
+    {
+        QSettings settings;
+        QString lang = settings.value("settings/lang").toString();
+        if (lang != "")
+        {
+            //set language from config
+            locale = lang;
+        }
+        else
+        {
+            //set default system language
+            locale = QLocale::system().name().section('_', 0, 0);
+            qDebug() << "System locale: " << QLocale::system();
+        }
+    }
+
+    delete translator;
+    translator = new QTranslator(this);
+
+    //Set language
+    QString langfile = QString(":/lang/mc_%1.qm").arg(locale);
+    qInfo() << "Trying to set language: " << langfile;
+    if (QFile::exists(langfile))
+    {
+        translator->load(langfile);
+        if (!installTranslator(translator))
+            qCritical() << "Failed to install " << langfile;
+        qDebug() << "Translator installed";
+    }
 }

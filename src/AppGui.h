@@ -45,16 +45,19 @@ public:
     void mainWindowHide();
     void enableDaemon();
     void disableDaemon();
+    void setupLanguage();
 
     static QtAwesome *qtAwesome();
 
+    void checkUpdate(bool displayMessage);
+
 private slots:
+    void restartDaemon();
     void connectedChanged();
     void updateSystrayTooltip();
     void searchDaemonTick();
     void slotConnectionEstablished();
     void daemonLogRead();
-    void checkUpdate();
 
 private:
      MainWindow *win = nullptr;
@@ -62,6 +65,9 @@ private:
      WSClient *wsClient = nullptr;
      QAction *showConfigApp = nullptr;
      DaemonMenuAction *daemonAction = nullptr;
+#ifdef Q_OS_LINUX
+     QAction *restartDaemonAction;
+#endif
 
      QProcess *daemonProcess = nullptr;
      QProcess *sshAgentProcess = nullptr;
@@ -81,6 +87,8 @@ private:
 
      //This socket gives us access to the daemon log
      QLocalSocket *logSocket = nullptr;
+
+     QTranslator *translator = nullptr;
 
      bool createSingleApplication();
      void startSSHAgent();

@@ -1,9 +1,8 @@
 #ifndef FILESCACHE_H
 #define FILESCACHE_H
 
-#include <QHash>
 #include <QList>
-#include <QPair>
+#include <QVariantHash>
 #include <QObject>
 #include "SimpleCrypt/SimpleCrypt.h"
 
@@ -21,8 +20,8 @@ signals:
     void cardCPZChanged(QByteArray cardCPZ);
 
 public slots:
-    bool save(QList<QPair<int, QString>> files);
-    QList<QPair<int, QString>> load();
+    bool save(QList<QVariantMap> files);
+    QList<QVariantMap> load();
     bool erase();
 
     void resetState();

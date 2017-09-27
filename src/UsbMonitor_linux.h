@@ -21,6 +21,10 @@
 
 #include <QtCore>
 #include <libusb.h>
+#include <QThread>
+#include <QMap>
+
+#include "MPDevice_linux.h"
 
 class UsbMonitor_linux: public QObject
 {
@@ -33,41 +37,33 @@ public:
     }
     ~UsbMonitor_linux();
 
-    void filterVendorId(int vid) { vendorId = vid; }
-    void filterProductId(int pid) { productId = pid; }
+    libusb_context *getUsbContext() { return usb_ctx; }
+public slots:
     void start();
     void stop();
 
-    libusb_context *getUsbContext() { return usb_ctx; }
-
+    void handleEvents();
+    void createSocketMonitor(int fd);
+    void releaseSocketMonitor(int fd);
 signals:
     void usbDeviceAdded();
     void usbDeviceRemoved();
 
 private:
-    void startMonitoringFd(int fd);
-    void stopMonitoringFd(int fd);
-    void handleEvents();
-
+    void attachCallbacks();
+    void relaseCallbacks();
     UsbMonitor_linux();
 
     libusb_context *usb_ctx = nullptr;
-    libusb_device_handle *handle = nullptr;
     libusb_hotplug_callback_handle cbaddhandle;
     libusb_hotplug_callback_handle cbdelhandle;
 
-    QMutex mutex;
-    bool run = true;
+    QMap<intptr_t, QSocketNotifier*> m_fdMonitors;
 
-    int vendorId = LIBUSB_HOTPLUG_MATCH_ANY;
-    int productId = LIBUSB_HOTPLUG_MATCH_ANY;
-
-    friend int libusb_device_add_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
-    friend int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
     friend void libusb_fd_add_cb(int fd, short events, void *user_data);
     friend void libusb_fd_del_cb(int fd, void *user_data);
-
-    QVector<QSocketNotifier*> monitoredFds;
+    friend int libusb_device_add_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
+    friend int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
 };
 
 Q_DECLARE_METATYPE(struct libusb_transfer *)

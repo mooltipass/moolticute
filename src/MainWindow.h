@@ -62,10 +62,10 @@ private slots:
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
 
-    void integrityProgress(int total, int current);
+    void integrityProgress(int total, int current, QString message);
     void integrityFinished(bool success);
 
-    void loadingProgress(int total, int current);
+    void loadingProgress(int total, int current, QString message);
 
     void dbExported(const QByteArray &d, bool success);
     void dbImported(bool success, QString message);
@@ -90,14 +90,23 @@ private slots:
     void onRadioButtonSSHTabsAlwaysToggled(bool bChecked);
     void onCurrentTabChanged(int);
 
+    void on_comboBoxAppLang_currentIndexChanged(int index);
+
+    void on_pushButtonCheckUpdate_clicked();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
     virtual void closeEvent(QCloseEvent *event);
+    virtual void changeEvent(QEvent *event);
 
     void checkAutoStart();
 
     void setKeysTabVisibleOnDemand(bool bValue);
+
+    void setupLanguages();
+
+    void retranslateUi();
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;

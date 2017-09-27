@@ -32,6 +32,7 @@
 #include <QDebug>
 
 #include "PasswordProfilesModel.h"
+#include "AppGui.h"
 
 #define PROGRESS_STYLE \
     "QProgressBar {" \
@@ -46,23 +47,25 @@
     "border-radius: 2px;" \
     "}"
 
-PasswordLineEdit::PasswordLineEdit(QWidget* parent)
- : QLineEdit(parent),
-   m_passwordOptionsPopup(nullptr)
+PasswordLineEdit::PasswordLineEdit(QWidget* parent):
+    QLineEdit(parent),
+    m_passwordProfilesModel(nullptr),
+    m_passwordOptionsPopup(nullptr)
 
 {
-
-    QtAwesome* awesome = new QtAwesome(this);
-    Q_ASSERT(awesome->initFontAwesome());
+    AppGui *appGui = dynamic_cast<AppGui*> qApp;
+    QtAwesome *awesome = appGui->qtAwesome();
 
     m_showPassword = new QAction(awesome->icon(fa::eye), tr("Show Password"), this);
-    m_hidePassword = new QAction(awesome->icon(fa::eyeslash), ("Hide Password"), this);
-    m_generateRandom = new QAction(awesome->icon(fa::sliders), ("Random Password"), this);
+    m_hidePassword = new QAction(awesome->icon(fa::eyeslash), tr("Hide Password"), this);
+    m_generateRandom = new QAction(awesome->icon(fa::sliders), tr("Random Password"), this);
 
-    connect(m_showPassword, &QAction::triggered, [this]() {
+    connect(m_showPassword, &QAction::triggered, [this]()
+    {
         this->setPasswordVisible(true);
     });
-    connect(m_hidePassword, &QAction::triggered, [this]() {
+    connect(m_hidePassword, &QAction::triggered, [this]()
+    {
         this->setPasswordVisible(false);
     });
 
@@ -81,8 +84,10 @@ void PasswordLineEdit::setPasswordProfilesModel(PasswordProfilesModel *passwordP
         m_passwordOptionsPopup->setPasswordProfilesModel(passwordProfilesModel);
 }
 
-void PasswordLineEdit::showPasswordOptions() {
-    if(!m_passwordOptionsPopup) {
+void PasswordLineEdit::showPasswordOptions()
+{
+    if (!m_passwordOptionsPopup)
+    {
         m_passwordOptionsPopup = new PasswordOptionsPopup(this);
         m_passwordOptionsPopup->setPasswordProfilesModel(m_passwordProfilesModel);
         connect(m_passwordOptionsPopup, &PasswordOptionsPopup::passwordGenerated,
@@ -94,25 +99,26 @@ void PasswordLineEdit::showPasswordOptions() {
     m_passwordOptionsPopup->move(mapToGlobal(this->rect().bottomLeft()));
 }
 
-
-void PasswordLineEdit::setPasswordVisible(bool visible) {
-    if(visible) {
-        if(!actions().contains(m_hidePassword)) {
+void PasswordLineEdit::setPasswordVisible(bool visible)
+{
+    if (visible)
+    {
+        if (!actions().contains(m_hidePassword))
+        {
             this->removeAction(m_showPassword);
             this->addAction(m_hidePassword, QLineEdit::TrailingPosition);
-
         }
     }
-    else if(!actions().contains(m_showPassword)) {
+    else if (!actions().contains(m_showPassword))
+    {
         this->removeAction(m_hidePassword);
         this->addAction(m_showPassword, QLineEdit::TrailingPosition);
-
     }
     setEchoMode(visible ? QLineEdit::Normal: QLineEdit::Password);
 }
 
-PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
-    : QFrame(parent, Qt::Popup)
+PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent):
+    QFrame(parent, Qt::Popup)
 {
     setFrameShadow(QFrame::Plain);
     setFrameShape(QFrame::Panel);
@@ -220,7 +226,6 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent)
     setPalette(p);
 
     updatePasswordLength(m_lengthSlider->value());
-
 }
 
 void PasswordOptionsPopup::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
@@ -228,11 +233,13 @@ void PasswordOptionsPopup::setPasswordProfilesModel(PasswordProfilesModel *passw
     m_passwordProfileCMB->setModel(passwordProfilesModel);
 }
 
-void PasswordOptionsPopup::updatePasswordLength(int length) {
+void PasswordOptionsPopup::updatePasswordLength(int length)
+{
     m_sliderLengthLabel->setText(tr("Length: %1 ").arg(length));
 }
 
-void PasswordOptionsPopup::emitPassword() {
+void PasswordOptionsPopup::emitPassword()
+{
     Q_EMIT passwordGenerated(m_passwordLabel->text());
 }
 
@@ -246,61 +253,57 @@ void PasswordOptionsPopup::onPasswordProfileChanged(int index)
     generatePassword();
 }
 
-void PasswordOptionsPopup::showEvent(QShowEvent* e) {
+void PasswordOptionsPopup::showEvent(QShowEvent* e)
+{
     generatePassword();
     QFrame::showEvent(e);
 }
 
 
-LockedPasswordLineEdit::LockedPasswordLineEdit(QWidget* parent)
- : PasswordLineEdit(parent)
- , m_locked(false) {
-
+LockedPasswordLineEdit::LockedPasswordLineEdit(QWidget* parent):
+    PasswordLineEdit(parent),
+    m_locked(false)
+{
     disconnect(m_showPassword, 0, 0, 0);
 
-    connect(m_showPassword, &QAction::triggered, [this]() {
-
-       if(!m_locked) {
-           qDebug() << "*** NOT LOCKED ***";
-           this->setPasswordVisible(true);
-       }
-       else {
-           qDebug() << "*** UNLOCK REQUESTED ***";
-           Q_EMIT unlockRequested();
-       }
+    connect(m_showPassword, &QAction::triggered, [this]()
+    {
+        if(!m_locked)
+            this->setPasswordVisible(true);
+        else
+            Q_EMIT unlockRequested();
     });
-
 }
 
-void LockedPasswordLineEdit::setLocked(bool locked) {
+void LockedPasswordLineEdit::setLocked(bool locked)
+{
     m_locked = locked;
 
-    if(m_locked) {
-
+    if(m_locked)
+    {
         this->setText("");
-        this->setPlaceholderText("Password Locked");
+        this->setPlaceholderText(tr("Password Locked"));
         setPasswordVisible(false);
-
     }
-    else {
+    else
         setPasswordVisible(true);
-    }
     this->setReadOnly(m_locked);
 }
 
 
-void PasswordOptionsPopup::generatePassword() {
+void PasswordOptionsPopup::generatePassword()
+{
     PasswordProfile *profile = static_cast<PasswordProfilesModel*>(m_passwordProfileCMB->model())->getProfile(m_passwordProfileCMB->currentIndex());
-    if(!profile)
+    if (!profile)
         return;
 
     std::vector<char> pool;
-    if(profile->getName() == kCustomPasswordItem)
+    if (profile->getName() == kCustomPasswordItem)
         pool = generateCustomPasswordPool();
     else
         pool = profile->getPool();
 
-    if(pool.empty())
+    if (pool.empty())
         return;
 
     const int length = m_lengthSlider->value();
@@ -312,9 +315,8 @@ void PasswordOptionsPopup::generatePassword() {
     std::uniform_int_distribution<char> distribution(0, pool.size() - 1);
 
     //Fill the password with random characters
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++)
         result[i] = pool.at(distribution(m_random_generator));
-    }
 
     //Done
     m_passwordLabel->setText(result);
@@ -356,13 +358,13 @@ std::vector<char> PasswordOptionsPopup::generateCustomPasswordPool()
     std::vector<char> pool;
 
     int poolSize = 0;
-    if(m_upperCaseCB->isChecked())
+    if (m_upperCaseCB->isChecked())
         poolSize += PasswordProfile::upperLetters.size();
-    if(m_lowerCaseCB->isChecked())
+    if (m_lowerCaseCB->isChecked())
         poolSize += PasswordProfile::lowerLetters.size();
-    if(m_digitsCB->isChecked())
+    if (m_digitsCB->isChecked())
         poolSize += PasswordProfile::digits.size();
-    if(m_symbolsCB->isChecked())
+    if (m_symbolsCB->isChecked())
     {
         poolSize += kSymbols.size();
     }
@@ -370,13 +372,13 @@ std::vector<char> PasswordOptionsPopup::generateCustomPasswordPool()
     pool.resize(poolSize);
     //Fill the pool
     auto it = std::begin(pool);
-    if(m_upperCaseCB->isChecked())
+    if (m_upperCaseCB->isChecked())
         it = std::copy(std::begin(PasswordProfile::upperLetters), std::end(PasswordProfile::upperLetters), it);
-    if(m_lowerCaseCB->isChecked())
+    if (m_lowerCaseCB->isChecked())
         it = std::copy(std::begin(PasswordProfile::lowerLetters), std::end(PasswordProfile::lowerLetters), it);
-    if(m_digitsCB->isChecked())
+    if (m_digitsCB->isChecked())
         it = std::copy(std::begin(PasswordProfile::digits), std::end(PasswordProfile::digits), it);
-    if(m_symbolsCB->isChecked())
+    if (m_symbolsCB->isChecked())
     {
         std::string str = kSymbols.toStdString();
         it = std::copy(std::begin(str), std::end(str), it);
@@ -384,7 +386,8 @@ std::vector<char> PasswordOptionsPopup::generateCustomPasswordPool()
 
     //Initialize a mersen twister engine
     std::mt19937 random_generator;
-    if(random_generator == std::mt19937{}) {
+    if(random_generator == std::mt19937{})
+    {
         std::random_device r;
         std::seed_seq seed{r(), r(), r(), r(), r(), r(), r(), r()};
         random_generator.seed(seed);

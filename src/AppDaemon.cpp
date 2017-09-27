@@ -40,9 +40,9 @@ bool AppDaemon::initialize()
     localLogServer->listen(MOOLTICUTE_DAEMON_LOG_SOCK);
     Common::installMessageOutputHandler(localLogServer);
 
-    QCoreApplication::setOrganizationName("Raoulh");
-    QCoreApplication::setOrganizationDomain("raoulh.org");
-    QCoreApplication::setApplicationName("Moolticute");
+    QCoreApplication::setOrganizationName("mooltipass");
+    QCoreApplication::setOrganizationDomain("themooltipass.com");
+    QCoreApplication::setApplicationName("moolticute");
 
     qInfo() << "Moolticute Daemon version: " << APP_VERSION;
     qInfo() << "(c) 2016 Raoul Hecky";
