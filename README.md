@@ -41,9 +41,12 @@ sudo udevadm control --reload-rules
 ```
 
 ##### Arch Linux
+Install [AUR package](https://aur.archlinux.org/packages/moolticute/).
+
+##### Fedora
 ```bash
-sudo pacman -S --needed qt5-websockets libusb qt5-base
-echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
+sudo dnf install qt5-qtbase-devel qt5-qtwebsockets-devel libusb-devel
+echo 'ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", SYMLINK+="mooltipass", MODE="0664", GROUP="$USER"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
 sudo udevadm control --reload-rules
 ```
 
@@ -83,6 +86,19 @@ Using Qt version 5.5.1 in /usr/lib
 On Gentoo, a wrapper is created for qmake, so this command should be used:
 ```
 qmake -qt=5 ../Moolticute.pro
+```
+
+To have it running:
+```bash
+make install INSTALL_ROOT=$PWD/tmp
+mkdir -p tmp/share/systemd/user
+mv tmp/lib/systemd/system/moolticuted.service tmp/share/systemd/user
+rm -r tmp/lib
+sed -i 's#/usr/bin#$HOME/.local/bin#' tmp/share/systemd/user/moolticuted.service
+cp -r tmp/* ~/.local
+systemctl --user daemon-reload
+systemctl --user start moolticuted
+systemctl --user enable moolticuted
 ```
 
 ### Licensing
