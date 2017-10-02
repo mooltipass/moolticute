@@ -560,6 +560,7 @@ void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)
 
 void WSServerCon::resetDevice(MPDevice *dev)
 {
+    qDebug() << "resetDevice";
     mpdevice = dev;
 
     if (!mpdevice)
@@ -604,6 +605,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
 
     connect(mpdevice, &MPDevice::filesCacheChanged, this, &WSServerCon::sendFilesCache);
     connect(mpdevice, &MPDevice::hashedCardCPZChanged, this, &WSServerCon::sendDBBackupFile);
+    connect(mpdevice, &MPDevice::credentialsDiffer, this, &WSServerCon::sendCredentialsComparingResult);
 }
 
 void WSServerCon::statusChanged()
@@ -896,7 +898,7 @@ void WSServerCon::sendFilesCache()
 {
     if (!mpdevice->hasFilesCache())
     {
-        qDebug() << "There is fo files cache to send";
+        qDebug() << "There is no files cache to send";
         return;
     }
 
@@ -926,6 +928,12 @@ void WSServerCon::sendDBBackupFile()
 
     sendJsonMessage({{ "msg", "db_backup_file" },
                     { "data", backupFile }});
+}
+
+void WSServerCon::sendCredentialsComparingResult(int result)
+{
+    sendJsonMessage({{ "msg", "credentials_change_numbers" },
+                    { "data", result }});
 }
 
 void WSServerCon::setDBBackupFile(const QString &backupFile)

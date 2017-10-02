@@ -2733,6 +2733,16 @@ QWidget {background-color: #EFEFEF;}</string>
       </widget>
      </widget>
     </item>
+    <item>
+     <widget class="PromptWidget" name="promptWidget">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
@@ -2760,6 +2770,12 @@ QWidget {background-color: #EFEFEF;}</string>
    <class>FilesManagement</class>
    <extends>QWidget</extends>
    <header>FilesManagement.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PromptWidget</class>
+   <extends>QFrame</extends>
+   <header>PromptWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

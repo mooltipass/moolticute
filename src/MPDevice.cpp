@@ -22,7 +22,8 @@
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
 MPDevice::MPDevice(QObject *parent):
-    QObject(parent)
+    QObject(parent),
+    m_credentialsDbChangeNumberSet(false)
 {
     set_status(Common::UnknownStatus);
     set_memMgmtMode(false); //by default device is not in MMM
@@ -3577,6 +3578,7 @@ void MPDevice::getCurrentCardCPZ()
             qDebug() << "Card CPZ: " << get_cardCPZ().toHex();
             if (filesCache.setCardCPZ(get_cardCPZ()))
             {
+                checkCredentialsDbChangeNumbers();
                 qDebug() << "CPZ set to file cache, emitting file cache changed";
                 emit filesCacheChanged();
             }
@@ -3620,11 +3622,13 @@ void MPDevice::getChangeNumbers()
         else
         {
             set_credentialsDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]);
+            m_credentialsDbChangeNumberSet = true;
             credentialsDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+1];
             set_dataDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]);
             dataDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
             if (filesCache.setDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]))
             {
+                checkCredentialsDbChangeNumbers();
                 qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
                 emit filesCacheChanged();
             }
@@ -4834,7 +4838,8 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
         QJsonArray importFile = d.array();
 
         /* Checks */
-        if (!((importFile[9].toString() == "mooltipass" && importFile.size() == 10) || (importFile[9].toString() == "moolticute" && importFile.size() == 14)))
+        if (!((importFile[9].toString() == "mooltipass" && importFile.size() == 10) ||
+              (importFile[9].toString() == "moolticute" && importFile.size() == 14)))
         {
             qCritical() << "Invalid MooltiApp file";
             errorString = "Selected File Isn't Correct";
@@ -6598,4 +6603,67 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
+}
+
+void MPDevice::checkCredentialsDbChangeNumbers()
+{
+    qDebug() << "checkCredentialsDbChangeNumbers";
+    QString backupFile = getDBBackupFile();
+    if(backupFile.isEmpty()/*filesCache.cardCPZ().isNull()*/
+            || !m_credentialsDbChangeNumberSet)
+        return;
+
+    QFile file(backupFile);
+    if(file.exists())
+    {
+        if(file.open(QFile::ReadOnly))
+        {
+            QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+
+            if(doc.isEmpty() || doc.isNull())
+            {
+                qWarning() << "Failed to read backup file";
+                return;
+            }
+
+            if(doc.isArray())
+            {
+                QJsonArray arr = doc.array();
+
+                /* Checks */
+                if (!((arr[9].toString() == "mooltipass" && arr.size() == 10) ||
+                      (arr[9].toString() == "moolticute" && arr.size() == 14)))
+                {
+                    qCritical() << "Invalid MooltiApp file";
+                    return;
+                }
+
+                if (arr[9].toString() == "moolticute")
+                {
+                    quint8 changeNumberFromFile = arr[11].toInt();
+                    int result;
+
+                    if(m_credentialsDbChangeNumber > changeNumberFromFile)
+                    {
+                        // number from Mooltipass is greater
+                        result = Common::Device;
+                    }
+                    else if(m_credentialsDbChangeNumber < changeNumberFromFile)
+                    {
+                        //number from backup file is greater
+                        result = Common::BackupFile;
+                    }
+                    else
+                    {
+                        // everything is ok,
+                        // do nothing in this case
+                        return;
+                        //result = Common::Equal;
+                    }
+
+                    emit credentialsDiffer(result);
+                }
+            }
+        }
+    }
 }

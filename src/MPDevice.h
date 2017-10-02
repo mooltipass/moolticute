@@ -229,6 +229,7 @@ signals:
     void platformFailed();
     void filesCacheChanged();
     void hashedCardCPZChanged();
+    void credentialsDiffer(int);
 
 private slots:
     void newDataRead(const QByteArray &data);
@@ -313,6 +314,14 @@ private:
 
     void updateParam(MPParams::Param param, bool en);
     void updateParam(MPParams::Param param, int val);
+
+    /*! \brief Compares credebtials change number from Mooltipass and from backup file.
+     *
+     * This function should be called after both cardCPZ and
+     * credentialsDbChangeNumber are set. "hashedCardCPZ" is needed to get
+     * corresponding backup file that holds one of compared numbers.
+     */
+    void checkCredentialsDbChangeNumbers();
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
@@ -402,6 +411,8 @@ private:
     int progressCurrent;
 
     FilesCache filesCache;
+
+    bool m_credentialsDbChangeNumberSet;
 };
 
 #endif // MPDEVICE_H

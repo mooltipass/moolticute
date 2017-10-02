@@ -185,6 +185,14 @@ public:
         FAV_13,
         FAV_14,
     };
+
+    enum CredChangeNumComparing{
+        Equal,
+
+        // More recent credentials are in
+        Device,
+        BackupFile
+    };
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)

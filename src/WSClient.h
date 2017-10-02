@@ -122,6 +122,7 @@ signals:
     void memMgmtModeFailed(int errCode, QString errMsg);
     void filesCacheChanged();
     void databaseBackupFileChanged(QString backupFile);
+    void credentialsCompared(int result);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

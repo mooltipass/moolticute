@@ -157,6 +157,12 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         dlg.exec();
     });
     connect(ui->pushButtonDBFolder, &QPushButton::clicked, this, &MainWindow::changeDBBackupFile);
+    connect(ui->promptWidget, &PromptWidget::accepted, this, &MainWindow::onPromptAccepted);
+    connect(ui->promptWidget, &PromptWidget::rejected, [=]()
+    {
+        ui->promptWidget->hide();
+        layout()->activate();
+    });
 
     ui->pushButtonDevSettings->setChecked(false);
 
@@ -415,6 +421,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         checkSettingsChanged();
     });
 
+    connect(wsClient, &WSClient::credentialsCompared, this, &MainWindow::onCredentialsCompared);
+
     //When something changed in GUI, show save/reset buttons
     connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxLock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
@@ -449,6 +457,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
+
+    // hide widget with prompts by default
+    ui->promptWidget->setVisible(false);
 
     updateSerialInfos();
     updatePage();
@@ -1248,4 +1259,32 @@ void MainWindow::retranslateUi()
 {
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
     updateSerialInfos();
+}
+
+void MainWindow::onCredentialsCompared(int result)
+{
+    m_credentialsComparingResult = result;
+
+    QString message;
+    if(m_credentialsComparingResult == Common::BackupFile)
+        message = tr("Credentials in the backup file are more recent. "
+                     "Do you want import credentials to the device?");
+    else if(m_credentialsComparingResult == Common::Device)
+        message = tr("Credentials on the device are more recent. "
+                     "Do you want export credentials to backup file?");
+
+    ui->promptWidget->setText(message);
+    ui->promptWidget->show();
+}
+
+void MainWindow::onPromptAccepted()
+{
+    ui->promptWidget->hide();
+
+    if(m_credentialsComparingResult == Common::BackupFile)
+        //on_pushButtonImportFile_clicked();
+        QMessageBox::warning(this, tr("Stub message"), tr("Code for importing from backup file will be called."));
+    else if(m_credentialsComparingResult == Common::Device)
+        //on_pushButtonExportFile_clicked();
+        QMessageBox::warning(this, tr("Stub message"), tr("Code for exporting to backup file will be called."));
 }

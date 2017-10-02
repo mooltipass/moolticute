@@ -74,6 +74,8 @@ private slots:
     void sendDeviceUID();
     void sendFilesCache();
     void sendDBBackupFile();
+    void sendCredentialsComparingResult(int result);
+
     void setDBBackupFile(const QString &backupFile);
 
 private:

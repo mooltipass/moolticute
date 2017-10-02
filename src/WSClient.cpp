@@ -295,6 +295,11 @@ void WSClient::onTextMessageReceived(const QString &message)
         QString backupFile = rootobj["data"].toString();
         emit databaseBackupFileChanged(backupFile);
     }
+    else if (rootobj["msg"] == "credentials_change_numbers")
+    {
+        int result = rootobj["data"].toInt();
+        emit credentialsCompared(result);
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
