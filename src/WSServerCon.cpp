@@ -226,6 +226,7 @@ void WSServerCon::processMessage(const QString &message)
             QJsonObject oroot = root;
             oroot["data"] = ores;
             sendJsonMessage(oroot);
+            mpdevice->getChangeNumbers();
         });
     }
     else if (root["msg"] == "del_credential")
@@ -473,6 +474,7 @@ void WSServerCon::processMessage(const QString &message)
             ores["success"] = "true";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
+            mpdevice->getChangeNumbers();
         });
     }
     else if (root["msg"] == "export_database")

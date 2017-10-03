@@ -8,8 +8,10 @@
 #include "Common.h"
 
 PromptWidget::PromptWidget(QWidget *parent) : QFrame(parent),
+    m_hideAfterAccepted(true),
     m_messageLabel(new QLabel),
-    m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No))
+    m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No)),
+    m_promptMessage(nullptr)
 {
     QHBoxLayout *lay = new QHBoxLayout(this);
     setLayout(lay);
@@ -25,14 +27,38 @@ PromptWidget::PromptWidget(QWidget *parent) : QFrame(parent),
 
     m_messageLabel->setAlignment(Qt::AlignCenter);
     m_messageLabel->setWordWrap(true);
-    m_messageLabel->setText(tr("This is text message in PromptWidget.\n"
-                               "And this is long long text"));
 
-    connect(m_buttonBox, &QDialogButtonBox::accepted, this, &PromptWidget::accepted);
+    connect(m_buttonBox, &QDialogButtonBox::accepted, this, &PromptWidget::onAccepted);
     connect(m_buttonBox, &QDialogButtonBox::rejected, this, &PromptWidget::rejected);
 }
 
 void PromptWidget::setText(const QString &text)
 {
     m_messageLabel->setText(text);
+}
+
+void PromptWidget::setPromptMessage(PromptMessage *promptMessage)
+{
+    if(m_promptMessage)
+        delete m_promptMessage;
+
+    m_promptMessage = promptMessage;
+
+    if(m_promptMessage)
+        m_messageLabel->setText(m_promptMessage->getText());
+}
+
+void PromptWidget::onAccepted()
+{
+    if(m_hideAfterAccepted)
+        hide();
+
+    if(m_promptMessage)
+    {
+        m_promptMessage->runCallBack();
+        delete m_promptMessage;
+        m_promptMessage = nullptr;
+    }
+
+    emit accepted();
 }

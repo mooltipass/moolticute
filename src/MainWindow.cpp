@@ -157,7 +157,6 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         dlg.exec();
     });
     connect(ui->pushButtonDBFolder, &QPushButton::clicked, this, &MainWindow::changeDBBackupFile);
-    connect(ui->promptWidget, &PromptWidget::accepted, this, &MainWindow::onPromptAccepted);
     connect(ui->promptWidget, &PromptWidget::rejected, [=]()
     {
         ui->promptWidget->hide();
@@ -804,7 +803,7 @@ void MainWindow::wantSaveCredentialManagement()
     {
         disconnect(*conn);
         if (!success)
-	{
+        {
             QMessageBox::warning(this, tr("Failure"), tr("Couldn't save credentials, please contact the support team with moolticute's log"));
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         }
@@ -820,6 +819,7 @@ void MainWindow::wantImportDatabase()
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
+    ui->promptWidget->hide();
 
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
@@ -832,13 +832,14 @@ void MainWindow::wantExportDatabase()
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
+    ui->promptWidget->hide();
 
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
 void MainWindow::changeDBBackupFile()
 {
-    QString file = QFileDialog::getSaveFileName(this, tr("Choose file"),
+    QString file = QFileDialog::getOpenFileName(this, tr("Choose file"),
                                                 ui->lineEditDBFile->text());
 
     ui->lineEditDBFile->setText(file);
@@ -1263,28 +1264,24 @@ void MainWindow::retranslateUi()
 
 void MainWindow::onCredentialsCompared(int result)
 {
-    m_credentialsComparingResult = result;
+    if(result == Common::BackupFile)
+        showImportCredentialsPrompt();
+    else if(result == Common::Device)
+        showExportCredentialsPrompt();
+}
 
-    QString message;
-    if(m_credentialsComparingResult == Common::BackupFile)
-        message = tr("Credentials in the backup file are more recent. "
-                     "Do you want import credentials to the device?");
-    else if(m_credentialsComparingResult == Common::Device)
-        message = tr("Credentials on the device are more recent. "
-                     "Do you want export credentials to backup file?");
-
-    ui->promptWidget->setText(message);
+void MainWindow::showImportCredentialsPrompt()
+{
+    ui->promptWidget->setPromptMessage(new PromptMessage(tr("Credentials in the backup file are more recent. "
+                                                            "Do you want import credentials to the device?"),
+                                                         [this](){ this->on_pushButtonImportFile_clicked(); }));
     ui->promptWidget->show();
 }
 
-void MainWindow::onPromptAccepted()
+void MainWindow::showExportCredentialsPrompt()
 {
-    ui->promptWidget->hide();
-
-    if(m_credentialsComparingResult == Common::BackupFile)
-        //on_pushButtonImportFile_clicked();
-        QMessageBox::warning(this, tr("Stub message"), tr("Code for importing from backup file will be called."));
-    else if(m_credentialsComparingResult == Common::Device)
-        //on_pushButtonExportFile_clicked();
-        QMessageBox::warning(this, tr("Stub message"), tr("Code for exporting to backup file will be called."));
+    ui->promptWidget->setPromptMessage(new PromptMessage(tr("Credentials on the device are more recent. "
+                                                            "Do you want export credentials to backup file?"),
+                                                         [this](){ this->on_pushButtonExportFile_clicked(); }));
+    ui->promptWidget->show();
 }

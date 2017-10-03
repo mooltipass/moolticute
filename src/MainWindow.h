@@ -94,7 +94,6 @@ private slots:
 
     void on_pushButtonCheckUpdate_clicked();
     void onCredentialsCompared(int result);
-    void onPromptAccepted();
 
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
@@ -109,6 +108,9 @@ private:
     void setupLanguages();
 
     void retranslateUi();
+
+    void showImportCredentialsPrompt();
+    void showExportCredentialsPrompt();
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;
@@ -130,8 +132,6 @@ private:
     QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;
     PasswordProfilesModel *m_passwordProfilesModel;
-    int m_credentialsComparingResult;
-
     static const QString SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY;
 };
 
