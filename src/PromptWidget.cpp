@@ -29,7 +29,12 @@ PromptWidget::PromptWidget(QWidget *parent) : QFrame(parent),
     m_messageLabel->setWordWrap(true);
 
     connect(m_buttonBox, &QDialogButtonBox::accepted, this, &PromptWidget::onAccepted);
-    connect(m_buttonBox, &QDialogButtonBox::rejected, this, &PromptWidget::rejected);
+    connect(m_buttonBox, &QDialogButtonBox::rejected, this, &PromptWidget::onRejected);
+}
+
+PromptWidget::~PromptWidget()
+{
+    cleanPromptMessage();
 }
 
 void PromptWidget::setText(const QString &text)
@@ -39,13 +44,21 @@ void PromptWidget::setText(const QString &text)
 
 void PromptWidget::setPromptMessage(PromptMessage *promptMessage)
 {
-    if(m_promptMessage)
-        delete m_promptMessage;
+    cleanPromptMessage();
 
     m_promptMessage = promptMessage;
 
     if(m_promptMessage)
         m_messageLabel->setText(m_promptMessage->getText());
+}
+
+void PromptWidget::cleanPromptMessage()
+{
+    if(m_promptMessage)
+    {
+        delete m_promptMessage;
+        m_promptMessage = nullptr;
+    }
 }
 
 void PromptWidget::onAccepted()
@@ -54,11 +67,15 @@ void PromptWidget::onAccepted()
         hide();
 
     if(m_promptMessage)
-    {
-        m_promptMessage->runCallBack();
-        delete m_promptMessage;
-        m_promptMessage = nullptr;
-    }
+        m_promptMessage->runAcceptCallBack();
 
     emit accepted();
+}
+
+void PromptWidget::onRejected()
+{
+    if(m_promptMessage)
+        m_promptMessage->runRejectCallBack();
+
+    emit rejected();
 }

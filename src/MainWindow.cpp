@@ -157,11 +157,6 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         dlg.exec();
     });
     connect(ui->pushButtonDBFolder, &QPushButton::clicked, this, &MainWindow::changeDBBackupFile);
-    connect(ui->promptWidget, &PromptWidget::rejected, [=]()
-    {
-        ui->promptWidget->hide();
-        layout()->activate();
-    });
 
     ui->pushButtonDevSettings->setChecked(false);
 
@@ -1274,7 +1269,20 @@ void MainWindow::showImportCredentialsPrompt()
 {
     ui->promptWidget->setPromptMessage(new PromptMessage(tr("Credentials in the backup file are more recent. "
                                                             "Do you want import credentials to the device?"),
-                                                         [this](){ this->on_pushButtonImportFile_clicked(); }));
+                                                         [this](){ this->on_pushButtonImportFile_clicked(); },
+    [this]()
+    {
+        QMessageBox::StandardButton btn = QMessageBox::warning(this, tr("Be careful"),
+                                                               tr("By denying you can lose your changes. Do you want to continue?"),
+                                                               QMessageBox::Yes | QMessageBox::No);
+        if(btn == QMessageBox::Yes)
+        {
+            ui->promptWidget->hide();
+            this->layout()->activate();
+        }
+    }
+    ));
+
     ui->promptWidget->show();
 }
 
@@ -1282,6 +1290,19 @@ void MainWindow::showExportCredentialsPrompt()
 {
     ui->promptWidget->setPromptMessage(new PromptMessage(tr("Credentials on the device are more recent. "
                                                             "Do you want export credentials to backup file?"),
-                                                         [this](){ this->on_pushButtonExportFile_clicked(); }));
+                                                         [this](){ this->on_pushButtonExportFile_clicked(); },
+    [this]()
+    {
+        QMessageBox::StandardButton btn = QMessageBox::warning(this, tr("Be careful"),
+                                                               tr("By denying you can lose your changes. Do you want to continue?"),
+                                                               QMessageBox::Yes | QMessageBox::No);
+        if(btn == QMessageBox::Yes)
+        {
+            ui->promptWidget->hide();
+            this->layout()->activate();
+        }
+    }
+    ));
+
     ui->promptWidget->show();
 }

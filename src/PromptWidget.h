@@ -17,17 +17,21 @@ class PromptMessage{
 
 public:
     PromptMessage(const QString &text,
-                  std::function<void()> cb) :
+                  std::function<void()> acceptCallBack = nullptr,
+                  std::function<void()> rejectCallBack = nullptr) :
         m_text(text),
-        m_cb(cb)
+        m_acceptCallBack(acceptCallBack),
+        m_rejectCallBack(rejectCallBack)
     {}
 
     QString getText() const { return m_text; }
-    void runCallBack() { if(m_cb) m_cb(); }
+    void runAcceptCallBack() { if(m_acceptCallBack) m_acceptCallBack(); }
+    void runRejectCallBack() { if(m_rejectCallBack) m_rejectCallBack(); }
 
 private:
     QString m_text;
-    std::function<void()> m_cb;
+    std::function<void()> m_acceptCallBack;
+    std::function<void()> m_rejectCallBack;
 };
 
 //!
@@ -40,10 +44,12 @@ class PromptWidget : public QFrame
     Q_OBJECT
 public:
     explicit PromptWidget(QWidget *parent = nullptr);
+    ~PromptWidget();
 
     void setHideAfterAccepted(bool hide) { m_hideAfterAccepted = hide; }
     void setText(const QString &text);
     void setPromptMessage(PromptMessage *promptMessage);
+    void cleanPromptMessage();
 
 signals:
     void accepted();
@@ -51,6 +57,7 @@ signals:
 
 protected slots:
     void onAccepted();
+    void onRejected();
 
 private:
     bool m_hideAfterAccepted;
