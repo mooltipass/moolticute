@@ -1007,7 +1007,7 @@ void MainWindow::on_pushButtonImportFile_clicked()
     {
         fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
                                                  "Memory exports (*.bin);;All files (*.*)");
-        ui->lineEditDBFile->setText(fname);
+        setDatabaseBackupFile(fname);
     }
 
     if (fname.isEmpty())
@@ -1065,7 +1065,7 @@ void MainWindow::dbImported(bool success, QString message)
     if (!success)
     {
         QMessageBox::warning(this, tr("Error"), message);
-        ui->lineEditDBFile->setText(QString()); // clean field
+        setDatabaseBackupFile(QString()); // clean field
     }
     else
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
