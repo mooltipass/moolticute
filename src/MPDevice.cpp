@@ -388,6 +388,9 @@ void MPDevice::setDBBackupFile(const QString &backupFile)
     settings.beginGroup("users");
     settings.setValue(fileInfo.baseName(), backupFile);
     settings.endGroup();
+
+    // check change credentials database numbers in the device and backup file
+    checkCredentialsDbChangeNumbers();
 }
 
 bool MPDevice::isJobsQueueBusy()

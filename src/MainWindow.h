@@ -58,6 +58,7 @@ private slots:
     void wantImportDatabase();
     void wantExportDatabase();
     void changeDBBackupFile();
+    void setDatabaseBackupFile(const QString &filePath);
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);

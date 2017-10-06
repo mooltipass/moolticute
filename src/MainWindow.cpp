@@ -837,8 +837,13 @@ void MainWindow::changeDBBackupFile()
     QString file = QFileDialog::getOpenFileName(this, tr("Choose file"),
                                                 ui->lineEditDBFile->text());
 
-    ui->lineEditDBFile->setText(file);
-    wsClient->sendDBBackupFile(file);
+    setDatabaseBackupFile(file);
+}
+
+void MainWindow::setDatabaseBackupFile(const QString &filePath)
+{
+    ui->lineEditDBFile->setText(filePath);
+    wsClient->sendDBBackupFile(filePath);
 }
 
 void MainWindow::wantExitFilesManagement()
@@ -996,8 +1001,15 @@ void MainWindow::on_pushButtonExportFile_clicked()
 
 void MainWindow::on_pushButtonImportFile_clicked()
 {
-    QString fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
+    QString fname = ui->lineEditDBFile->text();
+
+    if(fname.isEmpty())
+    {
+        fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
                                                  "Memory exports (*.bin);;All files (*.*)");
+        ui->lineEditDBFile->setText(fname);
+    }
+
     if (fname.isEmpty())
         return;
 
@@ -1021,15 +1033,23 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
         QMessageBox::warning(this, tr("Error"), tr(d));
     else
     {
-        QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),
+        QString fname = ui->lineEditDBFile->text();
+        if(fname.isEmpty())
+            fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),
                                                      "Memory exports (*.bin);;All files (*.*)");
+
         if (!fname.isEmpty())
         {
             QFile f(fname);
             if (!f.open(QFile::WriteOnly | QFile::Truncate))
                 QMessageBox::warning(this, tr("Error"), tr("Unable to write to file %1").arg(fname));
             else
+            {
                 f.write(d);
+                if(ui->lineEditDBFile->text().isEmpty())
+                    setDatabaseBackupFile(fname);
+                QMessageBox::information(this, tr("Export result"), tr("Backup file successfully updated: %1").arg(fname));
+            }
             f.close();
         }
     }
@@ -1043,7 +1063,10 @@ void MainWindow::dbImported(bool success, QString message)
     ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
     if (!success)
+    {
         QMessageBox::warning(this, tr("Error"), message);
+        ui->lineEditDBFile->setText(QString()); // clean field
+    }
     else
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
 
