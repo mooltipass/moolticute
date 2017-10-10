@@ -53,7 +53,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
                                 { "color-active", QColor(Qt::white) }};
 
     ui->setupUi(this);
-    setupLanguages();
+    refreshAppLangCb();
 
     m_tabMap[ui->pageAbout] = ui->pushButtonAbout;
     m_tabMap[ui->pageAppSettings] = ui->pushButtonAppSettings;
@@ -1158,8 +1158,13 @@ void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
                          tr("An error occured when trying to go into Memory Management mode.\n\n%1").arg(errMsg));
 }
 
-void MainWindow::setupLanguages()
+void MainWindow::refreshAppLangCb()
 {
+    bool oldState = ui->comboBoxAppLang->blockSignals(true);
+
+    while (ui->comboBoxAppLang->count() > 0)
+        ui->comboBoxAppLang->removeItem(0);
+
     QSettings settings;
     QString language = settings.value("settings/lang").toString();
 
@@ -1196,12 +1201,14 @@ void MainWindow::setupLanguages()
                     .arg(QLocale::languageToString(locale.language()))
                     .arg(QLocale::scriptToString(locale.script()));
         else
-            ln = QLocale::languageToString(locale.language());
+            ln = locale.nativeLanguageName();
 
         ui->comboBoxAppLang->addItem(ln, llang);
 
         if (language == llang) ui->comboBoxAppLang->setCurrentIndex(ui->comboBoxAppLang->count() - 1);
     }
+
+    ui->comboBoxAppLang->blockSignals(oldState);
 }
 
 void MainWindow::on_comboBoxAppLang_currentIndexChanged(int index)
@@ -1216,6 +1223,7 @@ void MainWindow::on_comboBoxAppLang_currentIndexChanged(int index)
 
         AppGui *a = qobject_cast<AppGui *>(qApp);
         a->setupLanguage();
+        refreshAppLangCb();
     }
 }
 
