@@ -208,7 +208,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     bool success = true;
 
     // Special case: if command check was requested but the device returned a mooltipass status (user entering his PIN), resend packet
-    if (currentCmd.checkReturn && MPCmd::from(currentCmd.data.at(MP_CMD_FIELD_INDEX)) != MPCmd::MOOLTIPASS_STATUS && MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::MOOLTIPASS_STATUS)
+    if (currentCmd.checkReturn && MPCmd::from(currentCmd.data.at(MP_CMD_FIELD_INDEX)) != MPCmd::MOOLTIPASS_STATUS && MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::MOOLTIPASS_STATUS && (data.at(MP_PAYLOAD_FIELD_INDEX) & MP_UNLOCKING_SCREEN_BITMASK) != 0)
     {
         qDebug() << MPCmd::printCmd(data) << " received, resending command " << MPCmd::printCmd(commandQueue.head().data);
         platformWrite(commandQueue.head().data);
