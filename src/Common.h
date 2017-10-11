@@ -217,7 +217,7 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                         "}" \
                         "QPushButton:pressed {" \
                             "color: #FFFFFF;" \
-                            "background-color: #E57373;" \
+                            "background-color: #237C95;" \
                         "}"
 
 #endif // COMMON_H

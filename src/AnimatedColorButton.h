@@ -26,6 +26,9 @@ private:
     int getProgress();
     void reset();
 
+private slots:
+    void mouseClick();
+
 private:
     virtual void resizeEvent(QResizeEvent *event);
 

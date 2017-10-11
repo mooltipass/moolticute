@@ -26,6 +26,8 @@ AnimatedColorButton::AnimatedColorButton(QWidget *parent, int iAnimationDuration
     m_pAnimation->setStartValue(0);
     m_pAnimation->setEndValue(width());
 
+    connect(this, &AnimatedColorButton::clicked, this, &AnimatedColorButton::mouseClick);
+
     reset();
 }
 
@@ -54,17 +56,30 @@ int AnimatedColorButton::animationDuration() const
 void AnimatedColorButton::mousePressEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-    if (!m_tTimer.isActive())
+
+    QSettings s;
+    bool enabled = s.value("settings/long_press_cancel", true).toBool();
+
+    if (enabled &&
+        !m_tTimer.isActive())
     {
         m_tTimer.start();
         m_pAnimation->start();
+    }
+    else if (!enabled)
+    {
+        QPushButton::mousePressEvent(event);
     }
 }
 
 void AnimatedColorButton::mouseReleaseEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
     reset();
+
+    QSettings s;
+    bool enabled = s.value("settings/long_press_cancel", true).toBool();
+    if (!enabled)
+        QPushButton::mouseReleaseEvent(event);
 }
 
 void AnimatedColorButton::onTimeOut()
@@ -85,4 +100,12 @@ void AnimatedColorButton::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
     m_pAnimation->setEndValue(width());
+}
+
+void AnimatedColorButton::mouseClick()
+{
+    QSettings s;
+    bool enabled = s.value("settings/long_press_cancel", true).toBool();
+    if (!enabled)
+        emit actionValidated();
 }

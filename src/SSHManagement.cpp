@@ -35,7 +35,8 @@ SSHManagement::SSHManagement(QWidget *parent) :
 
     ui->pushButtonUnlock->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonUnlock->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
-    ui->buttonDiscard->setStyleSheet(CSS_GREY_BUTTON);
+    ui->buttonDiscard->setText(tr("Discard all changes"));
+    connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &SSHManagement::buttonDiscardClicked);
     ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonImport->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonImport->setIcon(AppGui::qtAwesome()->icon(fa::plussquare, whiteButtons));
@@ -225,7 +226,7 @@ void SSHManagement::onExportPrivateKey()
     QMessageBox::information(this, "Moolticute", tr("Private key successfully exported."));
 }
 
-void SSHManagement::on_buttonDiscard_clicked()
+void SSHManagement::buttonDiscardClicked()
 {
     loaded = false;
     keysModel->clear();

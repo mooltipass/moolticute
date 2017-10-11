@@ -43,9 +43,9 @@ private slots:
     void onExportPublicKey();
     void onExportPrivateKey();
     void onServiceExists(const QString service, bool exists);
+    void buttonDiscardClicked();
 
     void on_pushButtonUnlock_clicked();
-    void on_buttonDiscard_clicked();
     void on_buttonSaveChanges_clicked();
     void on_pushButtonImport_clicked();
 

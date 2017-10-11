@@ -359,22 +359,25 @@ border-right: none;
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>288</width>
-             <height>20</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="buttonDiscard">
+          <widget class="AnimatedColorButton" name="buttonDiscard" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>150</width>
              <height>0</height>
             </size>
-           </property>
-           <property name="text">
-            <string>Discard all changes</string>
            </property>
           </widget>
          </item>
@@ -398,8 +401,8 @@ border-right: none;
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>288</width>
-             <height>20</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
           </spacer>
@@ -413,6 +416,11 @@ border-right: none;
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>AnimatedColorButton</class>
+   <extends>QPushButton</extends>
+   <header>AnimatedColorButton.h</header>
+  </customwidget>
   <customwidget>
    <class>RotateSpinner</class>
    <extends>QWidget</extends>

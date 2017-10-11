@@ -127,8 +127,6 @@ private:
     QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;
     PasswordProfilesModel *m_passwordProfilesModel;
-
-    static const QString SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY;
 };
 
 #endif // MAINWINDOW_H
