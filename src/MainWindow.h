@@ -103,7 +103,7 @@ private:
 
     void setKeysTabVisibleOnDemand(bool bValue);
 
-    void setupLanguages();
+    void refreshAppLangCb();
 
     void retranslateUi();
 
