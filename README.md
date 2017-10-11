@@ -59,7 +59,9 @@ Two method can be used to build, by using QtCreator IDE, or from command line (t
 
  - Download and install the Qt SDK from their [website](http://qt.io)
  - Start Qt-Creator
- - Open the main Moolticute.pro project file
+ - Open the main Moolticute.pro project file 
+    - Note for Windows users: make sure that you select a "kit" that uses the MinGW compiler.
+      Moolticute currently won't compile successfully on the Microsoft Visual C++ compiler.
  - Click on the "play" button to build and run
 
 ##### Command line
