@@ -51,7 +51,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
                                 { "color-active", QColor(Qt::white) }};
 
     ui->setupUi(this);
-    setupLanguages();
+    refreshAppLangCb();
 
     ui->checkBoxLongPress->setChecked(s.value("settings/long_press_cancel", true).toBool());
     connect(ui->checkBoxLongPress, &QCheckBox::toggled, [this](bool checked)
@@ -1163,8 +1163,12 @@ void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
                          tr("An error occured when trying to go into Memory Management mode.\n\n%1").arg(errMsg));
 }
 
-void MainWindow::setupLanguages()
-{   
+void MainWindow::refreshAppLangCb()
+{
+    bool oldState = ui->comboBoxAppLang->blockSignals(true);
+
+    ui->comboBoxAppLang->clear();
+
     QSettings settings;
     QString language = settings.value("settings/lang").toString();
 
@@ -1201,12 +1205,14 @@ void MainWindow::setupLanguages()
                     .arg(QLocale::languageToString(locale.language()))
                     .arg(QLocale::scriptToString(locale.script()));
         else
-            ln = QLocale::languageToString(locale.language());
+            ln = locale.nativeLanguageName();
 
         ui->comboBoxAppLang->addItem(ln, llang);
 
         if (language == llang) ui->comboBoxAppLang->setCurrentIndex(ui->comboBoxAppLang->count() - 1);
     }
+
+    ui->comboBoxAppLang->blockSignals(oldState);
 }
 
 void MainWindow::on_comboBoxAppLang_currentIndexChanged(int index)
@@ -1221,6 +1227,7 @@ void MainWindow::on_comboBoxAppLang_currentIndexChanged(int index)
 
         AppGui *a = qobject_cast<AppGui *>(qApp);
         a->setupLanguage();
+        refreshAppLangCb();
     }
 }
 
