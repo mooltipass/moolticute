@@ -198,21 +198,38 @@ void MPDevice::newDataRead(const QByteArray &data)
     if (MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::PLEASE_RETRY)
     {
         qDebug() << MPCmd::printCmd(data) << " received, resending command " << MPCmd::printCmd(commandQueue.head().data);
-        platformWrite(commandQueue.head().data);
-        commandQueue.head().timerTimeout->start(); //restart timer
+        commandQueue.head().timerTimeout->stop();
+        QTimer *timer = new QTimer(this);
+        connect(timer, &QTimer::timeout, [this, timer]()
+        {
+            timer->stop();
+            timer->deleteLater();
+            platformWrite(commandQueue.head().data);
+            commandQueue.head().timerTimeout->start(); //restart timer
+        });
+        timer->start(300);
         return;
     }
 
     MPCommand currentCmd = commandQueue.head();
 
-    bool success = true;
-
     // Special case: if command check was requested but the device returned a mooltipass status (user entering his PIN), resend packet
-    if (currentCmd.checkReturn && MPCmd::from(currentCmd.data.at(MP_CMD_FIELD_INDEX)) != MPCmd::MOOLTIPASS_STATUS && MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::MOOLTIPASS_STATUS)
+    if (currentCmd.checkReturn &&
+        MPCmd::from(currentCmd.data.at(MP_CMD_FIELD_INDEX)) != MPCmd::MOOLTIPASS_STATUS &&
+        MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::MOOLTIPASS_STATUS &&
+        (data.at(MP_PAYLOAD_FIELD_INDEX) & MP_UNLOCKING_SCREEN_BITMASK) != 0)
     {
         qDebug() << MPCmd::printCmd(data) << " received, resending command " << MPCmd::printCmd(commandQueue.head().data);
-        platformWrite(commandQueue.head().data);
-        commandQueue.head().timerTimeout->start(); //restart timer
+        commandQueue.head().timerTimeout->stop();
+        QTimer *timer = new QTimer(this);
+        connect(timer, &QTimer::timeout, [this, timer]()
+        {
+            timer->stop();
+            timer->deleteLater();
+            platformWrite(commandQueue.head().data);
+            commandQueue.head().timerTimeout->start(); //restart timer
+        });
+        timer->start(300);
         return;
     }
 
@@ -223,13 +240,13 @@ void MPDevice::newDataRead(const QByteArray &data)
     {
         qWarning() << "Wrong answer received: " << MPCmd::printCmd(data)
                    << " for command: " << MPCmd::printCmd(currentCmd.data);
-        success = false;
+        return;
     }
 
 //    qDebug() << "Received answer:" << MPCmd::printCmd(data);
 
     bool done = true;
-    currentCmd.cb(success, data, done);
+    currentCmd.cb(true, data, done);
     delete currentCmd.timerTimeout;
     commandQueue.head().timerTimeout = nullptr;
 
