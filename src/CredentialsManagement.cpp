@@ -31,6 +31,8 @@
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
 {
+    m_selectionCanceled= false;
+
     ui->setupUi(this);
     ui->stackedWidget->setCurrentWidget(ui->pageLocked);
 
@@ -41,7 +43,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonEnterMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->addCredentialButton->setStyleSheet(CSS_BLUE_BUTTON);
     ui->buttonDiscard->setText(tr("Discard all changes"));
-    connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_buttonDiscard_clicked);
+    connect(ui->buttonDiscard, &AnimatedColorButton::pressed, this, &CredentialsManagement::on_buttonDiscard_pressed);
+    connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_buttonDiscard_confirmed);
 
     ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
@@ -73,7 +76,9 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     connect(m_pCredModel, &CredentialModel::modelLoaded, ui->credentialTreeView, &CredentialView::onModelLoaded);
     connect(m_pCredModel, &CredentialModel::modelLoaded, this, &CredentialsManagement::onModelLoaded);
-    connect(ui->credentialTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &CredentialsManagement::onCredentialSelected);
+    connect(ui->credentialTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &CredentialsManagement::onCredentialSelected,
+            Qt::QueuedConnection);
     connect(this, &CredentialsManagement::loginSelected, this, &CredentialsManagement::onLoginSelected);
     connect(this, &CredentialsManagement::serviceSelected, this, &CredentialsManagement::onServiceSelected);
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::unlockRequested, this, &CredentialsManagement::requestPasswordForSelectedItem);
@@ -122,6 +127,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memoryDataChanged, [=]()
     {
         m_pCredModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
+        m_loadedModelSerialiation = m_pCredModel->getJsonChanges();
         ui->lineEditFilterCred->clear();
     });
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
@@ -162,16 +168,25 @@ void CredentialsManagement::on_pushButtonEnterMMM_clicked()
     emit wantEnterMemMode();
 }
 
-void CredentialsManagement::on_buttonDiscard_clicked()
+void CredentialsManagement::on_buttonDiscard_pressed()
 {
-    if (!confirmDiscardUneditedCredentialChanges())
-        return;
+    auto modelSerialization = m_pCredModel->getJsonChanges();
+    if (modelSerialization == m_loadedModelSerialiation) {
+        wsClient->sendLeaveMMRequest();
+        m_pCredModel->clear();
+    }
+}
+
+void CredentialsManagement::on_buttonDiscard_confirmed()
+{
     wsClient->sendLeaveMMRequest();
     m_pCredModel->clear();
 }
 
 void CredentialsManagement::on_buttonSaveChanges_clicked()
 {
+    saveSelectedCredential({});
+
     qDebug() << m_pCredModel->getJsonChanges();
     wsClient->sendCredentialsMM(m_pCredModel->getJsonChanges());
     emit wantSaveMemMode(); //waits for the daemon to process the data
@@ -523,7 +538,20 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
 
 void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, const QModelIndex &previous)
 {
-    Q_UNUSED(previous)
+    if (m_selectionCanceled)
+    {
+        m_selectionCanceled = false;
+        return;
+    }
+
+    if (!confirmDiscardUneditedCredentialChanges(previous))
+    {
+        m_selectionCanceled = true;
+        auto selectionModel = ui->credentialTreeView->selectionModel();
+        selectionModel->setCurrentIndex(previous, QItemSelectionModel::ClearAndSelect);
+        return;
+    }
+
     QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
     if (srcIndex.isValid())
     {
