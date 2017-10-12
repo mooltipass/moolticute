@@ -1047,7 +1047,9 @@ void MPDevice::startMemMgmtMode(bool wantData,
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
 
     /* Ask device to go into MMM first */
-    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+    auto startMmmJob = new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet);
+    startMmmJob->setTimeout(15000); //We need a big timeout here in case user enter a wrong pin code
+    jobs->append(startMmmJob);
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
