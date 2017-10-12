@@ -238,6 +238,7 @@ void CredentialsManagement::on_addCredentialButton_clicked()
     }
     else
     {
+        ui->addCredentialButton->setEnabled(false);
         ui->gridLayoutAddCred->setEnabled(false);
         wsClient->addOrUpdateCredential(ui->addCredServiceInput->text(),
                                         ui->addCredLoginInput->text(),
@@ -247,6 +248,7 @@ void CredentialsManagement::on_addCredentialButton_clicked()
         *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & service, const QString & login, const QString &, bool success)
         {
             disconnect(*conn);
+            ui->addCredentialButton->setEnabled(true);
             ui->gridLayoutAddCred->setEnabled(true);
             if (success)
                 QMessageBox::information(this, "Moolticute", tr("%1: New Login %2 added.").arg(service, login));
