@@ -72,6 +72,7 @@ private slots:
     void onModelLoaded(bool bClearLoginDescription);
     void onSelectLoginItem(LoginItem *pLoginItem);
     void onSelectLoginTimerTimeOut();
+    void updateFavMenu();
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
@@ -92,6 +93,7 @@ private:
     QTimer m_tSelectLoginTimer;
     LoginItem *m_pAddedLoginItem;
 
+    QMenu m_favMenu;
     QJsonArray m_loadedModelSerialiation;
     bool m_selectionCanceled;
 
