@@ -55,8 +55,6 @@ int AnimatedColorButton::animationDuration() const
 
 void AnimatedColorButton::mousePressEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
-
     QSettings s;
     bool enabled = s.value("settings/long_press_cancel", true).toBool();
 
@@ -65,6 +63,8 @@ void AnimatedColorButton::mousePressEvent(QMouseEvent *event)
     {
         m_tTimer.start();
         m_pAnimation->start();
+
+        emit pressed();
     }
     else if (!enabled)
     {
