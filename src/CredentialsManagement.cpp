@@ -171,7 +171,8 @@ void CredentialsManagement::on_pushButtonEnterMMM_clicked()
 void CredentialsManagement::on_buttonDiscard_pressed()
 {
     auto modelSerialization = m_pCredModel->getJsonChanges();
-    if (modelSerialization == m_loadedModelSerialiation) {
+    if (modelSerialization == m_loadedModelSerialiation)
+    {
         wsClient->sendLeaveMMRequest();
         m_pCredModel->clear();
     }
