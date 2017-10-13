@@ -4815,6 +4815,9 @@ QByteArray MPDevice::generateExportFileData(void)
     exportTopObject.insert("encryption", "SimpleCrypt");
     exportTopObject.insert("payload", encryptedFileContent);
 
+    exportTopObject.insert("dataDbChangeNumber", QJsonValue((quint8)get_dataDbChangeNumber()));
+    exportTopObject.insert("credentialsDbChangeNumber", QJsonValue((quint8)get_credentialsDbChangeNumber()));
+
     QJsonDocument fileContentDoc(exportTopObject);
     return fileContentDoc.toJson();
 }
