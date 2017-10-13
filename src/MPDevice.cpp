@@ -5789,12 +5789,16 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
                     /* First child? */
                     if (curNode->getAddress() == nodeItem->getStartChildAddress())
                     {
+                        dataChildNodes.removeOne(curNode);
                         nodeItem->setStartChildAddress(MPNode::EmptyAddress);
 
                         /* Remove parent */
                         removeEmptyParentFromDB(nodeItem, true);
                     }
-                    dataChildNodes.removeOne(curNode);
+                    else
+                    {
+                        dataChildNodes.removeOne(curNode);
+                    }
                 }
             }
         }
