@@ -59,20 +59,23 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonFavorite->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonFavorite->setIcon(AppGui::qtAwesome()->icon(fa::star, whiteButtons));
 
-    QMenu *favMenu = new QMenu();
-    QAction *action = favMenu->addAction(tr("Not a favorite"));
+    QAction *action = m_favMenu.addAction(tr("Not a favorite"));
     connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
-    for (int i = 1;i < 15;i++)
+
+    for (int i = 1; i < 15;i++)
     {
-        action = favMenu->addAction(tr("Set as favorite #%1").arg(i));
+        action = m_favMenu.addAction(tr("Set as favorite #%1").arg(i));
         connect(action, &QAction::triggered, [this, i](){ changeCurrentFavorite(i - 1); });
     }
-    ui->pushButtonFavorite->setMenu(favMenu);
+    ui->pushButtonFavorite->setMenu(&m_favMenu);
 
     m_pCredModel = new CredentialModel(this);
     m_pCredModelFilter = new CredentialModelFilter(this);
     m_pCredModelFilter->setSourceModel(m_pCredModel);
     ui->credentialTreeView->setModel(m_pCredModelFilter);
+
+    connect(m_pCredModel, &CredentialModel::modelReset, this, &CredentialsManagement::updateFavMenu);
+    connect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::updateFavMenu);
 
     connect(m_pCredModel, &CredentialModel::modelLoaded, ui->credentialTreeView, &CredentialView::onModelLoaded);
     connect(m_pCredModel, &CredentialModel::modelLoaded, this, &CredentialsManagement::onModelLoaded);
@@ -692,6 +695,33 @@ void CredentialsManagement::onSelectLoginTimerTimeOut()
             }
         }
         m_pAddedLoginItem = nullptr;
+    }
+}
+
+void CredentialsManagement::updateFavMenu()
+{
+    QList<QAction*> actions = m_favMenu.actions();
+    for (QAction* action : actions)
+        action->setEnabled(true);
+
+    // check taken favs
+    if (m_pCredModel)
+    {
+        int services = m_pCredModel->rowCount();
+        for (int i = 0; i < services; i ++)
+        {
+            auto service_index = m_pCredModel->index(i,0);
+            int logins = m_pCredModel->rowCount(service_index);
+            for (int j = 0; j < logins; j++)
+            {
+                auto login_index = m_pCredModel->index(j, 0, service_index);
+                auto login = m_pCredModel->getLoginItemByIndex(login_index);
+                int favNumber = login->favorite();
+                if (favNumber >= 0 && actions.length() > favNumber &&
+                        actions.at(favNumber+1) != nullptr)
+                    actions.at(favNumber+1)->setEnabled(false);
+            }
+        }
     }
 }
 
