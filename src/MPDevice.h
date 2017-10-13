@@ -287,6 +287,7 @@ private:
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
+    bool readExportPayload(QJsonArray dataArray, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool deleteDataParentChilds(MPNode *parentNodePt);
@@ -304,6 +305,10 @@ private:
 
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
+
+    // Crypto
+    quint64 getUInt64EncryptionKey();
+    QByteArray decryptSimpleCrypt(const QString &payload);
 
     // Last page scanned
     quint16 lastFlashPageScanned = 0;

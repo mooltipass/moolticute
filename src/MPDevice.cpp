@@ -4530,6 +4530,23 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
     }
 }
 
+quint64 MPDevice::getUInt64EncryptionKey()
+{
+    qint64 key = 0;
+    for (int i = 0; i < std::min(8, m_cardCPZ.size()) ; i ++)
+        key += (static_cast<unsigned int>(m_cardCPZ[i]) & 0xFF) << (i*8);
+
+    return key;
+}
+
+QByteArray MPDevice::decryptSimpleCrypt(const QString &payload)
+{
+    SimpleCrypt simpleCrypt;
+    simpleCrypt.setKey(getUInt64EncryptionKey());
+
+    return simpleCrypt.decryptToByteArray(payload);
+}
+
 bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 {
     /* Sort the parent list alphabetically */
@@ -4783,9 +4800,23 @@ QByteArray MPDevice::generateExportFileData(void)
     /* Mooltipass serial */
     exportTopArray.append(QJsonValue((qint64)get_serialNumber()));
 
-    /* Finally, write file contents */
-    QJsonDocument saveDoc(exportTopArray);
-    return saveDoc.toJson();
+    /* Generate file payload */
+    QJsonDocument payloadDoc(exportTopArray);
+    auto payload = payloadDoc.toJson();
+
+    /* Encrypt payload */
+    SimpleCrypt simpleCrypt;
+    simpleCrypt.setKey(getUInt64EncryptionKey());
+
+    auto encryptedFileContent = simpleCrypt.encryptToString(payload);
+
+    /* Export file content */
+    QJsonObject exportTopObject;
+    exportTopObject.insert("encryption", "SimpleCrypt");
+    exportTopObject.insert("payload", encryptedFileContent);
+
+    QJsonDocument fileContentDoc(exportTopObject);
+    return fileContentDoc.toJson();
 }
 
 bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
@@ -4820,194 +4851,45 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
         /** Mooltiapp / Chrome App save file **/
 
         /* Get the array */
-        QJsonArray importFile = d.array();
-
-        /* Checks */
-        if (!((importFile[9].toString() == "mooltipass" && importFile.size() == 10) || (importFile[9].toString() == "moolticute" && importFile.size() == 14)))
-        {
-            qCritical() << "Invalid MooltiApp file";
-            errorString = "Selected File Isn't Correct";
-            return false;
-        }
-
-        /* Know which bundle we're dealing with */
-        if (importFile[9].toString() == "mooltipass")
-        {
-            isMooltiAppImportFile = true;
-            qInfo() << "Dealing with MooltiApp export file";
-        }
-        else
-        {
-            qInfo() << "Dealing with Moolticute export file";
-            isMooltiAppImportFile = false;
-            importedCredentialsDbChangeNumber = importFile[11].toInt();
-            qDebug() << "Imported cred change number: " << importedCredentialsDbChangeNumber;
-            importedDataDbChangeNumber = importFile[12].toInt();
-            qDebug() << "Imported data change number: " << importedDataDbChangeNumber;
-            importedDbMiniSerialNumber = importFile[13].toInt();
-            qDebug() << "Imported mini serial number: " << importedDbMiniSerialNumber;
-        }
-
-        /* Read CTR */
-        importedCtrValue = QByteArray();
-        qjobject = importFile[0].toObject();
-        for (qint32 i = 0; i < qjobject.size(); i++) {importedCtrValue.append(qjobject[QString::number(i)].toInt());}
-        qDebug() << "Imported CTR: " << importedCtrValue.toHex();
-
-        /* Read CPZ CTR values */
-        qjarray = importFile[1].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++)
-        {
-            qjobject = qjarray[i].toObject();
-            QByteArray qbarray = QByteArray();
-            for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(qjobject[QString::number(j)].toInt());}
-            qDebug() << "Imported CPZ/CTR value : " << qbarray.toHex();
-            importedCpzCtrValue.append(qbarray);
-        }
-
-        /* Check if one of them is for the current card */
-        bool cpzFound = false;
-        for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
-        {
-            if (importedCpzCtrValue[i].mid(0, 8) == get_cardCPZ())
-            {
-                qDebug() << "Import file is a backup for current Card";
-                unknownCardAddPayload = importedCpzCtrValue[i];
-                cpzFound = true;
-            }
-        }
-        if (!cpzFound)
-        {
-            qWarning() << "Import file is not a backup for current Card";            
-            errorString = "Selected File Is Not For That Card";
-            return false;
-        }
-
-        /* Read Starting Parent */
-        importedStartNode = QByteArray();
-        qjarray = importFile[2].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++) {importedStartNode.append(qjarray[i].toInt());}
-        qDebug() << "Imported start node: " << importedStartNode.toHex();
-
-        /* Read Data Starting Parent */
-        importedStartDataNode = QByteArray();
-        qjarray = importFile[3].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++) {importedStartDataNode.append(qjarray[i].toInt());}
-        qDebug() << "Imported data start node: " << importedStartDataNode.toHex();
-
-        /* Read favorites */
-        qjarray = importFile[4].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++)
-        {
-            qjobject = qjarray[i].toObject();
-            QByteArray qbarray = QByteArray();
-            for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(qjobject[QString::number(j)].toInt());}
-            qDebug() << "Imported favorite " << i << " : " << qbarray.toHex();
-            importedFavoritesAddrs.append(qbarray);
-        }
-
-        /* Read service nodes */
-        qjarray = importFile[5].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++)
-        {
-            qjobject = qjarray[i].toObject();
-
-            /* Fetch address */
-            QJsonArray serviceAddrArr = qjobject["address"].toArray();
-            QByteArray serviceAddr = QByteArray();
-            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-            /* Fetch core data */
-            QJsonObject dataObj = qjobject["data"].toObject();
-            QByteArray dataCore = QByteArray();
-            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-            /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
-            importedLoginNodes.append(importedNode);
-            //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
-        }
-
-        /* Read service child nodes */
-        qjarray = importFile[6].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++)
-        {
-            qjobject = qjarray[i].toObject();
-
-            /* Fetch address */
-            QJsonArray serviceAddrArr = qjobject["address"].toArray();
-            QByteArray serviceAddr = QByteArray();
-            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-            /* Fetch core data */
-            QJsonObject dataObj = qjobject["data"].toObject();
-            QByteArray dataCore = QByteArray();
-            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-            /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
-            importedLoginChildNodes.append(importedNode);
-            //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
-        }
-
-        if (!isMooltiAppImportFile)
-        {
-            /* Read service nodes */
-            qjarray = importFile[7].toArray();
-            for (qint32 i = 0; i < qjarray.size(); i++)
-            {
-                qjobject = qjarray[i].toObject();
-
-                /* Fetch address */
-                QJsonArray serviceAddrArr = qjobject["address"].toArray();
-                QByteArray serviceAddr = QByteArray();
-                for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-                /* Fetch core data */
-                QJsonObject dataObj = qjobject["data"].toObject();
-                QByteArray dataCore = QByteArray();
-                for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-                /* Recreate node and add it to the list of imported nodes */
-                MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
-                importedDataNodes.append(importedNode);
-                //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
-            }
-
-            /* Read service child nodes */
-            qjarray = importFile[8].toArray();
-            for (qint32 i = 0; i < qjarray.size(); i++)
-            {
-                qjobject = qjarray[i].toObject();
-
-                /* Fetch address */
-                QJsonArray serviceAddrArr = qjobject["address"].toArray();
-                QByteArray serviceAddr = QByteArray();
-                for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-                /* Fetch core data */
-                QJsonObject dataObj = qjobject["data"].toObject();
-                QByteArray dataCore = QByteArray();
-                for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-                /* Recreate node and add it to the list of imported nodes */
-                MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
-                importedDataChildNodes.append(importedNode);
-                //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
-            }
-        }
-
-        return true;
+        QJsonArray dataArray = d.array();
+        return readExportPayload(dataArray, errorString);
     }
     else if (d.isObject())
     {
-        qInfo() << "File is a JSON object";
-        errorString = "Selected File Isn't Correct";
-        return false;
-
         /* Use object */
         QJsonObject importFile = d.object();
         qInfo() << importFile.keys();
+        if ( importFile.contains("encryption") && importFile.contains("payload") )
+        {
+            auto encryptionMethod = importFile.value("encryption").toString();
+            if ( encryptionMethod == "SimpleCrypt")
+            {
+                QString payload = importFile.value("payload").toString();
+                auto decryptedData = decryptSimpleCrypt(payload);
+
+                QJsonDocument decryptedDocument = QJsonDocument::fromJson(decryptedData);
+                if (decryptedDocument.isArray())
+                {
+                    /* Get the array */
+                    QJsonArray dataArray = decryptedDocument.array();
+                    return readExportPayload(dataArray, errorString);
+                }
+                else
+                {
+                    qCritical() << "Encrypted payload isn't correct";
+                    errorString = "Selected File Isn't Correct";
+                    return false;
+                }
+            }
+            else
+            {
+                errorString = "Unknown Encryption Method";
+                return false;
+            }
+        }
+
+        qInfo() << "File is a JSON object";
+        errorString = "Selected File Isn't Correct";
         return false;
     }
     else
@@ -5016,6 +4898,188 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
         errorString = "Selected File Isn't Correct";
         return false;
     }
+}
+
+bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
+{
+    /** Mooltiapp / Chrome App save file **/
+
+    /* Checks */
+    if (!((dataArray[9].toString() == "mooltipass" && dataArray.size() == 10) || (dataArray[9].toString() == "moolticute" && dataArray.size() == 14)))
+    {
+        qCritical() << "Invalid MooltiApp file";
+        errorString = "Selected File Isn't Correct";
+        return false;
+    }
+
+    /* Know which bundle we're dealing with */
+    if (dataArray[9].toString() == "mooltipass")
+    {
+        isMooltiAppImportFile = true;
+        qInfo() << "Dealing with MooltiApp export file";
+    }
+    else
+    {
+        qInfo() << "Dealing with Moolticute export file";
+        isMooltiAppImportFile = false;
+        importedCredentialsDbChangeNumber = dataArray[11].toInt();
+        qDebug() << "Imported cred change number: " << importedCredentialsDbChangeNumber;
+        importedDataDbChangeNumber = dataArray[12].toInt();
+        qDebug() << "Imported data change number: " << importedDataDbChangeNumber;
+        importedDbMiniSerialNumber = dataArray[13].toInt();
+        qDebug() << "Imported mini serial number: " << importedDbMiniSerialNumber;
+    }
+
+    /* Read CTR */
+    importedCtrValue = QByteArray();
+    auto qjobject = dataArray[0].toObject();
+    for (qint32 i = 0; i < qjobject.size(); i++) {importedCtrValue.append(qjobject[QString::number(i)].toInt());}
+    qDebug() << "Imported CTR: " << importedCtrValue.toHex();
+
+    /* Read CPZ CTR values */
+    auto qjarray = dataArray[1].toArray();
+    for (qint32 i = 0; i < qjarray.size(); i++)
+    {
+        qjobject = qjarray[i].toObject();
+        QByteArray qbarray = QByteArray();
+        for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(qjobject[QString::number(j)].toInt());}
+        qDebug() << "Imported CPZ/CTR value : " << qbarray.toHex();
+        importedCpzCtrValue.append(qbarray);
+    }
+
+    /* Check if one of them is for the current card */
+    bool cpzFound = false;
+    for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
+    {
+        if (importedCpzCtrValue[i].mid(0, 8) == get_cardCPZ())
+        {
+            qDebug() << "Import file is a backup for current Card";
+            unknownCardAddPayload = importedCpzCtrValue[i];
+            cpzFound = true;
+        }
+    }
+    if (!cpzFound)
+    {
+        qWarning() << "Import file is not a backup for current Card";
+        errorString = "Selected File Is Not For That Card";
+        return false;
+    }
+
+    /* Read Starting Parent */
+    importedStartNode = QByteArray();
+    qjarray = dataArray[2].toArray();
+    for (qint32 i = 0; i < qjarray.size(); i++) {importedStartNode.append(qjarray[i].toInt());}
+    qDebug() << "Imported start node: " << importedStartNode.toHex();
+
+    /* Read Data Starting Parent */
+    importedStartDataNode = QByteArray();
+    qjarray = dataArray[3].toArray();
+    for (qint32 i = 0; i < qjarray.size(); i++) {importedStartDataNode.append(qjarray[i].toInt());}
+    qDebug() << "Imported data start node: " << importedStartDataNode.toHex();
+
+    /* Read favorites */
+    qjarray = dataArray[4].toArray();
+    for (qint32 i = 0; i < qjarray.size(); i++)
+    {
+        qjobject = qjarray[i].toObject();
+        QByteArray qbarray = QByteArray();
+        for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(qjobject[QString::number(j)].toInt());}
+        qDebug() << "Imported favorite " << i << " : " << qbarray.toHex();
+        importedFavoritesAddrs.append(qbarray);
+    }
+
+    /* Read service nodes */
+    qjarray = dataArray[5].toArray();
+    for (qint32 i = 0; i < qjarray.size(); i++)
+    {
+        qjobject = qjarray[i].toObject();
+
+        /* Fetch address */
+        QJsonArray serviceAddrArr = qjobject["address"].toArray();
+        QByteArray serviceAddr = QByteArray();
+        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
+
+        /* Fetch core data */
+        QJsonObject dataObj = qjobject["data"].toObject();
+        QByteArray dataCore = QByteArray();
+        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
+
+        /* Recreate node and add it to the list of imported nodes */
+        MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+        importedLoginNodes.append(importedNode);
+        //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
+    }
+
+    /* Read service child nodes */
+    qjarray = dataArray[6].toArray();
+    for (qint32 i = 0; i < qjarray.size(); i++)
+    {
+        qjobject = qjarray[i].toObject();
+
+        /* Fetch address */
+        QJsonArray serviceAddrArr = qjobject["address"].toArray();
+        QByteArray serviceAddr = QByteArray();
+        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
+
+        /* Fetch core data */
+        QJsonObject dataObj = qjobject["data"].toObject();
+        QByteArray dataCore = QByteArray();
+        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
+
+        /* Recreate node and add it to the list of imported nodes */
+        MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+        importedLoginChildNodes.append(importedNode);
+        //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
+    }
+
+    if (!isMooltiAppImportFile)
+    {
+        /* Read service nodes */
+        qjarray = dataArray[7].toArray();
+        for (qint32 i = 0; i < qjarray.size(); i++)
+        {
+            qjobject = qjarray[i].toObject();
+
+            /* Fetch address */
+            QJsonArray serviceAddrArr = qjobject["address"].toArray();
+            QByteArray serviceAddr = QByteArray();
+            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
+
+            /* Fetch core data */
+            QJsonObject dataObj = qjobject["data"].toObject();
+            QByteArray dataCore = QByteArray();
+            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
+
+            /* Recreate node and add it to the list of imported nodes */
+            MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+            importedDataNodes.append(importedNode);
+            //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
+        }
+
+        /* Read service child nodes */
+        qjarray = dataArray[8].toArray();
+        for (qint32 i = 0; i < qjarray.size(); i++)
+        {
+            qjobject = qjarray[i].toObject();
+
+            /* Fetch address */
+            QJsonArray serviceAddrArr = qjobject["address"].toArray();
+            QByteArray serviceAddr = QByteArray();
+            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
+
+            /* Fetch core data */
+            QJsonObject dataObj = qjobject["data"].toObject();
+            QByteArray dataCore = QByteArray();
+            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
+
+            /* Recreate node and add it to the list of imported nodes */
+            MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+            importedDataChildNodes.append(importedNode);
+            //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
+        }
+    }
+
+    return true;
 }
 
 void MPDevice::cleanImportedVars(void)
