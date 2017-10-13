@@ -194,7 +194,7 @@ public:
                           std::function<void(bool success, QString errstr)> cb);
 
     //Export database
-    void exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
+    void exportDatabase(QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                         MPDeviceProgressCb cbProgress);
     //Import database
     void importDatabase(const QByteArray &fileData, bool noDelete,
@@ -293,7 +293,7 @@ private:
     bool deleteDataParentChilds(MPNode *parentNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
-    QByteArray generateExportFileData(void);
+    QByteArray generateExportFileData(const QString &encryption = "none");
     void cleanImportedVars(void);
     void cleanMMMVars(void);
 
@@ -308,6 +308,7 @@ private:
 
     // Crypto
     quint64 getUInt64EncryptionKey();
+    QString encryptSimpleCrypt(const QByteArray &data);
     QByteArray decryptSimpleCrypt(const QString &payload);
 
     // Last page scanned

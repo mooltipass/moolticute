@@ -4539,6 +4539,15 @@ quint64 MPDevice::getUInt64EncryptionKey()
     return key;
 }
 
+QString MPDevice::encryptSimpleCrypt(const QByteArray &data)
+{
+    /* Encrypt payload */
+    SimpleCrypt simpleCrypt;
+    simpleCrypt.setKey(getUInt64EncryptionKey());
+
+    return simpleCrypt.encryptToString(data);
+}
+
 QByteArray MPDevice::decryptSimpleCrypt(const QString &payload)
 {
     SimpleCrypt simpleCrypt;
@@ -4707,7 +4716,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     return true;
 }
 
-QByteArray MPDevice::generateExportFileData(void)
+QByteArray MPDevice::generateExportFileData(const QString &encryption)
 {
     QJsonArray exportTopArray = QJsonArray();
 
@@ -4804,22 +4813,29 @@ QByteArray MPDevice::generateExportFileData(void)
     QJsonDocument payloadDoc(exportTopArray);
     auto payload = payloadDoc.toJson();
 
-    /* Encrypt payload */
-    SimpleCrypt simpleCrypt;
-    simpleCrypt.setKey(getUInt64EncryptionKey());
-
-    auto encryptedFileContent = simpleCrypt.encryptToString(payload);
+    if (encryption.isEmpty() || encryption == "none")
+        return payload;
 
     /* Export file content */
     QJsonObject exportTopObject;
-    exportTopObject.insert("encryption", "SimpleCrypt");
-    exportTopObject.insert("payload", encryptedFileContent);
+
+    if (encryption == "SimpleCrypt") {
+        exportTopObject.insert("encryption", "SimpleCrypt");
+        exportTopObject.insert("payload", encryptSimpleCrypt(payload));
+    } else
+    {
+        // Fallback in case of an unknown encryption method where specified
+        exportTopObject.insert("encryption", "none");
+        exportTopObject.insert("payload", QString(payload));
+    }
 
     exportTopObject.insert("dataDbChangeNumber", QJsonValue((quint8)get_dataDbChangeNumber()));
     exportTopObject.insert("credentialsDbChangeNumber", QJsonValue((quint8)get_credentialsDbChangeNumber()));
 
     QJsonDocument fileContentDoc(exportTopObject);
-    return fileContentDoc.toJson();
+    payload = fileContentDoc.toJson();
+
+    return payload;
 }
 
 bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
@@ -6492,7 +6508,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
     runAndDequeueJobs();
 }
 
-void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
+void MPDevice::exportDatabase(QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                               MPDeviceProgressCb cbProgress)
 {
     /* New job for starting MMM */
@@ -6520,7 +6536,7 @@ void MPDevice::exportDatabase(std::function<void(bool success, QString errstr, Q
         else
         {
             /* Generate export file */
-            cb(true, "Export File Generated!", generateExportFileData());
+            cb(true, "Export File Generated!", generateExportFileData(encryption));
         }
     });
 

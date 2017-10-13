@@ -429,9 +429,11 @@ void WSClient::sendCredentialsMM(const QJsonArray &creds)
                   { "data", creds }});
 }
 
-void WSClient::exportDbFile()
+void WSClient::exportDbFile(const QString &encryption)
 {
-    sendJsonData({{ "msg", "export_database" }});
+    QJsonObject d = {{ "encryption", encryption }};
+    sendJsonData({{ "msg", "export_database" },
+                  { "data", d }});
 }
 
 void WSClient::importDbFile(const QByteArray &fileData, bool noDelete)
