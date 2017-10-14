@@ -314,7 +314,7 @@ void CredentialsManagement::saveSelectedCredential(const QModelIndex &proxyIndex
 
 bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex)
 {   
-    if (ui->stackedWidget->currentWidget() != ui->pageUnlocked || !wsClient->get_memMgmtMode() || deletingCred)
+    if (ui->stackedWidget->currentWidget() != ui->pageUnlocked || !wsClient->get_memMgmtMode())
         return true;
 
     // Retrieve src index
@@ -521,7 +521,11 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
                                          QMessageBox::Yes);
         if (btn == QMessageBox::Yes)
         {
-            deletingCred = true;
+            m_selectionCanceled = true;
+            ui->credDisplayPasswordInput->setText("");
+            ui->credDisplayDescriptionInput->setText("");
+            ui->credDisplayLoginInput->setText("");
+
             bool bSelectNextAvailableLogin = m_pCredModel->removeCredential(srcIndex);
             if (bSelectNextAvailableLogin)
             {
@@ -537,14 +541,13 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
                         ui->credentialTreeView->setCurrentIndex(firstLoginIndex);
                 }
             }
-            deletingCred = false;
         }
     }
 }
 
 void CredentialsManagement::onCredentialSelected(const QModelIndex &proxyIndex, const QModelIndex &previous)
 {
-    if (m_selectionCanceled)
+    if (m_selectionCanceled || !previous.isValid() || proxyIndex == previous)
     {
         m_selectionCanceled = false;
         return;
@@ -622,7 +625,9 @@ void CredentialsManagement::clearLoginDescription()
 
 QModelIndex CredentialsManagement::getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex)
 {
-    return m_pCredModelFilter->mapToSource(proxyIndex);
+    if (proxyIndex.isValid())
+        return m_pCredModelFilter->mapToSource(proxyIndex);
+    return QModelIndex();
 }
 
 QModelIndex CredentialsManagement::getProxyIndexFromSourceIndex(const QModelIndex &srcIndex)

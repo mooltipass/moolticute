@@ -89,7 +89,6 @@ private:
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;
     WSClient *wsClient = nullptr;
-    bool deletingCred = false;
     QTimer m_tSelectLoginTimer;
     LoginItem *m_pAddedLoginItem;
 
