@@ -1464,7 +1464,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             cbProgress(data);
 
             //Node is loaded
-            qDebug() << "Parent data node loaded: " << pnode->getService();
+            qDebug() << "Parent data node loaded: " << pnode->getService() << " at address " << pnode->getAddress().toHex() << " first child at " << pnode->getStartChildAddress().toHex();
 
             //Load data child
             if (pnode->getStartChildAddress() != MPNode::EmptyAddress && load_childs)
@@ -2598,7 +2598,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
 
 bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
 {
-    qDebug() << "Removing parent " << parentNodePt->getService() << " from DB";
+    qDebug() << "Removing parent " << parentNodePt->getService() << " from DB, addr: " << parentNodePt->getAddress().toHex();
     MPNode* nextNodePt = nullptr;
     MPNode* prevNodePt = nullptr;
     MPNode* curNodePt = nullptr;
@@ -5757,6 +5757,7 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
 
             /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
             QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
+            bool deleteDataNode = false;
 
             /* Special case: no child */
             if (curChildNodeAddr == MPNode::EmptyAddress)
@@ -5789,17 +5790,21 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
                     /* First child? */
                     if (curNode->getAddress() == nodeItem->getStartChildAddress())
                     {
-                        dataChildNodes.removeOne(curNode);
-                        nodeItem->setStartChildAddress(MPNode::EmptyAddress);
+                        deleteDataNode = true;
+                    }
 
-                        /* Remove parent */
-                        removeEmptyParentFromDB(nodeItem, true);
-                    }
-                    else
-                    {
-                        dataChildNodes.removeOne(curNode);
-                    }
+                    /* Delete child */
+                    dataChildNodes.removeOne(curNode);
+                    nodeItem->removeChild(curNode);
+                    delete(curNode);
                 }
+            }
+
+            /* If parent node is marked for deletion */
+            if(deleteDataNode)
+            {
+                nodeItem->setStartChildAddress(MPNode::EmptyAddress);
+                removeEmptyParentFromDB(nodeItem, true);
             }
         }
     }
