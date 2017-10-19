@@ -969,9 +969,10 @@ void MainWindow::on_checkBoxSSHAgent_stateChanged(int)
 void MainWindow::on_pushButtonExportFile_clicked()
 {
     if (ui->checkBoxExport->isChecked())
-        wsClient->exportDbFile("SimpleCrypt");
-    else
         wsClient->exportDbFile("none");
+    else
+        wsClient->exportDbFile("SimpleCrypt");
+
 
     connect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
     wantExportDatabase();

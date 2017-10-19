@@ -1183,10 +1183,10 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QCheckBox" name="checkBoxExport">
               <property name="text">
-               <string>Encrypt backup</string>
+               <string>Generate MooltiApp Compatible File</string>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>
