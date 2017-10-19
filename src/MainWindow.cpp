@@ -131,7 +131,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonDBFolder->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDBFile->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDeleteDbFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->lineEditDBFile->setStyleSheet(CSS_BLUE_LINEEDIT);
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
 
@@ -156,7 +157,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         dlg.setPasswordProfilesModel(m_passwordProfilesModel);
         dlg.exec();
     });
-    connect(ui->pushButtonDBFolder, &QPushButton::clicked, this, &MainWindow::changeDBBackupFile);
+    connect(ui->pushButtonDBFile, &QPushButton::clicked, this, &MainWindow::changeDBBackupFile);
+    connect(ui->pushButtonDeleteDbFile, &QPushButton::clicked, this, &MainWindow::resetDBBackupFile);
 
     ui->pushButtonDevSettings->setChecked(false);
 
@@ -837,7 +839,18 @@ void MainWindow::changeDBBackupFile()
     QString file = QFileDialog::getOpenFileName(this, tr("Choose file"),
                                                 ui->lineEditDBFile->text());
 
-    setDatabaseBackupFile(file);
+    if(!file.isEmpty())
+        setDatabaseBackupFile(file);
+}
+
+void MainWindow::resetDBBackupFile()
+{
+    QString dbFile = ui->lineEditDBFile->text();
+
+    if(!dbFile.isEmpty())
+    {
+        setDatabaseBackupFile(QString());
+    }
 }
 
 void MainWindow::setDatabaseBackupFile(const QString &filePath)
@@ -1001,14 +1014,8 @@ void MainWindow::on_pushButtonExportFile_clicked()
 
 void MainWindow::on_pushButtonImportFile_clicked()
 {
-    QString fname = ui->lineEditDBFile->text();
-
-    if(fname.isEmpty())
-    {
-        fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
-                                                 "Memory exports (*.bin);;All files (*.*)");
-        setDatabaseBackupFile(fname);
-    }
+    QString fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
+                                         "Memory exports (*.bin);;All files (*.*)");
 
     if (fname.isEmpty())
         return;
