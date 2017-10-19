@@ -194,7 +194,7 @@ public:
                           std::function<void(bool success, QString errstr)> cb);
 
     //Export database
-    void exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
+    void exportDatabase(QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                         MPDeviceProgressCb cbProgress);
     //Import database
     void importDatabase(const QByteArray &fileData, bool noDelete,
@@ -287,12 +287,13 @@ private:
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
+    bool readExportPayload(QJsonArray dataArray, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool deleteDataParentChilds(MPNode *parentNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
-    QByteArray generateExportFileData(void);
+    QByteArray generateExportFileData(const QString &encryption = "none");
     void cleanImportedVars(void);
     void cleanMMMVars(void);
 
@@ -304,6 +305,11 @@ private:
 
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
+
+    // Crypto
+    quint64 getUInt64EncryptionKey();
+    QString encryptSimpleCrypt(const QByteArray &data);
+    QByteArray decryptSimpleCrypt(const QString &payload);
 
     // Last page scanned
     quint16 lastFlashPageScanned = 0;

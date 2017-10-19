@@ -238,7 +238,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>9</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -488,8 +488,8 @@ QWidget {background-color: #EFEFEF;}</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>720</width>
-             <height>597</height>
+             <width>836</width>
+             <height>665</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1176,6 +1176,16 @@ QWidget {background-color: #EFEFEF;}</string>
                <string>Make a backup of your database on your local computer</string>
               </property>
               <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxExport">
+              <property name="text">
+               <string>Encrypt backup</string>
+              </property>
+              <property name="checked">
                <bool>true</bool>
               </property>
              </widget>
