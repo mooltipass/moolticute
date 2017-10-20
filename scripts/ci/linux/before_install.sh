@@ -5,7 +5,7 @@ SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/../funcs.sh
 
 sudo add-apt-repository -y ppa:ubuntu-wine/ppa
-sudo add-apt-repository ppa:likemartinma/osslsigncode
+sudo add-apt-repository -y ppa:likemartinma/osslsigncode
 sudo dpkg --add-architecture i386
 sudo apt-get update -qq
 sudo apt-get -y install --install-recommends wine1.7 osslsigncode
