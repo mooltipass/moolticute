@@ -33,3 +33,6 @@ docker-compose $DOCKER_COMPOSE_CONFIG up --force-recreate -d
 # git setup
 $DOCKER_EXEC "git config --global user.email '${USER_EMAIL}'"
 $DOCKER_EXEC "git config --global user.name '${USER}'"
+
+#create certificate from env
+ echo $CODESIGN_WIN_CERT| base64 -d > $HOME/cert.p12
