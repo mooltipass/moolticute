@@ -46,12 +46,16 @@ do
     cp -R $f $WDIR
 done
 
+find_and_sign $WDIR
+
 pushd win
 
 echo "#define MyAppVersion \"$VERSION\"" > build.iss
 cat installer.iss >> build.iss
 chmod +x iscc
 ./iscc build.iss
+
+sign_binary build/$FILENAME.exe
 
 #create update manifest
 cat > build/updater.json <<EOF
