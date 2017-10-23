@@ -3953,11 +3953,10 @@ void MPDevice::setCredential(const QString &service, const QString &login,
                              const QString &pass, const QString &description, bool setDesc,
                              std::function<void(bool success, QString errstr)> cb)
 {
-    if (service.isEmpty() ||
-        login.isEmpty())
+    if (service.isEmpty())
     {
-        qWarning() << "service or login  is empty.";
-        cb(false, "service or login is empty");
+        qWarning() << "service is empty.";
+        cb(false, "service is empty");
         return;
     }
 
