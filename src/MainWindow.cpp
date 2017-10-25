@@ -34,8 +34,6 @@ static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx =
     cb->setCurrentIndex(idx);
 }
 
-const QString MainWindow::SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY = "settings/SSHKeysTabsVisibleOnDemand";
-
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -46,14 +44,21 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     m_passwordProfilesModel(new PasswordProfilesModel(this))
 {
     QSettings s;
-    bSSHKeysTabVisibleOnDemand = s.value(SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY, true).toBool();
+    bSSHKeysTabVisibleOnDemand = s.value("settings/SSHKeysTabsVisibleOnDemand", true).toBool();
 
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
                                 { "color-active", QColor(Qt::white) }};
 
     ui->setupUi(this);
-    setupLanguages();
+    refreshAppLangCb();
+
+    ui->checkBoxLongPress->setChecked(s.value("settings/long_press_cancel", true).toBool());
+    connect(ui->checkBoxLongPress, &QCheckBox::toggled, [this](bool checked)
+    {
+        QSettings settings;
+        settings.setValue("settings/long_press_cancel", checked);
+    });
 
     m_tabMap[ui->pageAbout] = ui->pushButtonAbout;
     m_tabMap[ui->pageAppSettings] = ui->pushButtonAppSettings;
@@ -949,7 +954,7 @@ void MainWindow::setKeysTabVisibleOnDemand(bool bValue)
 
     // Save in settings
     QSettings s;
-    s.setValue(SSH_KEY_TAB_VISIBLE_ON_DEMAND_SETTINGS_KEY, bValue);
+    s.setValue("settings/SSHKeysTabsVisibleOnDemand", bValue);
 
     // SSH keys tab will show up only after activating the CTRL+SHIFT+F1 shortcut
     if (bSSHKeysTabVisibleOnDemand) {
@@ -1007,7 +1012,12 @@ void MainWindow::on_checkBoxSSHAgent_stateChanged(int)
 
 void MainWindow::on_pushButtonExportFile_clicked()
 {
-    wsClient->exportDbFile();
+    if (ui->checkBoxExport->isChecked())
+        wsClient->exportDbFile("none");
+    else
+        wsClient->exportDbFile("SimpleCrypt");
+
+
     connect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
     wantExportDatabase();
 }
@@ -1199,8 +1209,12 @@ void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
                          tr("An error occured when trying to go into Memory Management mode.\n\n%1").arg(errMsg));
 }
 
-void MainWindow::setupLanguages()
+void MainWindow::refreshAppLangCb()
 {
+    bool oldState = ui->comboBoxAppLang->blockSignals(true);
+
+    ui->comboBoxAppLang->clear();
+
     QSettings settings;
     QString language = settings.value("settings/lang").toString();
 
@@ -1237,12 +1251,14 @@ void MainWindow::setupLanguages()
                     .arg(QLocale::languageToString(locale.language()))
                     .arg(QLocale::scriptToString(locale.script()));
         else
-            ln = QLocale::languageToString(locale.language());
+            ln = locale.nativeLanguageName();
 
         ui->comboBoxAppLang->addItem(ln, llang);
 
         if (language == llang) ui->comboBoxAppLang->setCurrentIndex(ui->comboBoxAppLang->count() - 1);
     }
+
+    ui->comboBoxAppLang->blockSignals(oldState);
 }
 
 void MainWindow::on_comboBoxAppLang_currentIndexChanged(int index)
@@ -1257,6 +1273,7 @@ void MainWindow::on_comboBoxAppLang_currentIndexChanged(int index)
 
         AppGui *a = qobject_cast<AppGui *>(qApp);
         a->setupLanguage();
+        refreshAppLangCb();
     }
 }
 

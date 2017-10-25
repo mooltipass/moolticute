@@ -55,7 +55,8 @@ private slots:
     void onCredentialUpdated(const QString &service, const QString &login, const QString &description, bool success);
     void saveSelectedCredential(const QModelIndex &proxyIndex=QModelIndex());
     void on_pushButtonEnterMMM_clicked();
-    void on_buttonDiscard_clicked();
+    void on_buttonDiscard_pressed();
+    void on_buttonDiscard_confirmed();
     void on_buttonSaveChanges_clicked();
     void requestPasswordForSelectedItem();
     void on_addCredentialButton_clicked();
@@ -71,6 +72,7 @@ private slots:
     void onModelLoaded(bool bClearLoginDescription);
     void onSelectLoginItem(LoginItem *pLoginItem);
     void onSelectLoginTimerTimeOut();
+    void updateFavMenu();
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
@@ -87,9 +89,12 @@ private:
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;
     WSClient *wsClient = nullptr;
-    bool deletingCred = false;
     QTimer m_tSelectLoginTimer;
     LoginItem *m_pAddedLoginItem;
+
+    QMenu m_favMenu;
+    QJsonArray m_loadedModelSerialiation;
+    bool m_selectionCanceled;
 
 signals:
     void wantEnterMemMode();

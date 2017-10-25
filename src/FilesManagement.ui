@@ -516,14 +516,20 @@ padding: 2px;
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>288</width>
-             <height>20</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
           <widget class="AnimatedColorButton" name="buttonDiscard" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>158</width>
@@ -550,12 +556,6 @@ padding: 2px;
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>288</width>
-             <height>20</height>
-            </size>
-           </property>
           </spacer>
          </item>
         </layout>
@@ -569,7 +569,7 @@ padding: 2px;
  <customwidgets>
   <customwidget>
    <class>AnimatedColorButton</class>
-   <extends>QWidget</extends>
+   <extends>QPushButton</extends>
    <header>AnimatedColorButton.h</header>
   </customwidget>
  </customwidgets>

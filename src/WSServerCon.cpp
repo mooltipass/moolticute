@@ -479,8 +479,15 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "export_database")
     {
-        mpdevice->exportDatabase(
-                    [=](bool success, QString errstr, QByteArray fileData)
+        QString encryptionMethod  = "none";
+        if (root.contains("data"))
+        {
+            QJsonObject o = root["data"].toObject();
+            encryptionMethod = o.value("encryption").toString();
+        }
+
+        mpdevice->exportDatabase(encryptionMethod,
+                                 [=](bool success, QString errstr, QByteArray fileData)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;

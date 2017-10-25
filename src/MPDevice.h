@@ -194,7 +194,7 @@ public:
                           std::function<void(bool success, QString errstr)> cb);
 
     //Export database
-    void exportDatabase(std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
+    void exportDatabase(QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                         MPDeviceProgressCb cbProgress);
     //Import database
     void importDatabase(const QByteArray &fileData, bool noDelete,
@@ -291,14 +291,20 @@ private:
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
+    bool readExportPayload(QJsonArray dataArray, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool deleteDataParentChilds(MPNode *parentNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
-    QByteArray generateExportFileData(void);
+    QByteArray generateExportFileData(const QString &encryption = "none");
     void cleanImportedVars(void);
     void cleanMMMVars(void);
+
+    // checks for exported file
+    bool checkExportedPayload(const QJsonArray &dataArray, QString &errorString) const;
+    inline bool isMooltipass(const QJsonArray &dataArray) const;
+    inline bool isMoolticute(const QJsonArray &dataArray) const;
 
     // Functions added by mathieu for unit testing
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
@@ -308,6 +314,11 @@ private:
 
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
+
+    // Crypto
+    quint64 getUInt64EncryptionKey();
+    QString encryptSimpleCrypt(const QByteArray &data);
+    QByteArray decryptSimpleCrypt(const QString &payload);
 
     // Last page scanned
     quint16 lastFlashPageScanned = 0;
@@ -427,5 +438,15 @@ private:
 
     bool m_credentialsDbChangeNumberSet;
 };
+
+bool MPDevice::isMooltipass(const QJsonArray &dataArray) const
+{
+    return dataArray[9].toString() == "mooltipass" && dataArray.size() == 10;
+}
+
+bool MPDevice::isMoolticute(const QJsonArray &dataArray) const
+{
+    return dataArray[9].toString() == "moolticute" && dataArray.size() == 14;
+}
 
 #endif // MPDEVICE_H

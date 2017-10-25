@@ -278,3 +278,57 @@ function osx_setup_netrc()
 
     chmod 600 ${DIR}/.netrc
 }
+
+#signing of exe from server
+#Usage sign_binary $Path/file.exe
+function sign_binary()
+{
+    set +e
+    if [ -f $1 ]
+    then
+        echo "Signing binary file: $1"
+
+        #sign SHA1
+        osslsigncode sign \
+            -pkcs12 $HOME/cert.p12 \
+            -pass $CODESIGN_WIN_PASS \
+            -h sha1 \
+            -n "Moolticute" \
+            -i "http://themooltipass.com" \
+            -t http://timestamp.comodoca.com \
+            -in $1 -out ${1}_signed1
+
+        if [ $? -eq 0 ] ; then
+            rm ${1}_signed1
+            return
+        fi
+
+        #Append SHA256
+        osslsigncode sign \
+            -pkcs12 $HOME/cert.p12 \
+            -pass $CODESIGN_WIN_PASS \
+            -h sha256 \
+            -n "Moolticute" \
+            -i "http://themooltipass.com" \
+            -ts http://timestamp.comodoca.com \
+            -in ${1}_signed1 -out ${1}_signed2 \
+            -nest
+
+        if [ $? -eq 0 ] ; then
+            mv ${1}_signed2 $1
+            rm ${1}_signed1
+        fi
+    fi
+    set -e
+}
+
+
+#search for files in folder and sign all exe/dll
+#Usage: find_and_sign $Path
+function find_and_sign()
+{
+    Path=$1
+    find $Path -iname "*.exe" -type f | while read file; do sign_binary "$file"; done
+    find $Path -iname "*.dll" -type f | while read file; do sign_binary "$file"; done
+}
+
