@@ -1014,22 +1014,7 @@ void MainWindow::on_pushButtonExportFile_clicked()
 
 void MainWindow::on_pushButtonImportFile_clicked()
 {
-    QString fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
-                                         "Memory exports (*.bin);;All files (*.*)");
-
-    if (fname.isEmpty())
-        return;
-
-    QFile f(fname);
-    if (!f.open(QFile::ReadOnly))
-    {
-        QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
-        return;
-    }
-    ui->widgetHeader->setEnabled(false);
-    wsClient->importDbFile(f.readAll(), ui->checkBoxImport->isChecked());
-    connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
-    wantImportDatabase();
+    importDatabase(QString());
 }
 
 void MainWindow::dbExported(const QByteArray &d, bool success)
@@ -1297,13 +1282,23 @@ void MainWindow::onCredentialsCompared(int result)
 
 void MainWindow::showImportCredentialsPrompt()
 {
-    ui->promptWidget->setPromptMessage(new PromptMessage(tr("Credentials in the backup file are more recent. "
-                                                            "Do you want import credentials to the device?"),
-                                                         [this](){ this->on_pushButtonImportFile_clicked(); },
+    int res = QMessageBox::warning(this, tr("Credentials"), tr("Credentials in the backup file are more recent. "
+                                                               "Do you want to import credentials to the device"
+                                                               "(by denying you can loose your changes)?"), QMessageBox::Yes | QMessageBox::No);
+
+    if(res == QMessageBox::Yes)
+        importDatabase(ui->lineEditDBFile->text());
+}
+
+void MainWindow::showExportCredentialsPrompt()
+{
+    ui->promptWidget->setPromptMessage(new PromptMessage(tr("Credentials on the device are more recent. "
+                                                            "Do you want export credentials to backup file?"),
+                                                         [this](){ this->on_pushButtonExportFile_clicked(); },
     [this]()
     {
         QMessageBox::StandardButton btn = QMessageBox::warning(this, tr("Be careful"),
-                                                               tr("By denying you can lose your changes. Do you want to continue?"),
+                                                               tr("By denying you can loose your changes. Do you want to continue?"),
                                                                QMessageBox::Yes | QMessageBox::No);
         if(btn == QMessageBox::Yes)
         {
@@ -1316,23 +1311,24 @@ void MainWindow::showImportCredentialsPrompt()
     ui->promptWidget->show();
 }
 
-void MainWindow::showExportCredentialsPrompt()
+void MainWindow::importDatabase(const QString &fileName)
 {
-    ui->promptWidget->setPromptMessage(new PromptMessage(tr("Credentials on the device are more recent. "
-                                                            "Do you want export credentials to backup file?"),
-                                                         [this](){ this->on_pushButtonExportFile_clicked(); },
-    [this]()
-    {
-        QMessageBox::StandardButton btn = QMessageBox::warning(this, tr("Be careful"),
-                                                               tr("By denying you can lose your changes. Do you want to continue?"),
-                                                               QMessageBox::Yes | QMessageBox::No);
-        if(btn == QMessageBox::Yes)
-        {
-            ui->promptWidget->hide();
-            this->layout()->activate();
-        }
-    }
-    ));
+    QString fname = fileName;
+    if(fname.isEmpty())
+        fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
+                                         "Memory exports (*.bin);;All files (*.*)");
 
-    ui->promptWidget->show();
+    if (fname.isEmpty())
+        return;
+
+    QFile f(fname);
+    if (!f.open(QFile::ReadOnly))
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
+        return;
+    }
+    ui->widgetHeader->setEnabled(false);
+    wsClient->importDbFile(f.readAll(), ui->checkBoxImport->isChecked());
+    connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
+    wantImportDatabase();
 }

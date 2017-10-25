@@ -72,6 +72,10 @@ private slots:
     void dbExported(const QByteArray &d, bool success);
     void dbImported(bool success, QString message);
 
+    // starts importing database from device.
+    // if fileName is empty user will be asked to choose imported file
+    void importDatabase(const QString &fileName);
+
     void memMgmtModeFailed(int errCode, QString errMsg);
 
     void on_pushButtonViewLogs_clicked();

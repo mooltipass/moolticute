@@ -236,7 +236,7 @@ private slots:
     void commandFailed();
     void sendDataDequeue(); //execute commands from the command queue
     void runAndDequeueJobs(); //execute AsyncJobs from the jobs queues
-
+    void onCardCPZChanged();
 
 private:
     /* Platform function for starting a read, should be implemented in platform class */
@@ -321,7 +321,19 @@ private:
      * credentialsDbChangeNumber are set. "hashedCardCPZ" is needed to get
      * corresponding backup file that holds one of compared numbers.
      */
-    void checkCredentialsDbChangeNumbers();
+    void checkCredentialsDbChangeNumbers(const QString &dbBackupFile);
+
+    /*!
+     * \brief readDBBackupFile
+     * \return path of the backup dile saved with QSettings
+     */
+    QString readDBBackupFile() const;
+
+    /*!
+     * \brief saveDBBackupFile
+     * Saves path to backup file with QSettings
+     */
+    void saveDBBackupFile(const QString &backupFile);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
@@ -411,6 +423,7 @@ private:
     int progressCurrent;
 
     FilesCache filesCache;
+    QFileSystemWatcher *m_credentialsDbFileWatcher;
 
     bool m_credentialsDbChangeNumberSet;
 };

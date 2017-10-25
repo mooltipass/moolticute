@@ -23,6 +23,7 @@ const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
 MPDevice::MPDevice(QObject *parent):
     QObject(parent),
+    m_credentialsDbFileWatcher(new QFileSystemWatcher(this)),
     m_credentialsDbChangeNumberSet(false)
 {
     set_status(Common::UnknownStatus);
@@ -88,7 +89,9 @@ MPDevice::MPDevice(QObject *parent):
     });
 
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
+    connect(&filesCache, &FilesCache::cardCPZChanged, this, &MPDevice::onCardCPZChanged);
     connect(&filesCache, &FilesCache::cardCPZChanged, this, &MPDevice::hashedCardCPZChanged);
+    connect(m_credentialsDbFileWatcher, &QFileSystemWatcher::fileChanged, this, &MPDevice::checkCredentialsDbChangeNumbers);
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
 
@@ -363,34 +366,20 @@ void MPDevice::removeFileFromCache(QString fileName)
 
 QString MPDevice::getDBBackupFile()
 {
-    if(filesCache.filePath().isEmpty())
-        return QString();
+    QString backupFile = readDBBackupFile();
 
-    QFileInfo fileInfo(filesCache.filePath());
-
-    // get backup folder for hashed card CPZ
-    QSettings settings;
-    settings.beginGroup("users");
-    QString backupFile = settings.value(fileInfo.baseName()).toString();
-    settings.endGroup();
+    // check change credentials database numbers in the device and backup file
+    checkCredentialsDbChangeNumbers(backupFile);
 
     return backupFile;
 }
 
 void MPDevice::setDBBackupFile(const QString &backupFile)
 {
-    if(filesCache.filePath().isEmpty())
-        return;
-
-    QFileInfo fileInfo(filesCache.filePath());
-
-    QSettings settings;
-    settings.beginGroup("users");
-    settings.setValue(fileInfo.baseName(), backupFile);
-    settings.endGroup();
+    saveDBBackupFile(backupFile);
 
     // check change credentials database numbers in the device and backup file
-    checkCredentialsDbChangeNumbers();
+    checkCredentialsDbChangeNumbers(backupFile);
 }
 
 bool MPDevice::isJobsQueueBusy()
@@ -3578,10 +3567,9 @@ void MPDevice::getCurrentCardCPZ()
         else
         {
             set_cardCPZ(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
-            qDebug() << "Card CPZ: " << get_cardCPZ().toHex();
+
             if (filesCache.setCardCPZ(get_cardCPZ()))
             {
-                checkCredentialsDbChangeNumbers();
                 qDebug() << "CPZ set to file cache, emitting file cache changed";
                 emit filesCacheChanged();
             }
@@ -3631,7 +3619,7 @@ void MPDevice::getChangeNumbers()
             dataDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
             if (filesCache.setDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]))
             {
-                checkCredentialsDbChangeNumbers();
+                checkCredentialsDbChangeNumbers(readDBBackupFile());
                 qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
                 emit filesCacheChanged();
             }
@@ -6608,15 +6596,13 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
     runAndDequeueJobs();
 }
 
-void MPDevice::checkCredentialsDbChangeNumbers()
+void MPDevice::checkCredentialsDbChangeNumbers(const QString &dbBackupFile)
 {
-    qDebug() << "checkCredentialsDbChangeNumbers";
-    QString backupFile = getDBBackupFile();
-    if(backupFile.isEmpty()/*filesCache.cardCPZ().isNull()*/
+    if(dbBackupFile.isEmpty()
             || !m_credentialsDbChangeNumberSet)
         return;
 
-    QFile file(backupFile);
+    QFile file(dbBackupFile);
     if(file.exists())
     {
         if(file.open(QFile::ReadOnly))
@@ -6669,4 +6655,44 @@ void MPDevice::checkCredentialsDbChangeNumbers()
             }
         }
     }
+}
+
+void MPDevice::onCardCPZChanged()
+{
+    QString filePath = readDBBackupFile();
+
+    if(!filePath.isEmpty())
+    {
+        if(!m_credentialsDbFileWatcher->addPath(filePath))
+            qWarning() << "Failed to set monitored file for QFileSystemWatcher";
+    }
+}
+
+QString MPDevice::readDBBackupFile() const
+{
+    if(filesCache.filePath().isEmpty())
+        return QString();
+
+    QFileInfo fileInfo(filesCache.filePath());
+
+    // get backup folder for hashed card CPZ
+    QSettings settings;
+    settings.beginGroup("users");
+    QString backupFile = settings.value(fileInfo.baseName()).toString();
+    settings.endGroup();
+
+    return backupFile;
+}
+
+void MPDevice::saveDBBackupFile(const QString &backupFile)
+{
+    if(filesCache.filePath().isEmpty())
+        return;
+
+    QFileInfo fileInfo(filesCache.filePath());
+
+    QSettings settings;
+    settings.beginGroup("users");
+    settings.setValue(fileInfo.baseName(), backupFile);
+    settings.endGroup();
 }

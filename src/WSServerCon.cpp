@@ -562,7 +562,6 @@ void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)
 
 void WSServerCon::resetDevice(MPDevice *dev)
 {
-    qDebug() << "resetDevice";
     mpdevice = dev;
 
     if (!mpdevice)
