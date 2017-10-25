@@ -20,6 +20,8 @@
 #include <functional>
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
+static const QString kDataDbChangeNumberItem("dataDbChangeNumber");
+static const QString kCredentialsDbChangeNumberItem("credentialsDbChangeNumber");
 
 MPDevice::MPDevice(QObject *parent):
     QObject(parent),
@@ -4853,8 +4855,8 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
         exportTopObject.insert("payload", QString(payload));
     }
 
-    exportTopObject.insert("dataDbChangeNumber", QJsonValue((quint8)get_dataDbChangeNumber()));
-    exportTopObject.insert("credentialsDbChangeNumber", QJsonValue((quint8)get_credentialsDbChangeNumber()));
+    exportTopObject.insert(kDataDbChangeNumberItem, QJsonValue((quint8)get_dataDbChangeNumber()));
+    exportTopObject.insert(kCredentialsDbChangeNumberItem, QJsonValue((quint8)get_credentialsDbChangeNumber()));
 
     QJsonDocument fileContentDoc(exportTopObject);
     payload = fileContentDoc.toJson();
@@ -6720,10 +6722,12 @@ void MPDevice::checkCredentialsDbChangeNumbers(const QString &dbBackupFile)
                 return;
             }
 
+            quint8 changeNumberFromFile;
+            QString errorString;
+
             if(doc.isArray())
             {
                 QJsonArray arr = doc.array();
-                QString errorString;
 
                 /* Checks */
                 if (!checkExportedPayload(arr, errorString))
@@ -6733,31 +6737,43 @@ void MPDevice::checkCredentialsDbChangeNumbers(const QString &dbBackupFile)
                 }
 
                 if (isMoolticute(arr))
-                {
-                    quint8 changeNumberFromFile = arr[11].toInt();
-                    int result;
+                    changeNumberFromFile = arr[11].toInt();
+                else
+                    return;
 
-                    if(m_credentialsDbChangeNumber > changeNumberFromFile)
-                    {
-                        // number from Mooltipass is greater
-                        result = Common::Device;
-                    }
-                    else if(m_credentialsDbChangeNumber < changeNumberFromFile)
-                    {
-                        //number from backup file is greater
-                        result = Common::BackupFile;
-                    }
-                    else
-                    {
-                        // everything is ok,
-                        // do nothing in this case
-                        return;
-                        //result = Common::Equal;
-                    }
-
-                    emit credentialsDiffer(result);
-                }
             }
+            else if (doc.isObject())
+            {
+                QJsonObject obj = doc.object();
+                QJsonObject::iterator it = obj.find(kCredentialsDbChangeNumberItem);
+
+                if(it != obj.end())
+                    changeNumberFromFile = quint8(it.value().toInt());
+                else
+                    return;
+            }
+
+            int result;
+
+            if(m_credentialsDbChangeNumber > changeNumberFromFile)
+            {
+                // number from Mooltipass is greater
+                result = Common::Device;
+            }
+            else if(m_credentialsDbChangeNumber < changeNumberFromFile)
+            {
+                //number from backup file is greater
+                result = Common::BackupFile;
+            }
+            else
+            {
+                // everything is ok,
+                // do nothing in this case
+                return;
+                //result = Common::Equal;
+            }
+
+            emit credentialsDiffer(result);
         }
     }
 }
