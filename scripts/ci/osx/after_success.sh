@@ -57,7 +57,7 @@ fi
 
 #Call fix to change all rpath
 wget_retry https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
-python macdeployqtfix.py build/$APP.app/Contents/MacOS/MoolticuteApp /usr/local/Cellar/qt5/5.*/
+python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticute /usr/local/Cellar/qt5/5.*/
 python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /usr/local/Cellar/qt5/5.*/
 
 #install appdmg https://github.com/LinusU/node-appdmg a tool to create awesome dmg !
