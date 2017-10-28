@@ -442,15 +442,14 @@ void Updater::setUpdateAvailable (const bool available)
         box.setDefaultButton   (QMessageBox::Yes);
 
         if (box.exec() == QMessageBox::Yes) {
-            if (!openUrl().isEmpty())
+            if (downloadUrl().isEmpty())
                 QDesktopServices::openUrl (QUrl (openUrl()));
 
-            else if (downloaderEnabled()) {
+            if (downloaderEnabled()) {
                 m_downloader->setUrlId (url());
                 m_downloader->setFileName (downloadUrl().split ("/").last());
                 m_downloader->startDownload (QUrl (downloadUrl()));
             }
-
             else
                 QDesktopServices::openUrl (QUrl (downloadUrl()));
         }
