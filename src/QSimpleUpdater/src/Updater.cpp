@@ -29,6 +29,7 @@
 
 #include <QDebug>
 #include <QJsonValue>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QApplication>
@@ -361,18 +362,58 @@ void Updater::onReply (QNetworkReply* reply)
         return;
     }
 
-    /* Get the platform information */
-    QJsonObject updates = document.object().value ("updates").toObject();
-    QJsonObject platform = updates.value (platformKey()).toObject();
+    /* Get latest GitHub Release */
+    QJsonArray githubReleases = document.array();
+    QJsonObject latestGithubRelese = githubReleases.at(0).toObject();
+    QString tagName = latestGithubRelese.value("tag_name").toString();
+    QString htmlUrl = latestGithubRelese.value("html_url").toString();
+    QString body = latestGithubRelese.value("body").toString();
 
-    /* Get update information */
-    m_openUrl = platform.value ("open-url").toString();
-    m_changelog = platform.value ("changelog").toString();
-    m_downloadUrl = platform.value ("download-url").toString();
-    m_latestVersion = platform.value ("latest-version").toString();
+    QString releaseFileSuffix;
+    if (platformKey().compare("osx") == 0)
+        releaseFileSuffix = ".dmg";
 
-    /* Compare latest and current version */
-    setUpdateAvailable (latestVersion() != moduleVersion());
+    if (platformKey().compare("linux") == 0)
+        releaseFileSuffix = ".deb";
+
+    if (platformKey().compare("windows") == 0)
+        releaseFileSuffix = ".exe";
+
+    if (releaseFileSuffix.isEmpty())
+    {
+        qWarning() << "Automatic updates are not suppurted in this platform " << platformKey();
+        setUpdateAvailable(false);
+        emit checkingFinished (url());
+        return;
+    }
+
+    QJsonArray githubReleaseAssets = latestGithubRelese.value("assets").toArray();
+    bool releaseFound = false;
+    QString releaseName;
+    QString downloadUrl;
+    for (QJsonValue jsonValue : githubReleaseAssets)
+    {
+        QJsonObject releaseAsset = jsonValue.toObject();
+        releaseName = releaseAsset.value("name").toString();
+
+        if (releaseName.endsWith(releaseFileSuffix))
+        {
+            releaseFound = true;
+            downloadUrl = releaseAsset.value("browser_download_url").toString();
+            break;
+        }
+    }
+    if (releaseFound)
+    {
+        m_openUrl = htmlUrl;
+        m_changelog = body;
+        m_downloadUrl = downloadUrl;
+        m_latestVersion = tagName;
+        qDebug() << m_downloadUrl;
+
+        /* Compare latest and current version */
+        setUpdateAvailable (latestVersion() != moduleVersion());
+    }
     emit checkingFinished (url());
 }
 
