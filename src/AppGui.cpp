@@ -528,7 +528,7 @@ void AppGui::checkUpdate(bool displayMessage)
     u->setDownloaderEnabled(GITHUB_UPDATE_URL, true);
     u->setNotifyOnFinish(GITHUB_UPDATE_URL, displayMessage);
 
-    u->checkForUpdates(MC_UPDATE_URL);
+    u->checkForUpdates(GITHUB_UPDATE_URL);
 
     //Recheck in at least 30minutes plus some random time
     if (!displayMessage)

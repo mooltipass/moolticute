@@ -10,7 +10,7 @@ QT       -= gui
 
 QMAKE_CXXFLAGS += -std=c++0x
 
-TARGET = tst_testsfilescache
+TARGET = tests
 CONFIG   += console
 CONFIG   -= app_bundle
 
