@@ -13,7 +13,8 @@ wget_retry https://calaos.fr/download/misc/InnoSetup5.zip -O $HOME/InnoSetup5.zi
 #download our signcode tool
 wget_retry https://github.com/mooltipass/osslsigncode/releases/download/1.7.1/osslsigncode_amd64.tar.xz -O $HOME/osslsigncode_amd64.tar.xz
 tar xJvf $HOME/osslsigncode_amd64.tar.xz
-sudo mv osslsigncode /usr/bin/local
+chmod +x osslsigncode
+sudo mv osslsigncode $HOME
 
 mkdir -p "$HOME/.wine/drive_c/Program Files (x86)/"
 pushd "$HOME/.wine/drive_c/Program Files (x86)/"
