@@ -1,25 +1,10 @@
-#include <QString>
-#include <QtTest>
+#include "FilesCacheTests.h"
 
-#include <QStringList>
-#include "../src/FilesCache.h"
-
-class TestsFilesCache : public QObject
-{
-    Q_OBJECT
-
-public:
-    TestsFilesCache();
-
-private Q_SLOTS:
-    void testSaveAndLoadFileNames();
-};
-
-TestsFilesCache::TestsFilesCache()
+FilesCacheTests::FilesCacheTests()
 {
 }
 
-void TestsFilesCache::testSaveAndLoadFileNames()
+void FilesCacheTests::testSaveAndLoadFileNames()
 {
     QList<QVariantMap> testFiles;
     for (int i = 0; i< 3; i++)
@@ -46,8 +31,3 @@ void TestsFilesCache::testSaveAndLoadFileNames()
 
     QVERIFY(cache.erase());
 }
-
-
-QTEST_APPLESS_MAIN(TestsFilesCache)
-
-#include "tst_filescache.moc"

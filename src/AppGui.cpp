@@ -24,6 +24,8 @@
 #include "MacUtils.h"
 #endif
 
+#define GITHUB_UPDATE_URL "https://api.github.com/repos/mooltipass/moolticute/releases"
+
 #if defined(Q_OS_WIN)
     #define MC_UPDATE_URL   "https://calaos.fr/mooltipass/windows/updater.json"
 #elif defined(Q_OS_MAC)
@@ -521,12 +523,12 @@ void AppGui::checkUpdate(bool displayMessage)
         return;
 
     auto u = QSimpleUpdater::getInstance();
-    u->setModuleVersion(MC_UPDATE_URL, APP_VERSION);
-    u->setNotifyOnUpdate(MC_UPDATE_URL, true);
-    u->setDownloaderEnabled(MC_UPDATE_URL, true);
-    u->setNotifyOnFinish(MC_UPDATE_URL, displayMessage);
+    u->setModuleVersion(GITHUB_UPDATE_URL, APP_VERSION);
+    u->setNotifyOnUpdate(GITHUB_UPDATE_URL, true);
+    u->setDownloaderEnabled(GITHUB_UPDATE_URL, true);
+    u->setNotifyOnFinish(GITHUB_UPDATE_URL, displayMessage);
 
-    u->checkForUpdates(MC_UPDATE_URL);
+    u->checkForUpdates(GITHUB_UPDATE_URL);
 
     //Recheck in at least 30minutes plus some random time
     if (!displayMessage)
