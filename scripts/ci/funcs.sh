@@ -289,7 +289,7 @@ function sign_binary()
         echo "Signing binary file: $1"
 
         #sign SHA1
-        osslsigncode sign \
+        /usr/bin/local/osslsigncode sign \
             -pkcs12 $HOME/cert.p12 \
             -pass $CODESIGN_WIN_PASS \
             -h sha1 \
@@ -304,7 +304,7 @@ function sign_binary()
         fi
 
         #Append SHA256
-        osslsigncode sign \
+        /usr/bin/local/osslsigncode sign \
             -pkcs12 $HOME/cert.p12 \
             -pass $CODESIGN_WIN_PASS \
             -h sha256 \
