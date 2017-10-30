@@ -291,34 +291,40 @@ function sign_binary()
         #sign SHA1
         $HOME/osslsigncode sign \
             -pkcs12 $HOME/cert.p12 \
-            -pass $CODESIGN_WIN_PASS \
+            -pass "$CODESIGN_WIN_PASS" \
             -h sha1 \
             -n "Moolticute" \
             -i "http://themooltipass.com" \
             -t http://timestamp.comodoca.com \
-            -in $1 -out ${1}_signed1
+            -in "$1" -out "${1}_signed1"
 
-        if [ $? -eq 0 ] ; then
+        if [ ! $? -eq 0 ] ; then
+            set -e
             rm ${1}_signed1
-            return
+            echo "Failed to codesign SHA1"
+            return 255
         fi
 
         #Append SHA256
         $HOME/osslsigncode sign \
             -pkcs12 $HOME/cert.p12 \
-            -pass $CODESIGN_WIN_PASS \
+            -pass "$CODESIGN_WIN_PASS" \
             -h sha256 \
             -n "Moolticute" \
             -i "http://themooltipass.com" \
             -ts http://timestamp.comodoca.com \
-            -in ${1}_signed1 -out ${1}_signed2 \
+            -in "${1}_signed1" -out "${1}_signed2" \
             -nest
 
-        if [ $? -eq 0 ] ; then
-            mv ${1}_signed2 $1
-            rm ${1}_signed1
+        if [ ! $? -eq 0 ] ; then
+            set -e
+            echo "Failed to codesign SHA256"
+            return 255
         fi
-    fi
+
+        mv ${1}_signed2 $1
+        rm ${1}_signed1
+        fi
     set -e
 }
 
