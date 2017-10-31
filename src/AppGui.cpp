@@ -26,14 +26,6 @@
 
 #define GITHUB_UPDATE_URL "https://api.github.com/repos/mooltipass/moolticute/releases"
 
-#if defined(Q_OS_WIN)
-    #define MC_UPDATE_URL   "https://calaos.fr/mooltipass/windows/updater.json"
-#elif defined(Q_OS_MAC)
-    #define MC_UPDATE_URL   "https://calaos.fr/mooltipass/macos/updater.json"
-#else
-    #define MC_UPDATE_URL   ""
-#endif
-
 AppGui::AppGui(int & argc, char ** argv) :
     QApplication(argc, argv),
     sharedMem("moolticute")
