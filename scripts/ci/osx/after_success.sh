@@ -44,14 +44,10 @@ wget_retry https://calaos.fr/mooltipass/tools/macos/mc-agent -O build/$APP.app/C
 wget_retry https://calaos.fr/mooltipass/tools/macos/mc-cli -O build/$APP.app/Contents/MacOS/mc-cli
 
 # use macdeployqt to deploy the application
-#echo "Calling macdeployqt and code signing application"
-#$QTDIR/bin/macdeployqt ./$APP.app -codesign="$DEVELOPER_NAME"
 echo "Calling macdeployqt"
 $QTDIR/bin/macdeployqt build/$APP.app
 if [ "$?" -ne "0" ]; then
     echo "Failed to run macdeployqt"
-    # remove keys
- #   security delete-keychain osx-build.keychain 
     exit 1
 fi
 
@@ -60,9 +56,42 @@ wget_retry https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/mas
 python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticute /usr/local/Cellar/qt5/5.*/
 python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /usr/local/Cellar/qt5/5.*/
 
+#setup keychain
+KEYCHAIN="travis.keychain"
+KEYCHAIN_PW="mooltipass"
+
+security create-keychain -p $KEYCHAIN_PW $KEYCHAIN
+security default-keychain -s $KEYCHAIN
+security set-keychain-settings $KEYCHAIN
+security unlock-keychain -p $KEYCHAIN_PW $KEYCHAIN
+security import $HOME/cert.p12 -k $KEYCHAIN -P "$CODESIGN_OSX_PASS" -A
+security set-key-partition-list -S apple-tool:,apple: -s -k $KEYCHAIN_PW $KEYCHAIN
+
+# Use first ID
+security find-identity -v $KEYCHAIN
+export ID=$(security find-identity -v $KEYCHAIN | grep "1)" | sed "s/^ *1) *\([^ ]*\).*/\1/")
+
+#Sign binaries!
+codesign --deep --force --verbose --sign $ID --keychain $KEYCHAIN build/$APP.app
+
+echo "Verifying code signed app"
+codesign --verify --verbose=4 build/$APP.app
+spctl --assess --verbose=4 --raw build/$APP.app
+
 #install appdmg https://github.com/LinusU/node-appdmg a tool to create awesome dmg !
 npm install -g appdmg
 appdmg mac/appdmg.json build/$APP-$VERSION.dmg
+
+#sign dmg
+codesign --force --verify --verbose --sign "$ID" build/$APP-$VERSION.dmg
+
+echo "Verifying code signed disk image"
+codesign --verify --verbose=4 build/$APP-$VERSION.dmg
+spctl --assess --verbose=4 --raw build/$APP-$VERSION.dmg
+
+echo "Removing keys"
+# remove keys
+security delete-keychain $KEYCHAIN
 
 #create update manifest
 cat > build/updater.json <<EOF
