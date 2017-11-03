@@ -21,6 +21,7 @@
 #include <QLocalSocket>
 #include <time.h>
 #include "version.h"
+#include <chrono>
 
 #ifndef Q_OS_WIN
 #include <stdio.h>
@@ -346,4 +347,32 @@ QString Common::maskLog(const QString &rawJson)
     logMsg.replace(QRegularExpression("\"file_data\"\\s*:\\s*\"[^\"-\"]+\""), "\"file_data\":\"<base64_data>\"");
     logMsg.replace(QRegularExpression("\"node_data\"\\s*:\\s*\"[^\"-\"]+\""), "\"node_data\":\"<base64_data>\"");
     return logMsg;
+}
+
+static std::vector<qint64> mpRngIntegers;
+static std::random_device rngDevice;
+
+std::seed_seq Common::getRngSeed()
+{
+    if (mpRngIntegers.empty())
+    {
+        std::vector<qint64> ints = {rngDevice(), rngDevice(), rngDevice(), rngDevice(),
+                                 rngDevice(), rngDevice(), rngDevice(), rngDevice(),
+                                 std::chrono::system_clock::now().time_since_epoch().count()};
+        std::seed_seq sequence(ints.begin(), ints.end());
+        return sequence;
+    }
+    else
+    {
+        std::vector<qint64> ints = mpRngIntegers;
+        ints.push_back(rngDevice());
+        ints.push_back(std::chrono::system_clock::now().time_since_epoch().count());
+        std::seed_seq sequence(ints.begin(), ints.end());
+        return sequence;
+    }
+}
+
+void Common::updateSeed(std::vector<qint64> &newInts)
+{
+    mpRngIntegers = newInts;
 }

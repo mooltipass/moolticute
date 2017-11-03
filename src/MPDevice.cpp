@@ -3896,7 +3896,7 @@ void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, 
         //all jobs finished success
 
         qInfo() << "Random numbers generated ok";
-        cb(true, QString(), data);
+        cb(true, QString(), data.mid(0, 32));
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
