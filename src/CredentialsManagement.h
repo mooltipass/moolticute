@@ -56,7 +56,7 @@ private slots:
     void saveSelectedCredential(const QModelIndex &proxyIndex=QModelIndex());
     void on_pushButtonEnterMMM_clicked();
     void on_buttonDiscard_pressed();
-    void on_buttonDiscard_confirmed();
+    void onButtonDiscard_confirmed();
     void on_buttonSaveChanges_clicked();
     void requestPasswordForSelectedItem();
     void on_addCredentialButton_clicked();
