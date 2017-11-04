@@ -19,10 +19,10 @@ public:
     void setParentItem(TreeItem *pParentItem);
     const Status &status() const;
     void setStatus(const Status &eStatus);
-    const QDate &createdDate() const;
-    void setCreatedDate(const QDate &dDate);
     const QDate &updatedDate() const;
     void setUpdatedDate(const QDate &dDate);
+    const QDate &accessedDate() const;
+    void setAccessedDate(const QDate &dDate);
     const QString &description() const;
     void setDescription(const QString &sDescription);
     TreeItem *child(int iIndex);
@@ -47,8 +47,8 @@ protected:
     TreeItem *m_pParentItem;
     Status m_eStatus;
     QString m_sName;
-    QDate m_dCreatedDate;
     QDate m_dUpdatedDate;
+    QDate m_dAccessedDate;
     QString m_sDescription;
 };
 

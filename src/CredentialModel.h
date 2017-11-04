@@ -24,8 +24,8 @@ public:
         ItemNameRole=Qt::UserRole+1,
         PasswordRole,
         DescriptionRole,
-        DateCreatedRole,
         DateUpdatedRole,
+        DateAccessedRole,
         FavoriteRole
     };
 
