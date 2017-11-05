@@ -84,9 +84,9 @@ QJsonObject LoginItem::toJson() const
 
 QString LoginItem::itemLabel() const
 {
-    QString sTargetDate = createdDate().toString(Qt::DefaultLocaleShortDate);
-    if (!updatedDate().isNull())
-        sTargetDate = updatedDate().toString(Qt::DefaultLocaleShortDate);
+    QString sTargetDate = updatedDate().toString(Qt::DefaultLocaleShortDate);
+    if (!accessedDate().isNull())
+        sTargetDate = accessedDate().toString(Qt::DefaultLocaleShortDate);
     return m_sName + QString(" (") + sTargetDate + QString(")");
 }
 
