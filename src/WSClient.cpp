@@ -18,12 +18,17 @@
  ******************************************************************************/
 #include "WSClient.h"
 
-#define WS_URI      "ws://localhost"
+#define WS_URI                      "ws://localhost"
+#define QUERY_RANDOM_NUMBER_TIME    10 * 60 * 1000 //10 min
 
 WSClient::WSClient(QObject *parent):
     QObject(parent)
 {
     openWebsocket();
+
+    randomNumTimer = new QTimer(this);
+    connect(randomNumTimer, &QTimer::timeout, this, &WSClient::queryRandomNumbers);
+    randomNumTimer->start(QUERY_RANDOM_NUMBER_TIME);
 }
 
 WSClient::~WSClient()
@@ -63,8 +68,11 @@ void WSClient::closeWebsocket()
 
 void WSClient::sendJsonData(const QJsonObject &data)
 {
+    if (!isConnected())
+        return;
+
     QJsonDocument jdoc(data);
-    //    qDebug().noquote() << jdoc.toJson();
+    //    qDebug().noquote() << jdoc.toJson();    
     wsocket->sendTextMessage(jdoc.toJson());
 }
 
@@ -72,11 +80,14 @@ void WSClient::onWsConnected()
 {
     qDebug() << "Websocket connected";
     connect(wsocket, &QWebSocket::textMessageReceived, this, &WSClient::onTextMessageReceived);
-    Q_EMIT wsConnected();
+    queryRandomNumbers();
+    emit wsConnected();
 }
 
-bool WSClient::isConnected() const {
-    return wsocket && wsocket->state() == QAbstractSocket::ConnectedState;
+bool WSClient::isConnected() const
+{
+    return wsocket &&
+            wsocket->state() == QAbstractSocket::ConnectedState;
 }
 
 void WSClient::onWsDisconnected()
@@ -299,6 +310,16 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         int result = rootobj["data"].toInt();
         emit credentialsCompared(result);
+	}
+    else if (rootobj["msg"] == "get_random_numbers")
+    {
+        std::vector<qint64> ints;
+        QJsonArray jarr = rootobj["data"].toArray();
+        for (int i = 0;i < jarr.size();i++)
+            ints.push_back(jarr.at(i).toInt());
+
+        qDebug() << "update seed: " << jarr;
+        Common::updateSeed(ints);
     }
 }
 
@@ -474,4 +495,9 @@ void WSClient::sendDBBackupFile(const QString &backupFile)
 {
     sendJsonData({{ "msg", "set_db_backup_file" },
                   { "data", backupFile }});
+}
+
+void WSClient::queryRandomNumbers()
+{
+    sendJsonData({{ "msg", "get_random_numbers" }});
 }

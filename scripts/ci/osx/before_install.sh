@@ -20,9 +20,5 @@ source $SCRIPTDIR/../funcs.sh
 
 osx_setup_netrc $HOME
 
-#openssl aes-256-cbc \
-#    -K $encrypted_7917762619ed_key \
-#    -iv $encrypted_7917762619ed_iv \
-#    -in scripts/ci/osx/developerID_application.cer.enc \
-#    -out scripts/ci/osx/developerID_application.cer \
-#    -d
+#create certificate from env
+echo $CODESIGN_OSX_CERT| base64 -d > $HOME/cert.p12

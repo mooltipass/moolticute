@@ -9,8 +9,8 @@ TreeItem::TreeItem(const QString &sName, const QDate &dCreatedDate, const QDate 
     m_pParentItem(nullptr),
     m_eStatus(UNUSED),
     m_sName(sName),
-    m_dCreatedDate(dCreatedDate),
-    m_dUpdatedDate(dUpdatedDate),
+    m_dUpdatedDate(dCreatedDate),
+    m_dAccessedDate(dUpdatedDate),
     m_sDescription(sDescription)
 {
 }
@@ -70,16 +70,6 @@ void TreeItem::setStatus(const Status &eStatus)
     m_eStatus = eStatus;
 }
 
-const QDate &TreeItem::createdDate() const
-{
-    return m_dCreatedDate;
-}
-
-void TreeItem::setCreatedDate(const QDate &dDate)
-{
-    m_dCreatedDate = dDate;
-}
-
 const QDate &TreeItem::updatedDate() const
 {
     return m_dUpdatedDate;
@@ -88,6 +78,16 @@ const QDate &TreeItem::updatedDate() const
 void TreeItem::setUpdatedDate(const QDate &dDate)
 {
     m_dUpdatedDate = dDate;
+}
+
+const QDate &TreeItem::accessedDate() const
+{
+    return m_dAccessedDate;
+}
+
+void TreeItem::setAccessedDate(const QDate &dDate)
+{
+    m_dAccessedDate = dDate;
 }
 
 const QString &TreeItem::description() const

@@ -23,6 +23,7 @@
 #include <functional>
 #include <memory>
 #include <type_traits>
+#include <random>
 
 #define MOOLTIPASS_VENDORID     0x16D0
 #define MOOLTIPASS_PRODUCTID    0x09A0
@@ -150,6 +151,9 @@ public:
 
     //mask log by removing passwords and data from log
     static QString maskLog(const QString &rawJson);
+
+    static std::seed_seq getRngSeed();
+    static void updateSeed(std::vector<qint64> &newInts);
 
     typedef enum
     {

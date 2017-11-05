@@ -44,7 +44,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->addCredentialButton->setStyleSheet(CSS_BLUE_BUTTON);
     ui->buttonDiscard->setText(tr("Discard all changes"));
     connect(ui->buttonDiscard, &AnimatedColorButton::pressed, this, &CredentialsManagement::on_buttonDiscard_pressed);
-    connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_buttonDiscard_confirmed);
+    connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::onButtonDiscard_confirmed);
 
     ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
@@ -180,7 +180,7 @@ void CredentialsManagement::on_buttonDiscard_pressed()
     }
 }
 
-void CredentialsManagement::on_buttonDiscard_confirmed()
+void CredentialsManagement::onButtonDiscard_confirmed()
 {
     wsClient->sendLeaveMMRequest();
     m_pCredModel->clear();
@@ -605,8 +605,8 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
             ui->credDisplayLoginInput->setText(pLoginItem->name());
             ui->credDisplayPasswordInput->setText(pLoginItem->password());
             ui->credDisplayDescriptionInput->setText(pLoginItem->description());
-            ui->credDisplayCreationDateInput->setText(pLoginItem->createdDate().toString(Qt::DefaultLocaleShortDate));
-            ui->credDisplayModificationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
+            ui->credDisplayCreationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
+            ui->credDisplayModificationDateInput->setText(pLoginItem->accessedDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayPasswordInput->setLocked(pLoginItem->passwordLocked());
         }
     }

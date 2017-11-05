@@ -126,6 +126,7 @@ signals:
 
 public slots:
     void sendJsonData(const QJsonObject &data);
+    void queryRandomNumbers();
 
 private slots:
     void onWsConnected();
@@ -142,6 +143,8 @@ private:
 
     QJsonObject memData;
     QJsonArray filesCache;
+
+    QTimer *randomNumTimer = nullptr;
 };
 
 #endif // WSCLIENT_H

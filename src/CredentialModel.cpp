@@ -187,11 +187,11 @@ void CredentialModel::load(const QJsonArray &json)
 
             // Update login item created date
             QDate dCreatedDate = QDate::fromString(cnode["date_created"].toString(), Qt::ISODate);
-            pLoginItem->setCreatedDate(dCreatedDate);
+            pLoginItem->setUpdatedDate(dCreatedDate);
 
             // Update login item updated date
             QDate dUpdatedDate = QDate::fromString(cnode["date_last_used"].toString(), Qt::ISODate);
-            pLoginItem->setUpdatedDate(dUpdatedDate);
+            pLoginItem->setAccessedDate(dUpdatedDate);
 
             QJsonArray a = cnode["address"].toArray();
             if (a.size() < 2)
@@ -301,22 +301,22 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &ro
             }
             break;
         }
-        case DateCreatedRole:
-        {
-            QDate dDate = vValue.toDate();
-            if (dDate != pLoginItem->createdDate())
-            {
-                pLoginItem->setCreatedDate(dDate);
-                bChanged = true;
-            }
-            break;
-        }
         case DateUpdatedRole:
         {
             QDate dDate = vValue.toDate();
             if (dDate != pLoginItem->updatedDate())
             {
                 pLoginItem->setUpdatedDate(dDate);
+                bChanged = true;
+            }
+            break;
+        }
+        case DateAccessedRole:
+        {
+            QDate dDate = vValue.toDate();
+            if (dDate != pLoginItem->accessedDate())
+            {
+                pLoginItem->setAccessedDate(dDate);
                 bChanged = true;
             }
             break;
