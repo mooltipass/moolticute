@@ -25,9 +25,16 @@ wget -q https://github.com/probonopd/AppImages/raw/master/functions.sh -O ./func
 
 cd $APP.AppDir
 
-# sudo chown -R $USER /app/
+echo "[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Moolticute
+Comment=Moolticute allows your browser extensions to talk with the Mooltipass.
+TryExec=moolticute
+Exec=moolticute %F
+Icon=moolticute" > moolticute.desktop
 
-# cp -r /app/* ./usr/
+wget -O moolticute.svg https://raw.githubusercontent.com/mooltipass/moolticute/master/img/AppIcon.svg
 
 ########################################################################
 # Copy desktop and icon file to AppDir for AppRun to pick them up
