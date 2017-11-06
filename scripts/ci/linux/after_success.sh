@@ -21,33 +21,33 @@ fi
 mkdir -p $WDIR/redist
 
 #Get 3rd party tools
-wget_retry https://calaos.fr/mooltipass/tools/windows/mc-agent.exe -O $WDIR/mc-agent.exe
-wget_retry https://calaos.fr/mooltipass/tools/windows/mc-cli.exe -O $WDIR/mc-cli.exe
-wget_retry https://calaos.fr/download/misc/redist/Win32OpenSSL_Light-1_0_2L.exe -O $WDIR/redist/Win32OpenSSL_Light-1_0_2L.exe
-wget_retry https://calaos.fr/download/misc/redist/vcredist_sp1_x86.exe -O $WDIR/redist/vcredist_sp1_x86.exe
+# wget_retry https://calaos.fr/mooltipass/tools/windows/mc-agent.exe -O $WDIR/mc-agent.exe
+# wget_retry https://calaos.fr/mooltipass/tools/windows/mc-cli.exe -O $WDIR/mc-cli.exe
+# wget_retry https://calaos.fr/download/misc/redist/Win32OpenSSL_Light-1_0_2L.exe -O $WDIR/redist/Win32OpenSSL_Light-1_0_2L.exe
+# wget_retry https://calaos.fr/download/misc/redist/vcredist_sp1_x86.exe -O $WDIR/redist/vcredist_sp1_x86.exe
 
-for f in $MXE_BIN/bin/libgcc_s_sjlj-1.dll \
-         $MXE_BIN/bin/libstdc++-6.dll \
-         $MXE_BIN/bin/libwinpthread-1.dll \
-         $MXE_BIN/bin/libwebp-5.dll \
-         $MXE_BIN/bin/zlib1.dll \
-         $MXE_BIN/bin/icudt56.dll \
-         $MXE_BIN/bin/icuin56.dll \
-         $MXE_BIN/bin/icuuc56.dll \
-         $MXE_BIN/qt5/bin/Qt5Core.dll \
-         $MXE_BIN/qt5/bin/Qt5Gui.dll \
-         $MXE_BIN/qt5/bin/Qt5Network.dll \
-         $MXE_BIN/qt5/bin/Qt5Widgets.dll \
-         $MXE_BIN/qt5/bin/Qt5WebSockets.dll \
-         $MXE_BIN/qt5/plugins/imageformats \
-         $MXE_BIN/qt5/plugins/platforms \
-         build/release/moolticute.exe \
-         build/release/moolticuted.exe
-do
-    cp -R $f $WDIR
-done
+# for f in $MXE_BIN/bin/libgcc_s_sjlj-1.dll \
+#          $MXE_BIN/bin/libstdc++-6.dll \
+#          $MXE_BIN/bin/libwinpthread-1.dll \
+#          $MXE_BIN/bin/libwebp-5.dll \
+#          $MXE_BIN/bin/zlib1.dll \
+#          $MXE_BIN/bin/icudt56.dll \
+#          $MXE_BIN/bin/icuin56.dll \
+#          $MXE_BIN/bin/icuuc56.dll \
+#          $MXE_BIN/qt5/bin/Qt5Core.dll \
+#          $MXE_BIN/qt5/bin/Qt5Gui.dll \
+#          $MXE_BIN/qt5/bin/Qt5Network.dll \
+#          $MXE_BIN/qt5/bin/Qt5Widgets.dll \
+#          $MXE_BIN/qt5/bin/Qt5WebSockets.dll \
+#          $MXE_BIN/qt5/plugins/imageformats \
+#          $MXE_BIN/qt5/plugins/platforms \
+#          build/release/moolticute.exe \
+#          build/release/moolticuted.exe
+# do
+#     cp -R $f $WDIR
+# done
 
-find_and_sign $WDIR
+# find_and_sign $WDIR
 
 pushd win
 
