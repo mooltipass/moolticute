@@ -1,7 +1,7 @@
 version: '2'
 services:
   ubuntu:
-    image: ubuntu:latest
+    image: tomaszjaniczek/moolticute
     environment:
       - GITHUB_LOGIN=${GITHUB_LOGIN}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
