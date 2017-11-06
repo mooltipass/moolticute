@@ -51,10 +51,10 @@ find_and_sign $WDIR
 
 pushd win
 
-echo "#define MyAppVersion \"$VERSION\"" > build.iss
-cat installer.iss >> build.iss
-chmod +x iscc
-./iscc build.iss
+# echo "#define MyAppVersion \"$VERSION\"" > build.iss
+# cat installer.iss >> build.iss
+# chmod +x iscc
+# ./iscc build.iss
 
 # TODO: UNCOMMENT
 # sign_binary build/$FILENAME.exe
