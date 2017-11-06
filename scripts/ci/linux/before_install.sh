@@ -35,6 +35,7 @@ fi
 mkdir -p ${BUILD_DIR}/deb
 docker-compose $DOCKER_COMPOSE_CONFIG up --force-recreate -d
 
+$DOCKER_EXEC "apt install git cmake qttools5-dev-tools"
 # git setup
 $DOCKER_EXEC "git config --global user.email '${USER_EMAIL}'"
 $DOCKER_EXEC "git config --global user.name '${USER}'"
