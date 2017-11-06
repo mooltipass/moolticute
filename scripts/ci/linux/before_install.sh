@@ -21,9 +21,9 @@ source $SCRIPTDIR/../funcs.sh
 # unzip $HOME/InnoSetup5.zip
 # popd
 
-pushd $HOME
-wget_retry https://calaos.fr/download/misc/mxe_qt591.tar.xz
-popd
+# pushd $HOME
+# wget_retry https://calaos.fr/download/misc/mxe_qt591.tar.xz
+# popd
 
 if [ "$HOME" != "/home/ubuntu" ] ; then
     #Fix MXE path that was installed in /home/ubuntu
