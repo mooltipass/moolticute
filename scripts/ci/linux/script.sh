@@ -23,7 +23,7 @@ $DOCKER_EXEC "mkdir -p /app/build-linux || true && cd /app/build-linux && qmake 
 export PATH=$HOME/mxe/usr/bin:$PATH
 export MXE_BASE=$HOME/mxe
 
-$MXE_BASE/usr/i686-w64-mingw32.shared.posix/qt5/bin/qmake ../Moolticute.pro
-make
+# $MXE_BASE/usr/i686-w64-mingw32.shared.posix/qt5/bin/qmake ../Moolticute.pro
+# make
 
 popd
