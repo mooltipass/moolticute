@@ -60,9 +60,9 @@ pushd win
 # sign_binary build/$FILENAME.exe
 
 #create update manifest
-cat > build/updater.json <<EOF
-{ "updates": { "windows": { "latest-version": "$VERSION", "download-url": "https://calaos.fr/mooltipass/windows/$FILENAME.exe" }}}
-EOF
+# cat > build/updater.json <<EOF
+# { "updates": { "windows": { "latest-version": "$VERSION", "download-url": "https://calaos.fr/mooltipass/windows/$FILENAME.exe" }}}
+# EOF
 
 # Debian package
 echo "Generating changelog for tag ${BUILD_TAG} [${TRAVIS_COMMIT}]"
