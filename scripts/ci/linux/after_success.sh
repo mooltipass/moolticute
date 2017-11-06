@@ -14,7 +14,8 @@ FILENAME=moolticute_setup_$VERSION
 #Only build if the commit we are building is for the last tag
 if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
     echo "Not uploading package"
-    return 0
+    # TODO: REMOVE ME!!!
+    # return 0
 fi
 
 mkdir -p $WDIR/redist

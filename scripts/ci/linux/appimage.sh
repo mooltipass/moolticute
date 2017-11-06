@@ -9,12 +9,14 @@
 
 export ARCH=$(arch)
 
+BASE_PATH=$(pwd)
+
 APP=moolticute
 LOWERAPP=${APP,,}
 
-mkdir -p $APP/$APP.AppDir/usr/
+mkdir -p $BASE_PATH/$APP/$APP.AppDir/usr/
 
-cd $APP/
+cd $BASE_PATH/$APP/
 
 BINARIES_DIR=$APP/$APP.AppDir
 
@@ -52,7 +54,7 @@ wget -c "https://github.com/mooltipass/moolticute/releases/download/v0.9.15-beta
 
 cd ./$APP.AppDir/
 
-find build-linux/deb/*.deb -exec dpkg -x {} . \; || true
+find $BASE_PATH -iname '*.deb' -exec dpkg -x {} . \; || true
 apt-get install \
     libc6 \
     libgcc1 \
