@@ -12,11 +12,11 @@ export ARCH=$(arch)
 APP=moolticute
 LOWERAPP=${APP,,}
 
-mkdir -p $HOME/$APP/$APP.AppDir/usr/
+mkdir -p $APP/$APP.AppDir/usr/
 
-cd $HOME/$APP/
+cd $APP/
 
-BINARIES_DIR=$HOME/$APP/$APP.AppDir
+BINARIES_DIR=$APP/$APP.AppDir
 
 wget -q https://github.com/probonopd/AppImages/raw/master/functions.sh -O ./functions.sh
 . ./functions.sh
@@ -52,7 +52,7 @@ wget -c "https://github.com/mooltipass/moolticute/releases/download/v0.9.15-beta
 
 cd ./$APP.AppDir/
 
-find ../*.deb -exec dpkg -x {} . \; || true
+find build-linux/deb/*.deb -exec dpkg -x {} . \; || true
 apt-get install \
     libc6 \
     libgcc1 \
@@ -72,7 +72,7 @@ apt-get install -f -y
 # on all target systems
 ########################################################################
 
-# copy qt platform plugins 
+# copy all qt platform plugins 
 mkdir -p ./usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/
 cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/* ./usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/
 
@@ -126,7 +126,6 @@ find usr/ -type f -exec sed -i -e 's@././/bin/env@/usr/bin/env@g' {} \;
 
 cd .. # Go out of AppImage
 
-mkdir -p ../out/
 generate_type2_appimage
 
 ########################################################################
@@ -134,4 +133,4 @@ generate_type2_appimage
 ########################################################################
 
 # transfer ../out/*
-echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
+# echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
