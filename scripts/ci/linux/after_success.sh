@@ -12,7 +12,7 @@ VERSION="$(get_version .)"
 FILENAME=moolticute_setup_$VERSION
 
 #Only build if the commit we are building is for the last tag
-if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
+if [ "$(git rev-list -n 1 $VERSION --always)" != "$(cat .git/HEAD)"  ]; then
     echo "Not uploading package"
     # TODO: REMOVE ME!!!
     # return 0
