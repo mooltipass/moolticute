@@ -56,7 +56,8 @@ cat installer.iss >> build.iss
 chmod +x iscc
 ./iscc build.iss
 
-sign_binary build/$FILENAME.exe
+# TODO: UNCOMMENT
+# sign_binary build/$FILENAME.exe
 
 #create update manifest
 cat > build/updater.json <<EOF
