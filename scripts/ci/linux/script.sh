@@ -11,8 +11,8 @@ echo $DOCKER_EXEC
 $DOCKER_EXEC "mkdir -p /app/build-linux || true && cd /app/build-linux && qmake /app/Moolticute.pro && make"
 
 # Windows build
-mkdir build
-pushd build
+# mkdir build
+# pushd build
 
 #Cleaning env make travis failed in some case
 #unset `env | \
