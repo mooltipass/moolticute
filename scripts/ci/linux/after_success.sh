@@ -76,7 +76,8 @@ echo "Building .deb package..."
 $DOCKER_EXEC "cp -f README.md debian/README"
 $DOCKER_EXEC "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
 
-$DOCKER_EXEC "./appimage.sh"
+echo "Building AppImage"
+$DOCKER_EXEC "source $SCRIPTDIR/appimage.sh"
 
 # GitHub release
 $DOCKER_EXEC \
