@@ -2,6 +2,10 @@ version: '2'
 services:
   ubuntu:
     image: tomaszjaniczek/moolticute
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - "/dev/fuse:/dev/fuse"
     environment:
       - GITHUB_LOGIN=${GITHUB_LOGIN}
       - GITHUB_TOKEN=${GITHUB_TOKEN}

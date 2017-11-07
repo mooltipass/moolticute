@@ -57,7 +57,7 @@ apt-get $OPTIONS update
 cd ./$APP.AppDir/
 
 find $BASE_PATH -iname '*.deb' -exec dpkg -x {} . \; || true
-apt-get install \
+apt-get install -y \
     libc6 \
     libgcc1 \
     libqt5core5a \
@@ -70,6 +70,13 @@ apt-get install \
     libusb-1.0-0
 
 apt-get install -f -y
+
+# Make sure fuse is installed and available for the user
+apt-get install -y fuse libfuse-dev libfuse2
+# modprobe fuse
+# user="$(whoami)"
+# usermod -a -G fuse $user 
+
 
 ########################################################################
 # Copy in the dependencies that cannot be assumed to be available
@@ -136,5 +143,5 @@ generate_type2_appimage
 # Upload the AppDir
 ########################################################################
 
-transfer ../*.AppImage
+transfer *.AppImage
 echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
