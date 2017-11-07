@@ -9,19 +9,18 @@
 
 export ARCH=$(arch)
 
-BASE_PATH=$(pwd)
+BASE_PATH=$(pwd)/appimage_build/
 
 APP=moolticute
 LOWERAPP=${APP,,}
 
-mkdir -p $BASE_PATH/$APP/$APP.AppDir/usr/
+mkdir -p $BASE  _PATH/$APP/$APP.AppDir/usr/
 
 cd $BASE_PATH/$APP/
 
 BINARIES_DIR=$APP/$APP.AppDir
 
-wget -q https://github.com/probonopd/AppImages/raw/master/functions.sh -O ./functions.sh
-. ./functions.sh
+. ./appimage_functions.sh
 
 cd $APP.AppDir
 
