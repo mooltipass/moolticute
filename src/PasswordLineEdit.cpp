@@ -120,7 +120,8 @@ void PasswordLineEdit::setPasswordVisible(bool visible)
 PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent):
     QFrame(parent, Qt::Popup)
 {
-    auto seed = Common::getRngSeed();
+    auto iseed = Common::getRngSeed();
+    std::seed_seq seed(iseed.begin(), iseed.end());
     m_random_generator.seed(seed);
 
     setFrameShadow(QFrame::Plain);

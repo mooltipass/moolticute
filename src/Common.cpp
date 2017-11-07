@@ -352,23 +352,21 @@ QString Common::maskLog(const QString &rawJson)
 static std::vector<qint64> mpRngIntegers;
 static std::random_device rngDevice;
 
-std::seed_seq Common::getRngSeed()
+std::vector<qint64> Common::getRngSeed()
 {
     if (mpRngIntegers.empty())
     {
         std::vector<qint64> ints = {rngDevice(), rngDevice(), rngDevice(), rngDevice(),
                                  rngDevice(), rngDevice(), rngDevice(), rngDevice(),
                                  std::chrono::system_clock::now().time_since_epoch().count()};
-        std::seed_seq sequence(ints.begin(), ints.end());
-        return sequence;
+        return ints;
     }
     else
     {
         std::vector<qint64> ints = mpRngIntegers;
         ints.push_back(rngDevice());
         ints.push_back(std::chrono::system_clock::now().time_since_epoch().count());
-        std::seed_seq sequence(ints.begin(), ints.end());
-        return sequence;
+        return ints;
     }
 }
 

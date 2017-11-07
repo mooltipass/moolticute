@@ -152,7 +152,7 @@ public:
     //mask log by removing passwords and data from log
     static QString maskLog(const QString &rawJson);
 
-    static std::seed_seq getRngSeed();
+    static std::vector<qint64> getRngSeed();
     static void updateSeed(std::vector<qint64> &newInts);
 
     typedef enum
