@@ -20,7 +20,7 @@ cd $BASE_PATH/$APP/
 
 BINARIES_DIR=$APP/$APP.AppDir
 
-. ./appimage_functions.sh
+source ./appimage_functions.sh
 
 cd $APP.AppDir
 
