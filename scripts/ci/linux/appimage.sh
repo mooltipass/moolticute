@@ -7,20 +7,29 @@
 # For more information, see http://appimage.org/
 ########################################################################
 
-export ARCH=$(arch)
 
-BASE_PATH=$(pwd)/build-appimage/
+export ARCH=$(arch)
 
 APP=moolticute
 LOWERAPP=${APP,,}
 
-BINARIES_DIR=$BASE_PATH/$APP/$APP.AppDir/usr/
-mkdir -p $BINARIES_DIR
+BASE_PATH=$PWD/build-appimage/
+TARGET_DIR=$BASE_PATH/$APP/$APP.AppDir/usr/
+
+mkdir -p $TARGET_DIR
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/appimage_functions.sh
 
-cd $BASE_PATH/$APP/$APP.AppDir
+########################################################################
+# Install application binaries to the AppDir
+########################################################################
+cp ./debian/moolticute/usr/* $TARGET_DIR -r
+
+find .
+########################################################################
+# Generate .desketop file and icon
+########################################################################
 
 echo "[Desktop Entry]
 Version=1.0
@@ -29,25 +38,25 @@ Name=Moolticute
 Comment=Moolticute allows your browser extensions to talk with the Mooltipass.
 TryExec=moolticute
 Exec=moolticute %F
-Icon=moolticute" > moolticute.desktop
+Icon=moolticute" > $BASE_PATH/$APP/$APP.AppDir/moolticute.desktop
 
-wget -O moolticute.svg https://raw.githubusercontent.com/mooltipass/moolticute/master/img/AppIcon.svg
+wget -O $BASE_PATH/$APP/$APP.AppDir/moolticute.svg https://raw.githubusercontent.com/mooltipass/moolticute/master/img/AppIcon.svg
 
 ########################################################################
 # Copy desktop and icon file to AppDir for AppRun to pick them up
 ########################################################################
+cd $BASE_PATH/$APP/$APP.AppDir
 
 get_apprun
-get_desktop
-get_icon
+# get_desktop
+# get_icon
 
+cd ..
 ########################################################################
 # Other appliaction-specific finishing touches
 ########################################################################
 
 # Bundle Qt and all the plugins needed
-
-cd ..
 
 generate_status
 
@@ -56,13 +65,15 @@ apt-get $OPTIONS update
 
 cd ./$APP.AppDir/
 
-find $BASE_PATH -iname '*.deb' -exec dpkg -x {} . \; || true
+
 apt-get install -y \
+    fuse \
+    libfuse-dev \
+    libfuse2 \
     libc6 \
     libgcc1 \
     libqt5core5a \
     libqt5gui5 \
-    libqt5gui5-gles \
     libqt5network5 \
     libqt5websockets5 \
     libqt5widgets5 \
@@ -71,23 +82,16 @@ apt-get install -y \
 
 apt-get install -f -y
 
-# Make sure fuse is installed and available for the user
-apt-get install -y fuse libfuse-dev libfuse2
-# modprobe fuse
-# user="$(whoami)"
-# usermod -a -G fuse $user 
-
-
 ########################################################################
 # Copy in the dependencies that cannot be assumed to be available
 # on all target systems
 ########################################################################
 
 # copy all qt platform plugins 
-mkdir -p ./usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/
-cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/* ./usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/
+mkdir -p $TARGET_DIR/lib/x86_64-linux-gnu/qt5/plugins/platforms/
+cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/* $TARGET_DIR/lib/x86_64-linux-gnu/qt5/plugins/platforms/
 
-list=$(find $BINARIES_DIR -type f)
+list=$(find $TARGET_DIR -type f)
 for bynary in $list; do
     if [ -f $bynary ]; then
         deps=$(ldd $bynary  | cut -d ' ' -f 3)
@@ -98,7 +102,6 @@ for bynary in $list; do
         done
     fi;
 done
-
 
 copy_deps
 
@@ -143,5 +146,5 @@ generate_type2_appimage
 # Upload the AppDir
 ########################################################################
 
-curl --upload-file *.AppImage https://transfer.sh/*.AppImage
+curl --upload-file *.AppImage https://transfer.sh/Moolticute.AppImage
 echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
