@@ -17,7 +17,7 @@ LOWERAPP=${APP,,}
 BINARIES_DIR=$BASE_PATH/$APP/$APP.AppDir/usr/
 mkdir -p $BINARIES_DIR
 
-source ./appimage_functions.sh
+source $SCRIPTDIR/appimage_functions.sh
 
 cd $BASE_PATH/$APP/$APP.AppDir
 
