@@ -69,6 +69,7 @@ echo "Generating changelog for tag ${BUILD_TAG} [${TRAVIS_COMMIT}]"
 
 rm -f debian/changelog
 
+DEB_VERSION=V=$VERSION
 $DOCKER_EXEC "VISUAL='/bin/true' DEBEMAIL=${USER_EMAIL} dch --create --empty --distribution trusty --package \"moolticute\" \
     --newversion ${DEB_VERSION} \"Release ${BUILD_TAG}\""
 
