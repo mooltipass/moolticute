@@ -69,7 +69,8 @@ echo "Generating changelog for tag ${BUILD_TAG} [${TRAVIS_COMMIT}]"
 
 rm -f debian/changelog
 
-$DOCKER_EXEC "apt-get install vi"
+$DOCKER_EXEC 'echo "deb http://mx.archive.ubuntu.com/ubuntu/ xenial main restricted" > /etc/apt/sources.list'
+$DOCKER_EXEC "apt-get update; apt-get install vi"
 $DOCKER_EXEC "DEBEMAIL=${USER_EMAIL} dch --create --distribution trusty --package \"moolticute\" \
     --newversion ${DEB_VERSION} \"Release ${BUILD_TAG}\""
 
