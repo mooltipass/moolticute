@@ -78,8 +78,7 @@ $DOCKER_EXEC "cp -f README.md debian/README"
 $DOCKER_EXEC "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
 
 echo "Building AppImage"
-$DOCKER_EXEC "find $SCRIPTDIR"
-$DOCKER_EXEC "source $SCRIPTDIR/appimage.sh"
+$DOCKER_EXEC "scripts/ci/linux/appimage.sh"
 
 # GitHub release
 $DOCKER_EXEC \
