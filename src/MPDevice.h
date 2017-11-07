@@ -220,6 +220,23 @@ public:
     QString getDBBackupFile();
     void setDBBackupFile(const QString &backupFile);
 
+    /*!
+     * \brief readDBBackupFile
+     * \return path of the backup dile saved with QSettings
+     */
+    QString readDBBackupFile() const;
+
+    /*! \brief Compares credebtials change number from Mooltipass and from backup file.
+     *
+     * This function should be called after both cardCPZ and
+     * credentialsDbChangeNumber are set. "hashedCardCPZ" is needed to get
+     * corresponding backup file that holds one of compared numbers.
+     */
+    void checkCredentialsDbChangeNumbers(const QString &dbBackupFile);
+
+    void startWatchDbBackupFile();
+    void stopWatchDbBackupfile();
+
 signals:
     /* Signal emited by platform code when new data comes from MP */
     /* A signal is used for platform code that uses a dedicated thread */
@@ -291,7 +308,7 @@ private:
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
-    bool readExportPayload(QJsonArray dataArray, QString &errorString);
+    bool readExportPayload(QJsonArray dataArray, QString &errorString, bool isMooltiApp);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool deleteDataParentChilds(MPNode *parentNodePt);
@@ -302,9 +319,7 @@ private:
     void cleanMMMVars(void);
 
     // checks for exported file
-    bool checkExportedPayload(const QJsonArray &dataArray, QString &errorString) const;
-    inline bool isMooltipass(const QJsonArray &dataArray) const;
-    inline bool isMoolticute(const QJsonArray &dataArray) const;
+    inline bool isCorrectMooltiAppFile(const QJsonArray &dataArray);
 
     // Functions added by mathieu for unit testing
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
@@ -326,25 +341,13 @@ private:
     void updateParam(MPParams::Param param, bool en);
     void updateParam(MPParams::Param param, int val);
 
-    /*! \brief Compares credebtials change number from Mooltipass and from backup file.
-     *
-     * This function should be called after both cardCPZ and
-     * credentialsDbChangeNumber are set. "hashedCardCPZ" is needed to get
-     * corresponding backup file that holds one of compared numbers.
-     */
-    void checkCredentialsDbChangeNumbers(const QString &dbBackupFile);
-
-    /*!
-     * \brief readDBBackupFile
-     * \return path of the backup dile saved with QSettings
-     */
-    QString readDBBackupFile() const;
-
     /*!
      * \brief saveDBBackupFile
      * Saves path to backup file with QSettings
      */
     void saveDBBackupFile(const QString &backupFile);
+
+    void addFileToWatcher(const QString &backupFile);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
@@ -439,12 +442,7 @@ private:
     bool m_credentialsDbChangeNumberSet;
 };
 
-bool MPDevice::isMooltipass(const QJsonArray &dataArray) const
-{
-    return dataArray[9].toString() == "mooltipass" && dataArray.size() == 10;
-}
-
-bool MPDevice::isMoolticute(const QJsonArray &dataArray) const
+bool MPDevice::isCorrectMooltiAppFile(const QJsonArray &dataArray)
 {
     return dataArray[9].toString() == "moolticute" && dataArray.size() == 14;
 }

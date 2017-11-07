@@ -96,6 +96,7 @@ public:
     void sendCredentialsMM(const QJsonArray &creds);
 
     void exportDbFile(const QString &encryption);
+    void exportedDbFileProcessed(bool saved);
     void importDbFile(const QByteArray &fileData, bool noDelete);
 
     void sendListFilesCacheRequest();

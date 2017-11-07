@@ -498,6 +498,12 @@ void WSServerCon::processMessage(const QString &message)
                 return;
             }
 
+            /** Stop watching changes in backup file, because user can choose
+            * backup file for saving exported data. In that case, it's not needed
+            * to check credentials change numbers.
+            */
+            mpdevice->stopWatchDbBackupfile();
+
             QJsonObject ores;
             QJsonObject oroot = root;
             ores["file_data"] = QString(fileData.toBase64());
@@ -505,6 +511,19 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         },
         defaultProgressCb);
+    }
+    else if (root["msg"] == "export_database_processed")
+    {
+        if(root.contains("data"))
+        {
+            QJsonObject o = root["data"].toObject();
+            bool saved = o.value("saved").toBool();
+
+            // not used for now
+            Q_UNUSED(saved)
+
+            mpdevice->startWatchDbBackupFile();
+        }
     }
     else if (root["msg"] == "import_database")
     {
@@ -534,6 +553,7 @@ void WSServerCon::processMessage(const QString &message)
             ores["success"] = "true";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
+            mpdevice->checkCredentialsDbChangeNumbers(mpdevice->readDBBackupFile());
         },
         defaultProgressCb);
     }

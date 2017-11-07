@@ -467,6 +467,13 @@ void WSClient::exportDbFile(const QString &encryption)
                   { "data", d }});
 }
 
+void WSClient::exportedDbFileProcessed(bool saved)
+{
+    QJsonObject d = {{ "saved", saved }};
+    sendJsonData({{ "msg", "export_database_processed" },
+                  { "data", d }});
+}
+
 void WSClient::importDbFile(const QByteArray &fileData, bool noDelete)
 {
     QJsonObject d = {{ "file_data", QString(fileData.toBase64()) },

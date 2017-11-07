@@ -1035,9 +1035,8 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
         QMessageBox::warning(this, tr("Error"), tr(d));
     else
     {
-        QString fname = ui->lineEditDBFile->text();
-        if(fname.isEmpty())
-            fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),
+        bool saved = false;
+        QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),
                                                      "Memory exports (*.bin);;All files (*.*)");
 
         if (!fname.isEmpty())
@@ -1048,12 +1047,13 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
             else
             {
                 f.write(d);
-                if(ui->lineEditDBFile->text().isEmpty())
-                    setDatabaseBackupFile(fname);
                 QMessageBox::information(this, tr("Export result"), tr("Backup file successfully updated: %1").arg(fname));
+                saved = true;
             }
             f.close();
         }
+
+        wsClient->exportedDbFileProcessed(saved);
     }
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
 
