@@ -14,15 +14,12 @@ BASE_PATH=$(pwd)/appimage_build/
 APP=moolticute
 LOWERAPP=${APP,,}
 
-mkdir -p $BASE  _PATH/$APP/$APP.AppDir/usr/
-
-cd $BASE_PATH/$APP/
-
-BINARIES_DIR=$APP/$APP.AppDir
+BINARIES_DIR=$BASE_PATH/$APP/$APP.AppDir/usr/
+mkdir -p $BINARIES_DIR
 
 source ./appimage_functions.sh
 
-cd $APP.AppDir
+cd $BASE_PATH/$APP/$APP.AppDir
 
 echo "[Desktop Entry]
 Version=1.0
@@ -55,8 +52,6 @@ generate_status
 
 echo "deb http://archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse" > sources.list
 apt-get $OPTIONS update
-
-wget -c "https://github.com/mooltipass/moolticute/releases/download/v0.9.15-beta/moolticute_0.9.15-beta_amd64.deb"
 
 cd ./$APP.AppDir/
 
@@ -118,7 +113,7 @@ get_desktopintegration $LOWERAPP
 # Determine the version of the app; also include needed glibc version
 ########################################################################
 
-VERSION=$(echo "$MYPAINT_VERSION_CEREMONIAL" | sed -e 's/alpha+gitexport/git/')
+VERSION=$(echo "$VERSION" | sed -e 's/alpha+gitexport/git/')
 
 ########################################################################
 # Patch away absolute paths; it would be nice if they were relative
@@ -140,5 +135,5 @@ generate_type2_appimage
 # Upload the AppDir
 ########################################################################
 
-# transfer ../out/*
-# echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
+transfer ../*.AppImage
+echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
