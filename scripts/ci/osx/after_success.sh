@@ -65,9 +65,7 @@ security default-keychain -s $KEYCHAIN
 security set-keychain-settings $KEYCHAIN
 security unlock-keychain -p $KEYCHAIN_PW $KEYCHAIN
 security import $HOME/cert.p12 -k $KEYCHAIN -P "$CODESIGN_OSX_PASS" -A
-security -h | grep set-key-partition-list
-security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PW $KEYCHAIN || true
-
+security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PW $KEYCHAIN || true # do not fail
 
 # Use first ID
 security find-identity -v $KEYCHAIN
