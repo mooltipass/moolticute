@@ -9,7 +9,7 @@
 
 export ARCH=$(arch)
 
-BASE_PATH=$(pwd)/appimage_build/
+BASE_PATH=$(pwd)/build-appimage/
 
 APP=moolticute
 LOWERAPP=${APP,,}
@@ -17,6 +17,7 @@ LOWERAPP=${APP,,}
 BINARIES_DIR=$BASE_PATH/$APP/$APP.AppDir/usr/
 mkdir -p $BINARIES_DIR
 
+SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/appimage_functions.sh
 
 cd $BASE_PATH/$APP/$APP.AppDir

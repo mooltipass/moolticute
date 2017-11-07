@@ -232,7 +232,7 @@ function create_github_release_linux()
     local DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
     local DEB_FILE="build-linux/deb/${DEB_NAME}"
     local EXE_FILE="$(ls win/build/*.exe 2> /dev/null | head -n 1)"
-    local APPIMAGE_FILE="out/*.AppImage"
+    local APPIMAGE_FILE="build-appimage/*.AppImage"
 
     if [ -z "$VERSION" ]; then
         >&2 echo -e "Skipping GitHub release creation (current build does not have a tag)"
