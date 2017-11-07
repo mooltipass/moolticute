@@ -14,7 +14,7 @@ VERSION="$(get_version .)"
 #Only build if the commit we are building is for the last tag
 if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
     echo "Not uploading package"
-#    return 0
+    return 0
 fi
 
 QTDIR="/usr/local/opt/qt5"
@@ -70,6 +70,7 @@ security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_
 # Use first ID
 security find-identity -v $KEYCHAIN
 export ID=$(security find-identity -v $KEYCHAIN | grep "1)" | sed "s/^ *1) *\([^ ]*\).*/\1/")
+echo "Using ID: $ID"
 
 #Sign binaries!
 codesign --deep --force --verbose --sign $ID --keychain $KEYCHAIN build/$APP.app
