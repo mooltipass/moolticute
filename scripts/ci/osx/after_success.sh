@@ -86,9 +86,9 @@ appdmg mac/appdmg.json build/$APP-$VERSION.dmg
 #sign dmg
 codesign --force --verify --verbose --sign "$ID" build/$APP-$VERSION.dmg
 
-echo "Verifying code signed disk image"
-codesign --verify --verbose=4 build/$APP-$VERSION.dmg
-spctl --assess --verbose=4 --raw build/$APP-$VERSION.dmg
+#echo "Verifying code signed disk image"
+#codesign --verify --verbose=4 build/$APP-$VERSION.dmg
+#spctl --assess --verbose=4 --raw build/$APP-$VERSION.dmg
 
 echo "Removing keys"
 # remove keys
