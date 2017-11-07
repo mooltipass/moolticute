@@ -21,4 +21,4 @@ source $SCRIPTDIR/../funcs.sh
 osx_setup_netrc $HOME
 
 #create certificate from env
-echo $CODESIGN_OSX_CERT| base64 -d > $HOME/cert.p12
+echo $CODESIGN_OSX_CERT| base64 -D > $HOME/cert.p12
