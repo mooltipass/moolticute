@@ -143,5 +143,5 @@ generate_type2_appimage
 # Upload the AppDir
 ########################################################################
 
-transfer *.AppImage
+curl --upload-file *.AppImage https://transfer.sh/*.AppImage
 echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
