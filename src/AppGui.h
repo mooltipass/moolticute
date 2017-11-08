@@ -65,7 +65,7 @@ private:
      WSClient *wsClient = nullptr;
      QAction *showConfigApp = nullptr;
      DaemonMenuAction *daemonAction = nullptr;
-#ifdef Q_OS_LINUX
+#ifndef Q_OS_WIN
      QAction *restartDaemonAction;
 #endif
 
