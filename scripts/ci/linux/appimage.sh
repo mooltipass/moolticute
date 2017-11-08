@@ -14,7 +14,8 @@ APP=moolticute
 LOWERAPP=${APP,,}
 
 BASE_PATH=$PWD/build-appimage/
-TARGET_DIR=$BASE_PATH/$APP/$APP.AppDir/usr/
+APPDIR=$BASE_PATH/$APP/$APP.AppDir/
+TARGET_DIR=$APPDIR/usr/
 
 mkdir -p $TARGET_DIR
 
@@ -97,7 +98,9 @@ for bynary in $list; do
         deps=$(ldd $bynary  | cut -d ' ' -f 3)
         for file in $deps; do
             if [ -f $file ]; then
-                cp $file ${TARGET_DIR}${file}
+                DIR=$(dirname "${file}")
+                mkdir -p ${APPDIR}${DIR}
+                cp $file ${APPDIR}${file}
             fi
         done
     fi;
