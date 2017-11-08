@@ -97,8 +97,9 @@ bool AppGui::initialize()
     QMenu *systrayMenu = new QMenu();
 
     daemonAction = new DaemonMenuAction(systrayMenu);
-#ifdef Q_OS_LINUX
-    // Custom systray widgets are don't work on linux
+#ifndef Q_OS_WIN
+    // Custom systray widgets are not working on linux
+    // And it fails too much on macos, see issue #132
     restartDaemonAction = new QAction(this);
     connect(restartDaemonAction, &QAction::triggered, this, &AppGui::restartDaemon);
     systrayMenu->addAction(restartDaemonAction);
