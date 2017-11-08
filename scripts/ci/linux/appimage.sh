@@ -148,3 +148,5 @@ generate_type2_appimage
 
 curl --upload-file *.AppImage https://transfer.sh/Moolticute.AppImage
 echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
+
+create_release_and_upload_asset $VERSION *.AppImage
