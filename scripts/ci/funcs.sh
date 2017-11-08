@@ -188,6 +188,8 @@ function create_release_and_upload_asset()
     local FILE_NAME=$(basename $FILE_PATH)
     local FILE_DIR=$(dirname $FILE_PATH)
 
+    echo "HERE! ----------------- "
+
     RELEASE_ID=$(get_release_id_by_name "$TAG")
 
     if [ -z "$RELEASE_ID" ]; then
@@ -232,7 +234,7 @@ function create_github_release_linux()
     local DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
     local DEB_FILE="build-linux/deb/${DEB_NAME}"
     local EXE_FILE="$(ls win/build/*.exe 2> /dev/null | head -n 1)"
-    local APPIMAGE_FILE="build-appimage/*.AppImage"
+    local APPIMAGE_FILE=$(find build-appimage -iname '*.AppImage')
 
     if [ -z "$VERSION" ]; then
         >&2 echo -e "Skipping GitHub release creation (current build does not have a tag)"

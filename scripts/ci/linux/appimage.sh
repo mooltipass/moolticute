@@ -20,13 +20,14 @@ mkdir -p $TARGET_DIR
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/appimage_functions.sh
+source $SCRIPTDIR/../funcs.sh
 
 ########################################################################
 # Install application binaries to the AppDir
 ########################################################################
+mkdir -p $TARGET_DIR
 cp ./debian/moolticute/usr/* $TARGET_DIR -r
 
-find .
 ########################################################################
 # Generate .desketop file and icon
 ########################################################################
@@ -97,7 +98,7 @@ for bynary in $list; do
         deps=$(ldd $bynary  | cut -d ' ' -f 3)
         for file in $deps; do
             if [ -f $file ]; then
-                cp $file .$file
+                cp $file ${TARGET_DIR}${file}
             fi
         done
     fi;
@@ -124,7 +125,9 @@ get_desktopintegration $LOWERAPP
 # Determine the version of the app; also include needed glibc version
 ########################################################################
 
-VERSION=$(echo "$VERSION" | sed -e 's/alpha+gitexport/git/')
+echo "OLD VERSION $VERSION"
+VERSION=$(get_version .)
+echo "new version $VERSION"
 
 ########################################################################
 # Patch away absolute paths; it would be nice if they were relative
@@ -147,6 +150,4 @@ generate_type2_appimage
 ########################################################################
 
 curl --upload-file *.AppImage https://transfer.sh/Moolticute.AppImage
-echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
-
-create_release_and_upload_asset $VERSION *.AppImage
+# echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
