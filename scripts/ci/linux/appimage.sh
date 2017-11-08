@@ -149,9 +149,4 @@ generate_type2_appimage
 curl --upload-file *.AppImage https://transfer.sh/Moolticute.AppImage
 echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
 
-SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-export PATH=$PATH:$SCRIPTDIR/../../lib/
-source $SCRIPTDIR/../funcs.sh
-APPIMAGE_FILE=$(find ./*.AppImage)
-echo $VERSION $APPIMAGE_FILE
-create_release_and_upload_asset $VERSION $APPIMAGE_FILE
+create_release_and_upload_asset $VERSION *.AppImage
