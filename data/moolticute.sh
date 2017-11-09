@@ -68,6 +68,8 @@ then
 elif (( $INSTALL == 1 ));
 then
     echo "Installing moolticute UDEV rules"
+    echo 'SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", SYMLINK+="mooltipass" TAG+="uaccess", TAG+="udev-acl"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
+    sudo udevadm control --reload-rules
 elif (( $CHECK == 1 ));
 then
     if [ -s $UDEV_RULES_FILE_PATH ];
@@ -81,4 +83,6 @@ then
 elif (( $UNINSTALL == 1 ));
 then
     echo "Uninstalling moolticuted UDEV rules"
+    sudo rm /etc/udev/rules.d/50-mooltipass.rules
+    sudo udevadm control --reload-rules
 fi
