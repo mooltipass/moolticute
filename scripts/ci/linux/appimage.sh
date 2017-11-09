@@ -41,7 +41,7 @@ TryExec=moolticute
 Exec=moolticute %F
 Icon=moolticute" > $BASE_PATH/$APP/$APP.AppDir/moolticute.desktop
 
-wget -O $BASE_PATH/$APP/$APP.AppDir/moolticute.svg https://raw.githubusercontent.com/mooltipass/moolticute/master/img/AppIcon.svg
+cp ./img/AppIcon.svg $BASE_PATH/$APP/$APP.AppDir/moolticute.svg
 
 ########################################################################
 # Copy desktop and icon file to AppDir for AppRun to pick them up
