@@ -26,7 +26,7 @@ Run only the moolticuted daemon
 ./$me --daemon
 ";
 
-SUDO_MSG="Allow Mooltipas Udev rules to be applied in your system?"
+SUDO_MSG="Allow Mooltipass Udev rules to be applied in your system?"
 
 DAEMON_ONLY=0
 INSTALL=0
