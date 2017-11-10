@@ -231,6 +231,7 @@ function create_github_release_linux()
     local DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
     local DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
     local DEB_FILE="build-linux/deb/${DEB_NAME}"
+    local APPIMAGE_FILE=$(find build-appimage -iname '*.AppImage')
     local EXE_FILE="$(ls win/build/*.exe 2> /dev/null | head -n 1)"
 
     if [ -z "$VERSION" ]; then
@@ -241,6 +242,7 @@ function create_github_release_linux()
     >&2 echo -e "Creating (Linux) GitHub release (tag: $VERSION)"
 
 	create_release_and_upload_asset $VERSION $DEB_FILE
+    create_release_and_upload_asset $VERSION $APPIMAGE_FILE
     create_release_and_upload_asset $VERSION $EXE_FILE
 }
 
