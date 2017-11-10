@@ -2,8 +2,10 @@
 ##
 # Wrapper for the moolticute AppImage
 ##
+
 me="Moolticute.AppImage"
 UDEV_RULES_FILE_PATH="/etc/udev/rules.d/50-mooltipass.rules"
+UDEV_RULE='SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", SYMLINK+="mooltipass" TAG+="uaccess", TAG+="udev-acl"'
 
 help_msg="Moolticute for linux
 Usage:
@@ -24,28 +26,25 @@ Run only the moolticuted daemon
 ./$me --daemon
 ";
 
+SUDO_MSG="Allow Mooltipas Udev rules to be applied in your system?"
+
 DAEMON_ONLY=0
 INSTALL=0
 UNINSTALL=0
 CHECK=0
 
-
 case "$1" in
     -d|--daemon)
         DAEMON_ONLY=1
-        shift
         ;;
     -i|--install)
         INSTALL=1
-        shift
     ;;
         -c|--check)
         CHECK=1
-        shift
     ;;
     -u|--uninstall)
         UNINSTALL=1
-        shift
     ;;
     -h|-\?|--help)
         printf "$help_msg"
@@ -58,6 +57,31 @@ case "$1" in
 
 esac
 
+# Check if UDEV rules are set on normal run
+if (( $# == 0 )) &&\
+    [ ! -s $UDEV_RULES_FILE_PATH ];
+then
+    
+    SUDO_BIN=$( which kdesudo || which gksudo || which sudo)
+
+    INSTALL_COMMAND="echo \"$UDEV_RULE\" | tee $UDEV_RULES_FILE_PATH && udevadm control --reload-rules"
+    
+    SUDO_ARGS=
+    FILENAME=$(basename "$SUDO_BIN")
+    case "$FILENAME" in
+        'sudo')
+            echo "$SUDO_MSG"
+            $SUDO_BIN sh -c "$INSTALL_COMMAND"
+        ;;
+        'gksudo')
+            $SUDO_BIN -m "$SUDO_MSG" "sh -c '$INSTALL_COMMAND'"
+        ;;
+        'kdesudo')
+            $SUDO_BIN -i moolticute --comment "$SUDO_MSG" -c "$INSTALL_COMMAND"
+        ;;
+    esac
+fi
+
 if (( $DAEMON_ONLY == 1 )) ;
 then
     echo "Running daemon only"
@@ -68,7 +92,7 @@ then
 elif (( $INSTALL == 1 ));
 then
     echo "Installing moolticute UDEV rules"
-    echo 'SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", SYMLINK+="mooltipass" TAG+="uaccess", TAG+="udev-acl"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
+    echo $UDEV_RULE | sudo tee $UDEV_RULES_FILE_PATH
     sudo udevadm control --reload-rules
 elif (( $CHECK == 1 ));
 then
@@ -83,6 +107,6 @@ then
 elif (( $UNINSTALL == 1 ));
 then
     echo "Uninstalling moolticuted UDEV rules"
-    sudo rm /etc/udev/rules.d/50-mooltipass.rules
+    sudo rm $UDEV_RULES_FILE_PATH
     sudo udevadm control --reload-rules
 fi
