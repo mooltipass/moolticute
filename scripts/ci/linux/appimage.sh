@@ -28,20 +28,12 @@ source $SCRIPTDIR/../funcs.sh
 ########################################################################
 cp ./debian/moolticute/usr/* $TARGET_DIR -r
 
-########################################################################
-# Generate .desketop file and icon
-########################################################################
-
-echo "[Desktop Entry]
-Version=1.0
-Type=Application
-Name=Moolticute
-Comment=Moolticute allows your browser extensions to talk with the Mooltipass.
-TryExec=moolticute
-Exec=moolticute %F
-Icon=moolticute" > $BASE_PATH/$APP/$APP.AppDir/moolticute.desktop
-
+cp ./data/moolticute.desktop $BASE_PATH/$APP/$APP.AppDir
 cp ./img/AppIcon.svg $BASE_PATH/$APP/$APP.AppDir/moolticute.svg
+cp ./data/moolticute.sh $BASE_PATH/$APP/$APP.AppDir/usr/bin/
+
+# Use the wrapper instead of the 
+sed -i 's/Exec=\/usr\/bin\/moolticute/Exec=moolticute.sh/g' /$BASE_PATH/$APP/$APP.AppDir/moolticute.desktop 
 
 ########################################################################
 # Copy desktop and icon file to AppDir for AppRun to pick them up
