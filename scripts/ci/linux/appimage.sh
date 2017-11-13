@@ -84,21 +84,17 @@ apt-get install -f -y
 mkdir -p $TARGET_DIR/lib/x86_64-linux-gnu/qt5/plugins/platforms/
 cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/* $TARGET_DIR/lib/x86_64-linux-gnu/qt5/plugins/platforms/
 
-list=$(find $TARGET_DIR -type f)
-for bynary in $list; do
-    if [ -f $bynary ]; then
-        deps=$(ldd $bynary  | cut -d ' ' -f 3)
-        for file in $deps; do
-            if [ -f $file ]; then
-                DIR=$(dirname "${file}")
-                mkdir -p ${APPDIR}${DIR}
-                cp $file ${APPDIR}${file}
-            fi
-        done
-    fi;
+# copy deps recursively 
+old_list=""
+list=$(find .)
+while [ "$old_list" != "$list" ]
+do
+   copy_deps
+   old_list="$list"
+   list=$(find . | sort | uniq)
 done
 
-copy_deps
+
 
 ########################################################################
 # Delete stuff that should not go into the AppImage
@@ -107,7 +103,6 @@ copy_deps
 # Delete dangerous libraries; see
 # https://github.com/probonopd/AppImages/blob/master/excludelist
 delete_blacklisted
-find . -name *harfbuzz* -delete
 
 ########################################################################
 # desktopintegration asks the user on first run to install a menu item
