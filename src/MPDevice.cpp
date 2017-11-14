@@ -4354,6 +4354,13 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
         {
             getChangeNumbers();
         }
+        else
+        {
+            set_credentialsDbChangeNumber(0);
+            credentialsDbChangeNumberClone = 0;
+            set_dataDbChangeNumber(0);
+            dataDbChangeNumberClone = 0;
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -6047,6 +6054,10 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
 
         /* Check loaded nodes, set bool to repair */
         checkLoadedNodes(true, true, true);
+
+        /* set clone change number to actual, to prevent change number changes on device */
+        credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
+        dataDbChangeNumberClone = get_dataDbChangeNumber();
 
         /* Generate save packets */
         bool packets_generated = generateSavePackets(repairJobs, true, true, [](QVariantMap){});
