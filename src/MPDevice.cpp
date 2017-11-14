@@ -3770,21 +3770,24 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
         return true;
     }));
 
-    jobs->append(new MPCommandJob(this, MPCmd::GET_DESCRIPTION,
-                                  [=](const QByteArray &data, bool &) -> bool
+    if (isFw12())
     {
-        /// Commented below: in case there's an empty description it is impossible to distinguish between device refusal and empty description.
-        /*if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+        jobs->append(new MPCommandJob(this, MPCmd::GET_DESCRIPTION,
+                                      [=](const QByteArray &data, bool &) -> bool
         {
-            jobs->setCurrentJobError("failed to query description on device");
-            qWarning() << "failed to query description on device";
-            return true; //Do not fail if description is not available for this node
-        }*/
-        QVariantMap m = jobs->user_data.toMap();
-        m["description"] = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-        jobs->user_data = m;
-        return true;
-    }));
+            /// Commented below: in case there's an empty description it is impossible to distinguish between device refusal and empty description.
+            /*if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+            {
+                jobs->setCurrentJobError("failed to query description on device");
+                qWarning() << "failed to query description on device";
+                return true; //Do not fail if description is not available for this node
+            }*/
+            QVariantMap m = jobs->user_data.toMap();
+            m["description"] = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            jobs->user_data = m;
+            return true;
+        }));
+    }
 
     jobs->append(new MPCommandJob(this, MPCmd::GET_PASSWORD,
                                   [=](const QByteArray &data, bool &) -> bool
