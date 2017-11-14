@@ -91,7 +91,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAbout->setIcon(AppGui::qtAwesome()->icon(fa::info));
     ui->pushButtonFiles->setIcon(AppGui::qtAwesome()->icon(fa::file));
 
-    ui->pushButtonSSH->setIcon(AppGui::qtAwesome()->icon(fa::key));    
+    ui->pushButtonSSH->setIcon(AppGui::qtAwesome()->icon(fa::key));
     ui->pushButtonSSH->setVisible(!bSSHKeysTabVisibleOnDemand || bSSHKeyTabVisible);
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
@@ -179,7 +179,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->comboBoxLang->addItem("frde_CH", ID_KEYB_FRDE_CH_LUT);
     ui->comboBoxLang->addItem("en_UK", ID_KEYB_EN_UK_LUT);
     ui->comboBoxLang->addItem("cs_QWERTY", ID_KEYB_CZ_QWERTY_LUT);
-    ui->comboBoxLang->addItem("en_DB", ID_KEYB_EN_DV_LUT);
+    ui->comboBoxLang->addItem("en_DV", ID_KEYB_EN_DV_LUT);
     ui->comboBoxLang->addItem("fr_MAC", ID_KEYB_FR_MAC_LUT);
     ui->comboBoxLang->addItem("fr_CH_MAC", ID_KEYB_FR_CH_MAC_LUT);
     ui->comboBoxLang->addItem("de_CH_MAC", ID_KEYB_DE_CH_MAC_LUT);
