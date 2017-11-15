@@ -264,7 +264,7 @@ void AppGui::connectedChanged()
         icon.setIsMask(true);
 #endif
         systray->setIcon(icon);
-        systray->setToolTip(tr("No moolltipass connected."));
+        systray->setToolTip(tr("No mooltipass connected."));
     }
     else
     {
