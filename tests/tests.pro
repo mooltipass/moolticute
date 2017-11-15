@@ -32,14 +32,18 @@ include (../src/QSimpleUpdater/QSimpleUpdater.pri)
 SOURCES += \
     ../src/SimpleCrypt/SimpleCrypt.cpp \
     ../src/FilesCache.cpp \
+    ../src/DbBackupsTracker.cpp \
     main.cpp \
     FilesCacheTests.cpp \
-    UpdaterTests.cpp
+    UpdaterTests.cpp \
+    DbBackupsTrackerTests.cpp
 
 HEADERS += \
     ../src/SimpleCrypt/SimpleCrypt.h \
     ../src/FilesCache.h \
+    ../src/DbBackupsTracker.h\
     UpdaterTests.h \
-    FilesCacheTests.h
+    FilesCacheTests.h \
+    DbBackupsTrackerTests.h
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
