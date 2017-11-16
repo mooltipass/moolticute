@@ -15,12 +15,15 @@ signals:
 private slots:
     void setCPZ();
     void setDbChangeNumber();
-    void TrackFile();
-    void TrackFileNoCpz();
-    void TrackFileChanged();
+    void trackFile();
+    void trackFileNoCpz();
+    void trackDbBackupWithMajorChangeNumber();
+    void trackDbBackupWithMinorChangeNumber();
+    void trackingPersisted();
 
 private:
     DbBackupsTracker tracker;
+    QString getTestDbFilePath();
 };
 
 #endif // DBBACKUPSTRACKERTESTS_H
