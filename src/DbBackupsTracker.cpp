@@ -21,9 +21,10 @@ DbBackupsTracker::~DbBackupsTracker()
 }
 
 QString
-DbBackupsTracker::getTrackPath(const QString& cpz) const
+DbBackupsTracker::getTrackPath(const QByteArray &cpz) const
 {
-    return tracks.value(cpz, "");
+    QByteArray hash =  getCpzHash(cpz);
+    return tracks.value(hash, "");
 }
 
 QByteArray
@@ -107,7 +108,7 @@ bool DbBackupsTracker::isBackupRequired() const
 bool DbBackupsTracker::hasBackup() const
 {
     if (!cpz.isEmpty())
-        return tracks.contains(cpz);
+        return tracks.contains(cpzHash);
 
     return false;
 }
@@ -134,12 +135,19 @@ void DbBackupsTracker::track(const QString path)
     } else {
         watchPath(path);
 
-        tracks.insert(cpz, path);
+        tracks.insert(cpzHash, path);
         emit newTrack(cpz, path);
 
         checkDbBackupSynchronization();
         saveTracks();
     }
+}
+
+QByteArray DbBackupsTracker::getCpzHash(const QByteArray &cpz) const
+{
+    QCryptographicHash cryptoHash(QCryptographicHash::Sha512);
+    cryptoHash.addData(cpz);
+    return cryptoHash.result();;
 }
 
 void DbBackupsTracker::setCPZ(QByteArray cpz)
@@ -148,6 +156,7 @@ void DbBackupsTracker::setCPZ(QByteArray cpz)
         return;
 
     this->cpz = cpz;
+    cpzHash = getCpzHash(cpz);
     emit cpzChanged(cpz);
 }
 

@@ -34,10 +34,10 @@ void DbBackupsTrackerTests::setDbChangeNumber()
 void DbBackupsTrackerTests::trackFile()
 {
     QString p = "/tmp/file";
-    QString cpz = "123456";
+    QByteArray cpz = "123456";
 
     QSignalSpy spy(&tracker, &DbBackupsTracker::newTrack);
-    tracker.setCPZ(cpz.toLocal8Bit());
+    tracker.setCPZ(cpz);
     tracker.track(p);
 
     QCOMPARE(spy.count(), 1);
@@ -71,8 +71,8 @@ QString DbBackupsTrackerTests::getTestDbFilePath()
 
 void DbBackupsTrackerTests::trackDbBackupWithMajorChangeNumber()
 {
-    QString cpz = "123456";
-    tracker.setCPZ(cpz.toLocal8Bit());
+    QByteArray cpz = "123456";
+    tracker.setCPZ(cpz);
     tracker.setCredentialsDbChangeNumber(0);
     tracker.setDataDbChangeNumber(0);
 
@@ -92,8 +92,8 @@ void DbBackupsTrackerTests::trackDbBackupWithMajorChangeNumber()
 
 void DbBackupsTrackerTests::trackDbBackupWithMinorChangeNumber()
 {
-    QString cpz = "123456";
-    tracker.setCPZ(cpz.toLocal8Bit());
+    QByteArray cpz = "123456";
+    tracker.setCPZ(cpz);
     tracker.setCredentialsDbChangeNumber(30);
     tracker.setDataDbChangeNumber(0);
 

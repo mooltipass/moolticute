@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QObject>
 #include <QString>
+#include <QCryptographicHash>
 
 class DbBackupsTrackerNoCpzSet : public QException {
 public:
@@ -24,7 +25,7 @@ public:
     explicit DbBackupsTracker(QObject* parent = nullptr);
     ~DbBackupsTracker();
 
-    QString getTrackPath(const QString& cpz) const;
+    QString getTrackPath(const QByteArray& cpz) const;
     QByteArray getCPZ() const;
 
     int getCredentialsDbChangeNumber() const;
@@ -58,13 +59,14 @@ private:
     void loadTracks();
     QFileSystemWatcher watcher;
     QMap<QString, QString> tracks;
-    QByteArray cpz;
+    QByteArray cpz, cpzHash;
     int credentialsDbChangeNumber;
     int dataDbChangeNumber;
     void watchPath(const QString path);
     QString readFile(QString path) const;
     int extractCredentialsDbChangeNumber(const QString& content) const;
     int extractDataDbChangeNumber(const QString& content) const;
+    QByteArray getCpzHash(const QByteArray &cpz) const;
 };
 
 #endif // DBBACKUPSTRACKER_H
