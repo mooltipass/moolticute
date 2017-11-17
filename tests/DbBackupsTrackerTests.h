@@ -24,6 +24,7 @@ private slots:
 private:
     DbBackupsTracker tracker;
     QString getTestDbFilePath();
+    QString getTestLegacyDbFilePath();
 };
 
 #endif // DBBACKUPSTRACKERTESTS_H

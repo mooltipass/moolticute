@@ -64,7 +64,16 @@ QString DbBackupsTrackerTests::getTestDbFilePath()
 {
     QString file(__FILE__);
     QFileInfo fileInfo(file);
-    file = fileInfo.absoluteDir().absolutePath() + "/data/testdb";
+    file = fileInfo.absoluteDir().absolutePath() + "/data/tests_backup";
+
+    return file;
+}
+
+QString DbBackupsTrackerTests::getTestLegacyDbFilePath()
+{
+    QString file(__FILE__);
+    QFileInfo fileInfo(file);
+    file = fileInfo.absoluteDir().absolutePath() + "/data/tests_legacy_backups";
 
     return file;
 }
