@@ -17,14 +17,20 @@ private slots:
     void setDbChangeNumber();
     void trackFile();
     void trackFileNoCpz();
-    void trackDbBackupWithMajorChangeNumber();
-    void trackDbBackupWithMinorChangeNumber();
+    void trackEncryptedDbBackMajorCredentialsDbChangeNumber();
+    void trackEncryptedDbBackupWithMinorCredentialsDbChangeNumber();
+    void trackEncryptedDbBackupMajorDataDbChangeNumber();
+    void trackEncryptedDbBackupWithMinorDataDbChangeNumber();
+
+    void trackLegacyDbBackupWithMajorChangeNumber();
+    void trackLegacyDbBackupWithMinorChangeNumber();
+    void trackLegacyDbBackupMajorDataDbChangeNumber();
+    void trackLegacyDbBackupWithMinorDataDbChangeNumber();
     void trackingPersisted();
 
 private:
     DbBackupsTracker tracker;
-    QString getTestDbFilePath();
-    QString getTestLegacyDbFilePath();
+    QString getTestsDataDirPath();
 };
 
 #endif // DBBACKUPSTRACKERTESTS_H

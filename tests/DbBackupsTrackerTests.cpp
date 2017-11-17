@@ -60,32 +60,23 @@ void DbBackupsTrackerTests::trackFileNoCpz()
     QCOMPARE(spy.count(), 0);
 }
 
-QString DbBackupsTrackerTests::getTestDbFilePath()
+QString DbBackupsTrackerTests::getTestsDataDirPath()
 {
-    QString file(__FILE__);
-    QFileInfo fileInfo(file);
-    file = fileInfo.absoluteDir().absolutePath() + "/data/tests_backup";
+    QString dir(__FILE__);
+    QFileInfo fileInfo(dir);
+    dir = fileInfo.absoluteDir().absolutePath() + "/data/";
 
-    return file;
+    return dir;
 }
 
-QString DbBackupsTrackerTests::getTestLegacyDbFilePath()
-{
-    QString file(__FILE__);
-    QFileInfo fileInfo(file);
-    file = fileInfo.absoluteDir().absolutePath() + "/data/tests_legacy_backups";
-
-    return file;
-}
-
-void DbBackupsTrackerTests::trackDbBackupWithMajorChangeNumber()
+void DbBackupsTrackerTests::trackEncryptedDbBackMajorCredentialsDbChangeNumber()
 {
     QByteArray cpz = "123456";
     tracker.setCPZ(cpz);
     tracker.setCredentialsDbChangeNumber(0);
     tracker.setDataDbChangeNumber(0);
 
-    QString file = getTestDbFilePath();
+    QString file = getTestsDataDirPath() + "tests_backup";
 
     QSignalSpy spy(&tracker, &DbBackupsTracker::greaterDbBackupChangeNumber);
 
@@ -94,19 +85,19 @@ void DbBackupsTrackerTests::trackDbBackupWithMajorChangeNumber()
     } catch (DbBackupsTrackerNoCpzSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
-    spy.wait(100);
+
     QCOMPARE(spy.count(), 1);
     Q_ASSERT(tracker.isUpdateRequired());
 }
 
-void DbBackupsTrackerTests::trackDbBackupWithMinorChangeNumber()
+void DbBackupsTrackerTests::trackEncryptedDbBackupWithMinorCredentialsDbChangeNumber()
 {
     QByteArray cpz = "123456";
     tracker.setCPZ(cpz);
     tracker.setCredentialsDbChangeNumber(30);
     tracker.setDataDbChangeNumber(0);
 
-    QString file = getTestDbFilePath();
+    QString file = getTestsDataDirPath() + "tests_backup";
 
     QSignalSpy spy(&tracker, &DbBackupsTracker::lowerDbBackupChangeNumber);
 
@@ -115,7 +106,134 @@ void DbBackupsTrackerTests::trackDbBackupWithMinorChangeNumber()
     } catch (DbBackupsTrackerNoCpzSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
-    spy.wait(100);
+
+    QCOMPARE(spy.count(), 1);
+    Q_ASSERT(tracker.isBackupRequired());
+}
+
+void DbBackupsTrackerTests::trackEncryptedDbBackupMajorDataDbChangeNumber()
+{
+    QByteArray cpz = "123456";
+    tracker.setCPZ(cpz);
+    tracker.setCredentialsDbChangeNumber(0);
+    tracker.setDataDbChangeNumber(0);
+
+    QString file = getTestsDataDirPath() + "tests_backup1";
+
+    QSignalSpy spy(&tracker, &DbBackupsTracker::greaterDbBackupChangeNumber);
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCpzSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+
+    QCOMPARE(spy.count(), 1);
+    Q_ASSERT(tracker.isUpdateRequired());
+}
+
+void DbBackupsTrackerTests::trackEncryptedDbBackupWithMinorDataDbChangeNumber()
+{
+    QByteArray cpz = "123456";
+    tracker.setCPZ(cpz);
+    tracker.setCredentialsDbChangeNumber(0);
+    tracker.setDataDbChangeNumber(30);
+
+    QString file = getTestsDataDirPath() + "tests_backup1";
+
+    QSignalSpy spy(&tracker, &DbBackupsTracker::lowerDbBackupChangeNumber);
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCpzSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+
+    QCOMPARE(spy.count(), 1);
+    Q_ASSERT(tracker.isBackupRequired());
+}
+
+void DbBackupsTrackerTests::trackLegacyDbBackupWithMajorChangeNumber()
+{
+    QByteArray cpz = "123456";
+    tracker.setCPZ(cpz);
+    tracker.setCredentialsDbChangeNumber(0);
+    tracker.setDataDbChangeNumber(0);
+
+    QString file = getTestsDataDirPath() + "tests_legacy_backups";
+
+    QSignalSpy spy(&tracker, &DbBackupsTracker::greaterDbBackupChangeNumber);
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCpzSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+
+    QCOMPARE(spy.count(), 1);
+    Q_ASSERT(tracker.isUpdateRequired());
+}
+
+void DbBackupsTrackerTests::trackLegacyDbBackupWithMinorChangeNumber()
+{
+    QByteArray cpz = "123456";
+    tracker.setCPZ(cpz);
+    tracker.setCredentialsDbChangeNumber(30);
+    tracker.setDataDbChangeNumber(0);
+
+    QString file = getTestsDataDirPath() + "tests_legacy_backups";
+
+    QSignalSpy spy(&tracker, &DbBackupsTracker::lowerDbBackupChangeNumber);
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCpzSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+
+    QCOMPARE(spy.count(), 1);
+    Q_ASSERT(tracker.isBackupRequired());
+}
+
+
+void DbBackupsTrackerTests::trackLegacyDbBackupMajorDataDbChangeNumber()
+{
+    QByteArray cpz = "123456";
+    tracker.setCPZ(cpz);
+    tracker.setCredentialsDbChangeNumber(0);
+    tracker.setDataDbChangeNumber(0);
+
+    QString file = getTestsDataDirPath() + "tests_legacy_backups1";
+
+    QSignalSpy spy(&tracker, &DbBackupsTracker::greaterDbBackupChangeNumber);
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCpzSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+
+    QCOMPARE(spy.count(), 1);
+    Q_ASSERT(tracker.isUpdateRequired());
+}
+
+void DbBackupsTrackerTests::trackLegacyDbBackupWithMinorDataDbChangeNumber()
+{
+    QByteArray cpz = "123456";
+    tracker.setCPZ(cpz);
+    tracker.setCredentialsDbChangeNumber(30);
+    tracker.setDataDbChangeNumber(0);
+
+    QString file = getTestsDataDirPath() + "tests_legacy_backups1";
+
+    QSignalSpy spy(&tracker, &DbBackupsTracker::lowerDbBackupChangeNumber);
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCpzSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+
     QCOMPARE(spy.count(), 1);
     Q_ASSERT(tracker.isBackupRequired());
 }

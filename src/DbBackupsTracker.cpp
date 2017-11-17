@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QException>
 #include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
@@ -21,9 +22,9 @@ DbBackupsTracker::~DbBackupsTracker()
 }
 
 QString
-DbBackupsTracker::getTrackPath(const QByteArray &cpz) const
+DbBackupsTracker::getTrackPath(const QByteArray& cpz) const
 {
-    QByteArray hash =  getCpzHash(cpz);
+    QByteArray hash = getCpzHash(cpz);
     return tracks.value(hash, "");
 }
 
@@ -50,29 +51,64 @@ QString DbBackupsTracker::readFile(QString path) const
     return content;
 }
 
+int DbBackupsTracker::extractCredentialsDbChangeNumberEncryptedBackup(QJsonDocument d) const
+{
+    QJsonObject root = d.object();
+    if (root.contains("credentialsDbChangeNumber"))
+        return root.value("credentialsDbChangeNumber").toInt();
+
+    return 0;
+}
+
+int DbBackupsTracker::extractCredentialsDbChangeNumberLegacyBackup(QJsonDocument d) const
+{
+    QJsonArray root = d.array();
+    QJsonValue val = root.at(root.size() - 3);
+    if (val.isDouble())
+        return val.toInt();
+
+    return 0;
+}
+
 int DbBackupsTracker::extractCredentialsDbChangeNumber(const QString& content) const
 {
     int cn = 0;
     QJsonDocument d = QJsonDocument::fromJson(content.toLocal8Bit());
-    if (d.isObject()) {
-        QJsonObject root = d.object();
-        if (root.contains("credentialsDbChangeNumber"))
-            cn = root.value("credentialsDbChangeNumber").toInt();
-    }
+    if (d.isObject())
+        cn = extractCredentialsDbChangeNumberEncryptedBackup(d);
+    else if (d.isArray())
+        cn = extractCredentialsDbChangeNumberLegacyBackup(d);
 
     return cn;
+}
+
+int DbBackupsTracker::extractDataDbChangeNumberEncryptedBackup(QJsonDocument d) const
+{
+    QJsonObject root = d.object();
+    if (root.contains("dataDbChangeNumber"))
+        return root.value("dataDbChangeNumber").toInt();
+
+    return 0;
+}
+
+int DbBackupsTracker::extractDataDbChangeNumberLegacyBackup(QJsonDocument d) const
+{
+    QJsonArray root = d.array();
+    QJsonValue val = root.at(root.size() - 2);
+    if (val.isDouble())
+        return val.toInt();
+
+    return 0;
 }
 
 int DbBackupsTracker::extractDataDbChangeNumber(const QString& content) const
 {
     int cn = 0;
     QJsonDocument d = QJsonDocument::fromJson(content.toLocal8Bit());
-    if (d.isObject()) {
-        QJsonObject root = d.object();
-
-        if (root.contains("dataDbChangeNumber"))
-            cn = root.value("dataDbChangeNumber").toInt();
-    }
+    if (d.isObject())
+        cn = extractDataDbChangeNumberEncryptedBackup(d);
+    else if (d.isArray())
+        cn = extractDataDbChangeNumberLegacyBackup(d);
     return cn;
 }
 
@@ -143,11 +179,12 @@ void DbBackupsTracker::track(const QString path)
     }
 }
 
-QByteArray DbBackupsTracker::getCpzHash(const QByteArray &cpz) const
+QByteArray DbBackupsTracker::getCpzHash(const QByteArray& cpz) const
 {
     QCryptographicHash cryptoHash(QCryptographicHash::Sha512);
     cryptoHash.addData(cpz);
-    return cryptoHash.result();;
+    return cryptoHash.result();
+    ;
 }
 
 void DbBackupsTracker::setCPZ(QByteArray cpz)

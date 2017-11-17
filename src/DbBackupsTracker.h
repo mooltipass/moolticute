@@ -1,12 +1,12 @@
 #ifndef DBBACKUPSTRACKER_H
 #define DBBACKUPSTRACKER_H
 
+#include <QCryptographicHash>
 #include <QException>
 #include <QFileSystemWatcher>
 #include <QMap>
 #include <QObject>
 #include <QString>
-#include <QCryptographicHash>
 
 class DbBackupsTrackerNoCpzSet : public QException {
 public:
@@ -66,7 +66,11 @@ private:
     QString readFile(QString path) const;
     int extractCredentialsDbChangeNumber(const QString& content) const;
     int extractDataDbChangeNumber(const QString& content) const;
-    QByteArray getCpzHash(const QByteArray &cpz) const;
+    QByteArray getCpzHash(const QByteArray& cpz) const;
+    int extractCredentialsDbChangeNumberEncryptedBackup(QJsonDocument d) const;
+    int extractCredentialsDbChangeNumberLegacyBackup(QJsonDocument d) const;
+    int extractDataDbChangeNumberEncryptedBackup(QJsonDocument d) const;
+    int extractDataDbChangeNumberLegacyBackup(QJsonDocument d) const;
 };
 
 #endif // DBBACKUPSTRACKER_H
