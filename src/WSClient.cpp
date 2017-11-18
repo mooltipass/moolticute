@@ -310,6 +310,14 @@ void WSClient::onTextMessageReceived(const QString &message)
 
         qDebug() << "update seed: " << jarr;
         Common::updateSeed(ints);
+    } else if (rootobj["msg"] == "card_db_metadata") {
+        QJsonObject data = rootobj["data"].toObject();
+
+        QString cardId = data["cardId"].toString();
+        int credentialsDbChangeNumber = data["credentialsDbChangeNumber"].toInt();
+        int dataDbChangeNumber = data["dataDbChangeNumber"].toInt();
+
+        emit cardDbMetadataChanged(cardId, credentialsDbChangeNumber, dataDbChangeNumber);
     }
 }
 

@@ -20,6 +20,8 @@
 #include "WSServer.h"
 #include "version.h"
 
+#include <QCryptographicHash>
+
 WSServerCon::WSServerCon(QWebSocket *conn):
     wsClient(conn),
     clientUid(Common::createUid(QStringLiteral("ws-")))
@@ -602,6 +604,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
 
     connect(mpdevice, &MPDevice::filesCacheChanged, this, &WSServerCon::sendFilesCache);
+    connect(mpdevice, &MPDevice::credentialsDbChangeNumberChanged, this, &WSServerCon::sendCardDbMetadata);
 }
 
 void WSServerCon::statusChanged()
@@ -648,6 +651,7 @@ void WSServerCon::sendInitialStatus()
         sendKeyAfterPassSend();
         sendDelayAfterKeyEntryEnable();
         sendDelayAfterKeyEntry();
+        sendCardDbMetadata();
     }
 }
 
@@ -913,6 +917,34 @@ void WSServerCon::sendFilesCache()
 
     oroot["data"] = array;
     sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendCardDbMetadata()
+{
+    qDebug() << "Send card db metadata";
+    QByteArray cpz = mpdevice->get_cardCPZ();
+    int credentialsCn = mpdevice->get_credentialsDbChangeNumber();
+    int dataCn = mpdevice->get_dataDbChangeNumber();
+    if (cpz.isEmpty())
+    {
+        qDebug() << "There is no card data to be send.";
+        return;
+    } else {
+        QCryptographicHash hash(QCryptographicHash::Sha256);
+        hash.addData("mooltipass");
+        hash.addData(cpz);
+        QString cardId = hash.result().toHex();
+
+        QJsonObject oroot = { {"msg", "card_db_metadata"} };
+        QJsonObject data;
+        data.insert("cardId", cardId);
+        data.insert("credentialsDbChangeNumber", credentialsCn);
+        data.insert("dataDbChangeNumber", dataCn);
+        oroot["data"] = data;
+
+        sendJsonMessage(oroot);
+        qDebug() << "Sended card db metadata";
+    }
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

@@ -73,6 +73,7 @@ private slots:
     void sendDelayAfterKeyEntry();
     void sendDeviceUID();
     void sendFilesCache();
+    void sendCardDbMetadata();
 
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
