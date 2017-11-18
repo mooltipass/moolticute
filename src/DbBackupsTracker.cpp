@@ -22,16 +22,14 @@ DbBackupsTracker::~DbBackupsTracker()
 }
 
 QString
-DbBackupsTracker::getTrackPath(const QByteArray& cpz) const
+DbBackupsTracker::getTrackPath(const QString& cardId) const
 {
-    QByteArray hash = getCpzHash(cpz);
-    return tracks.value(hash, "");
+    return tracks.value(cardId, "");
 }
 
-QByteArray
-DbBackupsTracker::getCPZ() const
+QString DbBackupsTracker::getCardId() const
 {
-    return cpz;
+    return cardId;
 }
 
 int DbBackupsTracker::getCredentialsDbChangeNumber() const
@@ -114,7 +112,7 @@ int DbBackupsTracker::extractDataDbChangeNumber(const QString& content) const
 
 int DbBackupsTracker::getCredentialsDbBackupChangeNumber() const
 {
-    QString path = getTrackPath(cpz);
+    QString path = getTrackPath(cardId);
     QString content = readFile(path);
 
     return extractCredentialsDbChangeNumber(content);
@@ -143,15 +141,15 @@ bool DbBackupsTracker::isBackupRequired() const
 
 bool DbBackupsTracker::hasBackup() const
 {
-    if (!cpz.isEmpty())
-        return tracks.contains(cpzHash);
+    if (!cardId.isEmpty())
+        return tracks.contains(cardId);
 
     return false;
 }
 
 int DbBackupsTracker::getDataDbBackupChangeNumber() const
 {
-    QString path = getTrackPath(cpz);
+    QString path = getTrackPath(cardId);
     QString content = readFile(path);
 
     return extractDataDbChangeNumber(content);
@@ -165,36 +163,27 @@ void DbBackupsTracker::watchPath(const QString path)
 
 void DbBackupsTracker::track(const QString path)
 {
-    if (cpz.isEmpty()) {
-        DbBackupsTrackerNoCpzSet ex;
+    if (cardId.isEmpty()) {
+        DbBackupsTrackerNoCardIdSet ex;
         ex.raise();
     } else {
         watchPath(path);
 
-        tracks.insert(cpzHash, path);
-        emit newTrack(cpz, path);
+        tracks.insert(cardId, path);
+        emit newTrack(cardId, path);
 
         checkDbBackupSynchronization();
         saveTracks();
     }
 }
 
-QByteArray DbBackupsTracker::getCpzHash(const QByteArray& cpz) const
+void DbBackupsTracker::setCardId(QString cardId)
 {
-    QCryptographicHash cryptoHash(QCryptographicHash::Sha512);
-    cryptoHash.addData(cpz);
-    return cryptoHash.result();
-    ;
-}
-
-void DbBackupsTracker::setCPZ(QByteArray cpz)
-{
-    if (this->cpz == cpz)
+    if (this->cardId == cardId)
         return;
 
-    this->cpz = cpz;
-    cpzHash = getCpzHash(cpz);
-    emit cpzChanged(cpz);
+    this->cardId = cardId;
+    emit cardIdChanged(cardId);
 }
 
 void DbBackupsTracker::setCredentialsDbChangeNumber(int dbChangeNumber)
@@ -251,13 +240,13 @@ void DbBackupsTracker::loadTracks()
     s.endGroup();
 }
 
-void DbBackupsTrackerNoCpzSet::raise() const
+void DbBackupsTrackerNoCardIdSet::raise() const
 {
     throw * this;
 }
 
-DbBackupsTrackerNoCpzSet*
-DbBackupsTrackerNoCpzSet::clone() const
+DbBackupsTrackerNoCardIdSet*
+DbBackupsTrackerNoCardIdSet::clone() const
 {
-    return new DbBackupsTrackerNoCpzSet(*this);
+    return new DbBackupsTrackerNoCardIdSet(*this);
 }

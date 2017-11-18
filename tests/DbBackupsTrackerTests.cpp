@@ -13,12 +13,12 @@ DbBackupsTrackerTests::DbBackupsTrackerTests(QObject* parent)
 
 void DbBackupsTrackerTests::setCPZ()
 {
-    const QByteArray cpz = "123456";
-    QSignalSpy spy(&tracker, &DbBackupsTracker::cpzChanged);
-    tracker.setCPZ(cpz);
+    const QString cpz = "123456";
+    QSignalSpy spy(&tracker, &DbBackupsTracker::cardIdChanged);
+    tracker.setCardId(cpz);
 
     QCOMPARE(spy.count(), 1);
-    QCOMPARE(tracker.getCPZ(), cpz);
+    QCOMPARE(tracker.getCardId(), cpz);
 }
 
 void DbBackupsTrackerTests::setDbChangeNumber()
@@ -34,10 +34,10 @@ void DbBackupsTrackerTests::setDbChangeNumber()
 void DbBackupsTrackerTests::trackFile()
 {
     QString p = "/tmp/file";
-    QByteArray cpz = "123456";
+    const QString cpz = "123456";
 
     QSignalSpy spy(&tracker, &DbBackupsTracker::newTrack);
-    tracker.setCPZ(cpz);
+    tracker.setCardId(cpz);
     tracker.track(p);
 
     QCOMPARE(spy.count(), 1);
@@ -46,13 +46,13 @@ void DbBackupsTrackerTests::trackFile()
 
 void DbBackupsTrackerTests::trackFileNoCpz()
 {
-    tracker.setCPZ(QByteArray());
+    tracker.setCardId(QByteArray());
     QSignalSpy spy(&tracker, &DbBackupsTracker::newTrack);
 
     bool fired = false;
     try {
         tracker.track("/tmp/file");
-    } catch (DbBackupsTrackerNoCpzSet& e) {
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
         fired = true;
     }
 
@@ -71,8 +71,8 @@ QString DbBackupsTrackerTests::getTestsDataDirPath()
 
 void DbBackupsTrackerTests::trackEncryptedDbBackMajorCredentialsDbChangeNumber()
 {
-    QByteArray cpz = "123456";
-    tracker.setCPZ(cpz);
+    const QString cardId = "123456";
+    tracker.setCardId(cardId);
     tracker.setCredentialsDbChangeNumber(0);
     tracker.setDataDbChangeNumber(0);
 
@@ -82,7 +82,7 @@ void DbBackupsTrackerTests::trackEncryptedDbBackMajorCredentialsDbChangeNumber()
 
     try {
         tracker.track(file);
-    } catch (DbBackupsTrackerNoCpzSet& e) {
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
 
@@ -92,8 +92,8 @@ void DbBackupsTrackerTests::trackEncryptedDbBackMajorCredentialsDbChangeNumber()
 
 void DbBackupsTrackerTests::trackEncryptedDbBackupWithMinorCredentialsDbChangeNumber()
 {
-    QByteArray cpz = "123456";
-    tracker.setCPZ(cpz);
+    const QString cardId = "123456";
+    tracker.setCardId(cardId);
     tracker.setCredentialsDbChangeNumber(30);
     tracker.setDataDbChangeNumber(0);
 
@@ -103,7 +103,7 @@ void DbBackupsTrackerTests::trackEncryptedDbBackupWithMinorCredentialsDbChangeNu
 
     try {
         tracker.track(file);
-    } catch (DbBackupsTrackerNoCpzSet& e) {
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
 
@@ -113,8 +113,8 @@ void DbBackupsTrackerTests::trackEncryptedDbBackupWithMinorCredentialsDbChangeNu
 
 void DbBackupsTrackerTests::trackEncryptedDbBackupMajorDataDbChangeNumber()
 {
-    QByteArray cpz = "123456";
-    tracker.setCPZ(cpz);
+    const QString cardId = "123456";
+    tracker.setCardId(cardId);
     tracker.setCredentialsDbChangeNumber(0);
     tracker.setDataDbChangeNumber(0);
 
@@ -124,7 +124,7 @@ void DbBackupsTrackerTests::trackEncryptedDbBackupMajorDataDbChangeNumber()
 
     try {
         tracker.track(file);
-    } catch (DbBackupsTrackerNoCpzSet& e) {
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
 
@@ -134,8 +134,8 @@ void DbBackupsTrackerTests::trackEncryptedDbBackupMajorDataDbChangeNumber()
 
 void DbBackupsTrackerTests::trackEncryptedDbBackupWithMinorDataDbChangeNumber()
 {
-    QByteArray cpz = "123456";
-    tracker.setCPZ(cpz);
+    const QString cardId = "123456";
+    tracker.setCardId(cardId);
     tracker.setCredentialsDbChangeNumber(0);
     tracker.setDataDbChangeNumber(30);
 
@@ -145,7 +145,7 @@ void DbBackupsTrackerTests::trackEncryptedDbBackupWithMinorDataDbChangeNumber()
 
     try {
         tracker.track(file);
-    } catch (DbBackupsTrackerNoCpzSet& e) {
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
 
@@ -155,8 +155,8 @@ void DbBackupsTrackerTests::trackEncryptedDbBackupWithMinorDataDbChangeNumber()
 
 void DbBackupsTrackerTests::trackLegacyDbBackupWithMajorChangeNumber()
 {
-    QByteArray cpz = "123456";
-    tracker.setCPZ(cpz);
+    const QString cardId = "123456";
+    tracker.setCardId(cardId);
     tracker.setCredentialsDbChangeNumber(0);
     tracker.setDataDbChangeNumber(0);
 
@@ -166,7 +166,7 @@ void DbBackupsTrackerTests::trackLegacyDbBackupWithMajorChangeNumber()
 
     try {
         tracker.track(file);
-    } catch (DbBackupsTrackerNoCpzSet& e) {
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
 
@@ -176,8 +176,8 @@ void DbBackupsTrackerTests::trackLegacyDbBackupWithMajorChangeNumber()
 
 void DbBackupsTrackerTests::trackLegacyDbBackupWithMinorChangeNumber()
 {
-    QByteArray cpz = "123456";
-    tracker.setCPZ(cpz);
+    const QString cardId = "123456";
+    tracker.setCardId(cardId);
     tracker.setCredentialsDbChangeNumber(30);
     tracker.setDataDbChangeNumber(0);
 
@@ -187,7 +187,7 @@ void DbBackupsTrackerTests::trackLegacyDbBackupWithMinorChangeNumber()
 
     try {
         tracker.track(file);
-    } catch (DbBackupsTrackerNoCpzSet& e) {
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
 
@@ -198,8 +198,8 @@ void DbBackupsTrackerTests::trackLegacyDbBackupWithMinorChangeNumber()
 
 void DbBackupsTrackerTests::trackLegacyDbBackupMajorDataDbChangeNumber()
 {
-    QByteArray cpz = "123456";
-    tracker.setCPZ(cpz);
+    const QString cardId = "123456";
+    tracker.setCardId(cardId);
     tracker.setCredentialsDbChangeNumber(0);
     tracker.setDataDbChangeNumber(0);
 
@@ -209,7 +209,7 @@ void DbBackupsTrackerTests::trackLegacyDbBackupMajorDataDbChangeNumber()
 
     try {
         tracker.track(file);
-    } catch (DbBackupsTrackerNoCpzSet& e) {
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
 
@@ -219,8 +219,8 @@ void DbBackupsTrackerTests::trackLegacyDbBackupMajorDataDbChangeNumber()
 
 void DbBackupsTrackerTests::trackLegacyDbBackupWithMinorDataDbChangeNumber()
 {
-    QByteArray cpz = "123456";
-    tracker.setCPZ(cpz);
+    const QString cardId = "123456";
+    tracker.setCardId(cardId);
     tracker.setCredentialsDbChangeNumber(30);
     tracker.setDataDbChangeNumber(0);
 
@@ -230,7 +230,7 @@ void DbBackupsTrackerTests::trackLegacyDbBackupWithMinorDataDbChangeNumber()
 
     try {
         tracker.track(file);
-    } catch (DbBackupsTrackerNoCpzSet& e) {
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
 
@@ -241,13 +241,13 @@ void DbBackupsTrackerTests::trackLegacyDbBackupWithMinorDataDbChangeNumber()
 void DbBackupsTrackerTests::trackingPersisted()
 {
     DbBackupsTracker* t = new DbBackupsTracker();
-    t->setCPZ("00000");
+    t->setCardId("00000");
     t->track("/tmp/file1");
 
     t->deleteLater();
 
     t = new DbBackupsTracker();
-    t->setCPZ("00000");
+    t->setCardId("00000");
     Q_ASSERT(t->hasBackup());
 
     t->deleteLater();

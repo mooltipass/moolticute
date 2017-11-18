@@ -8,15 +8,15 @@
 #include <QObject>
 #include <QString>
 
-class DbBackupsTrackerNoCpzSet : public QException {
+class DbBackupsTrackerNoCardIdSet : public QException {
 public:
     void raise() const;
-    DbBackupsTrackerNoCpzSet* clone() const;
+    DbBackupsTrackerNoCardIdSet* clone() const;
 };
 
 class DbBackupsTracker : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QByteArray cpz READ getCPZ WRITE setCPZ NOTIFY cpzChanged)
+    Q_PROPERTY(QString cardId READ getCardId WRITE setCardId NOTIFY cardIdChanged)
     Q_PROPERTY(int credentialsDbChangeNumber READ getCredentialsDbChangeNumber WRITE setCredentialsDbChangeNumber
             NOTIFY credentialsDbChangeNumberChanged)
     Q_PROPERTY(int dataDbChangeNumber READ getDataDbChangeNumber WRITE setDataDbChangeNumber
@@ -25,8 +25,8 @@ public:
     explicit DbBackupsTracker(QObject* parent = nullptr);
     ~DbBackupsTracker();
 
-    QString getTrackPath(const QByteArray& cpz) const;
-    QByteArray getCPZ() const;
+    QString getTrackPath(const QString &cardId) const;
+    QString getCardId() const;
 
     int getCredentialsDbChangeNumber() const;
     int getCredentialsDbBackupChangeNumber() const;
@@ -38,9 +38,9 @@ public:
     bool hasBackup() const;
 
 signals:
-    void cpzChanged(QByteArray cpz);
+    void cardIdChanged(QString cardId);
     void credentialsDbChangeNumberChanged(int credentialsDbChangeNumber);
-    void newTrack(const QString& cpz, const QString& path);
+    void newTrack(const QString& cardId, const QString& path);
 
     void greaterDbBackupChangeNumber();
     void lowerDbBackupChangeNumber();
@@ -49,7 +49,7 @@ signals:
 
 public slots:
     void track(const QString path);
-    void setCPZ(QByteArray cpz);
+    void setCardId(QString cardId);
     void setCredentialsDbChangeNumber(int credentialsDbChangeNumber);
     void setDataDbChangeNumber(int dataDbChangeNumber);
     void checkDbBackupSynchronization();
@@ -59,14 +59,13 @@ private:
     void loadTracks();
     QFileSystemWatcher watcher;
     QMap<QString, QString> tracks;
-    QByteArray cpz, cpzHash;
+    QString cardId;
     int credentialsDbChangeNumber;
     int dataDbChangeNumber;
     void watchPath(const QString path);
     QString readFile(QString path) const;
     int extractCredentialsDbChangeNumber(const QString& content) const;
     int extractDataDbChangeNumber(const QString& content) const;
-    QByteArray getCpzHash(const QByteArray& cpz) const;
     int extractCredentialsDbChangeNumberEncryptedBackup(QJsonDocument d) const;
     int extractCredentialsDbChangeNumberLegacyBackup(QJsonDocument d) const;
     int extractDataDbChangeNumberEncryptedBackup(QJsonDocument d) const;
