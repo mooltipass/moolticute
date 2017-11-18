@@ -24,6 +24,8 @@
 #include <QtAwesome.h>
 #include "WindowLog.h"
 
+#include <DbBackupsTracker.h>
+
 namespace Ui {
 class MainWindow;
 }
@@ -45,6 +47,10 @@ public:
 signals:
     void windowCloseRequested();
 
+public slots:
+    void wantImportDatabase();
+    void wantExportDatabase();
+
 private slots:
     void enableCredentialsManagement(bool enable);
     void updateTabButtons();
@@ -55,8 +61,6 @@ private slots:
     void wantEnterCredentialManagement();
     void wantSaveCredentialManagement();
     void wantExitFilesManagement();
-    void wantImportDatabase();
-    void wantExportDatabase();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
