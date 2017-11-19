@@ -226,6 +226,7 @@ signals:
     /* the command has failed in platform code */
     void platformFailed();
     void filesCacheChanged();
+    void dbChangeNumbersChanged(const int credentialsDbChangeNumber, const int dataDbChangeNumber);
 
 private slots:
     void newDataRead(const QByteArray &data);

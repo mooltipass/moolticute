@@ -41,7 +41,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     bSSHKeyTabVisible(false),
     bAdvancedTabVisible(false),
     previousWidget(nullptr),
-    m_passwordProfilesModel(new PasswordProfilesModel(this))
+    m_passwordProfilesModel(new PasswordProfilesModel(this)),
+    dbBackupsTrackerController(this, client, this)
 {
     QSettings s;
     bSSHKeysTabVisibleOnDemand = s.value("settings/SSHKeysTabsVisibleOnDemand", true).toBool();
@@ -154,6 +155,17 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     });
 
     ui->pushButtonDevSettings->setChecked(false);
+
+    // DB Backups UI
+    ui->toolButton_clearBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::remove));
+    ui->toolButton_setBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::foldero));
+    ui->pushButton_applyBackupTrackingChanges->setStyleSheet(CSS_BLUE_BUTTON);
+
+    ui->lineEdit_dbBackupFilePath->setText(dbBackupsTrackerController.getBackupFilePath());
+    connect(&dbBackupsTrackerController, &DbBackupsTrackerController::backupFilePathChanged, [=] (const QString &path) {
+        ui->lineEdit_dbBackupFilePath->setText(path);
+        ui->pushButton_applyBackupTrackingChanges->setEnabled(false);
+    });
 
     //Add languages to combobox
     ui->comboBoxLang->addItem("en_US", ID_KEYB_EN_US_LUT);
@@ -799,6 +811,7 @@ void MainWindow::wantSaveCredentialManagement()
 
 void MainWindow::wantImportDatabase()
 {
+    previousWidget = ui->stackedWidget->currentWidget();
     ui->labelWait->show();
     ui->labelWait->setText(tr("<html><!--import_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Please Approve Request On Device</span></p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
@@ -810,6 +823,7 @@ void MainWindow::wantImportDatabase()
 
 void MainWindow::wantExportDatabase()
 {
+    previousWidget = ui->stackedWidget->currentWidget();
     ui->widgetHeader->setEnabled(false);
     ui->labelWait->show();
     ui->labelWait->setText(tr("<html><!--export_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Please Approve Request On Device</span></p></body></html>"));
@@ -818,6 +832,22 @@ void MainWindow::wantExportDatabase()
     ui->labelProgressMessage->hide();
 
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+}
+
+void MainWindow::handleBackupExported()
+{
+    ui->widgetHeader->setEnabled(true);
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+
+    ui->stackedWidget->setCurrentWidget(previousWidget);
+}
+
+void MainWindow::handleBackupImported()
+{
+    ui->widgetHeader->setEnabled(true);
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+
+    ui->stackedWidget->setCurrentWidget(previousWidget);
 }
 
 void MainWindow::wantExitFilesManagement()
@@ -1246,4 +1276,40 @@ void MainWindow::retranslateUi()
 {
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
     updateSerialInfos();
+}
+
+void MainWindow::on_toolButton_clearBackupFilePath_released()
+{
+    ui->lineEdit_dbBackupFilePath->clear();
+}
+
+void MainWindow::on_toolButton_setBackupFilePath_released()
+{
+    QFileDialog dialog(this);
+    dialog.setNameFilter(tr("Memory exports (*.bin)"));
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+
+    if (dialog.exec()) {
+        QStringList fileNames = dialog.selectedFiles();
+        ui->lineEdit_dbBackupFilePath->setText(fileNames.first());
+    }
+}
+
+void MainWindow::on_lineEdit_dbBackupFilePath_textChanged(const QString &text)
+{
+    if (text.isEmpty())
+        ui->pushButton_applyBackupTrackingChanges->setText("Stop tracking backup");
+    else
+        ui->pushButton_applyBackupTrackingChanges->setText("Set tracking backup");
+
+    ui->pushButton_applyBackupTrackingChanges->setEnabled(true);
+}
+
+void MainWindow::on_pushButton_applyBackupTrackingChanges_released()
+{
+    ui->pushButton_applyBackupTrackingChanges->setEnabled(false);
+    QString path = ui->lineEdit_dbBackupFilePath->text();
+
+    dbBackupsTrackerController.setBackupFilePath(path);
 }

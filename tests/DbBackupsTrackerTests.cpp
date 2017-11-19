@@ -46,7 +46,7 @@ void DbBackupsTrackerTests::trackFile()
 
 void DbBackupsTrackerTests::trackFileNoCpz()
 {
-    tracker.setCardId(QByteArray());
+    tracker.setCardId("");
     QSignalSpy spy(&tracker, &DbBackupsTracker::newTrack);
 
     bool fired = false;

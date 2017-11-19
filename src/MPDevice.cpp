@@ -3617,6 +3617,7 @@ void MPDevice::getChangeNumbers()
                 qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
                 emit filesCacheChanged();
             }
+            emit dbChangeNumbersChanged(credentialsDbChangeNumberClone, dataDbChangeNumberClone);
             qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
             qDebug() << "Data change number:" << get_dataDbChangeNumber();
             return true;
@@ -4363,6 +4364,8 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
             credentialsDbChangeNumberClone = 0;
             set_dataDbChangeNumber(0);
             dataDbChangeNumberClone = 0;
+
+            emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
         }
     });
 
@@ -5957,6 +5960,8 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
     {
         set_credentialsDbChangeNumber(importedCredentialsDbChangeNumber);
         set_dataDbChangeNumber(importedDataDbChangeNumber);
+
+        emit dbChangeNumbersChanged(importedCredentialsDbChangeNumber, importedDataDbChangeNumber);
     }
     return true;
 }
@@ -6374,6 +6379,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
     updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
     updateChangeNumbersPacket.append(get_dataDbChangeNumber());
     jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+
+    emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
 
     /* Out of pure coding laziness, ask free addresses even if we don't need them */
     loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);

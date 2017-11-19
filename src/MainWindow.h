@@ -24,7 +24,7 @@
 #include <QtAwesome.h>
 #include "WindowLog.h"
 
-#include <DbBackupsTracker.h>
+#include <DbBackupsTrackerController.h>
 
 namespace Ui {
 class MainWindow;
@@ -50,6 +50,8 @@ signals:
 public slots:
     void wantImportDatabase();
     void wantExportDatabase();
+    void handleBackupExported();
+    void handleBackupImported();
 
 private slots:
     void enableCredentialsManagement(bool enable);
@@ -97,6 +99,14 @@ private slots:
 
     void on_pushButtonCheckUpdate_clicked();
 
+    void on_toolButton_clearBackupFilePath_released();
+
+    void on_toolButton_setBackupFilePath_released();
+
+    void on_lineEdit_dbBackupFilePath_textChanged(const QString &);
+
+    void on_pushButton_applyBackupTrackingChanges_released();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -131,6 +141,7 @@ private:
     QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;
     PasswordProfilesModel *m_passwordProfilesModel;
+    DbBackupsTrackerController dbBackupsTrackerController;
 };
 
 #endif // MAINWINDOW_H

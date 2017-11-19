@@ -604,7 +604,9 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
 
     connect(mpdevice, &MPDevice::filesCacheChanged, this, &WSServerCon::sendFilesCache);
-    connect(mpdevice, &MPDevice::credentialsDbChangeNumberChanged, this, &WSServerCon::sendCardDbMetadata);
+
+    connect(mpdevice, &MPDevice::dbChangeNumbersChanged, this, &WSServerCon::sendCardDbMetadata);
+
 }
 
 void WSServerCon::statusChanged()
