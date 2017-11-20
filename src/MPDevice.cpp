@@ -4069,6 +4069,19 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         //all jobs finished success
         qInfo() << "set_credential success";
         cb(true, QString());
+
+        // request change numbers in case they changed
+        if (isFw12())
+        {
+            getChangeNumbers();
+        }
+        else
+        {
+            set_credentialsDbChangeNumber(0);
+            credentialsDbChangeNumberClone = 0;
+            set_dataDbChangeNumber(0);
+            dataDbChangeNumberClone = 0;
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
