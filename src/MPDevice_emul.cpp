@@ -26,124 +26,100 @@ MPDevice_emul::MPDevice_emul(QObject *parent):
     MPDevice(parent)
 {
     qDebug() << "Emulation Device";
-
+    m_defaultCPZ = "123456";
 }
 
 void MPDevice_emul::platformWrite(const QByteArray &data)
 {
-    switch((MPCmd::Command)data[1])
+    m_data.clear();
+    m_data.resize(64);
+    m_data[0] = 0x00;
+
+    switch(MPCmd::from(data[MP_CMD_FIELD_INDEX]))
     {
     case MPCmd::PING:
-        emit platformDataRead(data);
+        m_data = data;
         break;
     case MPCmd::VERSION:
     {
-        QByteArray d;
-        d[1] = MPCmd::VERSION;
-        d[2] = 0x08;
-        d.append("v1.0_emul");
-        d[0] = d.size() - 1;
-        d.resize(64);
-        emit platformDataRead(d);
-        CLEAN_MEMORY_QBYTEARRAY(d);
+        QByteArray version("v1.0_emul");
+        m_data[1] = MPCmd::VERSION;
+        m_data[2] = 0x08;
+        m_data.replace(3, version.size(), version);
+        m_data[0] = version.size();
         break;
     }
     case MPCmd::START_MEMORYMGMT:
     {
-        QByteArray d;
-        d[0] = 1;
-        d[1] = MPCmd::START_MEMORYMGMT;
-        d[2] = 0x01;
-        d.resize(64);
-        emit platformDataRead(d);
+        m_data[0] = 1;
+        m_data[1] = MPCmd::START_MEMORYMGMT;
+        m_data[2] = 0x01;
         break;
     }
     case MPCmd::SET_MOOLTIPASS_PARM:
     {
-        mooltipassParam[data[2]] = data [3];
-        QByteArray d;
-        d[0] = 1;
-        d[1] = MPCmd::SET_MOOLTIPASS_PARM;
-        d[2] = 0x01;
-        d.resize(64);
-        emit platformDataRead(d);
+        mooltipassParam[data[2]] = data[3];
+        m_data[0] = 1;
+        m_data[1] = MPCmd::SET_MOOLTIPASS_PARM;
+        m_data[2] = 0x01;
         break;
     }
     case MPCmd::GET_MOOLTIPASS_PARM:
     {
-        QByteArray d;
-        d[0] = 1;
-        d[1] = MPCmd::GET_MOOLTIPASS_PARM;
-        d[2] = mooltipassParam[data[2]];
-        d.resize(64);
-        emit platformDataRead(d);
+        m_data[0] = 1;
+        m_data[1] = MPCmd::GET_MOOLTIPASS_PARM;
+        m_data[2] = mooltipassParam[data[2]];
         break;
     }
     case MPCmd::MOOLTIPASS_STATUS:
     {
-        QByteArray d;
-        d[0] = 0x01;
-        d[1] = MPCmd::MOOLTIPASS_STATUS;
-        d[2] = 0b101;
-        d.resize(64);
-        emit platformDataRead(d);
+        m_data[0] = 0x01;
+        m_data[1] = MPCmd::MOOLTIPASS_STATUS;
+        m_data[2] = 0b101;
         break;
     }
     case MPCmd::END_MEMORYMGMT:
     {
-        QByteArray d;
-        d[0] = 1;
-        d[1] = MPCmd::END_MEMORYMGMT;
-        d[2] = 0x01;
-        d.resize(64);
-        emit platformDataRead(d);
+        m_data[0] = 1;
+        m_data[1] = MPCmd::END_MEMORYMGMT;
+        m_data[2] = 0x01;
         break;
     }
     case MPCmd::CONTEXT:
     {
         context = QString::fromUtf8(data.mid(2, data.length()));
         qDebug() << "Context : " << context;
-        QByteArray d;
-        d[0] = 1;
-        d[1] = MPCmd::CONTEXT;
-        d[2] = (quint8)logins.contains(context);
-        d.resize(64);
-        emit platformDataRead(d);
+        m_data[0] = 1;
+        m_data[1] = MPCmd::CONTEXT;
+        m_data[2] = (quint8)logins.contains(context);
         break;
     }
     case MPCmd::GET_LOGIN:
     {
-        QByteArray d;
-
-        d[1] = MPCmd::GET_LOGIN;
-        if (logins.contains(context))
-            d.append(logins[context]);
+        m_data[1] = MPCmd::GET_LOGIN;
+        QString login = logins[context];
+        if (!login.isEmpty())
+            m_data.replace(2, login.size(), login.toLocal8Bit());
         else
-            d[2] = 0x0;
-        d[0] = d.length() - 2;
-        d.resize(64);
-        emit platformDataRead(d);
+            m_data[2] = 0x0;
+        m_data[0] = login.size();
         break;
     }
     case MPCmd::GET_PASSWORD:
     {
-        QByteArray d;
-
-        d[1] = MPCmd::GET_PASSWORD;
-        if (passwords.contains(context))
-            d.append(passwords[context]);
+        m_data[1] = MPCmd::GET_PASSWORD;
+        QString password = passwords[context];
+        if (!password.isEmpty())
+            m_data.replace(2, password.size(), password.toLocal8Bit());
         else
-            d[2] = 0x0;
-        d[0] = d.length() - 2;
-        d.resize(64);
-        emit platformDataRead(d);
+            m_data[2] = 0x0;
+        m_data[0] = password.size();
         break;
     }
     case MPCmd::ADD_CONTEXT:
     {
-        QByteArray d;
-        d[0] = 1;
-        d[1] = MPCmd::ADD_CONTEXT;
+        m_data[0] = 1;
+        m_data[1] = MPCmd::ADD_CONTEXT;
 
         context = QString::fromUtf8(data.mid(2, data.length()));
         qDebug() << "Context : " << context;
@@ -151,26 +127,21 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         {
             passwords[context] = "";
             logins[context] = "";
-            d[2] = 0x1;
+            m_data[2] = 0x1;
         }
         else
         {
-            d[2] = 0x00;
+            m_data[2] = 0x00;
         }
-        d.resize(64);
-        emit platformDataRead(d);
         break;
     }
     case MPCmd::SET_LOGIN:
     {
-        QByteArray d;
-        d[0] = 1;
-        d[1] = MPCmd::SET_LOGIN;
+        m_data[0] = 1;
+        m_data[1] = MPCmd::SET_LOGIN;
         QString login = QString::fromUtf8(data.mid(2, data.length()));
         logins[context] = login;
-        d[2] = 0x01;
-        d.resize(64);
-        emit platformDataRead(d);
+        m_data[2] = 0x01;
         break;
     }
     case MPCmd::SET_PASSWORD:
@@ -178,62 +149,72 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QString password = QString::fromUtf8(data.mid(2, data.length()));
         passwords[context] = password;
 
-        QByteArray d;
-        d[0] = 1;
-        d[1] = MPCmd::SET_PASSWORD;
-        d[2] = 0x01;
-        d.resize(64);
-        emit platformDataRead(d);
+        m_data[0] = 1;
+        m_data[1] = MPCmd::SET_PASSWORD;
+        m_data[2] = 0x01;
         break;
     }
     case MPCmd::GET_RANDOM_NUMBER:
     {
-         QByteArray d;
-         d[0] = 32;
-         d[1] = MPCmd::GET_RANDOM_NUMBER;
-         for (int i = 0; i < 32; i++)
-             d[2 + i] = qrand() % 255;
-         d.resize(64);
-         emit platformDataRead(d);
-         break;
+        m_data[0] = 32;
+        m_data[1] = MPCmd::GET_RANDOM_NUMBER;
+        for (int i = 0; i < 32; i++)
+            m_data[2 + i] = qrand() % 255;
+        break;
     }
     case MPCmd::GET_FAVORITE:
     {
-        QByteArray d;
-        d[0] = 4;
-        d[1] = MPCmd::GET_FAVORITE;
+        m_data[0] = 4;
+        m_data[1] = MPCmd::GET_FAVORITE;
         for (int i = 0; i < 4; i++)
-            d[i] = 0x00;
-
-        d.resize(64);
-        emit platformDataRead(d);
+            m_data[i] = 0x00;
         break;
     }
     case MPCmd::READ_FLASH_NODE:
     {
-        QByteArray d(134, 0x00);
-        d[0] = d.size() - 2;
-        d[1] = MPCmd::READ_FLASH_NODE;
-        d.resize(64);
-        emit platformDataRead(d);
+        m_data.resize(134);
+        m_data.fill(0x00);
+
+        m_data[0] = m_data.size() - 2;
+        m_data[1] = MPCmd::READ_FLASH_NODE;
         break;
     }
-      /* MPCmd::READ_FLASH_NODE
+    case MPCmd::GET_CUR_CARD_CPZ:
+    {
+        m_data[1] = MPCmd::GET_CUR_CARD_CPZ;
+        m_data.replace(2, m_defaultCPZ.size(), m_defaultCPZ);
+        m_data[0] = m_defaultCPZ.size();
+        break;
+    }
+    case MPCmd::SET_DATE:
+    {
+        m_data[1] = MPCmd::SET_DATE;
+        int dataSize = data.size() - 2;
+        m_data.replace(2, dataSize, data.mid(2));
+        m_data[0] = dataSize;
+        break;
+    }
+        /* MPCmd::READ_FLASH_NODE
                MPCmd::GET_DN_START_PARENT
                MPCmd::GET_STARTING_PARENT
                MPCmd::GET_FAVORITE
-               MPCmd::GET_CARD_CPZ_CTR
                MPCmd::GET_CTRVALUE
                MPCmd::GET_RANDOM_NUMBER*/
     default:
         qDebug() << "Unimplemented emulation command: " << data;
-        QByteArray d = data;
-        d.resize(64);
-        d[2] = 0; //result is 0
-        emit platformDataRead(d);
+        m_data[2] = 0; //result is 0
+        m_data.replace(3, data.size(), data);
+        m_data[0] = data.size();
         break;
     }
 
+    if(m_data.at(0))
+    {
+        QTimer::singleShot(0, [=]()
+        {
+            emit platformDataRead(m_data);
+        });
+    }
 }
 
 void MPDevice_emul::platformRead()

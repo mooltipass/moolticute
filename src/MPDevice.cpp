@@ -20,9 +20,13 @@
 #include <functional>
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
+static const QString kDataDbChangeNumberItem("dataDbChangeNumber");
+static const QString kCredentialsDbChangeNumberItem("credentialsDbChangeNumber");
 
 MPDevice::MPDevice(QObject *parent):
-    QObject(parent)
+    QObject(parent),
+    m_credentialsDbFileWatcher(new QFileSystemWatcher(this)),
+    m_credentialsDbChangeNumberSet(false)
 {
     set_status(Common::UnknownStatus);
     set_memMgmtMode(false); //by default device is not in MMM
@@ -87,6 +91,9 @@ MPDevice::MPDevice(QObject *parent):
     });
 
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
+    connect(&filesCache, &FilesCache::cardCPZChanged, this, &MPDevice::onCardCPZChanged);
+    connect(&filesCache, &FilesCache::cardCPZChanged, this, &MPDevice::hashedCardCPZChanged);
+    connect(m_credentialsDbFileWatcher, &QFileSystemWatcher::fileChanged, this, &MPDevice::checkCredentialsDbChangeNumbers);
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
 
@@ -374,6 +381,25 @@ void MPDevice::removeFileFromCache(QString fileName)
 
     filesCache.save(cache);
     emit filesCacheChanged();
+}
+
+QString MPDevice::getDBBackupFile()
+{
+    QString backupFile = readDBBackupFile();
+
+    // check change credentials database numbers in the device and backup file
+    checkCredentialsDbChangeNumbers(backupFile);
+
+    return backupFile;
+}
+
+void MPDevice::setDBBackupFile(const QString &backupFile)
+{
+    saveDBBackupFile(backupFile);
+    addFileToWatcher(backupFile);
+
+    // check change credentials database numbers in the device and backup file
+    checkCredentialsDbChangeNumbers(backupFile);
 }
 
 bool MPDevice::isJobsQueueBusy()
@@ -3563,7 +3589,7 @@ void MPDevice::getCurrentCardCPZ()
         else
         {
             set_cardCPZ(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
-            qDebug() << "Card CPZ: " << get_cardCPZ().toHex();
+
             if (filesCache.setCardCPZ(get_cardCPZ()))
             {
                 qDebug() << "CPZ set to file cache, emitting file cache changed";
@@ -3609,11 +3635,13 @@ void MPDevice::getChangeNumbers()
         else
         {
             set_credentialsDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]);
+            m_credentialsDbChangeNumberSet = true;
             credentialsDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+1];
             set_dataDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]);
             dataDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
             if (filesCache.setDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]))
             {
+                checkCredentialsDbChangeNumbers(readDBBackupFile());
                 qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
                 emit filesCacheChanged();
             }
@@ -4850,8 +4878,8 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
         exportTopObject.insert("payload", QString(payload));
     }
 
-    exportTopObject.insert("dataDbChangeNumber", QJsonValue((quint8)get_dataDbChangeNumber()));
-    exportTopObject.insert("credentialsDbChangeNumber", QJsonValue((quint8)get_credentialsDbChangeNumber()));
+    exportTopObject.insert(kDataDbChangeNumberItem, QJsonValue((quint8)get_dataDbChangeNumber()));
+    exportTopObject.insert(kCredentialsDbChangeNumberItem, QJsonValue((quint8)get_credentialsDbChangeNumber()));
 
     QJsonDocument fileContentDoc(exportTopObject);
     payload = fileContentDoc.toJson();
@@ -4892,15 +4920,28 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
 
         /* Get the array */
         QJsonArray dataArray = d.array();
-        return readExportPayload(dataArray, errorString);
+
+        if(isCorrectMooltiAppFile(dataArray))
+            return readExportPayload(dataArray, errorString, true);
+        else
+        {
+            errorString = "Selected File Isn't Correct";
+            return false;
+        }
     }
     else if (d.isObject())
     {
         /* Use object */
         QJsonObject importFile = d.object();
         qInfo() << importFile.keys();
-        if ( importFile.contains("encryption") && importFile.contains("payload") )
+        if ( importFile.contains("encryption") && importFile.contains("payload") &&
+             importFile.contains(kCredentialsDbChangeNumberItem) && importFile.contains(kDataDbChangeNumberItem))
         {
+            importedCredentialsDbChangeNumber = importFile.value(kCredentialsDbChangeNumberItem).toInt();
+            qDebug() << "Imported cred change number: " << importedCredentialsDbChangeNumber;
+            importedDataDbChangeNumber = importFile.value(kDataDbChangeNumberItem).toInt();
+            qDebug() << "Imported data change number: " << importedDataDbChangeNumber;
+
             auto encryptionMethod = importFile.value("encryption").toString();
             if ( encryptionMethod == "SimpleCrypt")
             {
@@ -4912,7 +4953,7 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
                 {
                     /* Get the array */
                     QJsonArray dataArray = decryptedDocument.array();
-                    return readExportPayload(dataArray, errorString);
+                    return readExportPayload(dataArray, errorString, false);
                 }
                 else
                 {
@@ -4940,32 +4981,27 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
     }
 }
 
-bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
+bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString, bool isMooltiApp)
 {
     /** Mooltiapp / Chrome App save file **/
 
-    /* Checks */
-    if (!((dataArray[9].toString() == "mooltipass" && dataArray.size() == 10) || (dataArray[9].toString() == "moolticute" && dataArray.size() == 14)))
-    {
-        qCritical() << "Invalid MooltiApp file";
-        errorString = "Selected File Isn't Correct";
-        return false;
-    }
+    /* Is this variable still needed? */
+    isMooltiAppImportFile = false;
 
     /* Know which bundle we're dealing with */
-    if (dataArray[9].toString() == "mooltipass")
+    if (isMooltiApp)
     {
-        isMooltiAppImportFile = true;
         qInfo() << "Dealing with MooltiApp export file";
-    }
-    else
-    {
-        qInfo() << "Dealing with Moolticute export file";
-        isMooltiAppImportFile = false;
         importedCredentialsDbChangeNumber = dataArray[11].toInt();
         qDebug() << "Imported cred change number: " << importedCredentialsDbChangeNumber;
         importedDataDbChangeNumber = dataArray[12].toInt();
         qDebug() << "Imported data change number: " << importedDataDbChangeNumber;
+        importedDbMiniSerialNumber = dataArray[13].toInt();
+        qDebug() << "Imported mini serial number: " << importedDbMiniSerialNumber;
+    }
+    else
+    {
+        qInfo() << "Dealing with Moolticute (encrypted) export file";
         importedDbMiniSerialNumber = dataArray[13].toInt();
         qDebug() << "Imported mini serial number: " << importedDbMiniSerialNumber;
     }
@@ -6600,6 +6636,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
     {
         /// We are here because the card is known by the export file and the export file is valid
 
+        qDebug() << "importDatabase" << importedCredentialsDbChangeNumber << m_credentialsDbChangeNumber;
         /* If we don't know this card, we need to add the CPZ CTR */
         if (get_status() == Common::UnkownSmartcad)
         {
@@ -6704,4 +6741,161 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
+}
+
+void MPDevice::checkCredentialsDbChangeNumbers(const QString &dbBackupFile)
+{
+    /** Sometimes you can get "Failed to read backup file" warning if this function is called
+     * after emiting of fileChanged signal from m_credentialsDbFileWatcher. This could
+     * happen when backup file is changed and in this case m_credentialsDbFileWatcher emits
+     * 2 consecutive fileChanged signals. First - after removing data from file, as result QJsonDocument is empty.
+     * Second - after writing new data to file.
+    */
+
+    if(dbBackupFile.isEmpty()
+            || !m_credentialsDbChangeNumberSet)
+        return;
+
+    QFile file(dbBackupFile);
+    if(file.exists())
+    {
+        if(file.open(QFile::ReadOnly))
+        {
+            QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+
+            if(doc.isEmpty() || doc.isNull())
+            {
+                qWarning() << "Failed to read backup file";
+                return;
+            }
+
+            quint8 changeNumberFromFile;
+
+            // if doc is array check that it's correct MooltiApp (non-encrypted file)
+            if(doc.isArray())
+            {
+                QJsonArray arr = doc.array();
+
+                /* Checks */
+                if (isCorrectMooltiAppFile(arr))
+                {
+                    changeNumberFromFile = arr[11].toInt();
+                }
+                else
+                {
+                    qCritical() << "Invalid MooltiApp file";
+                    return;
+                }
+            }
+            // if doc is object then it's could be MooltiCute file with encrypted data
+            else if (doc.isObject())
+            {
+                QJsonObject obj = doc.object();
+                QJsonObject::iterator it = obj.find(kCredentialsDbChangeNumberItem);
+
+                if(it != obj.end())
+                    changeNumberFromFile = quint8(it.value().toInt());
+                else
+                {
+                    qCritical() << "Invalid MooltiCute file";
+                    return;
+                }
+            }
+
+            int result;
+
+            if(m_credentialsDbChangeNumber > changeNumberFromFile)
+            {
+                // number from Mooltipass is greater
+                result = Common::Device;
+            }
+            else if(m_credentialsDbChangeNumber < changeNumberFromFile)
+            {
+                //number from backup file is greater
+                result = Common::BackupFile;
+            }
+            else
+            {
+                // everything is ok,
+                // do nothing in this case
+                return;
+                //result = Common::Equal;
+            }
+
+            emit credentialsDiffer(result);
+        }
+        else
+            qCritical() << "Failed to open backup file:" << dbBackupFile;
+    }
+    else
+        qCritical() << "File doesn't exist:" << dbBackupFile;
+}
+
+void MPDevice::onCardCPZChanged()
+{
+    QString filePath = readDBBackupFile();
+
+    addFileToWatcher(filePath);
+}
+
+QString MPDevice::readDBBackupFile() const
+{
+    if(filesCache.filePath().isEmpty())
+        return QString();
+
+    QFileInfo fileInfo(filesCache.filePath());
+
+    // get backup folder for hashed card CPZ
+    QSettings settings;
+    settings.beginGroup("users");
+    QString backupFile = settings.value(fileInfo.baseName()).toString();
+    settings.endGroup();
+
+    return backupFile;
+}
+
+void MPDevice::saveDBBackupFile(const QString &backupFile)
+{
+    if(filesCache.filePath().isEmpty())
+        return;
+
+    QFileInfo fileInfo(filesCache.filePath());
+
+    QSettings settings;
+    settings.beginGroup("users");
+    settings.setValue(fileInfo.baseName(), backupFile);
+    settings.endGroup();
+}
+
+void MPDevice::addFileToWatcher(const QString &backupFile)
+{
+    if(backupFile.isEmpty())
+        return;
+
+    QStringList files = m_credentialsDbFileWatcher->files();
+
+    if(!files.isEmpty())
+    {
+        QStringList failedToRemove = m_credentialsDbFileWatcher->removePaths(files);
+        if(!failedToRemove.isEmpty())
+            qWarning() << "Failed to remove files from file system watcher:" << failedToRemove;
+    }
+
+    if(!m_credentialsDbFileWatcher->addPath(backupFile))
+        qWarning() << "Failed to set monitored file for QFileSystemWatcher:" << backupFile;
+}
+
+void MPDevice::startWatchDbBackupFile()
+{
+    QString filePath = readDBBackupFile();
+
+    addFileToWatcher(filePath);
+}
+
+void MPDevice::stopWatchDbBackupfile()
+{
+    QString filePath = readDBBackupFile();
+
+    if(!filePath.isEmpty())
+        m_credentialsDbFileWatcher->removePath(filePath);
 }

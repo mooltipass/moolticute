@@ -107,7 +107,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
-
+    connect(wsClient, &WSClient::databaseBackupFileChanged, ui->lineEditDBFile, &QLineEdit::setText);
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantSaveMemMode, this, &MainWindow::wantSaveCredentialManagement);
@@ -116,8 +116,15 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::statusChanged, [this]()
     {
-        this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
-        if (wsClient->get_status() == Common::UnkownSmartcad)
+        Common::MPStatus status = wsClient->get_status();
+
+        this->enableKnockSettings(status == Common::NoCardInserted);
+        ui->widgetDBFolderControls->setVisible(status == Common::Unlocked);
+
+        if(status == Common::Unlocked)
+            wsClient->requestDBBackupFile();
+
+        if (status == Common::UnkownSmartcad)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
     });
 
@@ -129,6 +136,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDBFile->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDeleteDbFile->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->lineEditDBFile->setStyleSheet(CSS_BLUE_LINEEDIT);
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonCheckUpdate->setStyleSheet(CSS_BLUE_BUTTON);
@@ -152,6 +162,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         dlg.setPasswordProfilesModel(m_passwordProfilesModel);
         dlg.exec();
     });
+    connect(ui->pushButtonDBFile, &QPushButton::clicked, this, &MainWindow::changeDBBackupFile);
+    connect(ui->pushButtonDeleteDbFile, &QPushButton::clicked, this, &MainWindow::resetDBBackupFile);
 
     ui->pushButtonDevSettings->setChecked(false);
 
@@ -410,6 +422,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         checkSettingsChanged();
     });
 
+    connect(wsClient, &WSClient::credentialsCompared, this, &MainWindow::onCredentialsCompared);
+
     //When something changed in GUI, show save/reset buttons
     connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxLock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
@@ -444,6 +458,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
+
+    // hide widget with prompts by default
+    ui->promptWidget->setVisible(false);
 
     updateSerialInfos();
     updatePage();
@@ -788,7 +805,7 @@ void MainWindow::wantSaveCredentialManagement()
     {
         disconnect(*conn);
         if (!success)
-	{
+        {
             QMessageBox::warning(this, tr("Failure"), tr("Couldn't save credentials, please contact the support team with moolticute's log"));
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         }
@@ -804,6 +821,7 @@ void MainWindow::wantImportDatabase()
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
+    ui->promptWidget->hide();
 
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
@@ -816,8 +834,34 @@ void MainWindow::wantExportDatabase()
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
+    ui->promptWidget->hide();
 
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+}
+
+void MainWindow::changeDBBackupFile()
+{
+    QString file = QFileDialog::getOpenFileName(this, tr("Choose file"),
+                                                ui->lineEditDBFile->text());
+
+    if(!file.isEmpty())
+        setDatabaseBackupFile(file);
+}
+
+void MainWindow::resetDBBackupFile()
+{
+    QString dbFile = ui->lineEditDBFile->text();
+
+    if(!dbFile.isEmpty())
+    {
+        setDatabaseBackupFile(QString());
+    }
+}
+
+void MainWindow::setDatabaseBackupFile(const QString &filePath)
+{
+    ui->lineEditDBFile->setText(filePath);
+    wsClient->sendDBBackupFile(filePath);
 }
 
 void MainWindow::wantExitFilesManagement()
@@ -980,21 +1024,7 @@ void MainWindow::on_pushButtonExportFile_clicked()
 
 void MainWindow::on_pushButtonImportFile_clicked()
 {
-    QString fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
-                                                 "Memory exports (*.bin);;All files (*.*)");
-    if (fname.isEmpty())
-        return;
-
-    QFile f(fname);
-    if (!f.open(QFile::ReadOnly))
-    {
-        QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
-        return;
-    }
-    ui->widgetHeader->setEnabled(false);
-    wsClient->importDbFile(f.readAll(), ui->checkBoxImport->isChecked());
-    connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
-    wantImportDatabase();
+    importDatabase(QString());
 }
 
 void MainWindow::dbExported(const QByteArray &d, bool success)
@@ -1005,17 +1035,25 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
         QMessageBox::warning(this, tr("Error"), tr(d));
     else
     {
+        bool saved = false;
         QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),
                                                      "Memory exports (*.bin);;All files (*.*)");
+
         if (!fname.isEmpty())
         {
             QFile f(fname);
             if (!f.open(QFile::WriteOnly | QFile::Truncate))
                 QMessageBox::warning(this, tr("Error"), tr("Unable to write to file %1").arg(fname));
             else
+            {
                 f.write(d);
+                QMessageBox::information(this, tr("Export result"), tr("Backup file successfully updated: %1").arg(fname));
+                saved = true;
+            }
             f.close();
         }
+
+        wsClient->exportedDbFileProcessed(saved);
     }
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
 
@@ -1027,7 +1065,10 @@ void MainWindow::dbImported(bool success, QString message)
     ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
     if (!success)
+    {
         QMessageBox::warning(this, tr("Error"), message);
+        setDatabaseBackupFile(QString()); // clean field
+    }
     else
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
 
@@ -1246,4 +1287,65 @@ void MainWindow::retranslateUi()
 {
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
     updateSerialInfos();
+}
+
+void MainWindow::onCredentialsCompared(int result)
+{
+    if(result == Common::BackupFile)
+        showImportCredentialsPrompt();
+    else if(result == Common::Device)
+        showExportCredentialsPrompt();
+}
+
+void MainWindow::showImportCredentialsPrompt()
+{
+    int res = QMessageBox::warning(this, tr("Credentials"), tr("Credentials in the backup file are more recent. "
+                                                               "Do you want to import credentials to the device"
+                                                               "(by denying you can loose your changes)?"), QMessageBox::Yes | QMessageBox::No);
+
+    if(res == QMessageBox::Yes)
+        importDatabase(ui->lineEditDBFile->text());
+}
+
+void MainWindow::showExportCredentialsPrompt()
+{
+    ui->promptWidget->setPromptMessage(new PromptMessage(tr("Credentials on the device are more recent. "
+                                                            "Do you want export credentials to backup file?"),
+                                                         [this](){ this->on_pushButtonExportFile_clicked(); },
+    [this]()
+    {
+        QMessageBox::StandardButton btn = QMessageBox::warning(this, tr("Be careful"),
+                                                               tr("By denying you can loose your changes. Do you want to continue?"),
+                                                               QMessageBox::Yes | QMessageBox::No);
+        if(btn == QMessageBox::Yes)
+        {
+            ui->promptWidget->hide();
+            this->layout()->activate();
+        }
+    }
+    ));
+
+    ui->promptWidget->show();
+}
+
+void MainWindow::importDatabase(const QString &fileName)
+{
+    QString fname = fileName;
+    if(fname.isEmpty())
+        fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
+                                         "Memory exports (*.bin);;All files (*.*)");
+
+    if (fname.isEmpty())
+        return;
+
+    QFile f(fname);
+    if (!f.open(QFile::ReadOnly))
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
+        return;
+    }
+    ui->widgetHeader->setEnabled(false);
+    wsClient->importDbFile(f.readAll(), ui->checkBoxImport->isChecked());
+    connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
+    wantImportDatabase();
 }

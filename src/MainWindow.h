@@ -57,6 +57,9 @@ private slots:
     void wantExitFilesManagement();
     void wantImportDatabase();
     void wantExportDatabase();
+    void changeDBBackupFile();
+    void resetDBBackupFile();
+    void setDatabaseBackupFile(const QString &filePath);
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
@@ -68,6 +71,10 @@ private slots:
 
     void dbExported(const QByteArray &d, bool success);
     void dbImported(bool success, QString message);
+
+    // starts importing database from device.
+    // if fileName is empty user will be asked to choose imported file
+    void importDatabase(const QString &fileName);
 
     void memMgmtModeFailed(int errCode, QString errMsg);
 
@@ -92,6 +99,7 @@ private slots:
     void on_comboBoxAppLang_currentIndexChanged(int index);
 
     void on_pushButtonCheckUpdate_clicked();
+    void onCredentialsCompared(int result);
 
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
@@ -106,6 +114,9 @@ private:
     void refreshAppLangCb();
 
     void retranslateUi();
+
+    void showImportCredentialsPrompt();
+    void showExportCredentialsPrompt();
 
     Ui::MainWindow *ui;
     QtAwesome* awesome;

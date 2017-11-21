@@ -301,6 +301,16 @@ void WSClient::onTextMessageReceived(const QString &message)
         filesCache = rootobj["data"].toArray();
         emit filesCacheChanged();
     }
+    else if (rootobj["msg"] == "db_backup_file")
+    {
+        QString backupFile = rootobj["data"].toString();
+        emit databaseBackupFileChanged(backupFile);
+    }
+    else if (rootobj["msg"] == "credentials_change_numbers")
+    {
+        int result = rootobj["data"].toInt();
+        emit credentialsCompared(result);
+	}
     else if (rootobj["msg"] == "get_random_numbers")
     {
         std::vector<qint64> ints;
@@ -457,6 +467,13 @@ void WSClient::exportDbFile(const QString &encryption)
                   { "data", d }});
 }
 
+void WSClient::exportedDbFileProcessed(bool saved)
+{
+    QJsonObject d = {{ "saved", saved }};
+    sendJsonData({{ "msg", "export_database_processed" },
+                  { "data", d }});
+}
+
 void WSClient::importDbFile(const QByteArray &fileData, bool noDelete)
 {
     QJsonObject d = {{ "file_data", QString(fileData.toBase64()) },
@@ -474,6 +491,17 @@ void WSClient::sendListFilesCacheRequest()
 void WSClient::sendRefreshFilesCacheRequest()
 {
     sendJsonData({{ "msg", "refresh_files_cache" }});
+}
+
+void WSClient::requestDBBackupFile()
+{
+    sendJsonData({{ "msg", "get_db_backup_file" }});
+}
+
+void WSClient::sendDBBackupFile(const QString &backupFile)
+{
+    sendJsonData({{ "msg", "set_db_backup_file" },
+                  { "data", backupFile }});
 }
 
 void WSClient::queryRandomNumbers()

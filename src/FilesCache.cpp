@@ -151,6 +151,7 @@ bool FilesCache::setCardCPZ(QByteArray cardCPZ)
 
     m_simpleCrypt.setKey(m_key);
     m_simpleCrypt.setIntegrityProtectionMode(SimpleCrypt::ProtectionHash);
+    emit cardCPZChanged(m_cardCPZ);
 
     if (m_dbChangeNumberSet)
         return true;

@@ -96,10 +96,13 @@ public:
     void sendCredentialsMM(const QJsonArray &creds);
 
     void exportDbFile(const QString &encryption);
+    void exportedDbFileProcessed(bool saved);
     void importDbFile(const QByteArray &fileData, bool noDelete);
 
     void sendListFilesCacheRequest();
     void sendRefreshFilesCacheRequest();
+    void requestDBBackupFile();
+    void sendDBBackupFile(const QString &backupFile);
 
 signals:
     void wsConnected();
@@ -119,6 +122,8 @@ signals:
     void dbImported(bool success, QString message);
     void memMgmtModeFailed(int errCode, QString errMsg);
     void filesCacheChanged();
+    void databaseBackupFileChanged(QString backupFile);
+    void credentialsCompared(int result);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

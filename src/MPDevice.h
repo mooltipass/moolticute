@@ -217,6 +217,25 @@ public:
     void addFileToCache(QString fileName, int size);
     void updateFileInCache(QString fileName, int size);
     void removeFileFromCache(QString fileName);
+    QString getDBBackupFile();
+    void setDBBackupFile(const QString &backupFile);
+
+    /*!
+     * \brief readDBBackupFile
+     * \return path of the backup dile saved with QSettings
+     */
+    QString readDBBackupFile() const;
+
+    /*! \brief Compares credebtials change number from Mooltipass and from backup file.
+     *
+     * This function should be called after both cardCPZ and
+     * credentialsDbChangeNumber are set. "hashedCardCPZ" is needed to get
+     * corresponding backup file that holds one of compared numbers.
+     */
+    void checkCredentialsDbChangeNumbers(const QString &dbBackupFile);
+
+    void startWatchDbBackupFile();
+    void stopWatchDbBackupfile();
 
 signals:
     /* Signal emited by platform code when new data comes from MP */
@@ -226,13 +245,15 @@ signals:
     /* the command has failed in platform code */
     void platformFailed();
     void filesCacheChanged();
+    void hashedCardCPZChanged();
+    void credentialsDiffer(int);
 
 private slots:
     void newDataRead(const QByteArray &data);
     void commandFailed();
     void sendDataDequeue(); //execute commands from the command queue
     void runAndDequeueJobs(); //execute AsyncJobs from the jobs queues
-
+    void onCardCPZChanged();
 
 private:
     /* Platform function for starting a read, should be implemented in platform class */
@@ -287,7 +308,7 @@ private:
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
-    bool readExportPayload(QJsonArray dataArray, QString &errorString);
+    bool readExportPayload(QJsonArray dataArray, QString &errorString, bool isMooltiApp);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool deleteDataParentChilds(MPNode *parentNodePt);
@@ -296,6 +317,9 @@ private:
     QByteArray generateExportFileData(const QString &encryption = "none");
     void cleanImportedVars(void);
     void cleanMMMVars(void);
+
+    // checks for exported file
+    inline bool isCorrectMooltiAppFile(const QJsonArray &dataArray);
 
     // Functions added by mathieu for unit testing
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
@@ -316,6 +340,14 @@ private:
 
     void updateParam(MPParams::Param param, bool en);
     void updateParam(MPParams::Param param, int val);
+
+    /*!
+     * \brief saveDBBackupFile
+     * Saves path to backup file with QSettings
+     */
+    void saveDBBackupFile(const QString &backupFile);
+
+    void addFileToWatcher(const QString &backupFile);
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
@@ -405,6 +437,14 @@ private:
     int progressCurrent;
 
     FilesCache filesCache;
+    QFileSystemWatcher *m_credentialsDbFileWatcher;
+
+    bool m_credentialsDbChangeNumberSet;
 };
+
+bool MPDevice::isCorrectMooltiAppFile(const QJsonArray &dataArray)
+{
+    return dataArray[9].toString() == "moolticute" && dataArray.size() == 14;
+}
 
 #endif // MPDEVICE_H

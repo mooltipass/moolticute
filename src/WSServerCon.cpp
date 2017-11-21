@@ -226,6 +226,7 @@ void WSServerCon::processMessage(const QString &message)
             QJsonObject oroot = root;
             oroot["data"] = ores;
             sendJsonMessage(oroot);
+            mpdevice->getChangeNumbers();
         });
     }
     else if (root["msg"] == "del_credential")
@@ -473,6 +474,7 @@ void WSServerCon::processMessage(const QString &message)
             ores["success"] = "true";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
+            mpdevice->getChangeNumbers();
         });
     }
     else if (root["msg"] == "export_database")
@@ -496,6 +498,12 @@ void WSServerCon::processMessage(const QString &message)
                 return;
             }
 
+            /** Stop watching changes in backup file, because user can choose
+            * backup file for saving exported data. In that case, it's not needed
+            * to check credentials change numbers.
+            */
+            mpdevice->stopWatchDbBackupfile();
+
             QJsonObject ores;
             QJsonObject oroot = root;
             ores["file_data"] = QString(fileData.toBase64());
@@ -503,6 +511,19 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         },
         defaultProgressCb);
+    }
+    else if (root["msg"] == "export_database_processed")
+    {
+        if(root.contains("data"))
+        {
+            QJsonObject o = root["data"].toObject();
+            bool saved = o.value("saved").toBool();
+
+            // not used for now
+            Q_UNUSED(saved)
+
+            mpdevice->startWatchDbBackupFile();
+        }
     }
     else if (root["msg"] == "import_database")
     {
@@ -532,6 +553,7 @@ void WSServerCon::processMessage(const QString &message)
             ores["success"] = "true";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
+            mpdevice->checkCredentialsDbChangeNumbers(mpdevice->readDBBackupFile());
         },
         defaultProgressCb);
     }
@@ -542,6 +564,14 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "list_files_cache")
     {
         sendFilesCache();
+    }
+    else if (root["msg"] == "get_db_backup_file")
+    {
+        sendDBBackupFile();
+    }
+    else if (root["msg"] == "set_db_backup_file")
+    {
+        setDBBackupFile(root["data"].toString());
     }
 }
 
@@ -602,6 +632,8 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
 
     connect(mpdevice, &MPDevice::filesCacheChanged, this, &WSServerCon::sendFilesCache);
+    connect(mpdevice, &MPDevice::hashedCardCPZChanged, this, &WSServerCon::sendDBBackupFile);
+    connect(mpdevice, &MPDevice::credentialsDiffer, this, &WSServerCon::sendCredentialsComparingResult);
 }
 
 void WSServerCon::statusChanged()
@@ -894,7 +926,7 @@ void WSServerCon::sendFilesCache()
 {
     if (!mpdevice->hasFilesCache())
     {
-        qDebug() << "There is fo files cache to send";
+        qDebug() << "There is no files cache to send";
         return;
     }
 
@@ -913,6 +945,31 @@ void WSServerCon::sendFilesCache()
 
     oroot["data"] = array;
     sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendDBBackupFile()
+{
+    if (!mpdevice)
+        return;
+
+    QString backupFile = mpdevice->getDBBackupFile();
+
+    sendJsonMessage({{ "msg", "db_backup_file" },
+                    { "data", backupFile }});
+}
+
+void WSServerCon::sendCredentialsComparingResult(int result)
+{
+    sendJsonMessage({{ "msg", "credentials_change_numbers" },
+                    { "data", result }});
+}
+
+void WSServerCon::setDBBackupFile(const QString &backupFile)
+{
+    if (!mpdevice)
+        return;
+
+    mpdevice->setDBBackupFile(backupFile);
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

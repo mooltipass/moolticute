@@ -189,6 +189,14 @@ public:
         FAV_13,
         FAV_14,
     };
+
+    enum CredChangeNumComparing{
+        Equal,
+
+        // More recent credentials are in
+        Device,
+        BackupFile
+    };
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)
@@ -224,5 +232,11 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                             "background-color: #237C95;" \
                         "}"
 
+#define CSS_BLUE_LINEEDIT   "QLineEdit {" \
+                                "border: 2px solid #60B1C7;" \
+                                "background: #cee8ef;" \
+                                "selection-background-color: #3d96af;" \
+                            "}" \
+                            "QLineEdit:focus { border: 2px solid #3d96af; }"
 #endif // COMMON_H
 

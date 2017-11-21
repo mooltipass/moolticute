@@ -15,7 +15,10 @@ var apiList = ['{"msg": ""}',
                '{"msg": "start_memcheck"}',
                '{"msg": "get_application_id"}',
                '{"msg": "credential_exists", "data": {"service": "example.com"}}',
-               '{"msg": "data_node_exists", "data": {"service": "data example"}}'
+               '{"msg": "data_node_exists", "data": {"service": "data example"}}',
+			   '{"msg": "db_backup_file", "data": "backup_file.db"}',
+			   '{"msg", "get_db_backup_file"}',
+			   '{"msg": "set_db_backup_file", "data": "new_backup_file.db"}'
 ]
 
 function popuplateApiList() {
