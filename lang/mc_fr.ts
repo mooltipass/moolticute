@@ -20,7 +20,7 @@
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="271"/>
-        <source>No moolltipass connected.</source>
+        <source>No mooltipass connected.</source>
         <translation>Aucun mooltipass connecté.</translation>
     </message>
     <message>

@@ -4070,6 +4070,19 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         //all jobs finished success
         qInfo() << "set_credential success";
         cb(true, QString());
+
+        // request change numbers in case they changed
+        if (isFw12())
+        {
+            getChangeNumbers();
+        }
+        else
+        {
+            set_credentialsDbChangeNumber(0);
+            credentialsDbChangeNumberClone = 0;
+            set_dataDbChangeNumber(0);
+            dataDbChangeNumberClone = 0;
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
@@ -4350,8 +4363,7 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
         cb(true, QString());
 
         // update file cache
-        // FIXME: Set the real file size
-        addFileToCache(service, 0);
+        addFileToCache(service, ((nodeData.size()+MP_DATA_HEADER_SIZE+MOOLTIPASS_BLOCK_SIZE-1)/MOOLTIPASS_BLOCK_SIZE)*MOOLTIPASS_BLOCK_SIZE);
 
         // request change numbers in case they changed
         if (isFw12())
