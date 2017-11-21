@@ -160,12 +160,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     // DB Backups UI
     ui->toolButton_clearBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::remove));
     ui->toolButton_setBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::foldero));
-    ui->pushButton_applyBackupTrackingChanges->setStyleSheet(CSS_BLUE_BUTTON);
-
     ui->lineEdit_dbBackupFilePath->setText(dbBackupsTrackerController.getBackupFilePath());
     connect(&dbBackupsTrackerController, &DbBackupsTrackerController::backupFilePathChanged, [=] (const QString &path) {
         ui->lineEdit_dbBackupFilePath->setText(path);
-        ui->pushButton_applyBackupTrackingChanges->setEnabled(false);
     });
 
     //Add languages to combobox
@@ -1296,6 +1293,7 @@ void MainWindow::retranslateUi()
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
+    dbBackupsTrackerController.setBackupFilePath("");
 }
 
 void MainWindow::on_toolButton_setBackupFilePath_released()
@@ -1308,23 +1306,6 @@ void MainWindow::on_toolButton_setBackupFilePath_released()
     if (dialog.exec()) {
         QStringList fileNames = dialog.selectedFiles();
         ui->lineEdit_dbBackupFilePath->setText(fileNames.first());
+        dbBackupsTrackerController.setBackupFilePath(fileNames.first());
     }
-}
-
-void MainWindow::on_lineEdit_dbBackupFilePath_textChanged(const QString &text)
-{
-    if (text.isEmpty())
-        ui->pushButton_applyBackupTrackingChanges->setText("Stop tracking backup");
-    else
-        ui->pushButton_applyBackupTrackingChanges->setText("Set tracking backup");
-
-    ui->pushButton_applyBackupTrackingChanges->setEnabled(true);
-}
-
-void MainWindow::on_pushButton_applyBackupTrackingChanges_released()
-{
-    ui->pushButton_applyBackupTrackingChanges->setEnabled(false);
-    QString path = ui->lineEdit_dbBackupFilePath->text();
-
-    dbBackupsTrackerController.setBackupFilePath(path);
 }

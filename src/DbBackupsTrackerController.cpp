@@ -24,6 +24,7 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow* window, WSCli
 
 void DbBackupsTrackerController::setBackupFilePath(const QString& path)
 {
+    window->hidePrompt();
     try
     {
         dbBackupsTracker.track(path);
@@ -35,6 +36,8 @@ void DbBackupsTrackerController::setBackupFilePath(const QString& path)
 
 void DbBackupsTrackerController::handleCardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber)
 {
+    window->hidePrompt();
+
     dbBackupsTracker.setCardId(cardId);
     dbBackupsTracker.setCredentialsDbChangeNumber(credentialsDbChangeNumber);
     dbBackupsTracker.setDataDbChangeNumber(dataDbChangeNumber);

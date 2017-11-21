@@ -1441,6 +1441,9 @@ QWidget {background-color: #EFEFEF;}</string>
                   <height>0</height>
                  </size>
                 </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
                 <property name="placeholderText">
                  <string>Backup file path</string>
                 </property>
@@ -1463,16 +1466,6 @@ QWidget {background-color: #EFEFEF;}</string>
              </layout>
             </item>
            </layout>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="pushButton_applyBackupTrackingChanges">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Apply</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </item>

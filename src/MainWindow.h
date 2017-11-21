@@ -105,10 +105,6 @@ private slots:
 
     void on_toolButton_setBackupFilePath_released();
 
-    void on_lineEdit_dbBackupFilePath_textChanged(const QString &);
-
-    void on_pushButton_applyBackupTrackingChanges_released();
-
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
