@@ -276,6 +276,10 @@ void DbBackupsTracker::saveTracks()
         s.setValue(k, tracks.value(k));
 
     s.endGroup();
+
+    s.sync();
+    if (s.status() != QSettings::NoError)
+        qWarning() << "Unable to save settings " << s.status();
 }
 
 void DbBackupsTracker::loadTracks()
@@ -284,6 +288,10 @@ void DbBackupsTracker::loadTracks()
 
     QString path = getSettingsFilePath();
     QSettings s(path, QSettings::IniFormat);
+    s.sync();
+    if (s.status() != QSettings::NoError)
+        qWarning() << "Unable to load settings " << s.status();
+
     s.beginGroup("BackupsTracks");
     for (QString k : s.allKeys())
     {
