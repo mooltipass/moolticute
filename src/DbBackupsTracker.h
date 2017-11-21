@@ -70,6 +70,7 @@ protected slots:
 private:
     void saveTracks();
     void loadTracks();
+    QString getSettingsFilePath();
     QFileSystemWatcher watcher;
     QMap<QString, QString> tracks;
     QString cardId;
