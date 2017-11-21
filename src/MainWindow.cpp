@@ -24,6 +24,7 @@
 #include "AppGui.h"
 #include "PasswordProfilesModel.h"
 #include "PassGenerationProfilesDialog.h"
+#include "PromptWidget.h"
 
 template <typename T>
 static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
@@ -457,6 +458,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
 
+    // hide widget with prompts by default
+    ui->promptWidget->setVisible(false);
+
     updateSerialInfos();
     updatePage();
 }
@@ -848,6 +852,17 @@ void MainWindow::handleBackupImported()
     disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     ui->stackedWidget->setCurrentWidget(previousWidget);
+}
+
+void MainWindow::showPrompt(PromptMessage * message)
+{
+    ui->promptWidget->setPromptMessage(message);
+    ui->promptWidget->show();
+}
+
+void MainWindow::hidePrompt()
+{
+    ui->promptWidget->hide();
 }
 
 void MainWindow::wantExitFilesManagement()

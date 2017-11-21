@@ -31,7 +31,7 @@ class MainWindow;
 }
 class QShortcut;
 class PasswordProfilesModel;
-
+class PromptMessage;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -52,6 +52,8 @@ public slots:
     void wantExportDatabase();
     void handleBackupExported();
     void handleBackupImported();
+    void showPrompt(PromptMessage * message);
+    void hidePrompt();
 
 private slots:
     void enableCredentialsManagement(bool enable);

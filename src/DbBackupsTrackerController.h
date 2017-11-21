@@ -36,8 +36,8 @@ private:
     MainWindow* window;
     WSClient* wsClient;
 
-    int askForImportBackup();
-    int askForExportBackup();
+    void askForImportBackup();
+    void askForExportBackup();
     QString readDbBackupFile();
     void importDbBackup(QString data);
     void exportDbBackup();

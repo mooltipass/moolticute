@@ -4,6 +4,7 @@
 
 #include "MainWindow.h"
 #include "WSClient.h"
+#include "PromptWidget.h"
 
 DbBackupsTrackerController::DbBackupsTrackerController(MainWindow* window, WSClient* wsClient, QObject* parent)
     : QObject(parent)
@@ -44,15 +45,26 @@ void DbBackupsTrackerController::handleCardDbMetadataChanged(QString cardId, int
     emit backupFilePathChanged(path);
 }
 
-int DbBackupsTrackerController::askForImportBackup()
+void DbBackupsTrackerController::askForImportBackup()
 {
-    QMessageBox msgBox(window);
-    msgBox.setText("The db backup has changes to be imported. Do you want to import them?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::No);
-    int ret = msgBox.exec();
+    std::function<void()> onAccept = [this]()
+    {
+        QString data = readDbBackupFile();
+        importDbBackup(data);
+    };
 
-    return ret;
+    std::function<void()> onReject = [this]() {
+        QMessageBox::StandardButton btn = QMessageBox::warning(window, tr("Be careful"),
+                                                               tr("By denying you can loose your changes. Do you want to continue?"),
+                                                               QMessageBox::Yes | QMessageBox::No);
+        if(btn == QMessageBox::Yes)
+            window->hidePrompt();
+    };
+
+    PromptMessage *message = new PromptMessage(tr("Credentials in the backup file are more recent. "
+                                                  "Do you want to import credentials to the device?"),
+                                               onAccept, onReject);
+    window->showPrompt(message);
 }
 
 void DbBackupsTrackerController::importDbBackup(QString data)
@@ -68,24 +80,28 @@ void DbBackupsTrackerController::importDbBackup(QString data)
 
 void DbBackupsTrackerController::handleGreaterDbBackupChangeNumber()
 {
-    int ret = askForImportBackup();
-
-    if (ret == QMessageBox::Yes)
-    {
-        QString data = readDbBackupFile();
-        importDbBackup(data);
-    }
+    askForImportBackup();
 }
 
-int DbBackupsTrackerController::askForExportBackup()
+void DbBackupsTrackerController::askForExportBackup()
 {
-    QMessageBox msgBox(window);
-    msgBox.setText("The db backup is outdated. Do you want to update it?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::No);
-    int ret = msgBox.exec();
+    std::function<void()> onAccept = [this]()
+    {
+        exportDbBackup();
+    };
 
-    return ret;
+    std::function<void()> onReject = [this]() {
+        QMessageBox::StandardButton btn = QMessageBox::warning(window, tr("Be careful"),
+                                                               tr("By denying you can loose your changes. Do you want to continue?"),
+                                                               QMessageBox::Yes | QMessageBox::No);
+        if(btn == QMessageBox::Yes)
+            window->hidePrompt();
+    };
+
+    PromptMessage *message = new PromptMessage(tr("Credentials on the device are more recent. "
+                                                 "Do you want export credentials to backup file?"),
+                                               onAccept, onReject);
+    window->showPrompt(message);
 }
 
 void DbBackupsTrackerController::exportDbBackup()
@@ -98,9 +114,7 @@ void DbBackupsTrackerController::exportDbBackup()
 
 void DbBackupsTrackerController::handleLowerDbBackupChangeNumber()
 {
-    int ret = askForExportBackup();
-    if (ret == QMessageBox::Yes)
-        exportDbBackup();
+    askForExportBackup();
 }
 
 void DbBackupsTrackerController::writeDbBackup(QString file, const QByteArray& d)
