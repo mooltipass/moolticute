@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QSettings>
 #include <QTimer>
+#include <QApplication>
 
 DbBackupsTracker::DbBackupsTracker(QObject* parent)
     : QObject(parent)
@@ -266,7 +267,7 @@ void DbBackupsTracker::refreshTracking()
 
 void DbBackupsTracker::saveTracks()
 {
-    QSettings s;
+    QSettings s(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName());
     s.beginGroup("BackupsTracks");
     for (QString k : tracks.keys())
         s.setValue(k, tracks.value(k));
@@ -278,7 +279,7 @@ void DbBackupsTracker::loadTracks()
 {
     tracks.clear();
 
-    QSettings s;
+    QSettings s(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName());
     s.beginGroup("BackupsTracks");
     for (QString k : s.allKeys())
     {

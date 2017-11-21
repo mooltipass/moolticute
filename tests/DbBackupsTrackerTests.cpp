@@ -242,8 +242,10 @@ void DbBackupsTrackerTests::trackingPersisted()
 {
     DbBackupsTracker* t = new DbBackupsTracker();
     t->setCardId("00000");
-    t->track("/tmp/file1");
+    QTemporaryFile file;
+    file.open();
 
+    t->track(file.fileName());
     t->deleteLater();
 
     t = new DbBackupsTracker();
@@ -251,4 +253,6 @@ void DbBackupsTrackerTests::trackingPersisted()
     Q_ASSERT(t->hasBackup());
 
     t->deleteLater();
+
+    file.close();
 }
