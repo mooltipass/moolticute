@@ -24,12 +24,13 @@
 #include "AppGui.h"
 #include "PasswordProfilesModel.h"
 #include "PassGenerationProfilesDialog.h"
+#include "PromptWidget.h"
 
 template <typename T>
 static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
 {
     int idx = cb->findData(QVariant::fromValue(value));
-    if(idx < 0)
+    if (idx < 0)
         idx = defaultIdx;
     cb->setCurrentIndex(idx);
 }
@@ -41,7 +42,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     bSSHKeyTabVisible(false),
     bAdvancedTabVisible(false),
     previousWidget(nullptr),
-    m_passwordProfilesModel(new PasswordProfilesModel(this))
+    m_passwordProfilesModel(new PasswordProfilesModel(this)),
+    dbBackupsTrackerController(this, client, this)
 {
     QSettings s;
     bSSHKeysTabVisibleOnDemand = s.value("settings/SSHKeysTabsVisibleOnDemand", true).toBool();
@@ -155,6 +157,15 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->pushButtonDevSettings->setChecked(false);
 
+    // DB Backups UI
+    ui->toolButton_clearBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::remove));
+    ui->toolButton_setBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::foldero));
+    ui->lineEdit_dbBackupFilePath->setText(dbBackupsTrackerController.getBackupFilePath());
+    connect(&dbBackupsTrackerController, &DbBackupsTrackerController::backupFilePathChanged, [=] (const QString &path)
+    {
+        ui->lineEdit_dbBackupFilePath->setText(path);
+    });
+
     //Add languages to combobox
     ui->comboBoxLang->addItem("en_US", ID_KEYB_EN_US_LUT);
     ui->comboBoxLang->addItem("fr_FR", ID_KEYB_FR_FR_LUT);
@@ -235,17 +246,20 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::memMgmtModeFailed, this, &MainWindow::memMgmtModeFailed);
 
-    connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial) {
+    connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial)
+    {
         setUIDRequestInstructionsWithId(serial > 0 ? QString::number(serial) : "XXXX");
     });
-    connect(wsClient, &WSClient::connectedChanged, [this] () {
+    connect(wsClient, &WSClient::connectedChanged, [this] ()
+    {
         setUIDRequestInstructionsWithId("XXXX");
     });
 
     QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{32}"), ui->UIDRequestKeyInput);
     ui->UIDRequestKeyInput->setValidator(uidKeyValidator);
     ui->UIDRequestValidateBtn->setEnabled(false);
-    connect(ui->UIDRequestKeyInput, &QLineEdit::textEdited, [this] () {
+    connect(ui->UIDRequestKeyInput, &QLineEdit::textEdited, [this] ()
+    {
         ui->UIDRequestValidateBtn->setEnabled(ui->UIDRequestKeyInput->hasAcceptableInput());
     });
 
@@ -254,8 +268,10 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->UIDRequestResultLabel->setVisible(false);
     ui->UIDRequestResultIcon->setVisible(false);
 
-    connect(ui->UIDRequestValidateBtn, &QPushButton::clicked, [this]() {
-        if(wsClient) {
+    connect(ui->UIDRequestValidateBtn, &QPushButton::clicked, [this]()
+    {
+        if (wsClient)
+        {
             wsClient->requestDeviceUID(ui->UIDRequestKeyInput->text().toUtf8());
             ui->UIDRequestResultIcon->setMovie(gb_spinner);
             ui->UIDRequestResultIcon->setVisible(true);
@@ -268,11 +284,13 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(ui->UIDRequestKeyInput, &QLineEdit::returnPressed, ui->UIDRequestValidateBtn, &QPushButton::click);
 
-    connect(wsClient, &WSClient::uidChanged, [this](qint64 uid) {
+    connect(wsClient, &WSClient::uidChanged, [this](qint64 uid)
+    {
         ui->UIDRequestResultLabel->setVisible(true);
         ui->UIDRequestResultIcon->setVisible(true);
         gb_spinner->stop();
-        if(uid <= 0) {
+        if (uid <= 0)
+        {
             ui->UIDRequestResultIcon->setPixmap(QPixmap(":/message_error.png").scaledToHeight(ui->UIDRequestResultIcon->height(), Qt::SmoothTransformation));
             ui->UIDRequestResultLabel->setText("<span style='color:#FF0000; font-weight:bold'>" + tr("Either the device have been tempered with or the input key is invalid.") + "</span>");
             return;
@@ -281,14 +299,14 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         ui->UIDRequestResultLabel->setText("<span style='color:#006400'>" + tr("Your device's UID is %1").arg(QString::number(uid, 16).toUpper()) + "</span>");
     });
 
-    connect(wsClient, &WSClient::connectedChanged, [this](bool connected) {
+    connect(wsClient, &WSClient::connectedChanged, [this](bool connected)
+    {
         ui->UIDRequestGB->setVisible(connected);
         gb_spinner->stop();
         ui->UIDRequestResultLabel->setMovie(nullptr);
         ui->UIDRequestResultLabel->setText({});
         ui->UIDRequestResultLabel->setVisible(false);
         ui->UIDRequestResultIcon->setVisible(false);
-
     });
 
 
@@ -444,6 +462,9 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
+
+    // hide widget with prompts by default
+    ui->promptWidget->setVisible(false);
 
     updateSerialInfos();
     updatePage();
@@ -799,6 +820,7 @@ void MainWindow::wantSaveCredentialManagement()
 
 void MainWindow::wantImportDatabase()
 {
+    previousWidget = ui->stackedWidget->currentWidget();
     ui->labelWait->show();
     ui->labelWait->setText(tr("<html><!--import_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Please Approve Request On Device</span></p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
@@ -810,6 +832,7 @@ void MainWindow::wantImportDatabase()
 
 void MainWindow::wantExportDatabase()
 {
+    previousWidget = ui->stackedWidget->currentWidget();
     ui->widgetHeader->setEnabled(false);
     ui->labelWait->show();
     ui->labelWait->setText(tr("<html><!--export_db_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Please Approve Request On Device</span></p></body></html>"));
@@ -818,6 +841,33 @@ void MainWindow::wantExportDatabase()
     ui->labelProgressMessage->hide();
 
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+}
+
+void MainWindow::handleBackupExported()
+{
+    ui->widgetHeader->setEnabled(true);
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+
+    ui->stackedWidget->setCurrentWidget(previousWidget);
+}
+
+void MainWindow::handleBackupImported()
+{
+    ui->widgetHeader->setEnabled(true);
+    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+
+    ui->stackedWidget->setCurrentWidget(previousWidget);
+}
+
+void MainWindow::showPrompt(PromptMessage * message)
+{
+    ui->promptWidget->setPromptMessage(message);
+    ui->promptWidget->show();
+}
+
+void MainWindow::hidePrompt()
+{
+    ui->promptWidget->hide();
 }
 
 void MainWindow::wantExitFilesManagement()
@@ -1121,7 +1171,7 @@ void MainWindow::updateTabButtons()
 	{
             if (typeid(*object) ==  typeid(QPushButton))
 	    {
-                QAbstractButton *tabButton = (QAbstractButton *) object;
+                QAbstractButton *tabButton = qobject_cast<QAbstractButton *>(object);
                 tabButton->setEnabled(enabled);
             }
         }
@@ -1246,4 +1296,25 @@ void MainWindow::retranslateUi()
 {
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
     updateSerialInfos();
+}
+
+void MainWindow::on_toolButton_clearBackupFilePath_released()
+{
+    ui->lineEdit_dbBackupFilePath->clear();
+    dbBackupsTrackerController.setBackupFilePath("");
+}
+
+void MainWindow::on_toolButton_setBackupFilePath_released()
+{
+    QFileDialog dialog(this);
+    dialog.setNameFilter(tr("Memory exports (*.bin)"));
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+
+    if (dialog.exec())
+    {
+        QStringList fileNames = dialog.selectedFiles();
+        ui->lineEdit_dbBackupFilePath->setText(fileNames.first());
+        dbBackupsTrackerController.setBackupFilePath(fileNames.first());
+    }
 }

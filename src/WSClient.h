@@ -119,6 +119,7 @@ signals:
     void dbImported(bool success, QString message);
     void memMgmtModeFailed(int errCode, QString errMsg);
     void filesCacheChanged();
+    void cardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

@@ -42,7 +42,10 @@ SOURCES += src/main_gui.cpp \
     src/RootItem.cpp \
     src/AnimatedColorButton.cpp \
     src/PasswordProfilesModel.cpp \
-    src/PassGenerationProfilesDialog.cpp
+    src/PassGenerationProfilesDialog.cpp \
+    src/DbBackupsTracker.cpp \
+    src/DbBackupsTrackerController.cpp \
+    src/PromptWidget.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -72,7 +75,10 @@ HEADERS  += src/MainWindow.h \
     src/CredentialModelFilter.h \
     src/AnimatedColorButton.h \
     src/PasswordProfilesModel.h \
-    src/PassGenerationProfilesDialog.h
+    src/PassGenerationProfilesDialog.h \
+    src/DbBackupsTracker.h \
+    src/DbBackupsTrackerController.h \
+    src/PromptWidget.h
 
 mac {
     HEADERS += src/MacUtils.h

@@ -24,12 +24,14 @@
 #include <QtAwesome.h>
 #include "WindowLog.h"
 
+#include <DbBackupsTrackerController.h>
+
 namespace Ui {
 class MainWindow;
 }
 class QShortcut;
 class PasswordProfilesModel;
-
+class PromptMessage;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -45,6 +47,14 @@ public:
 signals:
     void windowCloseRequested();
 
+public slots:
+    void wantImportDatabase();
+    void wantExportDatabase();
+    void handleBackupExported();
+    void handleBackupImported();
+    void showPrompt(PromptMessage * message);
+    void hidePrompt();
+
 private slots:
     void enableCredentialsManagement(bool enable);
     void updateTabButtons();
@@ -55,8 +65,6 @@ private slots:
     void wantEnterCredentialManagement();
     void wantSaveCredentialManagement();
     void wantExitFilesManagement();
-    void wantImportDatabase();
-    void wantExportDatabase();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
@@ -93,6 +101,10 @@ private slots:
 
     void on_pushButtonCheckUpdate_clicked();
 
+    void on_toolButton_clearBackupFilePath_released();
+
+    void on_toolButton_setBackupFilePath_released();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -127,6 +139,7 @@ private:
     QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;
     PasswordProfilesModel *m_passwordProfilesModel;
+    DbBackupsTrackerController dbBackupsTrackerController;
 };
 
 #endif // MAINWINDOW_H

@@ -74,6 +74,7 @@ private slots:
     void sendDeviceUID();
     void sendFilesCache();
 
+    void sendCardDbMetadata();
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
 

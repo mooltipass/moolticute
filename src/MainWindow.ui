@@ -489,7 +489,7 @@ QWidget {background-color: #EFEFEF;}</string>
              <x>0</x>
              <y>0</y>
              <width>836</width>
-             <height>665</height>
+             <height>684</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1099,24 +1099,9 @@ QWidget {background-color: #EFEFEF;}</string>
          <number>50</number>
         </property>
         <item>
-         <layout class="QFormLayout" name="formLayout">
+         <layout class="QGridLayout" name="gridLayout_2">
           <property name="sizeConstraint">
            <enum>QLayout::SetNoConstraint</enum>
-          </property>
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-          </property>
-          <property name="labelAlignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="formAlignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="horizontalSpacing">
-           <number>60</number>
-          </property>
-          <property name="verticalSpacing">
-           <number>40</number>
           </property>
           <property name="leftMargin">
            <number>60</number>
@@ -1126,6 +1111,12 @@ QWidget {background-color: #EFEFEF;}</string>
           </property>
           <property name="rightMargin">
            <number>60</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>60</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>30</number>
           </property>
           <item row="0" column="0">
            <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1285,6 +1276,31 @@ QWidget {background-color: #EFEFEF;}</string>
             </item>
            </layout>
           </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="pushButtonImportFile">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Import from file</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="0">
            <layout class="QVBoxLayout" name="verticalLayout_18">
             <property name="sizeConstraint">
@@ -1365,30 +1381,91 @@ QWidget {background-color: #EFEFEF;}</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="pushButtonImportFile">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+          <item row="3" column="0">
+           <layout class="QVBoxLayout" name="verticalLayout_27" stretch="0,0,0">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
             </property>
-            <property name="minimumSize">
-             <size>
-              <width>150</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>200</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Import from file</string>
-            </property>
-           </widget>
+            <item>
+             <widget class="QLabel" name="label_10">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Database Backup</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_11">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Keep your database backup synchronized with the card database.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_32">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <item>
+               <widget class="QLineEdit" name="lineEdit_dbBackupFilePath">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>300</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+                <property name="placeholderText">
+                 <string>Backup file path</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="toolButton_clearBackupFilePath">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="toolButton_setBackupFilePath">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
@@ -2675,6 +2752,16 @@ QWidget {background-color: #EFEFEF;}</string>
       </widget>
      </widget>
     </item>
+    <item>
+     <widget class="PromptWidget" name="promptWidget">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
@@ -2702,6 +2789,12 @@ QWidget {background-color: #EFEFEF;}</string>
    <class>FilesManagement</class>
    <extends>QWidget</extends>
    <header>FilesManagement.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PromptWidget</class>
+   <extends>QFrame</extends>
+   <header>PromptWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
