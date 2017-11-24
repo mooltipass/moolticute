@@ -7,7 +7,8 @@
 
 #include "Common.h"
 
-PromptWidget::PromptWidget(QWidget *parent) : QFrame(parent),
+PromptWidget::PromptWidget(QWidget *parent) :
+    QFrame(parent),
     m_hideAfterAccepted(true),
     m_messageLabel(new QLabel),
     m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No)),
@@ -21,7 +22,7 @@ PromptWidget::PromptWidget(QWidget *parent) : QFrame(parent),
     lay->addWidget(m_buttonBox);
     lay->addStretch();
 
-    for(auto btn : m_buttonBox->buttons())
+    for (auto btn : m_buttonBox->buttons())
         btn->setStyleSheet(CSS_BLUE_BUTTON);
     setStyleSheet("PromptWidget {border: 5px solid #60B1C7;}");
 
@@ -48,13 +49,13 @@ void PromptWidget::setPromptMessage(PromptMessage *promptMessage)
 
     m_promptMessage = promptMessage;
 
-    if(m_promptMessage)
+    if (m_promptMessage)
         m_messageLabel->setText(m_promptMessage->getText());
 }
 
 void PromptWidget::cleanPromptMessage()
 {
-    if(m_promptMessage)
+    if (m_promptMessage)
     {
         delete m_promptMessage;
         m_promptMessage = nullptr;
@@ -63,10 +64,10 @@ void PromptWidget::cleanPromptMessage()
 
 void PromptWidget::onAccepted()
 {
-    if(m_hideAfterAccepted)
+    if (m_hideAfterAccepted)
         hide();
 
-    if(m_promptMessage)
+    if (m_promptMessage)
         m_promptMessage->runAcceptCallBack();
 
     emit accepted();
@@ -74,7 +75,7 @@ void PromptWidget::onAccepted()
 
 void PromptWidget::onRejected()
 {
-    if(m_promptMessage)
+    if (m_promptMessage)
         m_promptMessage->runRejectCallBack();
 
     emit rejected();

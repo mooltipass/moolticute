@@ -12,30 +12,30 @@ class DbBackupsTrackerNoCardIdSet : public QException
 {
 public:
     void raise() const;
-    DbBackupsTrackerNoCardIdSet* clone() const;
+    DbBackupsTrackerNoCardIdSet *clone() const;
 };
 
 class DbBackupsTrackerNoBackupFileSet : public QException
 {
 public:
     void raise() const;
-    DbBackupsTrackerNoBackupFileSet* clone() const;
+    DbBackupsTrackerNoBackupFileSet *clone() const;
 };
 
 class DbBackupsTracker : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString cardId READ getCardId WRITE setCardId NOTIFY cardIdChanged)
-    Q_PROPERTY(
-        int credentialsDbChangeNumber READ getCredentialsDbChangeNumber WRITE
-            setCredentialsDbChangeNumber NOTIFY credentialsDbChangeNumberChanged)
-    Q_PROPERTY(int dataDbChangeNumber READ getDataDbChangeNumber WRITE
-            setDataDbChangeNumber NOTIFY dataDbChangeNumberChanged)
+    Q_PROPERTY(int credentialsDbChangeNumber READ getCredentialsDbChangeNumber
+               WRITE setCredentialsDbChangeNumber NOTIFY credentialsDbChangeNumberChanged)
+    Q_PROPERTY(int dataDbChangeNumber READ getDataDbChangeNumber
+               WRITE setDataDbChangeNumber NOTIFY dataDbChangeNumberChanged)
+
 public:
-    explicit DbBackupsTracker(QObject* parent = nullptr);
+    explicit DbBackupsTracker(QObject *parent = nullptr);
     ~DbBackupsTracker();
 
-    QString getTrackPath(const QString& cardId) const;
+    QString getTrackPath(const QString &cardId) const;
     QString getCardId() const;
 
     int getCredentialsDbChangeNumber() const;
@@ -61,7 +61,7 @@ public:
 signals:
     void cardIdChanged(QString cardId);
     void credentialsDbChangeNumberChanged(int credentialsDbChangeNumber);
-    void newTrack(const QString& cardId, const QString& path);
+    void newTrack(const QString &cardId, const QString &path);
 
     void greaterDbBackupChangeNumber();
     void lowerDbBackupChangeNumber();
@@ -79,27 +79,32 @@ protected slots:
     void checkDbBackupSynchronization();
 
 private:
-    void saveTracks();
-    void loadTracks();
-    QString getSettingsFilePath();
     QFileSystemWatcher watcher;
     QMap<QString, QString> tracks;
     QString cardId;
     int credentialsDbChangeNumber;
     int dataDbChangeNumber;
+
+    void saveTracks();
+    void loadTracks();
+    QString getSettingsFilePath();
+
     int tryGetCredentialsDbBackupChangeNumber() const;
     int tryGetDataDbBackupChangeNumber() const;
     void watchPath(const QString path);
     QString tryReadBackupFile() const;
     QString readFile(QString path) const;
-    int extractCredentialsDbChangeNumber(const QString& content) const;
-    int extractDataDbChangeNumber(const QString& content) const;
+
+    int extractCredentialsDbChangeNumber(const QString &content) const;
+    int extractDataDbChangeNumber(const QString &content) const;
+
     bool isALegacyBackup(const QJsonDocument &d) const;
     bool isAnEncryptedBackup(const QJsonDocument &d) const;
-    int extractCredentialsDbChangeNumberEncryptedBackup(QJsonDocument d) const;
-    int extractCredentialsDbChangeNumberLegacyBackup(QJsonDocument d) const;
-    int extractDataDbChangeNumberEncryptedBackup(QJsonDocument d) const;
-    int extractDataDbChangeNumberLegacyBackup(QJsonDocument d) const;
+
+    int extractCredentialsDbChangeNumberEncryptedBackup(const QJsonDocument &d) const;
+    int extractCredentialsDbChangeNumberLegacyBackup(const QJsonDocument &d) const;
+    int extractDataDbChangeNumberEncryptedBackup(const QJsonDocument &d) const;
+    int extractDataDbChangeNumberLegacyBackup(const QJsonDocument &d) const;
 };
 
 #endif // DBBACKUPSTRACKER_H

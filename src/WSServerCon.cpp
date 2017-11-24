@@ -931,7 +931,9 @@ void WSServerCon::sendCardDbMetadata()
     {
         qDebug() << "There is no card data to be send.";
         return;
-    } else {
+    }
+    else
+    {
         QCryptographicHash hash(QCryptographicHash::Sha256);
         hash.addData("mooltipass");
         hash.addData(cpz);

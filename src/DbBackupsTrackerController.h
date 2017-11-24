@@ -8,40 +8,42 @@
 
 class WSClient;
 class MainWindow;
+
 class DbBackupsTrackerController : public QObject
 {
     Q_OBJECT
 public:
-    explicit DbBackupsTrackerController(MainWindow* window,
-        WSClient* wsClient,
-        QObject* parent = nullptr);
+    explicit DbBackupsTrackerController(MainWindow *window,
+                                        WSClient *wsClient,
+                                        QObject *parent = nullptr);
 
     QString getBackupFilePath();
+
 signals:
-    void backupFilePathChanged(const QString& path);
+    void backupFilePathChanged(const QString &path);
 
 public slots:
-    void setBackupFilePath(const QString& path);
+    void setBackupFilePath(const QString &path);
 
 protected slots:
     void handleCardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void handleGreaterDbBackupChangeNumber();
     void handleLowerDbBackupChangeNumber();
-    void handleExportDbResult(const QByteArray& d, bool success);
-    void handleNewTrack(const QString& cardId, const QString& path);
-    void handleDeviceStatusChanged(const Common::MPStatus& status);
+    void handleExportDbResult(const QByteArray &d, bool success);
+    void handleNewTrack(const QString &cardId, const QString &path);
+    void handleDeviceStatusChanged(const Common::MPStatus &status);
 
 private:
     DbBackupsTracker dbBackupsTracker;
-    MainWindow* window;
-    WSClient* wsClient;
+    MainWindow *window;
+    WSClient *wsClient;
 
     void askForImportBackup();
     void askForExportBackup();
     QString readDbBackupFile();
     void importDbBackup(QString data);
     void exportDbBackup();
-    void writeDbBackup(QString file, const QByteArray& d);
+    void writeDbBackup(QString file, const QByteArray &d);
 };
 
 #endif // DBBACKUPSTRACKERCONTROLLER_H

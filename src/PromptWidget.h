@@ -13,8 +13,8 @@ class QDialogButtonBox;
 //! Class for handling message that will be visible in PromptWidget and
 //! callback function that will be called after widget is accepted
 
-class PromptMessage{
-
+class PromptMessage
+{
 public:
     PromptMessage(const QString &text,
                   std::function<void()> acceptCallBack = nullptr,
@@ -25,8 +25,8 @@ public:
     {}
 
     QString getText() const { return m_text; }
-    void runAcceptCallBack() { if(m_acceptCallBack) m_acceptCallBack(); }
-    void runRejectCallBack() { if(m_rejectCallBack) m_rejectCallBack(); }
+    void runAcceptCallBack() { if (m_acceptCallBack) m_acceptCallBack(); }
+    void runRejectCallBack() { if (m_rejectCallBack) m_rejectCallBack(); }
 
 private:
     QString m_text;

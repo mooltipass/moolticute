@@ -30,7 +30,7 @@ template <typename T>
 static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
 {
     int idx = cb->findData(QVariant::fromValue(value));
-    if(idx < 0)
+    if (idx < 0)
         idx = defaultIdx;
     cb->setCurrentIndex(idx);
 }
@@ -161,7 +161,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->toolButton_clearBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::remove));
     ui->toolButton_setBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::foldero));
     ui->lineEdit_dbBackupFilePath->setText(dbBackupsTrackerController.getBackupFilePath());
-    connect(&dbBackupsTrackerController, &DbBackupsTrackerController::backupFilePathChanged, [=] (const QString &path) {
+    connect(&dbBackupsTrackerController, &DbBackupsTrackerController::backupFilePathChanged, [=] (const QString &path)
+    {
         ui->lineEdit_dbBackupFilePath->setText(path);
     });
 
@@ -245,17 +246,20 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(wsClient, &WSClient::memMgmtModeFailed, this, &MainWindow::memMgmtModeFailed);
 
-    connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial) {
+    connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial)
+    {
         setUIDRequestInstructionsWithId(serial > 0 ? QString::number(serial) : "XXXX");
     });
-    connect(wsClient, &WSClient::connectedChanged, [this] () {
+    connect(wsClient, &WSClient::connectedChanged, [this] ()
+    {
         setUIDRequestInstructionsWithId("XXXX");
     });
 
     QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{32}"), ui->UIDRequestKeyInput);
     ui->UIDRequestKeyInput->setValidator(uidKeyValidator);
     ui->UIDRequestValidateBtn->setEnabled(false);
-    connect(ui->UIDRequestKeyInput, &QLineEdit::textEdited, [this] () {
+    connect(ui->UIDRequestKeyInput, &QLineEdit::textEdited, [this] ()
+    {
         ui->UIDRequestValidateBtn->setEnabled(ui->UIDRequestKeyInput->hasAcceptableInput());
     });
 
@@ -264,8 +268,10 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->UIDRequestResultLabel->setVisible(false);
     ui->UIDRequestResultIcon->setVisible(false);
 
-    connect(ui->UIDRequestValidateBtn, &QPushButton::clicked, [this]() {
-        if(wsClient) {
+    connect(ui->UIDRequestValidateBtn, &QPushButton::clicked, [this]()
+    {
+        if (wsClient)
+        {
             wsClient->requestDeviceUID(ui->UIDRequestKeyInput->text().toUtf8());
             ui->UIDRequestResultIcon->setMovie(gb_spinner);
             ui->UIDRequestResultIcon->setVisible(true);
@@ -278,11 +284,13 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     connect(ui->UIDRequestKeyInput, &QLineEdit::returnPressed, ui->UIDRequestValidateBtn, &QPushButton::click);
 
-    connect(wsClient, &WSClient::uidChanged, [this](qint64 uid) {
+    connect(wsClient, &WSClient::uidChanged, [this](qint64 uid)
+    {
         ui->UIDRequestResultLabel->setVisible(true);
         ui->UIDRequestResultIcon->setVisible(true);
         gb_spinner->stop();
-        if(uid <= 0) {
+        if (uid <= 0)
+        {
             ui->UIDRequestResultIcon->setPixmap(QPixmap(":/message_error.png").scaledToHeight(ui->UIDRequestResultIcon->height(), Qt::SmoothTransformation));
             ui->UIDRequestResultLabel->setText("<span style='color:#FF0000; font-weight:bold'>" + tr("Either the device have been tempered with or the input key is invalid.") + "</span>");
             return;
@@ -291,14 +299,14 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
         ui->UIDRequestResultLabel->setText("<span style='color:#006400'>" + tr("Your device's UID is %1").arg(QString::number(uid, 16).toUpper()) + "</span>");
     });
 
-    connect(wsClient, &WSClient::connectedChanged, [this](bool connected) {
+    connect(wsClient, &WSClient::connectedChanged, [this](bool connected)
+    {
         ui->UIDRequestGB->setVisible(connected);
         gb_spinner->stop();
         ui->UIDRequestResultLabel->setMovie(nullptr);
         ui->UIDRequestResultLabel->setText({});
         ui->UIDRequestResultLabel->setVisible(false);
         ui->UIDRequestResultIcon->setVisible(false);
-
     });
 
 
@@ -1163,7 +1171,7 @@ void MainWindow::updateTabButtons()
 	{
             if (typeid(*object) ==  typeid(QPushButton))
 	    {
-                QAbstractButton *tabButton = (QAbstractButton *) object;
+                QAbstractButton *tabButton = qobject_cast<QAbstractButton *>(object);
                 tabButton->setEnabled(enabled);
             }
         }
@@ -1303,7 +1311,8 @@ void MainWindow::on_toolButton_setBackupFilePath_released()
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::ExistingFile);
 
-    if (dialog.exec()) {
+    if (dialog.exec())
+    {
         QStringList fileNames = dialog.selectedFiles();
         ui->lineEdit_dbBackupFilePath->setText(fileNames.first());
         dbBackupsTrackerController.setBackupFilePath(fileNames.first());

@@ -12,30 +12,29 @@
 #include <QDir>
 #include <QStandardPaths>
 
-DbBackupsTracker::DbBackupsTracker(QObject* parent)
-    : QObject(parent)
+DbBackupsTracker::DbBackupsTracker(QObject* parent):
+    QObject(parent)
 {
     loadTracks();
 
-    connect(&watcher, &QFileSystemWatcher::fileChanged, [=] (const QString &path) {
+    connect(&watcher, &QFileSystemWatcher::fileChanged, [=] (const QString &path)
+    {
         qDebug () << "FILE CHANGED" << path;
     });
-    connect(&watcher, &QFileSystemWatcher::fileChanged, this,
-        &DbBackupsTracker::checkDbBackupSynchronization);
+    connect(&watcher, &QFileSystemWatcher::fileChanged,
+            this, &DbBackupsTracker::checkDbBackupSynchronization);
 }
 
 DbBackupsTracker::~DbBackupsTracker()
 {
 }
 
-QString
-DbBackupsTracker::getTrackPath(const QString& cardId) const
+QString DbBackupsTracker::getTrackPath(const QString& cardId) const
 {
     return tracks.value(cardId, "");
 }
 
-QString
-DbBackupsTracker::getCardId() const
+QString DbBackupsTracker::getCardId() const
 {
     return cardId;
 }
@@ -45,8 +44,7 @@ int DbBackupsTracker::getCredentialsDbChangeNumber() const
     return credentialsDbChangeNumber;
 }
 
-QString
-DbBackupsTracker::readFile(QString path) const
+QString DbBackupsTracker::readFile(QString path) const
 {
     QString content;
     QFile f(path);
@@ -59,8 +57,7 @@ DbBackupsTracker::readFile(QString path) const
     return content;
 }
 
-int DbBackupsTracker::extractCredentialsDbChangeNumberEncryptedBackup(
-    QJsonDocument d) const
+int DbBackupsTracker::extractCredentialsDbChangeNumberEncryptedBackup(const QJsonDocument &d) const
 {
     QJsonObject root = d.object();
     if (root.contains("credentialsDbChangeNumber"))
@@ -69,8 +66,7 @@ int DbBackupsTracker::extractCredentialsDbChangeNumberEncryptedBackup(
     return 0;
 }
 
-int DbBackupsTracker::extractCredentialsDbChangeNumberLegacyBackup(
-    QJsonDocument d) const
+int DbBackupsTracker::extractCredentialsDbChangeNumberLegacyBackup(const QJsonDocument &d) const
 {
     QJsonArray root = d.array();
     QJsonValue val = root.at(root.size() - 3);
@@ -80,7 +76,7 @@ int DbBackupsTracker::extractCredentialsDbChangeNumberLegacyBackup(
     return 0;
 }
 
-int DbBackupsTracker::extractCredentialsDbChangeNumber(const QString& content) const
+int DbBackupsTracker::extractCredentialsDbChangeNumber(const QString &content) const
 {
     int cn = 0;
     QJsonDocument d = QJsonDocument::fromJson(content.toLocal8Bit());
@@ -92,8 +88,7 @@ int DbBackupsTracker::extractCredentialsDbChangeNumber(const QString& content) c
     return cn;
 }
 
-int DbBackupsTracker::extractDataDbChangeNumberEncryptedBackup(
-    QJsonDocument d) const
+int DbBackupsTracker::extractDataDbChangeNumberEncryptedBackup(const QJsonDocument &d) const
 {
     QJsonObject root = d.object();
     if (root.contains("dataDbChangeNumber"))
@@ -112,7 +107,7 @@ bool DbBackupsTracker::isAnEncryptedBackup(const QJsonDocument &d) const
     return d.isObject();
 }
 
-int DbBackupsTracker::extractDataDbChangeNumberLegacyBackup(QJsonDocument d) const
+int DbBackupsTracker::extractDataDbChangeNumberLegacyBackup(const QJsonDocument &d) const
 {
     QJsonArray root = d.array();
     QJsonValue val = root.at(root.size() - 2);
@@ -122,7 +117,7 @@ int DbBackupsTracker::extractDataDbChangeNumberLegacyBackup(QJsonDocument d) con
     return 0;
 }
 
-int DbBackupsTracker::extractDataDbChangeNumber(const QString& content) const
+int DbBackupsTracker::extractDataDbChangeNumber(const QString &content) const
 {
     int cn = 0;
     QJsonDocument d = QJsonDocument::fromJson(content.toLocal8Bit());
@@ -153,7 +148,8 @@ bool DbBackupsTracker::isUpdateRequired() const
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
         return (backupCCN > credentialsDbChangeNumber || backupDCN > dataDbChangeNumber);
-    } catch (DbBackupsTrackerNoBackupFileSet)
+    }
+    catch (DbBackupsTrackerNoBackupFileSet)
     {
         return false;
     }
@@ -168,7 +164,8 @@ bool DbBackupsTracker::isBackupRequired() const
 
         return (backupCCN < credentialsDbChangeNumber || backupDCN < dataDbChangeNumber);
 
-    } catch (DbBackupsTrackerNoBackupFileSet)
+    }
+    catch (DbBackupsTrackerNoBackupFileSet)
     {
         return false;
     }
@@ -186,6 +183,7 @@ QString DbBackupsTracker::getTrackedBackupFileFormat()
 {
     QString content = tryReadBackupFile();
     QJsonDocument d = QJsonDocument::fromJson(content.toLocal8Bit());
+
     if (isALegacyBackup(d))
         return "none";
 
@@ -218,8 +216,11 @@ QString DbBackupsTracker::tryReadBackupFile() const
     {
         DbBackupsTrackerNoBackupFileSet ex;
         ex.raise();
-    } else
+    }
+    else
+    {
         return readFile(path);
+    }
 
     return "";
 }
@@ -230,7 +231,8 @@ void DbBackupsTracker::track(const QString path)
     {
         DbBackupsTrackerNoCardIdSet ex;
         ex.raise();
-    } else
+    }
+    else
     {
         watchPath(path);
 
@@ -281,7 +283,8 @@ void DbBackupsTracker::checkDbBackupSynchronization()
 
         if (backupCCN < credentialsDbChangeNumber || backupDCN < dataDbChangeNumber)
             emit lowerDbBackupChangeNumber();
-    } catch (DbBackupsTrackerNoBackupFileSet)
+    }
+    catch (DbBackupsTrackerNoBackupFileSet)
     {
         qDebug() << "No backup file for  " << cardId;
     }
@@ -343,22 +346,20 @@ QString DbBackupsTracker::getSettingsFilePath()
 
 void DbBackupsTrackerNoCardIdSet::raise() const
 {
-    throw * this;
+    throw *this;
 }
 
-DbBackupsTrackerNoCardIdSet*
-DbBackupsTrackerNoCardIdSet::clone() const
+DbBackupsTrackerNoCardIdSet *DbBackupsTrackerNoCardIdSet::clone() const
 {
     return new DbBackupsTrackerNoCardIdSet(*this);
 }
 
 void DbBackupsTrackerNoBackupFileSet::raise() const
 {
-    throw * this;
+    throw *this;
 }
 
-DbBackupsTrackerNoBackupFileSet*
-DbBackupsTrackerNoBackupFileSet::clone() const
+DbBackupsTrackerNoBackupFileSet *DbBackupsTrackerNoBackupFileSet::clone() const
 {
     return new DbBackupsTrackerNoBackupFileSet(*this);
 }
