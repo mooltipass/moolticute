@@ -111,8 +111,18 @@ void DbBackupsTrackerController::exportDbBackup()
     connect(wsClient, &WSClient::dbExported, this,
         &DbBackupsTrackerController::handleExportDbResult);
 
+    QString format;
+    try
+    {
+        format = dbBackupsTracker.getTrackedBackupFileFormat();
+    } catch (DbBackupsTrackerNoBackupFileSet)
+    {
+        format = "SympleCrypt";
+    }
+
+
     window->wantExportDatabase();
-    wsClient->exportDbFile("SimpleCrypt");
+    wsClient->exportDbFile(format);
 }
 
 void DbBackupsTrackerController::handleLowerDbBackupChangeNumber()

@@ -28,6 +28,9 @@ private slots:
     void trackLegacyDbBackupWithMinorDataDbChangeNumber();
     void trackingPersisted();
 
+    void getFileFormatLegacy();
+    void getFileFormatSympleCrypt();
+
 private:
     DbBackupsTracker tracker;
     QString getTestsDataDirPath();

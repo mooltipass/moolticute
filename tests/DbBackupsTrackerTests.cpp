@@ -85,7 +85,6 @@ void DbBackupsTrackerTests::trackEncryptedDbBackMajorCredentialsDbChangeNumber()
     } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
-
     QCOMPARE(spy.count(), 1);
     Q_ASSERT(tracker.isUpdateRequired());
 }
@@ -169,7 +168,6 @@ void DbBackupsTrackerTests::trackLegacyDbBackupWithMajorChangeNumber()
     } catch (DbBackupsTrackerNoCardIdSet& e) {
         QFAIL("DbBackupsTracker No Cpz Set");
     }
-
     QCOMPARE(spy.count(), 1);
     Q_ASSERT(tracker.isUpdateRequired());
 }
@@ -255,4 +253,26 @@ void DbBackupsTrackerTests::trackingPersisted()
     t->deleteLater();
 
     file.close();
+}
+
+void DbBackupsTrackerTests::getFileFormatLegacy()
+{
+    DbBackupsTracker* t = new DbBackupsTracker();
+    t->setCardId("00000");
+    QString file = getTestsDataDirPath() + "tests_legacy_backups";
+    t->track(file);
+
+    QCOMPARE(QString("none"), t->getTrackedBackupFileFormat());
+    t->deleteLater();
+}
+
+void DbBackupsTrackerTests::getFileFormatSympleCrypt()
+{
+    DbBackupsTracker* t = new DbBackupsTracker();
+    t->setCardId("00000");
+    QString file = getTestsDataDirPath() + "tests_backup";
+    t->track(file);
+
+    QCOMPARE(QString("SympleCrypt"), t->getTrackedBackupFileFormat());
+    t->deleteLater();
 }

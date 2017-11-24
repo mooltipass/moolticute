@@ -39,13 +39,24 @@ public:
     QString getCardId() const;
 
     int getCredentialsDbChangeNumber() const;
-    int tryGetCredentialsDbBackupChangeNumber() const;
-    int tryGetDataDbBackupChangeNumber() const;
     int getDataDbChangeNumber() const;
 
+    /**
+     * throws: DbBackupsTrackerNoBackupFileSet
+     */
     bool isUpdateRequired() const;
+    /**
+     * throws: DbBackupsTrackerNoBackupFileSet
+     */
     bool isBackupRequired() const;
     bool hasBackup() const;
+
+    /**
+     * Guess the current tracked backup file format,
+     * currently suported: "none" and "SympleCrypt"
+     * throws: DbBackupsTrackerNoBackupFileSet
+     */
+    QString getTrackedBackupFileFormat();
 
 signals:
     void cardIdChanged(QString cardId);
@@ -76,10 +87,15 @@ private:
     QString cardId;
     int credentialsDbChangeNumber;
     int dataDbChangeNumber;
+    int tryGetCredentialsDbBackupChangeNumber() const;
+    int tryGetDataDbBackupChangeNumber() const;
     void watchPath(const QString path);
+    QString tryReadBackupFile() const;
     QString readFile(QString path) const;
     int extractCredentialsDbChangeNumber(const QString& content) const;
     int extractDataDbChangeNumber(const QString& content) const;
+    bool isALegacyBackup(const QJsonDocument &d) const;
+    bool isAnEncryptedBackup(const QJsonDocument &d) const;
     int extractCredentialsDbChangeNumberEncryptedBackup(QJsonDocument d) const;
     int extractCredentialsDbChangeNumberLegacyBackup(QJsonDocument d) const;
     int extractDataDbChangeNumberEncryptedBackup(QJsonDocument d) const;

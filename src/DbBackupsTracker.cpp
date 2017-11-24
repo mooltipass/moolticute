@@ -84,10 +84,10 @@ int DbBackupsTracker::extractCredentialsDbChangeNumber(const QString& content) c
 {
     int cn = 0;
     QJsonDocument d = QJsonDocument::fromJson(content.toLocal8Bit());
-    if (d.isObject())
-        cn = extractCredentialsDbChangeNumberEncryptedBackup(d);
-    else if (d.isArray())
+    if (isALegacyBackup(d))
         cn = extractCredentialsDbChangeNumberLegacyBackup(d);
+    else if (isAnEncryptedBackup(d))
+        cn = extractCredentialsDbChangeNumberEncryptedBackup(d);
 
     return cn;
 }
@@ -100,6 +100,16 @@ int DbBackupsTracker::extractDataDbChangeNumberEncryptedBackup(
         return root.value("dataDbChangeNumber").toInt();
 
     return 0;
+}
+
+bool DbBackupsTracker::isALegacyBackup(const QJsonDocument &d) const
+{
+    return d.isArray();
+}
+
+bool DbBackupsTracker::isAnEncryptedBackup(const QJsonDocument &d) const
+{
+    return d.isObject();
 }
 
 int DbBackupsTracker::extractDataDbChangeNumberLegacyBackup(QJsonDocument d) const
@@ -125,17 +135,8 @@ int DbBackupsTracker::extractDataDbChangeNumber(const QString& content) const
 
 int DbBackupsTracker::tryGetCredentialsDbBackupChangeNumber() const
 {
-    QString path = getTrackPath(cardId);
-    if (path.isEmpty())
-    {
-        DbBackupsTrackerNoBackupFileSet ex;
-        ex.raise();
-
-        return 0;
-    } else {
-        QString content = readFile(path);
-        return extractCredentialsDbChangeNumber(content);
-    }
+    QString content = tryReadBackupFile();
+    return extractCredentialsDbChangeNumber(content);
 }
 
 int DbBackupsTracker::getDataDbChangeNumber() const
@@ -181,21 +182,23 @@ bool DbBackupsTracker::hasBackup() const
     return false;
 }
 
+QString DbBackupsTracker::getTrackedBackupFileFormat()
+{
+    QString content = tryReadBackupFile();
+    QJsonDocument d = QJsonDocument::fromJson(content.toLocal8Bit());
+    if (isALegacyBackup(d))
+        return "none";
+
+    if (isAnEncryptedBackup(d))
+        return "SympleCrypt";
+
+    return "none";
+}
+
 int DbBackupsTracker::tryGetDataDbBackupChangeNumber() const
 {
-    QString path = getTrackPath(cardId);
-    if (path.isEmpty())
-    {
-        DbBackupsTrackerNoBackupFileSet ex;
-        ex.raise();
-
-        return 0;
-    } else
-    {
-        QString content = readFile(path);
-
-        return extractDataDbChangeNumber(content);
-    }
+    QString content = tryReadBackupFile();
+    return extractDataDbChangeNumber(content);
 }
 
 void DbBackupsTracker::watchPath(const QString path)
@@ -206,6 +209,19 @@ void DbBackupsTracker::watchPath(const QString path)
 
     qDebug() << "Watching path " << path;
     watcher.addPath(path);
+}
+
+QString DbBackupsTracker::tryReadBackupFile() const
+{
+    QString path = getTrackPath(cardId);
+    if (path.isEmpty())
+    {
+        DbBackupsTrackerNoBackupFileSet ex;
+        ex.raise();
+    } else
+        return readFile(path);
+
+    return "";
 }
 
 void DbBackupsTracker::track(const QString path)
