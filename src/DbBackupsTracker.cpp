@@ -50,7 +50,8 @@ DbBackupsTracker::readFile(QString path) const
 {
     QString content;
     QFile f(path);
-    if (f.exists()) {
+    if (f.exists())
+    {
         f.open(QIODevice::ReadOnly);
         content = f.readAll();
     }
@@ -125,7 +126,8 @@ int DbBackupsTracker::extractDataDbChangeNumber(const QString& content) const
 int DbBackupsTracker::tryGetCredentialsDbBackupChangeNumber() const
 {
     QString path = getTrackPath(cardId);
-    if (path.isEmpty()) {
+    if (path.isEmpty())
+    {
         DbBackupsTrackerNoBackupFileSet ex;
         ex.raise();
 
@@ -143,26 +145,30 @@ int DbBackupsTracker::getDataDbChangeNumber() const
 
 bool DbBackupsTracker::isUpdateRequired() const
 {
-    try {
+    try
+    {
 
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
         return (backupCCN > credentialsDbChangeNumber || backupDCN > dataDbChangeNumber);
-    } catch (DbBackupsTrackerNoBackupFileSet) {
+    } catch (DbBackupsTrackerNoBackupFileSet)
+    {
         return false;
     }
 }
 
 bool DbBackupsTracker::isBackupRequired() const
 {
-    try {
+    try
+    {
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
         return (backupCCN < credentialsDbChangeNumber || backupDCN < dataDbChangeNumber);
 
-    } catch (DbBackupsTrackerNoBackupFileSet) {
+    } catch (DbBackupsTrackerNoBackupFileSet)
+    {
         return false;
     }
 }
@@ -178,12 +184,14 @@ bool DbBackupsTracker::hasBackup() const
 int DbBackupsTracker::tryGetDataDbBackupChangeNumber() const
 {
     QString path = getTrackPath(cardId);
-    if (path.isEmpty()) {
+    if (path.isEmpty())
+    {
         DbBackupsTrackerNoBackupFileSet ex;
         ex.raise();
 
         return 0;
-    } else {
+    } else
+    {
         QString content = readFile(path);
 
         return extractDataDbChangeNumber(content);
@@ -202,10 +210,12 @@ void DbBackupsTracker::watchPath(const QString path)
 
 void DbBackupsTracker::track(const QString path)
 {
-    if (cardId.isEmpty()) {
+    if (cardId.isEmpty())
+    {
         DbBackupsTrackerNoCardIdSet ex;
         ex.raise();
-    } else {
+    } else
+    {
         watchPath(path);
 
         tracks.insert(cardId, path);

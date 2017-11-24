@@ -3,10 +3,12 @@
 #include <QMessageBox>
 
 #include "MainWindow.h"
-#include "WSClient.h"
 #include "PromptWidget.h"
+#include "WSClient.h"
 
-DbBackupsTrackerController::DbBackupsTrackerController(MainWindow* window, WSClient* wsClient, QObject* parent)
+DbBackupsTrackerController::DbBackupsTrackerController(MainWindow* window,
+    WSClient* wsClient,
+    QObject* parent)
     : QObject(parent)
 {
     Q_ASSERT(window != nullptr);
@@ -15,26 +17,30 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow* window, WSCli
     this->window = window;
     this->wsClient = wsClient;
 
-    connect(wsClient, &WSClient::cardDbMetadataChanged, this, &DbBackupsTrackerController::handleCardDbMetadataChanged);
-    connect(wsClient, &WSClient::statusChanged, this, &DbBackupsTrackerController::handleDeviceStatusChanged);
-    connect(&dbBackupsTracker, &DbBackupsTracker::greaterDbBackupChangeNumber, this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
-    connect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber, this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
-    connect(&dbBackupsTracker, &DbBackupsTracker::newTrack, this, &DbBackupsTrackerController::handleNewTrack);
+    connect(wsClient, &WSClient::cardDbMetadataChanged, this,
+        &DbBackupsTrackerController::handleCardDbMetadataChanged);
+    connect(wsClient, &WSClient::statusChanged, this,
+        &DbBackupsTrackerController::handleDeviceStatusChanged);
+    connect(&dbBackupsTracker, &DbBackupsTracker::greaterDbBackupChangeNumber,
+        this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
+    connect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber, this,
+        &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
+    connect(&dbBackupsTracker, &DbBackupsTracker::newTrack, this,
+        &DbBackupsTrackerController::handleNewTrack);
 }
 
 void DbBackupsTrackerController::setBackupFilePath(const QString& path)
 {
     window->hidePrompt();
-    try
-    {
+    try {
         dbBackupsTracker.track(path);
-    } catch (DbBackupsTrackerNoCardIdSet)
-    {
+    } catch (DbBackupsTrackerNoCardIdSet) {
         // Just ignore it
     }
 }
 
-void DbBackupsTrackerController::handleCardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber)
+void DbBackupsTrackerController::handleCardDbMetadataChanged(
+    QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber)
 {
     window->hidePrompt();
 
@@ -50,31 +56,25 @@ void DbBackupsTrackerController::handleCardDbMetadataChanged(QString cardId, int
 
 void DbBackupsTrackerController::askForImportBackup()
 {
-    std::function<void()> onAccept = [this]()
+    QMessageBox::StandardButton btn = QMessageBox::question(
+        window, tr("Import db backup"),
+        tr("Credentials in the backup file are more recent. "
+           "Do you want to import credentials to the device?"),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+    if (btn == QMessageBox::Yes)
     {
         QString data = readDbBackupFile();
         importDbBackup(data);
-    };
-
-    std::function<void()> onReject = [this]() {
-        QMessageBox::StandardButton btn = QMessageBox::warning(window, tr("Be careful"),
-                                                               tr("By denying you can loose your changes. Do you want to continue?"),
-                                                               QMessageBox::Yes | QMessageBox::No);
-        if(btn == QMessageBox::Yes)
-            window->hidePrompt();
-    };
-
-    PromptMessage *message = new PromptMessage(tr("Credentials in the backup file are more recent. "
-                                                  "Do you want to import credentials to the device?"),
-                                               onAccept, onReject);
-    window->showPrompt(message);
+    }
 }
 
 void DbBackupsTrackerController::importDbBackup(QString data)
 {
     if (!data.isEmpty())
     {
-        connect(wsClient, &WSClient::dbImported, window, &MainWindow::handleBackupImported);
+        connect(wsClient, &WSClient::dbImported, window,
+            &MainWindow::handleBackupImported);
 
         window->wantImportDatabase();
         wsClient->importDbFile(data.toLocal8Bit(), true);
@@ -88,28 +88,28 @@ void DbBackupsTrackerController::handleGreaterDbBackupChangeNumber()
 
 void DbBackupsTrackerController::askForExportBackup()
 {
-    std::function<void()> onAccept = [this]()
-    {
-        exportDbBackup();
-    };
+    std::function<void()> onAccept = [this]() { exportDbBackup(); };
 
-    std::function<void()> onReject = [this]() {
-        QMessageBox::StandardButton btn = QMessageBox::warning(window, tr("Be careful"),
-                                                               tr("By denying you can loose your changes. Do you want to continue?"),
-                                                               QMessageBox::Yes | QMessageBox::No);
-        if(btn == QMessageBox::Yes)
+    std::function<void()> onReject = [this]()
+    {
+        QMessageBox::StandardButton btn = QMessageBox::warning(
+            window, tr("Be careful"),
+            tr("By denying you can loose your changes. Do you want to continue?"),
+            QMessageBox::Yes | QMessageBox::No);
+        if (btn == QMessageBox::Yes)
             window->hidePrompt();
     };
 
-    PromptMessage *message = new PromptMessage(tr("Credentials on the device are more recent. "
-                                                 "Do you want export credentials to backup file?"),
-                                               onAccept, onReject);
+    PromptMessage* message = new PromptMessage(tr("Credentials on the device are more recent. "
+                                                  "Do you want export credentials to backup file?"),
+        onAccept, onReject);
     window->showPrompt(message);
 }
 
 void DbBackupsTrackerController::exportDbBackup()
 {
-    connect(wsClient, &WSClient::dbExported, this, &DbBackupsTrackerController::handleExportDbResult);
+    connect(wsClient, &WSClient::dbExported, this,
+        &DbBackupsTrackerController::handleExportDbResult);
 
     window->wantExportDatabase();
     wsClient->exportDbFile("SimpleCrypt");
@@ -120,7 +120,8 @@ void DbBackupsTrackerController::handleLowerDbBackupChangeNumber()
     askForExportBackup();
 }
 
-void DbBackupsTrackerController::writeDbBackup(QString file, const QByteArray& d)
+void DbBackupsTrackerController::writeDbBackup(QString file,
+    const QByteArray& d)
 {
     QFile f(file);
     f.open(QIODevice::WriteOnly);
@@ -128,7 +129,8 @@ void DbBackupsTrackerController::writeDbBackup(QString file, const QByteArray& d
     f.close();
 }
 
-void DbBackupsTrackerController::handleExportDbResult(const QByteArray& d, bool success)
+void DbBackupsTrackerController::handleExportDbResult(const QByteArray& d,
+    bool success)
 {
     if (success)
     {
@@ -136,19 +138,20 @@ void DbBackupsTrackerController::handleExportDbResult(const QByteArray& d, bool 
         writeDbBackup(file, d);
 
         window->handleBackupExported();
-    } else {
+    } else
         QMessageBox::warning(window, tr("Error"), tr(d));
-    }
 }
 
-void DbBackupsTrackerController::handleNewTrack(const QString& cardId, const QString& path)
+void DbBackupsTrackerController::handleNewTrack(const QString& cardId,
+    const QString& path)
 {
     QString currentCardId = dbBackupsTracker.getCardId();
     if (currentCardId.compare(cardId) == 0)
         emit backupFilePathChanged(path);
 }
 
-void DbBackupsTrackerController::handleDeviceStatusChanged(const Common::MPStatus& status)
+void DbBackupsTrackerController::handleDeviceStatusChanged(
+    const Common::MPStatus& status)
 {
     if (status != Common::Unlocked)
     {
