@@ -32,11 +32,14 @@ protected slots:
     void handleExportDbResult(const QByteArray &d, bool success);
     void handleNewTrack(const QString &cardId, const QString &path);
     void handleDeviceStatusChanged(const Common::MPStatus &status);
+    void handleDeviceConnectedChanged(const bool &connected);
+    void hideExportRequestIfVisible();
 
 private:
     DbBackupsTracker dbBackupsTracker;
     MainWindow *window;
     WSClient *wsClient;
+    bool isExportRequestMessageVisible;
 
     void askForImportBackup();
     void askForExportBackup();
