@@ -31,7 +31,8 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSCli
 
 void DbBackupsTrackerController::setBackupFilePath(const QString &path)
 {
-    window->hidePrompt();
+    hideExportRequestIfVisible();
+    hideExportImportIfVisible();
     try
     {
         dbBackupsTracker.track(path);
@@ -153,7 +154,7 @@ void DbBackupsTrackerController::writeDbBackup(QString file, const QByteArray& d
 }
 
 void DbBackupsTrackerController::clearTrackerCardInfo()
- {
+{
     dbBackupsTracker.setCardId("");
     dbBackupsTracker.setDataDbChangeNumber(0);
     dbBackupsTracker.setCredentialsDbChangeNumber(0);
@@ -180,17 +181,8 @@ void DbBackupsTrackerController::handleNewTrack(const QString &cardId, const QSt
     QString currentCardId = dbBackupsTracker.getCardId();
     if (currentCardId.compare(cardId) == 0)
         emit backupFilePathChanged(path);
-
-    hideExportRequestIfVisible();
-    hideExportImportIfVisible();
-}
-
-void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &)
-{
-    clearTrackerCardInfo();
-
-    hideExportRequestIfVisible();
-    hideExportImportIfVisible();
+    else
+        emit backupFilePathChanged(QString());
 }
 
 void DbBackupsTrackerController::handleDeviceStatusChanged(const Common::MPStatus &status)
@@ -202,6 +194,14 @@ void DbBackupsTrackerController::handleDeviceStatusChanged(const Common::MPStatu
         hideExportRequestIfVisible();
         hideExportImportIfVisible();
     }
+}
+
+void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &)
+{
+    clearTrackerCardInfo();
+
+    hideExportRequestIfVisible();
+    hideExportImportIfVisible();
 }
 
 void DbBackupsTrackerController::hideExportRequestIfVisible()
