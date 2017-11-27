@@ -47,6 +47,7 @@ private:
     void importDbBackup(QString data);
     void exportDbBackup();
     void writeDbBackup(QString file, const QByteArray &d);
+    void clearTrackerCardInfo();
 };
 
 #endif // DBBACKUPSTRACKERCONTROLLER_H

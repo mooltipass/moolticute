@@ -151,12 +151,19 @@ void DbBackupsTrackerController::handleNewTrack(const QString &cardId,
     emit backupFilePathChanged(path);
 }
 
-void DbBackupsTrackerController::handleDeviceStatusChanged(
-    const Common::MPStatus &status) {
-  if (status != Common::Unlocked) {
+void DbBackupsTrackerController::clearTrackerCardInfo()
+{
     dbBackupsTracker.setCardId("");
     dbBackupsTracker.setDataDbChangeNumber(0);
     dbBackupsTracker.setCredentialsDbChangeNumber(0);
+
+    emit backupFilePathChanged(QString());
+}
+
+void DbBackupsTrackerController::handleDeviceStatusChanged(
+    const Common::MPStatus &status) {
+  if (status != Common::Unlocked) {
+    clearTrackerCardInfo();
 
     hideExportRequestIfVisible();
   }
@@ -164,6 +171,7 @@ void DbBackupsTrackerController::handleDeviceStatusChanged(
 
 void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &connected)
 {
+    clearTrackerCardInfo();
     hideExportRequestIfVisible();
 }
 
