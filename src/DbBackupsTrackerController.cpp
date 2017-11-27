@@ -7,7 +7,7 @@
 #include "WSClient.h"
 
 DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSClient *wsClient, QObject *parent):
-    QObject(parent)
+    QObject(parent), isExportRequestMessageVisible(false), askImportMessage(nullptr)
 {
     Q_ASSERT(window != nullptr);
     Q_ASSERT(wsClient != nullptr);
@@ -19,6 +19,8 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSCli
             this, &DbBackupsTrackerController::handleCardDbMetadataChanged);
     connect(wsClient, &WSClient::statusChanged,
             this, &DbBackupsTrackerController::handleDeviceStatusChanged);
+    connect(wsClient, &WSClient::connectedChanged, this,
+            &DbBackupsTrackerController::handleDeviceConnectedChanged);
     connect(&dbBackupsTracker, &DbBackupsTracker::greaterDbBackupChangeNumber,
             this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
     connect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber,
@@ -56,19 +58,28 @@ void DbBackupsTrackerController::handleCardDbMetadataChanged(QString cardId,
     emit backupFilePathChanged(path);
 }
 
+
 void DbBackupsTrackerController::askForImportBackup()
 {
-    QMessageBox::StandardButton btn = QMessageBox::question(
-                window, tr("Import db backup"),
-                tr("Credentials in the backup file are more recent. "
-                   "Do you want to import credentials to the device?"),
-                QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  askImportMessage = new QMessageBox(window);
+  askImportMessage->setWindowTitle(tr("Import db backup"));
+  askImportMessage->setText(tr("Credentials in the backup file are more recent. "
+                               "Do you want to import credentials to the device?"));
 
-    if (btn == QMessageBox::Yes)
-    {
-        QString data = readDbBackupFile();
-        importDbBackup(data);
-    }
+  askImportMessage->addButton(QMessageBox::Yes);
+  askImportMessage->addButton(QMessageBox::No);
+  askImportMessage->setDefaultButton(QMessageBox::No);
+  askImportMessage->setModal(true);
+
+  int btn  = askImportMessage->exec();
+  askImportMessage->deleteLater();
+  askImportMessage = nullptr;
+
+  if (btn == QMessageBox::Yes)
+  {
+      QString data = readDbBackupFile();
+      importDbBackup(data);
+  }
 }
 
 void DbBackupsTrackerController::importDbBackup(QString data)
@@ -141,6 +152,14 @@ void DbBackupsTrackerController::writeDbBackup(QString file, const QByteArray& d
     f.close();
 }
 
+void DbBackupsTrackerController::clearTrackerCardInfo()
+ {
+    dbBackupsTracker.setCardId("");
+    dbBackupsTracker.setDataDbChangeNumber(0);
+    dbBackupsTracker.setCredentialsDbChangeNumber(0);
+ }
+
+
 void DbBackupsTrackerController::handleExportDbResult(const QByteArray &d, bool success)
 {
     if (success)
@@ -161,24 +180,52 @@ void DbBackupsTrackerController::handleNewTrack(const QString &cardId, const QSt
     QString currentCardId = dbBackupsTracker.getCardId();
     if (currentCardId.compare(cardId) == 0)
         emit backupFilePathChanged(path);
+
+    hideExportRequestIfVisible();
+    hideExportImportIfVisible();
+}
+
+void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &)
+{
+    clearTrackerCardInfo();
+
+    hideExportRequestIfVisible();
+    hideExportImportIfVisible();
 }
 
 void DbBackupsTrackerController::handleDeviceStatusChanged(const Common::MPStatus &status)
 {
     if (status != Common::Unlocked)
     {
-        dbBackupsTracker.setCardId("");
-        dbBackupsTracker.setDataDbChangeNumber(0);
-        dbBackupsTracker.setCredentialsDbChangeNumber(0);
+        clearTrackerCardInfo();
+
+        hideExportRequestIfVisible();
+        hideExportImportIfVisible();
     }
 }
 
+void DbBackupsTrackerController::hideExportRequestIfVisible()
+{
+    if (isExportRequestMessageVisible)
+    {
+        window->hidePrompt();
+        isExportRequestMessageVisible = false;
+    }
+}
+
+void DbBackupsTrackerController::hideExportImportIfVisible()
+{
+    if (askImportMessage != nullptr)
+        askImportMessage->reject();
+}
+
+
 QString DbBackupsTrackerController::getBackupFilePath()
 {
-    QString id = dbBackupsTracker.getCardId();
-    QString file = dbBackupsTracker.getTrackPath(id);
+  QString id = dbBackupsTracker.getCardId();
+  QString file = dbBackupsTracker.getTrackPath(id);
 
-    return file;
+   return file;
 }
 
 QString DbBackupsTrackerController::readDbBackupFile()
