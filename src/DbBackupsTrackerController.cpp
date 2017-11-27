@@ -102,7 +102,11 @@ void DbBackupsTrackerController::handleGreaterDbBackupChangeNumber()
 
 void DbBackupsTrackerController::askForExportBackup()
 {
-    std::function<void()> onAccept = [this]() { exportDbBackup(); };
+    std::function<void()> onAccept = [this]()
+    {
+        exportDbBackup();
+        isExportRequestMessageVisible = false;
+    };
 
     std::function<void()> onReject = [this]()
     {
@@ -110,14 +114,19 @@ void DbBackupsTrackerController::askForExportBackup()
                     window, tr("Be careful"),
                     tr("By denying you can loose your changes. Do you want to continue?"),
                     QMessageBox::Yes | QMessageBox::No);
+
         if (btn == QMessageBox::Yes)
+        {
             window->hidePrompt();
+            isExportRequestMessageVisible = false;
+        }
     };
 
     PromptMessage *message = new PromptMessage(tr("Credentials on the device are more recent. "
                                                   "Do you want export credentials to backup file?"),
                                                onAccept, onReject);
     window->showPrompt(message);
+    isExportRequestMessageVisible = true;
 }
 
 void DbBackupsTrackerController::exportDbBackup()
