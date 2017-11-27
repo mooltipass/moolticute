@@ -9,7 +9,7 @@
 DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window,
                                                        WSClient *wsClient,
                                                        QObject *parent)
-    : QObject(parent), isExportRequestMessageVisible(false) {
+    : QObject(parent), isExportRequestMessageVisible(false), askImportMessage(nullptr) {
   Q_ASSERT(window != nullptr);
   Q_ASSERT(wsClient != nullptr);
 
@@ -55,15 +55,23 @@ void DbBackupsTrackerController::handleCardDbMetadataChanged(
 }
 
 void DbBackupsTrackerController::askForImportBackup() {
-  QMessageBox::StandardButton btn = QMessageBox::question(
-      window, tr("Import db backup"),
-      tr("Credentials in the backup file are more recent. "
-         "Do you want to import credentials to the device?"),
-      QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  askImportMessage = new QMessageBox(window);
+  askImportMessage->setWindowTitle(tr("Import db backup"));
+  askImportMessage->setText(tr("Credentials in the backup file are more recent. "
+                              "Do you want to import credentials to the device?"));
+
+  askImportMessage->addButton(QMessageBox::Yes);
+  askImportMessage->addButton(QMessageBox::No);
+  askImportMessage->setDefaultButton(QMessageBox::No);
+  askImportMessage->setModal(true);
+
+  int btn  = askImportMessage->exec();
+  askImportMessage->deleteLater();
+  askImportMessage = nullptr;
 
   if (btn == QMessageBox::Yes) {
-    QString data = readDbBackupFile();
-    importDbBackup(data);
+      QString data = readDbBackupFile();
+      importDbBackup(data);
   }
 }
 
@@ -166,13 +174,15 @@ void DbBackupsTrackerController::handleDeviceStatusChanged(
     clearTrackerCardInfo();
 
     hideExportRequestIfVisible();
+    hideExportImportIfVisible();
   }
 }
 
-void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &connected)
+void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &)
 {
     clearTrackerCardInfo();
     hideExportRequestIfVisible();
+    hideExportImportIfVisible();
 }
 
 void DbBackupsTrackerController::hideExportRequestIfVisible()
@@ -181,6 +191,12 @@ void DbBackupsTrackerController::hideExportRequestIfVisible()
         window->hidePrompt();
         isExportRequestMessageVisible = false;
     }
+}
+
+void DbBackupsTrackerController::hideExportImportIfVisible()
+{
+    if (askImportMessage != nullptr)
+        askImportMessage->reject();
 }
 
 QString DbBackupsTrackerController::getBackupFilePath() {

@@ -8,6 +8,7 @@
 
 class WSClient;
 class MainWindow;
+class QMessageBox;
 
 class DbBackupsTrackerController : public QObject
 {
@@ -34,12 +35,14 @@ protected slots:
     void handleDeviceStatusChanged(const Common::MPStatus &status);
     void handleDeviceConnectedChanged(const bool &connected);
     void hideExportRequestIfVisible();
+    void hideExportImportIfVisible();
 
 private:
     DbBackupsTracker dbBackupsTracker;
     MainWindow *window;
     WSClient *wsClient;
     bool isExportRequestMessageVisible;
+    QMessageBox *askImportMessage;
 
     void askForImportBackup();
     void askForExportBackup();
