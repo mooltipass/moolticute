@@ -1415,7 +1415,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Keep your database backup synchronized with the card database.</string>
+               <string>Keep your database backup synchronized with this mini database.</string>
               </property>
               <property name="wordWrap">
                <bool>true</bool>
