@@ -8,6 +8,7 @@
 
 class WSClient;
 class MainWindow;
+class QMessageBox;
 
 class DbBackupsTrackerController : public QObject
 {
@@ -32,18 +33,25 @@ protected slots:
     void handleExportDbResult(const QByteArray &d, bool success);
     void handleNewTrack(const QString &cardId, const QString &path);
     void handleDeviceStatusChanged(const Common::MPStatus &status);
+    void handleDeviceConnectedChanged(const bool &connected);
+
 
 private:
     DbBackupsTracker dbBackupsTracker;
     MainWindow *window;
     WSClient *wsClient;
+    bool isExportRequestMessageVisible;
+    QMessageBox *askImportMessage;
 
     void askForImportBackup();
     void askForExportBackup();
+    void hideExportRequestIfVisible();
+    void hideExportImportIfVisible();
     QString readDbBackupFile();
     void importDbBackup(QString data);
     void exportDbBackup();
     void writeDbBackup(QString file, const QByteArray &d);
+    void clearTrackerCardInfo();
 };
 
 #endif // DBBACKUPSTRACKERCONTROLLER_H
