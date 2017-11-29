@@ -7,7 +7,9 @@
 #include "WSClient.h"
 
 DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSClient *wsClient, QObject *parent):
-    QObject(parent), isExportRequestMessageVisible(false), askImportMessage(nullptr)
+    QObject(parent),
+    isExportRequestMessageVisible(false),
+    askImportMessage(nullptr)
 {
     Q_ASSERT(window != nullptr);
     Q_ASSERT(wsClient != nullptr);
@@ -19,8 +21,8 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSCli
             this, &DbBackupsTrackerController::handleCardDbMetadataChanged);
     connect(wsClient, &WSClient::statusChanged,
             this, &DbBackupsTrackerController::handleDeviceStatusChanged);
-    connect(wsClient, &WSClient::connectedChanged, this,
-            &DbBackupsTrackerController::handleDeviceConnectedChanged);
+    connect(wsClient, &WSClient::connectedChanged,
+            this, &DbBackupsTrackerController::handleDeviceConnectedChanged);
     connect(&dbBackupsTracker, &DbBackupsTracker::greaterDbBackupChangeNumber,
             this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
     connect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber,
