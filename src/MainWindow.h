@@ -44,6 +44,8 @@ public:
 
     bool isHttpDebugChecked();
 
+    void updateBackupControlsVisibility();
+
 signals:
     void windowCloseRequested();
 
@@ -54,6 +56,7 @@ public slots:
     void handleBackupImported();
     void showPrompt(PromptMessage * message);
     void hidePrompt();
+    void showDbBackTrackingControls(const bool &show);
 
 private slots:
     void enableCredentialsManagement(bool enable);
@@ -119,7 +122,7 @@ private:
 
     void retranslateUi();
 
-    Ui::MainWindow *ui;
+    Ui::MainWindow *ui = NULL;
     QtAwesome* awesome;
 
     WSClient *wsClient;
@@ -133,6 +136,7 @@ private:
     bool bSSHKeyTabVisible;
     bool bAdvancedTabVisible;
     bool bSSHKeysTabVisibleOnDemand;
+    bool dbBackupTrakingControlsVisible;
 
     QShortcut *m_FilesAndSSHKeysTabsShortcut;
     QShortcut *m_advancedTabShortcut;

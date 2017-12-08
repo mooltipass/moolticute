@@ -6,6 +6,26 @@
 #include "PromptWidget.h"
 #include "WSClient.h"
 
+void DbBackupsTrackerController::connectDbBackupsTracker()
+{
+    connect(&dbBackupsTracker, &DbBackupsTracker::greaterDbBackupChangeNumber,
+            this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
+    connect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber,
+            this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
+    connect(&dbBackupsTracker, &DbBackupsTracker::newTrack,
+            this, &DbBackupsTrackerController::handleNewTrack);
+}
+
+void DbBackupsTrackerController::disconnectDbBackupsTracker()
+{
+    disconnect(&dbBackupsTracker, &DbBackupsTracker::greaterDbBackupChangeNumber,
+               this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
+    disconnect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber,
+               this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
+    disconnect(&dbBackupsTracker, &DbBackupsTracker::newTrack,
+               this, &DbBackupsTrackerController::handleNewTrack);
+}
+
 DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSClient *wsClient, QObject *parent):
     QObject(parent),
     isExportRequestMessageVisible(false),
@@ -17,18 +37,16 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSCli
     this->window = window;
     this->wsClient = wsClient;
 
+    connect(wsClient, &WSClient::fwVersionChanged,
+            this, &DbBackupsTrackerController::handleFirmwareVersionChange);
     connect(wsClient, &WSClient::cardDbMetadataChanged,
             this, &DbBackupsTrackerController::handleCardDbMetadataChanged);
     connect(wsClient, &WSClient::statusChanged,
             this, &DbBackupsTrackerController::handleDeviceStatusChanged);
     connect(wsClient, &WSClient::connectedChanged,
             this, &DbBackupsTrackerController::handleDeviceConnectedChanged);
-    connect(&dbBackupsTracker, &DbBackupsTracker::greaterDbBackupChangeNumber,
-            this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
-    connect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber,
-            this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
-    connect(&dbBackupsTracker, &DbBackupsTracker::newTrack,
-            this, &DbBackupsTrackerController::handleNewTrack);
+
+    handleFirmwareVersionChange(wsClient->get_fwVersion());
 }
 
 void DbBackupsTrackerController::setBackupFilePath(const QString &path)
@@ -213,6 +231,20 @@ void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &)
 
     hideExportRequestIfVisible();
     hideExportImportIfVisible();
+}
+
+void DbBackupsTrackerController::handleFirmwareVersionChange(const QString &version)
+{
+    if (version >= "1.2")
+    {
+        window->showDbBackTrackingControls(true);
+        connectDbBackupsTracker();
+    } else
+    {
+        window->showDbBackTrackingControls(false);
+        disconnectDbBackupsTracker();
+    }
+
 }
 
 void DbBackupsTrackerController::hideExportRequestIfVisible()
