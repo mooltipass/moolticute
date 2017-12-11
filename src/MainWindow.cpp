@@ -41,6 +41,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     wsClient(client),
     bSSHKeyTabVisible(false),
     bAdvancedTabVisible(false),
+    dbBackupTrakingControlsVisible(false),
     previousWidget(nullptr),
     m_passwordProfilesModel(new PasswordProfilesModel(this)),
     dbBackupsTrackerController(this, client, this)
@@ -495,6 +496,15 @@ void MainWindow::changeEvent(QEvent *event)
     QMainWindow::changeEvent(event);
 }
 
+void MainWindow::updateBackupControlsVisibility()
+{
+    ui->label_backupControlsTitle->setVisible(dbBackupTrakingControlsVisible);
+    ui->label_backupControlsDescription->setVisible(dbBackupTrakingControlsVisible);
+    ui->lineEdit_dbBackupFilePath->setVisible(dbBackupTrakingControlsVisible);
+    ui->toolButton_clearBackupFilePath->setVisible(dbBackupTrakingControlsVisible);
+    ui->toolButton_setBackupFilePath->setVisible(dbBackupTrakingControlsVisible);
+}
+
 void MainWindow::updatePage()
 {
     bool isCardUnknown = wsClient->get_status() == Common::UnkownSmartcad;
@@ -551,6 +561,7 @@ void MainWindow::updatePage()
         ui->stackedWidget->setCurrentWidget(ui->pageSSH);
 
     updateTabButtons();
+    updateBackupControlsVisibility();
 }
 
 void MainWindow::enableKnockSettings(bool enable)
@@ -868,6 +879,11 @@ void MainWindow::showPrompt(PromptMessage * message)
 void MainWindow::hidePrompt()
 {
     ui->promptWidget->hide();
+}
+
+void MainWindow::showDbBackTrackingControls(const bool &show)
+{
+    dbBackupTrakingControlsVisible = show;
 }
 
 void MainWindow::wantExitFilesManagement()

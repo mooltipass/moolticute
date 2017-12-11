@@ -34,6 +34,7 @@ protected slots:
     void handleNewTrack(const QString &cardId, const QString &path);
     void handleDeviceStatusChanged(const Common::MPStatus &status);
     void handleDeviceConnectedChanged(const bool &connected);
+    void handleFirmwareVersionChange(const QString &version);
 
 
 private:
@@ -52,6 +53,8 @@ private:
     void exportDbBackup();
     void writeDbBackup(QString file, const QByteArray &d);
     void clearTrackerCardInfo();
+    void connectDbBackupsTracker();
+    void disconnectDbBackupsTracker();
 };
 
 #endif // DBBACKUPSTRACKERCONTROLLER_H
