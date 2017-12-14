@@ -1402,7 +1402,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </font>
               </property>
               <property name="text">
-               <string>Database Backup</string>
+               <string>Database Backup Monitoring</string>
               </property>
              </widget>
             </item>
