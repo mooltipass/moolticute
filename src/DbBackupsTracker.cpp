@@ -147,7 +147,7 @@ bool DbBackupsTracker::isUpdateRequired() const
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
-        return (backupCCN > credentialsDbChangeNumber || backupDCN > dataDbChangeNumber);
+        return isDbBackupChangeNumberGreater(backupCCN, backupDCN);
     }
     catch (DbBackupsTrackerNoBackupFileSet)
     {
@@ -162,8 +162,7 @@ bool DbBackupsTracker::isBackupRequired() const
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
-        return (backupCCN < credentialsDbChangeNumber || backupDCN < dataDbChangeNumber);
-
+        return isDbBackupChangeNumberLower(backupCCN, backupDCN);
     }
     catch (DbBackupsTrackerNoBackupFileSet)
     {
@@ -271,6 +270,28 @@ void DbBackupsTracker::setDataDbChangeNumber(int dataDbChangeNumber)
     emit dataDbChangeNumberChanged(this->dataDbChangeNumber);
 }
 
+bool DbBackupsTracker::isDbBackupChangeNumberGreater(int backupCCN, int backupDCN) const
+{
+    // - the monitored file change number is higher than the one the device
+    bool result = (backupCCN > credentialsDbChangeNumber || backupDCN > dataDbChangeNumber);
+
+    // *and* the difference between both numbers is less than 0x60
+    result = result && ( abs(backupCCN - credentialsDbChangeNumber) < 0x60);
+
+     /*
+     * - the monitored file change number is < 0x20 and the
+     * change number on the device is > 0xE0.
+     */
+    result = result ||
+            ((backupCCN < 0x20) && (credentialsDbChangeNumber > 0xE0));
+    return result;
+}
+
+bool DbBackupsTracker::isDbBackupChangeNumberLower(int backupCCN, int backupDCN) const
+{
+    return backupCCN < credentialsDbChangeNumber || backupDCN < dataDbChangeNumber;
+}
+
 void DbBackupsTracker::checkDbBackupSynchronization()
 {
     try
@@ -278,10 +299,10 @@ void DbBackupsTracker::checkDbBackupSynchronization()
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
-        if (backupCCN > credentialsDbChangeNumber || backupDCN > dataDbChangeNumber)
+        if (isDbBackupChangeNumberGreater(backupCCN, backupDCN))
             emit greaterDbBackupChangeNumber();
 
-        if (backupCCN < credentialsDbChangeNumber || backupDCN < dataDbChangeNumber)
+        if (isDbBackupChangeNumberLower(backupCCN, backupDCN))
             emit lowerDbBackupChangeNumber();
     }
     catch (DbBackupsTrackerNoBackupFileSet)
