@@ -235,7 +235,7 @@ void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &)
 
 void DbBackupsTrackerController::handleFirmwareVersionChange(const QString &version)
 {
-    if (version >= "1.2")
+    if (version >= "v1.2")
     {
         window->showDbBackTrackingControls(true);
         connectDbBackupsTracker();
