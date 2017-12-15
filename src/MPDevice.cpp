@@ -1015,6 +1015,10 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                 }
                 else
                 {
+                    /* Update files cache */
+                    filesCache.save(QList<QVariantMap>());
+                    filesCache.setDbChangeNumber(get_dataDbChangeNumber());
+                    emit filesCacheChanged();
                     qInfo() << "No parent data nodes to load.";
                 }
 
