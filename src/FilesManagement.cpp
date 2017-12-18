@@ -139,10 +139,21 @@ void FilesManagement::setWsClient(WSClient *c)
     {
         loadFilesCacheModel();
     });
+
+    setFileCacheControlsVisible(wsClient->get_fwVersion() >= "v1.2");
+    connect(wsClient, &WSClient::fwVersionChanged, [=](const QString &version)
+    {
+        setFileCacheControlsVisible(version >= "v1.2");
+    });
     connect(wsClient, &WSClient::wsConnected, [=] ()
     {
         wsClient->sendListFilesCacheRequest();
     });
+}
+
+void FilesManagement::setFileCacheControlsVisible(bool visible)
+{
+    ui->widget_filesCache->setVisible(visible);
 }
 
 void FilesManagement::enableMemManagement(bool enable)
@@ -202,6 +213,12 @@ void FilesManagement::loadModel()
 
 void FilesManagement::loadFilesCacheModel()
 {
+    if (wsClient->get_fwVersion() <= "v1.2")
+    {
+        setFileCacheControlsVisible(false);
+        return;
+    }
+
     QListWidget * listWidget = ui->filesCacheListWidget;
     listWidget->clear();
     for (auto jsonValue : wsClient->getFilesCache())
