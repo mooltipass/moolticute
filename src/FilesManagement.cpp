@@ -223,7 +223,8 @@ void FilesManagement::loadFilesCacheModel()
 
         connect(button, &QToolButton::clicked, [=]()
         {
-            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), jsonValue.toString());
+            QString target_file = jsonObject.value("name").toString();
+            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), target_file);
 
             if (fileName.isEmpty())
                 return;
@@ -238,7 +239,7 @@ void FilesManagement::loadFilesCacheModel()
             connect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
 //            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
 
-            wsClient->requestDataFile(jsonValue.toString());
+            wsClient->requestDataFile(target_file);
         });
 
         rowLayout->addWidget(button, 1, Qt::AlignRight);
