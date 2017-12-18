@@ -270,9 +270,17 @@ void DbBackupsTracker::setDataDbChangeNumber(int dataDbChangeNumber)
     emit dataDbChangeNumberChanged(this->dataDbChangeNumber);
 }
 
-bool DbBackupsTracker::greaterThanWithWrapOver(int a, int b, int limit, int range) const{
-    bool res = (a > b) && ( (a - b) < range) ;
+bool DbBackupsTracker::greaterThanWithWrapOver(int a, int b, int limit, int range) const
+{
+    bool res = (a > b) && ( (a - b) < range);
     res = res | ((limit - b + a) < range);
+    return res;
+}
+
+bool DbBackupsTracker::lowerThanWithWrapOver(int a, int b, int limit, int range) const
+{
+    bool res = (a < b) && ( (b - a) < range);
+    res = res | ((limit - a + b) < range);
     return res;
 }
 
@@ -286,7 +294,10 @@ bool DbBackupsTracker::isDbBackupChangeNumberGreater(int backupCCN, int backupDC
 
 bool DbBackupsTracker::isDbBackupChangeNumberLower(int backupCCN, int backupDCN) const
 {
-    return backupCCN < credentialsDbChangeNumber || backupDCN < dataDbChangeNumber;
+    bool result = false;
+    result = result | lowerThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result | lowerThanWithWrapOver(backupDCN, dataDbChangeNumber);
+    return result;
 }
 
 void DbBackupsTracker::checkDbBackupSynchronization()
