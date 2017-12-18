@@ -276,12 +276,27 @@ void DbBackupsTrackerTests::credentialChangenumberWrapOver()
     QCOMPARE(spy.count(), 0);
     Q_ASSERT(!tracker.isUpdateRequired());
 
-    // monitored file change number is < 0x20 and
-    // the change number on the device is > 0xE0
-    tracker.setCredentialsDbChangeNumber(0xE1);
-    tracker.setDataDbChangeNumber(0);
+    // monitored file change number is 0xFF and
+    // the change number on the device is 0x00
+    tracker.setCredentialsDbChangeNumber(0x00);
+    tracker.setDataDbChangeNumber(0x00);
 
-    file = getTestsDataDirPath() + "tests_backup1";
+    file = getTestsDataDirPath() + "tests_backup3";
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+    QCOMPARE(spy.count(), 0);
+    Q_ASSERT(!tracker.isUpdateRequired());
+
+    // monitored file change number is 0x00 and
+    // the change number on the device is 0xFF
+    tracker.setCredentialsDbChangeNumber(0xFF);
+    tracker.setDataDbChangeNumber(0xFF);
+
+    file = getTestsDataDirPath() + "tests_backup4";
 
     try {
         tracker.track(file);
