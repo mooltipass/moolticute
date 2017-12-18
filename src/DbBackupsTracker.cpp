@@ -270,20 +270,17 @@ void DbBackupsTracker::setDataDbChangeNumber(int dataDbChangeNumber)
     emit dataDbChangeNumberChanged(this->dataDbChangeNumber);
 }
 
+bool DbBackupsTracker::greaterThanWithWrapOver(int a, int b, int limit, int range) const{
+    bool res = (a > b) && ( (a - b) < range) ;
+    res = res | ((limit - b + a) < range);
+    return res;
+}
+
 bool DbBackupsTracker::isDbBackupChangeNumberGreater(int backupCCN, int backupDCN) const
 {
-    // - the monitored file change number is higher than the one the device
-    bool result = (backupCCN > credentialsDbChangeNumber || backupDCN > dataDbChangeNumber);
-
-    // *and* the difference between both numbers is less than 0x60
-    result = result && ( abs(backupCCN - credentialsDbChangeNumber) < 0x60);
-
-     /*
-     * - the monitored file change number is < 0x20 and the
-     * change number on the device is > 0xE0.
-     */
-    result = result ||
-            ((backupCCN < 0x20) && (credentialsDbChangeNumber > 0xE0));
+    bool result = false;
+    result = result | greaterThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result | greaterThanWithWrapOver(backupDCN, dataDbChangeNumber);
     return result;
 }
 

@@ -107,6 +107,7 @@ private:
     int extractDataDbChangeNumberLegacyBackup(const QJsonDocument &d) const;
     bool isDbBackupChangeNumberGreater(int backupCCN, int backupDCN) const;
     bool isDbBackupChangeNumberLower(int backupCCN, int backupDCN) const;
+    bool greaterThanWithWrapOver(int a, int b, int limit = 0xFF, int range = 0x60) const;
 };
 
 #endif // DBBACKUPSTRACKER_H
