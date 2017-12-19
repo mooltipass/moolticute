@@ -273,14 +273,14 @@ void DbBackupsTracker::setDataDbChangeNumber(int dataDbChangeNumber)
 bool DbBackupsTracker::greaterThanWithWrapOver(int a, int b, int limit, int range) const
 {
     bool res = (a > b) && ( (a - b) < range);
-    res = res | ((limit - b + a) < range);
+    res = res | (a < b) && ((limit - b + a) < range);
     return res;
 }
 
 bool DbBackupsTracker::lowerThanWithWrapOver(int a, int b, int limit, int range) const
 {
     bool res = (a < b) && ( (b - a) < range);
-    res = res | ((limit - a + b) < range);
+    res = res | (a > b) && ((limit - a + b) < range);
     return res;
 }
 
