@@ -328,6 +328,19 @@ border-right: none;
             </widget>
            </item>
            <item>
+            <widget class="QPushButton" name="pushButtonDelete">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Delete selected</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer_7">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -353,20 +366,7 @@ border-right: none;
           <number>20</number>
          </property>
          <item>
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="AnimatedColorButton" name="buttonDiscard" native="true">
+          <widget class="QPushButton" name="buttonDiscard">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -379,33 +379,39 @@ border-right: none;
              <height>0</height>
             </size>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonSaveChanges">
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
            <property name="text">
-            <string>Save all changes</string>
+            <string>Quit SSH Management</string>
            </property>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_6">
+          <spacer name="horizontalSpacer_5">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::MinimumExpanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>0</width>
-             <height>0</height>
+             <height>20</height>
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QProgressBar" name="progressBarLoad2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="value">
+            <number>24</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -416,11 +422,6 @@ border-right: none;
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>AnimatedColorButton</class>
-   <extends>QPushButton</extends>
-   <header>AnimatedColorButton.h</header>
-  </customwidget>
   <customwidget>
    <class>RotateSpinner</class>
    <extends>QWidget</extends>

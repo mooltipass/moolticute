@@ -46,11 +46,14 @@ private slots:
     void buttonDiscardClicked();
 
     void on_pushButtonUnlock_clicked();
-    void on_buttonSaveChanges_clicked();
     void on_pushButtonImport_clicked();
+
+    void on_pushButtonDelete_clicked();
 
 private:
     virtual void changeEvent(QEvent *event);
+
+    void handleProgressErrors(const QJsonObject &rootobj);
 
     Ui::SSHManagement *ui;
 

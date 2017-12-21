@@ -28,6 +28,7 @@ SSHManagement::SSHManagement(QWidget *parent) :
     ui->setupUi(this);
 
     ui->stackedWidget->setCurrentWidget(ui->pageLocked);
+    ui->progressBarLoad2->hide();
 
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
@@ -35,13 +36,14 @@ SSHManagement::SSHManagement(QWidget *parent) :
 
     ui->pushButtonUnlock->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonUnlock->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
-    ui->buttonDiscard->setText(tr("Discard all changes"));
-    connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &SSHManagement::buttonDiscardClicked);
-    ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
+    connect(ui->buttonDiscard, &QPushButton::clicked, this, &SSHManagement::buttonDiscardClicked);
+    ui->buttonDiscard->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonImport->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonImport->setIcon(AppGui::qtAwesome()->icon(fa::plussquare, whiteButtons));
     ui->pushButtonExport->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExport->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
+    ui->pushButtonDelete->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDelete->setIcon(AppGui::qtAwesome()->icon(fa::trasho, whiteButtons));
 
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
@@ -98,6 +100,7 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
         QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
         QStringList arguments;
         arguments << "--output_progress"
+                  << "cli"
                   << "-c"
                   << "list";
 
@@ -105,7 +108,8 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
         connect(sshProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
-            qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
+            if (exitStatus != QProcess::NormalExit)
+                qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
 
             if (loaded)
                 ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);
@@ -125,6 +129,24 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
     }
 }
 
+void SSHManagement::handleProgressErrors(const QJsonObject &rootobj)
+{
+    if (rootobj.contains("error") && rootobj["error"].toBool())
+    {
+        //Handle errors here
+        QString msg = rootobj["error_message"].toString();
+        if (msg.isEmpty())
+            msg = tr("Some internal errors occured. Please check the log and contact the dev team.");
+        QMessageBox::warning(this, "Moolticute", tr("Some errors occured:\n\n%1").arg(msg));
+    }
+    else if (rootobj["msg"] == "progress_detailed")
+    {
+        qDebug() << "Progress detailed";
+        QJsonObject o = rootobj["data"].toObject();
+        progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt());
+    }
+}
+
 void SSHManagement::readStdOutLoadKeys()
 {
     while (sshProcess->canReadLine())
@@ -136,22 +158,19 @@ void SSHManagement::readStdOutLoadKeys()
         if (err.error != QJsonParseError::NoError)
         {
             qWarning() << "JSON parse error " << err.errorString();
+            qWarning() << "Line is: " << line;
             return;
         }
 
-        //progress message
+        //progress message§
         if (jdoc.isObject())
         {
-            QJsonObject rootobj = jdoc.object();
-            if (rootobj["msg"] == "progress")
-            {
-                QJsonObject o = rootobj["data"].toObject();
-                progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt());
-            }
+            handleProgressErrors(jdoc.object());
         }
         else if (jdoc.isArray()) //keys
         {
             loaded = true;
+            keysModel->clear();
 
             QJsonArray jarr = jdoc.array();
             for (int i = 0;i < jarr.count();i++)
@@ -160,7 +179,7 @@ void SSHManagement::readStdOutLoadKeys()
                 QString pub = k["PublicKey"].toString();
 
                 QString type = pub.section(QRegularExpression("\\s+"), 0, 0);
-                QString comment = pub.section(QRegularExpression("\\s+"), -1);
+                QString comment = pub.section(QRegularExpression("\\s+"), 2, -1);
 
                 if (type == "ssh-ed25519")
                     type = "ED25519";
@@ -186,6 +205,8 @@ void SSHManagement::progressChanged(int total, int current)
 {
     ui->progressBarLoad->setMaximum(total);
     ui->progressBarLoad->setValue(current);
+    ui->progressBarLoad2->setMaximum(total);
+    ui->progressBarLoad2->setValue(current);
 }
 
 void SSHManagement::onExportPublicKey()
@@ -233,14 +254,41 @@ void SSHManagement::buttonDiscardClicked()
     ui->stackedWidget->setCurrentWidget(ui->pageLocked);
 }
 
-void SSHManagement::on_buttonSaveChanges_clicked()
-{
-    QMessageBox::information(this, "moolticute", "Not implemented yet!");
-}
-
 void SSHManagement::on_pushButtonImport_clicked()
 {
-    QMessageBox::information(this, "moolticute", "Not implemented yet!");
+    QString fname = QFileDialog::getOpenFileName(this, tr("Open SSH private key"), QString(), tr("OpenSsh private key (*.key *.*)"));
+    if (fname.isEmpty()) return;
+
+    ui->progressBarLoad2->setMinimum(0);
+    ui->progressBarLoad2->setMaximum(0);
+    ui->progressBarLoad2->setValue(0);
+    ui->progressBarLoad2->show();
+    setEnabled(false);
+
+    sshProcess = new QProcess(this);
+    QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
+    QStringList arguments;
+    arguments << "--output_progress"
+              << "cli"
+              << "-c"
+              << "add"
+              << "--key"
+              << fname;
+
+    qInfo() << "Running " << program << " " << arguments;
+    connect(sshProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+            [=](int exitCode, QProcess::ExitStatus exitStatus)
+    {
+        if (exitStatus != QProcess::NormalExit)
+            qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
+        ui->progressBarLoad2->hide();
+        setEnabled(true);
+    });
+
+    connect(sshProcess, &QProcess::readyReadStandardOutput, this, &SSHManagement::readStdOutLoadKeys);
+
+    sshProcess->setReadChannel(QProcess::StandardOutput);
+    sshProcess->start(program, arguments);
 }
 
 void SSHManagement::changeEvent(QEvent *event)
@@ -248,4 +296,43 @@ void SSHManagement::changeEvent(QEvent *event)
     if (event->type() == QEvent::LanguageChange)
         ui->retranslateUi(this);
     QWidget::changeEvent(event);
+}
+
+void SSHManagement::on_pushButtonDelete_clicked()
+{
+    QStandardItem *it = keysModel->itemFromIndex(ui->listViewKeys->currentIndex());
+    if (!it) return;
+
+    if (QMessageBox::question(this, "Moolticute", tr("You are going to delete the selected key from the device.\n\nProceed?")) != QMessageBox::Yes)
+        return;
+
+    ui->progressBarLoad2->setMinimum(0);
+    ui->progressBarLoad2->setMaximum(0);
+    ui->progressBarLoad2->setValue(0);
+    ui->progressBarLoad2->show();
+    setEnabled(false);
+
+    sshProcess = new QProcess(this);
+    QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
+    QStringList arguments;
+    arguments << "--output_progress"
+              << "cli"
+              << "-c"
+              << "delete"
+              << QStringLiteral("--num=%1").arg(ui->listViewKeys->currentIndex().row());
+
+    qInfo() << "Running " << program << " " << arguments;
+    connect(sshProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+            [=](int exitCode, QProcess::ExitStatus exitStatus)
+    {
+        if (exitStatus != QProcess::NormalExit)
+            qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
+        ui->progressBarLoad2->hide();
+        setEnabled(true);
+    });
+
+    connect(sshProcess, &QProcess::readyReadStandardOutput, this, &SSHManagement::readStdOutLoadKeys);
+
+    sshProcess->setReadChannel(QProcess::StandardOutput);
+    sshProcess->start(program, arguments);
 }
