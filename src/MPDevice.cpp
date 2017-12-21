@@ -265,8 +265,22 @@ void MPDevice::sendDataDequeue()
     MPCommand &currentCmd = commandQueue.head();
     currentCmd.running = true;
 
+#ifdef DEV_DEBUG
+    qDebug() << "Platform send command: " << MPCmd::printCmd(currentCmd.data);
+
+    auto toHex = [](quint8 b) -> QString { return QString("0x%1").arg((quint8)b, 2, 16, QChar('0')); };
+    QString a = "[";
+    for (int i = 0;i < currentCmd.data.size();i++)
+    {
+        a += toHex((quint8)currentCmd.data.at(i));
+        if (i < currentCmd.data.size() - 1) a += ", ";
+    }
+    a += "]";
+
+    qDebug() << "Full packet: " << a;
+#endif
+
     // send data with platform code
-//    qDebug() << "Platform send command: " << MPCmd::printCmd(currentCmd.data);
     platformWrite(currentCmd.data);
 
     currentCmd.timerTimeout->start();
