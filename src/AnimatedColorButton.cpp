@@ -33,7 +33,6 @@ AnimatedColorButton::AnimatedColorButton(QWidget *parent, int iAnimationDuration
 
 void AnimatedColorButton::setProgress(int p)
 {
-    qDebug() << "progress: " << p;
     bar->setMinimumWidth(p);
     bar->setMaximumWidth(p);
 }
