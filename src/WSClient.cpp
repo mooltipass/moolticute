@@ -209,7 +209,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
 //    messages with the simple style will be ignored
 //    else if (rootobj["msg"] == "progress")
-    else if (rootobj["msg"] == "progress_datailed")
+    else if (rootobj["msg"] == "progress_detailed")
     {
         QJsonObject o = rootobj["data"].toObject();
         QString progressString = o["progress_message"].toString();

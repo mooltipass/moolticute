@@ -106,7 +106,7 @@ void WSServerCon::processMessage(const QString &message)
             }
         }
         oroot["data"] = ores;
-        oroot["msg"] = "progress_datailed"; //change msg to avoid breaking of client waiting of the response
+        oroot["msg"] = "progress_detailed"; //change msg to avoid breaking of client waiting of the response
         sendJsonMessage(oroot);
     };
 
