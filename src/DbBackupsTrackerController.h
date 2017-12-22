@@ -47,7 +47,7 @@ private:
     void askForImportBackup();
     void askForExportBackup();
     void hideExportRequestIfVisible();
-    void hideExportImportIfVisible();
+    void hideImportRequestIfVisible();
     QString readDbBackupFile();
     void importDbBackup(QString data);
     void exportDbBackup();
