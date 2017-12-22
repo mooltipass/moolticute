@@ -31,6 +31,10 @@ MPDevice::MPDevice(QObject *parent):
     statusTimer->start(500);
     connect(statusTimer, &QTimer::timeout, [=]()
     {
+        //Do not interfer with parameter loading by sending a MOOLTIPASS_STATUS command
+        if (readingParams)
+            return;
+
         sendData(MPCmd::MOOLTIPASS_STATUS, [=](bool success, const QByteArray &data, bool &)
         {
             if (!success)
@@ -80,6 +84,8 @@ MPDevice::MPDevice(QObject *parent):
                             qInfo() << "Firmware above v1.2, requesting change numbers";
                             getChangeNumbers();
                         }
+                        else
+                            qInfo() << "Firmware below v1.2, do not request change numbers";
                     });
                 }
             }
@@ -397,6 +403,7 @@ bool MPDevice::isJobsQueueBusy()
 
 void MPDevice::loadParameters()
 {
+    readingParams = true;
     AsyncJobs *jobs = new AsyncJobs(
                           "Loading device parameters",
                           this);
@@ -670,6 +677,7 @@ void MPDevice::loadParameters()
                 Q_UNUSED(data);
                 //data is last result
                 //all jobs finished success
+                readingParams = false;
                 qInfo() << "Finished loading Mini serial number";
             });
 
@@ -677,6 +685,7 @@ void MPDevice::loadParameters()
             {
                 Q_UNUSED(failedJob);
                 qCritical() << "Loading Mini serial number failed";
+                readingParams = false;
                 loadParameters(); // memory: does it get "piled on?"
             });
             jobsQueue.enqueue(v12jobs);
@@ -688,6 +697,7 @@ void MPDevice::loadParameters()
     {
         Q_UNUSED(failedJob);
         qCritical() << "Loading option failed";
+        readingParams = false;
         loadParameters(); // memory: does it get "piled on?"
     });
 

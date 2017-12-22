@@ -406,6 +406,9 @@ private:
     int progressCurrent;
 
     FilesCache filesCache;
+
+    //flag set when loading all parameters
+    bool readingParams = false;
 };
 
 #endif // MPDEVICE_H
