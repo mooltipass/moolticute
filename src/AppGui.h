@@ -90,6 +90,9 @@ private:
 
      QTranslator *translator = nullptr;
 
+     //Buffer for storing log from daemon when mainwindow is not created
+     QByteArray logBuffer;
+
      bool createSingleApplication();
      void startSSHAgent();
 };

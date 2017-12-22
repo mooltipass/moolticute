@@ -51,8 +51,13 @@ bool AppGui::initialize()
 
     Common::installMessageOutputHandler(nullptr, [this](const QByteArray &d)
     {
+        logBuffer.append(d);
+
         if (win)
-            win->daemonLogAppend(d);
+        {
+            win->daemonLogAppend(logBuffer);
+            logBuffer.clear();
+        }
     });
 
     setupLanguage();
@@ -72,8 +77,6 @@ bool AppGui::initialize()
     if (!createSingleApplication())
         return false;
 
-    qtAwesome()->initFontAwesome();
-
     systray = new QSystemTrayIcon(this);
     QIcon icon(":/systray_disconnected.png");
 #ifdef Q_OS_MAC
@@ -85,7 +88,7 @@ bool AppGui::initialize()
     showConfigApp = new QAction(tr("&Show Moolticute Application"), this);
     connect(showConfigApp, &QAction::triggered, [=]()
     {
-        if (win->isHidden())
+        if (!win || win->isHidden())
             mainWindowShow();
         else
             mainWindowHide();
@@ -130,7 +133,7 @@ bool AppGui::initialize()
          || reason == QSystemTrayIcon::Trigger
 #endif
        ) {
-            if (win->isHidden())
+            if (!win || win->isHidden())
                 mainWindowShow();
             else
                 mainWindowHide();
@@ -145,17 +148,8 @@ bool AppGui::initialize()
     connect(wsClient, &WSClient::statusChanged, this, &AppGui::updateSystrayTooltip);
     connectedChanged();
 
-    win = new MainWindow(wsClient);
-    connect(win, &MainWindow::destroyed, [this](QObject *)
-    {
-        win = nullptr;
-    });
-    connect(win, &MainWindow::windowCloseRequested, [=]()
-    {
-        mainWindowHide();
-    });
-
-    autoLaunched ?  mainWindowHide() : mainWindowShow();
+    if (!autoLaunched)
+        mainWindowShow();
 
     connect(wsClient, &WSClient::showAppRequested, [=]()
     {
@@ -322,7 +316,21 @@ AppGui::~AppGui()
 void AppGui::mainWindowShow()
 {
     if (!win)
-        return;
+    {
+        //Postpone qtawesome initialisation when the windows is showed
+        //This fix a crash when starting the app with system in macOS
+        qtAwesome()->initFontAwesome();
+
+        win = new MainWindow(wsClient);
+        connect(win, &MainWindow::destroyed, [this](QObject *)
+        {
+            win = nullptr;
+        });
+        connect(win, &MainWindow::windowCloseRequested, [=]()
+        {
+            mainWindowHide();
+        });
+    }
 
     win->show();
     showConfigApp->setText(tr("&Hide Moolticute App"));
@@ -480,8 +488,13 @@ void AppGui::daemonLogRead()
 {
     while (logSocket->canReadLine())
     {
-        QByteArray out = logSocket->readLine();
-        win->daemonLogAppend(out);
+        logBuffer.append(logSocket->readLine());
+
+        if (win)
+        {
+            win->daemonLogAppend(logBuffer);
+            logBuffer.clear();
+        }
         //qDebug() << QString::fromUtf8(out);
     }
 }
