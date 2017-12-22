@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>691</width>
-    <height>647</height>
+    <width>687</width>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,7 +166,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageLocked">
       <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -174,102 +174,111 @@ border-right: none;
         <number>35</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <property name="leftMargin">
-          <number>40</number>
+        <widget class="QWidget" name="widget_filesCache" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>160</height>
+          </size>
          </property>
-         <property name="rightMargin">
-          <number>40</number>
-         </property>
-         <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Quick File Access</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QListWidget" name="filesCacheListWidget"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="emptyCacheLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>No Files In The Device</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QPushButton" name="listFilesButton">
-             <property name="minimumSize">
-              <size>
-               <width>208</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>300</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>List Files</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Quick File Access</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="filesCacheListWidget"/>
+          </item>
+          <item>
+           <widget class="QProgressBar" name="progressBarQuick">
+            <property name="value">
+             <number>24</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="emptyCacheLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>No Files In The Device</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QPushButton" name="listFilesButton">
+              <property name="minimumSize">
+               <size>
+                <width>208</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>300</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>List Files</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -286,6 +295,9 @@ border-right: none;
           <spacer name="verticalSpacer_5">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Preferred</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -332,7 +344,7 @@ border-right: none;
              <property name="maximumSize">
               <size>
                <width>300</width>
-               <height>16777215</height>
+               <height>38</height>
               </size>
              </property>
              <property name="text">
@@ -346,6 +358,9 @@ border-right: none;
           <spacer name="verticalSpacer_6">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -523,7 +538,7 @@ padding: 2px;
           </spacer>
          </item>
          <item>
-          <widget class="AnimatedColorButton" name="buttonDiscard" native="true">
+          <widget class="AnimatedColorButton" name="buttonDiscard">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -555,6 +570,12 @@ padding: 2px;
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
            </property>
           </spacer>
          </item>

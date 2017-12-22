@@ -97,6 +97,7 @@ private:
     QString fileName;
 
     QStringList deletedList;
+    void setFileCacheControlsVisible(bool visible);
 };
 
 #endif // FILESMANAGEMENT_H
