@@ -255,6 +255,59 @@ void DbBackupsTrackerTests::trackingPersisted()
     file.close();
 }
 
+void DbBackupsTrackerTests::credentialChangenumberWrapOver()
+{
+    // the monitored file change number is higher than the one the device
+    // *and* the difference between both numbers is less than 0x60
+    const QString cardId = "123456";
+    tracker.setCardId(cardId);
+    tracker.setCredentialsDbChangeNumber(22);
+    tracker.setDataDbChangeNumber(0);
+
+    QString file = getTestsDataDirPath() + "tests_backup2";
+
+    QSignalSpy spy(&tracker, &DbBackupsTracker::greaterDbBackupChangeNumber);
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+    QCOMPARE(spy.count(), 0);
+    Q_ASSERT(!tracker.isUpdateRequired());
+
+    // monitored file change number is 0xFF and
+    // the change number on the device is 0x00
+    tracker.setCredentialsDbChangeNumber(0x00);
+    tracker.setDataDbChangeNumber(0x00);
+
+    file = getTestsDataDirPath() + "tests_backup3";
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+    QCOMPARE(spy.count(), 0);
+    Q_ASSERT(!tracker.isUpdateRequired());
+
+    // monitored file change number is 0x00 and
+    // the change number on the device is 0xFF
+    tracker.setCredentialsDbChangeNumber(0xFF);
+    tracker.setDataDbChangeNumber(0xFF);
+
+    file = getTestsDataDirPath() + "tests_backup4";
+
+    try {
+        tracker.track(file);
+    } catch (DbBackupsTrackerNoCardIdSet& e) {
+        QFAIL("DbBackupsTracker No Cpz Set");
+    }
+    QCOMPARE(spy.count(), 1);
+    Q_ASSERT(tracker.isUpdateRequired());
+
+}
+
 void DbBackupsTrackerTests::getFileFormatLegacy()
 {
     DbBackupsTracker* t = new DbBackupsTracker();

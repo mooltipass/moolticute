@@ -147,7 +147,7 @@ bool DbBackupsTracker::isUpdateRequired() const
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
-        return (backupCCN > credentialsDbChangeNumber || backupDCN > dataDbChangeNumber);
+        return isDbBackupChangeNumberGreater(backupCCN, backupDCN);
     }
     catch (DbBackupsTrackerNoBackupFileSet)
     {
@@ -162,8 +162,7 @@ bool DbBackupsTracker::isBackupRequired() const
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
-        return (backupCCN < credentialsDbChangeNumber || backupDCN < dataDbChangeNumber);
-
+        return isDbBackupChangeNumberLower(backupCCN, backupDCN);
     }
     catch (DbBackupsTrackerNoBackupFileSet)
     {
@@ -271,6 +270,36 @@ void DbBackupsTracker::setDataDbChangeNumber(int dataDbChangeNumber)
     emit dataDbChangeNumberChanged(this->dataDbChangeNumber);
 }
 
+bool DbBackupsTracker::greaterThanWithWrapOver(int a, int b, int limit, int range) const
+{
+    bool res = (a > b) && ( (a - b) < range);
+    res = res | (a < b) && ((limit - b + a) < range);
+    return res;
+}
+
+bool DbBackupsTracker::lowerThanWithWrapOver(int a, int b, int limit, int range) const
+{
+    bool res = (a < b) && ( (b - a) < range);
+    res = res | (a > b) && ((limit - a + b) < range);
+    return res;
+}
+
+bool DbBackupsTracker::isDbBackupChangeNumberGreater(int backupCCN, int backupDCN) const
+{
+    bool result = false;
+    result = result | greaterThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result | greaterThanWithWrapOver(backupDCN, dataDbChangeNumber);
+    return result;
+}
+
+bool DbBackupsTracker::isDbBackupChangeNumberLower(int backupCCN, int backupDCN) const
+{
+    bool result = false;
+    result = result | lowerThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result | lowerThanWithWrapOver(backupDCN, dataDbChangeNumber);
+    return result;
+}
+
 void DbBackupsTracker::checkDbBackupSynchronization()
 {
     try
@@ -278,10 +307,10 @@ void DbBackupsTracker::checkDbBackupSynchronization()
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
-        if (backupCCN > credentialsDbChangeNumber || backupDCN > dataDbChangeNumber)
+        if (isDbBackupChangeNumberGreater(backupCCN, backupDCN))
             emit greaterDbBackupChangeNumber();
 
-        if (backupCCN < credentialsDbChangeNumber || backupDCN < dataDbChangeNumber)
+        if (isDbBackupChangeNumberLower(backupCCN, backupDCN))
             emit lowerDbBackupChangeNumber();
     }
     catch (DbBackupsTrackerNoBackupFileSet)
