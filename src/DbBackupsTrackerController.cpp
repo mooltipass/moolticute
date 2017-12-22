@@ -52,7 +52,7 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSCli
 void DbBackupsTrackerController::setBackupFilePath(const QString &path)
 {
     hideExportRequestIfVisible();
-    hideExportImportIfVisible();
+    hideImportRequestIfVisible();
     try
     {
         dbBackupsTracker.track(path);
@@ -117,6 +117,8 @@ void DbBackupsTrackerController::importDbBackup(QString data)
 
 void DbBackupsTrackerController::handleGreaterDbBackupChangeNumber()
 {
+    hideExportRequestIfVisible();
+    hideImportRequestIfVisible();
     askForImportBackup();
 }
 
@@ -171,6 +173,8 @@ void DbBackupsTrackerController::exportDbBackup()
 
 void DbBackupsTrackerController::handleLowerDbBackupChangeNumber()
 {
+    hideImportRequestIfVisible();
+    hideExportRequestIfVisible();
     askForExportBackup();
 }
 
@@ -221,7 +225,7 @@ void DbBackupsTrackerController::handleDeviceStatusChanged(const Common::MPStatu
         clearTrackerCardInfo();
 
         hideExportRequestIfVisible();
-        hideExportImportIfVisible();
+        hideImportRequestIfVisible();
     }
 }
 
@@ -230,7 +234,7 @@ void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &)
     clearTrackerCardInfo();
 
     hideExportRequestIfVisible();
-    hideExportImportIfVisible();
+    hideImportRequestIfVisible();
 }
 
 void DbBackupsTrackerController::handleFirmwareVersionChange(const QString &version)
@@ -256,7 +260,7 @@ void DbBackupsTrackerController::hideExportRequestIfVisible()
     }
 }
 
-void DbBackupsTrackerController::hideExportImportIfVisible()
+void DbBackupsTrackerController::hideImportRequestIfVisible()
 {
     if (askImportMessage != nullptr)
         askImportMessage->reject();
