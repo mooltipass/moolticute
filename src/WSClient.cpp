@@ -484,6 +484,20 @@ void WSClient::sendRefreshFilesCacheRequest()
     sendJsonData({{ "msg", "refresh_files_cache" }});
 }
 
+bool WSClient::isFw12()
+{
+    static QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
+    QRegularExpressionMatchIterator i = regVersion.globalMatch(m_fwVersion);
+    if (i.hasNext())
+    {
+        QRegularExpressionMatch match = i.next();
+        int v = match.captured(1).toInt() * 10 +
+                match.captured(2).toInt();
+        return v >= 12;
+    } else
+        return false;
+}
+
 void WSClient::queryRandomNumbers()
 {
     sendJsonData({{ "msg", "get_random_numbers" }});

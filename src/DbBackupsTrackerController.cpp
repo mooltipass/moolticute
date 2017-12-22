@@ -233,9 +233,9 @@ void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &)
     hideExportImportIfVisible();
 }
 
-void DbBackupsTrackerController::handleFirmwareVersionChange(const QString &version)
+void DbBackupsTrackerController::handleFirmwareVersionChange(const QString &)
 {
-    if (version >= "v1.2")
+    if (wsClient->isFw12())
     {
         window->showDbBackTrackingControls(true);
         connectDbBackupsTracker();

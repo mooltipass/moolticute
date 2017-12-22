@@ -140,10 +140,10 @@ void FilesManagement::setWsClient(WSClient *c)
         loadFilesCacheModel();
     });
 
-    setFileCacheControlsVisible(wsClient->get_fwVersion() >= "v1.2");
-    connect(wsClient, &WSClient::fwVersionChanged, [=](const QString &version)
+    setFileCacheControlsVisible(wsClient->isFw12());
+    connect(wsClient, &WSClient::fwVersionChanged, [=](const QString &)
     {
-        setFileCacheControlsVisible(version >= "v1.2");
+        setFileCacheControlsVisible(wsClient->isFw12());
     });
     connect(wsClient, &WSClient::wsConnected, [=] ()
     {
@@ -213,7 +213,7 @@ void FilesManagement::loadModel()
 
 void FilesManagement::loadFilesCacheModel()
 {
-    if (wsClient->get_fwVersion() <= "v1.2")
+    if (!wsClient->isFw12())
     {
         setFileCacheControlsVisible(false);
         return;
