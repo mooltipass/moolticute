@@ -317,6 +317,10 @@ void WSClient::onTextMessageReceived(const QString &message)
         int credentialsDbChangeNumber = data["credentialsDbChangeNumber"].toInt();
         int dataDbChangeNumber = data["dataDbChangeNumber"].toInt();
 
+        set_cardId(cardId);
+        set_credentialsDbChangeNumber(credentialsDbChangeNumber);
+        set_dataDbChangeNumber(dataDbChangeNumber);
+
         emit cardDbMetadataChanged(cardId, credentialsDbChangeNumber, dataDbChangeNumber);
     }
 }

@@ -16,11 +16,6 @@ DbBackupsTracker::DbBackupsTracker(QObject* parent):
     QObject(parent)
 {
     loadTracks();
-
-    connect(&watcher, &QFileSystemWatcher::fileChanged, [=] (const QString &path)
-    {
-        qDebug () << "FILE CHANGED" << path;
-    });
     connect(&watcher, &QFileSystemWatcher::fileChanged,
             this, &DbBackupsTracker::checkDbBackupSynchronization);
 }
@@ -63,7 +58,7 @@ int DbBackupsTracker::extractCredentialsDbChangeNumberEncryptedBackup(const QJso
     if (root.contains("credentialsDbChangeNumber"))
         return root.value("credentialsDbChangeNumber").toInt();
 
-    return 0;
+    return -1;
 }
 
 int DbBackupsTracker::extractCredentialsDbChangeNumberLegacyBackup(const QJsonDocument &d) const
@@ -73,12 +68,12 @@ int DbBackupsTracker::extractCredentialsDbChangeNumberLegacyBackup(const QJsonDo
     if (val.isDouble())
         return val.toInt();
 
-    return 0;
+    return -1;
 }
 
 int DbBackupsTracker::extractCredentialsDbChangeNumber(const QString &content) const
 {
-    int cn = 0;
+    int cn = -1;
     QJsonDocument d = QJsonDocument::fromJson(content.toLocal8Bit());
     if (isALegacyBackup(d))
         cn = extractCredentialsDbChangeNumberLegacyBackup(d);
@@ -94,7 +89,7 @@ int DbBackupsTracker::extractDataDbChangeNumberEncryptedBackup(const QJsonDocume
     if (root.contains("dataDbChangeNumber"))
         return root.value("dataDbChangeNumber").toInt();
 
-    return 0;
+    return -1;
 }
 
 bool DbBackupsTracker::isALegacyBackup(const QJsonDocument &d) const
@@ -114,12 +109,12 @@ int DbBackupsTracker::extractDataDbChangeNumberLegacyBackup(const QJsonDocument 
     if (val.isDouble())
         return val.toInt();
 
-    return 0;
+    return -1;
 }
 
 int DbBackupsTracker::extractDataDbChangeNumber(const QString &content) const
 {
-    int cn = 0;
+    int cn = -1;
     QJsonDocument d = QJsonDocument::fromJson(content.toLocal8Bit());
     if (d.isObject())
         cn = extractDataDbChangeNumberEncryptedBackup(d);
@@ -143,7 +138,6 @@ bool DbBackupsTracker::isUpdateRequired() const
 {
     try
     {
-
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
@@ -307,6 +301,12 @@ void DbBackupsTracker::checkDbBackupSynchronization()
         int backupCCN = tryGetCredentialsDbBackupChangeNumber();
         int backupDCN = tryGetDataDbBackupChangeNumber();
 
+        // < 0 values are a failure to read the file.
+        if (backupCCN < 0 || backupDCN < 0)
+            return;
+
+        qDebug () << "Backup file changed: " << backupCCN << " - " << backupDCN;
+
         if (isDbBackupChangeNumberGreater(backupCCN, backupDCN))
             emit greaterDbBackupChangeNumber();
 
@@ -315,7 +315,7 @@ void DbBackupsTracker::checkDbBackupSynchronization()
     }
     catch (DbBackupsTrackerNoBackupFileSet)
     {
-        qDebug() << "No backup file for  " << cardId;
+        qDebug() << "No backup file for " << cardId;
     }
 }
 

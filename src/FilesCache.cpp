@@ -50,7 +50,7 @@ bool FilesCache::save(QList<QVariantMap> files)
 
 QList<QVariantMap> FilesCache::load()
 {
-    if (!m_dbChangeNumberSet || m_cardCPZ.isNull())
+    if (!m_dbChangeNumberSet || m_cardCPZ.isEmpty())
     {
         qDebug() << "dbChangeNumberSet not set or null CPZ";
         return QList<QVariantMap>();
@@ -105,7 +105,7 @@ void FilesCache::resetState()
 
 bool FilesCache::setDbChangeNumber(quint8 changeNumber)
 {
-    if (m_dbChangeNumberSet && m_dbChangeNumber != changeNumber && !m_cardCPZ.isNull())
+    if (m_dbChangeNumberSet && m_dbChangeNumber != changeNumber && !m_cardCPZ.isEmpty())
     {
         qDebug() << "dbChangeNumber updated, triggering file storage";
         auto tempDb = load();
@@ -117,7 +117,7 @@ bool FilesCache::setDbChangeNumber(quint8 changeNumber)
     m_dbChangeNumber = changeNumber;
     m_dbChangeNumberSet = true;
 
-    if (!m_cardCPZ.isNull())
+    if (!m_cardCPZ.isEmpty())
         return true;
     else
         return false;
@@ -146,8 +146,8 @@ bool FilesCache::setCardCPZ(QByteArray cardCPZ)
     m_filePath = dataDir.absoluteFilePath(fileName);
 
     qint64 m_key = 0;
-    for (int i = 0; i < std::min(8, cardCPZ.size()) ; i ++)
-        m_key += (static_cast<unsigned int>(cardCPZ[i]) & 0xFF) << (i*8);
+    for (int i = 0;i < std::min(8, cardCPZ.size());i++)
+        m_key += (static_cast<unsigned int>(cardCPZ[i]) & 0xFF) << (i * 8);
 
     m_simpleCrypt.setKey(m_key);
     m_simpleCrypt.setIntegrityProtectionMode(SimpleCrypt::ProtectionHash);

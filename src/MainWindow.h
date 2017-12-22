@@ -143,7 +143,7 @@ private:
     QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;
     PasswordProfilesModel *m_passwordProfilesModel;
-    DbBackupsTrackerController dbBackupsTrackerController;
+    DbBackupsTrackerController *dbBackupsTrackerController;
 };
 
 #endif // MAINWINDOW_H

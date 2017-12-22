@@ -47,6 +47,16 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSCli
             this, &DbBackupsTrackerController::handleDeviceConnectedChanged);
 
     handleFirmwareVersionChange(wsClient->get_fwVersion());
+    handleDeviceStatusChanged(wsClient->get_status());
+    handleDeviceConnectedChanged(wsClient->isConnected());
+
+    //Delay the init in the next event loop call. Not in constructor.
+    QTimer::singleShot(0, [=]()
+    {
+        handleCardDbMetadataChanged(wsClient->get_cardId(),
+                                    wsClient->get_credentialsDbChangeNumber(),
+                                    wsClient->get_dataDbChangeNumber());
+    });
 }
 
 void DbBackupsTrackerController::setBackupFilePath(const QString &path)
@@ -67,6 +77,7 @@ void DbBackupsTrackerController::handleCardDbMetadataChanged(QString cardId,
                                                              int credentialsDbChangeNumber,
                                                              int dataDbChangeNumber)
 {
+    qDebug() << "Card meta data changed " << cardId << " - " << credentialsDbChangeNumber << " - " << dataDbChangeNumber;
     window->hidePrompt();
 
     dbBackupsTracker.setCardId(cardId);
@@ -79,28 +90,27 @@ void DbBackupsTrackerController::handleCardDbMetadataChanged(QString cardId,
     emit backupFilePathChanged(path);
 }
 
-
 void DbBackupsTrackerController::askForImportBackup()
 {
-  askImportMessage = new QMessageBox(window);
-  askImportMessage->setWindowTitle(tr("Import db backup"));
-  askImportMessage->setText(tr("Credentials in the backup file are more recent. "
-                               "Do you want to import credentials to the device?"));
+    askImportMessage = new QMessageBox(window);
+    askImportMessage->setWindowTitle(tr("Import db backup"));
+    askImportMessage->setText(tr("Credentials in the backup file are more recent. "
+                                 "Do you want to import credentials to the device?"));
 
-  askImportMessage->addButton(QMessageBox::Yes);
-  askImportMessage->addButton(QMessageBox::No);
-  askImportMessage->setDefaultButton(QMessageBox::No);
-  askImportMessage->setModal(true);
+    askImportMessage->addButton(QMessageBox::Yes);
+    askImportMessage->addButton(QMessageBox::No);
+    askImportMessage->setDefaultButton(QMessageBox::No);
+    askImportMessage->setModal(true);
 
-  int btn  = askImportMessage->exec();
-  askImportMessage->deleteLater();
-  askImportMessage = nullptr;
+    int btn  = askImportMessage->exec();
+    askImportMessage->deleteLater();
+    askImportMessage = nullptr;
 
-  if (btn == QMessageBox::Yes)
-  {
-      QString data = readDbBackupFile();
-      importDbBackup(data);
-  }
+    if (btn == QMessageBox::Yes)
+    {
+        QString data = readDbBackupFile();
+        importDbBackup(data);
+    }
 }
 
 void DbBackupsTrackerController::importDbBackup(QString data)
@@ -117,6 +127,8 @@ void DbBackupsTrackerController::importDbBackup(QString data)
 
 void DbBackupsTrackerController::handleGreaterDbBackupChangeNumber()
 {
+    qDebug() << "Backup file is greater than device";
+
     hideExportRequestIfVisible();
     hideImportRequestIfVisible();
     askForImportBackup();
@@ -133,9 +145,9 @@ void DbBackupsTrackerController::askForExportBackup()
     std::function<void()> onReject = [this]()
     {
         QMessageBox::StandardButton btn = QMessageBox::warning(
-                    window, tr("Be careful"),
-                    tr("By denying you can loose your changes. Do you want to continue?"),
-                    QMessageBox::Yes | QMessageBox::No);
+                                              window, tr("Be careful"),
+                                              tr("By denying you can loose your changes. Do you want to continue?"),
+                                              QMessageBox::Yes | QMessageBox::No);
 
         if (btn == QMessageBox::Yes)
         {
@@ -173,6 +185,8 @@ void DbBackupsTrackerController::exportDbBackup()
 
 void DbBackupsTrackerController::handleLowerDbBackupChangeNumber()
 {
+    qDebug() << "Device is newer than backup";
+
     hideImportRequestIfVisible();
     hideExportRequestIfVisible();
     askForExportBackup();
@@ -191,7 +205,7 @@ void DbBackupsTrackerController::clearTrackerCardInfo()
     dbBackupsTracker.setCardId("");
     dbBackupsTracker.setDataDbChangeNumber(0);
     dbBackupsTracker.setCredentialsDbChangeNumber(0);
- }
+}
 
 
 void DbBackupsTrackerController::handleExportDbResult(const QByteArray &d, bool success)
@@ -241,14 +255,16 @@ void DbBackupsTrackerController::handleFirmwareVersionChange(const QString &)
 {
     if (wsClient->isFw12())
     {
+        qDebug() << "Setup db tracking";
         window->showDbBackTrackingControls(true);
         connectDbBackupsTracker();
-    } else
+    }
+    else
     {
+        qDebug() << "Db tracking is not available for fw < 1.2";
         window->showDbBackTrackingControls(false);
         disconnectDbBackupsTracker();
     }
-
 }
 
 void DbBackupsTrackerController::hideExportRequestIfVisible()
@@ -266,13 +282,12 @@ void DbBackupsTrackerController::hideImportRequestIfVisible()
         askImportMessage->reject();
 }
 
-
 QString DbBackupsTrackerController::getBackupFilePath()
 {
-  QString id = dbBackupsTracker.getCardId();
-  QString file = dbBackupsTracker.getTrackPath(id);
+    QString id = dbBackupsTracker.getCardId();
+    QString file = dbBackupsTracker.getTrackPath(id);
 
-   return file;
+    return file;
 }
 
 QString DbBackupsTrackerController::readDbBackupFile()

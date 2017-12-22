@@ -43,8 +43,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     bAdvancedTabVisible(false),
     dbBackupTrakingControlsVisible(false),
     previousWidget(nullptr),
-    m_passwordProfilesModel(new PasswordProfilesModel(this)),
-    dbBackupsTrackerController(this, client, this)
+    m_passwordProfilesModel(new PasswordProfilesModel(this))
 {
     QSettings s;
     bSSHKeysTabVisibleOnDemand = s.value("settings/SSHKeysTabsVisibleOnDemand", true).toBool();
@@ -55,6 +54,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     ui->setupUi(this);
     refreshAppLangCb();
+
+    dbBackupsTrackerController = new DbBackupsTrackerController(this, client, this);
 
     ui->checkBoxLongPress->setChecked(s.value("settings/long_press_cancel", true).toBool());
     connect(ui->checkBoxLongPress, &QCheckBox::toggled, [this](bool checked)
@@ -161,8 +162,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     // DB Backups UI
     ui->toolButton_clearBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::remove));
     ui->toolButton_setBackupFilePath->setIcon(AppGui::qtAwesome()->icon(fa::foldero));
-    ui->lineEdit_dbBackupFilePath->setText(dbBackupsTrackerController.getBackupFilePath());
-    connect(&dbBackupsTrackerController, &DbBackupsTrackerController::backupFilePathChanged, [=] (const QString &path)
+    ui->lineEdit_dbBackupFilePath->setText(dbBackupsTrackerController->getBackupFilePath());
+    connect(dbBackupsTrackerController, &DbBackupsTrackerController::backupFilePathChanged, [=] (const QString &path)
     {
         ui->lineEdit_dbBackupFilePath->setText(path);
     });
@@ -1317,7 +1318,7 @@ void MainWindow::retranslateUi()
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
-    dbBackupsTrackerController.setBackupFilePath("");
+    dbBackupsTrackerController->setBackupFilePath("");
 }
 
 void MainWindow::on_toolButton_setBackupFilePath_released()
@@ -1331,6 +1332,6 @@ void MainWindow::on_toolButton_setBackupFilePath_released()
     {
         QStringList fileNames = dialog.selectedFiles();
         ui->lineEdit_dbBackupFilePath->setText(fileNames.first());
-        dbBackupsTrackerController.setBackupFilePath(fileNames.first());
+        dbBackupsTrackerController->setBackupFilePath(fileNames.first());
     }
 }

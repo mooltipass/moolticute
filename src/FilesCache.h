@@ -29,9 +29,9 @@ public slots:
 private:
     QByteArray m_cardCPZ;
     QString m_filePath;
-    qint64 m_key;
+    qint64 m_key = 0;
     bool m_dbChangeNumberSet = false;
-    quint8 m_dbChangeNumber;
+    quint8 m_dbChangeNumber = -1;
     SimpleCrypt m_simpleCrypt;
 };
 
