@@ -448,7 +448,10 @@ void FilesManagement::addUpdateFile(QString service, QString filename, QProgress
     QFileInfo fi(filename);
     if (fi.size() > maxSize)
     {
-        QMessageBox::warning(this, tr("Failure"), tr("File '%1' is too big to be stored in the Mooltipass!").arg(filename));
+        QMessageBox::warning(this, tr("Failure"),
+                             tr("File '%1' is too big to be stored in the Mooltipass!\n\nMaximum allowed size is %2 bytes.")
+                             .arg(filename)
+                             .arg(maxSize));
         return;
     }
 
