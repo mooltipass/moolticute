@@ -1,3 +1,5 @@
 build-linux/moolticuted /usr/bin
 build-linux/moolticute /usr/bin
+mc-agent /usr/bin
+mc-cli /usr/bin
 systemd/moolticuted.service /lib/systemd/system

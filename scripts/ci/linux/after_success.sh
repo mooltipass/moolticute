@@ -72,7 +72,10 @@ $DOCKER_EXEC "DEBEMAIL=${USER_EMAIL} dch --create --distribution trusty --packag
 
 echo "Building .deb package..."
 
-$DOCKER_EXEC "cp -f README.md debian/README"
+wget_retry https://calaos.fr/mooltipass/tools/linux/mc-agent -O mc-agent
+wget_retry https://calaos.fr/mooltipass/tools/linux/mc-cli -O mc-cli
+
+$DOCKER_EXEC "cp -f README.md mc-agent mc-cli debian/README"
 $DOCKER_EXEC "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
 
 echo "Building AppImage"
