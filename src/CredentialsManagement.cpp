@@ -229,7 +229,7 @@ void CredentialsManagement::on_addCredentialButton_clicked()
 {
     if (wsClient->get_memMgmtMode())
     {
-        m_pCredModel->addCredential(ui->addCredServiceInput->text(),
+        m_pCredModel->addCredential(ui->addCredServiceInput->text().toLower(),
                                     ui->addCredLoginInput->text(),
                                     ui->addCredPasswordInput->text(),
                                     QString());
@@ -242,7 +242,7 @@ void CredentialsManagement::on_addCredentialButton_clicked()
     {
         ui->addCredentialButton->setEnabled(false);
         ui->gridLayoutAddCred->setEnabled(false);
-        wsClient->addOrUpdateCredential(ui->addCredServiceInput->text(),
+        wsClient->addOrUpdateCredential(ui->addCredServiceInput->text().toLower(),
                                         ui->addCredLoginInput->text(),
                                         ui->addCredPasswordInput->text());
 
