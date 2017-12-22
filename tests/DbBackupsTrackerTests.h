@@ -27,6 +27,7 @@ private slots:
     void trackLegacyDbBackupMajorDataDbChangeNumber();
     void trackLegacyDbBackupWithMinorDataDbChangeNumber();
     void trackingPersisted();
+    void credentialChangenumberWrapOver();
 
     void getFileFormatLegacy();
     void getFileFormatSympleCrypt();
