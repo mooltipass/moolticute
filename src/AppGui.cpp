@@ -34,6 +34,9 @@
     #define MC_UPDATE_URL   ""
 #endif
 
+//5 min
+#define GUI_STARTUP_DELAY   5 * 60 * 1000
+
 AppGui::AppGui(int & argc, char ** argv) :
     QApplication(argc, argv),
     sharedMem("moolticute")
@@ -211,6 +214,12 @@ bool AppGui::initialize()
 
     QTimer::singleShot(15000, [this]() { checkUpdate(false); });
 
+    QTimer::singleShot(GUI_STARTUP_DELAY, [this]()
+    {
+        //After some delays create the MainWindow if it's not done yet
+        createMainWindow();
+    });
+
     return true;
 }
 
@@ -319,17 +328,7 @@ void AppGui::mainWindowShow()
     {
         //Postpone qtawesome initialisation when the windows is showed
         //This fix a crash when starting the app with system in macOS
-        qtAwesome()->initFontAwesome();
-
-        win = new MainWindow(wsClient);
-        connect(win, &MainWindow::destroyed, [this](QObject *)
-        {
-            win = nullptr;
-        });
-        connect(win, &MainWindow::windowCloseRequested, [=]()
-        {
-            mainWindowHide();
-        });
+        createMainWindow();
     }
 
     win->show();
@@ -581,4 +580,21 @@ void AppGui::setupLanguage()
             qCritical() << "Failed to install " << langfile;
         qDebug() << "Translator installed";
     }
+}
+
+void AppGui::createMainWindow()
+{
+    if (win) return;
+
+    qtAwesome()->initFontAwesome();
+
+    win = new MainWindow(wsClient);
+    connect(win, &MainWindow::destroyed, [this](QObject *)
+    {
+        win = nullptr;
+    });
+    connect(win, &MainWindow::windowCloseRequested, [=]()
+    {
+        mainWindowHide();
+    });
 }

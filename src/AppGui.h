@@ -95,6 +95,7 @@ private:
 
      bool createSingleApplication();
      void startSSHAgent();
+     void createMainWindow();
 };
 
 #endif // APPGUI_H
