@@ -273,30 +273,30 @@ void DbBackupsTracker::setDataDbChangeNumber(int dataDbChangeNumber)
 bool DbBackupsTracker::greaterThanWithWrapOver(int a, int b, int limit, int range) const
 {
     bool res = (a > b) && ( (a - b) < range);
-    res = res | (a < b) && ((limit - b + a) < range);
+    res = res || ((a < b) && ((limit - b + a) < range));
     return res;
 }
 
 bool DbBackupsTracker::lowerThanWithWrapOver(int a, int b, int limit, int range) const
 {
     bool res = (a < b) && ( (b - a) < range);
-    res = res | (a > b) && ((limit - a + b) < range);
+    res = res || ((a > b) && ((limit - a + b) < range));
     return res;
 }
 
 bool DbBackupsTracker::isDbBackupChangeNumberGreater(int backupCCN, int backupDCN) const
 {
     bool result = false;
-    result = result | greaterThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
-    result = result | greaterThanWithWrapOver(backupDCN, dataDbChangeNumber);
+    result = result || greaterThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result || greaterThanWithWrapOver(backupDCN, dataDbChangeNumber);
     return result;
 }
 
 bool DbBackupsTracker::isDbBackupChangeNumberLower(int backupCCN, int backupDCN) const
 {
     bool result = false;
-    result = result | lowerThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
-    result = result | lowerThanWithWrapOver(backupDCN, dataDbChangeNumber);
+    result = result || lowerThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result || lowerThanWithWrapOver(backupDCN, dataDbChangeNumber);
     return result;
 }
 
