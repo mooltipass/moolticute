@@ -77,7 +77,7 @@ MPDevice::MPDevice(QObject *parent):
                 if (s == Common::Unlocked)
                 {
                     /* If v1.2 firmware, query user change number */
-                    QTimer::singleShot(20, [=]()
+                    QTimer::singleShot(50, [=]()
                     {
                         if (isFw12())
                         {
