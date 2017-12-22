@@ -103,6 +103,7 @@ FilesManagement::FilesManagement(QWidget *parent) :
 
     ui->progressBar->hide();
     ui->progressBarTop->hide();
+    ui->progressBarQuick->hide();
 
     connect(ui->lineEditFilterFiles, &QLineEdit::textChanged, [=](const QString &t)
     {
@@ -246,15 +247,14 @@ void FilesManagement::loadFilesCacheModel()
             if (fileName.isEmpty())
                 return;
 
-// todo: reuse progress bar to indicate dl progress
-//            ui->progressBar->setMinimum(0);
-//            ui->progressBar->setMaximum(0);
-//            ui->progressBar->setValue(0);
-//            ui->progressBar->show();
-//            updateButtonsUI();
+            ui->progressBarQuick->setMinimum(0);
+            ui->progressBarQuick->setMaximum(0);
+            ui->progressBarQuick->setValue(0);
+            ui->progressBarQuick->show();
+            updateButtonsUI();
 
             connect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
-//            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
+            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
 
             wsClient->requestDataFile(target_file);
         });
@@ -290,8 +290,6 @@ void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QMo
     ui->filesDisplayFrame->show();
 
     currentItem = filesModel->itemFromIndex(filesModel->index(filterModel->indexToSource(curr.row()), 0));
-
-//    ui->fileDisplayServiceInput->setText(currentItem->text());
 }
 
 void FilesManagement::on_pushButtonUpdateFile_clicked()
@@ -392,6 +390,7 @@ void FilesManagement::dataFileRequested(const QString &service, const QByteArray
     disconnect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
     disconnect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
     ui->progressBar->hide();
+    ui->progressBarQuick->hide();
     updateButtonsUI();
 
     if (!success)
@@ -419,13 +418,18 @@ void FilesManagement::updateProgress(int total, int curr)
     ui->progressBar->setValue(curr);
     ui->progressBarTop->setMaximum(total);
     ui->progressBarTop->setValue(curr);
+    ui->progressBarQuick->setMaximum(total);
+    ui->progressBarQuick->setValue(curr);
 }
 
 void FilesManagement::updateButtonsUI()
 {
     bool vis = ui->progressBar->isVisible() ||
-               ui->progressBarTop->isVisible();
+               ui->progressBarTop->isVisible() ||
+               ui->progressBarQuick->isVisible();
 
+    ui->pushButtonEnterMMM->setEnabled(!vis);
+    ui->addFileButton->setEnabled(!vis);
     ui->buttonQuitMMM->setEnabled(!vis);
     ui->pushButtonDelFile->setEnabled(!vis);
     ui->pushButtonSaveFile->setEnabled(!vis);

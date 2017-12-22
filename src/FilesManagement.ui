@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>691</width>
-    <height>647</height>
+    <width>687</width>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,7 +166,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageLocked">
       <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -217,6 +217,13 @@ border-right: none;
           </item>
           <item>
            <widget class="QListWidget" name="filesCacheListWidget"/>
+          </item>
+          <item>
+           <widget class="QProgressBar" name="progressBarQuick">
+            <property name="value">
+             <number>24</number>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="emptyCacheLabel">
@@ -531,7 +538,7 @@ padding: 2px;
           </spacer>
          </item>
          <item>
-          <widget class="AnimatedColorButton" name="buttonDiscard" native="true">
+          <widget class="AnimatedColorButton" name="buttonDiscard">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
              <horstretch>0</horstretch>
