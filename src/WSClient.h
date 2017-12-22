@@ -101,6 +101,8 @@ public:
     void sendListFilesCacheRequest();
     void sendRefreshFilesCacheRequest();
 
+    bool isFw12();
+
 signals:
     void wsConnected();
     void wsDisconnected();

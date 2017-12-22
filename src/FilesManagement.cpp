@@ -139,10 +139,21 @@ void FilesManagement::setWsClient(WSClient *c)
     {
         loadFilesCacheModel();
     });
+
+    setFileCacheControlsVisible(wsClient->isFw12());
+    connect(wsClient, &WSClient::fwVersionChanged, [=](const QString &)
+    {
+        setFileCacheControlsVisible(wsClient->isFw12());
+    });
     connect(wsClient, &WSClient::wsConnected, [=] ()
     {
         wsClient->sendListFilesCacheRequest();
     });
+}
+
+void FilesManagement::setFileCacheControlsVisible(bool visible)
+{
+    ui->widget_filesCache->setVisible(visible);
 }
 
 void FilesManagement::enableMemManagement(bool enable)
@@ -202,6 +213,12 @@ void FilesManagement::loadModel()
 
 void FilesManagement::loadFilesCacheModel()
 {
+    if (!wsClient->isFw12())
+    {
+        setFileCacheControlsVisible(false);
+        return;
+    }
+
     QListWidget * listWidget = ui->filesCacheListWidget;
     listWidget->clear();
     for (auto jsonValue : wsClient->getFilesCache())
@@ -223,7 +240,8 @@ void FilesManagement::loadFilesCacheModel()
 
         connect(button, &QToolButton::clicked, [=]()
         {
-            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), jsonValue.toString());
+            QString target_file = jsonObject.value("name").toString();
+            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), target_file);
 
             if (fileName.isEmpty())
                 return;
@@ -238,7 +256,7 @@ void FilesManagement::loadFilesCacheModel()
             connect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
 //            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
 
-            wsClient->requestDataFile(jsonValue.toString());
+            wsClient->requestDataFile(target_file);
         });
 
         rowLayout->addWidget(button, 1, Qt::AlignRight);
