@@ -245,6 +245,9 @@ void AppGui::startSSHAgent()
 #ifndef Q_OS_WIN
         arguments << "--no-fork";
 #endif
+        QStringList userArgs = s.value("settings/ssh_args").toString().split(' ');
+        arguments.append(userArgs);
+
         qInfo() << "Running " << program << " " << arguments;
 
         connect(sshAgentProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),

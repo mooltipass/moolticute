@@ -238,7 +238,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>8</number>
+       <number>9</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -488,8 +488,8 @@ QWidget {background-color: #EFEFEF;}</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>720</width>
-             <height>597</height>
+             <width>853</width>
+             <height>675</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -2364,6 +2364,45 @@ QWidget {background-color: #EFEFEF;}</string>
            </layout>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_33">
+            <item>
+             <widget class="QLabel" name="label_43">
+              <property name="text">
+               <string>Moolticute SSH arguments</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_44">
+              <property name="font">
+               <font>
+                <italic>true</italic>
+               </font>
+              </property>
+              <property name="text">
+               <string>(Restart needed)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_34">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditSshArgs"/>
+            </item>
+           </layout>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_18">
             <item>
              <widget class="QLabel" name="label_33">
@@ -2799,8 +2838,6 @@ QWidget {background-color: #EFEFEF;}</string>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../img/images.qrc"/>
-  <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
  </resources>
  <connections/>

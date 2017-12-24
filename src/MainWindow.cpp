@@ -461,6 +461,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
 
     //Check is ssh agent opt has to be checked
     ui->checkBoxSSHAgent->setChecked(s.value("settings/auto_start_ssh").toBool());
+    ui->lineEditSshArgs->setText(s.value("settings/ssh_args").toString());
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
@@ -1334,4 +1335,10 @@ void MainWindow::on_toolButton_setBackupFilePath_released()
         ui->lineEdit_dbBackupFilePath->setText(fileNames.first());
         dbBackupsTrackerController->setBackupFilePath(fileNames.first());
     }
+}
+
+void MainWindow::on_lineEditSshArgs_textChanged(const QString &text)
+{
+    QSettings s;
+    s.setValue("settings/ssh_args", ui->lineEditSshArgs->text());
 }
