@@ -314,6 +314,11 @@ void AppGui::updateSystrayTooltip()
 
 AppGui::~AppGui()
 {
+#ifndef QOS_WIN
+    //First let mc-agent clean gracefully
+    sshAgentProcess->terminate();
+#endif
+
     aboutToQuit = true;
     delete wsClient;
     delete daemonProcess;
