@@ -72,12 +72,17 @@ $DOCKER_EXEC "DEBEMAIL=${USER_EMAIL} dch --create --distribution trusty --packag
 
 echo "Building .deb package..."
 
-wget_retry https://calaos.fr/mooltipass/tools/linux/mc-agent -O mc-agent
-wget_retry https://calaos.fr/mooltipass/tools/linux/mc-cli -O mc-cli
-chmod +x mc-agent mc-cli
+$DOCKER_EXEC \
+    "mkdir -p build-linux && \
+    wget https://calaos.fr/mooltipass/tools/linux/mc-agent -O build-linux/mc-agent && \
+    wget https://calaos.fr/mooltipass/tools/linux/mc-agent -O build-linux/mc-cli && \
+    chmod +x build-linux/mc-agent && \
+    chmod +x build-linux/mc-cli"
 
-$DOCKER_EXEC "mkdir -p build-linux && cp -f mc-agent mc-cli build-linux/"
-$DOCKER_EXEC "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
+$DOCKER_EXEC \
+    "dpkg-buildpackage -b -us -uc && \
+    mkdir -p build-linux/deb && \
+    cp ../*.deb build-linux/deb"
 
 echo "Building AppImage"
 $DOCKER_EXEC "scripts/ci/linux/appimage.sh"
