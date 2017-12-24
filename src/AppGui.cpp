@@ -102,26 +102,21 @@ bool AppGui::initialize()
 
     QMenu *systrayMenu = new QMenu();
 
-    daemonAction = new DaemonMenuAction(systrayMenu);
 #ifndef Q_OS_WIN
     // Custom systray widgets are not working on linux
     // And it fails too much on macos, see issue #132
-    restartDaemonAction = new QAction(this);
+    restartDaemonAction = new QAction(tr("&Restart daemon"), this);
     connect(restartDaemonAction, &QAction::triggered, this, &AppGui::restartDaemon);
     systrayMenu->addAction(restartDaemonAction);
 #else
+    daemonAction = new DaemonMenuAction(systrayMenu);
     systrayMenu->addAction(daemonAction);
 #endif
+
     systrayMenu->addSeparator();
     systrayMenu->addAction(showConfigApp);
     systrayMenu->addSeparator();
     systrayMenu->addAction(quitAction);
-    connect(systrayMenu, &QMenu::aboutToShow, [=]()
-    {
-        //Hack: On OSX the second time the menu is shown the widget is not drawn
-        //Force a redraw make it visible again
-        daemonAction->forceRepaint();
-    });
 
     systray->setContextMenu(systrayMenu);
 
@@ -204,7 +199,9 @@ bool AppGui::initialize()
     if (!foundDaemon)
         daemonProcess->start(program, arguments);
 
+#ifdef Q_OS_WIN
     connect(daemonAction, &DaemonMenuAction::restartClicked, this, &AppGui::restartDaemon);
+#endif
 
     timerDaemon = new QTimer(this);
     connect(timerDaemon, SIGNAL(timeout()), SLOT(searchDaemonTick()));
@@ -393,12 +390,12 @@ void AppGui::searchDaemonTick()
         return;
     foundDaemon = search;
 
-#ifdef Q_OS_LINUX
+#ifndef Q_OS_WIN
     restartDaemonAction->setEnabled(foundDaemon && !needRestart);
     if (!foundDaemon && needRestart)
-        restartDaemonAction->setText("Restarting daemon...");
+        restartDaemonAction->setText(tr("Restarting daemon..."));
     else
-        restartDaemonAction->setText("&Restart daemon");
+        restartDaemonAction->setText(tr("&Restart daemon"));
 #else
     if (foundDaemon)
         daemonAction->updateStatus(DaemonMenuAction::StatusRunning);
