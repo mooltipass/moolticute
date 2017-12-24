@@ -161,19 +161,6 @@ bool AppGui::initialize()
     //arguments << "-e" <<  "-s 8080";
     qInfo() << "Running " << program << " " << arguments;
 
-    connect(daemonProcess, &QProcess::errorOccurred, [=](QProcess::ProcessError error)
-    {
-        switch (error)
-        {
-        case QProcess::FailedToStart: qWarning() << "daemon: Failed to start"; break;
-        case QProcess::Crashed: qWarning() << "daemon: crashed"; break;
-        case QProcess::Timedout: qWarning() << "daemon: Timedout"; break;
-        case QProcess::WriteError: qWarning() << "daemon: WriteError"; break;
-        case QProcess::ReadError: qWarning() << "daemon: ReadError"; break;
-        default: qWarning() << "daemon: UnknownError";
-        }
-    });
-
     connect(daemonProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
         [=](int exitCode, QProcess::ExitStatus exitStatus)
     {
