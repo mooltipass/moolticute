@@ -74,6 +74,7 @@ echo "Building .deb package..."
 
 wget_retry https://calaos.fr/mooltipass/tools/linux/mc-agent -O mc-agent
 wget_retry https://calaos.fr/mooltipass/tools/linux/mc-cli -O mc-cli
+chmod +x mc-agent mc-cli
 
 $DOCKER_EXEC "mkdir -p build-linux && cp -f mc-agent mc-cli build-linux/"
 $DOCKER_EXEC "dpkg-buildpackage -b -us -uc && mkdir -p build-linux/deb && cp ../*.deb build-linux/deb"
