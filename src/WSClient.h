@@ -72,6 +72,7 @@ public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();
 
+    void openWebsocket();
     void closeWebsocket();
 
     QJsonObject &getMemoryData() { return memData; }
@@ -138,8 +139,6 @@ private slots:
     void onTextMessageReceived(const QString &message);
 
 private:
-    void openWebsocket();
-
     void udateParameters(const QJsonObject &data);
 
     QWebSocket *wsocket = nullptr;

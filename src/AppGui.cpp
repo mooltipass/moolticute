@@ -161,6 +161,19 @@ bool AppGui::initialize()
     //arguments << "-e" <<  "-s 8080";
     qInfo() << "Running " << program << " " << arguments;
 
+    connect(daemonProcess, &QProcess::errorOccurred, [=](QProcess::ProcessError error)
+    {
+        switch (error)
+        {
+        case QProcess::FailedToStart: qWarning() << "daemon: Failed to start"; break;
+        case QProcess::Crashed: qWarning() << "daemon: crashed"; break;
+        case QProcess::Timedout: qWarning() << "daemon: Timedout"; break;
+        case QProcess::WriteError: qWarning() << "daemon: WriteError"; break;
+        case QProcess::ReadError: qWarning() << "daemon: ReadError"; break;
+        default: qWarning() << "daemon: UnknownError";
+        }
+    });
+
     connect(daemonProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
         [=](int exitCode, QProcess::ExitStatus exitStatus)
     {
@@ -406,6 +419,12 @@ void AppGui::searchDaemonTick()
 #endif
     if (foundDaemon)
     {
+        //Force reopen connection, this prevents waiting for a timeout
+        //before retrying the connection. On macOS the timeout being too long
+        //the gui waits too much before reconnecting
+        wsClient->closeWebsocket();
+        wsClient->openWebsocket();
+
         delete logSocket;
         logSocket = new QLocalSocket(this);
         logSocket->connectToServer(MOOLTICUTE_DAEMON_LOG_SOCK);
