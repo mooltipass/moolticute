@@ -4430,7 +4430,7 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
 
     if (services.isEmpty())
     {
-        //No data services do delete, just exit mmm
+        //No data services to delete, just exit mmm
         exitMemMgmtMode(true);
         return;
     }
@@ -4512,6 +4512,7 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
                 updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
                 updateChangeNumbersPacket.append(get_dataDbChangeNumber());
                 saveJobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+                emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
             }
 
             /* Run jobs */
