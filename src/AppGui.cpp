@@ -233,7 +233,8 @@ void AppGui::startSSHAgent()
         arguments << "--no-fork";
 #endif
         QStringList userArgs = s.value("settings/ssh_args").toString().split(' ');
-        arguments.append(userArgs);
+        if (!userArgs.isEmpty())
+            arguments.append(userArgs);
 
         qInfo() << "Running " << program << " " << arguments;
 
@@ -314,9 +315,12 @@ void AppGui::updateSystrayTooltip()
 
 AppGui::~AppGui()
 {
-#ifndef QOS_WIN
-    //First let mc-agent clean gracefully
-    sshAgentProcess->terminate();
+#ifndef Q_OS_WIN
+    if (sshAgentProcess)
+    {
+        //First let mc-agent clean gracefully
+        sshAgentProcess->terminate();
+    }
 #endif
 
     aboutToQuit = true;
