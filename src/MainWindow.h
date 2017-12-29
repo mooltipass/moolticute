@@ -108,7 +108,7 @@ private slots:
 
     void on_toolButton_setBackupFilePath_released();
 
-    void on_lineEditSshArgs_textChanged(const QString &arg1);
+    void on_lineEditSshArgs_textChanged(const QString &);
 
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");

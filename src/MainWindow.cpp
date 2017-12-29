@@ -1337,7 +1337,7 @@ void MainWindow::on_toolButton_setBackupFilePath_released()
     }
 }
 
-void MainWindow::on_lineEditSshArgs_textChanged(const QString &text)
+void MainWindow::on_lineEditSshArgs_textChanged(const QString &)
 {
     QSettings s;
     s.setValue("settings/ssh_args", ui->lineEditSshArgs->text());
