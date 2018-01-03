@@ -5456,7 +5456,7 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
                 // Loop in the memory nodes to compare data
                 for (qint32 j = 0; j < dataNodes.size(); j++)
                 {
-                    if (importedDataNodes[i]->getService() == dataNodes[j]->getService())
+                    if ((importedDataNodes[i]->getService() == dataNodes[j]->getService()) && (importedDataNodes[i]->getStartDataCtr() == dataNodes[j]->getStartDataCtr()))
                     {
                         // We found a parent data node that has the same core data (doesn't mean the same prev / next node though!)
                         qDebug() << "Data parent node core data match for " << importedDataNodes[i]->getService();
