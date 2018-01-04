@@ -6017,7 +6017,7 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
 {
     qDebug() << "Loading free addresses from address:" << addressFrom.toHex();
 
-    jobs->prepend(new MPCommandJob(this, MPCmd::GET_30_FREE_SLOTS,
+    jobs->append(new MPCommandJob(this, MPCmd::GET_30_FREE_SLOTS,
                                   addressFrom,
                                   [=](const QByteArray &data, bool &) -> bool
     {
@@ -6088,6 +6088,11 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     /* Ask device to go into MMM first */
     jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
+    /* Ask one free address just in case we need it for creating a _recovered_ service */
+    newAddressesNeededCounter = 1;
+    newAddressesReceivedCounter = 0;
+    loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress, false);
+
     /* Setup global vars dedicated to speed diagnostics */
     diagNbBytesRec = 0;
     diagLastNbBytesPSec = 0;
@@ -6109,6 +6114,9 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
 
         /* Check loaded nodes, set bool to repair */
         checkLoadedNodes(true, true, true);
+        
+        /* Just in case a new _recovered_ service was added, change virtual for real addresses */
+        changeVirtualAddressesToFreeAddresses();
 
         /* set clone change number to actual, to prevent change number changes on device */
         credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
