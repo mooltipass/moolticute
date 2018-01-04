@@ -6091,7 +6091,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     /* Ask one free address just in case we need it for creating a _recovered_ service */
     newAddressesNeededCounter = 1;
     newAddressesReceivedCounter = 0;
-    loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress, false);
+    loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
 
     /* Setup global vars dedicated to speed diagnostics */
     diagNbBytesRec = 0;
