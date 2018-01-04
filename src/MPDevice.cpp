@@ -3012,9 +3012,7 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
     }
 
     /* Add child to DB */
-    addChildToDB(tempNodePt, childNodePt);
-
-    return true;
+    return addChildToDB(tempNodePt, childNodePt);
 }
 
 bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed)
@@ -3056,7 +3054,15 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
                 qWarning() << "Orphan child found:" << i->getLogin() << "at address:" << i->getAddress().toHex();
                 if (repairAllowed)
                 {
-                    addOrphanChildToDB(i);
+                    quint32 append_number = 2;
+                    QString service_name = i->getLogin();
+
+                    /* If the "_recovered_" service already has the same login, append a number */
+                    while(!addOrphanChildToDB(i))
+                    {
+                        i->setLogin(service_name + QString::number(append_number));
+                        append_number++;
+                    }
                 }
                 nbOrphanChildren++;
             }
