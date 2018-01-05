@@ -68,6 +68,7 @@ private slots:
 
     void on_pushButtonEnterMMM_clicked();
     void on_buttonQuitMMM_clicked();
+    void on_buttonDiscard_pressed();
     void on_buttonDiscard_clicked();
 
     void currentSelectionChanged(const QModelIndex &curr, const QModelIndex &);
