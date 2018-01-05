@@ -1204,7 +1204,7 @@ QWidget {background-color: #EFEFEF;}</string>
              </size>
             </property>
             <property name="text">
-             <string>Export to file</string>
+             <string>Export To File</string>
             </property>
            </widget>
           </item>
@@ -1270,7 +1270,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Do not delete credentials on local DB</string>
+               <string>Do Not Delete Credentials on Local DB</string>
               </property>
              </widget>
             </item>
@@ -1297,7 +1297,7 @@ QWidget {background-color: #EFEFEF;}</string>
              </size>
             </property>
             <property name="text">
-             <string>Import from file</string>
+             <string>Import From File</string>
             </property>
            </widget>
           </item>
@@ -1377,7 +1377,7 @@ QWidget {background-color: #EFEFEF;}</string>
              </size>
             </property>
             <property name="text">
-             <string>Perform integrity check</string>
+             <string>Perform Integrity Check</string>
             </property>
            </widget>
           </item>
