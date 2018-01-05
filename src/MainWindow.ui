@@ -293,7 +293,7 @@ QWidget {background-color: #EFEFEF;}</string>
              </font>
             </property>
             <property name="text">
-             <string>The Moolticute deamon is not running.</string>
+             <string>The Moolticute Daemon is Not Running.</string>
             </property>
            </widget>
           </item>
@@ -390,7 +390,7 @@ QWidget {background-color: #EFEFEF;}</string>
              </font>
             </property>
             <property name="text">
-             <string>Connect your Mooltipass device</string>
+             <string>Connect Your Mooltipass Device</string>
             </property>
            </widget>
           </item>
@@ -458,7 +458,7 @@ QWidget {background-color: #EFEFEF;}</string>
            </font>
           </property>
           <property name="text">
-           <string>Device settings</string>
+           <string>Device Settings</string>
           </property>
          </widget>
         </item>
@@ -1634,7 +1634,7 @@ QWidget {background-color: #EFEFEF;}</string>
              </font>
             </property>
             <property name="text">
-             <string>Unlock your Mooltipass device</string>
+             <string>Unlock Your Mooltipass Device</string>
             </property>
            </widget>
           </item>
@@ -1869,7 +1869,7 @@ QWidget {background-color: #EFEFEF;}</string>
           <item>
            <widget class="QPushButton" name="pushButtonCheckUpdate">
             <property name="text">
-             <string>Check for update</string>
+             <string>Check For Updates</string>
             </property>
            </widget>
           </item>
@@ -1906,7 +1906,7 @@ QWidget {background-color: #EFEFEF;}</string>
                 </font>
                </property>
                <property name="text">
-                <string>Device Firmware version:</string>
+                <string>Device Firmware Version:</string>
                </property>
               </widget>
              </item>
@@ -2186,7 +2186,7 @@ QWidget {background-color: #EFEFEF;}</string>
            </font>
           </property>
           <property name="text">
-           <string>Moolticute settings</string>
+           <string>Moolticute Settings</string>
           </property>
          </widget>
         </item>
@@ -2212,7 +2212,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Application language</string>
+               <string>Application Language</string>
               </property>
              </widget>
             </item>
@@ -2288,7 +2288,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </sizepolicy>
               </property>
               <property name="text">
-               <string>View daemon logs</string>
+               <string>View Daemon Logs</string>
               </property>
              </widget>
             </item>
@@ -2325,7 +2325,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QLabel" name="label_34">
               <property name="text">
-               <string>Start moolticute SSH agent automatically</string>
+               <string>Start Moolticute SSH Agent Automatically</string>
               </property>
              </widget>
             </item>
@@ -2337,7 +2337,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </font>
               </property>
               <property name="text">
-               <string>(Restart needed)</string>
+               <string>(Restart Needed)</string>
               </property>
              </widget>
             </item>
@@ -2368,7 +2368,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QLabel" name="label_43">
               <property name="text">
-               <string>Moolticute SSH arguments</string>
+               <string>Moolticute SSH Arguments</string>
               </property>
              </widget>
             </item>
@@ -2380,7 +2380,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </font>
               </property>
               <property name="text">
-               <string>(Restart needed)</string>
+               <string>(Restart Needed)</string>
               </property>
              </widget>
             </item>
@@ -2413,7 +2413,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Restart daemon with debug web server (on port 8484)</string>
+               <string>Restart Daemon with Debug Web Server (on port 8484)</string>
               </property>
              </widget>
             </item>
@@ -2433,7 +2433,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QCheckBox" name="checkBoxDebugHttp">
               <property name="text">
-               <string>Enable daemon web server</string>
+               <string>Enable Daemon Web Server</string>
               </property>
              </widget>
             </item>
@@ -2450,7 +2450,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Manage your password profiles</string>
+               <string>Manage Your Password Profiles</string>
               </property>
              </widget>
             </item>
@@ -2470,7 +2470,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QPushButton" name="btnPassGenerationProfiles">
               <property name="text">
-               <string>Password profiles...</string>
+               <string>Password Profiles...</string>
               </property>
              </widget>
             </item>
@@ -2487,7 +2487,7 @@ QWidget {background-color: #EFEFEF;}</string>
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Delayed cancel buttons to prevent mistakes</string>
+               <string>Delayed Cancel Buttons to Prevent Mistakes</string>
               </property>
              </widget>
             </item>
@@ -2507,7 +2507,7 @@ QWidget {background-color: #EFEFEF;}</string>
             <item>
              <widget class="QCheckBox" name="checkBoxLongPress">
               <property name="text">
-               <string>Enable long press cancel buttons</string>
+               <string>Enable Long Press Cancel Buttons</string>
               </property>
              </widget>
             </item>
