@@ -47,6 +47,13 @@ echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", TAG+=
 sudo udevadm control --reload-rules
 ```
 
+##### Fedora Linux
+```bash
+sudo dnf install libusb libusb-devel gcc-c++ qt5 qt5-qtwebsockets qt5-qtwebsockets-devel qt5-qttools-devel
+echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
+sudo udevadm control --reload-rules
+```
+
 ### How to build
 
 For now, no binary releases are out yet. You will need to build the software by following the next step.
@@ -85,6 +92,11 @@ Using Qt version 5.5.1 in /usr/lib
 On Gentoo, a wrapper is created for qmake, so this command should be used:
 ```
 qmake -qt=5 ../Moolticute.pro
+```
+
+On Fedora, use this qmake command:
+```
+qmake-qt5 ../Moolticute.pro
 ```
 
 ### Licensing
