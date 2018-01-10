@@ -513,6 +513,7 @@ void MainWindow::updatePage()
 
     ui->label_13->setVisible(!isCardUnknown);
     ui->label_14->setVisible(!isCardUnknown);
+    ui->checkBoxExport->setVisible(!isCardUnknown);
     ui->pushButtonExportFile->setVisible(!isCardUnknown);
 
     ui->label_27->setVisible(!isCardUnknown);
