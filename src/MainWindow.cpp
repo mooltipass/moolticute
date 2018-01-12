@@ -42,16 +42,16 @@ void MainWindow::initHelpLabels()
     };
 
     ui->label_exportDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
-    ui->label_exportDBHelp->setToolTip("Placeholder help hint.\n");
+    ui->label_exportDBHelp->setToolTip(tr("Placeholder help hint."));
 
     ui->label_importDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
-    ui->label_importDBHelp->setToolTip("Placeholder help hint.\n");
+    ui->label_importDBHelp->setToolTip(tr("Placeholder help hint."));
 
     ui->label_integrityCheckHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
-    ui->label_integrityCheckHelp->setToolTip("Placeholder help hint.\n");
+    ui->label_integrityCheckHelp->setToolTip(tr("Placeholder help hint."));
 
     ui->label_dbBackupMonitoringHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
-    ui->label_dbBackupMonitoringHelp->setToolTip("Placeholder help hint.\n");
+    ui->label_dbBackupMonitoringHelp->setToolTip(tr("Placeholder help hint."));
 }
 
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
