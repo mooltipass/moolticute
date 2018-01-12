@@ -527,7 +527,11 @@ void FilesManagement::on_pushButtonFilename_clicked()
     if (fileName.isEmpty())
         return;
 
+    QFileInfo fileInfo(fileName);
     ui->lineEditFilename->setText(fileName);
+
+    if (ui->addFileServiceInput->text().isEmpty())
+        ui->addFileServiceInput->setText(fileInfo.fileName().toLower());
 }
 
 void FilesManagement::changeEvent(QEvent *event)
