@@ -522,7 +522,7 @@ void FilesManagement::on_addFileButton_clicked()
 
 void FilesManagement::on_pushButtonFilename_clicked()
 {
-    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."));
+    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."), QDir::homePath());
 
     if (fileName.isEmpty())
         return;
