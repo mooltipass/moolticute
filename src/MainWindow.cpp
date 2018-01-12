@@ -35,6 +35,31 @@ static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx =
     cb->setCurrentIndex(idx);
 }
 
+void MainWindow::initHelpLabels()
+{
+    auto getFontAwesomeIconPixmap = [=](int character, QSize size = QSize(20, 20)) {
+        return AppGui::qtAwesome()->icon(character).pixmap(size);
+    };
+
+    ui->label_exportDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_exportDBHelp->setToolTip("This is a very very long description of what "
+                                       "how the export functionality behaves.\n"
+                                       "This is a very very long description of what "
+                                                                              "how the export functionality behaves.\n"
+                                       "This is a very very long description of what "
+                                                                              "how the export functionality behaves.\n"
+                                       "This is a very very long description of what "
+                                                                              "how the export functionality behaves.\n"
+                                       "This is a very very long description of what "
+                                                                              "how the export functionality behaves.\n"
+                                       "This is a very very long description of what "
+                                                                              "how the export functionality behaves.\n");
+
+    ui->label_importDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_integrityCheckHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_dbBackupMonitoringHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+}
+
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -81,6 +106,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->widgetCredentials->setPasswordProfilesModel(m_passwordProfilesModel);
 
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
+
+    initHelpLabels();
 
     //Disable this option for now, firmware does not support it
     ui->checkBoxInput->setEnabled(false);
