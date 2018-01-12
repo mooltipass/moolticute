@@ -590,12 +590,12 @@ void MainWindow::updatePage()
 
 void MainWindow::enableKnockSettings(bool enable)
 {
-    ui->knockSettingsFrame->setEnabled(enable);
+    ui->knockSettingsWidget->setEnabled(enable);
 
-    ui->knockSettingsFrame->setToolTip(enable ? "" : tr("Remove the card from the device to change this setting."));
-    ui->knockSettingsFrame->setToolTipDuration(enable ? -1 : std::numeric_limits<int>::max());
+    ui->knockSettingsWidget->setToolTip(enable ? "" : tr("Remove the card from the device to change this setting."));
+    ui->knockSettingsWidget->setToolTipDuration(enable ? -1 : std::numeric_limits<int>::max());
 
-    ui->labelRemoveCard->setVisible(!ui->knockSettingsFrame->isEnabled());
+    ui->labelRemoveCard->setVisible(!ui->knockSettingsWidget->isEnabled());
 
     //Make sure the suffix label ("sensitivity") matches the color of the other widgets.
     const QString color =
