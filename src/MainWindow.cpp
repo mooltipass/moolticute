@@ -42,22 +42,16 @@ void MainWindow::initHelpLabels()
     };
 
     ui->label_exportDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
-    ui->label_exportDBHelp->setToolTip("This is a very very long description of what "
-                                       "how the export functionality behaves.\n"
-                                       "This is a very very long description of what "
-                                                                              "how the export functionality behaves.\n"
-                                       "This is a very very long description of what "
-                                                                              "how the export functionality behaves.\n"
-                                       "This is a very very long description of what "
-                                                                              "how the export functionality behaves.\n"
-                                       "This is a very very long description of what "
-                                                                              "how the export functionality behaves.\n"
-                                       "This is a very very long description of what "
-                                                                              "how the export functionality behaves.\n");
+    ui->label_exportDBHelp->setToolTip("Placeholder help hint.\n");
 
     ui->label_importDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_importDBHelp->setToolTip("Placeholder help hint.\n");
+
     ui->label_integrityCheckHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_integrityCheckHelp->setToolTip("Placeholder help hint.\n");
+
     ui->label_dbBackupMonitoringHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_dbBackupMonitoringHelp->setToolTip("Placeholder help hint.\n");
 }
 
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
