@@ -522,12 +522,16 @@ void FilesManagement::on_addFileButton_clicked()
 
 void FilesManagement::on_pushButtonFilename_clicked()
 {
-    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."));
+    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."), QDir::homePath());
 
     if (fileName.isEmpty())
         return;
 
+    QFileInfo fileInfo(fileName);
     ui->lineEditFilename->setText(fileName);
+
+    if (ui->addFileServiceInput->text().isEmpty())
+        ui->addFileServiceInput->setText(fileInfo.fileName().toLower());
 }
 
 void FilesManagement::changeEvent(QEvent *event)
