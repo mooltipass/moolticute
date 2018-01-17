@@ -232,9 +232,13 @@ void AppGui::startSSHAgent()
 #ifndef Q_OS_WIN
         arguments << "--no-fork";
 #endif
-        QStringList userArgs = s.value("settings/ssh_args").toString().split(' ');
-        if (!userArgs.isEmpty())
-            arguments.append(userArgs);
+        QString uargs = s.value("settings/ssh_args").toString();
+        if (uargs != "")
+        {
+            QStringList userArgs = uargs.split(' ');
+            if (!userArgs.isEmpty())
+                arguments.append(userArgs);
+        }
 
         qInfo() << "Running " << program << " " << arguments;
 
@@ -250,7 +254,10 @@ void AppGui::startSSHAgent()
             });
         });
 
-        sshAgentProcess->start(program, arguments);
+        if (arguments.isEmpty())
+            sshAgentProcess->start(program);
+        else
+            sshAgentProcess->start(program, arguments);
     }
 }
 
@@ -321,6 +328,8 @@ AppGui::~AppGui()
         //First let mc-agent clean gracefully
         sshAgentProcess->terminate();
     }
+#else
+    delete sshAgentProcess;
 #endif
 
     aboutToQuit = true;
