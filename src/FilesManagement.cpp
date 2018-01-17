@@ -446,7 +446,8 @@ void FilesManagement::updateButtonsUI()
 
 void FilesManagement::addUpdateFile(QString service, QString filename, QProgressBar *pbar)
 {
-    Q_UNUSED(service)
+    //Force all service names to lowercase
+    service = service.toLower();
 
     qint64 maxSize = MP_MAX_FILE_SIZE;
     if (service == MC_SSH_SERVICE)

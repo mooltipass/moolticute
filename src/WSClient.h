@@ -88,7 +88,7 @@ public:
     void sendLeaveMMRequest();
 
     void addOrUpdateCredential(const QString &service, const QString &login,
-                       const QString &password, const QString &description = {});
+                               const QString &password, const QString &description = {});
 
     void requestPassword(const QString &service, const QString &login);
 

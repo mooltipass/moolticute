@@ -151,16 +151,16 @@ public:
     void getCurrentCardCPZ();
 
     //Ask a password for specified service/login to MP
-    void getCredential(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
+    void getCredential(QString service, const QString &login, const QString &fallback_service, const QString &reqid,
                        std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass, const QString &desc)> cb);
 
     //Add or Set service/login/pass/desc in MP
-    void setCredential(const QString &service, const QString &login,
+    void setCredential(QString service, const QString &login,
                        const QString &pass, const QString &description, bool setDesc,
                        std::function<void(bool success, QString errstr)> cb);
 
     //Delete credential in MMM and leave
-    void delCredentialAndLeave(const QString &service, const QString &login,
+    void delCredentialAndLeave(QString service, const QString &login,
                                MPDeviceProgressCb cbProgress,
                                std::function<void(bool success, QString errstr)> cb);
 
@@ -171,22 +171,22 @@ public:
     void cancelUserRequest(const QString &reqid);
 
     //Request for a raw data node from the device
-    void getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
+    void getDataNode(QString service, const QString &fallback_service, const QString &reqid,
                      std::function<void(bool success, QString errstr, QString service, QByteArray rawData)> cb,
                      MPDeviceProgressCb cbProgress);
 
     //Set data to a context on the device
-    void setDataNode(const QString &service, const QByteArray &nodeData,
+    void setDataNode(QString service, const QByteArray &nodeData,
                      std::function<void(bool success, QString errstr)> cb,
                      MPDeviceProgressCb cbProgress);
 
     //Delete a data context from the device
-    void deleteDataNodesAndLeave(const QStringList &services,
+    void deleteDataNodesAndLeave(QStringList services,
                                  std::function<void(bool success, QString errstr)> cb,
                                  MPDeviceProgressCb cbProgress);
 
     //Check is credential/data node exists
-    void serviceExists(bool isDatanode, const QString &service, const QString &reqid,
+    void serviceExists(bool isDatanode, QString service, const QString &reqid,
                        std::function<void(bool success, QString errstr, QString service, bool exists)> cb);
 
     //Set full list of credentials in MMM

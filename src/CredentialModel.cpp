@@ -381,8 +381,11 @@ QJsonArray CredentialModel::getJsonChanges()
     return jarr;
 }
 
-void CredentialModel::addCredential(const QString &sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription)
+void CredentialModel::addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription)
 {
+    //Force all service names to lowercase
+    sServiceName = sServiceName.toLower();
+
     // Retrieve target service
     ServiceItem *pTargetService = m_pRootItem->findServiceByName(sServiceName);
     LoginItem *pAddedLoginItem = nullptr;

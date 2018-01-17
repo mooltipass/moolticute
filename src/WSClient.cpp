@@ -207,8 +207,6 @@ void WSClient::onTextMessageReceived(const QString &message)
         else
             emit memcheckFinished(true);
     }
-//    messages with the simple style will be ignored
-//    else if (rootobj["msg"] == "progress")
     else if (rootobj["msg"] == "progress_detailed")
     {
         QJsonObject o = rootobj["data"].toObject();
@@ -404,10 +402,10 @@ void WSClient::sendLeaveMMRequest()
     sendJsonData({{ "msg", "exit_memorymgmt" }});
 }
 
-void WSClient::addOrUpdateCredential(const QString & service, const QString & login,
-                                     const QString & password, const QString & description)
+void WSClient::addOrUpdateCredential(const QString &service, const QString &login,
+                                     const QString &password, const QString &description)
 {
-    QJsonObject o = {{ "service", service},
+    QJsonObject o = {{ "service", service.toLower()},
                      { "login",   login},
                      { "password", password },
                      { "description", description}};
@@ -415,9 +413,8 @@ void WSClient::addOrUpdateCredential(const QString & service, const QString & lo
                   { "data", o }});
 }
 
-void WSClient::requestPassword(const QString & service, const QString & login)
+void WSClient::requestPassword(const QString &service, const QString &login)
 {
-
     QJsonObject d = {{ "service", service },
                      { "login", login }};
     sendJsonData({{ "msg", "ask_password" },
@@ -433,7 +430,7 @@ void WSClient::requestDataFile(const QString &service)
 
 void WSClient::sendDataFile(const QString &service, const QByteArray &data)
 {
-    QJsonObject d = {{ "service", service },
+    QJsonObject d = {{ "service", service.toLower() },
                      { "node_data", QString(data.toBase64()) }};
     sendJsonData({{ "msg", "set_data_node" },
                   { "data", d }});
@@ -443,7 +440,7 @@ void WSClient::deleteDataFilesAndLeave(const QStringList &services)
 {
     QJsonArray s;
     for (const QString &srv: qAsConst(services))
-        s.append(srv);
+        s.append(srv.toLower());
     QJsonObject d = {{ "services", s }};
     sendJsonData({{ "msg", "delete_data_nodes" },
                   { "data", d }});

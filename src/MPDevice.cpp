@@ -3719,9 +3719,12 @@ void MPDevice::cancelUserRequest(const QString &reqid)
     qWarning() << "No request found for reqid: " << reqid;
 }
 
-void MPDevice::getCredential(const QString &service, const QString &login, const QString &fallback_service, const QString &reqid,
+void MPDevice::getCredential(QString service, const QString &login, const QString &fallback_service, const QString &reqid,
                              std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass, const QString &desc)> cb)
 {
+    //Force all service names to lowercase
+    service = service.toLower();
+
     QString logInf = QStringLiteral("Ask for password for service: %1 login: %2 fallback_service: %3 reqid: %4")
                      .arg(service)
                      .arg(login)
@@ -3857,10 +3860,13 @@ void MPDevice::getCredential(const QString &service, const QString &login, const
     runAndDequeueJobs();
 }
 
-void MPDevice::delCredentialAndLeave(const QString &service, const QString &login,
+void MPDevice::delCredentialAndLeave(QString service, const QString &login,
                                      MPDeviceProgressCb cbProgress,
                                      std::function<void(bool success, QString errstr)> cb)
 {
+    //Force all service names to lowercase
+    service = service.toLower();
+
     auto deleteCred = [=]()
     {
         QJsonArray allCreds;
@@ -3987,7 +3993,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
     }), 0);
 }
 
-void MPDevice::setCredential(const QString &service, const QString &login,
+void MPDevice::setCredential(QString service, const QString &login,
                              const QString &pass, const QString &description, bool setDesc,
                              std::function<void(bool success, QString errstr)> cb)
 {
@@ -3997,6 +4003,9 @@ void MPDevice::setCredential(const QString &service, const QString &login,
         cb(false, "service is empty");
         return;
     }
+
+    //Force all service names to lowercase
+    service = service.toLower();
 
     QString logInf = QStringLiteral("Adding/Changing credential for service: %1 login: %2")
                      .arg(service)
@@ -4192,7 +4201,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
     return true;
 }
 
-void MPDevice::getDataNode(const QString &service, const QString &fallback_service, const QString &reqid,
+void MPDevice::getDataNode(QString service, const QString &fallback_service, const QString &reqid,
                            std::function<void(bool success, QString errstr, QString serv, QByteArray rawData)> cb,
                            MPDeviceProgressCb cbProgress)
 {
@@ -4202,6 +4211,9 @@ void MPDevice::getDataNode(const QString &service, const QString &fallback_servi
         cb(false, "context is empty", QString(), QByteArray());
         return;
     }
+
+    //Force all service names to lowercase
+    service = service.toLower();
 
     QString logInf = QStringLiteral("Ask for data node for service: %1 fallback_service: %2 reqid: %3")
                      .arg(service)
@@ -4332,7 +4344,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
     return true;
 }
 
-void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
+void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
                            std::function<void(bool success, QString errstr)> cb,
                            MPDeviceProgressCb cbProgress)
 {
@@ -4342,6 +4354,9 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
         cb(false, "context is empty");
         return;
     }
+
+    //Force all service names to lowercase
+    service = service.toLower();
 
     QString logInf = QStringLiteral("Set data node for service: %1")
                      .arg(service);
@@ -4425,7 +4440,7 @@ void MPDevice::setDataNode(const QString &service, const QByteArray &nodeData,
     runAndDequeueJobs();
 }
 
-void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
+void  MPDevice::deleteDataNodesAndLeave(QStringList services,
                                         std::function<void(bool success, QString errstr)> cb,
                                         MPDeviceProgressCb cbProgress)
 {
@@ -4440,6 +4455,10 @@ void  MPDevice::deleteDataNodesAndLeave(const QStringList &services,
         exitMemMgmtMode(true);
         return;
     }
+
+    //Force all service names to lowercase
+    for (int i = 0;i < services.size();i++)
+        services.replace(i, services.at(i).toLower());
 
     AsyncJobs *jobs = new AsyncJobs("Re-scanning the memory", this);
 
@@ -6166,7 +6185,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     runAndDequeueJobs();
 }
 
-void MPDevice::serviceExists(bool isDatanode, const QString &service, const QString &reqid,
+void MPDevice::serviceExists(bool isDatanode, QString service, const QString &reqid,
                              std::function<void(bool success, QString errstr, QString service, bool exists)> cb)
 {
     if (service.isEmpty())
@@ -6175,6 +6194,9 @@ void MPDevice::serviceExists(bool isDatanode, const QString &service, const QStr
         cb(false, "context is empty", QString(), false);
         return;
     }
+
+    //Force all service names to lowercase
+    service = service.toLower();
 
     QString logInf = QStringLiteral("Check if %1service exists: %2 reqid: %3")
                      .arg(isDatanode?"data ":"credential ")
@@ -6248,7 +6270,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             QByteArray nodeAddr;
             QString login = qjobject["login"].toString();
             qint32 favorite = qjobject["favorite"].toInt();
-            QString service = qjobject["service"].toString();
+            QString service = qjobject["service"].toString().toLower();
             QString password = qjobject["password"].toString();
             QString description = qjobject["description"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
