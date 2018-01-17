@@ -187,6 +187,12 @@ void FilesManagement::on_buttonQuitMMM_clicked()
         wsClient->sendLeaveMMRequest();
 }
 
+void FilesManagement::on_buttonDiscard_pressed()
+{
+    if (deletedList.isEmpty())
+        wsClient->sendLeaveMMRequest();
+}
+
 void FilesManagement::on_buttonDiscard_clicked()
 {
     wsClient->sendLeaveMMRequest();
