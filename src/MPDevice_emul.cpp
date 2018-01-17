@@ -26,7 +26,6 @@ MPDevice_emul::MPDevice_emul(QObject *parent):
     MPDevice(parent)
 {
     qDebug() << "Emulation Device";
-
 }
 
 void MPDevice_emul::platformWrite(const QByteArray &data)
@@ -34,7 +33,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
     switch((MPCmd::Command)data[1])
     {
     case MPCmd::PING:
-        emit platformDataRead(data);
+        sendReadSignal(data);
         break;
     case MPCmd::VERSION:
     {
@@ -44,7 +43,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d.append("v1.0_emul");
         d[0] = d.size() - 1;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         CLEAN_MEMORY_QBYTEARRAY(d);
         break;
     }
@@ -55,7 +54,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = MPCmd::START_MEMORYMGMT;
         d[2] = 0x01;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::SET_MOOLTIPASS_PARM:
@@ -66,7 +65,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = MPCmd::SET_MOOLTIPASS_PARM;
         d[2] = 0x01;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::GET_MOOLTIPASS_PARM:
@@ -76,7 +75,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = MPCmd::GET_MOOLTIPASS_PARM;
         d[2] = mooltipassParam[data[2]];
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::MOOLTIPASS_STATUS:
@@ -86,7 +85,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = MPCmd::MOOLTIPASS_STATUS;
         d[2] = 0b101;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::END_MEMORYMGMT:
@@ -96,7 +95,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = MPCmd::END_MEMORYMGMT;
         d[2] = 0x01;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::CONTEXT:
@@ -108,7 +107,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = MPCmd::CONTEXT;
         d[2] = (quint8)logins.contains(context);
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::GET_LOGIN:
@@ -122,7 +121,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
             d[2] = 0x0;
         d[0] = d.length() - 2;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::GET_PASSWORD:
@@ -136,7 +135,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
             d[2] = 0x0;
         d[0] = d.length() - 2;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::ADD_CONTEXT:
@@ -158,7 +157,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
             d[2] = 0x00;
         }
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::SET_LOGIN:
@@ -170,7 +169,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         logins[context] = login;
         d[2] = 0x01;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::SET_PASSWORD:
@@ -183,7 +182,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = MPCmd::SET_PASSWORD;
         d[2] = 0x01;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::GET_RANDOM_NUMBER:
@@ -194,7 +193,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
          for (int i = 0; i < 32; i++)
              d[2 + i] = qrand() % 255;
          d.resize(64);
-         emit platformDataRead(d);
+         sendReadSignal(d);
          break;
     }
     case MPCmd::GET_FAVORITE:
@@ -206,7 +205,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
             d[i] = 0x00;
 
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
     case MPCmd::READ_FLASH_NODE:
@@ -215,7 +214,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[0] = d.size() - 2;
         d[1] = MPCmd::READ_FLASH_NODE;
         d.resize(64);
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
       /* MPCmd::READ_FLASH_NODE
@@ -230,10 +229,17 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QByteArray d = data;
         d.resize(64);
         d[2] = 0; //result is 0
-        emit platformDataRead(d);
+        sendReadSignal(d);
         break;
     }
+}
 
+void MPDevice_emul::sendReadSignal(const QByteArray &data)
+{
+    QTimer::singleShot(0, [=]()
+    {
+        emit platformDataRead(data);
+    });
 }
 
 void MPDevice_emul::platformRead()

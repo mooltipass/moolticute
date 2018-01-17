@@ -33,6 +33,8 @@ private:
     QHash<QString, QString> logins;
     QHash<QString, QString> descriptions;
     QString context;
+
+    void sendReadSignal(const QByteArray &data);
 };
 
 #endif // MPDEVICE_EMUL_H
