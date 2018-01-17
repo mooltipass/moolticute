@@ -522,7 +522,7 @@ void FilesManagement::on_addFileButton_clicked()
         ui->lineEditFilename->text().isEmpty())
         return;
 
-    addUpdateFile(ui->addFileServiceInput->text(),
+    addUpdateFile(ui->addFileServiceInput->text().toLower(),
                   ui->lineEditFilename->text(),
                   ui->progressBarTop);
 }
