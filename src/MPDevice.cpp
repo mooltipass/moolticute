@@ -1686,6 +1686,94 @@ MPNode *MPDevice::findNodeWithNameInList(QList<MPNode *> list, const QString& na
 
     return it == list.end()?nullptr:*it;
 }
+
+/* Find a node inside a given list given his address */
+MPNode *MPDevice::findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QString& name)
+{
+    /* get first child */
+    MPNode* tempChildNodePt;
+    QByteArray tempChildAddress = parent->getStartChildAddress();
+    quint32 tempVirtualChildAddress = parent->getStartChildVirtualAddress();
+
+    /* browse through all the children */
+    while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
+    {
+        /* Get pointer to the child node */
+        tempChildNodePt = findNodeWithAddressInList(list, tempChildAddress, tempVirtualChildAddress);
+
+        /* Check we could find child pointer */
+        if (!tempChildNodePt)
+        {
+            qWarning() << "findNodeWithLoginWithGivenParentInList: couldn't find child node with address" << tempChildAddress.toHex() << "in our list";
+            return nullptr;
+        }
+        else
+        {
+            /* Check if it has the right name */
+            if (tempChildNodePt->getLogin() == name)
+            {
+                return tempChildNodePt;
+            }
+
+            /* Loop to next possible child */
+            tempChildAddress = tempChildNodePt->getNextChildAddress();
+            tempVirtualChildAddress = tempChildNodePt->getNextChildVirtualAddress();
+        }
+    }
+
+    /* Went through the list of children, didn't find anything */
+    return nullptr;
+}
+
+
+/* Find a node inside a given list given his address */
+MPNode *MPDevice::findNodeWithAddressWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr)
+{
+    /* get first child */
+    MPNode* tempChildNodePt;
+    QByteArray tempChildAddress = parent->getStartChildAddress();
+    quint32 tempVirtualChildAddress = parent->getStartChildVirtualAddress();
+
+    /* browse through all the children */
+    while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
+    {
+        /* Get pointer to the child node */
+        tempChildNodePt = findNodeWithAddressInList(list, tempChildAddress, tempVirtualChildAddress);
+
+        /* Check we could find child pointer */
+        if (!tempChildNodePt)
+        {
+            qWarning() << "findNodeWithLoginWithGivenParentInList: couldn't find child node with address" << tempChildAddress.toHex() << "in our list";
+            return nullptr;
+        }
+        else
+        {
+            /* Check if it has the right address */
+            if (tempChildNodePt->getAddress().isNull())
+            {
+                if (tempChildNodePt->getVirtualAddress() == virt_addr)
+                {
+                    return tempChildNodePt;
+                }
+            }
+            else
+            {
+                if (tempChildNodePt->getAddress() == address)
+                {
+                    return tempChildNodePt;
+                }
+            }
+
+            /* Loop to next possible child */
+            tempChildAddress = tempChildNodePt->getNextChildAddress();
+            tempVirtualChildAddress = tempChildNodePt->getNextChildVirtualAddress();
+        }
+    }
+
+    /* Went through the list of children, didn't find anything */
+    return nullptr;
+}
+
 /* Find a node inside the parent list given his service */
 MPNode *MPDevice::findNodeWithServiceInList(const QString &service)
 {
@@ -3126,7 +3214,10 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
             {
                 /* Find the nodes in memory */
                 temp_pnode_pointer = findNodeWithAddressInList(loginNodes, temp_pnode_address, 0);
-                temp_cnode_pointer = findNodeWithAddressInList(loginChildNodes, temp_cnode_address, 0);
+                if (temp_pnode_pointer)
+                {
+                    temp_cnode_pointer = findNodeWithAddressWithGivenParentInList(loginChildNodes,  temp_pnode_pointer, temp_cnode_address, 0);
+                }
 
                 if ((!temp_cnode_pointer) || (!temp_pnode_pointer))
                 {
@@ -5992,7 +6083,11 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
         else
         {
             MPNode* localCurParentNode = findNodeWithNameInList(loginNodes, importedCurParentNode->getService(), true);
-            MPNode* localCurChildNode = findNodeWithNameInList(loginChildNodes, importedCurChildNode->getLogin(), false);
+            MPNode* localCurChildNode = nullptr;
+            if (localCurParentNode)
+            {
+                localCurChildNode = findNodeWithLoginWithGivenParentInList(loginChildNodes, localCurParentNode, importedCurChildNode->getLogin());
+            }
 
             if (!localCurChildNode || !localCurParentNode)
             {
