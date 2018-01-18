@@ -267,6 +267,8 @@ private:
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
     void startImportFileMerging(MPDeviceProgressCb progressCb, std::function<void(bool success, QString errstr)> cb, bool noDelete);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, MPDeviceProgressCb cbProgress);
+    MPNode *findNodeWithAddressWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr);
+    MPNode *findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QString& name);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
     void deletePossibleFavorite(QByteArray parentAddr, QByteArray childAddr);
     bool finishImportFileMerging(QString &stringError, bool noDelete);
