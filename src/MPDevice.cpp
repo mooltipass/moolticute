@@ -4528,7 +4528,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
         if (generateSavePackets(saveJobs, false, true, cbProgress))
         {            
             /* Increment db change number */
-            if (services.size() > 0)
+            if ((services.size() > 0) && isFw12())
             {
                 set_dataDbChangeNumber(get_dataDbChangeNumber() + 1);
                 dataDbChangeNumberClone = get_dataDbChangeNumber();
@@ -6450,12 +6450,15 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
     }
 
     /* Increment db change numbers */
-    set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
-    credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
-    QByteArray updateChangeNumbersPacket = QByteArray();
-    updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
-    updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-    jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+    if (isFw12())
+    {
+        set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
+        credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
+        QByteArray updateChangeNumbersPacket = QByteArray();
+        updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
+        updateChangeNumbersPacket.append(get_dataDbChangeNumber());
+        jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+    }
 
     emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
 
