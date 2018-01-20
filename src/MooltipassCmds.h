@@ -40,7 +40,7 @@ class MPCmd: public QObject
     Q_OBJECT
 public:
 
-    enum Command
+    enum Command: unsigned char
     {
         EXPORT_FLASH_START    = 0x8A,
         EXPORT_FLASH          = 0x8B,
