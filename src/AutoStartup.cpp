@@ -43,6 +43,10 @@ void AutoStartup::enableAutoStartup(bool en)
         settings.sync();
     }
 #elif defined(Q_OS_LINUX)
+    QString applicationFilePath = qgetenv("APPIMAGE");
+    if (applicationFilePath.isEmpty())
+        applicationFilePath= qApp->applicationFilePath();
+
     QString desktopFile = QString("[Desktop Entry]\n"
                                           "Name=Moolticute\n"
                                           "Comment=Mooltipass companion\n"
@@ -52,7 +56,7 @@ void AutoStartup::enableAutoStartup(bool en)
                                           "Hidden=false\n"
                                           "NoDisplay=false\n"
                                           "X-GNOME-Autostart-enabled=true\n")
-                                  .arg(qApp->applicationFilePath());
+                                  .arg(applicationFilePath);
 
     QString autostartLocation;
     char *xgdConfigHome = getenv("XDG_CONFIG_HOME");
