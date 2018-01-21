@@ -43,11 +43,30 @@ void CredentialView::refreshLoginItem(const QModelIndex &srcIndex, bool bIsFavor
 void CredentialView::onModelLoaded(bool bClearLoginDescription)
 {
     Q_UNUSED(bClearLoginDescription)
+    CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
+
     QModelIndex firstServiceIndex = model()->index(0, 0, QModelIndex());
     if (firstServiceIndex.isValid())
     {
         selectionModel()->setCurrentIndex(firstServiceIndex, QItemSelectionModel::ClearAndSelect);
         onToggleExpandedState(firstServiceIndex);
+
+        // Expand every index marked as favorite
+        for (int i = 0; i < pCredModelFilter->rowCount(); i ++)
+        {
+            QModelIndex serviceIndex = pCredModelFilter->index(i, 0, QModelIndex());
+            for (int j = 0; j < pCredModelFilter->rowCount(serviceIndex); j ++)
+            {
+                QModelIndex itemIndex = pCredModelFilter->index(j, 0, serviceIndex);
+                TreeItem *pItem = pCredModelFilter->getItemByProxyIndex(itemIndex);
+                LoginItem *loginItem = dynamic_cast<LoginItem *>(pItem);
+                if (loginItem && loginItem->favorite() >= 0)
+                {
+                    expand(serviceIndex);
+                    expand(itemIndex);
+                }
+            }
+        }
     }
 }
 
