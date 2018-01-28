@@ -48,8 +48,7 @@ void CredentialView::onModelLoaded(bool bClearLoginDescription)
     QModelIndex firstServiceIndex = model()->index(0, 0, QModelIndex());
     if (firstServiceIndex.isValid())
     {
-        selectionModel()->setCurrentIndex(firstServiceIndex, QItemSelectionModel::ClearAndSelect);
-        onToggleExpandedState(firstServiceIndex);
+        bool wasAnyItemFavoriteExpanded = false;
 
         // Expand every index marked as favorite
         for (int i = 0; i < pCredModelFilter->rowCount(); i ++)
@@ -64,8 +63,14 @@ void CredentialView::onModelLoaded(bool bClearLoginDescription)
                 {
                     expand(serviceIndex);
                     expand(itemIndex);
+                    wasAnyItemFavoriteExpanded = true;
                 }
             }
+        }
+
+        if (!wasAnyItemFavoriteExpanded) {
+            selectionModel()->setCurrentIndex(firstServiceIndex, QItemSelectionModel::ClearAndSelect);
+            onToggleExpandedState(firstServiceIndex);
         }
     }
 }
