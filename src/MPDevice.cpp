@@ -3813,9 +3813,6 @@ void MPDevice::cancelUserRequest(const QString &reqid)
 void MPDevice::getCredential(QString service, const QString &login, const QString &fallback_service, const QString &reqid,
                              std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass, const QString &desc)> cb)
 {
-    //Force all service names to lowercase
-    service = service.toLower();
-
     QString logInf = QStringLiteral("Ask for password for service: %1 login: %2 fallback_service: %3 reqid: %4")
                      .arg(service)
                      .arg(login)
@@ -3955,9 +3952,6 @@ void MPDevice::delCredentialAndLeave(QString service, const QString &login,
                                      MPDeviceProgressCb cbProgress,
                                      std::function<void(bool success, QString errstr)> cb)
 {
-    //Force all service names to lowercase
-    service = service.toLower();
-
     auto deleteCred = [=]()
     {
         QJsonArray allCreds;
@@ -4303,9 +4297,6 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
         return;
     }
 
-    //Force all service names to lowercase
-    service = service.toLower();
-
     QString logInf = QStringLiteral("Ask for data node for service: %1 fallback_service: %2 reqid: %3")
                      .arg(service)
                      .arg(fallback_service)
@@ -4546,10 +4537,6 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
         exitMemMgmtMode(true);
         return;
     }
-
-    //Force all service names to lowercase
-    for (int i = 0;i < services.size();i++)
-        services.replace(i, services.at(i).toLower());
 
     AsyncJobs *jobs = new AsyncJobs("Re-scanning the memory", this);
 
