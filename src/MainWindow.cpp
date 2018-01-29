@@ -35,6 +35,25 @@ static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx =
     cb->setCurrentIndex(idx);
 }
 
+void MainWindow::initHelpLabels()
+{
+    auto getFontAwesomeIconPixmap = [=](int character, QSize size = QSize(20, 20)) {
+        return AppGui::qtAwesome()->icon(character).pixmap(size);
+    };
+
+    ui->label_exportDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_exportDBHelp->setToolTip(tr("Export your encrypted database to a file"));
+
+    ui->label_importDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_importDBHelp->setToolTip(tr("Import a credential database to your Mooltipass"));
+
+    ui->label_integrityCheckHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_integrityCheckHelp->setToolTip(tr("Only if instructed by the Mooltipass team should you click that button"));
+
+    ui->label_dbBackupMonitoringHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_dbBackupMonitoringHelp->setToolTip(tr("Select a backup file to make sure your Mooltipass database is always in sync with it. You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected."));
+}
+
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -81,6 +100,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->widgetCredentials->setPasswordProfilesModel(m_passwordProfilesModel);
 
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
+
+    initHelpLabels();
 
     //Disable this option for now, firmware does not support it
     ui->checkBoxInput->setEnabled(false);
@@ -569,12 +590,12 @@ void MainWindow::updatePage()
 
 void MainWindow::enableKnockSettings(bool enable)
 {
-    ui->knockSettingsFrame->setEnabled(enable);
+    ui->knockSettingsWidget->setEnabled(enable);
 
-    ui->knockSettingsFrame->setToolTip(enable ? "" : tr("Remove the card from the device to change this setting."));
-    ui->knockSettingsFrame->setToolTipDuration(enable ? -1 : std::numeric_limits<int>::max());
+    ui->knockSettingsWidget->setToolTip(enable ? "" : tr("Remove the card from the device to change this setting."));
+    ui->knockSettingsWidget->setToolTipDuration(enable ? -1 : std::numeric_limits<int>::max());
 
-    ui->labelRemoveCard->setVisible(!ui->knockSettingsFrame->isEnabled());
+    ui->labelRemoveCard->setVisible(!ui->knockSettingsWidget->isEnabled());
 
     //Make sure the suffix label ("sensitivity") matches the color of the other widgets.
     const QString color =
