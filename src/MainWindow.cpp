@@ -42,16 +42,16 @@ void MainWindow::initHelpLabels()
     };
 
     ui->label_exportDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
-    ui->label_exportDBHelp->setToolTip(tr("Export your encrypted database to a file"));
+    ui->label_exportDBHelp->setToolTip(tr("All your logins and passwords are stored inside an encrypted database on your Mooltipass device.\r\nTogether with your smartcard, this feature allows you to securely export your user's database to your computer to later import it on other devices."));
 
     ui->label_importDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
-    ui->label_importDBHelp->setToolTip(tr("Import a credential database to your Mooltipass"));
+    ui->label_importDBHelp->setToolTip(tr("All your logins and passwords are stored inside an encrypted database on your Mooltipass device.\r\nTogether with your smartcard, this feature allows you to import a database from another Mooltipass into this device."));
 
     ui->label_integrityCheckHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
-    ui->label_integrityCheckHelp->setToolTip(tr("Only if instructed by the Mooltipass team should you click that button"));
+    ui->label_integrityCheckHelp->setToolTip(tr("Only if instructed by the Mooltipass team should you click that button!"));
 
     ui->label_dbBackupMonitoringHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
-    ui->label_dbBackupMonitoringHelp->setToolTip(tr("Select a backup file to make sure your Mooltipass database is always in sync with it. You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected."));
+    ui->label_dbBackupMonitoringHelp->setToolTip(tr("Select a backup file to make sure your Mooltipass database is always in sync with it.\r\nYou will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected."));
 }
 
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
