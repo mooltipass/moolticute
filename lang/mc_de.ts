@@ -707,18 +707,8 @@ Maximum allowed size is %2 bytes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="518"/>
-        <source>carotte keyboard layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.ui" line="536"/>
         <source>Keyboard Layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="569"/>
-        <source>carotte slow computer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -729,11 +719,6 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="610"/>
         <source>ms after each key press</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="633"/>
-        <source>carotte send after login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -748,11 +733,6 @@ Maximum allowed size is %2 bytes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="691"/>
-        <source>carotte send after pass</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.ui" line="726"/>
         <source>after each password output</source>
         <translation type="unfinished"></translation>
@@ -760,11 +740,6 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="752"/>
         <source>Inactivity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="758"/>
-        <source>carotte cancel req</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -778,11 +753,6 @@ Maximum allowed size is %2 bytes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="816"/>
-        <source>carotte lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.ui" line="834"/>
         <source>Lock after</source>
         <translation type="unfinished"></translation>
@@ -790,11 +760,6 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="857"/>
         <source>minutes of inactivity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="880"/>
-        <source>carotte screensave</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -808,18 +773,8 @@ Maximum allowed size is %2 bytes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="899"/>
-        <source>carotte brightness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.ui" line="917"/>
         <source>Screen Brightness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="950"/>
-        <source>carotte tutorial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -828,18 +783,8 @@ Maximum allowed size is %2 bytes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="960"/>
-        <source>carotte usb charger</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.ui" line="963"/>
         <source>Allow boot without host (e.g. USB battery / Charger)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="976"/>
-        <source>carotte knock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -855,11 +800,6 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="1027"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic; color:#ac0000;&quot;&gt;(remove the card to change that setting)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="1040"/>
-        <source>carotte flash screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -883,18 +823,8 @@ Maximum allowed size is %2 bytes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1069"/>
-        <source>carotte random pin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.ui" line="1072"/>
         <source>Random Starting Pin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="1079"/>
-        <source>carotte lock unlock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1054,6 +984,76 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/MainWindow.ui" line="518"/>
+        <source>Select the keyboard layout that your computer uses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="569"/>
+        <source>Enable this feature if characters are missing when using manual credential recall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="633"/>
+        <source>Select which key is pressed after a login is manually entered</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="691"/>
+        <source>Select which key is pressed after a password is manually entered</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="758"/>
+        <source>Number of seconds after which the prompt screen disappears</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="816"/>
+        <source>When enabled, the Mooltipass will lock itself after a given number of minutes of inactivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="880"/>
+        <source>Enable the Mooltipass screen saver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="899"/>
+        <source>Mooltipass screen brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="950"/>
+        <source>Display the device tutorial after the next Mooltipass start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="960"/>
+        <source>Enable offline mode of your Mooltipass in which passwords are displayed on its screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="976"/>
+        <source>Enable the knock to approve feature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1040"/>
+        <source>Flash screen when an action is required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1069"/>
+        <source>Random starting pin every time card unlock is needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1079"/>
+        <source>Select the lock/unlock action performed when your card is inserted/removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/MainWindow.ui" line="1392"/>
         <source>Export To File</source>
         <translation type="unfinished"></translation>
@@ -1196,6 +1196,24 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="3058"/>
         <source>ALWA&amp;YS visible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="50"/>
+        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
+Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="53"/>
+        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
+Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="59"/>
+        <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
+You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1346,26 +1364,8 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="50"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="53"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.cpp" line="56"/>
         <source>Only if instructed by the Mooltipass team should you click that button!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="59"/>
-        <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
-You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

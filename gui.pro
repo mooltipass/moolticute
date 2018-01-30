@@ -139,7 +139,8 @@ unix {
 TRANSLATIONS = \
     lang/mc_fr.ts \
     lang/mc_de.ts \
-	lang/mc_ru.ts
+    lang/mc_ru.ts \
+    lang/mc_nl.ts
 
 #Build *.qm translation files automatically
 
