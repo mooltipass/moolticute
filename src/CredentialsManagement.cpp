@@ -70,6 +70,11 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonFavorite->setMenu(&m_favMenu);
 
     m_pCredModel = new CredentialModel(this);
+    const QIcon i = AppGui::qtAwesome()->icon(fa::arrowcircleright, {{ "color", QColor("#0097a7") },
+                                                                     { "color-selected", QColor("#0097a7") },
+                                                                     { "color-active", QColor("#0097a7") }});
+    m_pCredModel->setLoginItemIcon(i);
+
     m_pCredModelFilter = new CredentialModelFilter(this);
     m_pCredModelFilter->setSourceModel(m_pCredModel);
     ui->credentialTreeView->setModel(m_pCredModelFilter);
