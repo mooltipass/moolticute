@@ -515,7 +515,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_keyboard_layout" native="true">
                  <property name="toolTip">
-                  <string>carotte keyboard layout</string>
+                  <string>Select the keyboard layout that your computer uses</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_25">
                   <property name="leftMargin">
@@ -566,7 +566,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_keyboard_keydelay" native="true">
                  <property name="toolTip">
-                  <string>carotte slow computer</string>
+                  <string>Enable this feature if characters are missing when using manual credential recall</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_20">
                   <property name="leftMargin">
@@ -630,7 +630,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_keyboard_key_after_login" native="true">
                  <property name="toolTip">
-                  <string>carotte send after login</string>
+                  <string>Select which key is pressed after a login is manually entered</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_21">
                   <property name="leftMargin">
@@ -688,7 +688,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_keyboard_key_after_password" native="true">
                  <property name="toolTip">
-                  <string>carotte send after pass</string>
+                  <string>Select which key is pressed after a password is manually entered</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_22">
                   <property name="leftMargin">
@@ -755,7 +755,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_inactivity_cace_timeout" native="true">
                  <property name="toolTip">
-                  <string>carotte cancel req</string>
+                  <string>Number of seconds after which the prompt screen disappears</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_3">
                   <property name="leftMargin">
@@ -813,7 +813,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_inactivity_lock" native="true">
                  <property name="toolTip">
-                  <string>carotte lock</string>
+                  <string>When enabled, the Mooltipass will lock itself after a given number of minutes of inactivity</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout">
                   <property name="leftMargin">
@@ -877,7 +877,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QCheckBox" name="checkBoxScreensaver">
                  <property name="toolTip">
-                  <string>carotte screensave</string>
+                  <string>Enable the Mooltipass screen saver</string>
                  </property>
                  <property name="text">
                   <string>Enable screen saver</string>
@@ -896,7 +896,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_miscellaneous_brightness" native="true">
                  <property name="toolTip">
-                  <string>carotte brightness</string>
+                  <string>Mooltipass screen brightness</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_24">
                   <property name="leftMargin">
@@ -947,7 +947,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QCheckBox" name="checkBoxTuto">
                  <property name="toolTip">
-                  <string>carotte tutorial</string>
+                  <string>Display the device tutorial after the next Mooltipass start</string>
                  </property>
                  <property name="text">
                   <string>Enable device tutorial</string>
@@ -957,7 +957,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QCheckBox" name="checkBoxBoot">
                  <property name="toolTip">
-                  <string>carotte usb charger</string>
+                  <string>Enable offline mode of your Mooltipass in which passwords are displayed on its screen</string>
                  </property>
                  <property name="text">
                   <string>Allow boot without host (e.g. USB battery / Charger)</string>
@@ -973,7 +973,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   </sizepolicy>
                  </property>
                  <property name="toolTip">
-                  <string>carotte knock</string>
+                  <string>Enable the knock to approve feature</string>
                  </property>
                  <layout class="QHBoxLayout" name="knockSettingsLayout">
                   <property name="spacing">
@@ -1037,7 +1037,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QCheckBox" name="checkBoxFlash">
                  <property name="toolTip">
-                  <string>carotte flash screen</string>
+                  <string>Flash screen when an action is required</string>
                  </property>
                  <property name="text">
                   <string>Flash screen when input is required</string>
@@ -1066,7 +1066,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QCheckBox" name="randomStartingPinCheckBox">
                  <property name="toolTip">
-                  <string>carotte random pin</string>
+                  <string>Random starting pin every time card unlock is needed</string>
                  </property>
                  <property name="text">
                   <string>Random Starting Pin</string>
@@ -1076,7 +1076,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_advanced_lockunlock" native="true">
                  <property name="toolTip">
-                  <string>carotte lock unlock</string>
+                  <string>Select the lock/unlock action performed when your card is inserted/removed</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_27">
                   <property name="leftMargin">
