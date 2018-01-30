@@ -238,7 +238,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>9</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -488,9 +488,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-399</y>
-             <width>836</width>
-             <height>722</height>
+             <y>-246</y>
+             <width>720</width>
+             <height>581</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -515,9 +515,21 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_keyboard_layout" native="true">
                  <property name="toolTip">
-                  <string>Tool Tip Placeholder</string>
+                  <string>carotte keyboard layout</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_25">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QLabel" name="label_4">
                     <property name="text">
@@ -554,9 +566,21 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_keyboard_keydelay" native="true">
                  <property name="toolTip">
-                  <string>Tool Tip Placeholder</string>
+                  <string>carotte slow computer</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_20">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QCheckBox" name="checkBoxSlowHost">
                     <property name="text">
@@ -606,9 +630,21 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_keyboard_key_after_login" native="true">
                  <property name="toolTip">
-                  <string>Tooltip placeholder</string>
+                  <string>carotte send after login</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_21">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QCheckBox" name="checkBoxSendAfterLogin">
                     <property name="text">
@@ -652,9 +688,21 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QWidget" name="settings_keyboard_key_after_password" native="true">
                  <property name="toolTip">
-                  <string>Tool Tip Place Holder</string>
+                  <string>carotte send after pass</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_22">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QCheckBox" name="checkBoxSendAfterPassword">
                     <property name="text">
@@ -706,7 +754,22 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               <layout class="QVBoxLayout" name="verticalLayout_15">
                <item>
                 <widget class="QWidget" name="settings_inactivity_cace_timeout" native="true">
+                 <property name="toolTip">
+                  <string>carotte cancel req</string>
+                 </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_3">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QCheckBox" name="checkBoxInput">
                     <property name="text">
@@ -749,7 +812,22 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </item>
                <item>
                 <widget class="QWidget" name="settings_inactivity_lock" native="true">
+                 <property name="toolTip">
+                  <string>carotte lock</string>
+                 </property>
                  <layout class="QHBoxLayout" name="horizontalLayout">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QCheckBox" name="checkBoxLock">
                     <property name="text">
@@ -798,6 +876,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxScreensaver">
+                 <property name="toolTip">
+                  <string>carotte screensave</string>
+                 </property>
                  <property name="text">
                   <string>Enable screen saver</string>
                  </property>
@@ -814,7 +895,22 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               <layout class="QVBoxLayout" name="verticalLayout_16">
                <item>
                 <widget class="QWidget" name="settings_miscellaneous_brightness" native="true">
+                 <property name="toolTip">
+                  <string>carotte brightness</string>
+                 </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_24">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QLabel" name="label_3">
                     <property name="text">
@@ -850,6 +946,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxTuto">
+                 <property name="toolTip">
+                  <string>carotte tutorial</string>
+                 </property>
                  <property name="text">
                   <string>Enable device tutorial</string>
                  </property>
@@ -857,6 +956,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxBoot">
+                 <property name="toolTip">
+                  <string>carotte usb charger</string>
+                 </property>
                  <property name="text">
                   <string>Allow boot without host (e.g. USB battery / Charger)</string>
                  </property>
@@ -869,6 +971,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>carotte knock</string>
                  </property>
                  <layout class="QHBoxLayout" name="knockSettingsLayout">
                   <property name="spacing">
@@ -931,6 +1036,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxFlash">
+                 <property name="toolTip">
+                  <string>carotte flash screen</string>
+                 </property>
                  <property name="text">
                   <string>Flash screen when input is required</string>
                  </property>
@@ -957,6 +1065,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </item>
                <item>
                 <widget class="QCheckBox" name="randomStartingPinCheckBox">
+                 <property name="toolTip">
+                  <string>carotte random pin</string>
+                 </property>
                  <property name="text">
                   <string>Random Starting Pin</string>
                  </property>
@@ -964,7 +1075,22 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </item>
                <item>
                 <widget class="QWidget" name="settings_advanced_lockunlock" native="true">
+                 <property name="toolTip">
+                  <string>carotte lock unlock</string>
+                 </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_27">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QLabel" name="label_30">
                     <property name="text">
@@ -2987,6 +3113,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../img/images.qrc"/>
+  <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
  </resources>
  <connections/>

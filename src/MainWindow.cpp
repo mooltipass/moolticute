@@ -37,20 +37,25 @@ static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx =
 
 void MainWindow::initHelpLabels()
 {
-    auto getFontAwesomeIconPixmap = [=](int character, QSize size = QSize(20, 20)) {
-        return AppGui::qtAwesome()->icon(character).pixmap(size);
+    auto getFontAwesomeIconPixmap = [=](int character, QSize size = QSize(20, 20))
+    {
+        QVariantMap gray = {{ "color", QColor(Qt::gray) },
+                            { "color-selected", QColor(Qt::gray) },
+                            { "color-active", QColor(Qt::gray) }};
+
+        return AppGui::qtAwesome()->icon(character, gray).pixmap(size);
     };
 
-    ui->label_exportDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_exportDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
     ui->label_exportDBHelp->setToolTip(tr("All your logins and passwords are stored inside an encrypted database on your Mooltipass device.\r\nTogether with your smartcard, this feature allows you to securely export your user's database to your computer to later import it on other devices."));
 
-    ui->label_importDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_importDBHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
     ui->label_importDBHelp->setToolTip(tr("All your logins and passwords are stored inside an encrypted database on your Mooltipass device.\r\nTogether with your smartcard, this feature allows you to import a database from another Mooltipass into this device."));
 
-    ui->label_integrityCheckHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_integrityCheckHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
     ui->label_integrityCheckHelp->setToolTip(tr("Only if instructed by the Mooltipass team should you click that button!"));
 
-    ui->label_dbBackupMonitoringHelp->setPixmap(getFontAwesomeIconPixmap(fa::questioncircle));
+    ui->label_dbBackupMonitoringHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
     ui->label_dbBackupMonitoringHelp->setToolTip(tr("Select a backup file to make sure your Mooltipass database is always in sync with it.\r\nYou will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected."));
 }
 
