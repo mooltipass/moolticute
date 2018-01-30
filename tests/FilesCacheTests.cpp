@@ -1,4 +1,5 @@
 #include "FilesCacheTests.h"
+#include "../src/TreeItem.h"
 
 FilesCacheTests::FilesCacheTests()
 {

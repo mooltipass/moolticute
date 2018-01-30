@@ -3,6 +3,7 @@
 #include "FilesCacheTests.h"
 #include "UpdaterTests.h"
 #include "DbBackupsTrackerTests.h"
+#include "TestTreeItem.h"
 
 // Note: This is equivalent to QTEST_APPLESS_MAIN for multiple test classes.
 int main(int argc, char** argv)
@@ -12,8 +13,11 @@ int main(int argc, char** argv)
 
    int status = 0;
 
-   DbBackupsTrackerTests dbBackupsTrackerTests;
-   QTest::qExec(&dbBackupsTrackerTests);
+//   DbBackupsTrackerTests dbBackupsTrackerTests;
+//   QTest::qExec(&dbBackupsTrackerTests);
+
+   TestTreeItem testTreeItem;
+   QTest::qExec(&testTreeItem);
 //   TEST_CLASS(FilesCache, status);
 //   TEST_CLASS(UpdaterTests, status);
 //   TEST_CLASS(DbBackupsTrackerTests, status);
