@@ -34,20 +34,30 @@ SOURCES += \
     ../src/FilesCache.cpp \
     ../src/DbBackupsTracker.cpp \
     ../src/TreeItem.cpp \
+    ../src/RootItem.cpp \
+    ../src/LoginItem.cpp \
+    ../src/ServiceItem.cpp \
+    ../src/CredentialModel.cpp \
     main.cpp \
     FilesCacheTests.cpp \
     UpdaterTests.cpp \
     DbBackupsTrackerTests.cpp \
-    TestTreeItem.cpp
+    TestTreeItem.cpp \
+    TestCredentialModel.cpp
 
 HEADERS += \
     ../src/SimpleCrypt/SimpleCrypt.h \
     ../src/FilesCache.h \
     ../src/DbBackupsTracker.h\
     ../src/TreeItem.h \
+    ../src/RootItem.h \
+    ../src/LoginItem.h \
+    ../src/ServiceItem.h \
+    ../src/CredentialModel.h \
     UpdaterTests.h \
     FilesCacheTests.h \
     DbBackupsTrackerTests.h \
-    TestTreeItem.h
+    TestTreeItem.h \
+    TestCredentialModel.h
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
