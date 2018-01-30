@@ -10,31 +10,36 @@ TestCredentialModel::TestCredentialModel(QObject *parent) : QObject(parent)
 
 }
 
+CredentialModel *TestCredentialModel::createCredentialModelWithThreeLogins()
+{
+    CredentialModel *model = new CredentialModel();
+    QJsonArray array = QJsonDocument::fromJson(emptyLoginTestJson).array();
+    model->load(array);
+
+    return model;
+}
+
 void TestCredentialModel::noChanges()
 {
-    CredentialModel model(this);
-    QJsonArray array = QJsonDocument::fromJson(emptyLoginTestJson).array();
-    model.load(array);
+    CredentialModel *model = createCredentialModelWithThreeLogins();
 
-    Q_ASSERT(model.rowCount());
-    Q_ASSERT(!model.getJsonChanges().isEmpty());
+    Q_ASSERT(model->rowCount());
+    Q_ASSERT(!model->getJsonChanges().isEmpty());
 }
 
 void TestCredentialModel::oneCredentialRemoved()
 {
-    CredentialModel model(this);
-    QJsonArray array = QJsonDocument::fromJson(emptyLoginTestJson).array();
-    model.load(array);
+    CredentialModel *model = createCredentialModelWithThreeLogins();
 
     QString loginName = "";
     QString serviceName = "service.io";
 
-    QModelIndex requiredIdx = findLoginIndex(loginName, serviceName, &model);
+    QModelIndex requiredIdx = findLoginIndex(loginName, serviceName, model);
     Q_ASSERT(requiredIdx.isValid());
 
-    model.removeCredential(requiredIdx);
+    model->removeCredential(requiredIdx);
 
-    QJsonArray result = model.getJsonChanges();
+    QJsonArray result = model->getJsonChanges();
     Q_ASSERT(result.count() == 2);
 
     QJsonObject l1 = result.at(0).toObject();

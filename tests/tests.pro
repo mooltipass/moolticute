@@ -38,12 +38,14 @@ SOURCES += \
     ../src/LoginItem.cpp \
     ../src/ServiceItem.cpp \
     ../src/CredentialModel.cpp \
+    ../src/CredentialModelFilter.cpp \
     main.cpp \
     FilesCacheTests.cpp \
     UpdaterTests.cpp \
     DbBackupsTrackerTests.cpp \
     TestTreeItem.cpp \
-    TestCredentialModel.cpp
+    TestCredentialModel.cpp \
+    TestCredentialModelFilter.cpp
 
 HEADERS += \
     ../src/SimpleCrypt/SimpleCrypt.h \
@@ -54,10 +56,12 @@ HEADERS += \
     ../src/LoginItem.h \
     ../src/ServiceItem.h \
     ../src/CredentialModel.h \
+    ../src/CredentialModelFilter.h \
     UpdaterTests.h \
     FilesCacheTests.h \
     DbBackupsTrackerTests.h \
     TestTreeItem.h \
-    TestCredentialModel.h
+    TestCredentialModel.h \
+    TestCredentialModelFilter.h
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
