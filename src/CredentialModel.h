@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QDate>
 #include <QTimer>
+#include <QIcon>
 
 // Application
 #include "Common.h"
@@ -50,11 +51,13 @@ public:
     LoginItem *getLoginItemByIndex(const QModelIndex &idx) const;
     ServiceItem *getServiceItemByIndex(const QModelIndex &idx) const;
 
+    void setLoginItemIcon(const QIcon &icon);
 private:
     ServiceItem *addService(const QString &sServiceName);
 
 private:
     RootItem *m_pRootItem;
+    QIcon loginItemIcon;
 
 signals:
     void modelLoaded(bool bClearLoginDescription);

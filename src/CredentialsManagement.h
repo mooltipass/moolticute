@@ -53,7 +53,7 @@ private slots:
     void updateSaveDiscardState(const QModelIndex &proxyIndex=QModelIndex());
     void onPasswordUnlocked(const QString &service, const QString &login, const QString &password, bool success);
     void onCredentialUpdated(const QString &service, const QString &login, const QString &description, bool success);
-    void saveSelectedCredential(const QModelIndex &proxyIndex=QModelIndex());
+    void saveSelectedCredential();
     void on_pushButtonEnterMMM_clicked();
     void on_buttonDiscard_pressed();
     void onButtonDiscard_confirmed();
@@ -95,6 +95,8 @@ private:
     QMenu m_favMenu;
     QJsonArray m_loadedModelSerialiation;
     bool m_selectionCanceled;
+
+    void saveCredential(const QModelIndex currentSelectionIndex);
 
 signals:
     void wantEnterMemMode();

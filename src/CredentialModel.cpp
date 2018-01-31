@@ -3,6 +3,7 @@
 #include <QJsonObject>
 #include <QColor>
 #include <QFont>
+#include <QApplication>
 
 // Application
 #include "CredentialModel.h"
@@ -10,7 +11,6 @@
 #include "ServiceItem.h"
 #include "LoginItem.h"
 #include "TreeItem.h"
-#include "AppGui.h"
 
 CredentialModel::CredentialModel(QObject *parent) : QAbstractItemModel(parent)
 {
@@ -67,9 +67,7 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
 
     if (role == Qt::DecorationRole) {
         if (pLoginItem != nullptr)
-            return AppGui::qtAwesome()->icon(fa::arrowcircleright, {{ "color", QColor("#0097a7") },
-                                                                    { "color-selected", QColor("#0097a7") },
-                                                                    { "color-active", QColor("#0097a7") }});
+            return loginItemIcon;
     }
 
     return QVariant();
@@ -249,6 +247,11 @@ LoginItem *CredentialModel::getLoginItemByIndex(const QModelIndex &idx) const
 ServiceItem *CredentialModel::getServiceItemByIndex(const QModelIndex &idx) const
 {
     return dynamic_cast<ServiceItem *>(getItemByIndex(idx));
+}
+
+void CredentialModel::setLoginItemIcon(const QIcon &icon)
+{
+    loginItemIcon = icon;
 }
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName)
