@@ -255,6 +255,19 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
+    case MPCmd::GET_STARTING_PARENT: //0xC9
+    {
+        // draft
+        QByteArray d;
+        d[0] = 2;
+        d[1] = MPCmd::GET_STARTING_PARENT;
+        d[2] = 0x00;
+        d[3] = 0x00;
+
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }
       /* MPCmd::READ_FLASH_NODE
                MPCmd::GET_DN_START_PARENT
                MPCmd::GET_STARTING_PARENT
