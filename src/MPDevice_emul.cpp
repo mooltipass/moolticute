@@ -30,6 +30,8 @@ MPDevice_emul::MPDevice_emul(QObject *parent):
 
 void MPDevice_emul::platformWrite(const QByteArray &data)
 {
+    //qDebug() << "Sending into emu" << data;
+
     switch((MPCmd::Command)data[1])
     {
     case MPCmd::PING:
@@ -213,6 +215,18 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QByteArray d(134, 0x00);
         d[0] = d.size() - 2;
         d[1] = MPCmd::READ_FLASH_NODE;
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }
+    case MPCmd::GET_CUR_CARD_CPZ:
+    {
+        QByteArray d;
+        d[0] = 8;
+        d[1] = MPCmd::GET_CUR_CARD_CPZ;
+        for (int i = 2; i < 10; i++)
+            d[i] = 0xFF;
+
         d.resize(64);
         sendReadSignal(d);
         break;
