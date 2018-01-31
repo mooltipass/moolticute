@@ -31,8 +31,8 @@ MPDevice::MPDevice(QObject *parent):
     statusTimer->start(500);
     connect(statusTimer, &QTimer::timeout, [=]()
     {
-        //Do not interfer with parameter loading by sending a MOOLTIPASS_STATUS command
-        if (readingParams)
+        //Do not interfer with any other operation by sending a MOOLTIPASS_STATUS command
+        if (commandQueue.size() > 0)
             return;
 
         sendData(MPCmd::MOOLTIPASS_STATUS, [=](bool success, const QByteArray &data, bool &)
@@ -114,6 +114,8 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
     cmd.data.append(data);
     cmd.cb = std::move(cb);
     cmd.checkReturn = checkReturn;
+    cmd.retries_done = 0;
+    cmd.sent_ts = QDateTime::currentMSecsSinceEpoch();
 
     cmd.timerTimeout = new QTimer(this);
     connect(cmd.timerTimeout, &QTimer::timeout, [=]()
@@ -123,8 +125,10 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
         if (commandQueue.head().retry > 0)
         {
             qDebug() << "> Retry command: " << MPCmd::printCmd(commandQueue.head().data);
-            platformWrite(commandQueue.head().data);
+            commandQueue.head().sent_ts = QDateTime::currentMSecsSinceEpoch();
             commandQueue.head().timerTimeout->start(); //restart timer
+            commandQueue.head().retries_done++;
+            platformWrite(commandQueue.head().data);
         }
         else
         {
@@ -200,42 +204,47 @@ void MPDevice::newDataRead(const QByteArray &data)
         return;
     }
 
-    //Resend the command, if device ask for retrying
-    if (MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::PLEASE_RETRY)
-    {
-        qDebug() << MPCmd::printCmd(data) << " received, resending command " << MPCmd::printCmd(commandQueue.head().data);
-        commandQueue.head().timerTimeout->stop();
-        QTimer *timer = new QTimer(this);
-        connect(timer, &QTimer::timeout, [this, timer]()
-        {
-            timer->stop();
-            timer->deleteLater();
-            platformWrite(commandQueue.head().data);
-            commandQueue.head().timerTimeout->start(); //restart timer
-        });
-        timer->start(300);
-        return;
-    }
-
     MPCommand currentCmd = commandQueue.head();
 
-    // Special case: if command check was requested but the device returned a mooltipass status (user entering his PIN), resend packet
-    if (currentCmd.checkReturn &&
+    // First if: Resend the command, if device ask for retrying
+    // Second if: Special case: if command check was requested but the device returned a mooltipass status (user entering his PIN), resend packet
+    if ((MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::PLEASE_RETRY) ||
+        (currentCmd.checkReturn &&
         MPCmd::from(currentCmd.data.at(MP_CMD_FIELD_INDEX)) != MPCmd::MOOLTIPASS_STATUS &&
         MPCmd::from(data.at(MP_CMD_FIELD_INDEX)) == MPCmd::MOOLTIPASS_STATUS &&
-        (data.at(MP_PAYLOAD_FIELD_INDEX) & MP_UNLOCKING_SCREEN_BITMASK) != 0)
+        (data.at(MP_PAYLOAD_FIELD_INDEX) & MP_UNLOCKING_SCREEN_BITMASK) != 0))
     {
-        qDebug() << MPCmd::printCmd(data) << " received, resending command " << MPCmd::printCmd(commandQueue.head().data);
+        /* Stop timeout timer */
         commandQueue.head().timerTimeout->stop();
-        QTimer *timer = new QTimer(this);
-        connect(timer, &QTimer::timeout, [this, timer]()
+
+        /* Bear with me for this complex explanation.
+         * In some case, USB commands may take quite a while to get an answer, especially when the user is prompted (or is deliberately trying to delay the answer)
+         * However, during long prompts, if a message is sent to the mini it will answer with a please retry or a status packet
+         * In Moolticute, we have a timeout that will trigger message sending, so imagine the following sequence:
+         * - MMM is asked
+         * - user is playing with the prompt, delaying the answer
+         * - timeout triggered, MC resends one packet
+         * - the mooltipass replies with a please retry
+         * In that case, there is twice the "go to MMM" packet "pending". So when we receive our please retry or status packet, we check that it is not for a message that actually was sent due to a timeout
+         * And just to be sure, we checked that the mini was quick to answer the second message
+         */
+        if ((commandQueue.head().retries_done == 1) && ((QDateTime::currentMSecsSinceEpoch() - commandQueue.head().sent_ts) < 200))
         {
-            timer->stop();
-            timer->deleteLater();
-            platformWrite(commandQueue.head().data);
-            commandQueue.head().timerTimeout->start(); //restart timer
-        });
-        timer->start(300);
+            qDebug() << MPCmd::printCmd(data) << " was received for a packet that was sent due to a timeout, not resending";
+        }
+        else
+        {
+            qDebug() << MPCmd::printCmd(data) << " received, resending command " << MPCmd::printCmd(commandQueue.head().data);
+            QTimer *timer = new QTimer(this);
+            connect(timer, &QTimer::timeout, [this, timer]()
+            {
+                timer->stop();
+                timer->deleteLater();
+                platformWrite(commandQueue.head().data);
+                commandQueue.head().timerTimeout->start(); //restart timer
+            });
+            timer->start(300);
+        }
         return;
     }
 
@@ -3813,9 +3822,6 @@ void MPDevice::cancelUserRequest(const QString &reqid)
 void MPDevice::getCredential(QString service, const QString &login, const QString &fallback_service, const QString &reqid,
                              std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass, const QString &desc)> cb)
 {
-    //Force all service names to lowercase
-    service = service.toLower();
-
     QString logInf = QStringLiteral("Ask for password for service: %1 login: %2 fallback_service: %3 reqid: %4")
                      .arg(service)
                      .arg(login)
@@ -3955,9 +3961,6 @@ void MPDevice::delCredentialAndLeave(QString service, const QString &login,
                                      MPDeviceProgressCb cbProgress,
                                      std::function<void(bool success, QString errstr)> cb)
 {
-    //Force all service names to lowercase
-    service = service.toLower();
-
     auto deleteCred = [=]()
     {
         QJsonArray allCreds;
@@ -4303,9 +4306,6 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
         return;
     }
 
-    //Force all service names to lowercase
-    service = service.toLower();
-
     QString logInf = QStringLiteral("Ask for data node for service: %1 fallback_service: %2 reqid: %3")
                      .arg(service)
                      .arg(fallback_service)
@@ -4546,10 +4546,6 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
         exitMemMgmtMode(true);
         return;
     }
-
-    //Force all service names to lowercase
-    for (int i = 0;i < services.size();i++)
-        services.replace(i, services.at(i).toLower());
 
     AsyncJobs *jobs = new AsyncJobs("Re-scanning the memory", this);
 

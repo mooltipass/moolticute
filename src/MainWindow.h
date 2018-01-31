@@ -146,6 +146,7 @@ private:
     QWidget *previousWidget;
     PasswordProfilesModel *m_passwordProfilesModel;
     DbBackupsTrackerController *dbBackupsTrackerController;
+    void initHelpLabels();
 };
 
 #endif // MAINWINDOW_H

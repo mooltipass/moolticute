@@ -47,6 +47,8 @@ public:
 
     QTimer *timerTimeout = nullptr;
     int retry = CMD_MAX_RETRY;
+    int retries_done = 0;
+    qint64 sent_ts = 0;
 
     bool checkReturn = true;
 };
