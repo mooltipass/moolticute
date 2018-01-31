@@ -187,7 +187,19 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
-    case MPCmd::GET_RANDOM_NUMBER:
+    case MPCmd::CHECK_PASSWORD: /* 0xA8 */
+    {
+        /* Currently we do nothing (only send back 0x01) */
+        QByteArray d;
+        d[0] = 1;
+        d[1] = MPCmd::CHECK_PASSWORD;
+        d[2] = 0x01;
+
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }
+    case MPCmd::GET_RANDOM_NUMBER: /* 0xAC */
     {
          QByteArray d;
          d[0] = 32;
