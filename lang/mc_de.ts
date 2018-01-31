@@ -1199,6 +1199,24 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/MainWindow.cpp" line="50"/>
+        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
+Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="53"/>
+        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
+Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="59"/>
+        <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
+You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/MainWindow.cpp" line="241"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
@@ -1346,26 +1364,8 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="50"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="53"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.cpp" line="56"/>
         <source>Only if instructed by the Mooltipass team should you click that button!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="59"/>
-        <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
-You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

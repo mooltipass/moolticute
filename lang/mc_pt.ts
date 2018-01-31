@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP">
+<TS version="2.1" language="pt_BR">
 <context>
     <name>AppGui</name>
     <message>
@@ -1199,11 +1199,6 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="56"/>
-        <source>Only if instructed by the Mooltipass team should you click that button!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.cpp" line="50"/>
         <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
 Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
@@ -1213,6 +1208,11 @@ Together with your smartcard, this feature allows you to securely export your us
         <location filename="../src/MainWindow.cpp" line="53"/>
         <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
 Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="56"/>
+        <source>Only if instructed by the Mooltipass team should you click that button!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
