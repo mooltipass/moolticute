@@ -248,7 +248,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QByteArray d;
         d[0] = 4;
         d[1] = MPCmd::GET_FAVORITE;
-        for (int i = 0; i < 4; i++)
+        for (int i = 2; i < 6; i++)
             d[i] = 0x00;
 
         d.resize(64);
