@@ -198,19 +198,31 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
          sendReadSignal(d);
          break;
     }
-    case MPCmd::GET_FAVORITE:
+    case MPCmd::SET_DATE: /* 0xBB */
     {
+        /* Currently we do nothing (only send back 0x01) */
         QByteArray d;
-        d[0] = 4;
-        d[1] = MPCmd::GET_FAVORITE;
-        for (int i = 0; i < 4; i++)
-            d[i] = 0x00;
+        d[0] = 1;
+        d[1] = MPCmd::SET_DATE;
+        d[2] = 0x01;
 
         d.resize(64);
         sendReadSignal(d);
         break;
     }
-    case MPCmd::READ_FLASH_NODE:
+    case MPCmd::GET_CUR_CARD_CPZ: /* 0xC2 */
+    {
+        QByteArray d;
+        d[0] = 8;
+        d[1] = MPCmd::GET_CUR_CARD_CPZ;
+        for (int i = 2; i < 10; i++)
+            d[i] = 0xFF;
+
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }
+    case MPCmd::READ_FLASH_NODE: /* 0xC5 */
     {
         QByteArray d(134, 0x00);
         d[0] = d.size() - 2;
@@ -219,13 +231,13 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
-    case MPCmd::GET_CUR_CARD_CPZ:
+    case MPCmd::GET_FAVORITE: /* 0xC7 */
     {
         QByteArray d;
-        d[0] = 8;
-        d[1] = MPCmd::GET_CUR_CARD_CPZ;
-        for (int i = 2; i < 10; i++)
-            d[i] = 0xFF;
+        d[0] = 4;
+        d[1] = MPCmd::GET_FAVORITE;
+        for (int i = 0; i < 4; i++)
+            d[i] = 0x00;
 
         d.resize(64);
         sendReadSignal(d);
