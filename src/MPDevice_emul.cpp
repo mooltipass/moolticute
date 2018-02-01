@@ -222,7 +222,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
-    case MPCmd::GET_CUR_CARD_CPZ: /* 0xC2 */
+    case MPCmd::GET_CUR_CARD_CPZ: // 0xC2
     {
         QByteArray d;
         d[0] = 8;
@@ -234,7 +234,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
-    case MPCmd::READ_FLASH_NODE: /* 0xC5 */
+    case MPCmd::READ_FLASH_NODE: // 0xC5
     {
         QByteArray d(134, 0x00);
         d[0] = d.size() - 2;
@@ -243,7 +243,21 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
-    case MPCmd::GET_FAVORITE: /* 0xC7 */
+    /*case MPCmd::WRITE_FLASH_NODE: // 0xC6
+    {
+        // draft
+        qDebug() << data;
+
+        QByteArray d;
+        d[0] = 1;
+        d[1] = MPCmd::WRITE_FLASH_NODE;
+        d[2] = 0x01;
+
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }*/
+    case MPCmd::GET_FAVORITE: // 0xC7
     {
         QByteArray d;
         d[0] = 4;
@@ -255,7 +269,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
-    case MPCmd::GET_STARTING_PARENT: //0xC9
+    case MPCmd::GET_STARTING_PARENT: // 0xC9
     {
         // draft
         QByteArray d;
@@ -263,6 +277,22 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = MPCmd::GET_STARTING_PARENT;
         d[2] = 0x00;
         d[3] = 0x00;
+
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }
+    case MPCmd::GET_30_FREE_SLOTS: //0xD0
+    {
+        // draft
+        // we try to make some kind of correct answer
+        QByteArray d;
+        d[0] = 4;
+        d[1] = MPCmd::GET_30_FREE_SLOTS;
+        d[2] = 0x00;
+        d[3] = 0x00;
+        d[4] = 0x00;
+        d[5] = 0x00;
 
         d.resize(64);
         sendReadSignal(d);
