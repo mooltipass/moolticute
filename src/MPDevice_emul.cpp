@@ -30,7 +30,7 @@ MPDevice_emul::MPDevice_emul(QObject *parent):
 
 void MPDevice_emul::platformWrite(const QByteArray &data)
 {
-    //qDebug() << "Sending into emu" << data;
+    qDebug() << "Sending into emu" << MPCmd::printCmd(data) << data.mid(2);
 
     switch((MPCmd::Command)data[1])
     {
@@ -306,7 +306,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
                MPCmd::GET_CTRVALUE
                MPCmd::GET_RANDOM_NUMBER*/
     default:
-        qDebug() << "Unimplemented emulation command: " << data;
+        qDebug() << "Unimplemented emulation command: " << MPCmd::printCmd(data) << data.mid(2);
         QByteArray d = data;
         d.resize(64);
         d[2] = 0; //result is 0

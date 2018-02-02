@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/AppGui.cpp" line="91"/>
         <source>&amp;Show Moolticute Application</source>
-        <translation>&amp;Afficher l&apos;application Moolticute</translation>
+        <translation>&amp;Afficher l&apos;Application Moolticute</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="100"/>
@@ -16,7 +16,7 @@
     <message>
         <location filename="../src/AppGui.cpp" line="417"/>
         <source>Restarting daemon...</source>
-        <translation type="unfinished"></translation>
+        <translation>Redémarage du Démon...</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="537"/>
@@ -32,7 +32,7 @@
         <location filename="../src/AppGui.cpp" line="108"/>
         <location filename="../src/AppGui.cpp" line="419"/>
         <source>&amp;Restart daemon</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Redémarrer le démon</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="308"/>
@@ -65,7 +65,7 @@
     <message>
         <location filename="../src/CredentialsManagement.ui" line="14"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="41"/>
@@ -112,7 +112,7 @@
     <message>
         <location filename="../src/CredentialsManagement.ui" line="205"/>
         <source>Browsing through your credentials list requires your device to be in management mode. Click the button below to start the process.</source>
-        <translation>Naviguer dans vos identifiants demande à ce que votre appareil soit en mode de gestion mémoire. Cliquez sur le bouton ci-dessous pour lancer le processus.</translation>
+        <translation>Naviguer dans vos identifiants nécessite que votre appareil soit en mode de gestion mémoire. Cliquez sur le bouton ci-dessous pour lancer le processus.</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="221"/>
@@ -157,7 +157,7 @@
     <message>
         <location filename="../src/CredentialsManagement.ui" line="571"/>
         <source>Last Accessed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dernier accès:</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="668"/>
@@ -292,32 +292,32 @@
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="96"/>
         <source>Import db backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer une base de données</translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="97"/>
         <source>Credentials in the backup file are more recent. Do you want to import credentials to the device?</source>
-        <translation type="unfinished"></translation>
+        <translation>Les identifiants dans le fichier de sauvegarde sont plus récents. Voulez-vous importer les identifiants sur l&apos;appareil ?</translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="148"/>
         <source>Be careful</source>
-        <translation type="unfinished"></translation>
+        <translation>Soyez prudent</translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="149"/>
         <source>By denying you can loose your changes. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>En refusant vous pourriez perdre vos modifications. Voiulez-vous continuer ?</translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="159"/>
         <source>Credentials on the device are more recent. Do you want export credentials to backup file?</source>
-        <translation type="unfinished"></translation>
+        <translation>les identifiants sur l&apos;appareil sont plus récents. Voulez-vous exporter les identifiants vers votre fichier de sauvegarde?</translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="222"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Erreur</translation>
     </message>
 </context>
 <context>
@@ -370,7 +370,7 @@
     <message>
         <location filename="../src/QSimpleUpdater/src/Downloader.cpp" line="162"/>
         <source>Cannot find downloaded update!</source>
-        <translation>Ne peut trouvez la mise à jour téléchargée!</translation>
+        <translation>Ne peut trouver la mise à jour téléchargée!</translation>
     </message>
     <message>
         <location filename="../src/QSimpleUpdater/src/Downloader.cpp" line="181"/>
@@ -512,7 +512,7 @@
     <message>
         <location filename="../src/FilesManagement.ui" line="112"/>
         <source>...</source>
-        <translation></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../src/FilesManagement.ui" line="121"/>
@@ -637,7 +637,7 @@ Continuer?</translation>
         <source>File &apos;%1&apos; is too big to be stored in the Mooltipass!
 
 Maximum allowed size is %2 bytes.</source>
-        <translation type="unfinished"></translation>
+        <translation>le fichier &apos;%1&apos; est tros volumineux pour être stocké dans le Mooltipass! La taille maximale autorisée est de %2 Octets.</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is too big to be stored in the Mooltipass!</source>
@@ -816,7 +816,7 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="917"/>
         <source>Screen Brightness</source>
-        <translation>Eclairage de l&apos;écran</translation>
+        <translation>Luminosité de l&apos;écran</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="953"/>
@@ -836,7 +836,7 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="1007"/>
         <source>sensitivity</source>
-        <translation> </translation>
+        <translation>sensibilité</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1027"/>
@@ -894,7 +894,7 @@ Maximum allowed size is %2 bytes.</source>
         <location filename="../src/MainWindow.ui" line="1561"/>
         <location filename="../src/MainWindow.ui" line="1665"/>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1352"/>
@@ -904,83 +904,83 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="1362"/>
         <source>Generate MooltiApp Compatible File</source>
-        <translation type="unfinished"></translation>
+        <translation>Générer un fichier compatible avec MooltiApp</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1912"/>
         <source>Unlock Your Mooltipass Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Déverrouiller votre Mooltipass</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2147"/>
         <source>Check For Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier les mises à jour</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2184"/>
         <source>Device Firmware Version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Version du firmware de l&apos;appareil:</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2464"/>
         <source>Moolticute Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres de Moolticute</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2490"/>
         <source>Application Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Langue de l&apos;application</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2566"/>
         <source>View Daemon Logs</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les logs du démon</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2603"/>
         <source>Start Moolticute SSH Agent Automatically</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer l&apos;agent SSH Moolticute automatiquement</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2615"/>
         <location filename="../src/MainWindow.ui" line="2658"/>
         <source>(Restart Needed)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Redémarrage nécessaire)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2646"/>
         <source>Moolticute SSH Arguments</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres SSH de Moolticute</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2691"/>
         <source>Restart Daemon with Debug Web Server (on port 8484)</source>
-        <translation type="unfinished"></translation>
+        <translation>Redémarrer le démon avec le serveur web de débug (sur le port 8484)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2711"/>
         <source>Enable Daemon Web Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le serveur web du démon</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2728"/>
         <source>Manage Your Password Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Gérer vos profils de most de passe</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2748"/>
         <source>Password Profiles...</source>
-        <translation type="unfinished"></translation>
+        <translation>Profils de mots de passe...</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2765"/>
         <source>Delayed Cancel Buttons to Prevent Mistakes</source>
-        <translation type="unfinished"></translation>
+        <translation>Boutons d&apos;annulation temporisés afin de minimiser le risque d&apos;erreurs</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2785"/>
         <source>Enable Long Press Cancel Buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer l&apos;appui long sur les boutons d&apos;annulations</translation>
     </message>
     <message>
         <source>Export to file</source>
@@ -1022,128 +1022,129 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="161"/>
         <source>Synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisation</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="296"/>
         <source>The Moolticute Daemon is Not Running.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="393"/>
         <source>Connect Your Mooltipass Device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="468"/>
         <source>These settings change parameters on your Mooltipass device. For browser specific settings, go to the options page of the extension.
 Hint: keep your mouse positioned over an option to get more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ces réglages modifient les paramètres de votre Mooltipass. Pour les réglages propres aux navigateurs, veuillez aller sur la page d&apos;options de l&apos;extention.
+Astuce: laisser votre souris sur une option pour avoir plus d&apos;informations.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="518"/>
         <source>Select the keyboard layout that your computer uses</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner la disposition du clavier de votre ordinateur</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="569"/>
         <source>Enable this feature if characters are missing when using manual credential recall</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer cette fonction si des caractères manquent lors de la sélection manuelle d&apos;identifiants</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="633"/>
         <source>Select which key is pressed after a login is manually entered</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner quelle touche est appuyée après la saisie manuelle d&apos;un identifiant</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="691"/>
         <source>Select which key is pressed after a password is manually entered</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner quelle touche est appuyée après la saisie manuelle d&apos;un mot de passe</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="758"/>
         <source>Number of seconds after which the prompt screen disappears</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de seondes après lequel l&apos;écran de validation disparait</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="816"/>
         <source>When enabled, the Mooltipass will lock itself after a given number of minutes of inactivity</source>
-        <translation type="unfinished"></translation>
+        <translation>Quand cette fonction est activée, le Mooltipass se verouillera seul après x minutes d&apos;inactivité</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="880"/>
         <source>Enable the Mooltipass screen saver</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer l&apos;écran de veille du Mooltipass</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="899"/>
         <source>Mooltipass screen brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Luminosité de l&apos;écran du Mooltipass</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="950"/>
         <source>Display the device tutorial after the next Mooltipass start</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher le guide de mise en route après le prochain démarrage du Mooltipass</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="960"/>
         <source>Enable offline mode of your Mooltipass in which passwords are displayed on its screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le mode déconnecté du Mooltipass dans lequel les mots de passe sont affichés sur l écran</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="976"/>
         <source>Enable the knock to approve feature</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer la fonction &quot;Tapoter pour valider&quot;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1040"/>
         <source>Flash screen when an action is required</source>
-        <translation type="unfinished"></translation>
+        <translation>Faire clignoter l&apos;écran quand une action est nécessaire</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1069"/>
         <source>Random starting pin every time card unlock is needed</source>
-        <translation type="unfinished"></translation>
+        <translation>Code pin de démarrage aléatoire à chaque fois que le déverrouillage de la carte est nécessaire</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1079"/>
         <source>Select the lock/unlock action performed when your card is inserted/removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner l&apos;action de verrouillage/déverrouilage effectuée quand votre carte est insérée/retirée</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1392"/>
         <source>Export To File</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter vers un fichier</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1488"/>
         <source>Do Not Delete Credentials on Local DB</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne pas effacer les identifiants de la base de données locale</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1515"/>
         <source>Import From File</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer d&apos;un fichier</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1625"/>
         <source>Perform Integrity Check</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier l&apos;intégrité des données</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1652"/>
         <source>Database Backup Monitoring</source>
-        <translation type="unfinished"></translation>
+        <translation>Surveillance de la base de données</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1693"/>
         <source>Keep your database backup synchronized with this mooltipass database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Garder la sauvegarde de votre base de données synchronisée avec celle de ce Mooltipass</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1723"/>
         <source>Backup file path</source>
-        <translation type="unfinished"></translation>
+        <translation>Emplacement du fichier de sauvegarde</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1815"/>
@@ -1172,7 +1173,7 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="2048"/>
         <source>Working</source>
-        <translation type="unfinished"></translation>
+        <translation>En cours</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2113"/>
@@ -1282,45 +1283,48 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="2917"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation>TextLabel</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3036"/>
         <source>SSH Key Tab</source>
-        <translation></translation>
+        <translation>Onglet SSH</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3048"/>
         <source>Visible ON DE&amp;MAND  (use CTRL+SHIFT+F1 keyboard shortcut)</source>
-        <translation></translation>
+        <translation>Visible sur demande (utilisez CTRL+SHIFT+F1)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3058"/>
         <source>ALWA&amp;YS visible</source>
-        <translation></translation>
+        <translation>Toujours Visible</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="56"/>
         <source>Only if instructed by the Mooltipass team should you click that button!</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous ne devriez appuyer sur ce bouton que si l&apos;équipe Mooltipass vous le demande!</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="50"/>
         <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
 Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vos identifiants et mots de passes sont stockés dans une base de données chiffrée sur votre Mooltipass.
+ Combinée avec votre carte à puce, cette fonction vous permet d&apos;exporter votre base de données vers votre ordinateur de façon sûre et de l&apos;importer ultérieurement sur d&apos;autres Mooltipass.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="53"/>
         <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
 Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vos identifiants et mots de passes sont stockés dans une base de données chiffrée sur votre Mooltipass.
+ Combinée avec votre carte à puce, cette fonction vous permet d&apos;importer une base de données provenant d&apos;un autre Mooltipass sur celui-ci.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="59"/>
         <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
 You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner un fichier de sauvegarde pour garantir que la base de données de votre Mooltipass soit synchronisée.
+ Si un changement est détecté dans la base de données de votre Mooltipass ou le fichier de sauvegarde sous surveillance, vous serez averti et vous pourrez choisir d&apos;importer ou d&apos;exporter ces changements.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="241"/>
@@ -1427,42 +1431,42 @@ You will be prompted for import or export operations if any changes to your Mool
     <message>
         <location filename="../src/MainWindow.cpp" line="827"/>
         <source>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;En attente de confirmation sur l&apos;appareil&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirmez la requête sur l&apos;appareil.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="840"/>
         <source>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving Changes to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Sauvegarde des modifications sur l&apos;appareil&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Veuillez patienter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="865"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Merci d&apos;approuver la requête sur l&apos;appareil&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="878"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Merci d&apos;approuver la requête sur l&apos;appareil&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="921"/>
         <source>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Sauvegarde des modifications dans la mémoire de l&apos;appareil&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Veuillez patienter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="954"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Exporting Database from Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Exporter la base de données depuis l&apos;appareil&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Veuillez patienter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="957"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Importing and Merging File to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Importer et fusionner le fichier dans l&apos;appareil&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Veuillez patienter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1355"/>
         <source>Memory exports (*.bin)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichiers d&apos;exports (*.bin)</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Wait for device confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -1561,7 +1565,7 @@ You will be prompted for import or export operations if any changes to your Mool
     <message>
         <location filename="../src/MainWindow.cpp" line="1146"/>
         <source>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;En Attente de la Confirmation de l&apos;Appareil&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Veuillez confirmer la request sur le Mooltipass.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1177"/>
@@ -1894,12 +1898,12 @@ You will be prompted for import or export operations if any changes to your Mool
     <message>
         <location filename="../src/SSHManagement.ui" line="339"/>
         <source>Delete selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer la sélection</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="383"/>
         <source>Quit SSH Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter le mode de gestion SSH</translation>
     </message>
     <message>
         <source>Discard all changes</source>
@@ -1922,14 +1926,14 @@ You will be prompted for import or export operations if any changes to your Mool
     <message>
         <location filename="../src/SSHManagement.cpp" line="139"/>
         <source>Some internal errors occured. Please check the log and contact the dev team.</source>
-        <translation type="unfinished"></translation>
+        <translation>Des erreurs internes sont survenues. Merci de vérifier les logs et de contacter l&apos;équipe de développement.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="140"/>
         <source>Some errors occured:
 
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Des erreurs sont survenues: %1</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="217"/>
@@ -1971,14 +1975,14 @@ You will be prompted for import or export operations if any changes to your Mool
     <message>
         <location filename="../src/SSHManagement.cpp" line="259"/>
         <source>Open SSH private key</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir la clé privée SSH</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="306"/>
         <source>You are going to delete the selected key from the device.
 
 Proceed?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes sur le point de supprimer de l&apos;appareil la clé sélectionnée de l&apos;appareil. Confirmer ?</translation>
     </message>
 </context>
 <context>
