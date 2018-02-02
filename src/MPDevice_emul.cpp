@@ -30,7 +30,7 @@ MPDevice_emul::MPDevice_emul(QObject *parent):
 
 void MPDevice_emul::platformWrite(const QByteArray &data)
 {
-    //qDebug() << "Sending into emu" << data;
+    qDebug() << "Sending into emu" << MPCmd::printCmd(data) << data.mid(2);
 
     switch((MPCmd::Command)data[1])
     {
@@ -222,7 +222,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
-    case MPCmd::GET_CUR_CARD_CPZ: /* 0xC2 */
+    case MPCmd::GET_CUR_CARD_CPZ: // 0xC2
     {
         QByteArray d;
         d[0] = 8;
@@ -234,7 +234,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
-    case MPCmd::READ_FLASH_NODE: /* 0xC5 */
+    case MPCmd::READ_FLASH_NODE: // 0xC5
     {
         QByteArray d(134, 0x00);
         d[0] = d.size() - 2;
@@ -243,13 +243,56 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
-    case MPCmd::GET_FAVORITE: /* 0xC7 */
+    /*case MPCmd::WRITE_FLASH_NODE: // 0xC6
+    {
+        // draft
+        qDebug() << data;
+
+        QByteArray d;
+        d[0] = 1;
+        d[1] = MPCmd::WRITE_FLASH_NODE;
+        d[2] = 0x01;
+
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }*/
+    case MPCmd::GET_FAVORITE: // 0xC7
     {
         QByteArray d;
         d[0] = 4;
         d[1] = MPCmd::GET_FAVORITE;
         for (int i = 2; i < 6; i++)
             d[i] = 0x00;
+
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }
+    case MPCmd::GET_STARTING_PARENT: // 0xC9
+    {
+        // draft
+        QByteArray d;
+        d[0] = 2;
+        d[1] = MPCmd::GET_STARTING_PARENT;
+        d[2] = 0x00;
+        d[3] = 0x00;
+
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }
+    case MPCmd::GET_30_FREE_SLOTS: //0xD0
+    {
+        // draft
+        // we try to make some kind of correct answer
+        QByteArray d;
+        d[0] = 4;
+        d[1] = MPCmd::GET_30_FREE_SLOTS;
+        d[2] = 0x00;
+        d[3] = 0x00;
+        d[4] = 0x00;
+        d[5] = 0x00;
 
         d.resize(64);
         sendReadSignal(d);
@@ -263,7 +306,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
                MPCmd::GET_CTRVALUE
                MPCmd::GET_RANDOM_NUMBER*/
     default:
-        qDebug() << "Unimplemented emulation command: " << data;
+        qDebug() << "Unimplemented emulation command: " << MPCmd::printCmd(data) << data.mid(2);
         QByteArray d = data;
         d.resize(64);
         d[2] = 0; //result is 0
