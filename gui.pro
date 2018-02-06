@@ -142,7 +142,10 @@ TRANSLATIONS = \
     lang/mc_ru.ts \
     lang/mc_nl.ts \
     lang/mc_ja.ts \
-    lang/mc_pt.ts
+    lang/mc_pt.ts \
+    lang/mc_br.ts \
+    lang/mc_tr.ts \
+    lang/mc_se.ts
 
 #Build *.qm translation files automatically
 
