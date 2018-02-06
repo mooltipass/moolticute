@@ -1,7 +1,7 @@
 QT       += core network websockets widgets
 QT       -= gui
 
-#Wee need that for qwinoverlappedionotifier class which is private
+#We need that for qwinoverlappedionotifier class which is private
 win32: QT += core-private
 
 TEMPLATE = app
@@ -23,6 +23,11 @@ win32 {
 }
 
 win32 {
+    greaterThan(QT_MAJOR_VERSION, 4):greaterThan(QT_MINOR_VERSION, 9) {
+        SOURCES += src/qwinoverlappedionotifier.cpp
+        HEADERS += src/qwinoverlappedionotifier.h
+        message (included qwinoverlappednotifier)
+    }
     SOURCES += src/UsbMonitor_win.cpp \
                src/MPDevice_win.cpp \
                src/HIDLoader.cpp
