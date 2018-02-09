@@ -50,6 +50,10 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
 
+    ui->horizontalLayout_filterCred->removeWidget(ui->toolButtonClearFilter);
+
+    setFilterCredLayout(whiteButtons);
+
     ui->pushButtonCancel->setText(tr("Discard changes"));
     ui->pushButtonCancel->setFixedWidth(108);
     connect(ui->pushButtonCancel, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_pushButtonCancel_clicked);
@@ -123,6 +127,17 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     m_tSelectLoginTimer.setSingleShot(true);
     connect(&m_tSelectLoginTimer, &QTimer::timeout, this, &CredentialsManagement::onSelectLoginTimerTimeOut);
 }
+
+void CredentialsManagement::setFilterCredLayout(QVariantMap whiteButtons)
+{
+    QHBoxLayout *filterLayout = new QHBoxLayout(ui->lineEditFilterCred);
+    filterLayout->setMargin(0);
+    filterLayout->addStretch();
+    filterLayout->addWidget(ui->toolButtonClearFilter);
+
+    ui->toolButtonClearFilter->setIcon(AppGui::qtAwesome()->icon(fa::times, whiteButtons));
+}
+
 
 CredentialsManagement::~CredentialsManagement()
 {
@@ -515,6 +530,11 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
             m_pCredModel->removeCredential(srcIndex);
         }
     }
+}
+
+void CredentialsManagement::on_toolButtonClearFilter_clicked()
+{
+    ui->lineEditFilterCred->clear();
 }
 
 void CredentialsManagement::onCredentialSelected(const QModelIndex &current, const QModelIndex &previous)
