@@ -45,7 +45,9 @@ SOURCES += src/main_gui.cpp \
     src/PassGenerationProfilesDialog.cpp \
     src/DbBackupsTracker.cpp \
     src/DbBackupsTrackerController.cpp \
-    src/PromptWidget.cpp
+    src/PromptWidget.cpp \
+    src/DbExportsRegistry.cpp \
+    src/DbExportsRegistryController.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -78,7 +80,9 @@ HEADERS  += src/MainWindow.h \
     src/PassGenerationProfilesDialog.h \
     src/DbBackupsTracker.h \
     src/DbBackupsTrackerController.h \
-    src/PromptWidget.h
+    src/PromptWidget.h \
+    src/DbExportsRegistry.h \
+    src/DbExportsRegistryController.h
 
 mac {
     HEADERS += src/MacUtils.h

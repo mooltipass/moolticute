@@ -32,9 +32,13 @@ int main(int argc, char** argv)
        QTest::qExec(&testCredentialsModelFilter);
    }
 
+   {
+       DbBackupsTrackerTests dbBackupsTrackerTests;
+       QTest::qExec(&dbBackupsTrackerTests);
+   }
+
 //   TEST_CLASS(FilesCache, status);
 //   TEST_CLASS(UpdaterTests, status);
-//   TEST_CLASS(DbBackupsTrackerTests, status);
 
    return status;
 }

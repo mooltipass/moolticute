@@ -19,6 +19,7 @@
 #include "AppGui.h"
 #include "version.h"
 #include "QSimpleUpdater.h"
+#include "DbExportsRegistryController.h"
 
 #ifdef Q_OS_MAC
 #include "MacUtils.h"
@@ -39,7 +40,8 @@
 
 AppGui::AppGui(int & argc, char ** argv) :
     QApplication(argc, argv),
-    sharedMem("moolticute")
+    sharedMem("moolticute"),
+    dbExportsRegistryController(nullptr)
 {
 }
 
@@ -217,7 +219,17 @@ bool AppGui::initialize()
         createMainWindow();
     });
 
+    initializeDbExportsRegitry();
+
     return true;
+}
+
+void AppGui::initializeDbExportsRegitry()
+{
+    QString regitryFile = getDataDirPath() + "/dbExportsRegistry.ini";
+    dbExportsRegistryController = new DbExportsRegistryController(regitryFile, this);
+    dbExportsRegistryController->setMainWindow(win);
+    dbExportsRegistryController->setWSClient(wsClient);
 }
 
 void AppGui::startSSHAgent()
@@ -572,6 +584,14 @@ void AppGui::checkUpdate(bool displayMessage)
         QTimer::singleShot(1000 * 60 * 60 * 30 + qrand() % 240, [this]() { checkUpdate(false); });
 }
 
+QString AppGui::getDataDirPath()
+{
+    QDir dataDir(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
+    dataDir.mkpath(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
+
+    return dataDir.absolutePath();
+}
+
 void AppGui::setupLanguage()
 {
     QString locale;
@@ -621,4 +641,7 @@ void AppGui::createMainWindow()
     {
         mainWindowHide();
     });
+
+    if (dbExportsRegistryController)
+        dbExportsRegistryController->setMainWindow(win);
 }

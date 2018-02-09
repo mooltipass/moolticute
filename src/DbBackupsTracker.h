@@ -32,7 +32,7 @@ class DbBackupsTracker : public QObject
                WRITE setDataDbChangeNumber NOTIFY dataDbChangeNumberChanged)
 
 public:
-    explicit DbBackupsTracker(QObject *parent = nullptr);
+    explicit DbBackupsTracker(const QString settingsFilePath, QObject *parent = nullptr);
     ~DbBackupsTracker();
 
     QString getTrackPath(const QString &cardId) const;
@@ -82,12 +82,13 @@ private:
     QFileSystemWatcher watcher;
     QMap<QString, QString> tracks;
     QString cardId;
+    QString settingsFilePath;
     int credentialsDbChangeNumber;
     int dataDbChangeNumber;
 
     void saveTracks();
     void loadTracks();
-    QString getSettingsFilePath();
+    static QString getSettingsFilePath();
 
     int tryGetCredentialsDbBackupChangeNumber() const;
     int tryGetDataDbBackupChangeNumber() const;

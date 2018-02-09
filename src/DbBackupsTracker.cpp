@@ -12,8 +12,8 @@
 #include <QDir>
 #include <QStandardPaths>
 
-DbBackupsTracker::DbBackupsTracker(QObject* parent):
-    QObject(parent)
+DbBackupsTracker::DbBackupsTracker(const QString settingsFilePath, QObject* parent):
+    QObject(parent), settingsFilePath(settingsFilePath)
 {
     loadTracks();
     connect(&watcher, &QFileSystemWatcher::fileChanged,
@@ -327,8 +327,7 @@ void DbBackupsTracker::refreshTracking()
 
 void DbBackupsTracker::saveTracks()
 {
-    QString path = getSettingsFilePath();
-    QSettings s(path, QSettings::IniFormat);
+    QSettings s(settingsFilePath, QSettings::IniFormat);
     s.beginGroup("BackupsTracks");
     for (QString k : tracks.keys())
         s.setValue(k, tracks.value(k));
@@ -344,8 +343,7 @@ void DbBackupsTracker::loadTracks()
 {
     tracks.clear();
 
-    QString path = getSettingsFilePath();
-    QSettings s(path, QSettings::IniFormat);
+    QSettings s(settingsFilePath, QSettings::IniFormat);
     s.sync();
     if (s.status() != QSettings::NoError)
         qWarning() << "Unable to load settings " << s.status();
@@ -362,15 +360,6 @@ void DbBackupsTracker::loadTracks()
     }
 
     s.endGroup();
-}
-
-QString DbBackupsTracker::getSettingsFilePath()
-{
-    QString fileName = "mooticute.ini";
-    QDir dataDir(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
-    dataDir.mkpath(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
-
-    return dataDir.absoluteFilePath(fileName);
 }
 
 void DbBackupsTrackerNoCardIdSet::raise() const
