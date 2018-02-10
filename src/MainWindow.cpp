@@ -1080,7 +1080,7 @@ void MainWindow::on_pushButtonExportFile_clicked()
 
 void MainWindow::on_pushButtonImportFile_clicked()
 {
-    QString fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
+    QString fname = QFileDialog::getOpenFileName(this, tr("Select database export..."), QString(),
                                                  "Memory exports (*.bin);;All files (*.*)");
     if (fname.isEmpty())
         return;
