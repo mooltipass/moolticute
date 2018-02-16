@@ -40,6 +40,7 @@ SOURCES += \
     ../src/CredentialModel.cpp \
     ../src/CredentialModelFilter.cpp \
     ../src/DbExportsRegistry.cpp \
+    ../src/DbBackupChangeNumbersComparator.cpp \
     main.cpp \
     FilesCacheTests.cpp \
     UpdaterTests.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     ../src/CredentialModel.h \
     ../src/CredentialModelFilter.h \
     ../src/DbExportsRegistry.h \
+    ../src/DbBackupChangeNumbersComparator.h \
     UpdaterTests.h \
     FilesCacheTests.h \
     DbBackupsTrackerTests.h \
