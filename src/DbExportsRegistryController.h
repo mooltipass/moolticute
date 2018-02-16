@@ -25,7 +25,7 @@ public:
 signals:
 
 public slots:
-    void handleCardIdChanged(const QString id);
+    void handleCardIdChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
 
 protected slots:
     void handleDbExportRecommended();

@@ -6,7 +6,10 @@
 class DbExportsRegistry : public QObject
 {
     Q_OBJECT
-    QString id;
+    QString cardId;
+    int credentialsDbChangeNumber;
+    int dataDbChangeNumber;
+
     QString settingsPath;
 public:
     explicit DbExportsRegistry(const QString &settingsPath, QObject *parent = nullptr);
@@ -15,14 +18,15 @@ signals:
     void dbExportRecommended();
 
 public slots:
-    void setCurrentCardId(const QString &id);
+    void setCurrentCardDbMetadata(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void registerDbExport();
 
 private:
-    QDate getLastExportDate(const QString &id);
-
+    void checkIfDbMustBeExported();
+    QDate getLastExportDate(const QString &cardId);
     bool isOlderThanAMonth(const QDate &lastExport);
-
+    int getLastExportCredentialDbChangeNumber(const QString &id);
+    int getLastExportDataDbChangeNumber(const QString &id);
 };
 
 #endif // DBEXPORTSREGISTRY_H

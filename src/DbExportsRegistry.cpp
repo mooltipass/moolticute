@@ -8,17 +8,51 @@ DbExportsRegistry::DbExportsRegistry(const QString &settingsPath, QObject *paren
 {
 }
 
+void DbExportsRegistry::setCurrentCardDbMetadata(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber)
+{
+    DbExportsRegistry::cardId = cardId;
+    DbExportsRegistry::credentialsDbChangeNumber = credentialsDbChangeNumber;
+    DbExportsRegistry::dataDbChangeNumber = dataDbChangeNumber;
+
+    checkIfDbMustBeExported();
+}
+
+void DbExportsRegistry::checkIfDbMustBeExported()
+{
+    if (!cardId.isEmpty())
+    {
+        const QDate date = getLastExportDate(cardId);
+        const int lastCredentialCN = getLastExportCredentialDbChangeNumber(cardId);
+        const int lastDataCN = getLastExportDataDbChangeNumber(cardId);
+
+        if  (isOlderThanAMonth(date) &&
+             (lastCredentialCN < credentialsDbChangeNumber || lastDataCN < dataDbChangeNumber))
+            emit dbExportRecommended();
+    }
+}
+
 QDate DbExportsRegistry::getLastExportDate(const QString &id)
 {
-    QDate lastExport;
     QSettings s(settingsPath, QSettings::IniFormat);
     s.sync();
-    s.beginGroup("DbExportRegitry");
-    if (s.contains(id))
-        lastExport = s.value(id).toDate();
-    s.endGroup();
+    const QString key = "DbExportRegitry/"+id+"/date";
+    return s.value(key, QDate()).toDate();
+}
 
-    return lastExport;
+int DbExportsRegistry::getLastExportCredentialDbChangeNumber(const QString &id)
+{
+    QSettings s(settingsPath, QSettings::IniFormat);
+    s.sync();
+    const QString key = "DbExportRegitry/"+id+"/credentialsDbChangeNumber";
+    return s.value(key, -1).toInt();
+}
+
+int DbExportsRegistry::getLastExportDataDbChangeNumber(const QString &id)
+{
+    QSettings s(settingsPath, QSettings::IniFormat);
+    s.sync();
+    const QString key = "DbExportRegitry/"+id+"/dataDbChangeNumber";
+    return s.value(key, -1).toInt();
 }
 
 bool DbExportsRegistry::isOlderThanAMonth(const QDate &lastExport)
@@ -27,24 +61,15 @@ bool DbExportsRegistry::isOlderThanAMonth(const QDate &lastExport)
     return lastExport <= limit;
 }
 
-void DbExportsRegistry::setCurrentCardId(const QString &id)
-{
-    DbExportsRegistry::id = id;
-    if (!DbExportsRegistry::id.isEmpty())
-    {
-        QDate date = getLastExportDate(id);
-
-        if  (isOlderThanAMonth(date))
-            emit dbExportRecommended();
-    }
-}
-
 void DbExportsRegistry::registerDbExport()
 {
     QSettings s(settingsPath, QSettings::IniFormat);
-    s.sync();
-    s.beginGroup("DbExportRegitry");
-    s.setValue(id, QDate::currentDate());
+    s.beginGroup("DbExportRegitry/"+cardId);
+
+    s.setValue("date", QDate::currentDate());
+    s.setValue("credentialsDbChangeNumber", credentialsDbChangeNumber);
+    s.setValue("dataDbChangeNumber", dataDbChangeNumber);
+
     s.endGroup();
     s.sync();
 }

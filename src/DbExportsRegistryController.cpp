@@ -33,7 +33,7 @@ void DbExportsRegistryController::setWSClient(WSClient *wsClient)
     connect(wsClient, &WSClient::statusChanged, this, &DbExportsRegistryController::handleDeviceStatusChanged);
     connect(wsClient, &WSClient::connectedChanged, this, &DbExportsRegistryController::handleDeviceConnectedChanged);
 
-    dbExportsRegistry->setCurrentCardId(wsClient->get_cardId());
+    dbExportsRegistry->setCurrentCardDbMetadata(wsClient->get_cardId(), wsClient->get_credentialsDbChangeNumber(), wsClient->get_dataDbChangeNumber());
 }
 
 void DbExportsRegistryController::hidePrompt()
@@ -42,21 +42,22 @@ void DbExportsRegistryController::hidePrompt()
     window->hidePrompt();
 }
 
-void DbExportsRegistryController::handleCardIdChanged(const QString id)
+void DbExportsRegistryController::handleCardIdChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber)
 {
     wasDbExportRecommendedWithoutMainWindow = false;
 
     hidePrompt();
 
     if (wsClient->get_connected() && wsClient->get_status() == Common::Unlocked)
-        dbExportsRegistry->setCurrentCardId(id);
+        dbExportsRegistry->setCurrentCardDbMetadata(cardId, credentialsDbChangeNumber, dataDbChangeNumber);
     else
-        dbExportsRegistry->setCurrentCardId(QString());
+        dbExportsRegistry->setCurrentCardDbMetadata(QString(), -1, -1);
 }
 
 void DbExportsRegistryController::handleDbExportRecommended()
 {
-    if (window) {
+    if (window)
+    {
         std::function<void()> onAccept = [this]()
         {
             exportDbBackup();
@@ -77,17 +78,18 @@ void DbExportsRegistryController::handleDbExportRecommended()
             }
         };
 
-        PromptMessage *message = new PromptMessage(tr("It seems that you don't have fresh backups of this card. "
-                                                      "Do you want export credentials to a backup file?"),
+        PromptMessage *message = new PromptMessage(tr("It seems that you don't have a fresh backup of this card. "
+                                                      "Do you want backup your credentials to a file now?"),
                                                    onAccept, onReject);
         window->showPrompt(message);
         isExportRequestMessageVisible = true;
-    } else {
-        wasDbExportRecommendedWithoutMainWindow = true;
     }
+    else
+        wasDbExportRecommendedWithoutMainWindow = true;
 }
 
-void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool success) {
+void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool success)
+{
     disconnect(wsClient, &WSClient::dbExported, this, &DbExportsRegistryController::handleExportDbResult);
     window->handleBackupExported();
 
@@ -107,12 +109,12 @@ void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool
 void DbExportsRegistryController::handleDeviceStatusChanged(const Common::MPStatus &status)
 {
     if (status != Common::Unlocked)
-        handleCardIdChanged(QString());
+        handleCardIdChanged(QString(), -1, -1);
 }
 
 void DbExportsRegistryController::handleDeviceConnectedChanged(const bool &)
 {
-    handleCardIdChanged(QString());
+    handleCardIdChanged(QString(), -1, -1);
 }
 
 void DbExportsRegistryController::writeDbToFile(const QByteArray &d, QString fname)
