@@ -270,16 +270,16 @@ void DbBackupsTracker::setDataDbChangeNumber(int dataDbChangeNumber)
 bool DbBackupsTracker::isDbBackupChangeNumberGreater(int backupCCN, int backupDCN) const
 {
     bool result = false;
-    result = result || DbBackupChangeNumbersComparator::greaterThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
-    result = result || DbBackupChangeNumbersComparator::greaterThanWithWrapOver(backupDCN, dataDbChangeNumber);
+    result = result || BackupChangeNumbersComparator::greaterThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result || BackupChangeNumbersComparator::greaterThanWithWrapOver(backupDCN, dataDbChangeNumber);
     return result;
 }
 
 bool DbBackupsTracker::isDbBackupChangeNumberLower(int backupCCN, int backupDCN) const
 {
     bool result = false;
-    result = result || DbBackupChangeNumbersComparator::lowerThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
-    result = result || DbBackupChangeNumbersComparator::lowerThanWithWrapOver(backupDCN, dataDbChangeNumber);
+    result = result || BackupChangeNumbersComparator::lowerThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result || BackupChangeNumbersComparator::lowerThanWithWrapOver(backupDCN, dataDbChangeNumber);
     return result;
 }
 

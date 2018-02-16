@@ -80,6 +80,48 @@ void TestDbExportsRegistry::registerManyCardDbExported()
     verifyExportedDbRecord("333", now, 5, 6);
 }
 
+void TestDbExportsRegistry::setBackDateRecordAMonth(const QString &cardId)
+{
+    QSettings s(tmpSettingsPath, QSettings::IniFormat);
+    s.setValue("DbExportRegitry/"+cardId+"/date", QDate::currentDate().addMonths(-1));
+}
+
+void TestDbExportsRegistry::recommendExportOnCredentialsDbChangeNumberWrapover()
+{
+    DbExportsRegistry registry(tmpSettingsPath);
+    const QString cardId = "AAA";
+    registry.setCurrentCardDbMetadata(cardId, 0xFF, 1);
+    registry.registerDbExport();
+
+    setBackDateRecordAMonth(cardId);
+
+    registry.setCurrentCardDbMetadata("", -1, -1);
+
+    QSignalSpy spy(&registry, &DbExportsRegistry::dbExportRecommended);
+
+    registry.setCurrentCardDbMetadata(cardId, 1, 1);
+
+    QCOMPARE(spy.count(), 1);
+}
+
+void TestDbExportsRegistry::recommendExportOnDataDbChangeNumberWithWrapover()
+{
+    DbExportsRegistry registry(tmpSettingsPath);
+    const QString cardId = "BBB";
+    registry.setCurrentCardDbMetadata(cardId, 1, 0xFF);
+    registry.registerDbExport();
+
+    setBackDateRecordAMonth(cardId);
+
+    registry.setCurrentCardDbMetadata("", -1, -1);
+
+    QSignalSpy spy(&registry, &DbExportsRegistry::dbExportRecommended);
+
+    registry.setCurrentCardDbMetadata(cardId, 1, 1);
+
+    QCOMPARE(spy.count(), 1);
+}
+
 void TestDbExportsRegistry::verifyExportedDbRecord(const QString &cardId, QDate now, const int credentialsDbCN, const int dataDbCN)
 {
     QSettings s(tmpSettingsPath, QSettings::IniFormat);

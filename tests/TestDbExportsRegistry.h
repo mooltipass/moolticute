@@ -12,6 +12,10 @@ class TestDbExportsRegistry : public QObject
 
     void verifyExportedDbRecord(const QString &cardId, QDate now, const int credentialsDbCN, const int dataDbCN);
 
+    void setBackDateRecordAMonth();
+
+    void setBackDateRecordAMonth(const QString &cardId);
+
 private slots:
     void recommendExportWhenANewCardIsInserted();
     void registerCardDbExported();
@@ -20,6 +24,8 @@ private slots:
     void recommendExportWhenAMonthHasPassedAndThereIsMajorDataDbChangeNumber();
     void registerManyCardDbExported();
 
+    void recommendExportOnCredentialsDbChangeNumberWrapover();
+    void recommendExportOnDataDbChangeNumberWithWrapover();
     void cleanupTestCase();
 
 };

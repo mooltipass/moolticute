@@ -3,6 +3,8 @@
 #include <QDate>
 #include <QSettings>
 
+#include "../src/DbBackupChangeNumbersComparator.h"
+
 DbExportsRegistry::DbExportsRegistry(const QString &settingsPath, QObject *parent) :
     QObject(parent), settingsPath(settingsPath)
 {
@@ -25,8 +27,11 @@ void DbExportsRegistry::checkIfDbMustBeExported()
         const int lastCredentialCN = getLastExportCredentialDbChangeNumber(cardId);
         const int lastDataCN = getLastExportDataDbChangeNumber(cardId);
 
-        if  (isOlderThanAMonth(date) &&
-             (lastCredentialCN < credentialsDbChangeNumber || lastDataCN < dataDbChangeNumber))
+        const bool areChangesSinceLastBackup =
+                BackupChangeNumbersComparator::greaterThanWithWrapOver(credentialsDbChangeNumber, lastCredentialCN) ||
+                BackupChangeNumbersComparator::greaterThanWithWrapOver(dataDbChangeNumber, lastDataCN);
+
+        if  (isOlderThanAMonth(date) && areChangesSinceLastBackup)
             emit dbExportRecommended();
     }
 }

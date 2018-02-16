@@ -2,7 +2,7 @@
 #define DBBACKUPCHANGENUMBERSCOMPARATOR_H
 
 
-class DbBackupChangeNumbersComparator
+class BackupChangeNumbersComparator
 {
 public:
     static bool greaterThanWithWrapOver(int a, int b, int limit = 0xFF, int range = 0x40);
