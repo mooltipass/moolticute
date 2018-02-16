@@ -136,6 +136,7 @@ void CredentialsManagement::setFilterCredLayout()
     filterLayout->addWidget(ui->toolButtonClearFilter);
 
     ui->toolButtonClearFilter->setIcon(AppGui::qtAwesome()->icon(fa::times));
+    ui->toolButtonClearFilter->setVisible(false);
 }
 
 
@@ -535,6 +536,11 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
 void CredentialsManagement::on_toolButtonClearFilter_clicked()
 {
     ui->lineEditFilterCred->clear();
+}
+
+void CredentialsManagement::on_lineEditFilterCred_textChanged(const QString &text)
+{
+    ui->toolButtonClearFilter->setVisible(!text.isEmpty());
 }
 
 void CredentialsManagement::onCredentialSelected(const QModelIndex &current, const QModelIndex &previous)
