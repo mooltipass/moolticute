@@ -64,6 +64,7 @@ private slots:
     void on_pushButtonCancel_clicked();
     void on_pushButtonDelete_clicked();
     void on_toolButtonClearFilter_clicked();
+    void on_lineEditFilterCred_textChanged(const QString &text);
     void onCredentialSelected(const QModelIndex &current, const QModelIndex &previous);
     void onLoginSelected(const QModelIndex &srcIndex);
     void onServiceSelected(const QModelIndex &srcIndex);
@@ -99,7 +100,7 @@ private:
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 
-    void setFilterCredLayout(QVariantMap whiteButtons);
+    void setFilterCredLayout();
     
 signals:
     void wantEnterMemMode();

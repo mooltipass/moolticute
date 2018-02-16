@@ -52,7 +52,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     ui->horizontalLayout_filterCred->removeWidget(ui->toolButtonClearFilter);
 
-    setFilterCredLayout(whiteButtons);
+    setFilterCredLayout();
 
     ui->pushButtonCancel->setText(tr("Discard changes"));
     ui->pushButtonCancel->setFixedWidth(108);
@@ -128,14 +128,15 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(&m_tSelectLoginTimer, &QTimer::timeout, this, &CredentialsManagement::onSelectLoginTimerTimeOut);
 }
 
-void CredentialsManagement::setFilterCredLayout(QVariantMap whiteButtons)
+void CredentialsManagement::setFilterCredLayout()
 {
     QHBoxLayout *filterLayout = new QHBoxLayout(ui->lineEditFilterCred);
     filterLayout->setMargin(0);
     filterLayout->addStretch();
     filterLayout->addWidget(ui->toolButtonClearFilter);
 
-    ui->toolButtonClearFilter->setIcon(AppGui::qtAwesome()->icon(fa::times, whiteButtons));
+    ui->toolButtonClearFilter->setIcon(AppGui::qtAwesome()->icon(fa::times));
+    ui->toolButtonClearFilter->setVisible(false);
 }
 
 
@@ -535,6 +536,11 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
 void CredentialsManagement::on_toolButtonClearFilter_clicked()
 {
     ui->lineEditFilterCred->clear();
+}
+
+void CredentialsManagement::on_lineEditFilterCred_textChanged(const QString &text)
+{
+    ui->toolButtonClearFilter->setVisible(!text.isEmpty());
 }
 
 void CredentialsManagement::onCredentialSelected(const QModelIndex &current, const QModelIndex &previous)
