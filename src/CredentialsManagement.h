@@ -99,7 +99,7 @@ private:
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 
-    void setFilterCredLayout(QVariantMap whiteButtons);
+    void setFilterCredLayout();
     
 signals:
     void wantEnterMemMode();
