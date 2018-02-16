@@ -78,8 +78,8 @@ void DbExportsRegistryController::handleDbExportRecommended()
             }
         };
 
-        PromptMessage *message = new PromptMessage(tr("It seems that you don't have a fresh backup of this card. "
-                                                      "Do you want backup your credentials to a file now?"),
+        PromptMessage *message = new PromptMessage(tr("You haven't made a backup of your database for a while. "
+                                                      "Do you want to backup your credentials now?"),
                                                    onAccept, onReject);
         window->showPrompt(message);
         isExportRequestMessageVisible = true;
