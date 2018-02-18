@@ -75,6 +75,11 @@ const QDate &TreeItem::updatedDate() const
     return m_dUpdatedDate;
 }
 
+QDate TreeItem::bestUpdateDate(Qt::SortOrder) const
+{
+    return m_dUpdatedDate;
+}
+
 void TreeItem::setUpdatedDate(const QDate &dDate)
 {
     m_dUpdatedDate = dDate;

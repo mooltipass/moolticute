@@ -33,6 +33,7 @@ public:
     CredentialModel(QObject *parent=nullptr);
     ~CredentialModel();
     virtual QVariant data(const QModelIndex &idx, int role) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual Qt::ItemFlags flags(const QModelIndex &idx) const;
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
     virtual QModelIndex parent(const QModelIndex &idx) const;

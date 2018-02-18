@@ -88,4 +88,28 @@ QString ServiceItem::logins() const
     return sLogins;
 }
 
+QDate ServiceItem::bestUpdateDate(Qt::SortOrder order) const
+{
+    QDate bestDate = m_dUpdatedDate;
+    if (m_vChilds.length() > 0)
+    {
+        bestDate = m_vChilds[0]->updatedDate();
+        for ( int i=1 ; i < m_vChilds.length() ; i++ )
+        {
+            if (order == Qt::AscendingOrder)
+            {
+                if (m_vChilds[i]->updatedDate() > bestDate)
+                    bestDate = m_vChilds[i]->updatedDate();
+            }
+            else
+            {
+                if (m_vChilds[i]->updatedDate() < bestDate)
+                    bestDate = m_vChilds[i]->updatedDate();
+            }
+        }
+    }
+
+    return bestDate;
+}
+
 

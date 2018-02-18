@@ -35,12 +35,20 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     // Cast to login item
     LoginItem *pLoginItem = getLoginItemByIndex(idx);
 
-    if (role == Qt::DisplayRole)
-        return pItem->name();
+    if (role == Qt::DisplayRole && idx.column() == 0)
+        return  pItem->name();
+    if (role == Qt::DisplayRole && idx.column() == 1)
+    {
+        if (pLoginItem != nullptr)
+            return pLoginItem->updatedDate();
+        else
+             return  QVariant(" ");
+    }
+
 
     if (role == Qt::ForegroundRole)
     {
-        if (pLoginItem != nullptr)
+        if (pLoginItem != nullptr && idx.column() == 0)
             return QColor("#3D96AF");
     }
 
@@ -54,7 +62,7 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
             return font;
         }
         else
-        if (pLoginItem != nullptr)
+        if (pLoginItem != nullptr && idx.column() == 0)
         {
             QFont font = qApp->font();
             font.setBold(true);
@@ -66,10 +74,27 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     }
 
     if (role == Qt::DecorationRole) {
-        if (pLoginItem != nullptr)
+        if (pLoginItem != nullptr && idx.column() == 0)
             return loginItemIcon;
     }
 
+    return QVariant();
+}
+
+QVariant CredentialModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (Qt::DisplayRole == role && orientation == Qt::Horizontal)
+    {
+        switch (section)
+        {
+        case 0:
+            return QString("Service or website");
+        case 1:
+            return QString("modified date");
+        default:
+            return QVariant();
+        }
+    }
     return QVariant();
 }
 
@@ -131,7 +156,7 @@ int CredentialModel::rowCount(const QModelIndex &parent) const
 int CredentialModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return 1;
+    return 2;
 }
 
 TreeItem *CredentialModel::getItemByIndex(const QModelIndex &idx) const

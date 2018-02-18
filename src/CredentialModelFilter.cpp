@@ -7,7 +7,6 @@
 CredentialModelFilter::CredentialModelFilter(QObject *parent) : QSortFilterProxyModel(parent)
 {
     setDynamicSortFilter(true);
-    sort(0);
 }
 
 CredentialModelFilter::~CredentialModelFilter()
@@ -33,6 +32,14 @@ const TreeItem *CredentialModelFilter::getItemByProxyIndex(const QModelIndex &pr
     QModelIndex srcIndex = mapToSource(proxyIndex);
     CredentialModel *pSrcModel = dynamic_cast<CredentialModel *>(sourceModel());
     return pSrcModel->getItemByIndex(srcIndex);
+}
+
+void CredentialModelFilter::sort(int column, Qt::SortOrder order)
+{
+    // sort order is not passed as a parameter to lessThan so need
+    // to save sort order globally.
+    tempSortOrder = order;
+    return QSortFilterProxyModel::sort(column, order);
 }
 
 bool CredentialModelFilter::filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const
@@ -103,7 +110,18 @@ bool CredentialModelFilter::lessThan(const QModelIndex &srcLeft, const QModelInd
     TreeItem *pRightItem = pSrcModel->getItemByIndex(srcRight);
 
     if ((pLeftItem != nullptr) && (pRightItem != nullptr))
-        return pLeftItem->name() < pRightItem->name();
+    {
+        if (srcLeft.column() == 0 && srcRight.column() == 0)
+        {
+            return pLeftItem->name() < pRightItem->name();
+        }
+
+        if ((srcLeft.column() == 1 && srcRight.column() == 1))
+        {
+            return pLeftItem->bestUpdateDate(tempSortOrder)
+                        < pRightItem->bestUpdateDate(tempSortOrder);
+        }
+    }
 
     return false;
 }

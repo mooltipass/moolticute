@@ -20,6 +20,7 @@ public:
     const Status &status() const;
     void setStatus(const Status &eStatus);
     const QDate &updatedDate() const;
+    virtual QDate bestUpdateDate(Qt::SortOrder order) const;
     void setUpdatedDate(const QDate &dDate);
     const QDate &accessedDate() const;
     void setAccessedDate(const QDate &dDate);

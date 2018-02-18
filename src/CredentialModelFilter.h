@@ -17,6 +17,7 @@ public:
     void setFilter(const QString &sFilter);
     TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex);
     const TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex) const;
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) Q_DECL_OVERRIDE;
 
 protected:
     virtual bool filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const;
@@ -28,6 +29,7 @@ private:
 
 private:
     QString m_sFilter;
+    Qt::SortOrder tempSortOrder;
 };
 
 #endif // CREDENTIALMODELFILTER_H
