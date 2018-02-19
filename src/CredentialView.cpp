@@ -28,10 +28,9 @@ CredentialView::CredentialView(QWidget *parent)
     m_pItemDelegate = new ItemDelegate(this);
     setItemDelegateForColumn(0, m_pItemDelegate);
     setMinimumWidth(430);
-    connect(this, &CredentialView::clicked, this, &CredentialView::onToggleExpandedState, Qt::DirectConnection);
+    connect(this, &CredentialView::clicked, this, &CredentialView::onToggleExpandedState);
 
     header()->setStyleSheet("QHeaderView::section{ background-color: #D5D5D5; }");
-    setColumnWidth(0, 300);
 }
 
 CredentialView::~CredentialView()
@@ -175,12 +174,11 @@ void CredentialView::setModel(QAbstractItemModel *model)
     connect(model, &QAbstractItemModel::layoutChanged, this, &CredentialView::onLayoutChanged);
 }
 
-
 void CredentialView::onLayoutChanged(const QList<QPersistentModelIndex> &parents
                                      , QAbstractItemModel::LayoutChangeHint hint)
 {
     Q_UNUSED(parents)
-    if (QAbstractItemModel::VerticalSortHint == hint && tempTreeItem)
+    if (QAbstractItemModel::VerticalSortHint == hint)
     {
         onSelectionTimerTimeOut();
     }

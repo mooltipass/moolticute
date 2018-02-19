@@ -102,24 +102,6 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
             painter->setPen(pen);
             painter->drawText(dstRect, sDisplayedData);
             paintFavorite(painter, option, pLoginItem->favorite());
-
-/*
-            QFont f = loginFont();
-            const QFontMetrics serviceMetrics = QFontMetrics{f};
-
-            QRect dstRect = option.rect;
-            int delta = 4;
-            QRect otherRect(dstRect.width() - serviceMetrics.width(sDisplayedData) - delta,
-                            dstRect.y() + (dstRect.height() - serviceMetrics.height()) / 2,
-                            serviceMetrics.width(sDisplayedData) + delta,
-                            dstRect.height());
-
-            pen.setColor(QColor("#666666"));
-            painter->setFont(f);
-            painter->setPen(pen);
-            painter->drawText(otherRect, sDisplayedData);
-
-            paintFavorite(painter, option, pLoginItem->favorite());*/
         }
     }
 }
@@ -155,12 +137,7 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
         if ((pServiceItem != nullptr) && (!pServiceItem->isExpanded()))
             paintServiceItem(painter, option, pServiceItem);
-        else if (pLoginItem != nullptr)
-        {
-            ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
-           // if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
-           //     paintLoginItem(painter, option, pLoginItem);
-        }
+
         painter->restore();
     }
 

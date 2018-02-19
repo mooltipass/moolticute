@@ -28,8 +28,6 @@ public slots:
     void onSelectionTimerTimeOut();
 
     virtual void setModel(QAbstractItemModel *model) Q_DECL_OVERRIDE;
-
-private slots:
     void onLayoutChanged(const QList<QPersistentModelIndex> &parents
                             , QAbstractItemModel::LayoutChangeHint hint);
 
@@ -41,9 +39,6 @@ private:
     ServiceItem *m_pCurrentServiceItem;
     LoginItem *m_pCurrentLoginItem;
     ItemDelegate *m_pItemDelegate;
-
-    TreeItem* tempTreeItem;
-    QPersistentModelIndex tempPIndex;
 
 signals:
     void expandedStateChanged(bool bIsExpanded);
