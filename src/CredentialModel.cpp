@@ -88,9 +88,9 @@ QVariant CredentialModel::headerData(int section, Qt::Orientation orientation, i
         switch (section)
         {
         case 0:
-            return QString("Service or website");
+            return QString("Service or Website");
         case 1:
-            return QString("modified date");
+            return QString("Modified Date");
         default:
             return QVariant();
         }
