@@ -3,5 +3,11 @@
         <file>lang/mc_de.qm</file>
         <file>lang/mc_fr.qm</file>
         <file>lang/mc_ru.qm</file>
+        <file>lang/mc_nl.qm</file>
+        <file>lang/mc_ja.qm</file>
+        <file>lang/mc_pt.qm</file>
+        <file>lang/mc_br.qm</file>
+        <file>lang/mc_tr.qm</file>
+        <file>lang/mc_sv.qm</file>
     </qresource>
 </RCC>
