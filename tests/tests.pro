@@ -39,13 +39,16 @@ SOURCES += \
     ../src/ServiceItem.cpp \
     ../src/CredentialModel.cpp \
     ../src/CredentialModelFilter.cpp \
+    ../src/DbExportsRegistry.cpp \
+    ../src/DbBackupChangeNumbersComparator.cpp \
     main.cpp \
     FilesCacheTests.cpp \
     UpdaterTests.cpp \
     DbBackupsTrackerTests.cpp \
     TestTreeItem.cpp \
     TestCredentialModel.cpp \
-    TestCredentialModelFilter.cpp
+    TestCredentialModelFilter.cpp \
+    TestDbExportsRegistry.cpp
 
 HEADERS += \
     ../src/SimpleCrypt/SimpleCrypt.h \
@@ -57,11 +60,14 @@ HEADERS += \
     ../src/ServiceItem.h \
     ../src/CredentialModel.h \
     ../src/CredentialModelFilter.h \
+    ../src/DbExportsRegistry.h \
+    ../src/DbBackupChangeNumbersComparator.h \
     UpdaterTests.h \
     FilesCacheTests.h \
     DbBackupsTrackerTests.h \
     TestTreeItem.h \
     TestCredentialModel.h \
-    TestCredentialModelFilter.h
+    TestCredentialModelFilter.h \
+    TestDbExportsRegistry.h
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"

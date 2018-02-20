@@ -26,8 +26,9 @@ void DbBackupsTrackerController::disconnectDbBackupsTracker()
                this, &DbBackupsTrackerController::handleNewTrack);
 }
 
-DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSClient *wsClient, QObject *parent):
+DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSClient *wsClient, const QString &settingsFilePath, QObject *parent):
     QObject(parent),
+    dbBackupsTracker(settingsFilePath),
     isExportRequestMessageVisible(false),
     askImportMessage(nullptr)
 {

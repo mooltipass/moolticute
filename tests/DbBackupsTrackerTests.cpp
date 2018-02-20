@@ -6,8 +6,7 @@
 #include <QTest>
 
 DbBackupsTrackerTests::DbBackupsTrackerTests(QObject* parent)
-    : QObject(parent)
-    , tracker(this)
+    : QObject(parent), tracker("/tmp/test_db_backups_tracker.info", this)
 {
 }
 
@@ -238,7 +237,7 @@ void DbBackupsTrackerTests::trackLegacyDbBackupWithMinorDataDbChangeNumber()
 
 void DbBackupsTrackerTests::trackingPersisted()
 {
-    DbBackupsTracker* t = new DbBackupsTracker();
+    DbBackupsTracker* t = new DbBackupsTracker("/tmp/test_db_backups_tracker.info");
     t->setCardId("00000");
     QTemporaryFile file;
     file.open();
@@ -246,7 +245,7 @@ void DbBackupsTrackerTests::trackingPersisted()
     t->track(file.fileName());
     t->deleteLater();
 
-    t = new DbBackupsTracker();
+    t = new DbBackupsTracker("/tmp/test_db_backups_tracker.info");
     t->setCardId("00000");
     Q_ASSERT(t->hasBackup());
 
@@ -310,7 +309,7 @@ void DbBackupsTrackerTests::credentialChangenumberWrapOver()
 
 void DbBackupsTrackerTests::getFileFormatLegacy()
 {
-    DbBackupsTracker* t = new DbBackupsTracker();
+    DbBackupsTracker* t = new DbBackupsTracker("/tmp/test_db_backups_tracker.info");
     t->setCardId("00000");
     QString file = getTestsDataDirPath() + "tests_legacy_backups";
     t->track(file);
@@ -321,7 +320,7 @@ void DbBackupsTrackerTests::getFileFormatLegacy()
 
 void DbBackupsTrackerTests::getFileFormatSympleCrypt()
 {
-    DbBackupsTracker* t = new DbBackupsTracker();
+    DbBackupsTracker* t = new DbBackupsTracker("/tmp/test_db_backups_tracker.info");
     t->setCardId("00000");
     QString file = getTestsDataDirPath() + "tests_backup";
     t->track(file);

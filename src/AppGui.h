@@ -32,6 +32,7 @@
 #include "DaemonMenuAction.h"
 #include <QtAwesome.h>
 
+class DbExportsRegistryController;
 class AppGui : public QApplication
 {
     Q_OBJECT
@@ -50,6 +51,8 @@ public:
     static QtAwesome *qtAwesome();
 
     void checkUpdate(bool displayMessage);
+
+    static QString getDataDirPath();
 
 private slots:
     void restartDaemon();
@@ -96,6 +99,9 @@ private:
      bool createSingleApplication();
      void startSSHAgent();
      void createMainWindow();
+
+     DbExportsRegistryController *dbExportsRegistryController;
+     void initializeDbExportsRegitry();
 };
 
 #endif // APPGUI_H

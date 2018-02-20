@@ -16,6 +16,7 @@ class DbBackupsTrackerController : public QObject
 public:
     explicit DbBackupsTrackerController(MainWindow *window,
                                         WSClient *wsClient,
+                                        const QString &settingsFilePath,
                                         QObject *parent = nullptr);
 
     QString getBackupFilePath();

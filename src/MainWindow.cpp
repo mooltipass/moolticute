@@ -84,7 +84,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->setupUi(this);
     refreshAppLangCb();
 
-    dbBackupsTrackerController = new DbBackupsTrackerController(this, client, this);
+    dbBackupsTrackerController = new DbBackupsTrackerController(this, client,
+                                                                AppGui::getDataDirPath() + "/dbBackupTracks.ini", this);
 
     ui->checkBoxLongPress->setChecked(s.value("settings/long_press_cancel", true).toBool());
     connect(ui->checkBoxLongPress, &QCheckBox::toggled, [this](bool checked)
