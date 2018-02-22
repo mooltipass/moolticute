@@ -68,7 +68,7 @@ void DbExportsRegistryController::handleDbExportRecommended()
         {
             QMessageBox::StandardButton btn = QMessageBox::warning(
                                                   window, tr("Be careful"),
-                                                  tr("By denying you can loose your changes. Do you want to continue?"),
+                                                  tr("It's always good to make a backup of your database. Are you sure you want to continue?"),
                                                   QMessageBox::Yes | QMessageBox::No);
 
             if (btn == QMessageBox::Yes)
