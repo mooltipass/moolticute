@@ -135,3 +135,25 @@ QModelIndex CredentialModelFilter::getProxyIndexFromItem(TreeItem *pItem, int co
     {
         QModelIndex serviceIndex = pCredModel->getServiceIndexByName(pItem->name(), column);
         return mapFromSource(serviceIndex);
+    }
+    case TreeItem::TreeType::Login:
+    {
+        QModelIndex parentIndex = getProxyIndexFromItem(pItem->parentItem());
+
+        for (int i = 0; i < rowCount(parentIndex); i ++)
+        {
+            QModelIndex loginIndex = index(i, column, parentIndex);
+            if (loginIndex.isValid())
+            {
+                TreeItem *pLoginItem = getItemByProxyIndex(loginIndex);
+                if (pLoginItem->name() == pItem->name())
+                    return loginIndex;
+            }
+        }
+        return QModelIndex();
+    }
+    case TreeItem::TreeType::Root:
+    default:
+        return QModelIndex();
+    }
+}
