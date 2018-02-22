@@ -17,6 +17,7 @@ public:
     void setFilter(const QString &sFilter);
     TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex);
     const TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex) const;
+    QModelIndex getProxyIndexFromItem(TreeItem* pItem, int column = 0);
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) Q_DECL_OVERRIDE;
 
 protected:

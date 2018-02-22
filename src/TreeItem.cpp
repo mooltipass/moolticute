@@ -145,3 +145,8 @@ void TreeItem::clear()
     qDeleteAll(m_vChilds);
     m_vChilds.clear();
 }
+
+TreeItem::TreeType TreeItem::treeType() const
+{
+    return Base;
+}

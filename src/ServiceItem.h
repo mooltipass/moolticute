@@ -18,7 +18,7 @@ public:
     QString logins() const;
 
     virtual QDate bestUpdateDate(Qt::SortOrder order) const Q_DECL_OVERRIDE;
-
+    virtual TreeType treeType()  const Q_DECL_OVERRIDE;
 private:
     bool m_bIsExpanded;
 };

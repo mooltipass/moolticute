@@ -209,7 +209,7 @@ void CredentialsManagement::requestPasswordForSelectedItem()
     // Get selection model
     QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
     QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-    if (lIndexes.size() != 1)
+    if (lIndexes.size() != 2)
         return;
 
     // Retrieve src index
@@ -325,7 +325,7 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
     {
         QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
         QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-        if (lIndexes.size() != 1)
+        if (lIndexes.size() != 2)
             return true;
 
         srcIndex = getSourceIndexFromProxyIndex(lIndexes.first());
@@ -385,7 +385,7 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
 
     // Retrieve selected indexes
     QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-    if (lIndexes.size() != 1)
+    if (lIndexes.size() != 2)
         return;
 
     // Retrieve src index
@@ -410,7 +410,7 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
     {
         QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
         QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-        if (lIndexes.size() != 1)
+        if (lIndexes.size() != 2)
         {
             ui->pushButtonCancel->hide();
             ui->pushButtonConfirm->hide();
@@ -464,7 +464,7 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
 
     // Retrieve selected indexes
     QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-    if (lIndexes.size() != 1)
+    if (lIndexes.size() != 2)
         return;
 
     // Retrieve src index
@@ -487,7 +487,7 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
 
     // Retrieve selected indexes
     QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-    if (lIndexes.size() != 1)
+    if (lIndexes.size() != 2)
         return;
 
     // Retrieve src index
@@ -511,6 +511,9 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
         {
             ui->credDisplayFrame->setEnabled(false);
             clearLoginDescription();
+
+            auto selectionModel = ui->credentialTreeView->selectionModel();
+            selectionModel->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
 
             m_pCredModel->removeCredential(srcIndex);
         }

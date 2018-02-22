@@ -15,6 +15,8 @@ public:
     ServiceItem *findServiceByName(const QString &sServiceName);
     void setItemsStatus(const Status &eStatus);
     void removeUnusedItems();
+
+    virtual TreeType treeType()  const Q_DECL_OVERRIDE;
 };
 
 #endif // ROOTITEM_H

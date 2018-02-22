@@ -255,9 +255,9 @@ ServiceItem *CredentialModel::addService(const QString &sServiceName)
     return new ServiceItem(sServiceName);
 }
 
-QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName) const
+QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName, int column) const
 {
-    QModelIndexList lMatches = match(index(0, 0, QModelIndex()), Qt::DisplayRole, sServiceName, 1);
+    QModelIndexList lMatches = match(index(0, column, QModelIndex()), Qt::DisplayRole, sServiceName, 1);
     if (!lMatches.isEmpty())
         return lMatches.first();
 

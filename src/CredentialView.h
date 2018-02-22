@@ -21,24 +21,28 @@ public:
     void refreshLoginItem(const QModelIndex &srcIndex, bool bIsFavorite=false);
 
 public slots:
-    void onModelLoaded(bool bClearLoginDescription);
+    void onModelLoaded(bool bClearLoginDescription = false);
 
     void onToggleExpandedState(const QModelIndex &proxyIndex);
     void onChangeExpandedState();
     void onSelectionTimerTimeOut();
 
     virtual void setModel(QAbstractItemModel *model) Q_DECL_OVERRIDE;
+    void onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents
+                                , QAbstractItemModel::LayoutChangeHint hint);
     void onLayoutChanged(const QList<QPersistentModelIndex> &parents
                             , QAbstractItemModel::LayoutChangeHint hint);
 
 private:
-    void dumpCurrentItem(const QString &intro);
+    void resetCurrentIndex();
 
     bool m_bIsFullyExpanded;
     QTimer m_tSelectionTimer;
     ServiceItem *m_pCurrentServiceItem;
-    LoginItem *m_pCurrentLoginItem;
     ItemDelegate *m_pItemDelegate;
+
+    ServiceItem *tempCurrentServiceItem;
+    LoginItem *tempCurrentLoginItem;
 
 signals:
     void expandedStateChanged(bool bIsExpanded);

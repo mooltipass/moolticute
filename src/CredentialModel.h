@@ -48,7 +48,7 @@ public:
     void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName);
     void updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue);
     void clear();
-    QModelIndex getServiceIndexByName(const QString &sServiceName) const;
+    QModelIndex getServiceIndexByName(const QString &sServiceName, int column = 0) const;
     LoginItem *getLoginItemByIndex(const QModelIndex &idx) const;
     ServiceItem *getServiceItemByIndex(const QModelIndex &idx) const;
 

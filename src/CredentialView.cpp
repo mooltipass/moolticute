@@ -1,4 +1,4 @@
- // Qt
+// Qt
 #include <QDateTime>
 #include <QMouseEvent>
 #include <QDebug>
@@ -13,12 +13,12 @@
 #include "TreeItem.h"
 #include "LoginItem.h"
 
-CredentialView::CredentialView(QWidget *parent)
-    : QTreeView(parent)
+CredentialView::CredentialView(QWidget *parent) : QTreeView(parent)
   , m_bIsFullyExpanded(false)
   , m_pCurrentServiceItem(nullptr)
-  , m_pCurrentLoginItem(nullptr)
   , m_pItemDelegate(nullptr)
+  , tempCurrentServiceItem(nullptr)
+  , tempCurrentLoginItem(nullptr)
 {
     m_tSelectionTimer.setInterval(50);
     m_tSelectionTimer.setSingleShot(true);
@@ -29,8 +29,8 @@ CredentialView::CredentialView(QWidget *parent)
     setItemDelegateForColumn(0, m_pItemDelegate);
     setMinimumWidth(430);
     connect(this, &CredentialView::clicked, this, &CredentialView::onToggleExpandedState);
-
     header()->setStyleSheet("QHeaderView::section{ background-color: #D5D5D5; }");
+
 }
 
 CredentialView::~CredentialView()
@@ -86,13 +86,8 @@ void CredentialView::onToggleExpandedState(const QModelIndex &proxyIndex)
 {
     CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
     TreeItem *pItem = pCredModelFilter->getItemByProxyIndex(proxyIndex);
-
     ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pItem);
-    LoginItem* ploginItem = dynamic_cast<LoginItem *>(pItem);    
-    Q_ASSERT((pServiceItem != nullptr || ploginItem != nullptr));
-
     m_pCurrentServiceItem = nullptr;
-    m_pCurrentLoginItem = nullptr;
     if (pServiceItem != nullptr)
     {
         m_pCurrentServiceItem = pServiceItem;
@@ -103,18 +98,7 @@ void CredentialView::onToggleExpandedState(const QModelIndex &proxyIndex)
                 m_tSelectionTimer.start();
         }
         else
-        {
             collapse(proxyIndex);
-        }
-    }
-    else if (ploginItem != nullptr)
-    {
-        QModelIndex proxyParent = proxyIndex.parent();
-        Q_ASSERT(proxyParent.isValid());
-        TreeItem *pParent = pCredModelFilter->getItemByProxyIndex(proxyParent);
-        ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pParent);
-        m_pCurrentServiceItem = pServiceItem;
-        m_pCurrentLoginItem = ploginItem;       
     }
 }
 
@@ -130,38 +114,23 @@ void CredentialView::onChangeExpandedState()
 
 void CredentialView::onSelectionTimerTimeOut()
 {
-    if ((m_pCurrentServiceItem != nullptr))
+    if ((m_pCurrentServiceItem != nullptr) && (m_pCurrentServiceItem->isExpanded()))
     {
         CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
         CredentialModel *pCredModel = dynamic_cast<CredentialModel *>(pCredModelFilter->sourceModel());
         QModelIndex serviceIndex = pCredModel->getServiceIndexByName(m_pCurrentServiceItem->name());
         if (serviceIndex.isValid())
         {
-            QModelIndex proxyServiceIndex = pCredModelFilter->mapFromSource(serviceIndex);
-            if (proxyServiceIndex.isValid())
+            QModelIndex proxyIndex = pCredModelFilter->mapFromSource(serviceIndex);
+            if (proxyIndex.isValid())
             {
-                if (m_pCurrentServiceItem->isExpanded())
+                int nVisibleChilds = pCredModelFilter->rowCount(proxyIndex);
+                if (nVisibleChilds > 0)
                 {
-                    int nVisibleChilds = pCredModelFilter->rowCount(proxyServiceIndex);
-                    if (nVisibleChilds > 0)
-                    {
-                        QModelIndex firstLoginIndex = proxyServiceIndex.child(0, 0);
-                        if (firstLoginIndex.isValid())
-                        {
-                            setCurrentIndex(firstLoginIndex);
-
-                            TreeItem *pItem = pCredModelFilter->getItemByProxyIndex(firstLoginIndex);
-                            LoginItem* ploginItem = dynamic_cast<LoginItem *>(pItem);
-                            m_pCurrentLoginItem = ploginItem;
-                        }
-                    }
+                    QModelIndex firstLoginIndex = proxyIndex.child(0, 0);
+                    if (firstLoginIndex.isValid())
+                        setCurrentIndex(firstLoginIndex);
                 }
-                else
-                {
-                    m_pCurrentLoginItem = nullptr;
-                    setCurrentIndex(proxyServiceIndex);
-                }
-
             }
         }
     }
@@ -171,7 +140,41 @@ void CredentialView::setModel(QAbstractItemModel *model)
 {
     QTreeView::setModel(model);
     setColumnWidth(0, 300);
-    connect(model, &QAbstractItemModel::layoutChanged, this, &CredentialView::onLayoutChanged);
+    connect(model, &QAbstractItemModel::layoutAboutToBeChanged
+            , this, &CredentialView::onLayoutAboutToBeChanged);
+    connect(model, &QAbstractItemModel::layoutChanged, this
+            , &CredentialView::onLayoutChanged);
+}
+
+void CredentialView::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents
+                                              , QAbstractItemModel::LayoutChangeHint hint)
+{
+   Q_UNUSED(parents)
+   if (QAbstractItemModel::VerticalSortHint == hint)
+   {
+        CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
+        TreeItem* currentItem = pCredModelFilter->getItemByProxyIndex(currentIndex());
+        if (nullptr == currentItem)
+        {
+            tempCurrentServiceItem = nullptr;
+            tempCurrentLoginItem = nullptr;
+        }
+        else if (currentItem->treeType() == TreeItem::TreeType::Login)
+        {
+            tempCurrentLoginItem = dynamic_cast<LoginItem *>(currentItem);
+            tempCurrentServiceItem = dynamic_cast<ServiceItem *>(currentItem->parentItem());
+        }
+        else if (currentItem->treeType() == TreeItem::TreeType::Service)
+        {
+            tempCurrentLoginItem = nullptr;
+            tempCurrentServiceItem = dynamic_cast<ServiceItem *>(currentItem);
+        }
+        else
+        {
+            tempCurrentServiceItem = nullptr;
+            tempCurrentLoginItem = nullptr;
+        }
+   }
 }
 
 void CredentialView::onLayoutChanged(const QList<QPersistentModelIndex> &parents
@@ -180,17 +183,39 @@ void CredentialView::onLayoutChanged(const QList<QPersistentModelIndex> &parents
     Q_UNUSED(parents)
     if (QAbstractItemModel::VerticalSortHint == hint)
     {
-        onSelectionTimerTimeOut();
+        resetCurrentIndex();
     }
 }
 
-void CredentialView::dumpCurrentItem(const QString& intro)
+void CredentialView::resetCurrentIndex()
 {
-    CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
-    TreeItem* currentItem = pCredModelFilter->getItemByProxyIndex(currentIndex());
-    qDebug() << intro
-             << "\tService\t" << (m_pCurrentServiceItem ? m_pCurrentServiceItem->name() : "none")
-             << "\tLogin\t" << (m_pCurrentLoginItem ? m_pCurrentLoginItem->name() : "none")
-             << "\tcurrent\t" << (currentItem ? currentItem->name() : "none");
-}
+    if (nullptr != tempCurrentServiceItem)
+    {
+        CredentialModelFilter *pCredModelFilter
+                = dynamic_cast<CredentialModelFilter *>(model());
+        QModelIndex serviceIndex
+               = pCredModelFilter->getProxyIndexFromItem(tempCurrentServiceItem);
+        if (serviceIndex.isValid())
+        {
+            if (tempCurrentLoginItem != nullptr)
+            {
+                QModelIndex loginIndex
+                    = pCredModelFilter->getProxyIndexFromItem(tempCurrentLoginItem);
+                if (loginIndex.isValid())
+                {
+                    setExpanded(serviceIndex, true);
+                    selectionModel()->setCurrentIndex(loginIndex, QItemSelectionModel::ClearAndSelect);
+                    return;
+                }
+            }
 
+            if (pCredModelFilter->rowCount(serviceIndex) > 0)
+            {
+                setExpanded(serviceIndex, false);
+                selectionModel()->setCurrentIndex(serviceIndex, QItemSelectionModel::ClearAndSelect);
+                return;
+            }
+        }
+    }
+    selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
+}

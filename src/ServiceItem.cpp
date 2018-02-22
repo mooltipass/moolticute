@@ -112,4 +112,9 @@ QDate ServiceItem::bestUpdateDate(Qt::SortOrder order) const
     return bestDate;
 }
 
+TreeItem::TreeType ServiceItem::treeType() const
+{
+    return Service;
+}
+
 

@@ -11,6 +11,7 @@ class TreeItem
 {
 public:
     enum Status {USED=0, UNUSED};
+    enum TreeType {Root = 0, Service, Login, Base};
     virtual ~TreeItem();
 
     const QString &name() const;
@@ -36,6 +37,7 @@ public:
     void addChild(TreeItem *pItem);
     bool removeOne(TreeItem *pItem);
     void clear();
+    virtual TreeType treeType()  const;
 
 protected:
     explicit TreeItem(const QString &sName = "",

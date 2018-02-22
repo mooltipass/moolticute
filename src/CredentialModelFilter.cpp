@@ -126,3 +126,12 @@ bool CredentialModelFilter::lessThan(const QModelIndex &srcLeft, const QModelInd
     return false;
 }
 
+QModelIndex CredentialModelFilter::getProxyIndexFromItem(TreeItem *pItem, int column)
+{
+    CredentialModel *pCredModel = dynamic_cast<CredentialModel *>(sourceModel());
+    switch (pItem->treeType())
+    {
+    case TreeItem::TreeType::Service:
+    {
+        QModelIndex serviceIndex = pCredModel->getServiceIndexByName(pItem->name(), column);
+        return mapFromSource(serviceIndex);
