@@ -112,28 +112,10 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     {
         const CredentialModelFilter *pProxyModel = dynamic_cast<const CredentialModelFilter *>(index.model());
         const TreeItem *pItem = pProxyModel->getItemByProxyIndex(index);
-        const LoginItem *pLoginItem = dynamic_cast<const LoginItem *>(pItem);
         const ServiceItem *pServiceItem = dynamic_cast<const ServiceItem *>(pItem);
 
         painter->save();
-
-        QColor bkgColor("white");
-        if (pServiceItem != nullptr)
-        {
-            if (index.row()%2 == 0)
-                bkgColor.setNamedColor("#eef7fa");
-            else
-                bkgColor.setNamedColor("white");
-        }
-        else if (pLoginItem != nullptr)
-        {
-            if (index.parent().row()%2 == 0)
-                bkgColor.setNamedColor("#eef7fa");
-            else
-                bkgColor.setNamedColor("white");
-        }
-
-        painter->fillRect(option.rect, bkgColor);
+        painter->fillRect(option.rect, painter->background());
 
         if ((pServiceItem != nullptr) && (!pServiceItem->isExpanded()))
             paintServiceItem(painter, option, pServiceItem);

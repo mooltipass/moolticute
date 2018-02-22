@@ -19,7 +19,8 @@ public:
     explicit CredentialView(QWidget *parent = nullptr);
     ~CredentialView();
     void refreshLoginItem(const QModelIndex &srcIndex, bool bIsFavorite=false);
-
+    virtual void setModel(QAbstractItemModel *model) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 public slots:
     void onModelLoaded(bool bClearLoginDescription = false);
 
@@ -27,7 +28,7 @@ public slots:
     void onChangeExpandedState();
     void onSelectionTimerTimeOut();
 
-    virtual void setModel(QAbstractItemModel *model) Q_DECL_OVERRIDE;
+
     void onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents
                                 , QAbstractItemModel::LayoutChangeHint hint);
     void onLayoutChanged(const QList<QPersistentModelIndex> &parents
@@ -43,6 +44,8 @@ private:
 
     ServiceItem *tempCurrentServiceItem;
     LoginItem *tempCurrentLoginItem;
+
+    const float columnBreakRatio;
 
 signals:
     void expandedStateChanged(bool bIsExpanded);

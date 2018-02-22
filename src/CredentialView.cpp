@@ -19,6 +19,7 @@ CredentialView::CredentialView(QWidget *parent) : QTreeView(parent)
   , m_pItemDelegate(nullptr)
   , tempCurrentServiceItem(nullptr)
   , tempCurrentLoginItem(nullptr)
+  , columnBreakRatio(0.75)
 {
     m_tSelectionTimer.setInterval(50);
     m_tSelectionTimer.setSingleShot(true);
@@ -139,11 +140,18 @@ void CredentialView::onSelectionTimerTimeOut()
 void CredentialView::setModel(QAbstractItemModel *model)
 {
     QTreeView::setModel(model);
-    setColumnWidth(0, 300);
+
+    setColumnWidth(0, geometry().width()*columnBreakRatio);
     connect(model, &QAbstractItemModel::layoutAboutToBeChanged
             , this, &CredentialView::onLayoutAboutToBeChanged);
     connect(model, &QAbstractItemModel::layoutChanged, this
             , &CredentialView::onLayoutChanged);
+}
+
+void CredentialView::resizeEvent(QResizeEvent *event)
+{
+    QTreeView::resizeEvent(event);
+    setColumnWidth(0, geometry().width()*columnBreakRatio);
 }
 
 void CredentialView::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents

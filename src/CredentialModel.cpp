@@ -4,6 +4,7 @@
 #include <QColor>
 #include <QFont>
 #include <QApplication>
+#include <QBrush>
 
 // Application
 #include "CredentialModel.h"
@@ -76,6 +77,26 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     if (role == Qt::DecorationRole) {
         if (pLoginItem != nullptr && idx.column() == 0)
             return loginItemIcon;
+    }
+
+    if (role == Qt::BackgroundRole)
+    {
+        QColor bkgColor("white");
+        if (pServiceItem != nullptr)
+        {
+            if (idx.row()%2 == 0)
+                bkgColor.setNamedColor("#eef7fa");
+            else
+                bkgColor.setNamedColor("white");
+        }
+        else if (pLoginItem != nullptr)
+        {
+            if (parent(idx).row()%2 == 0)
+                bkgColor.setNamedColor("#eef7fa");
+            else
+                bkgColor.setNamedColor("white");
+        }
+        return QBrush(bkgColor);
     }
 
     return QVariant();
