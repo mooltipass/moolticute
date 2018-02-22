@@ -45,7 +45,7 @@ int TreeItem::childCount() const
 int TreeItem::row() const
 {
     if (m_pParentItem)
-        return childs().indexOf(const_cast<TreeItem*>(this));
+        return m_pParentItem->childs().indexOf(const_cast<TreeItem*>(this));
 
     return 0;
 }
