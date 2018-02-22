@@ -85,8 +85,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(m_pCredModel, &CredentialModel::modelLoaded, ui->credentialTreeView, &CredentialView::onModelLoaded);
     connect(m_pCredModel, &CredentialModel::modelLoaded, this, &CredentialsManagement::onModelLoaded);
     connect(ui->credentialTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, &CredentialsManagement::onCredentialSelected,
-            Qt::QueuedConnection);
+            this, &CredentialsManagement::onCredentialSelected);
     connect(this, &CredentialsManagement::loginSelected, this, &CredentialsManagement::onLoginSelected);
     connect(this, &CredentialsManagement::serviceSelected, this, &CredentialsManagement::onServiceSelected);
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::unlockRequested, this, &CredentialsManagement::requestPasswordForSelectedItem);
