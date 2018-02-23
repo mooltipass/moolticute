@@ -5061,7 +5061,7 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
                 else
                 {
                     qCritical() << "Encrypted payload isn't correct";
-                    errorString = "Selected File Isn't Correct";
+                    errorString = "Selected File Is Another User's Backup";
                     return false;
                 }
             }
@@ -5137,15 +5137,15 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     {
         if (importedCpzCtrValue[i].mid(0, 8) == get_cardCPZ())
         {
-            qDebug() << "Import file is a backup for current Card";
+            qDebug() << "Import file is a backup for current user";
             unknownCardAddPayload = importedCpzCtrValue[i];
             cpzFound = true;
         }
     }
     if (!cpzFound)
     {
-        qWarning() << "Import file is not a backup for current Card";
-        errorString = "Selected File Is Not For That Card";
+        qWarning() << "Import file is not a backup for current user";
+        errorString = "Selected File Is Another User's Backup";
         return false;
     }
 
