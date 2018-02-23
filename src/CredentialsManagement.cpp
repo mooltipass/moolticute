@@ -208,7 +208,7 @@ void CredentialsManagement::requestPasswordForSelectedItem()
     // Get selection model
     QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
     QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-    if (lIndexes.size() != 2)
+    if (lIndexes.size() == 0)
         return;
 
     // Retrieve src index
@@ -324,7 +324,7 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
     {
         QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
         QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-        if (lIndexes.size() != 2)
+        if (lIndexes.size() == 0)
             return true;
 
         srcIndex = getSourceIndexFromProxyIndex(lIndexes.first());
@@ -384,7 +384,7 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
 
     // Retrieve selected indexes
     QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-    if (lIndexes.size() != 2)
+    if (lIndexes.size() == 0)
         return;
 
     // Retrieve src index
@@ -409,7 +409,7 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
     {
         QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
         QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-        if (lIndexes.size() != 2)
+        if (lIndexes.size() == 0)
         {
             ui->pushButtonCancel->hide();
             ui->pushButtonConfirm->hide();
@@ -463,7 +463,7 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
 
     // Retrieve selected indexes
     QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-    if (lIndexes.size() != 2)
+    if (lIndexes.size() == 0)
         return;
 
     // Retrieve src index
@@ -486,7 +486,7 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
 
     // Retrieve selected indexes
     QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
-    if (lIndexes.size() != 2)
+    if (lIndexes.size() == 0)
         return;
 
     // Retrieve src index
@@ -511,8 +511,12 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
             ui->credDisplayFrame->setEnabled(false);
             clearLoginDescription();
 
+            QModelIndexList nextRow = m_pCredModelFilter->getNextRow(lIndexes.at(0));
             auto selectionModel = ui->credentialTreeView->selectionModel();
-            selectionModel->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
+            if (nextRow.size()>0 && nextRow.at(0).isValid())
+                selectionModel->setCurrentIndex(nextRow.at(0), QItemSelectionModel::ClearAndSelect);
+            else
+                selectionModel->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
 
             m_pCredModel->removeCredential(srcIndex);
         }
@@ -521,19 +525,23 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
 
 void CredentialsManagement::onCredentialSelected(const QModelIndex &current, const QModelIndex &previous)
 {
-    if (m_selectionCanceled || !previous.isValid() || current == previous)
+    if (m_selectionCanceled || current == previous)
     {
         m_selectionCanceled = false;
         return;
     }
 
-    if (!confirmDiscardUneditedCredentialChanges(previous))
+    if (previous.isValid())
     {
-        m_selectionCanceled = true;
-        auto selectionModel = ui->credentialTreeView->selectionModel();
-        selectionModel->setCurrentIndex(previous, QItemSelectionModel::ClearAndSelect);
-        return;
+        if (!confirmDiscardUneditedCredentialChanges(previous))
+        {
+            m_selectionCanceled = true;
+            auto selectionModel = ui->credentialTreeView->selectionModel();
+            selectionModel->setCurrentIndex(previous, QItemSelectionModel::ClearAndSelect);
+            return;
+        }
     }
+
 
     // Don't trust in the "current" value it's wrong when a sourceModel item is deleted.
     const QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();

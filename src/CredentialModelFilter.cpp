@@ -42,6 +42,43 @@ void CredentialModelFilter::sort(int column, Qt::SortOrder order)
     return QSortFilterProxyModel::sort(column, order);
 }
 
+QModelIndexList CredentialModelFilter::getNextRow(const QModelIndex& rowIdx)
+{
+    QModelIndexList nextRow;
+    QModelIndex parent = rowIdx.parent();
+    if (!rowIdx.isValid())
+        return nextRow;
+
+    if (rowCount(parent) > rowIdx.row()+1)
+    {
+        nextRow << index(rowIdx.row()+1, 0, parent);
+        nextRow << index(rowIdx.row()+1, 1, parent);
+    }
+    else if (parent.isValid())
+    {
+        if  (rowCount(parent.parent()) > parent.row()+1)
+        {
+            QModelIndex nextParent = index(parent.row()+1, 0, parent.parent());
+            nextRow << index(0, 0, nextParent);
+            nextRow << index(0, 1, nextParent);
+        }
+        else if (rowIdx.row() > 0)
+        {
+            nextRow << index(rowIdx.row()-1, 0, parent);
+            nextRow << index(rowIdx.row()-1, 1, parent);
+
+        }
+        else if (parent.row() > 0)
+        {
+            QModelIndex prevousParent = index(parent.row()-1, 0, parent.parent());
+            nextRow << index(0, 0, prevousParent);
+            nextRow << index(0, 1, prevousParent);
+        }
+    }
+
+    return nextRow;
+}
+
 bool CredentialModelFilter::filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const
 {
     // Get source index

@@ -19,6 +19,7 @@ public:
     const TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex) const;
     QModelIndex getProxyIndexFromItem(TreeItem* pItem, int column = 0);
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) Q_DECL_OVERRIDE;
+    QModelIndexList getNextRow(const QModelIndex &rowIdx);
 
 protected:
     virtual bool filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const;
