@@ -147,7 +147,7 @@ void DbBackupsTrackerController::askForExportBackup()
     {
         QMessageBox::StandardButton btn = QMessageBox::warning(
                                               window, tr("Be careful"),
-                                              tr("By denying you can loose your changes. Do you want to continue?"),
+                                              tr("By denying you can lose your changes. Do you want to continue?"),
                                               QMessageBox::Yes | QMessageBox::No);
 
         if (btn == QMessageBox::Yes)

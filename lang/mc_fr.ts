@@ -306,7 +306,7 @@
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="149"/>
-        <source>By denying you can loose your changes. Do you want to continue?</source>
+        <source>By denying you can lose your changes. Do you want to continue?</source>
         <translation>En refusant vous pourriez perdre vos modifications. Voiulez-vous continuer ?</translation>
     </message>
     <message>
