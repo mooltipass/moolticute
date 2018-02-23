@@ -294,7 +294,7 @@
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="149"/>
-        <source>By denying you can loose your changes. Do you want to continue?</source>
+        <source>By denying you can lose your changes. Do you want to continue?</source>
         <translation>Om du avslår kan dina ändringar gå förlorade. Vill du fortsätta?</translation>
     </message>
     <message>
