@@ -32,7 +32,7 @@ void DbExportsRegistryController::setWSClient(WSClient *wsClient)
     connect(wsClient, &WSClient::cardDbMetadataChanged, this, &DbExportsRegistryController::handleCardIdChanged);
     connect(wsClient, &WSClient::statusChanged, this, &DbExportsRegistryController::handleDeviceStatusChanged);
     connect(wsClient, &WSClient::connectedChanged, this, &DbExportsRegistryController::handleDeviceConnectedChanged);
-
+    connect(wsClient, &WSClient::dbExported, this, &DbExportsRegistryController::registerDbExported);
     dbExportsRegistry->setCurrentCardDbMetadata(wsClient->get_cardId(), wsClient->get_credentialsDbChangeNumber(), wsClient->get_dataDbChangeNumber());
 }
 
@@ -52,6 +52,15 @@ void DbExportsRegistryController::handleCardIdChanged(QString cardId, int creden
         dbExportsRegistry->setCurrentCardDbMetadata(cardId, credentialsDbChangeNumber, dataDbChangeNumber);
     else
         dbExportsRegistry->setCurrentCardDbMetadata(QString(), -1, -1);
+}
+
+void DbExportsRegistryController::registerDbExported(const QByteArray &, bool success)
+{
+    if (success)
+    {
+        dbExportsRegistry->registerDbExport();
+        hidePrompt();
+    }
 }
 
 void DbExportsRegistryController::handleDbExportRecommended()
@@ -99,8 +108,6 @@ void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool
                                                      "Memory exports (*.bin);;All files (*.*)");
         if (!fname.isEmpty())
             writeDbToFile(d, fname);
-
-        dbExportsRegistry->registerDbExport();
     }
     else
         QMessageBox::warning(window, tr("Error"), tr(d));

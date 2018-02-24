@@ -26,6 +26,7 @@ signals:
 
 public slots:
     void handleCardIdChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
+    void registerDbExported(const QByteArray &, bool success);
 
 protected slots:
     void handleDbExportRecommended();
