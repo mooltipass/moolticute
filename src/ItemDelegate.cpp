@@ -55,8 +55,7 @@ void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewIte
 void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite) const
 {
     QFont f = loginFont();
-    int optionrecheight = option.rect.height();
-    QPoint topleft = option.rect.topLeft();
+
     QIcon star = AppGui::qtAwesome()->icon(fa::star);
     QSize iconSz = QSize(option.rect.height(), option.rect.height());
     QPoint pos = option.rect.topLeft() + QPoint(0, -(option.rect.height()-iconSz.height())/2);
@@ -78,8 +77,7 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
 }
 
 void ItemDelegate::paintArrow(QPainter *painter
-                              , const QStyleOptionViewItem &option
-                              , int iFavorite) const
+                              , const QStyleOptionViewItem &option) const
 {
     QIcon arrow = AppGui::qtAwesome()->icon(fa::arrowcircleright
                                     , {{ "color", QColor("#0097a7") }
@@ -92,7 +90,9 @@ void ItemDelegate::paintArrow(QPainter *painter
     arrow.paint(painter, arrowRec);
 }
 
-void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option,  const LoginItem *pLoginItem) const
+void ItemDelegate::paintLoginItem(QPainter *painter
+                                  , const QStyleOptionViewItem &option
+                                  ,  const LoginItem *pLoginItem) const
 {
     if (pLoginItem != nullptr)
     {
@@ -100,7 +100,7 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
         if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
         {
             if (pLoginItem->favorite() == Common::FAV_NOT_SET)
-                paintArrow(painter, option, pLoginItem->favorite());
+                paintArrow(painter, option);
             else
                 paintFavorite(painter, option, pLoginItem->favorite());
         }
@@ -153,13 +153,15 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         if ((pServiceItem != nullptr)
                 && (!pServiceItem->isExpanded())
                 && index.column() == 0)
-            paintServiceItem(painter, option, pServiceItem);
-        else if (pLoginItem != nullptr && index.column() == 1)
         {
-            ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
-            if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
-                paintDate(painter, option, pLoginItem);
+            paintServiceItem(painter, option, pServiceItem);
         }
+        //else if (pLoginItem != nullptr && index.column() == 1)
+        //{
+        //    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
+        //    if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
+        //        paintDate(painter, option, pLoginItem);
+        //}
         else if (pLoginItem != nullptr && index.column() == 0)
             paintLoginItem(painter, option, pLoginItem);
 

@@ -98,12 +98,12 @@ QDate ServiceItem::bestUpdateDate(Qt::SortOrder order) const
         {
             if (order == Qt::AscendingOrder)
             {
-                if (m_vChilds[i]->updatedDate() > bestDate)
+                if (m_vChilds[i]->updatedDate() < bestDate)
                     bestDate = m_vChilds[i]->updatedDate();
             }
             else
             {
-                if (m_vChilds[i]->updatedDate() < bestDate)
+                if (m_vChilds[i]->updatedDate() > bestDate)
                     bestDate = m_vChilds[i]->updatedDate();
             }
         }

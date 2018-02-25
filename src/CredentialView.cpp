@@ -28,6 +28,7 @@ CredentialView::CredentialView(QWidget *parent) : QTreeView(parent)
     setSortingEnabled(true);
     m_pItemDelegate = new ItemDelegate(this);
     setItemDelegateForColumn(0, m_pItemDelegate);
+    setItemDelegateForColumn(1, m_pItemDelegate);
     setMinimumWidth(430);
     connect(this, &CredentialView::clicked, this, &CredentialView::onToggleExpandedState);
     header()->setStyleSheet(CSS_CREDVIEW_HEADER);

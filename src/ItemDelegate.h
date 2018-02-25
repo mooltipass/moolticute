@@ -24,9 +24,7 @@ private:
     void paintFavorite(QPainter *painter
                        , const QStyleOptionViewItem &option
                        , int iFavorite) const;
-    void paintArrow(QPainter *painter
-                    , const QStyleOptionViewItem &option
-                    , int iFavorite) const;
+    void paintArrow(QPainter *painter, const QStyleOptionViewItem &option) const;
     QFont loginFont() const;
     QFont favFont() const;
 };
