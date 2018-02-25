@@ -22,6 +22,7 @@
 #include <QtWidgets>
 #include "WSClient.h"
 #include <QtAwesome.h>
+#include "DbExportsRegistry.h"
 #include "WindowLog.h"
 
 #include <DbBackupsTrackerController.h>

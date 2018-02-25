@@ -12,8 +12,10 @@
 #include <QDir>
 #include <QStandardPaths>
 
-DbBackupsTracker::DbBackupsTracker(QObject* parent):
-    QObject(parent)
+#include "DbBackupChangeNumbersComparator.h"
+
+DbBackupsTracker::DbBackupsTracker(const QString settingsFilePath, QObject* parent):
+    QObject(parent), settingsFilePath(settingsFilePath)
 {
     loadTracks();
     connect(&watcher, &QFileSystemWatcher::fileChanged,
@@ -264,33 +266,20 @@ void DbBackupsTracker::setDataDbChangeNumber(int dataDbChangeNumber)
     emit dataDbChangeNumberChanged(this->dataDbChangeNumber);
 }
 
-bool DbBackupsTracker::greaterThanWithWrapOver(int a, int b, int limit, int range) const
-{
-    bool res = (a > b) && ( (a - b) < range);
-    res = res || ((a < b) && ((limit - b + a) < range));
-    return res;
-}
-
-bool DbBackupsTracker::lowerThanWithWrapOver(int a, int b, int limit, int range) const
-{
-    bool res = (a < b) && ( (b - a) < range);
-    res = res || ((a > b) && ((limit - a + b) < range));
-    return res;
-}
 
 bool DbBackupsTracker::isDbBackupChangeNumberGreater(int backupCCN, int backupDCN) const
 {
     bool result = false;
-    result = result || greaterThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
-    result = result || greaterThanWithWrapOver(backupDCN, dataDbChangeNumber);
+    result = result || BackupChangeNumbersComparator::greaterThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result || BackupChangeNumbersComparator::greaterThanWithWrapOver(backupDCN, dataDbChangeNumber);
     return result;
 }
 
 bool DbBackupsTracker::isDbBackupChangeNumberLower(int backupCCN, int backupDCN) const
 {
     bool result = false;
-    result = result || lowerThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
-    result = result || lowerThanWithWrapOver(backupDCN, dataDbChangeNumber);
+    result = result || BackupChangeNumbersComparator::lowerThanWithWrapOver(backupCCN, credentialsDbChangeNumber);
+    result = result || BackupChangeNumbersComparator::lowerThanWithWrapOver(backupDCN, dataDbChangeNumber);
     return result;
 }
 
@@ -327,8 +316,7 @@ void DbBackupsTracker::refreshTracking()
 
 void DbBackupsTracker::saveTracks()
 {
-    QString path = getSettingsFilePath();
-    QSettings s(path, QSettings::IniFormat);
+    QSettings s(settingsFilePath, QSettings::IniFormat);
     s.beginGroup("BackupsTracks");
     for (QString k : tracks.keys())
         s.setValue(k, tracks.value(k));
@@ -344,8 +332,7 @@ void DbBackupsTracker::loadTracks()
 {
     tracks.clear();
 
-    QString path = getSettingsFilePath();
-    QSettings s(path, QSettings::IniFormat);
+    QSettings s(settingsFilePath, QSettings::IniFormat);
     s.sync();
     if (s.status() != QSettings::NoError)
         qWarning() << "Unable to load settings " << s.status();
@@ -362,15 +349,6 @@ void DbBackupsTracker::loadTracks()
     }
 
     s.endGroup();
-}
-
-QString DbBackupsTracker::getSettingsFilePath()
-{
-    QString fileName = "mooticute.ini";
-    QDir dataDir(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
-    dataDir.mkpath(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
-
-    return dataDir.absoluteFilePath(fileName);
 }
 
 void DbBackupsTrackerNoCardIdSet::raise() const

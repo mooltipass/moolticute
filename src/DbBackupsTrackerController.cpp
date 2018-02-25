@@ -26,8 +26,9 @@ void DbBackupsTrackerController::disconnectDbBackupsTracker()
                this, &DbBackupsTrackerController::handleNewTrack);
 }
 
-DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSClient *wsClient, QObject *parent):
+DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSClient *wsClient, const QString &settingsFilePath, QObject *parent):
     QObject(parent),
+    dbBackupsTracker(settingsFilePath),
     isExportRequestMessageVisible(false),
     askImportMessage(nullptr)
 {
@@ -146,7 +147,7 @@ void DbBackupsTrackerController::askForExportBackup()
     {
         QMessageBox::StandardButton btn = QMessageBox::warning(
                                               window, tr("Be careful"),
-                                              tr("By denying you can loose your changes. Do you want to continue?"),
+                                              tr("By denying you can lose your changes. Do you want to continue?"),
                                               QMessageBox::Yes | QMessageBox::No);
 
         if (btn == QMessageBox::Yes)

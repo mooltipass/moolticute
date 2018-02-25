@@ -45,7 +45,10 @@ SOURCES += src/main_gui.cpp \
     src/PassGenerationProfilesDialog.cpp \
     src/DbBackupsTracker.cpp \
     src/DbBackupsTrackerController.cpp \
-    src/PromptWidget.cpp
+    src/PromptWidget.cpp \
+    src/DbExportsRegistry.cpp \
+    src/DbExportsRegistryController.cpp \
+    src/DbBackupChangeNumbersComparator.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -78,7 +81,10 @@ HEADERS  += src/MainWindow.h \
     src/PassGenerationProfilesDialog.h \
     src/DbBackupsTracker.h \
     src/DbBackupsTrackerController.h \
-    src/PromptWidget.h
+    src/PromptWidget.h \
+    src/DbExportsRegistry.h \
+    src/DbExportsRegistryController.h \
+    src/DbBackupChangeNumbersComparator.h
 
 mac {
     HEADERS += src/MacUtils.h
@@ -142,7 +148,10 @@ TRANSLATIONS = \
     lang/mc_ru.ts \
     lang/mc_nl.ts \
     lang/mc_ja.ts \
-    lang/mc_pt.ts
+    lang/mc_pt.ts \
+    lang/mc_br.ts \
+    lang/mc_tr.ts \
+    lang/mc_sv.ts
 
 #Build *.qm translation files automatically
 

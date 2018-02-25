@@ -5,7 +5,19 @@
 
 me="Moolticute.AppImage"
 UDEV_RULES_FILE_PATH="/etc/udev/rules.d/50-mooltipass.rules"
-UDEV_RULE='SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", SYMLINK+="mooltipass" TAG+="uaccess", TAG+="udev-acl"'
+
+UDEV_RULE="
+# udev rules for allowing console user(s) and libusb access to Mooltipass Mini devices
+
+ACTION!=\"add|change\", GOTO=\"mooltipass_end\"
+
+# console user\n
+KERNEL==\"hidraw*\", SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"16d0\", ATTRS{idProduct}==\"09a0\", MODE=\"0660\", SYMLINK+=\"mooltipass_keyboard\", TAG+=\"uaccess\"
+# libusb
+SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"16d0\", ATTRS{idProduct}==\"09a0\", MODE=\"0660\", SYMLINK+=\"mooltipass_device\", TAG+=\"uaccess\"
+
+LABEL=\"mooltipass_end\"
+";
 
 help_msg="Moolticute for linux
 Usage:
@@ -92,7 +104,7 @@ then
 elif (( $INSTALL == 1 ));
 then
     echo "Installing moolticute UDEV rules"
-    echo $UDEV_RULE | sudo tee $UDEV_RULES_FILE_PATH
+    printf "$UDEV_RULE" | sudo tee $UDEV_RULES_FILE_PATH
     sudo udevadm control --reload-rules
 elif (( $CHECK == 1 ));
 then

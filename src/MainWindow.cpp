@@ -57,6 +57,11 @@ void MainWindow::initHelpLabels()
 
     ui->label_dbBackupMonitoringHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
     ui->label_dbBackupMonitoringHelp->setToolTip(tr("Select a backup file to make sure your Mooltipass database is always in sync with it.\r\nYou will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected."));
+
+    ui->label_MooltiAppHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
+    ui->label_MooltiAppHelp->setToolTip(tr("The MooltiApp backup file doesn't have encrypted logins."));
+
+
 }
 
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
@@ -79,7 +84,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->setupUi(this);
     refreshAppLangCb();
 
-    dbBackupsTrackerController = new DbBackupsTrackerController(this, client, this);
+    dbBackupsTrackerController = new DbBackupsTrackerController(this, client,
+                                                                AppGui::getDataDirPath() + "/dbBackupTracks.ini", this);
 
     ui->checkBoxLongPress->setChecked(s.value("settings/long_press_cancel", true).toBool());
     connect(ui->checkBoxLongPress, &QCheckBox::toggled, [this](bool checked)
@@ -1075,7 +1081,7 @@ void MainWindow::on_pushButtonExportFile_clicked()
 
 void MainWindow::on_pushButtonImportFile_clicked()
 {
-    QString fname = QFileDialog::getOpenFileName(this, tr("Save database export..."), QString(),
+    QString fname = QFileDialog::getOpenFileName(this, tr("Select database export..."), QString(),
                                                  "Memory exports (*.bin);;All files (*.*)");
     if (fname.isEmpty())
         return;

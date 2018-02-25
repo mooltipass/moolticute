@@ -44,7 +44,11 @@
 #include <setupapi.h>
 #include <winioctl.h>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+#include "qwinoverlappedionotifier.h"
+#else
 #include <private/qwinoverlappedionotifier_p.h>
+#endif
 
 #include "MPDevice.h"
 

@@ -6,6 +6,7 @@
 #include "TestTreeItem.h"
 #include "TestCredentialModel.h"
 #include "TestCredentialModelFilter.h"
+#include "TestDbExportsRegistry.h"
 
 // Note: This is equivalent to QTEST_APPLESS_MAIN for multiple test classes.
 int main(int argc, char** argv)
@@ -15,8 +16,6 @@ int main(int argc, char** argv)
 
    int status = 0;
 
-//   DbBackupsTrackerTests dbBackupsTrackerTests;
-//   QTest::qExec(&dbBackupsTrackerTests);
    {
        TestTreeItem testTreeItem;
        QTest::qExec(&testTreeItem);
@@ -32,9 +31,15 @@ int main(int argc, char** argv)
        QTest::qExec(&testCredentialsModelFilter);
    }
 
-//   TEST_CLASS(FilesCache, status);
-//   TEST_CLASS(UpdaterTests, status);
-//   TEST_CLASS(DbBackupsTrackerTests, status);
+   {
+       DbBackupsTrackerTests dbBackupsTrackerTests;
+       QTest::qExec(&dbBackupsTrackerTests);
+   }
+
+   {
+       TestDbExportsRegistry testDbExportsRegistry;
+       QTest::qExec(&testDbExportsRegistry);
+   }
 
    return status;
 }
