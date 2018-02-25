@@ -20,7 +20,13 @@ public:
 private:
     void paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const;
     void paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option, const LoginItem *pLoginItem) const;
-    void paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite) const;
+    void paintDate(QPainter *painter, const QStyleOptionViewItem &option, const LoginItem *pLoginItem) const;
+    void paintFavorite(QPainter *painter
+                       , const QStyleOptionViewItem &option
+                       , int iFavorite) const;
+    void paintArrow(QPainter *painter
+                    , const QStyleOptionViewItem &option
+                    , int iFavorite) const;
     QFont loginFont() const;
     QFont favFont() const;
 };

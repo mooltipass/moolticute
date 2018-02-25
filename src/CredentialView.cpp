@@ -24,14 +24,13 @@ CredentialView::CredentialView(QWidget *parent) : QTreeView(parent)
     m_tSelectionTimer.setInterval(50);
     m_tSelectionTimer.setSingleShot(true);
     connect(&m_tSelectionTimer, &QTimer::timeout, this, &CredentialView::onSelectionTimerTimeOut);
-
+    setIndentation(10);
     setSortingEnabled(true);
     m_pItemDelegate = new ItemDelegate(this);
     setItemDelegateForColumn(0, m_pItemDelegate);
     setMinimumWidth(430);
     connect(this, &CredentialView::clicked, this, &CredentialView::onToggleExpandedState);
-    header()->setStyleSheet("QHeaderView::section{ background-color: #D5D5D5; }");
-
+    header()->setStyleSheet(CSS_CREDVIEW_HEADER);
 }
 
 CredentialView::~CredentialView()
@@ -52,6 +51,7 @@ void CredentialView::onModelLoaded(bool bClearLoginDescription)
 {
     Q_UNUSED(bClearLoginDescription)
     CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
+    pCredModelFilter->sort(0, Qt::AscendingOrder);
 
     QModelIndex firstServiceIndex = model()->index(0, 0, QModelIndex());
     if (firstServiceIndex.isValid())
@@ -71,16 +71,26 @@ void CredentialView::onModelLoaded(bool bClearLoginDescription)
                 {
                     expand(serviceIndex);
                     expand(itemIndex);
-                    wasAnyItemFavoriteExpanded = true;
+                    if (!wasAnyItemFavoriteExpanded)
+                    {
+                        selectionModel()->setCurrentIndex(itemIndex
+                                , QItemSelectionModel::ClearAndSelect
+                                | QItemSelectionModel::Rows);
+                        wasAnyItemFavoriteExpanded = true;
+                    }
+
                 }
             }
         }
 
         if (!wasAnyItemFavoriteExpanded) {
-            selectionModel()->setCurrentIndex(firstServiceIndex, QItemSelectionModel::ClearAndSelect);
+            selectionModel()->setCurrentIndex(firstServiceIndex,
+                  QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
             onToggleExpandedState(firstServiceIndex);
         }
     }
+
+
 }
 
 void CredentialView::onToggleExpandedState(const QModelIndex &proxyIndex)
@@ -212,7 +222,8 @@ void CredentialView::resetCurrentIndex()
                 if (loginIndex.isValid())
                 {
                     setExpanded(serviceIndex, true);
-                    selectionModel()->setCurrentIndex(loginIndex, QItemSelectionModel::ClearAndSelect);
+                    selectionModel()->setCurrentIndex(loginIndex
+                        , QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
                     return;
                 }
             }
@@ -220,7 +231,8 @@ void CredentialView::resetCurrentIndex()
             if (pCredModelFilter->rowCount(serviceIndex) > 0)
             {
                 setExpanded(serviceIndex, false);
-                selectionModel()->setCurrentIndex(serviceIndex, QItemSelectionModel::ClearAndSelect);
+                selectionModel()->setCurrentIndex(serviceIndex
+                     , QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
                 return;
             }
         }

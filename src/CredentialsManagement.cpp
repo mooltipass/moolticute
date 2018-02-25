@@ -530,9 +530,11 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
             QModelIndexList nextRow = m_pCredModelFilter->getNextRow(lIndexes.at(0));
             auto selectionModel = ui->credentialTreeView->selectionModel();
             if (nextRow.size()>0 && nextRow.at(0).isValid())
-                selectionModel->setCurrentIndex(nextRow.at(0), QItemSelectionModel::ClearAndSelect);
+                selectionModel->setCurrentIndex(nextRow.at(0)
+                    , QItemSelectionModel::ClearAndSelect  | QItemSelectionModel::Rows);
             else
-                selectionModel->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
+                selectionModel->setCurrentIndex(QModelIndex()
+                    , QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 
             m_pCredModel->removeCredential(srcIndex);
         }
@@ -563,7 +565,8 @@ void CredentialsManagement::onCredentialSelected(const QModelIndex &current, con
         {
             m_selectionCanceled = true;
             auto selectionModel = ui->credentialTreeView->selectionModel();
-            selectionModel->setCurrentIndex(previous, QItemSelectionModel::ClearAndSelect);
+            selectionModel->setCurrentIndex(previous,
+                 QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
             return;
         }
     }

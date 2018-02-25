@@ -37,15 +37,17 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     LoginItem *pLoginItem = getLoginItemByIndex(idx);
 
     if (role == Qt::DisplayRole && idx.column() == 0)
-        return  pItem->name();
+    {
+        if (pLoginItem != nullptr)
+            return  "         " + pItem->name();
+        else if (pServiceItem != nullptr)
+            return  pItem->name();
+    }
     if (role == Qt::DisplayRole && idx.column() == 1)
     {
         if (pLoginItem != nullptr)
-            return pLoginItem->updatedDate();
-        else
-             return  QVariant(" ");
+            return  pItem->updatedDate();
     }
-
 
     if (role == Qt::ForegroundRole)
     {
@@ -73,32 +75,6 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
         }
         return qApp->font();
     }
-
-    if (role == Qt::DecorationRole) {
-        if (pLoginItem != nullptr && idx.column() == 0)
-            return loginItemIcon;
-    }
-
-    if (role == Qt::BackgroundRole)
-    {
-        QColor bkgColor("white");
-        if (pServiceItem != nullptr)
-        {
-            if (idx.row()%2 == 0)
-                bkgColor.setNamedColor("#eef7fa");
-            else
-                bkgColor.setNamedColor("white");
-        }
-        else if (pLoginItem != nullptr)
-        {
-            if (parent(idx).row()%2 == 0)
-                bkgColor.setNamedColor("#eef7fa");
-            else
-                bkgColor.setNamedColor("white");
-        }
-        return QBrush(bkgColor);
-    }
-
     return QVariant();
 }
 
@@ -109,7 +85,7 @@ QVariant CredentialModel::headerData(int section, Qt::Orientation orientation, i
         switch (section)
         {
         case 0:
-            return QString("Service or Website");
+            return QString("   Service or Website");
         case 1:
             return QString("Modified Date");
         default:

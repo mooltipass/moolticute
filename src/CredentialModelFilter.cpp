@@ -71,8 +71,8 @@ QModelIndexList CredentialModelFilter::getNextRow(const QModelIndex& rowIdx)
         else if (parent.row() > 0)
         {
             QModelIndex prevousParent = index(parent.row()-1, 0, parent.parent());
-            nextRow << index(0, 0, prevousParent);
-            nextRow << index(0, 1, prevousParent);
+            nextRow << index(rowCount(prevousParent)-1, 0, prevousParent);
+            nextRow << index(rowCount(prevousParent)-1, 1, prevousParent);
         }
     }
 
