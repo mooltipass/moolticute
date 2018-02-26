@@ -75,6 +75,15 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
         }
         return qApp->font();
     }
+
+    if (Qt::TextAlignmentRole == role)
+    {
+        if (pLoginItem != nullptr && idx.column() == 1)
+        {
+            return Qt::AlignHCenter;
+        }
+    }
+
     return QVariant();
 }
 
@@ -92,6 +101,15 @@ QVariant CredentialModel::headerData(int section, Qt::Orientation orientation, i
             return QVariant();
         }
     }
+
+    if (Qt::TextAlignmentRole == role)
+    {
+        if (section == 1)
+        {
+            return Qt::AlignHCenter;
+        }
+    }
+
     return QVariant();
 }
 

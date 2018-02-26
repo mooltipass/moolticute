@@ -52,7 +52,9 @@ void CredentialView::onModelLoaded(bool bClearLoginDescription)
 {
     Q_UNUSED(bClearLoginDescription)
     CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
+
     pCredModelFilter->sort(0, Qt::AscendingOrder);
+    header()->setSortIndicator(0, Qt::AscendingOrder);
 
     QModelIndex firstServiceIndex = model()->index(0, 0, QModelIndex());
     if (firstServiceIndex.isValid())
