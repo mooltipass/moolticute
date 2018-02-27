@@ -70,7 +70,7 @@
     <message>
         <location filename="../src/CredentialsManagement.ui" line="41"/>
         <source>Add or update a credential</source>
-        <translation>Ajouter ou modifier un identidiant</translation>
+        <translation>Ajouter ou modifier un identifiant</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="44"/>
