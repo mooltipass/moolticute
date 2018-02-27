@@ -2,6 +2,7 @@
 #include <QDateTime>
 #include <QMouseEvent>
 #include <QDebug>
+#include <QHeaderView>
 
 // Application
 #include "CredentialView.h"
@@ -12,18 +13,26 @@
 #include "TreeItem.h"
 #include "LoginItem.h"
 
-CredentialView::CredentialView(QWidget *parent) : QTreeView(parent),
-    m_bIsFullyExpanded(false), m_pCurrentServiceItem(nullptr), m_pItemDelegate(nullptr)
+CredentialView::CredentialView(QWidget *parent) : QTreeView(parent)
+  , m_bIsFullyExpanded(false)
+  , m_pCurrentServiceItem(nullptr)
+  , m_pItemDelegate(nullptr)
+  , tempCurrentServiceItem(nullptr)
+  , tempCurrentLoginItem(nullptr)
+  , columnBreakRatio(0.75)
 {
     m_tSelectionTimer.setInterval(50);
     m_tSelectionTimer.setSingleShot(true);
     connect(&m_tSelectionTimer, &QTimer::timeout, this, &CredentialView::onSelectionTimerTimeOut);
-
-    setHeaderHidden(true);
+    setIndentation(10);
+    setSortingEnabled(true);
     m_pItemDelegate = new ItemDelegate(this);
     setItemDelegateForColumn(0, m_pItemDelegate);
+    setItemDelegateForColumn(1, m_pItemDelegate);
     setMinimumWidth(430);
     connect(this, &CredentialView::clicked, this, &CredentialView::onToggleExpandedState);
+    header()->setStyleSheet(CSS_CREDVIEW_HEADER);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 CredentialView::~CredentialView()
@@ -45,6 +54,9 @@ void CredentialView::onModelLoaded(bool bClearLoginDescription)
     Q_UNUSED(bClearLoginDescription)
     CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
 
+    pCredModelFilter->sort(0, Qt::AscendingOrder);
+    header()->setSortIndicator(0, Qt::AscendingOrder);
+
     QModelIndex firstServiceIndex = model()->index(0, 0, QModelIndex());
     if (firstServiceIndex.isValid())
     {
@@ -63,16 +75,26 @@ void CredentialView::onModelLoaded(bool bClearLoginDescription)
                 {
                     expand(serviceIndex);
                     expand(itemIndex);
-                    wasAnyItemFavoriteExpanded = true;
+                    if (!wasAnyItemFavoriteExpanded)
+                    {
+                        selectionModel()->setCurrentIndex(itemIndex
+                                , QItemSelectionModel::ClearAndSelect
+                                | QItemSelectionModel::Rows);
+                        wasAnyItemFavoriteExpanded = true;
+                    }
+
                 }
             }
         }
 
         if (!wasAnyItemFavoriteExpanded) {
-            selectionModel()->setCurrentIndex(firstServiceIndex, QItemSelectionModel::ClearAndSelect);
+            selectionModel()->setCurrentIndex(firstServiceIndex,
+                  QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
             onToggleExpandedState(firstServiceIndex);
         }
     }
+
+
 }
 
 void CredentialView::onToggleExpandedState(const QModelIndex &proxyIndex)
@@ -127,4 +149,97 @@ void CredentialView::onSelectionTimerTimeOut()
             }
         }
     }
+}
+
+void CredentialView::setModel(QAbstractItemModel *model)
+{
+    QTreeView::setModel(model);
+
+    setColumnWidth(0, geometry().width()*columnBreakRatio);
+    connect(model, &QAbstractItemModel::layoutAboutToBeChanged
+            , this, &CredentialView::onLayoutAboutToBeChanged);
+    connect(model, &QAbstractItemModel::layoutChanged, this
+            , &CredentialView::onLayoutChanged);
+}
+
+void CredentialView::resizeEvent(QResizeEvent *event)
+{
+    QTreeView::resizeEvent(event);
+    setColumnWidth(0, geometry().width()*columnBreakRatio);
+}
+
+void CredentialView::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents
+                                              , QAbstractItemModel::LayoutChangeHint hint)
+{
+   Q_UNUSED(parents)
+   if (QAbstractItemModel::VerticalSortHint == hint)
+   {
+        CredentialModelFilter *pCredModelFilter = dynamic_cast<CredentialModelFilter *>(model());
+        TreeItem* currentItem = pCredModelFilter->getItemByProxyIndex(currentIndex());
+        if (nullptr == currentItem)
+        {
+            tempCurrentServiceItem = nullptr;
+            tempCurrentLoginItem = nullptr;
+        }
+        else if (currentItem->treeType() == TreeItem::TreeType::Login)
+        {
+            tempCurrentLoginItem = dynamic_cast<LoginItem *>(currentItem);
+            tempCurrentServiceItem = dynamic_cast<ServiceItem *>(currentItem->parentItem());
+        }
+        else if (currentItem->treeType() == TreeItem::TreeType::Service)
+        {
+            tempCurrentLoginItem = nullptr;
+            tempCurrentServiceItem = dynamic_cast<ServiceItem *>(currentItem);
+        }
+        else
+        {
+            tempCurrentServiceItem = nullptr;
+            tempCurrentLoginItem = nullptr;
+        }
+   }
+}
+
+void CredentialView::onLayoutChanged(const QList<QPersistentModelIndex> &parents
+                                     , QAbstractItemModel::LayoutChangeHint hint)
+{
+    Q_UNUSED(parents)
+    if (QAbstractItemModel::VerticalSortHint == hint)
+    {
+        resetCurrentIndex();
+    }
+}
+
+void CredentialView::resetCurrentIndex()
+{
+    if (nullptr != tempCurrentServiceItem)
+    {
+        CredentialModelFilter *pCredModelFilter
+                = dynamic_cast<CredentialModelFilter *>(model());
+        QModelIndex serviceIndex
+               = pCredModelFilter->getProxyIndexFromItem(tempCurrentServiceItem);
+        if (serviceIndex.isValid())
+        {
+            if (tempCurrentLoginItem != nullptr)
+            {
+                QModelIndex loginIndex
+                    = pCredModelFilter->getProxyIndexFromItem(tempCurrentLoginItem);
+                if (loginIndex.isValid())
+                {
+                    setExpanded(serviceIndex, true);
+                    selectionModel()->setCurrentIndex(loginIndex
+                        , QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+                    return;
+                }
+            }
+
+            if (pCredModelFilter->rowCount(serviceIndex) > 0)
+            {
+                setExpanded(serviceIndex, false);
+                selectionModel()->setCurrentIndex(serviceIndex
+                     , QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+                return;
+            }
+        }
+    }
+    selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
 }

@@ -45,7 +45,7 @@ int TreeItem::childCount() const
 int TreeItem::row() const
 {
     if (m_pParentItem)
-        return childs().indexOf(const_cast<TreeItem*>(this));
+        return m_pParentItem->childs().indexOf(const_cast<TreeItem*>(this));
 
     return 0;
 }
@@ -71,6 +71,11 @@ void TreeItem::setStatus(const Status &eStatus)
 }
 
 const QDate &TreeItem::updatedDate() const
+{
+    return m_dUpdatedDate;
+}
+
+QDate TreeItem::bestUpdateDate(Qt::SortOrder) const
 {
     return m_dUpdatedDate;
 }
@@ -139,4 +144,9 @@ void TreeItem::clear()
 {
     qDeleteAll(m_vChilds);
     m_vChilds.clear();
+}
+
+TreeItem::TreeType TreeItem::treeType() const
+{
+    return Base;
 }

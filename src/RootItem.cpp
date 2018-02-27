@@ -59,3 +59,8 @@ void RootItem::removeUnusedItems()
         }
     }
 }
+
+TreeItem::TreeType RootItem::treeType() const
+{
+    return Root;
+}

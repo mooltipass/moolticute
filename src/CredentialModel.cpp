@@ -4,6 +4,7 @@
 #include <QColor>
 #include <QFont>
 #include <QApplication>
+#include <QBrush>
 
 // Application
 #include "CredentialModel.h"
@@ -35,13 +36,15 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     // Cast to login item
     LoginItem *pLoginItem = getLoginItemByIndex(idx);
 
-    if (role == Qt::DisplayRole)
-        return pItem->name();
-
-    if (role == Qt::ForegroundRole)
+    if (role == Qt::DisplayRole && idx.column() == 0)
+    {
+       if (pServiceItem != nullptr)
+            return  pItem->name();
+    }
+    else if (role == Qt::DisplayRole && idx.column() == 1)
     {
         if (pLoginItem != nullptr)
-            return QColor("#3D96AF");
+            return  pItem->updatedDate();
     }
 
     if (role == Qt::FontRole)
@@ -53,21 +56,42 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
             font.setPointSize(10);
             return font;
         }
-        else
-        if (pLoginItem != nullptr)
-        {
-            QFont font = qApp->font();
-            font.setBold(true);
-            font.setItalic(true);
-            font.setPointSize(10);
-            return font;
-        }
+
         return qApp->font();
     }
 
-    if (role == Qt::DecorationRole) {
-        if (pLoginItem != nullptr)
-            return loginItemIcon;
+    if (Qt::TextAlignmentRole == role)
+    {
+        if (pLoginItem != nullptr && idx.column() == 1)
+        {
+            return Qt::AlignHCenter;
+        }
+    }
+
+    return QVariant();
+}
+
+QVariant CredentialModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (Qt::DisplayRole == role && orientation == Qt::Horizontal)
+    {
+        switch (section)
+        {
+        case 0:
+            return QString("   Service or Website");
+        case 1:
+            return QString("Modified Date");
+        default:
+            return QVariant();
+        }
+    }
+
+    if (Qt::TextAlignmentRole == role)
+    {
+        if (section == 1)
+        {
+            return Qt::AlignHCenter;
+        }
     }
 
     return QVariant();
@@ -131,7 +155,7 @@ int CredentialModel::rowCount(const QModelIndex &parent) const
 int CredentialModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return 1;
+    return 2;
 }
 
 TreeItem *CredentialModel::getItemByIndex(const QModelIndex &idx) const
@@ -230,9 +254,9 @@ ServiceItem *CredentialModel::addService(const QString &sServiceName)
     return new ServiceItem(sServiceName);
 }
 
-QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName) const
+QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName, int column) const
 {
-    QModelIndexList lMatches = match(index(0, 0, QModelIndex()), Qt::DisplayRole, sServiceName, 1);
+    QModelIndexList lMatches = match(index(0, column, QModelIndex()), Qt::DisplayRole, sServiceName, 1);
     if (!lMatches.isEmpty())
         return lMatches.first();
 
@@ -247,11 +271,6 @@ LoginItem *CredentialModel::getLoginItemByIndex(const QModelIndex &idx) const
 ServiceItem *CredentialModel::getServiceItemByIndex(const QModelIndex &idx) const
 {
     return dynamic_cast<ServiceItem *>(getItemByIndex(idx));
-}
-
-void CredentialModel::setLoginItemIcon(const QIcon &icon)
-{
-    loginItemIcon = icon;
 }
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName)

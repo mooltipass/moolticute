@@ -224,5 +224,14 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                             "background-color: #237C95;" \
                         "}"
 
+#define CSS_CREDVIEW_HEADER "QHeaderView::section {" \
+                                "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"\
+                                        "stop:0 #F1F1F1, stop: 0.5 #E0E0E0,"\
+                                        "stop: 0.6 #D3D3D3, stop:1 #F5F5F5);"\
+                                "color: black;"\
+                                "padding-left: 4px;"\
+                                "border: 1px solid #FcFcFc;"\
+                            "}"
+
 #endif // COMMON_H
 

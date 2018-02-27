@@ -30,14 +30,37 @@ QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
     return defaultSize;
 }
 
+void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const
+{
+    if (pServiceItem != nullptr)
+    {
+        QPen pen;
+        QString sLogins = pServiceItem->logins();
+
+        qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
+        painter->setRenderHint(QPainter::Antialiasing, true);
+
+        QFont f = loginFont();
+
+        if (!pServiceItem->isExpanded())
+        {
+            pen.setColor(QColor("#666666"));
+            painter->setFont(f);
+            painter->setPen(pen);
+            painter->drawText(option.rect, Qt::AlignRight, sLogins);
+        }
+    }
+}
+
 void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite) const
 {
     QFont f = loginFont();
 
     QIcon star = AppGui::qtAwesome()->icon(fa::star);
-    QSize iconSz = QSize(option.rect.height(), option.rect.height()); //QSize(serviceMetrics.height(), serviceMetrics.height());
-    QPoint pos = option.rect.topRight() - QPoint(iconSz.width(), -(option.rect.height()-iconSz.height())/2);
+    QSize iconSz = QSize(option.rect.height(), option.rect.height());
+    QPoint pos = option.rect.topLeft() + QPoint(0, -(option.rect.height()-iconSz.height())/2);
     QRect iconRect(pos, iconSz);
+
     if (iFavorite != Common::FAV_NOT_SET)
         star.paint(painter, iconRect);
 
@@ -50,67 +73,54 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
     painter->setPen(pen);
 
     if (iFavorite != Common::FAV_NOT_SET)
-        painter->drawText(iconRect, Qt::AlignCenter, sFavNumber);
+        painter->drawText(iconRect, Qt::AlignCenter , sFavNumber);
 }
 
-void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewItem &option, const ServiceItem *pServiceItem) const
+void ItemDelegate::paintArrow(QPainter *painter, const QStyleOptionViewItem &option) const
 {
-    if (pServiceItem != nullptr)
-    {
-        QPen pen;
-        QString sLogins = pServiceItem->logins();
+    QIcon arrow = AppGui::qtAwesome()->icon(fa::arrowcircleright
+                                    , {{ "color", QColor("#0097a7") }
+                                    , { "color-selected", QColor("#0097a7") }
+                                    , { "color-active", QColor("#0097a7") }});
 
-        qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
-        painter->setRenderHint(QPainter::Antialiasing, true);
-
-        QFont f = loginFont();
-        const QFontMetrics serviceMetrics = QFontMetrics{f};
-
-        QRect dstRect = option.rect;
-        if (!pServiceItem->isExpanded())
-        {
-            QRect otherRect(dstRect.width() - serviceMetrics.width(sLogins),
-                            dstRect.y() + (dstRect.height() - serviceMetrics.height()) / 2,
-                            serviceMetrics.width(sLogins),
-                            dstRect.height());
-            pen.setColor(QColor("#666666"));
-            painter->setFont(f);
-            painter->setPen(pen);
-            painter->drawText(otherRect, Qt::AlignRight, sLogins);
-        }
-    }
+    QPoint arrowPos(option.rect.topLeft() + QPoint(option.rect.height()*1/2, 0));
+    QSize arrowSz(QSize(option.rect.height(), option.rect.height()));
+    QRect arrowRec(arrowPos, arrowSz);
+    arrow.paint(painter, arrowRec);
 }
 
-void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option, const LoginItem *pLoginItem) const
+void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option,  const LoginItem *pLoginItem) const
 {
     if (pLoginItem != nullptr)
     {
         ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
-
         if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
         {
+            if (pLoginItem->favorite() == Common::FAV_NOT_SET)
+                paintArrow(painter, option);
+            else
+                paintFavorite(painter, option, pLoginItem->favorite());
+
             QPen pen;
-            QString sDisplayedData = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
-
-            qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
-            painter->setRenderHint(QPainter::Antialiasing, true);
-
-            QFont f = loginFont();
-            const QFontMetrics serviceMetrics = QFontMetrics{f};
-
-            QRect dstRect = option.rect;
-            int delta = 4;
-            QRect otherRect(dstRect.width() - serviceMetrics.width(sDisplayedData) - delta,
-                            dstRect.y() + (dstRect.height() - serviceMetrics.height()) / 2,
-                            serviceMetrics.width(sDisplayedData) + delta,
-                            dstRect.height());
-
-            pen.setColor(QColor("#666666"));
-            painter->setFont(f);
+            pen.setColor(QColor("#3D96AF"));
             painter->setPen(pen);
-            painter->drawText(otherRect, sDisplayedData);
+            QFont font = qApp->font();
+            font.setBold(true);
+            font.setItalic(true);
+            font.setPointSize(10);
+            painter->setFont(font);
 
-            paintFavorite(painter, option, pLoginItem->favorite());
+            int indent = 0;
+            if (pLoginItem->favorite() == Common::FAV_NOT_SET)
+                indent += option.rect.height() * 2;
+            else
+                indent += option.rect.height();
+            QRect loginRect(option.rect.x() + indent,
+                            option.rect.y(),
+                            option.rect.width() - indent,
+                            option.rect.height());
+
+            painter->drawText(loginRect, Qt::AlignVCenter, pLoginItem->name());
         }
     }
 }
@@ -141,17 +151,17 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
             else
                 bkgColor.setNamedColor("white");
         }
-
         painter->fillRect(option.rect, bkgColor);
 
-        if ((pServiceItem != nullptr) && (!pServiceItem->isExpanded()))
-            paintServiceItem(painter, option, pServiceItem);
-        else if (pLoginItem != nullptr)
+        if ((pServiceItem != nullptr)
+                && (!pServiceItem->isExpanded())
+                && index.column() == 0)
         {
-            ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
-            if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
-                paintLoginItem(painter, option, pLoginItem);
+            paintServiceItem(painter, option, pServiceItem);
         }
+        else if (pLoginItem != nullptr && index.column() == 0)
+            paintLoginItem(painter, option, pLoginItem);
+
         painter->restore();
     }
 

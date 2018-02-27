@@ -99,3 +99,8 @@ bool LoginItem::passwordLocked() const
 {
     return m_bPasswordLocked;
 }
+
+TreeItem::TreeType LoginItem::treeType() const
+{
+    return Login;
+}

@@ -26,7 +26,7 @@ public:
     QString itemLabel() const;
     void setPasswordLocked(bool bVisible);
     bool passwordLocked() const;
-
+    virtual TreeType treeType()  const Q_DECL_OVERRIDE;
 private:    
     QByteArray m_bAddress;
     qint8 m_iFavorite;

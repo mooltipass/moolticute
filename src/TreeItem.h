@@ -11,6 +11,7 @@ class TreeItem
 {
 public:
     enum Status {USED=0, UNUSED};
+    enum TreeType {Root = 0, Service, Login, Base};
     virtual ~TreeItem();
 
     const QString &name() const;
@@ -20,6 +21,7 @@ public:
     const Status &status() const;
     void setStatus(const Status &eStatus);
     const QDate &updatedDate() const;
+    virtual QDate bestUpdateDate(Qt::SortOrder order) const;
     void setUpdatedDate(const QDate &dDate);
     const QDate &accessedDate() const;
     void setAccessedDate(const QDate &dDate);
@@ -35,6 +37,7 @@ public:
     void addChild(TreeItem *pItem);
     bool removeOne(TreeItem *pItem);
     void clear();
+    virtual TreeType treeType()  const;
 
 protected:
     explicit TreeItem(const QString &sName = "",
