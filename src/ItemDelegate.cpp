@@ -103,23 +103,20 @@ void ItemDelegate::paintLoginItem(QPainter *painter
                 paintArrow(painter, option);
             else
                 paintFavorite(painter, option, pLoginItem->favorite());
+
+            QPen pen;
+            pen.setColor(QColor("#3D96AF"));
+            painter->setPen(pen);
+            QFont font = qApp->font();
+            font.setBold(true);
+            font.setItalic(true);
+            font.setPointSize(10);
+            painter->setFont(font);
+
+            QString indent(8, ' ');
+            painter->drawText(option.rect, Qt::AlignVCenter, indent + pLoginItem->name());
         }
     }
-}
-
-void ItemDelegate::paintDate(QPainter *painter, const QStyleOptionViewItem &option, const LoginItem *pLoginItem) const
-{
-    QPen pen;
-    QString sDisplayedData = pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate);
-
-    qApp->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter);
-    painter->setRenderHint(QPainter::Antialiasing, true);
-
-    QFont f = loginFont();
-    pen.setColor(QColor("#666666"));
-    painter->setFont(f);
-    painter->setPen(pen);
-    painter->drawText(option.rect, Qt::AlignVCenter, sDisplayedData);
 }
 
 void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -156,12 +153,6 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         {
             paintServiceItem(painter, option, pServiceItem);
         }
-        //else if (pLoginItem != nullptr && index.column() == 1)
-        //{
-        //    ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
-        //    if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
-        //        paintDate(painter, option, pLoginItem);
-        //}
         else if (pLoginItem != nullptr && index.column() == 0)
             paintLoginItem(painter, option, pLoginItem);
 
