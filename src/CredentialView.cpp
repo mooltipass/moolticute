@@ -32,6 +32,7 @@ CredentialView::CredentialView(QWidget *parent) : QTreeView(parent)
     setMinimumWidth(430);
     connect(this, &CredentialView::clicked, this, &CredentialView::onToggleExpandedState);
     header()->setStyleSheet(CSS_CREDVIEW_HEADER);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 CredentialView::~CredentialView()
