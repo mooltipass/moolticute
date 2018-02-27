@@ -76,8 +76,7 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
         painter->drawText(iconRect, Qt::AlignCenter , sFavNumber);
 }
 
-void ItemDelegate::paintArrow(QPainter *painter
-                              , const QStyleOptionViewItem &option) const
+void ItemDelegate::paintArrow(QPainter *painter, const QStyleOptionViewItem &option) const
 {
     QIcon arrow = AppGui::qtAwesome()->icon(fa::arrowcircleright
                                     , {{ "color", QColor("#0097a7") }
@@ -90,9 +89,7 @@ void ItemDelegate::paintArrow(QPainter *painter
     arrow.paint(painter, arrowRec);
 }
 
-void ItemDelegate::paintLoginItem(QPainter *painter
-                                  , const QStyleOptionViewItem &option
-                                  ,  const LoginItem *pLoginItem) const
+void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option,  const LoginItem *pLoginItem) const
 {
     if (pLoginItem != nullptr)
     {
@@ -113,8 +110,17 @@ void ItemDelegate::paintLoginItem(QPainter *painter
             font.setPointSize(10);
             painter->setFont(font);
 
-            QString indent(8, ' ');
-            painter->drawText(option.rect, Qt::AlignVCenter, indent + pLoginItem->name());
+            int indent = 0;
+            if (pLoginItem->favorite() == Common::FAV_NOT_SET)
+                indent += option.rect.height() * 2;
+            else
+                indent += option.rect.height();
+            QRect loginRect(option.rect.x() + indent,
+                            option.rect.y(),
+                            option.rect.width() - indent,
+                            option.rect.height());
+
+            painter->drawText(loginRect, Qt::AlignVCenter, pLoginItem->name());
         }
     }
 }
