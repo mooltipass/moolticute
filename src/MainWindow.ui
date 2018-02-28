@@ -1384,8 +1384,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </size>
                 </property>
                </spacer>
-              </item>             
-			 </layout>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
@@ -1657,7 +1657,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               <item>
                <widget class="QLabel" name="label_backupControlsTitle">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
