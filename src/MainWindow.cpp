@@ -547,10 +547,14 @@ void MainWindow::updatePage()
     ui->label_14->setVisible(!isCardUnknown);
     ui->checkBoxExport->setVisible(!isCardUnknown);
     ui->pushButtonExportFile->setVisible(!isCardUnknown);
+    ui->label_exportDBHelp->setVisible(!isCardUnknown);
+    ui->label_MooltiAppHelp->setVisible(!isCardUnknown);
 
     ui->label_27->setVisible(!isCardUnknown);
     ui->label_29->setVisible(!isCardUnknown);
     ui->pushButtonIntegrity->setVisible(!isCardUnknown);
+    ui->label_integrityCheckHelp->setVisible(!isCardUnknown);
+
 
     // When an import db operation is peformed in an unknown card
     // don't change the page until the operation is finished
