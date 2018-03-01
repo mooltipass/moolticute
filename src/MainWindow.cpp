@@ -864,6 +864,7 @@ void MainWindow::wantSaveCredentialManagement()
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         }
 
+        updatePage();
         updateTabButtons();
     });
 }
@@ -1210,9 +1211,6 @@ void MainWindow::enableCredentialsManagement(bool enable)
         else if (ui->pushButtonFiles->isChecked())
             ui->stackedWidget->setCurrentWidget(ui->pageFiles);
     }
-
-    if (!enable)
-        updatePage();
 
     updateTabButtons();
 }
