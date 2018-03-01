@@ -146,6 +146,13 @@ bool AppGui::initialize()
     wsClient = new WSClient(this);
     connect(wsClient, &WSClient::connectedChanged, this, &AppGui::connectedChanged);
     connect(wsClient, &WSClient::statusChanged, this, &AppGui::updateSystrayTooltip);
+    connect(wsClient, &WSClient::statusChanged, [this]()
+    {
+        if (wsClient->get_status() == Common::UnkownSmartcad)
+           mainWindowShow();
+    });
+
+
     connectedChanged();
 
     if (!autoLaunched)
