@@ -39,7 +39,8 @@ void DbExportsRegistryController::setWSClient(WSClient *wsClient)
 void DbExportsRegistryController::hidePrompt()
 {
     isExportRequestMessageVisible = false;
-    window->hidePrompt();
+    if (window)
+        window->hidePrompt();
 }
 
 void DbExportsRegistryController::handleCardIdChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber)
@@ -100,7 +101,8 @@ void DbExportsRegistryController::handleDbExportRecommended()
 void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool success)
 {
     disconnect(wsClient, &WSClient::dbExported, this, &DbExportsRegistryController::handleExportDbResult);
-    window->handleBackupExported();
+    if (window)
+        window->handleBackupExported();
 
     if (success)
     {
@@ -141,6 +143,7 @@ void DbExportsRegistryController::exportDbBackup()
 
     QString format = "SympleCrypt";
 
-    window->wantExportDatabase();
+    if (window)
+        window->wantExportDatabase();
     wsClient->exportDbFile(format);
 }
