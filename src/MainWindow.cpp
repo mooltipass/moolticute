@@ -864,6 +864,7 @@ void MainWindow::wantSaveCredentialManagement()
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         }
 
+        disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
         updatePage();
         updateTabButtons();
     });
@@ -1202,8 +1203,6 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
 
 void MainWindow::enableCredentialsManagement(bool enable)
 {
-    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
-
     if (enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
     {
         if (ui->pushButtonCred->isChecked())
