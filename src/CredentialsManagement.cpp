@@ -207,6 +207,7 @@ void CredentialsManagement::on_buttonSaveChanges_clicked()
 {
     saveSelectedCredential();
 
+    ui->stackedWidget->setCurrentWidget(ui->pageLocked);
     wsClient->sendCredentialsMM(m_pCredModel->getJsonChanges());
     emit wantSaveMemMode(); //waits for the daemon to process the data
     m_pCredModel->clear();
