@@ -6608,6 +6608,14 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                                                            sdata,
                                                            [=](const QByteArray &data, bool &) -> bool
                     {
+                        QVariantMap qmapdata = {
+                            {"total", mmmPasswordChangeArray.size()},
+                            {"current", i},
+                            {"msg", "%1/%2: Please Approve Password Storage" },
+                            {"msg_args", QVariantList({mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1]})}
+                        };
+                        cbProgress(qmapdata);
+
                         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
                         {
                             qWarning() << "context " << mmmPasswordChangeArray[i][0] << " does not exist";
