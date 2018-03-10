@@ -6658,8 +6658,9 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
                         {
                             pwdChangeJobs->setCurrentJobError("set_password failed on device");
-                            qWarning() << "failed to set_password";
-                            return false;
+                            qWarning() << "failed to set_password for " << mmmPasswordChangeArray[i][0];
+                            /* Below: no call back as the user can approve the next changes */
+                            //return false;
                         }
                         qDebug() << "set_password ok";
                         return true;
