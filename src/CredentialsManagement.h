@@ -102,6 +102,8 @@ private:
 
     void setFilterCredLayout();
     
+    LoginItem * tryGetSelectedLogin();
+
 signals:
     void wantEnterMemMode();
     void wantSaveMemMode();
