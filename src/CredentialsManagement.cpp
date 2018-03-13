@@ -281,18 +281,42 @@ void CredentialsManagement::on_addCredentialButton_clicked()
     }
 }
 
+LoginItem * CredentialsManagement::tryGetSelectedLogin()
+{
+    const QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
+    const QModelIndex realCurrent = pSelectionModel->currentIndex();
+
+    LoginItem *loginItem = nullptr;
+    if (realCurrent.isValid())
+    {
+        auto sourceIndex = getSourceIndexFromProxyIndex(realCurrent);
+        loginItem  = m_pCredModel->getLoginItemByIndex(sourceIndex);
+    }
+
+    return loginItem;
+}
+
 void CredentialsManagement::onPasswordUnlocked(const QString & service, const QString & login,
                                                const QString & password, bool success)
 {
-    if (!success)
+    if (success)
     {
-        ui->credDisplayPasswordInput->setPlaceholderText(tr("Password Query Was Denied"));
-        return;
-    }
+        LoginItem *selectedLogin = tryGetSelectedLogin();
+        TreeItem *serviceItem = nullptr;
+        if (selectedLogin)
+            serviceItem = dynamic_cast<ServiceItem *>(selectedLogin->parentItem());
 
-    m_pCredModel->setClearTextPassword(service, login, password);
-    ui->credDisplayPasswordInput->setText(password);
-    ui->credDisplayPasswordInput->setLocked(false);
+        if (selectedLogin && serviceItem)
+        {
+            if (service == serviceItem->name() && login == selectedLogin->name())
+            {
+                m_pCredModel->setClearTextPassword(service, login, password);
+                ui->credDisplayPasswordInput->setText(password);
+                ui->credDisplayPasswordInput->setLocked(false);
+            }
+        }
+    } else
+        ui->credDisplayPasswordInput->setPlaceholderText(tr("Password Query Was Denied"));
 }
 
 void CredentialsManagement::onCredentialUpdated(const QString & service, const QString & login, const QString & description, bool success)
