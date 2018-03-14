@@ -60,6 +60,8 @@ void AnimatedColorButton::mousePressEvent(QMouseEvent *event)
     if (enabled &&
         !m_tTimer.isActive())
     {
+        originalText = text();
+        setText(tr("Hold to Confirm"));
         m_tTimer.start();
         m_pAnimation->start();
 
@@ -93,6 +95,8 @@ void AnimatedColorButton::reset()
     m_pAnimation->stop();
     bar->setMinimumWidth(0);
     bar->setMaximumWidth(0);
+
+    setText(originalText);
 }
 
 void AnimatedColorButton::resizeEvent(QResizeEvent *event)

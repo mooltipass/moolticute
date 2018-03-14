@@ -10,7 +10,7 @@ class AnimatedColorButton : public QPushButton
 {
     Q_OBJECT
     Q_PROPERTY(int progress READ getProgress WRITE setProgress)
-
+    QString originalText;
 public:
     AnimatedColorButton(QWidget *parent = nullptr, int iAnimationDuration = 1300);
 
