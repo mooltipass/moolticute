@@ -165,7 +165,7 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent):
     m_refreshBtn->setShortcut(QKeySequence(Qt::Key_F5));
 
     m_passwordLabel = new QLabel;
-    m_passwordLabel->setFixedWidth(QFontMetrics(m_passwordLabel->font()).averageCharWidth() * 40 );
+    m_passwordLabel->setMinimumWidth(QFontMetrics(m_passwordLabel->font()).averageCharWidth() * 40 );
     m_passwordLabel->setAlignment(Qt::AlignCenter);
     m_passwordLabel->setStyleSheet("font-size: 12pt;");
 
