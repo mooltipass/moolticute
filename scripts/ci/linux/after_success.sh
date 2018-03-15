@@ -61,10 +61,11 @@ sign_binary build/$FILENAME.exe
 ZIPFILE=moolticute_portable_win32_${VERSION}.zip
 pushd $WDIR/..
 mv moolticute_build moolticute_$VERSION
+WDIR=$(pwd)
 zip --compression-method deflate -r $ZIPFILE moolticute_$VERSION
 popd
 
-mv $WDIR/../$ZIPFILE build/
+mv $WDIR/$ZIPFILE build/
 
 #create update manifest
 cat > build/updater.json <<EOF

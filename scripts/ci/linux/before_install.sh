@@ -6,7 +6,8 @@ source $SCRIPTDIR/../funcs.sh
 
 sudo add-apt-repository -y ppa:ubuntu-wine/ppa
 sudo dpkg --add-architecture i386
-sudo apt-get update -qq
+#This take too much time...
+#sudo apt-get update -qq
 sudo apt-get -y install --install-recommends wine1.7
 wget_retry https://calaos.fr/download/misc/InnoSetup5.zip -O $HOME/InnoSetup5.zip
 
