@@ -84,6 +84,9 @@ private:
     QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
 
 private:
+    void disableNonCredentialEditWidgets();
+    void enableNonCredentialEditWidgets();
+
     void changeCurrentFavorite(int iFavorite);
     virtual void changeEvent(QEvent *event);
 

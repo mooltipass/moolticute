@@ -238,6 +238,8 @@ void CredentialsManagement::requestPasswordForSelectedItem()
         if (pItem != nullptr) {
             wsClient->requestPassword(pItem->name(), pLoginItem->name());
             ui->credDisplayPasswordInput->setPlaceholderText(tr("Please Approve On Device"));
+
+            setEnabled(false);
         }
     }
 }
@@ -299,6 +301,8 @@ LoginItem * CredentialsManagement::tryGetSelectedLogin()
 void CredentialsManagement::onPasswordUnlocked(const QString & service, const QString & login,
                                                const QString & password, bool success)
 {
+    setEnabled(true);
+
     if (success)
     {
         LoginItem *selectedLogin = tryGetSelectedLogin();
@@ -458,6 +462,8 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
     {
         ui->pushButtonCancel->hide();
         ui->pushButtonConfirm->hide();
+
+        enableNonCredentialEditWidgets();
     }
     else
     {
@@ -478,17 +484,23 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
             {
                 ui->pushButtonCancel->show();
                 ui->pushButtonConfirm->show();
+
+                disableNonCredentialEditWidgets();
             }
             else
             {
                 ui->pushButtonCancel->hide();
                 ui->pushButtonConfirm->hide();
+
+                enableNonCredentialEditWidgets();
             }
         }
         else
         {
             ui->pushButtonCancel->hide();
             ui->pushButtonConfirm->hide();
+
+            enableNonCredentialEditWidgets();
         }
     }
 }
@@ -670,6 +682,18 @@ QModelIndex CredentialsManagement::getSourceIndexFromProxyIndex(const QModelInde
 QModelIndex CredentialsManagement::getProxyIndexFromSourceIndex(const QModelIndex &srcIndex)
 {
     return m_pCredModelFilter->mapFromSource(srcIndex);
+}
+
+void CredentialsManagement::disableNonCredentialEditWidgets()
+{
+    ui->quickInsertWidget->setEnabled(false);
+    ui->credentialsListWdiget->setEnabled(false);
+}
+
+void CredentialsManagement::enableNonCredentialEditWidgets()
+{
+    ui->quickInsertWidget->setEnabled(true);
+    ui->credentialsListWdiget->setEnabled(true);
 }
 
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)

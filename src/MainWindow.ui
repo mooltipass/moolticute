@@ -1315,7 +1315,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>?</string>
+                 <string notr="true">?</string>
                 </property>
                </widget>
               </item>
@@ -1367,8 +1367,11 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               </item>
               <item>
                <widget class="QLabel" name="label_MooltiAppHelp">
+                <property name="toolTip">
+                 <string notr="true"/>
+                </property>
                 <property name="text">
-                 <string>?</string>
+                 <string notr="true">?</string>
                 </property>
                </widget>
               </item>
@@ -1455,8 +1458,11 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="toolTip">
+                 <string notr="true"/>
+                </property>
                 <property name="text">
-                 <string>?</string>
+                 <string notr="true">?</string>
                 </property>
                </widget>
               </item>
@@ -1578,8 +1584,11 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="toolTip">
+                 <string notr="true"/>
+                </property>
                 <property name="text">
-                 <string>?</string>
+                 <string notr="true">?</string>
                 </property>
                </widget>
               </item>
@@ -1682,8 +1691,11 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="toolTip">
+                 <string notr="true"/>
+                </property>
                 <property name="text">
-                 <string>?</string>
+                 <string notr="true">?</string>
                 </property>
                </widget>
               </item>
