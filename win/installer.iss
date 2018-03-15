@@ -16,7 +16,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={userpf}\{#MyAppName}
 DefaultGroupName=Moolticute
 DisableProgramGroupPage=no
 OutputDir=build
@@ -28,7 +28,7 @@ WizardSmallImageFile=WizModernSmallImage-IS.bmp
 SetupIconFile=Setup.ico
 UninstallDisplayIcon={app}\moolticute.exe
 MinVersion=0,5.01sp3
-PrivilegesRequired=admin
+PrivilegesRequired=lowest
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -54,9 +54,10 @@ Name: "Full"; Description: "Full installation"
 Name: "moolticute"; Description: "Moolticute"; Types: Full
 
 [Run]
-Filename: "{app}\redist\vcredist_sp1_x86.exe"; Parameters: "/q /NoSetupVersionCheck"; WorkingDir: "{app}\redist"; StatusMsg: "Installing Visual Studio 2010 C++ CRT Libraries..."; Components: moolticute
-Filename: "{app}\redist\Win32OpenSSL_Light-1_0_2L.exe"; Parameters: "/silent /verysilent /sp- /suppressmsgboxes"; WorkingDir: "{app}\redist"; StatusMsg: "Installing OpenSSL libraries..."; Components: moolticute
 Filename: "{app}\moolticute.exe"; WorkingDir: "{app}"; Description: "Start Moolticute"; Flags: postinstall nowait skipifsilent runascurrentuser
+
+[Registry]
+Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Moolticute"; ValueData: "{app}\moolticute.exe --autolaunched"; Flags: uninsdeletevalue
 
 [Code]
 // function IsModuleLoaded to call at install time
@@ -157,46 +158,4 @@ begin
   // Unload the DLL, otherwise the dll psvince is not deleted
   UnloadDLL(ExpandConstant('{app}\psvince.dll'));
  
-end;
-
-//Install the registry key for autostart
-procedure CurStepChanged(CurStep: TSetupStep);
-var
-  Params: string;
-  ResultCode: Integer;
-begin
-  if CurStep = ssPostInstall then
-  begin
-    Log('Adding registry key for original user');
-    Params := 'ADD HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v Moolticute /t REG_SZ /d "' + ExpandConstant('{app}') + '\moolticute.exe --autolaunched" /f';
-    if ExecAsOriginalUser(
-         'reg.exe', Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and
-       (ResultCode = 0) then
-    begin
-      Log('Added registry key for original user');
-    end
-      else
-    begin
-      Log('Error adding registry key for original user');
-	  Params := 'ADD HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v Moolticute /t REG_SZ /d "' + ExpandConstant('{app}') + '\moolticute.exe --autolaunched" /f';
-	  Exec('reg.exe', Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
-    end;
-  end;
-end;
-
-procedure CurUninstallStepChanged(CurStep: TUninstallStep);
-var
-  Params: string;
-  ResultCode: Integer;
-begin
-  if CurStep = usPostUninstall then
-  begin
-    Log('Removing autostart reg keys in HKCU');
-    Params := 'DELETE HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v Moolticute /f';
-    ShellExec('runas', 'reg.exe', Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-
-    Log('Removing autostart reg keys in HKLM');
-    Params := 'DELETE HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v Moolticute /f';
-	  Exec('reg.exe', Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
-  end;
 end;

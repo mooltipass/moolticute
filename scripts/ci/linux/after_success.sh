@@ -22,14 +22,14 @@ mkdir -p $WDIR/redist
 #Get 3rd party tools
 wget_retry https://calaos.fr/mooltipass/tools/windows/mc-agent.exe -O $WDIR/mc-agent.exe
 wget_retry https://calaos.fr/mooltipass/tools/windows/mc-cli.exe -O $WDIR/mc-cli.exe
-wget_retry https://calaos.fr/download/misc/redist/Win32OpenSSL_Light-1_0_2L.exe -O $WDIR/redist/Win32OpenSSL_Light-1_0_2L.exe
-wget_retry https://calaos.fr/download/misc/redist/vcredist_sp1_x86.exe -O $WDIR/redist/vcredist_sp1_x86.exe
 
 for f in $MXE_BIN/bin/libgcc_s_sjlj-1.dll \
          $MXE_BIN/bin/libstdc++-6.dll \
          $MXE_BIN/bin/libwinpthread-1.dll \
          $MXE_BIN/bin/libwebp-5.dll \
          $MXE_BIN/bin/zlib1.dll \
+         $MXE_BIN/bin/ssleay32.dll \
+         $MXE_BIN/bin/libeay32.dll \
          $MXE_BIN/bin/icudt56.dll \
          $MXE_BIN/bin/icuin56.dll \
          $MXE_BIN/bin/icuuc56.dll \
@@ -56,6 +56,15 @@ chmod +x iscc
 ./iscc build.iss
 
 sign_binary build/$FILENAME.exe
+
+#Create a portable zip for windows
+ZIPFILE=moolticute_portable_win32_${VERSION}.zip
+pushd $WDIR/..
+mv moolticute_build moolticute_$VERSION
+zip --compression-method deflate -r $ZIPFILE moolticute_$VERSION
+popd
+
+mv $WDIR/../$ZIPFILE build/
 
 #create update manifest
 cat > build/updater.json <<EOF
