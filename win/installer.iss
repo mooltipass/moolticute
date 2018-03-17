@@ -105,29 +105,22 @@ begin
     ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im moolticuted.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
   END
 
-  if RegKeyExists(HKEY_LOCAL_MACHINE,
-    'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1') then
+  if RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1') then
   begin
-    RegQueryStringValue(HKEY_LOCAL_MACHINE,
-      'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1',
-      'DisplayVersion', oldVersion);
+    RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1','DisplayVersion', oldVersion);
     if (CompareVersion(oldVersion, '{#MyAppVersion}') < 0) then
     begin
-      if MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. Do you want to replace this version with {#MyAppVersion}?',
-        mbConfirmation, MB_YESNO) = IDNO then
+      if MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. Do you want to replace this version with {#MyAppVersion}?', mbConfirmation, MB_YESNO) = IDNO then
       begin
         Result := False;
       end
       else
       begin
-          RegQueryStringValue(HKEY_LOCAL_MACHINE,
-            'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1',
-            'UninstallString', uninstaller);
+          RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1', 'UninstallString', uninstaller);
           ShellExec('', uninstaller, 'SILENT', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
           if (ErrorCode <> 0) then
           begin
-            MsgBox( 'Failed to uninstall Moolticute version ' + oldVersion + '. Please restart Windows and run setup again.',
-             mbError, MB_OK );
+            MsgBox( 'Failed to uninstall Moolticute version ' + oldVersion + '. Please restart Windows and run setup again.', mbError, MB_OK );
             Result := False;
           end
           else
@@ -138,35 +131,27 @@ begin
     end
     else
     begin
-      MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. This installer will exit.',
-        mbInformation, MB_OK);
+      MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. This installer will exit.', mbInformation, MB_OK);
       Result := False;
     end;
   end
   else
-  if RegKeyExists(HKEY_CURRENT_USER,
-    'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1') then
+  if RegKeyExists(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1') then
   begin
-    RegQueryStringValue(HKEY_CURRENT_USER,
-      'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1',
-      'DisplayVersion', oldVersion);
+    RegQueryStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1', 'DisplayVersion', oldVersion);
     if (CompareVersion(oldVersion, '{#MyAppVersion}') < 0) then
     begin
-      if MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. Do you want to replace this version with {#MyAppVersion}?',
-        mbConfirmation, MB_YESNO) = IDNO then
+      if MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. Do you want to replace this version with {#MyAppVersion}?', mbConfirmation, MB_YESNO) = IDNO then
       begin
         Result := False;
       end
       else
       begin
-          RegQueryStringValue(HKEY_CURRENT_USER,
-            'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1',
-            'UninstallString', uninstaller);
+          RegQueryStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1', 'UninstallString', uninstaller);
           ShellExec('', uninstaller, 'SILENT', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
           if (ErrorCode <> 0) then
           begin
-            MsgBox( 'Failed to uninstall Moolticute version ' + oldVersion + '. Please restart Windows and run setup again.',
-             mbError, MB_OK );
+            MsgBox( 'Failed to uninstall Moolticute version ' + oldVersion + '. Please restart Windows and run setup again.', mbError, MB_OK );
             Result := False;
           end
           else
@@ -177,8 +162,7 @@ begin
     end
     else
     begin
-      MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. This installer will exit.',
-        mbInformation, MB_OK);
+      MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. This installer will exit.', mbInformation, MB_OK);
       Result := False;
     end;
   end
