@@ -38,7 +38,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "C:\moolticute_build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: moolticute;
-Source: "psvince.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: moolticute;
 
 [Icons]
 Name: "{group}\Moolticute"; Filename: "{app}\moolticute.exe"; Components: moolticute
@@ -60,15 +59,21 @@ Filename: "{app}\moolticute.exe"; WorkingDir: "{app}"; Description: "Start Moolt
 Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Moolticute"; ValueData: "{app}\moolticute.exe --autolaunched"; Flags: uninsdeletevalue
 
 [Code]
-// function IsModuleLoaded to call at install time
-// added also setuponly flag
-function IsModuleLoaded(modulename: String ):  Boolean;
-external 'IsModuleLoaded@files:psvince.dll stdcall setuponly';
- 
-// function IsModuleLoadedU to call at uninstall time
-// added also uninstallonly flag
-function IsModuleLoadedU(modulename: String ):  Boolean;
-external 'IsModuleLoaded@{app}\psvince.dll stdcall uninstallonly' ;
+function IsAppRunning(const FileName : string): Boolean;
+var
+    FSWbemLocator: Variant;
+    FWMIService   : Variant;
+    FWbemObjectSet: Variant;
+begin
+    Result := false;
+    FSWbemLocator := CreateOleObject('WBEMScripting.SWBEMLocator');
+    FWMIService := FSWbemLocator.ConnectServer('', 'root\CIMV2', '', '');
+    FWbemObjectSet := FWMIService.ExecQuery(Format('SELECT Name FROM Win32_Process Where Name="%s"',[FileName]));
+    Result := (FWbemObjectSet.Count > 0);
+    FWbemObjectSet := Unassigned;
+    FWMIService := Unassigned;
+    FSWbemLocator := Unassigned;
+end;
  
 function CompareVersion(str1, str2: String): Integer;
 var
@@ -92,14 +97,14 @@ var
   uninstaller: String;
   ErrorCode: Integer;
 begin
-  if IsModuleLoaded( 'moolticute.exe' ) or IsModuleLoaded( 'moolticuted.exe' ) then
-  begin
-    MsgBox( 'Moolticute is running, please close it and run setup again.',
-             mbError, MB_OK );
-    Result := False;
-    Exit;
-  end;
- 
+  
+  Result := true;
+  if IsAppRunning( 'moolticute.exe' ) or IsAppRunning( 'moolticuted.exe' ) then
+  BEGIN
+    ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im moolticute.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+    ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im moolticuted.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+  END
+
   if RegKeyExists(HKEY_LOCAL_MACHINE,
     'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1') then
   begin
@@ -118,7 +123,7 @@ begin
           RegQueryStringValue(HKEY_LOCAL_MACHINE,
             'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1',
             'UninstallString', uninstaller);
-          ShellExec('runas', uninstaller, '/SILENT', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+          ShellExec('', uninstaller, 'SILENT', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
           if (ErrorCode <> 0) then
           begin
             MsgBox( 'Failed to uninstall Moolticute version ' + oldVersion + '. Please restart Windows and run setup again.',
@@ -139,23 +144,55 @@ begin
     end;
   end
   else
+  if RegKeyExists(HKEY_CURRENT_USER,
+    'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1') then
   begin
-    Result := True;
-  end;
+    RegQueryStringValue(HKEY_CURRENT_USER,
+      'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1',
+      'DisplayVersion', oldVersion);
+    if (CompareVersion(oldVersion, '{#MyAppVersion}') < 0) then
+    begin
+      if MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. Do you want to replace this version with {#MyAppVersion}?',
+        mbConfirmation, MB_YESNO) = IDNO then
+      begin
+        Result := False;
+      end
+      else
+      begin
+          RegQueryStringValue(HKEY_CURRENT_USER,
+            'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1',
+            'UninstallString', uninstaller);
+          ShellExec('', uninstaller, 'SILENT', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+          if (ErrorCode <> 0) then
+          begin
+            MsgBox( 'Failed to uninstall Moolticute version ' + oldVersion + '. Please restart Windows and run setup again.',
+             mbError, MB_OK );
+            Result := False;
+          end
+          else
+          begin
+            Result := True;
+          end;
+      end;
+    end
+    else
+    begin
+      MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. This installer will exit.',
+        mbInformation, MB_OK);
+      Result := False;
+    end;
+  end
 end;
  
 function InitializeUninstall(): Boolean;
+var
+  ErrorCode: Integer;
 begin
- 
-  if IsModuleLoadedU( 'moolticute.exe' ) or IsModuleLoadedU( 'moolticuted.exe' ) then
-  begin
-    MsgBox( 'Moolticute is running, please close it and run again uninstall.',
-             mbError, MB_OK );
-    Result := false;
-  end
-  else Result := true;
-
-  // Unload the DLL, otherwise the dll psvince is not deleted
-  UnloadDLL(ExpandConstant('{app}\psvince.dll'));
- 
+  Result := true;
+   if IsAppRunning( 'moolticute.exe' ) or IsAppRunning( 'moolticuted.exe' ) then
+  BEGIN
+    ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im moolticute.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+    ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im moolticuted.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+  END
 end;
+
