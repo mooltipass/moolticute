@@ -94,6 +94,9 @@ then
     esac
 fi
 
+#fix https://github.com/mooltipass/moolticute/issues/245
+export QT_XKB_CONFIG_ROOT=/usr/share/X11/xkb
+
 if (( $DAEMON_ONLY == 1 )) ;
 then
     echo "Running daemon only"
