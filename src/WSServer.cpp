@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "WSServer.h"
 #include "WSServerCon.h"
+#include "AppDaemon.h"
 
 WSServer::WSServer()
 {
@@ -29,7 +30,7 @@ bool WSServer::initialize()
                                     QWebSocketServer::NonSecureMode,
                                     this);
 
-    if (wsServer->listen(QHostAddress::Any, MOOLTICUTE_DAEMON_PORT))
+    if (wsServer->listen(AppDaemon::getListenAddress(), MOOLTICUTE_DAEMON_PORT))
     {
         qDebug() << "Moolticute daemon websocket server listening on port " << MOOLTICUTE_DAEMON_PORT;
         connect(wsServer, &QWebSocketServer::newConnection, this, &WSServer::onNewConnection);
