@@ -46,6 +46,7 @@ public:
     bool initialize();
 
     static bool isEmulationMode();
+    static QHostAddress getListenAddress();
 
 private:
     WSServer *wsServer;
@@ -58,6 +59,7 @@ private:
     QLocalServer *localLogServer = nullptr;
 
     static bool emulationMode;
+    static bool anyAddress;
 };
 
 #endif // APPDAEMON_H
