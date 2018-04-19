@@ -75,7 +75,7 @@ EOF
 # Debian package
 echo "Generating changelog for tag ${BUILD_TAG} [${TRAVIS_COMMIT}]"
 
-$DOCKER_EXEC "git clone git@github.com:mooltipass/mooltipass-udev.git mooltipass-udev"
+$DOCKER_EXEC "git clone https://github.com/mooltipass/mooltipass-udev"
 
 rm -f debian/changelog
 
