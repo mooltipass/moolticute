@@ -193,7 +193,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QByteArray d;
         d[0] = 1;
         d[1] = MPCmd::CHECK_PASSWORD;
-        d[2] = 0x01;
+        d[2] = 0x00;
 
         d.resize(64);
         sendReadSignal(d);
