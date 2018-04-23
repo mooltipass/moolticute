@@ -39,7 +39,7 @@ Click the moolticute icon to bring up its window, select the settings tab and cl
 ## Checking for Credentials Storage
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mooltipass/moolticute/master/documentation/ressources/mc_storage.png"/>
+  <img src="https://raw.githubusercontent.com/mooltipass/moolticute/master/documentation/ressources/mc_cred_storage.png"/>
 </p>
   
   
