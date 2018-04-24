@@ -5065,6 +5065,11 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
                     return false;
                 }
             }
+            else if  (encryptionMethod == "none")
+            {
+                /* Legacy, not generated anymore */
+                return readExportPayload(QJsonDocument::fromJson(importFile.value("payload").toString().toUtf8()).array(), errorString);
+            }
             else
             {
                 errorString = "Unknown Encryption Method";
