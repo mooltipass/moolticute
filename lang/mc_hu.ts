@@ -91,7 +91,7 @@
         <location filename="../src/CredentialsManagement.ui" line="62"/>
         <location filename="../src/CredentialsManagement.ui" line="478"/>
         <source>Login</source>
-        <translation>Login</translation>
+        <translation>Felhasználónév</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="90"/>
