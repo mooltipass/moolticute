@@ -3,56 +3,61 @@
 # Provides:          moolticuted
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
-# X-Start-Before:    kdm gdm3 xdm lightdm
-# X-Stop-After:      kdm gdm3 xdm lightdm
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Start the mooltipass password mgmt daemon
+# Default-Start:     3 4 5
+# Default-Stop:      0 1 2 6
+# Short-Description: Start the mooltipass device management daemon
 ### END INIT INFO
 
-set -e
+NAME=moolticuted
+DESC="Mooltipass device management daemon"
+DAEMON=/usr/bin/${NAME}
+DEFAULTS=/etc/default/${NAME}
+PIDFILE=/var/run/${NAME}.pid
 
-DESC="Mooltipass password management daemon"
-DAEMON="/usr/bin/moolticuted"
-DEFAULTS="/etc/default/moolticuted"
-
-# Check for daemon presence
 [ -x "$DAEMON" ] || exit 0
 
 OPTIONS=""
-# Include moolticuted defaults if available
 [ -r "$DEFAULTS" ] && . "$DEFAULTS"
 
-# Get lsb functions
 . /lib/lsb/init-functions
 
-set +e
+f_start () {
+    log_daemon_msg "Starting $DESC" "$DAEMON"
+    start-stop-daemon --start --quiet --oknodo --background --exec "$DAEMON" --make-pidfile --pidfile "$PIDFILE" -- $OPTIONS
+    log_end_msg $?
+    }
+	
+f_stop () {
+    log_daemon_msg "Stopping $DESC" "$DAEMON"
+    start-stop-daemon --stop --quiet --oknodo --retry 2 --exec "$DAEMON" --remove-pidfile --pidfile "$PIDFILE"
+    log_end_msg $?
+    }
+	
+f_reload () {
+    log_daemon_msg "Reloading $DESC" "$DAEMON"
+    start-stop-daemon --stop --signal 1 --exec "$DAEMON" --pidfile "$PIDFILE"
+    log_end_msg $?
+    }
+	
 
 case "$1" in
   start)
-    log_daemon_msg "Starting $DESC" "$DAEMON"
-    start-stop-daemon --start --quiet --oknodo --background --exec "$DAEMON" -- $OPTIONS
-    log_end_msg $?
+    f_start
     ;;
   stop)
-    log_daemon_msg "Stopping $DESC" "$DAEMON"
-    start-stop-daemon --stop --quiet --oknodo --retry 2 --exec "$DAEMON"
-    log_end_msg $?
+    f_stop
     ;;
   restart)
-    $0 stop
-    sleep 1
-    $0 start
+    f_stop
+    f_start
     ;;
   reload|force-reload) 
-    log_daemon_msg "Reloading $DESC" "$DAEMON"
-    start-stop-daemon --stop --signal 1 --exec "$DAEMON"
-    log_end_msg $?
+    f_reload
     ;;
   status)
     status_of_proc "$DAEMON" moolticuted
     ;;
   *)
-    log_success_msg "Usage: /etc/init.d/$DAEMON {start|stop|restart|reload|force-reload|status}"
+    log_success_msg "Usage: /etc/init.d/$NAME {start|stop|restart|reload|force-reload|status}"
     exit 1
 esac
