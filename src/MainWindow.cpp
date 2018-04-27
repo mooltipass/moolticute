@@ -1197,7 +1197,7 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
 {
     ui->UIDRequestLabel->setText(tr("To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.<ol>"
                                     "<li>Get the serial number from the back of your device.</li>"
-                                    "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1\">Send us an email</a> with the serial number, requesting the password.</li>"
+                                    "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO\">Send us an email</a> with the serial number and your order number, requesting the password.</li>"
                                     "<li>Enter the password you received from us</li></ol>").arg(id));
 }
 
