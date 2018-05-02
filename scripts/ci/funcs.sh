@@ -248,6 +248,30 @@ function create_github_release_linux()
     create_release_and_upload_asset $VERSION $ZIP_FILE
 }
 
+function create_beta_release_linux()
+{
+    local VERSION="${1:?Release version required.}"
+    local DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
+    local DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
+    local DEB_FILE="build-linux/deb/${DEB_NAME}"
+    local APPIMAGE_FILE=$(find build-appimage -iname '*.AppImage')
+    local EXE_FILE="$(ls win/build/*.exe 2> /dev/null | head -n 1)"
+    local ZIP_FILE="$(ls win/build/*.zip 2> /dev/null | head -n 1)"
+
+    if [ -z "$VERSION" ]; then
+        >&2 echo -e "Skipping GitHub release creation (current build does not have a tag)"
+        return 0
+    fi
+
+    >&2 echo -e "Creating (Linux) beta release (tag: $VERSION)"
+
+    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DEB_FILE; bye"
+    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $APPIMAGE_FILE; bye"
+    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $EXE_FILE; bye"
+    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $ZIP_FILE; bye"
+    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put build/updater.json; bye"
+}
+
 # Create a a GitHub release for the specified version and upload all applicable assets
 #
 # Usage:
@@ -269,6 +293,17 @@ function create_github_release_osx()
     >&2 echo -e "Creating (OSX) GitHub release (tag: $VERSION)"
 
     create_release_and_upload_asset $VERSION $DMG_FILE
+}
+
+function create_beta_release_osx()
+{
+    local VERSION="${1:?Release version required.}"
+    local DMG_FILE="$(ls build/*.dmg 2> /dev/null | head -n 1)"
+
+    >&2 echo -e "Creating (OSX) beta release (tag: $VERSION)"
+
+    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DMG_FILE; bye"
+    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put build/updater_osx.json; bye"
 }
 
 function osx_setup_netrc()
@@ -340,5 +375,10 @@ function find_and_sign()
     Path=$1
     find $Path -iname "*.exe" -type f | while read file; do sign_binary "$file"; done
     find $Path -iname "*.dll" -type f | while read file; do sign_binary "$file"; done
+}
+
+function beginsWith()
+{
+    case $2 in "$1"*) true;; *) false;; esac;
 }
 

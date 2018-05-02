@@ -68,8 +68,9 @@ popd
 mv $WDIR/$ZIPFILE build/
 
 #create update manifest
+#TODO include deb and appimage
 cat > build/updater.json <<EOF
-{ "updates": { "windows": { "latest-version": "$VERSION", "download-url": "https://calaos.fr/mooltipass/windows/$FILENAME.exe" }}}
+{ "updates": { "windows": { "latest-version": "$VERSION", "download-url": "https://mooltipass-tests.com/mc_betas/$FILENAME.exe" }}}
 EOF
 
 # Debian package
@@ -99,14 +100,27 @@ $DOCKER_EXEC \
 echo "Building AppImage"
 $DOCKER_EXEC "scripts/ci/linux/appimage.sh"
 
-# GitHub release
-$DOCKER_EXEC \
-    "export TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG} PROJECT_NAME=${PROJECT_NAME} TRAVIS_OS_NAME=${TRAVIS_OS_NAME} \
-    DEB_VERSION=${DEB_VERSION}; \
-    source /usr/local/bin/tools.sh; \
-    create_github_release_linux ${BUILD_TAG}"
+#Check if this is a test release or not
+if beginsWith testing "$VERSION" ; then
 
-upload_file build/$FILENAME.exe $(sha256sum build/$FILENAME.exe | cut -d' ' -f1) "windows"
-upload_file build/updater.json $(sha256sum build/updater.json | cut -d' ' -f1) "windows"
+    $DOCKER_EXEC \
+        "export TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG} PROJECT_NAME=${PROJECT_NAME} TRAVIS_OS_NAME=${TRAVIS_OS_NAME} \
+        DEB_VERSION=${DEB_VERSION} SFTP_USER=${MC_BETA_UPLOAD_SFTP_USER} SFTP_PASS=${MC_BETA_UPLOAD_SFTP_PASS}; \
+        source /usr/local/bin/tools.sh; \
+        create_beta_release_linux ${BUILD_TAG}"
+
+else
+
+    # GitHub release
+    $DOCKER_EXEC \
+        "export TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG} PROJECT_NAME=${PROJECT_NAME} TRAVIS_OS_NAME=${TRAVIS_OS_NAME} \
+        DEB_VERSION=${DEB_VERSION}; \
+        source /usr/local/bin/tools.sh; \
+        create_github_release_linux ${BUILD_TAG}"
+
+# upload_file build/$FILENAME.exe $(sha256sum build/$FILENAME.exe | cut -d' ' -f1) "windows"
+# upload_file build/updater.json $(sha256sum build/updater.json | cut -d' ' -f1) "windows"
+
+fi
 
 popd

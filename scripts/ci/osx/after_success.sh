@@ -96,14 +96,21 @@ echo "Removing keys"
 security delete-keychain $KEYCHAIN
 
 #create update manifest
-cat > build/updater.json <<EOF
-{ "updates": { "osx": { "latest-version": "$VERSION", "download-url": "https://calaos.fr/mooltipass/macos/$APP-$VERSION.dmg" }}}
+cat > build/updater_osx.json <<EOF
+{ "updates": { "osx": { "latest-version": "$VERSION", "download-url": "https://mooltipass-tests.com/mc_betas/$APP-$VERSION.dmg" }}}
 EOF
 
-upload_file build/$APP-$VERSION.dmg $(shasum -a 256 build/$APP-$VERSION.dmg | cut -d' ' -f1) "macos"
-upload_file build/updater.json $(shasum -a 256 build/updater.json | cut -d' ' -f1) "macos"
+# upload_file build/$APP-$VERSION.dmg $(shasum -a 256 build/$APP-$VERSION.dmg | cut -d' ' -f1) "macos"
+# upload_file build/updater.json $(shasum -a 256 build/updater.json | cut -d' ' -f1) "macos"
 
-PATH=${PATH}:$(pwd)/scripts/lib create_github_release_osx ${BUILD_TAG}
+#Check if this is a test release or not
+if beginsWith testing "$VERSION" ; then
+    export SFTP_USER=${MC_BETA_UPLOAD_SFTP_USER}
+    export SFTP_PASS=${MC_BETA_UPLOAD_SFTP_PASS}
+    PATH=${PATH}:$(pwd)/scripts/lib create_beta_release_osx ${BUILD_TAG}
+else
+    PATH=${PATH}:$(pwd)/scripts/lib create_github_release_osx ${BUILD_TAG}
+fi
 
 exit 0
 
