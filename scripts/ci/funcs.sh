@@ -382,3 +382,8 @@ function beginsWith()
     case $2 in "$1"*) true;; *) false;; esac;
 }
 
+function endsWith()
+{
+    case $2 in *"$1") true;; *) false;; esac;
+}
+

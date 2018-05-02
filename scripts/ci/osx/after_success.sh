@@ -104,7 +104,7 @@ EOF
 # upload_file build/updater.json $(shasum -a 256 build/updater.json | cut -d' ' -f1) "macos"
 
 #Check if this is a test release or not
-if beginsWith testing "$VERSION" ; then
+if endsWith -testing "$VERSION" ; then
     export SFTP_USER=${MC_BETA_UPLOAD_SFTP_USER}
     export SFTP_PASS=${MC_BETA_UPLOAD_SFTP_PASS}
     PATH=${PATH}:$(pwd)/scripts/lib create_beta_release_osx ${BUILD_TAG}

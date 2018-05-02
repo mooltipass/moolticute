@@ -101,7 +101,7 @@ echo "Building AppImage"
 $DOCKER_EXEC "scripts/ci/linux/appimage.sh"
 
 #Check if this is a test release or not
-if beginsWith testing "$VERSION" ; then
+if endsWith -testing "$VERSION" ; then
 
     $DOCKER_EXEC \
         "export TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG} PROJECT_NAME=${PROJECT_NAME} TRAVIS_OS_NAME=${TRAVIS_OS_NAME} \
