@@ -97,11 +97,16 @@ security delete-keychain $KEYCHAIN
 
 #create update manifest
 cat > build/updater_osx.json <<EOF
-{ "updates": { "osx": { "latest-version": "$VERSION", "download-url": "https://mooltipass-tests.com/mc_betas/$APP-$VERSION.dmg" }}}
+[{
+    "tag_name": "$VERSION",
+    "html_url": "https://mooltipass-tests.com/mc_betas/$VERSION",
+    "body": "",
+    "assets": [{
+        "name": "$APP-$VERSION",
+        "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$APP-$VERSION.dmg"
+    }]
+}]
 EOF
-
-# upload_file build/$APP-$VERSION.dmg $(shasum -a 256 build/$APP-$VERSION.dmg | cut -d' ' -f1) "macos"
-# upload_file build/updater.json $(shasum -a 256 build/updater.json | cut -d' ' -f1) "macos"
 
 #Check if this is a test release or not
 if endsWith -testing "$VERSION" ; then

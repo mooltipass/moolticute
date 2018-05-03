@@ -67,12 +67,6 @@ popd
 
 mv $WDIR/$ZIPFILE build/
 
-#create update manifest
-#TODO include deb and appimage
-cat > build/updater.json <<EOF
-{ "updates": { "windows": { "latest-version": "$VERSION", "download-url": "https://mooltipass-tests.com/mc_betas/$FILENAME.exe" }}}
-EOF
-
 # Debian package
 echo "Generating changelog for tag ${BUILD_TAG} [${TRAVIS_COMMIT}]"
 
@@ -100,6 +94,38 @@ $DOCKER_EXEC \
 echo "Building AppImage"
 $DOCKER_EXEC "scripts/ci/linux/appimage.sh"
 
+#create update manifest
+DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
+DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
+APPIMAGE_FILE=$(basename $(find build-appimage -iname '*.AppImage'))
+ZIP_FILE="$(basename $(ls build/*.zip 2> /dev/null | head -n 1))"
+
+cat > ../build/updater.json <<EOF
+[{
+    "tag_name": "$VERSION",
+    "html_url": "https://mooltipass-tests.com/mc_betas/$VERSION",
+    "body": "",
+    "assets": [
+        {
+            "name": "$FILENAME.exe",
+            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$FILENAME.exe"
+        },
+        {
+            "name": "$DEB_NAME",
+            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$DEB_NAME"
+        },
+        {
+            "name": "$APPIMAGE_FILE",
+            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$APPIMAGE_FILE"
+        },
+        {
+            "name": "$ZIP_FILE",
+            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$ZIP_FILE"
+        }
+    ]
+}]
+EOF
+
 #Check if this is a test release or not
 if endsWith -testing "$VERSION" ; then
 
@@ -117,9 +143,6 @@ else
         DEB_VERSION=${DEB_VERSION}; \
         source /usr/local/bin/tools.sh; \
         create_github_release_linux ${BUILD_TAG}"
-
-# upload_file build/$FILENAME.exe $(sha256sum build/$FILENAME.exe | cut -d' ' -f1) "windows"
-# upload_file build/updater.json $(sha256sum build/updater.json | cut -d' ' -f1) "windows"
 
 fi
 

@@ -268,11 +268,17 @@ function create_beta_release_linux()
     mkdir -p ~/.ssh
     ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
 
-    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DEB_FILE; bye"
-    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $APPIMAGE_FILE; bye"
-    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $EXE_FILE; bye"
-    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $ZIP_FILE; bye"
-    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put build/updater.json; bye"
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com \
+        -e "set sftp:auto-confirm yes; \
+        cd mc_betas; \
+        mkdir -p -f $VERSION; \
+        cd $VERSION; \
+        put $DEB_FILE; \
+        put $APPIMAGE_FILE; \
+        put $EXE_FILE; \
+        put $ZIP_FILE; \
+        put build/updater.json; \
+        bye"
 }
 
 # Create a a GitHub release for the specified version and upload all applicable assets
@@ -308,8 +314,14 @@ function create_beta_release_osx()
     mkdir -p ~/.ssh
     ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
 
-    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DMG_FILE; bye"
-    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put build/updater_osx.json; bye"
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com \
+        -e "set sftp:auto-confirm yes; \
+        cd mc_betas; \
+        mkdir -p -f $VERSION; \
+        cd $VERSION; \
+        put $DMG_FILE; \
+        put build/updater_osx.json; \
+        bye"
 }
 
 function osx_setup_netrc()
