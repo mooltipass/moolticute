@@ -94,38 +94,6 @@ $DOCKER_EXEC \
 echo "Building AppImage"
 $DOCKER_EXEC "scripts/ci/linux/appimage.sh"
 
-#create update manifest
-DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
-DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
-APPIMAGE_FILE=$(basename $(find ../build-appimage -iname '*.AppImage'))
-ZIP_FILE="$(basename $(ls ../build/*.zip 2> /dev/null | head -n 1))"
-
-cat > ../build/updater.json <<EOF
-[{
-    "tag_name": "$VERSION",
-    "html_url": "https://mooltipass-tests.com/mc_betas/$VERSION",
-    "body": "",
-    "assets": [
-        {
-            "name": "$FILENAME.exe",
-            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$FILENAME.exe"
-        },
-        {
-            "name": "$DEB_NAME",
-            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$DEB_NAME"
-        },
-        {
-            "name": "$APPIMAGE_FILE",
-            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$APPIMAGE_FILE"
-        },
-        {
-            "name": "$ZIP_FILE",
-            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$ZIP_FILE"
-        }
-    ]
-}]
-EOF
-
 #Check if this is a test release or not
 if endsWith -testing "$VERSION" ; then
 

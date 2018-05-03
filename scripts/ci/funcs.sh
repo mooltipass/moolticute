@@ -271,6 +271,32 @@ function create_beta_release_linux()
 
     >&2 echo -e "Creating (Linux) beta release (tag: $VERSION)"
 
+    cat > updater.json <<EOF
+[{
+    "tag_name": "$VERSION",
+    "html_url": "https://mooltipass-tests.com/mc_betas/$VERSION",
+    "body": "",
+    "assets": [
+        {
+            "name": "$(basename $EXE_FILE)",
+            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$(basename $EXE_FILE)"
+        },
+        {
+            "name": "$DEB_NAME",
+            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$DEB_NAME"
+        },
+        {
+            "name": "$(basename $APPIMAGE_FILE)",
+            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$(basename $APPIMAGE_FILE)"
+        },
+        {
+            "name": "$(basename $ZIP_FILE)",
+            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$(basename $ZIP_FILE)"
+        }
+    ]
+}]
+EOF
+
     mkdir -p ~/.ssh
     ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
 
@@ -285,7 +311,7 @@ function create_beta_release_linux()
         put $ZIP_FILE; \
         cd ..; \
         rm -f updater.json; \
-        put build/updater.json; \
+        put updater.json; \
         bye"
 }
 
