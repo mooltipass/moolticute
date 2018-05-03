@@ -265,11 +265,13 @@ function create_beta_release_linux()
 
     >&2 echo -e "Creating (Linux) beta release (tag: $VERSION)"
 
-    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DEB_FILE; bye"
-    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $APPIMAGE_FILE; bye"
-    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $EXE_FILE; bye"
-    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $ZIP_FILE; bye"
-    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put build/updater.json; bye"
+    ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
+
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DEB_FILE; bye"
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $APPIMAGE_FILE; bye"
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $EXE_FILE; bye"
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $ZIP_FILE; bye"
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put build/updater.json; bye"
 }
 
 # Create a a GitHub release for the specified version and upload all applicable assets
@@ -302,8 +304,10 @@ function create_beta_release_osx()
 
     >&2 echo -e "Creating (OSX) beta release (tag: $VERSION)"
 
-    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DMG_FILE; bye"
-    lftp sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put build/updater_osx.json; bye"
+    ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
+
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DMG_FILE; bye"
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put build/updater_osx.json; bye"
 }
 
 function osx_setup_netrc()
