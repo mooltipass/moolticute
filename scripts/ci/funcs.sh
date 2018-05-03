@@ -40,7 +40,7 @@ function get_version()
 #Usage: make_version /path/to/repo
 function make_version()
 {
-    VERSION="(get_version $1)"
+    VERSION="$(get_version $1)"
     echo "#ifndef VERSION__H" > $1/src/version.h
     echo "#define VERSION__H" >> $1/src/version.h
     echo "#define APP_VERSION \"$VERSION\"" >> $1/src/version.h
