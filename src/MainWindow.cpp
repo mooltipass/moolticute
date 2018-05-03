@@ -238,6 +238,7 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->comboBoxLang->model()->sort(0);
 
     ui->widgetParamMini->setVisible(false);
+    ui->comboBoxScreenBrightness->addItem("10%", 25);
     ui->comboBoxScreenBrightness->addItem("20%", 51);
     ui->comboBoxScreenBrightness->addItem("35%", 89);
     ui->comboBoxScreenBrightness->addItem("50%", 128);
