@@ -97,8 +97,8 @@ $DOCKER_EXEC "scripts/ci/linux/appimage.sh"
 #create update manifest
 DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
 DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
-APPIMAGE_FILE=$(basename $(find build-appimage -iname '*.AppImage'))
-ZIP_FILE="$(basename $(ls build/*.zip 2> /dev/null | head -n 1))"
+APPIMAGE_FILE=$(basename $(find ../build-appimage -iname '*.AppImage'))
+ZIP_FILE="$(basename $(ls ../build/*.zip 2> /dev/null | head -n 1))"
 
 cat > ../build/updater.json <<EOF
 [{
