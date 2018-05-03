@@ -25,14 +25,14 @@
 #include "MacUtils.h"
 #endif
 
-#define GITHUB_UPDATE_URL "https://api.github.com/repos/mooltipass/moolticute/releases"
-
-#if defined(Q_OS_WIN)
-    #define MC_UPDATE_URL   "https://calaos.fr/mooltipass/windows/updater.json"
-#elif defined(Q_OS_MAC)
-    #define MC_UPDATE_URL   "https://calaos.fr/mooltipass/macos/updater.json"
+#ifndef APP_RELEASE_TESTING
+    #define GITHUB_UPDATE_URL "https://api.github.com/repos/mooltipass/moolticute/releases"
 #else
-    #define MC_UPDATE_URL   ""
+#if defined(Q_OS_MAC)
+    #define GITHUB_UPDATE_URL   "http://mooltipass-tests.com/mc_betas/updater_osx.json"
+#else
+    #define GITHUB_UPDATE_URL   "http://mooltipass-tests.com/mc_betas/updater.json"
+#endif
 #endif
 
 //5 min

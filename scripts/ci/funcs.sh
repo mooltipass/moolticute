@@ -40,9 +40,15 @@ function get_version()
 #Usage: make_version /path/to/repo
 function make_version()
 {
+    VERSION="(get_version $1)"
     echo "#ifndef VERSION__H" > $1/src/version.h
     echo "#define VERSION__H" >> $1/src/version.h
-    echo "#define APP_VERSION \"$(get_version $1)\"" >> $1/src/version.h
+    echo "#define APP_VERSION \"$VERSION\"" >> $1/src/version.h
+    if isReleaseBuild $1 ; then
+        if endsWith -testing "$VERSION"; then
+            echo "#define APP_RELEASE_TESTING 1" >> $1/src/version.h
+        fi
+    fi
     echo "#endif" >> $1/src/version.h
 }
 
@@ -277,6 +283,8 @@ function create_beta_release_linux()
         put $APPIMAGE_FILE; \
         put $EXE_FILE; \
         put $ZIP_FILE; \
+        cd ..; \
+        rm -f updater.json; \
         put build/updater.json; \
         bye"
 }
@@ -320,6 +328,8 @@ function create_beta_release_osx()
         mkdir -p -f $VERSION; \
         cd $VERSION; \
         put $DMG_FILE; \
+        cd ..; \
+        rm -f updater_osx.json; \
         put build/updater_osx.json; \
         bye"
 }
@@ -403,5 +413,16 @@ function beginsWith()
 function endsWith()
 {
     case $2 in *"$1") true;; *) false;; esac;
+}
+
+function isReleaseBuild()
+{
+    pushd $1
+    if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
+        popd
+        return false
+    fi
+    popd
+    return true
 }
 
