@@ -44,10 +44,8 @@ function make_version()
     echo "#ifndef VERSION__H" > $1/src/version.h
     echo "#define VERSION__H" >> $1/src/version.h
     echo "#define APP_VERSION \"$VERSION\"" >> $1/src/version.h
-    if isReleaseBuild $1 ; then
-        if endsWith -testing "$VERSION"; then
-            echo "#define APP_RELEASE_TESTING 1" >> $1/src/version.h
-        fi
+    if endsWith -testing "$VERSION"; then
+        echo "#define APP_RELEASE_TESTING 1" >> $1/src/version.h
     fi
     echo "#endif" >> $1/src/version.h
 }
@@ -439,16 +437,5 @@ function beginsWith()
 function endsWith()
 {
     case $2 in *"$1") true;; *) false;; esac;
-}
-
-function isReleaseBuild()
-{
-    pushd $1
-    if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
-        popd
-        return false
-    fi
-    popd
-    return true
 }
 
