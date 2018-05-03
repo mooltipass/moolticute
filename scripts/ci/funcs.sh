@@ -265,6 +265,7 @@ function create_beta_release_linux()
 
     >&2 echo -e "Creating (Linux) beta release (tag: $VERSION)"
 
+    mkdir -p ~/.ssh
     ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
 
     lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DEB_FILE; bye"
@@ -304,6 +305,7 @@ function create_beta_release_osx()
 
     >&2 echo -e "Creating (OSX) beta release (tag: $VERSION)"
 
+    mkdir -p ~/.ssh
     ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
 
     lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com -e "cd mc_betas; put $DMG_FILE; bye"
