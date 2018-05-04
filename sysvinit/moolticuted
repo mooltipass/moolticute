@@ -24,23 +24,23 @@ OPTIONS=""
 f_start () {
     log_daemon_msg "Starting ${DESC}" "${DAEMON}"
     start-stop-daemon --start --quiet --oknodo --background --exec "${DAEMON}" --make-pidfile --pidfile "${PIDFILE}" -- ${OPTIONS}
-    log_end_msg $?
+    log_end_msg "${?}"
     }
 	
 f_stop () {
     log_daemon_msg "Stopping ${DESC}" "${DAEMON}"
     start-stop-daemon --stop --quiet --oknodo --retry 2 --exec "${DAEMON}" --remove-pidfile --pidfile "${PIDFILE}"
-    log_end_msg $?
+    log_end_msg "${?}"
     }
 	
 f_reload () {
     log_daemon_msg "Reloading ${DESC}" "${DAEMON}"
     start-stop-daemon --stop --signal 1 --exec "${DAEMON}" --pidfile "${PIDFILE}"
-    log_end_msg $?
+    log_end_msg "${?}"
     }
 	
 
-case "$1" in
+case "${1}" in
   start)
     f_start
     ;;
