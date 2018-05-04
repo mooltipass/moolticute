@@ -10,32 +10,32 @@
 
 NAME=moolticuted
 DESC="Mooltipass device management daemon"
-DAEMON=/usr/bin/${NAME}
-DEFAULTS=/etc/default/${NAME}
-PIDFILE=/var/run/${NAME}.pid
+DAEMON="/usr/bin/${NAME}"
+DEFAULTS="/etc/default/${NAME}"
+PIDFILE="/var/run/${NAME}.pid"
 
-[ -x "$DAEMON" ] || exit 0
+[ -x "${DAEMON}" ] || exit 0
 
 OPTIONS=""
-[ -r "$DEFAULTS" ] && . "$DEFAULTS"
+[ -r "${DEFAULTS}" ] && . "${DEFAULTS}"
 
 . /lib/lsb/init-functions
 
 f_start () {
-    log_daemon_msg "Starting $DESC" "$DAEMON"
-    start-stop-daemon --start --quiet --oknodo --background --exec "$DAEMON" --make-pidfile --pidfile "$PIDFILE" -- $OPTIONS
+    log_daemon_msg "Starting ${DESC}" "${DAEMON}"
+    start-stop-daemon --start --quiet --oknodo --background --exec "${DAEMON}" --make-pidfile --pidfile "${PIDFILE}" -- ${OPTIONS}
     log_end_msg $?
     }
 	
 f_stop () {
-    log_daemon_msg "Stopping $DESC" "$DAEMON"
-    start-stop-daemon --stop --quiet --oknodo --retry 2 --exec "$DAEMON" --remove-pidfile --pidfile "$PIDFILE"
+    log_daemon_msg "Stopping ${DESC}" "${DAEMON}"
+    start-stop-daemon --stop --quiet --oknodo --retry 2 --exec "${DAEMON}" --remove-pidfile --pidfile "${PIDFILE}"
     log_end_msg $?
     }
 	
 f_reload () {
-    log_daemon_msg "Reloading $DESC" "$DAEMON"
-    start-stop-daemon --stop --signal 1 --exec "$DAEMON" --pidfile "$PIDFILE"
+    log_daemon_msg "Reloading ${DESC}" "${DAEMON}"
+    start-stop-daemon --stop --signal 1 --exec "${DAEMON}" --pidfile "${PIDFILE}"
     log_end_msg $?
     }
 	
@@ -55,9 +55,9 @@ case "$1" in
     f_reload
     ;;
   status)
-    status_of_proc "$DAEMON" moolticuted
+    status_of_proc "${DAEMON}" moolticuted
     ;;
   *)
-    log_success_msg "Usage: /etc/init.d/$NAME {start|stop|restart|reload|force-reload|status}"
+    log_success_msg "Usage: /etc/init.d/${NAME} {start|stop|restart|reload|force-reload|status}"
     exit 1
 esac
