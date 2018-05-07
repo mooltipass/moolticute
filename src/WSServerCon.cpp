@@ -329,7 +329,7 @@ void WSServerCon::processMessage(const QString &message)
         }
 
         int maxSize = MP_MAX_FILE_SIZE;
-        if (service == MC_SSH_SERVICE)
+        if (service.toLower() == MC_SSH_SERVICE)
             maxSize = MP_MAX_SSH_SIZE;
         if (data.size() > maxSize)
         {

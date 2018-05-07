@@ -51,7 +51,8 @@
 #define MP_MAX_FILE_SIZE        1024 * 10
 #define MP_MAX_SSH_SIZE         1024 * 50
 
-#define MC_SSH_SERVICE          "Moolticute SSH Keys"
+//SSH Service name should be lowercase
+#define MC_SSH_SERVICE          "moolticute ssh keys"
 
 //shared memory size
 #define SHMEM_SIZE              128 * 1024

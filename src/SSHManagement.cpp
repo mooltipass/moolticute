@@ -80,7 +80,7 @@ void SSHManagement::on_pushButtonUnlock_clicked()
 
 void SSHManagement::onServiceExists(const QString service, bool exists)
 {
-    if (service != MC_SSH_SERVICE)
+    if (service.toLower() != MC_SSH_SERVICE)
     {
         qWarning() << "SSH, Wrong service: " << service;
         return;
