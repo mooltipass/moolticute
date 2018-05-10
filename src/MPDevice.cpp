@@ -6885,3 +6885,21 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
+
+void MPDevice::resetSmartCard(MPDeviceProgressCb cbProgress,
+    std::function<void(bool success, QString errstr)> cb)
+{
+    AsyncJobs *jobs = new AsyncJobs("Reseting smart card...", this);
+
+    jobs->append(new MPCommandJob(this, MPCmd::RESET_CARD, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Reseting smart card failed";
+        cb(false, "");
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}

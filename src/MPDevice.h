@@ -203,6 +203,10 @@ public:
                         std::function<void(bool success, QString errstr)> cb,
                         MPDeviceProgressCb cbProgress);
 
+    // Reset smart card
+    void resetSmartCard(MPDeviceProgressCb cbProgress,
+                   std::function<void(bool success, QString errstr)> cb);
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }
