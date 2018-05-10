@@ -72,7 +72,7 @@ void WSClient::sendJsonData(const QJsonObject &data)
         return;
 
     QJsonDocument jdoc(data);
-    //    qDebug().noquote() << jdoc.toJson();    
+    // qDebug().noquote() << jdoc.toJson();
     wsocket->sendTextMessage(jdoc.toJson());
 }
 

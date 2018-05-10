@@ -861,7 +861,7 @@ void MainWindow::wantSaveCredentialManagement()
     {
         disconnect(*conn);
         if (!success)
-	{
+        {
             QMessageBox::warning(this, tr("Failure"), tr("Couldn't save credentials, please contact the support team with moolticute's log"));
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         }
@@ -1222,9 +1222,9 @@ void MainWindow::updateTabButtons()
     {
         ui->widgetHeader->setEnabled(enabled);
         for (QObject * object: ui->widgetHeader->children())
-	{
+        {
             if (typeid(*object) ==  typeid(QPushButton))
-	    {
+            {
                 QAbstractButton *tabButton = qobject_cast<QAbstractButton *>(object);
                 tabButton->setEnabled(enabled);
             }
