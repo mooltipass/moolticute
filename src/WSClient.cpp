@@ -321,6 +321,14 @@ void WSClient::onTextMessageReceived(const QString &message)
 
         emit cardDbMetadataChanged(cardId, credentialsDbChangeNumber, dataDbChangeNumber);
     }
+    else if (rootobj["msg"] == "card_reset")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        if (o.value("failed").toBool())
+            emit cardResetFinished(true);
+        else
+            emit cardResetFinished(false);
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -444,6 +452,11 @@ void WSClient::deleteDataFilesAndLeave(const QStringList &services)
     QJsonObject d = {{ "services", s }};
     sendJsonData({{ "msg", "delete_data_nodes" },
                   { "data", d }});
+}
+
+void WSClient::requestResetCard()
+{
+    sendJsonData({{ "msg", "reset_card" }});
 }
 
 void WSClient::serviceExists(bool isDatanode, const QString &service)

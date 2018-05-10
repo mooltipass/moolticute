@@ -111,6 +111,9 @@ private slots:
 
     void on_lineEditSshArgs_textChanged(const QString &);
 
+    void on_pushButtonResetCard_clicked();
+    void onResetCardFinished(bool successfully);
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 

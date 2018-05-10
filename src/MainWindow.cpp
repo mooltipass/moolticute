@@ -174,6 +174,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonSettingsSave->setVisible(false);
     ui->pushButtonSettingsReset->setVisible(false);
 
+    ui->pushButtonResetCard->setStyleSheet(CSS_BLUE_BUTTON);
+
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonSync, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
@@ -557,6 +559,7 @@ void MainWindow::updatePage()
     ui->pushButtonIntegrity->setVisible(!isCardUnknown);
     ui->label_integrityCheckHelp->setVisible(!isCardUnknown);
 
+    ui->groupBox_ResetCard->setVisible(isCardUnknown);
 
     // When an import db operation is peformed in an unknown card
     // don't change the page until the operation is finished
@@ -1377,4 +1380,20 @@ void MainWindow::on_lineEditSshArgs_textChanged(const QString &)
 {
     QSettings s;
     s.setValue("settings/ssh_args", ui->lineEditSshArgs->text());
+}
+
+void MainWindow::on_pushButtonResetCard_clicked()
+{
+    connect(wsClient, SIGNAL(cardResetFinished(bool)), this, SLOT(onResetCardFinished(bool)));
+    wsClient->requestResetCard();
+}
+
+void MainWindow::onResetCardFinished(bool successfully)
+{
+    disconnect(wsClient, SIGNAL(resetCardFinished(bool)), this, SLOT(resetCardFinished(bool)));
+
+    if (! successfully)
+        QMessageBox::warning(this, "Moolticute", tr("Reset card failed!"));
+    else
+        QMessageBox::information(this, "Moolticute", tr("Reset card done successfully"));
 }
