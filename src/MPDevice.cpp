@@ -259,8 +259,8 @@ void MPDevice::newDataRead(const QByteArray &data)
     }
 
 #ifdef DEV_DEBUG
-    if (currentCmd.data[1] != '\xb9') // ignore MOOLTIPASS_STATUS, there are too many
-        qDebug() << "Received answer:" << MPCmd::printCmd(data);
+    qDebug() << "Received answer:" << MPCmd::printCmd(data)
+             << "Full packet:" << data.toHex();
 #endif
 
     bool done = true;
@@ -284,7 +284,6 @@ void MPDevice::sendDataDequeue()
     currentCmd.running = true;
 
 #ifdef DEV_DEBUG
-    if (currentCmd.data[1] != '\xb9') { // ignore MOOLTIPASS_STATUS, there are too many
     qDebug() << "Platform send command: " << MPCmd::printCmd(currentCmd.data);
 
     auto toHex = [](quint8 b) -> QString { return QString("0x%1").arg((quint8)b, 2, 16, QChar('0')); };
@@ -297,7 +296,6 @@ void MPDevice::sendDataDequeue()
     a += "]";
 
     qDebug() << "Full packet: " << a;
-    }
 #endif
 
     // send data with platform code
