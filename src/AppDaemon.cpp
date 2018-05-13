@@ -92,7 +92,7 @@ bool AppDaemon::initialize()
     parser.addVersionOption();
 
     QCommandLineOption emulMode(QStringList() << "e" << "emulation",
-                                     QCoreApplication::translate("main", "Activate emulation mode, all Websocket API function return emulated string, usefull if you want to try the API."));
+                                     QCoreApplication::translate("main", "Activate emulation mode, all Websocket API function return emulated string, useful if you want to try the API."));
     parser.addOption(emulMode);
 
     QCommandLineOption anyAddressOption(QStringList() << "a" << "any-address",

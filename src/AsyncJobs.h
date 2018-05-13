@@ -40,7 +40,7 @@
  * In those callbacks, use can return false to stop the running queue, false otherwise.
  *
  * AsyncJobs queue support adding more jobs to the queue dynamically (even from the callback from
- * one running job). This is usefull to add jobs to the queue that are different based on the result
+ * one running job). This is useful to add jobs to the queue that are different based on the result
  * of the data received from the device.
  */
 
