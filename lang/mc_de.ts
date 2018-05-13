@@ -984,7 +984,7 @@ Die maximal zulässige Größe beträgt %2 Byte.</translation>
     <message>
         <location filename="../src/MainWindow.ui" line="2818"/>
         <source>Enable Long Press Cancel Buttons</source>
-        <translation>Lang-Drücken Abbrechen-Tasten aktievieren</translation>
+        <translation>Lang-Drücken Abbrechen-Tasten aktivieren</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1449"/>
