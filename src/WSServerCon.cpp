@@ -547,8 +547,7 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "reset_card")
     {
-        mpdevice->resetSmartCard(defaultProgressCb,
-        [=](bool success, QString errstr)
+        mpdevice->resetSmartCard([=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;

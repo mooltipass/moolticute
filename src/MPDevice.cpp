@@ -6889,8 +6889,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
     runAndDequeueJobs();
 }
 
-void MPDevice::resetSmartCard(MPDeviceProgressCb cbProgress,
-    std::function<void(bool success, QString errstr)> cb)
+void MPDevice::resetSmartCard(std::function<void(bool success, QString errstr)> cb)
 {
     AsyncJobs *jobs = new AsyncJobs("Reseting smart card...", this);
 
