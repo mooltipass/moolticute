@@ -3207,7 +3207,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_ResetCard">
           <property name="title">
-           <string>Unknown card inserted</string>
+           <string>Reset card</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -3223,7 +3223,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
            <item row="0" column="0">
             <widget class="QLabel" name="label_6">
              <property name="text">
-              <string>When unknown card is inserted that means you have no database for this user in currently connected Mooltipass device. Hovewer you or other users may have a backup file or use this card with another device. Think twice before reset a card.</string>
+              <string>Erase Inserted Card</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
