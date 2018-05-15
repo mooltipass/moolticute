@@ -61,7 +61,8 @@ void MainWindow::initHelpLabels()
     ui->label_MooltiAppHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
     ui->label_MooltiAppHelp->setToolTip(tr("The MooltiApp backup file doesn't have encrypted logins."));
 
-
+    ui->label_resetCardHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
+    ui->label_resetCardHelp->setToolTip(tr("When an unknown card message is displayed that means you have no database for this user in your Mooltipass device.\nHovewer you or other users may have a backup file or may use this card in another device.\nThink twice before resetting a card."));
 }
 
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
@@ -173,6 +174,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonSettingsReset->setIcon(AppGui::qtAwesome()->icon(fa::undo, whiteButtons));
     ui->pushButtonSettingsSave->setVisible(false);
     ui->pushButtonSettingsReset->setVisible(false);
+
+    ui->pushButtonResetCard->setStyleSheet(CSS_BLUE_BUTTON);
 
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
@@ -557,6 +560,7 @@ void MainWindow::updatePage()
     ui->pushButtonIntegrity->setVisible(!isCardUnknown);
     ui->label_integrityCheckHelp->setVisible(!isCardUnknown);
 
+    ui->groupBox_ResetCard->setVisible(isCardUnknown);
 
     // When an import db operation is peformed in an unknown card
     // don't change the page until the operation is finished
@@ -861,7 +865,7 @@ void MainWindow::wantSaveCredentialManagement()
     {
         disconnect(*conn);
         if (!success)
-	{
+        {
             QMessageBox::warning(this, tr("Failure"), tr("Couldn't save credentials, please contact the support team with moolticute's log"));
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         }
@@ -1222,9 +1226,9 @@ void MainWindow::updateTabButtons()
     {
         ui->widgetHeader->setEnabled(enabled);
         for (QObject * object: ui->widgetHeader->children())
-	{
+        {
             if (typeid(*object) ==  typeid(QPushButton))
-	    {
+            {
                 QAbstractButton *tabButton = qobject_cast<QAbstractButton *>(object);
                 tabButton->setEnabled(enabled);
             }
@@ -1377,4 +1381,20 @@ void MainWindow::on_lineEditSshArgs_textChanged(const QString &)
 {
     QSettings s;
     s.setValue("settings/ssh_args", ui->lineEditSshArgs->text());
+}
+
+void MainWindow::on_pushButtonResetCard_clicked()
+{
+    connect(wsClient, SIGNAL(cardResetFinished(bool)), this, SLOT(onResetCardFinished(bool)));
+    wsClient->requestResetCard();
+}
+
+void MainWindow::onResetCardFinished(bool successfully)
+{
+    disconnect(wsClient, SIGNAL(resetCardFinished(bool)), this, SLOT(resetCardFinished(bool)));
+
+    if (! successfully)
+        QMessageBox::warning(this, "Moolticute", tr("Reset card failed!"));
+    else
+        QMessageBox::information(this, "Moolticute", tr("Reset card done successfully"));
 }

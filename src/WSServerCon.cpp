@@ -545,6 +545,27 @@ void WSServerCon::processMessage(const QString &message)
     {
         sendFilesCache();
     }
+    else if (root["msg"] == "reset_card")
+    {
+        mpdevice->resetSmartCard([=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        }
+        );
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)

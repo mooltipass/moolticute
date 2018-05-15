@@ -96,6 +96,8 @@ public:
     void sendDataFile(const QString &service, const QByteArray &data);
     void deleteDataFilesAndLeave(const QStringList &services);
 
+    void requestResetCard();
+
     void serviceExists(bool isDatanode, const QString &service);
 
     void sendCredentialsMM(const QJsonArray &creds);
@@ -127,6 +129,7 @@ signals:
     void memMgmtModeFailed(int errCode, QString errMsg);
     void filesCacheChanged();
     void cardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
+    void cardResetFinished(bool successfully);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

@@ -258,7 +258,10 @@ void MPDevice::newDataRead(const QByteArray &data)
         return;
     }
 
-//    qDebug() << "Received answer:" << MPCmd::printCmd(data);
+#ifdef DEV_DEBUG
+    qDebug() << "Received answer:" << MPCmd::printCmd(data)
+             << "Full packet:" << data.toHex();
+#endif
 
     bool done = true;
     currentCmd.cb(true, data, done);
@@ -6880,6 +6883,23 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
         qCritical() << "Setting device in MMM failed";
         exitMemMgmtMode(false);
         cb(false, QList<QVariantMap>());
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+void MPDevice::resetSmartCard(std::function<void(bool success, QString errstr)> cb)
+{
+    AsyncJobs *jobs = new AsyncJobs("Reseting smart card...", this);
+
+    jobs->append(new MPCommandJob(this, MPCmd::RESET_CARD, MPCommandJob::defaultCheckRet));
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Reseting smart card failed";
+        cb(false, "");
     });
 
     jobsQueue.enqueue(jobs);
