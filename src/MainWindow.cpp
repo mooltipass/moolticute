@@ -26,6 +26,9 @@
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
 
+#include "qtcsv/stringdata.h"
+#include "qtcsv/reader.h"
+
 template <typename T>
 static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
 {
@@ -63,6 +66,12 @@ void MainWindow::initHelpLabels()
 
     ui->label_resetCardHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
     ui->label_resetCardHelp->setToolTip(tr("When an unknown card message is displayed that means you have no database for this user in your Mooltipass device.\nHovewer you or other users may have a backup file or may use this card in another device.\nThink twice before resetting a card."));
+
+    ui->label_ImportCSVHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
+    ui->label_ImportCSVHelp->setToolTip(tr("Import unencrypted passwords from comma-separated values text file."));
+
+    ui->label_ExportCSVHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
+    ui->label_ExportCSVHelp->setToolTip(tr("Export unencrypted passwords to comma-separated values text file."));
 }
 
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
@@ -176,6 +185,8 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonSettingsReset->setVisible(false);
 
     ui->pushButtonResetCard->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonImportCSV->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonExportCSV->setStyleSheet(CSS_BLUE_BUTTON);
 
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
@@ -1397,4 +1408,25 @@ void MainWindow::onResetCardFinished(bool successfully)
         QMessageBox::warning(this, "Moolticute", tr("Reset card failed!"));
     else
         QMessageBox::information(this, "Moolticute", tr("Reset card done successfully"));
+}
+
+void MainWindow::on_pushButtonImportCSV_clicked()
+{
+    QString fname = QFileDialog::getOpenFileName(this, tr("Select CSV file to import..."), QString(),
+                                                 "CSV files (*.csv);;All files (*.*)");
+    if (fname.isEmpty())
+        return;
+
+    QFile f(fname);
+    if (! f.open(QFile::ReadOnly))
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
+        return;
+    }
+
+    QList<QStringList> readData = QtCSV::Reader::readToList(fname);
+    for ( int i = 0; i < readData.size(); ++i )
+    {
+        qDebug() << readData.at(i);
+    }
 }
