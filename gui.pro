@@ -15,6 +15,7 @@ win32 {
 
 include(src/QtAwesome/QtAwesome/QtAwesome.pri)
 include (src/QSimpleUpdater/QSimpleUpdater.pri)
+include (src/qtcsv/qtcsv.pri)
 
 SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \
