@@ -499,6 +499,15 @@ void WSClient::importCSVFile(const QList<QStringList> &fileData)
             continue;
         }
 
+        QUrl url(ll[0]);
+        if (! url.isValid()) {
+            qWarning() << "Skiping invalid URL line:" << ll.join(",");
+            continue;
+        }
+        else {
+            qDebug() << ll[0] << "is valid URL, accept it";
+        }
+
         QJsonObject o;
         o["service"] = ll[0];
         o["login"] = ll[1];
