@@ -6339,6 +6339,30 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
     runAndDequeueJobs();
 }
 
+
+void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgress,
+                   std::function<void(bool success, QString errstr)> cb)
+{
+
+    for (qint32 i = 0; i < creds.size(); i++)
+    {
+        /* Create object */
+        QJsonObject qjobject = creds[i].toObject();
+
+        qDebug() << "Import " << qjobject;
+    }
+
+    // to reuse setMMCredentials() we should add some required fields
+    // { "description", "imported from CSV" },
+    // { "address", "" },
+    // { "favorite", 0 }};
+
+    // enter to MMM
+
+    // jump to setMMCredentials()
+
+}
+
 void MPDevice::setMMCredentials(const QJsonArray &creds,
                                 MPDeviceProgressCb cbProgress,
                                 std::function<void(bool success, QString errstr)> cb)

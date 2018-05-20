@@ -104,6 +104,7 @@ public:
 
     void exportDbFile(const QString &encryption);
     void importDbFile(const QByteArray &fileData, bool noDelete);
+    void importCSVFile(const QList<QStringList> &fileData);
 
     void sendListFilesCacheRequest();
     void sendRefreshFilesCacheRequest();

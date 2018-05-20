@@ -487,6 +487,29 @@ void WSClient::importDbFile(const QByteArray &fileData, bool noDelete)
                   { "data", d }});
 }
 
+void WSClient::importCSVFile(const QList<QStringList> &fileData)
+{
+    QJsonArray creds;
+
+    for ( int i = 0; i < fileData.size(); ++i )
+    {
+        QStringList ll = fileData[i];
+        if (ll.size() < 3) {
+            qWarning() << "Skiping short line:" << ll.join(",");
+            continue;
+        }
+
+        QJsonObject o;
+        o["service"] = ll[0];
+        o["login"] = ll[1];
+        o["password"] = ll[2];
+        creds.append(o);
+    }
+
+    sendJsonData({{ "msg", "import_csv" },
+                  { "data", creds }});
+}
+
 void WSClient::sendListFilesCacheRequest()
 {
     qDebug() << "Sending cache files request";

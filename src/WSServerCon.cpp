@@ -537,6 +537,29 @@ void WSServerCon::processMessage(const QString &message)
         },
         defaultProgressCb);
     }
+    else if (root["msg"] == "import_csv")
+    {
+        mpdevice->importFromCSV(
+                    root["data"].toArray(),
+                    defaultProgressCb,
+                    [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else if (root["msg"] == "refresh_files_cache")
     {
         mpdevice->updateFilesCache();

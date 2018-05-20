@@ -1425,8 +1425,19 @@ void MainWindow::on_pushButtonImportCSV_clicked()
     }
 
     QList<QStringList> readData = QtCSV::Reader::readToList(fname);
+
+    if (readData.size() == 0) {
+        QMessageBox::warning(this, tr("Error"), tr("Nothing is read from %1").arg(fname));
+        return;
+    }
+
     for ( int i = 0; i < readData.size(); ++i )
     {
         qDebug() << readData.at(i);
     }
+
+    ui->widgetHeader->setEnabled(false);
+    wsClient->importCSVFile(readData);
+    connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
+    wantImportDatabase();
 }
