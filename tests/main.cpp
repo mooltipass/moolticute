@@ -7,6 +7,7 @@
 #include "TestCredentialModel.h"
 #include "TestCredentialModelFilter.h"
 #include "TestDbExportsRegistry.h"
+#include "TestParseDomain.h"
 
 // Note: This is equivalent to QTEST_APPLESS_MAIN for multiple test classes.
 int main(int argc, char** argv)
@@ -39,6 +40,11 @@ int main(int argc, char** argv)
    {
        TestDbExportsRegistry testDbExportsRegistry;
        QTest::qExec(&testDbExportsRegistry);
+   }
+
+   {
+       TestParseDomain testParseDomain;
+       QTest::qExec(&testParseDomain);
    }
 
    return status;

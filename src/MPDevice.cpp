@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "MPDevice.h"
 #include <functional>
+#include "ParseDomain.h"
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
@@ -6343,19 +6344,33 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
 void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgress,
                    std::function<void(bool success, QString errstr)> cb)
 {
+    QJsonArray creds_processed;
 
     for (qint32 i = 0; i < creds.size(); i++)
     {
         /* Create object */
         QJsonObject qjobject = creds[i].toObject();
 
-        qDebug() << "Import " << qjobject;
-    }
+        ParseDomain url(qjobject["service"].toString());
 
-    // to reuse setMMCredentials() we should add some required fields
-    // { "description", "imported from CSV" },
-    // { "address", "" },
-    // { "favorite", 0 }};
+        if (url.isWebsite()) {
+            if (! url.subdomain().isEmpty()) {
+                qjobject["service"] = url.subdomain() + "." + url.domain() + url.tld();
+                qDebug() << "Url with subdomain:" << qjobject["service"];
+            }
+            else {
+                qjobject["service"] = url.domain() + url.tld();
+                qDebug() << "Url without subdomain:" << qjobject["service"];
+            }
+        }
+
+        // to reuse setMMCredentials() we may also add some required fields here:
+        // qjobject["description"] = "imported from CSV";
+        // qjobject["address"] = "";
+        // qjobject["favorite"] = 0;
+
+        creds_processed.append(qjobject);
+    }
 
     // enter to MMM
 
