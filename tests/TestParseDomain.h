@@ -11,10 +11,11 @@ public:
     explicit TestParseDomain(QObject *parent = nullptr);
 
 private slots:
-    void notValidURLS();
-    void validURLS();
-    void oneSectionTLDs();
-    void longTLDs();
+    void invalid_URLS();
+    void invalid_URLS_data();
+
+    void valid_URLS();
+    void valid_URLS_data();
 };
 
 #endif // TESTPARSEDOMAIN_H

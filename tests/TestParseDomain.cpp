@@ -3,56 +3,60 @@
 #include "TestParseDomain.h"
 #include "../src/ParseDomain.h"
 
+
 TestParseDomain::TestParseDomain(QObject *parent) : QObject(parent)
 {
 }
 
-void TestParseDomain::notValidURLS()
+void TestParseDomain::invalid_URLS()
 {
-    {
-        ParseDomain url("asdflkasdf234[092u34dfg)(**)&^(%$^*%$");
-        qDebug() << url << " isValid:" << url.isValid();
-        //Q_ASSERT(! url.isValid());   // actually it's valid!!!
-        Q_ASSERT(! url.isWebsite());
-    }
+    QFETCH(QString, invalid_url);
+
+    ParseDomain url(invalid_url);
+    QCOMPARE(url.isValid(), false);
+    QCOMPARE(url.isWebsite(), false);
 }
 
-void TestParseDomain::validURLS()
+void TestParseDomain::invalid_URLS_data()
 {
-    {
-        ParseDomain url("https://www.themooltipass.com/");
-        Q_ASSERT(url.isValid());
-        //Q_ASSERT(url.isWebsite());
-    }
-}
+    QTest::addColumn<QString>("invalid_url");
 
-void TestParseDomain::oneSectionTLDs()
-{
-    {
-        ParseDomain url("https://www.themooltipass.com/");
-        Q_ASSERT(url.isValid());
-        QVERIFY(url.isWebsite() == true);
-        qDebug() << url.tld();
-        QVERIFY(url.tld() == ".com");
-    }
+    QTest::newRow("crazy mix of chars") << "asdflkasdf234[092u34dfg)(**)&^(%$^*%$";
+    QTest::newRow("with space") << "ubuntu .com";
 }
 
 
-void TestParseDomain::longTLDs()
+void TestParseDomain::valid_URLS()
 {
-    {
-        ParseDomain url("https://daniel.brown.blogspot.be/article/01.html");
-        Q_ASSERT(url.isValid());
-        QVERIFY(url.isWebsite() == true);
-        qDebug() << url.tld();
-        QVERIFY(url.tld() == ".blogspot.be");
-    }
+    QFETCH(QString, valid_url);
+    QFETCH(QString, tld);
+    QFETCH(QString, domain);
+    QFETCH(QString, subdomain);
 
-    {
-        ParseDomain url("https://machine-1234.s3.amazonaws.com/some/url");
-        Q_ASSERT(url.isValid());
-        QVERIFY(url.isWebsite() == true);
-        qDebug() << url.tld();
-        QVERIFY(url.tld() == ".s3.amazonaws.com");
-    }
+    ParseDomain url(valid_url);
+
+    QCOMPARE(url.isValid(), true);
+    QCOMPARE(url.isWebsite(), true);
+    QCOMPARE(url.tld(), tld);
+    QCOMPARE(url.domain(), domain);
+    QCOMPARE(url.subdomain(), subdomain);
 }
+
+void TestParseDomain::valid_URLS_data()
+{
+    QTest::addColumn<QString>("valid_url");
+    QTest::addColumn<QString>("tld");
+    QTest::addColumn<QString>("domain");
+    QTest::addColumn<QString>("subdomain");
+
+    QTest::newRow("mooltipass site") << "https://www.themooltipass.com/" << ".com" << "themooltipass" << "";
+
+
+    // long TLD names
+    QTest::newRow("long TLD: blogspot") << "https://daniel.brown.blogspot.be/article/01.html"
+        << ".blogspot.be" << "brown" << "daniel";
+
+    QTest::newRow("long TLD: Amazon AWS") << "https://machine-1234.s3.amazonaws.com/some/url"
+        << ".s3.amazonaws.com" << "machine-1234" << "";
+}
+
