@@ -6353,7 +6353,8 @@ void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgr
 
         ParseDomain url(qjobject["service"].toString());
 
-        if (url.isWebsite()) {
+        // if URL ends to a known public suffix,
+        if (url.hasValidTLD()) {
             if (! url.subdomain().isEmpty()) {
                 qjobject["service"] = url.subdomain() + "." + url.domain() + url.tld();
                 qDebug() << "Url with subdomain:" << qjobject["service"];

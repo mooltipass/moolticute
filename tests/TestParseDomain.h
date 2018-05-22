@@ -14,6 +14,9 @@ private slots:
     void invalid_URLS();
     void invalid_URLS_data();
 
+    void invalid_site();
+    void invalid_site_data();
+
     void valid_URLS();
     void valid_URLS_data();
 };
