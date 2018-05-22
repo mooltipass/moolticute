@@ -40,7 +40,7 @@ public:
     ParseDomain(const QString &url);
 
     //! True, if domain belongs to a known public suffix
-    bool hasValidTLD() const { return _hasValidTLD; }
+    bool isWebsite() const { return _isWebsite; }
 
     //! Empty, or one of well known public suffix (for ex, .com, .org, .blogspot.be, .s3.amazonaws.com)
     QString tld() const { return _tld; }
@@ -51,11 +51,13 @@ public:
 
     int port() const { return _url.port(); }
 
+    const QUrl qurl() const { return _url; }
+
 private:
     ParseDomain();
 
     QUrl _url;
-    bool _hasValidTLD;
+    bool _isWebsite;
     QString _tld;
     QString _domain;
     QString _subdomain;

@@ -3,7 +3,7 @@
 
 ParseDomain::ParseDomain(const QString &url) :
     _url(url, QUrl::StrictMode)
-    , _hasValidTLD(false)
+    , _isWebsite(false)
 {
     if (! _url.isValid()) {
         qDebug() << "ParseDomain error:" << _url.errorString();
@@ -46,8 +46,8 @@ ParseDomain::ParseDomain(const QString &url) :
         return;
     }
 
-    // domain is the first (from right) section after TLD
-    _hasValidTLD = true;
+    // this URL has valid TLD and has domain part, can be a valid website URL
+    _isWebsite = true;
     _domain = domainParts.takeLast();
 
     // other parts is considered as subdomains
