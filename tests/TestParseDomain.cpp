@@ -47,6 +47,7 @@ void TestParseDomain::test_URLs_data()
     QTest::addColumn<int>("port");
 
 
+
     // invalid URLS
 
     QTest::newRow("crazy mix of chars") << "asdflkasdf234[092u34dfg)(**)&^(%$^*%$"
@@ -63,7 +64,31 @@ void TestParseDomain::test_URLs_data()
 
 
 
-    // non-websites, invalid TLD
+    // valid URL, invalid TLD (local sites)
+
+    QTest::newRow("local mycomputer") << "http://mycomputer/test-website/"
+        << true << false << false
+        << "" << "mycomputer" << "" << (-1);
+
+    QTest::newRow("local UPnP") << "ipp://corei5.local/printers/Epson_T117"
+        << true << false << false
+        << "local" << "corei5" << "" << (-1);
+
+
+
+    // valid URL, valid TLD, but no domain part- cannot be a website
+
+    QTest::newRow("only TLD blogspot") << "http://blogspot.be/some/article"
+        << true << true << false
+        << ".blogspot.be" << "" << "" << (-1);
+
+    QTest::newRow("only TLD amazon") << "http://s3.amazonaws.com/"
+        << true << true << false
+        << ".s3.amazonaws.com" << "" << "" << (-1);
+
+
+
+    // valid URL, invalid TLD
 
     QTest::newRow("wrong TLD") << "http://sundayfun.bogo/"
         << true << false << false
@@ -75,15 +100,7 @@ void TestParseDomain::test_URLs_data()
 
 
 
-    // non-websites, TLD-only
-
-    QTest::newRow("only TLD") << "http://blogspot.be/"
-        << true << true << false
-        << ".blogspot.be" << "" << "" << (-1);
-
-
-
-    // valid websites URLs
+    // valid URL, valid TLD, has domain name (websites)
 
     QTest::newRow("mooltipass site") << "https://www.themooltipass.com/"
         << true << true << true

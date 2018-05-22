@@ -16,20 +16,23 @@ ParseDomain::ParseDomain(const QString &url) :
         host = host.mid(4); // = remove first 4 chars
     _url.setHost(host);
 
-    if (host.endsWith(".local")) {
-        _domain = _url.host();
+    QStringList domainParts = _url.host().split('.');
+
+    Q_ASSERT(! domainParts.isEmpty()); // XXX, can't be a valid URL in this case (QUrl::isValid() returned true already)
+
+    if (domainParts.size() == 1) {
+        _domain = _url.host(); // ex.:  http://mycomputer/test-website
         return;
     }
 
     _tld = _url.topLevelDomain();
 
-    QStringList domainParts = _url.host().split('.');
-
     // domain suffix is NOT recognized as one of public suffix list
     if (_tld.isEmpty()) {
         _tld = domainParts.takeLast();
         _domain = domainParts.takeLast();
-        _subdomain = domainParts.join('.');
+        if (! domainParts.isEmpty())
+            _subdomain = domainParts.join('.');
         return;
     }
 
