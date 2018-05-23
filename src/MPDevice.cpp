@@ -6381,6 +6381,25 @@ void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgr
     // jump to setMMCredentials()
 
 
+
+
+    for (int i = 0 ; i < creds_processed.size() ; i++)
+    {
+        QThread::sleep(3);
+        int total = creds_processed.size();
+
+        {
+            QVariantMap data = {
+                {"total", total },
+                {"current", i},
+                {"msg", "Importing records..."}
+            };
+
+            qDebug() << "Send progress data";
+            cbProgress(data);
+        }
+    }
+
     cb(true, "");
 }
 
