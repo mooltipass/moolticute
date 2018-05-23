@@ -6380,6 +6380,8 @@ void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgr
 
     // jump to setMMCredentials()
 
+
+    cb(true, "");
 }
 
 void MPDevice::setMMCredentials(const QJsonArray &creds,
