@@ -2,7 +2,7 @@
 
 
 ParseDomain::ParseDomain(const QString &url) :
-    _url(url, QUrl::StrictMode)
+    _url(QUrl::fromUserInput(url))
     , _isWebsite(false)
 {
     if (! _url.isValid()) {

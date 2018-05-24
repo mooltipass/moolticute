@@ -58,9 +58,14 @@ void TestParseDomain::test_URLs_data()
         << false << false << false
         << "" << "" << "" << (-1);
 
+
+
+    // invalid URLs but corrected up to some crazy values by QUrl::fromUserInput
+
+    // became:  http://https//.weather.com/    ( host=https, path=//.weather.com/ )
     QTest::newRow("starts with dot") << "https://.weather.com/"
-        << false << false << false
-        << "" << "" << "" << (-1);
+        << true << false << false
+        << "" << "https" << "" << (-1);
 
 
 
