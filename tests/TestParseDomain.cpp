@@ -100,17 +100,54 @@ void TestParseDomain::test_URLs_data()
 
 
 
-    // valid URL, valid TLD, has domain name (websites)
+    // valid HTTP URL, valid TLD, has domain name (websites)
 
-    QTest::newRow("mooltipass site") << "https://www.themooltipass.com/"
+    QTest::newRow("http mooltipass site") << "https://www.themooltipass.com/"
         << true << true << true
         << ".com" << "themooltipass" << "" << (-1);
+
+    QTest::newRow("http google.com") << "http://google.com/"
+        << true << true << true
+        << ".com" << "google" << "" << (-1);
+
+    QTest::newRow(" www http google.com") << "http://www.google.com/"
+        << true << true << true
+        << ".com" << "google" << "" << (-1);
+
+    QTest::newRow("http website.wordpress.com") << "http://website.wordpress.com/"
+        << true << true << true
+        << ".com" << "wordpress" << "website" << (-1);
+
+    QTest::newRow("www http website.wordpress.com") << "http://www.website.wordpress.com/"
+        << true << true << true
+        << ".com" << "wordpress" << "website" << (-1);
 
     QTest::newRow("with redirect") << "https://id.atlassian.com/login?continue=https://my.atlassian.com&application=mac"
         << true << true << true
         << ".com" << "atlassian" << "id" << (-1);
 
-    // long TLD names
+
+    // URL without HTTP, valid TLD
+
+    QTest::newRow("google.com") << "google.com"
+        << true << true << true
+        << ".com" << "google" << "" << (-1);
+
+    QTest::newRow("website.wordpress.com") << "website.wordpress.com"
+        << true << true << true
+        << ".com" << "wordpress" << "website" << (-1);
+
+    QTest::newRow("www google.com") << "www.google.com"
+        << true << true << true
+        << ".com" << "google" << "" << (-1);
+
+    QTest::newRow("www website.wordpress.com") << "www.website.wordpress.com"
+        << true << true << true
+        << ".com" << "wordpress" << "website" << (-1);
+
+
+
+    // valid URL, valid (long) TLD
     QTest::newRow("long TLD: blogspot") << "https://daniel.brown.blogspot.be/article/01.html"
         << true << true << true
         << ".blogspot.be" << "brown" << "daniel" << (-1);
