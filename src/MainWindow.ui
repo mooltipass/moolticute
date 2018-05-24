@@ -3317,7 +3317,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              <item row="1" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_42">
                <item>
-                <widget class="QLabel" name="label_12">
+                <widget class="QLabel" name="label_ExportCSV">
                  <property name="text">
                   <string>Export passwords unencrypted</string>
                  </property>

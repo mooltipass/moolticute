@@ -188,6 +188,11 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonImportCSV->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExportCSV->setStyleSheet(CSS_BLUE_BUTTON);
 
+    // temporary hide 'CSV Export' until it will be implemented
+    ui->label_ExportCSV->hide();
+    ui->label_ExportCSVHelp->hide();
+    ui->pushButtonExportCSV->hide();
+
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonSync, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
