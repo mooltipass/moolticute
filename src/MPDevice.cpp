@@ -769,15 +769,15 @@ void MPDevice::updateLockTimeout(int timeout)
 void MPDevice::updateScreensaver(bool en)
 {
     updateParam(MPParams::SCREENSAVER_PARAM, en);
-  }
+}
 
 void MPDevice::updateUserRequestCancel(bool en)
-{   
+{
     updateParam(MPParams::USER_REQ_CANCEL_PARAM, en);
 }
 
 void MPDevice::updateUserInteractionTimeout(int timeout)
-{   
+{
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
     updateParam(MPParams::USER_INTER_TIMEOUT_PARAM, timeout);
@@ -1334,7 +1334,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
 }
 
 void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
-{    
+{
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
     /* Create new parent node, append to list */
@@ -1367,7 +1367,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDevic
                 done = false;
             }
             else
-            {                
+            {
                 QString srv = pnode->getService();
                 if (srv.size() > 0)
                 {
@@ -4617,7 +4617,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
             return;
         });
         if (generateSavePackets(saveJobs, false, true, cbProgress))
-        {            
+        {
             /* Increment db change number */
             if ((services.size() > 0) && isFw12())
             {
@@ -5008,7 +5008,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
 }
 
 bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
-{    
+{
     /* When we add nodes, we give them an address based on this counter */
     cleanMMMVars();
     cleanImportedVars();
@@ -6233,7 +6233,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
 
         /* Check loaded nodes, set bool to repair */
         checkLoadedNodes(true, true, true);
-        
+
         /* Just in case a new _recovered_ service was added, change virtual for real addresses */
         changeVirtualAddressesToFreeAddresses();
 
