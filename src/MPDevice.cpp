@@ -6613,7 +6613,6 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     /* Create new node, remove the old one and add it */
                     MPNode* newNode = new MPNode(nodePtr->getNodeData(), this, nodePtr->getAddress(), nodePtr->getVirtualAddress());
                     newNode->setLogin(login);
-                    // FIXME: do we need   newNode->setDescription(description);   here?
                     newNode->setNotDeletedTagged();
                     loginChildNodes.append(newNode);
                     removeChildFromDB(parentNodePtr, nodePtr, false);
