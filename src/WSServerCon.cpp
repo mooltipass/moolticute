@@ -459,6 +459,7 @@ void WSServerCon::processMessage(const QString &message)
 
         mpdevice->setMMCredentials(
                     root["data"].toArray(),
+                    false,
                     defaultProgressCb,
                     [=](bool success, QString errstr)
         {

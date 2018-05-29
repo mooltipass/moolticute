@@ -4001,7 +4001,7 @@ void MPDevice::delCredentialAndLeave(QString service, const QString &login,
             cb(false, "Credential was not found in database");
         }
         else
-            setMMCredentials(allCreds, cbProgress, [=](bool success, QString errstr)
+            setMMCredentials(allCreds, false, cbProgress, [=](bool success, QString errstr)
             {
                 exitMemMgmtMode(); //just in case
                 cb(success, errstr);
@@ -6468,7 +6468,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgr
             }
 
             /* finally, call setmmccredentials */
-            setMMCredentials(creds_processed, cbProgress, cb);
+            setMMCredentials(creds_processed, true, cbProgress, cb);
         }
         else
         {
@@ -6490,7 +6490,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgr
     runAndDequeueJobs();
 }
 
-void MPDevice::setMMCredentials(const QJsonArray &creds,
+void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                                 MPDeviceProgressCb cbProgress,
                                 std::function<void(bool success, QString errstr)> cb)
 {
@@ -6552,6 +6552,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                 loginChildNodes.append(newNodePt);
                 newNodePt->setNotDeletedTagged();
                 newNodePt->setLogin(login);
+                newNodePt->setDescription(description);
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
 
@@ -6612,6 +6613,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                     /* Create new node, remove the old one and add it */
                     MPNode* newNode = new MPNode(nodePtr->getNodeData(), this, nodePtr->getAddress(), nodePtr->getVirtualAddress());
                     newNode->setLogin(login);
+                    // FIXME: do we need   newNode->setDescription(description);   here?
                     newNode->setNotDeletedTagged();
                     loginChildNodes.append(newNode);
                     removeChildFromDB(parentNodePtr, nodePtr, false);
@@ -6673,7 +6675,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             curChildNodeAddr_v = curNode->getNextChildVirtualAddress();
 
             /* Marked for deletion? */
-            if (!curNode->getNotDeletedTagged())
+            if (!noDelete && !curNode->getNotDeletedTagged())
             {
                 removeChildFromDB(nodeItem, curNode, true);
                 packet_send_needed = true;
