@@ -6344,63 +6344,150 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
 void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgress,
                    std::function<void(bool success, QString errstr)> cb)
 {
-    QJsonArray creds_processed;
-
+    /* Loop through credentials to check them */
     for (qint32 i = 0; i < creds.size(); i++)
     {
         /* Create object */
         QJsonObject qjobject = creds[i].toObject();
 
-        ParseDomain url(qjobject["service"].toString());
-
-        // if URL ends to a known public suffix,
-        if (url.isWebsite())
+        /* Check login size */
+        if (qjobject["login"].toString().length() >= MP_MAX_LOGIN_LENGTH-1)
         {
-            if (! url.subdomain().isEmpty())
-            {
-                qjobject["service"] = url.subdomain() + "." + url.domain() + url.tld();
-                qDebug() << "Url with subdomain:" << qjobject["service"];
-            }
-            else
-            {
-                qjobject["service"] = url.domain() + url.tld();
-                qDebug() << "Url without subdomain:" << qjobject["service"];
-            }
+            cb(false, "Couldn't import CSV file: " + qjobject["login"].toString() + " has longer than supported length");
+            return;
         }
 
-        // to reuse setMMCredentials() we may also add some required fields here:
-        // qjobject["description"] = "imported from CSV";
-        // qjobject["address"] = "";
-        // qjobject["favorite"] = 0;
-
-        creds_processed.append(qjobject);
+        /* Check password size */
+        if (qjobject["password"].toString().length() >= MP_MAX_PASSWORD_LENGTH-1)
+        {
+            cb(false, "Couldn't import CSV file: " + qjobject["password"].toString() + " has longer than supported length");
+            return;
+        }
     }
 
-    // enter to MMM
+    /* Load database credentials */
+    AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for CSV import", this);
 
-    // jump to setMMCredentials()
+    /* Ask device to go into MMM first */
+    auto startMmmJob = new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet);
+    startMmmJob->setTimeout(15000); //We need a big timeout here in case user enter a wrong pin code
+    jobs->append(startMmmJob);
 
+    /* Load flash contents the usual way */
+    memMgmtModeReadFlash(jobs, false, cbProgress, true, false, true);
 
-
-
-    for (int i = 0 ; i < creds_processed.size() ; i++)
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
     {
-        QThread::sleep(3);
-        int total = creds_processed.size();
+        Q_UNUSED(data);
 
+        /* Tag favorites */
+        tagFavoriteNodes();
+
+        /* Check DB */
+        if (checkLoadedNodes(true, false, false))
         {
-            QVariantMap data = {
-                {"total", total },
-                {"current", i},
-                {"msg", "Importing records..."}
-            };
+            qInfo() << "Mem management mode enabled, DB checked";
 
-            qDebug() << "Send progress data";
-            cbProgress(data);
+            /* Array containing our processed credentials */
+            QJsonArray creds_processed;
+
+            /* In case of duplicate credentials, fill the node addresses */
+            for (qint32 i = 0; i < creds.size(); i++)
+            {
+                /* Create object */
+                QJsonObject qjobject = creds[i].toObject();
+
+                /* Parse URL */
+                QString importedURL = qjobject["service"].toString();
+                ParseDomain url(importedURL);
+
+                /* Format imported URL */
+                if (url.isWebsite())
+                {
+                    if (!url.subdomain().isEmpty())
+                    {
+                        if (url.port() < 0)
+                        {
+                            qjobject["service"] = url.subdomain() + "." + url.domain() + url.tld();
+                        }
+                        else
+                        {
+                            qjobject["service"] = url.subdomain() + "." + url.domain() + url.tld() + ":" + QString::number(url.port());
+                        }
+                    }
+                    else
+                    {
+                        if (url.port() < 0)
+                        {
+                            qjobject["service"] = url.domain() + url.tld();
+                        }
+                        else
+                        {
+                            qjobject["service"] = url.domain() + url.tld() + ":" + QString::number(url.port());
+                        }
+                    }
+                }
+
+                /* Debug */
+                qDebug() << importedURL << "converted to:" << qjobject["service"].toString();
+
+                /* To reuse setMMCredentials() we add the required fields */
+                qjobject["description"] = "imported from CSV";
+                qjobject["favorite"] = -1;
+
+                /* Try to find same service */
+                MPNode* parentPt = findNodeWithServiceInList(qjobject["service"].toString());
+
+                if(!parentPt)
+                {
+                    /* New service, leave empty address */
+                    qjobject["address"] = QJsonArray();
+                    qInfo() << "CSV import: new login" << qjobject["login"].toString() << "for new service" << qjobject["service"].toString();
+                }
+                else
+                {
+                    /* Service found, try to find login that has the same name */
+                    MPNode* childPt = findNodeWithLoginWithGivenParentInList(loginChildNodes, parentPt, qjobject["login"].toString());
+
+                    if(!childPt)
+                    {
+                        /* New service, leave empty address */
+                        qjobject["address"] = QJsonArray();
+                        qInfo() << "CSV import: new login" << qjobject["login"].toString() << "for existing service" << qjobject["service"].toString();
+                    }
+                    else
+                    {
+                        /* Update address with existing one */
+                        qjobject["address"] = QJsonArray({{ childPt->getAddress().at(0) }, { childPt->getAddress().at(1) }});
+                        qInfo() << "CSV import: updated password for login" << qjobject["login"].toString() << "for existing service" << qjobject["service"].toString();
+                    }
+                }
+
+                /* Add credential to list */
+                creds_processed.append(qjobject);
+            }
+
+            /* finally, call setmmccredentials */
+            setMMCredentials(creds_processed, cbProgress, cb);
         }
-    }
+        else
+        {
+            qInfo() << "DB has errors, leaving MMM";
+            exitMemMgmtMode(false);
+            cb(false, "Database Contains Errors, Please Run Integrity Check");
+        }
+    });
 
-    cb(true, "");
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Setting device in MMM failed";
+        exitMemMgmtMode(false);
+        cb(false, "Couldn't Load Database, Please Approve Prompt On Device");
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
 }
 
 void MPDevice::setMMCredentials(const QJsonArray &creds,
