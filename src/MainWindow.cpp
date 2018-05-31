@@ -26,6 +26,9 @@
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
 
+#include "qtcsv/stringdata.h"
+#include "qtcsv/reader.h"
+
 template <typename T>
 static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
 {
@@ -63,6 +66,12 @@ void MainWindow::initHelpLabels()
 
     ui->label_resetCardHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
     ui->label_resetCardHelp->setToolTip(tr("When an unknown card message is displayed that means you have no database for this user in your Mooltipass device.\nHovewer you or other users may have a backup file or may use this card in another device.\nThink twice before resetting a card."));
+
+    ui->label_ImportCSVHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
+    ui->label_ImportCSVHelp->setToolTip(tr("Import unencrypted passwords from comma-separated values text file."));
+
+    ui->label_ExportCSVHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
+    ui->label_ExportCSVHelp->setToolTip(tr("Export unencrypted passwords to comma-separated values text file."));
 }
 
 MainWindow::MainWindow(WSClient *client, QWidget *parent) :
@@ -176,6 +185,13 @@ MainWindow::MainWindow(WSClient *client, QWidget *parent) :
     ui->pushButtonSettingsReset->setVisible(false);
 
     ui->pushButtonResetCard->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonImportCSV->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonExportCSV->setStyleSheet(CSS_BLUE_BUTTON);
+
+    // temporary hide 'CSV Export' until it will be implemented
+    ui->label_ExportCSV->hide();
+    ui->label_ExportCSVHelp->hide();
+    ui->pushButtonExportCSV->hide();
 
     connect(ui->pushButtonDevSettings, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonCred, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
@@ -1397,4 +1413,80 @@ void MainWindow::onResetCardFinished(bool successfully)
         QMessageBox::warning(this, "Moolticute", tr("Reset card failed!"));
     else
         QMessageBox::information(this, "Moolticute", tr("Reset card done successfully"));
+}
+
+void MainWindow::on_pushButtonImportCSV_clicked()
+{
+    QString fname = QFileDialog::getOpenFileName(this, tr("Select CSV file to import..."), QString(),
+                                                 "CSV files (*.csv);;All files (*.*)");
+    if (fname.isEmpty())
+        return;
+
+    QFile f(fname);
+    if (! f.open(QFile::ReadOnly))
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
+        return;
+    }
+
+    QList<QStringList> readData;
+    QString probe_separators = ",;.\t";
+    QList<int> invalid_lines;
+
+    foreach (QChar c, probe_separators)
+    {
+        qDebug() << "Probing read CSV with" << c << "as a separator";
+
+        readData = QtCSV::Reader::readToList(fname, c);
+
+        // empty file will be empty with any separator, stop immediately
+        if (readData.size() == 0)
+        {
+            QMessageBox::warning(this, tr("Error"), tr("Nothing is read from %1").arg(fname));
+            return;
+        }
+
+        invalid_lines.clear();
+
+        // Check every line of CSV file contains only 3 rows
+        for(int i = 0 ; i < readData.size() ; i++)
+        {
+            if (readData.at(i).size() != 3)
+                invalid_lines.append(i+1);
+        }
+
+        if (invalid_lines.size() == 0)
+        {
+            qDebug() << "ImportCSV: CSV" << c << "delimiter detected";
+            break;
+        }
+
+        // less than 10% of lines contains not 3 elements. It may be a password database
+        if (invalid_lines.size() < (readData.size() * 0.5))
+        {
+            if (invalid_lines.size() < 10)
+            {
+                QStringList sl;
+                foreach(int n, invalid_lines)
+                    sl << QString("%1").arg(n);
+                QMessageBox::warning(this, tr("Error"), tr("Unable to import %1: Each row must contain exact 3 items. Some lines don't (lines number: %2)").arg(fname).arg(sl.join(",")));
+            }
+            else
+            {
+                QMessageBox::warning(this, tr("Error"), tr("Unable to import %1: Each row must contain exact 3 items (more than 10 lines don't)").arg(fname));
+            }
+            return;
+        }
+    }
+
+    if (invalid_lines.size() > 0)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to import %1: Each row must contain exact 3 items using comma as a delimiter").arg(fname));
+        return;
+    }
+
+    ui->widgetHeader->setEnabled(false);
+    wsClient->importCSVFile(readData);
+    connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
+    wantImportDatabase();
 }

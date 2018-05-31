@@ -114,6 +114,8 @@ private slots:
     void on_pushButtonResetCard_clicked();
     void onResetCardFinished(bool successfully);
 
+    void on_pushButtonImportCSV_clicked();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 

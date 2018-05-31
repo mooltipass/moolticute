@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "MPDevice.h"
 #include <functional>
+#include "ParseDomain.h"
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
@@ -768,15 +769,15 @@ void MPDevice::updateLockTimeout(int timeout)
 void MPDevice::updateScreensaver(bool en)
 {
     updateParam(MPParams::SCREENSAVER_PARAM, en);
-  }
+}
 
 void MPDevice::updateUserRequestCancel(bool en)
-{   
+{
     updateParam(MPParams::USER_REQ_CANCEL_PARAM, en);
 }
 
 void MPDevice::updateUserInteractionTimeout(int timeout)
-{   
+{
     if (timeout < 0) timeout = 0;
     if (timeout > 0xFF) timeout = 0xFF;
     updateParam(MPParams::USER_INTER_TIMEOUT_PARAM, timeout);
@@ -1333,7 +1334,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
 }
 
 void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
-{    
+{
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
     /* Create new parent node, append to list */
@@ -1366,7 +1367,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDevic
                 done = false;
             }
             else
-            {                
+            {
                 QString srv = pnode->getService();
                 if (srv.size() > 0)
                 {
@@ -4000,7 +4001,7 @@ void MPDevice::delCredentialAndLeave(QString service, const QString &login,
             cb(false, "Credential was not found in database");
         }
         else
-            setMMCredentials(allCreds, cbProgress, [=](bool success, QString errstr)
+            setMMCredentials(allCreds, false, cbProgress, [=](bool success, QString errstr)
             {
                 exitMemMgmtMode(); //just in case
                 cb(success, errstr);
@@ -4616,7 +4617,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
             return;
         });
         if (generateSavePackets(saveJobs, false, true, cbProgress))
-        {            
+        {
             /* Increment db change number */
             if ((services.size() > 0) && isFw12())
             {
@@ -5007,7 +5008,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
 }
 
 bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
-{    
+{
     /* When we add nodes, we give them an address based on this counter */
     cleanMMMVars();
     cleanImportedVars();
@@ -6232,7 +6233,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
 
         /* Check loaded nodes, set bool to repair */
         checkLoadedNodes(true, true, true);
-        
+
         /* Just in case a new _recovered_ service was added, change virtual for real addresses */
         changeVirtualAddressesToFreeAddresses();
 
@@ -6339,7 +6340,157 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
     runAndDequeueJobs();
 }
 
-void MPDevice::setMMCredentials(const QJsonArray &creds,
+
+void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgress,
+                   std::function<void(bool success, QString errstr)> cb)
+{
+    /* Loop through credentials to check them */
+    for (qint32 i = 0; i < creds.size(); i++)
+    {
+        /* Create object */
+        QJsonObject qjobject = creds[i].toObject();
+
+        /* Check login size */
+        if (qjobject["login"].toString().length() >= MP_MAX_LOGIN_LENGTH-1)
+        {
+            cb(false, "Couldn't import CSV file: " + qjobject["login"].toString() + " has longer than supported length");
+            return;
+        }
+
+        /* Check password size */
+        if (qjobject["password"].toString().length() >= MP_MAX_PASSWORD_LENGTH-1)
+        {
+            cb(false, "Couldn't import CSV file: " + qjobject["password"].toString() + " has longer than supported length");
+            return;
+        }
+    }
+
+    /* Load database credentials */
+    AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for CSV import", this);
+
+    /* Ask device to go into MMM first */
+    auto startMmmJob = new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet);
+    startMmmJob->setTimeout(15000); //We need a big timeout here in case user enter a wrong pin code
+    jobs->append(startMmmJob);
+
+    /* Load flash contents the usual way */
+    memMgmtModeReadFlash(jobs, false, cbProgress, true, false, true);
+
+    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+
+        /* Tag favorites */
+        tagFavoriteNodes();
+
+        /* Check DB */
+        if (checkLoadedNodes(true, false, false))
+        {
+            qInfo() << "Mem management mode enabled, DB checked";
+
+            /* Array containing our processed credentials */
+            QJsonArray creds_processed;
+
+            /* In case of duplicate credentials, fill the node addresses */
+            for (qint32 i = 0; i < creds.size(); i++)
+            {
+                /* Create object */
+                QJsonObject qjobject = creds[i].toObject();
+
+                /* Parse URL */
+                QString importedURL = qjobject["service"].toString();
+                ParseDomain url(importedURL);
+
+                /* Format imported URL */
+                if (url.isWebsite())
+                {
+                    if (!url.subdomain().isEmpty())
+                    {
+                        if (url.port() < 0)
+                        {
+                            qjobject["service"] = url.subdomain() + "." + url.domain() + url.tld();
+                        }
+                        else
+                        {
+                            qjobject["service"] = url.subdomain() + "." + url.domain() + url.tld() + ":" + QString::number(url.port());
+                        }
+                    }
+                    else
+                    {
+                        if (url.port() < 0)
+                        {
+                            qjobject["service"] = url.domain() + url.tld();
+                        }
+                        else
+                        {
+                            qjobject["service"] = url.domain() + url.tld() + ":" + QString::number(url.port());
+                        }
+                    }
+                }
+
+                /* Debug */
+                qDebug() << importedURL << "converted to:" << qjobject["service"].toString();
+
+                /* To reuse setMMCredentials() we add the required fields */
+                qjobject["description"] = "imported from CSV";
+                qjobject["favorite"] = -1;
+
+                /* Try to find same service */
+                MPNode* parentPt = findNodeWithServiceInList(qjobject["service"].toString());
+
+                if(!parentPt)
+                {
+                    /* New service, leave empty address */
+                    qjobject["address"] = QJsonArray();
+                    qInfo() << "CSV import: new login" << qjobject["login"].toString() << "for new service" << qjobject["service"].toString();
+                }
+                else
+                {
+                    /* Service found, try to find login that has the same name */
+                    MPNode* childPt = findNodeWithLoginWithGivenParentInList(loginChildNodes, parentPt, qjobject["login"].toString());
+
+                    if(!childPt)
+                    {
+                        /* New service, leave empty address */
+                        qjobject["address"] = QJsonArray();
+                        qInfo() << "CSV import: new login" << qjobject["login"].toString() << "for existing service" << qjobject["service"].toString();
+                    }
+                    else
+                    {
+                        /* Update address with existing one */
+                        qjobject["address"] = QJsonArray({{ childPt->getAddress().at(0) }, { childPt->getAddress().at(1) }});
+                        qInfo() << "CSV import: updated password for login" << qjobject["login"].toString() << "for existing service" << qjobject["service"].toString();
+                    }
+                }
+
+                /* Add credential to list */
+                creds_processed.append(qjobject);
+            }
+
+            /* finally, call setmmccredentials */
+            setMMCredentials(creds_processed, true, cbProgress, cb);
+        }
+        else
+        {
+            qInfo() << "DB has errors, leaving MMM";
+            exitMemMgmtMode(false);
+            cb(false, "Database Contains Errors, Please Run Integrity Check");
+        }
+    });
+
+    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Setting device in MMM failed";
+        exitMemMgmtMode(false);
+        cb(false, "Couldn't Load Database, Please Approve Prompt On Device");
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                                 MPDeviceProgressCb cbProgress,
                                 std::function<void(bool success, QString errstr)> cb)
 {
@@ -6401,6 +6552,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
                 loginChildNodes.append(newNodePt);
                 newNodePt->setNotDeletedTagged();
                 newNodePt->setLogin(login);
+                newNodePt->setDescription(description);
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
 
@@ -6522,7 +6674,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds,
             curChildNodeAddr_v = curNode->getNextChildVirtualAddress();
 
             /* Marked for deletion? */
-            if (!curNode->getNotDeletedTagged())
+            if (!noDelete && !curNode->getNotDeletedTagged())
             {
                 removeChildFromDB(nodeItem, curNode, true);
                 packet_send_needed = true;

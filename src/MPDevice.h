@@ -191,8 +191,12 @@ public:
     void serviceExists(bool isDatanode, QString service, const QString &reqid,
                        std::function<void(bool success, QString errstr, QString service, bool exists)> cb);
 
+    // Import unencrypted credentials from CSV
+    void importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgress,
+                          std::function<void(bool success, QString errstr)> cb);
+
     //Set full list of credentials in MMM
-    void setMMCredentials(const QJsonArray &creds, MPDeviceProgressCb cbProgress,
+    void setMMCredentials(const QJsonArray &creds, bool noDelete, MPDeviceProgressCb cbProgress,
                           std::function<void(bool success, QString errstr)> cb);
 
     //Export database
