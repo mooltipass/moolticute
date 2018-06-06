@@ -71,7 +71,8 @@ apt-get install -y \
     libqt5websockets5 \
     libqt5widgets5 \
     libstdc++6 \
-    libusb-1.0-0
+    libusb-1.0-0 \
+    libssl1.0.0
 
 apt-get install -f -y
 
