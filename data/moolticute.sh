@@ -4,20 +4,6 @@
 ##
 
 me="Moolticute.AppImage"
-UDEV_RULES_FILE_PATH="/etc/udev/rules.d/50-mooltipass.rules"
-
-UDEV_RULE="
-# udev rules for allowing console user(s) and libusb access to Mooltipass Mini devices
-
-ACTION!=\"add|change\", GOTO=\"mooltipass_end\"
-
-# console user\n
-KERNEL==\"hidraw*\", SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"16d0\", ATTRS{idProduct}==\"09a0\", MODE=\"0660\", SYMLINK+=\"mooltipass_keyboard\", TAG+=\"uaccess\"
-# libusb
-SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"16d0\", ATTRS{idProduct}==\"09a0\", MODE=\"0660\", SYMLINK+=\"mooltipass_device\", TAG+=\"uaccess\"
-
-LABEL=\"mooltipass_end\"
-";
 
 help_msg="Moolticute for linux
 Usage:
@@ -38,7 +24,52 @@ Run only the moolticuted daemon
 ./$me --daemon
 ";
 
-SUDO_MSG="Allow Mooltipass Udev rules to be applied in your system?"
+UDEV_RULES_FILE_PATH="/etc/udev/rules.d/50-mooltipass.rules"
+
+function install_udev_rule()
+{
+    SUDO_BIN="sudo"
+    which kdesudo > /dev/null 2>&1 && SUDO_BIN="kdesudo"
+    which kdesu > /dev/null 2>&1 && SUDO_BIN="kdesu"
+    which gksudo > /dev/null 2>&1 && SUDO_BIN="gksudo"
+
+    tmpfile=$(mktemp /tmp/mc-udev.XXXXXX)
+    cat > "$tmpfile" <<- EOF
+# udev rules for allowing console user(s) and libusb access to Mooltipass Mini devices
+
+ACTION!="add|change", GOTO="mooltipass_end"
+
+# console user
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", MODE="0660", SYMLINK+="mooltipass_keyboard", TAG+="uaccess"
+# libusb
+SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", MODE="0660", SYMLINK+="mooltipass_device", TAG+="uaccess"
+
+LABEL="mooltipass_end"
+EOF
+
+    chmod +r $tmpfile
+    SUDO_MSG="Allow Mooltipass Udev rules to be applied in your system?"
+    INSTALL_COMMAND="cp $tmpfile $UDEV_RULES_FILE_PATH && udevadm control --reload-rules"
+
+    FILENAME=$(basename "$SUDO_BIN")
+    case "$FILENAME" in
+        'sudo')
+            echo "$SUDO_MSG"
+            $SUDO_BIN sh -c "$INSTALL_COMMAND"
+        ;;
+        'gksudo')
+            $SUDO_BIN -m "$SUDO_MSG" "sh -c '$INSTALL_COMMAND'"
+        ;;
+        'kdesudo')
+            $SUDO_BIN -i moolticute --comment "$SUDO_MSG" -c "$INSTALL_COMMAND"
+        ;;
+        'kdesu')
+            $SUDO_BIN -c "$INSTALL_COMMAND" --noignorebutton
+        ;;
+    esac
+
+    rm "$tmpfile"  
+}
 
 DAEMON_ONLY=0
 INSTALL=0
@@ -73,25 +104,7 @@ esac
 if (( $# == 0 )) &&\
     [ ! -s $UDEV_RULES_FILE_PATH ];
 then
-    
-    SUDO_BIN=$( which kdesudo || which gksudo || which sudo)
-
-    INSTALL_COMMAND="echo \"$UDEV_RULE\" | tee $UDEV_RULES_FILE_PATH && udevadm control --reload-rules"
-    
-    SUDO_ARGS=
-    FILENAME=$(basename "$SUDO_BIN")
-    case "$FILENAME" in
-        'sudo')
-            echo "$SUDO_MSG"
-            $SUDO_BIN sh -c "$INSTALL_COMMAND"
-        ;;
-        'gksudo')
-            $SUDO_BIN -m "$SUDO_MSG" "sh -c '$INSTALL_COMMAND'"
-        ;;
-        'kdesudo')
-            $SUDO_BIN -i moolticute --comment "$SUDO_MSG" -c "$INSTALL_COMMAND"
-        ;;
-    esac
+    install_udev_rule
 fi
 
 #fix https://github.com/mooltipass/moolticute/issues/245
@@ -107,17 +120,16 @@ then
 elif (( $INSTALL == 1 ));
 then
     echo "Installing moolticute UDEV rules"
-    printf "$UDEV_RULE" | sudo tee $UDEV_RULES_FILE_PATH
-    sudo udevadm control --reload-rules
+    install_udev_rule
 elif (( $CHECK == 1 ));
 then
-    if [ -s $UDEV_RULES_FILE_PATH ];
+    if [ -s $UDEV_RULES_FILE_PATH ]
     then
-        echo "Moolticute Udev rules are NOT installed."
-        exit 1;
-    else
         echo "Moolticute Udev rules are installed."
         exit 0;
+    else
+        echo "Moolticute Udev rules are NOT installed."
+        exit 1;
     fi
 elif (( $UNINSTALL == 1 ));
 then
