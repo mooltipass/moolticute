@@ -58,13 +58,13 @@ EOF
             $SUDO_BIN sh -c "$INSTALL_COMMAND"
         ;;
         'gksudo')
-            $SUDO_BIN -m "$SUDO_MSG" "sh -c '$INSTALL_COMMAND'"
+            LD_LIBRARY_PATH="" $SUDO_BIN -m "$SUDO_MSG" "sh -c '$INSTALL_COMMAND'"
         ;;
         'kdesudo')
-            $SUDO_BIN -i moolticute --comment "$SUDO_MSG" -c "$INSTALL_COMMAND"
+            LD_LIBRARY_PATH="" $SUDO_BIN -i moolticute --comment "$SUDO_MSG" -c "$INSTALL_COMMAND"
         ;;
         'kdesu')
-            $SUDO_BIN -c "$INSTALL_COMMAND" --noignorebutton
+            LD_LIBRARY_PATH="" $SUDO_BIN -c "$INSTALL_COMMAND" --noignorebutton
         ;;
     esac
 

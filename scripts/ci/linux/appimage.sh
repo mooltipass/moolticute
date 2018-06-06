@@ -85,6 +85,17 @@ apt-get install -f -y
 mkdir -p $TARGET_DIR/lib/x86_64-linux-gnu/qt5/plugins/platforms/
 cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/* $TARGET_DIR/lib/x86_64-linux-gnu/qt5/plugins/platforms/
 
+#Copy openssl
+
+#TOFIX: Actually copying openssl is not working. SSL is going to try to load root certificates from the system
+# and the path differs from all distro...
+# More information here:
+# https://github.com/AppImage/AppImageKit/wiki/Desktop-Linux-Platform-Issues#certificates
+
+#mkdir -p $APPDIR/lib/x86_64-linux-gnu/
+#cp /lib/x86_64-linux-gnu/libcrypto* /lib/x86_64-linux-gnu/libssl* $APPDIR/lib/x86_64-linux-gnu/
+#cp -r /usr/lib/x86_64-linux-gnu/openssl* $TARGET_DIR/lib/x86_64-linux-gnu/
+
 # copy deps recursively 
 old_list=""
 list=$(find .)
@@ -123,7 +134,8 @@ echo "new version $VERSION"
 # Patch away absolute paths; it would be nice if they were relative
 ########################################################################
 
-find usr/ -type f -exec sed -i -e 's|/usr|././|g' {} \;
+#Prevent our moolticute.sh and moolticute.sh.wrapper to be patched
+find usr/ -type f ! -path "usr/bin/moolticute.sh*" -exec sed -i -e 's|/usr|././|g' {} \;
 find usr/ -type f -exec sed -i -e 's@././/bin/env@/usr/bin/env@g' {} \;
 
 ########################################################################
