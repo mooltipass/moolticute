@@ -14,26 +14,27 @@ class DbExportsRegistryController : public QObject
     MainWindow *window;
     WSClient *wsClient;
     bool wasDbExportRecommendedWithoutMainWindow;
+    bool handleExportResultEnabled = false;
 public:
     explicit DbExportsRegistryController(const QString &settingsFilePath, QObject *parent = nullptr);
     virtual ~DbExportsRegistryController();
 
     void setMainWindow(MainWindow *window);
     void setWSClient(WSClient *wsClient);
-    void writeDbToFile(const QByteArray &d, QString fname);
 
-signals:
-
-public slots:
+    // they are not slots anymore to prevent any attempts of connection to wsClient.
+    // they will be called by DbMasterController when no monitored backup is active.
     void handleCardIdChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
+    void handleDeviceStatusChanged(const Common::MPStatus &status);
+    void handleDeviceConnectedChanged(const bool &);
     void registerDbExported(const QByteArray &, bool success);
+    void handleExportDbResult(const QByteArray &d, bool success);
 
 protected slots:
     void handleDbExportRecommended();
-    void handleExportDbResult(const QByteArray &d, bool success);
-    void handleDeviceStatusChanged(const Common::MPStatus &status);
-    void handleDeviceConnectedChanged(const bool &);
+
 private:
+    void writeDbToFile(const QByteArray &d, QString fname);
     void exportDbBackup();
     void hidePrompt();
 };

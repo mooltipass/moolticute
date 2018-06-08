@@ -40,12 +40,6 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSCli
 
     connect(wsClient, &WSClient::fwVersionChanged,
             this, &DbBackupsTrackerController::handleFirmwareVersionChange);
-    connect(wsClient, &WSClient::cardDbMetadataChanged,
-            this, &DbBackupsTrackerController::handleCardDbMetadataChanged);
-    connect(wsClient, &WSClient::statusChanged,
-            this, &DbBackupsTrackerController::handleDeviceStatusChanged);
-    connect(wsClient, &WSClient::connectedChanged,
-            this, &DbBackupsTrackerController::handleDeviceConnectedChanged);
 
     handleFirmwareVersionChange(wsClient->get_fwVersion());
     handleDeviceStatusChanged(wsClient->get_status());
@@ -166,9 +160,6 @@ void DbBackupsTrackerController::askForExportBackup()
 
 void DbBackupsTrackerController::exportDbBackup()
 {
-    connect(wsClient, &WSClient::dbExported, this,
-            &DbBackupsTrackerController::handleExportDbResult);
-
     QString format;
     try
     {

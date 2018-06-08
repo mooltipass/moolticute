@@ -21,6 +21,12 @@ public:
 
     QString getBackupFilePath();
 
+    // they are not slots anymore. Will be called by dbMasterController.
+    void handleCardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
+    void handleExportDbResult(const QByteArray &d, bool success);
+    void handleDeviceStatusChanged(const Common::MPStatus &status);
+    void handleDeviceConnectedChanged(const bool &connected);
+
 signals:
     void backupFilePathChanged(const QString &path);
 
@@ -28,15 +34,10 @@ public slots:
     void setBackupFilePath(const QString &path);
 
 protected slots:
-    void handleCardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void handleGreaterDbBackupChangeNumber();
     void handleLowerDbBackupChangeNumber();
-    void handleExportDbResult(const QByteArray &d, bool success);
     void handleNewTrack(const QString &cardId, const QString &path);
-    void handleDeviceStatusChanged(const Common::MPStatus &status);
-    void handleDeviceConnectedChanged(const bool &connected);
     void handleFirmwareVersionChange(const QString &version);
-
 
 private:
     DbBackupsTracker dbBackupsTracker;

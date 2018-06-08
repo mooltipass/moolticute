@@ -7,6 +7,7 @@
 
 DbExportsRegistryController::DbExportsRegistryController(const QString &settingsFilePath, QObject *parent) :
     QObject(parent), isExportRequestMessageVisible(false), window(nullptr)
+    , wasDbExportRecommendedWithoutMainWindow(false)
 {
     dbExportsRegistry = new DbExportsRegistry(settingsFilePath, this);
     connect(dbExportsRegistry, &DbExportsRegistry::dbExportRecommended, this, &DbExportsRegistryController::handleDbExportRecommended);
@@ -21,7 +22,17 @@ void DbExportsRegistryController::setMainWindow(MainWindow *window)
 {
     DbExportsRegistryController::window = window;
     if (wasDbExportRecommendedWithoutMainWindow)
-        handleDbExportRecommended();
+    {
+        /* with main window there was DBBackupTrackerController also created.
+         * In its constructor it used similar QTimer::singleShot call
+         * of handleCardDbMetadataChanged(), that will
+         * hide the prompt which handleDbExportRecommended() will show.
+         * So to avoid it, we call handleDbExportRecommended() also deffered
+         * to be executed after DbBackupsTrackerController::handleCardDbMetadataChanged()
+         * (this workaround is only needed when run with --autolaunched option).
+         */
+        QTimer::singleShot(500, this, SLOT(handleDbExportRecommended()));
+    }
 
     wasDbExportRecommendedWithoutMainWindow = false;
 }
@@ -29,10 +40,6 @@ void DbExportsRegistryController::setMainWindow(MainWindow *window)
 void DbExportsRegistryController::setWSClient(WSClient *wsClient)
 {
     DbExportsRegistryController::wsClient = wsClient;
-    connect(wsClient, &WSClient::cardDbMetadataChanged, this, &DbExportsRegistryController::handleCardIdChanged);
-    connect(wsClient, &WSClient::statusChanged, this, &DbExportsRegistryController::handleDeviceStatusChanged);
-    connect(wsClient, &WSClient::connectedChanged, this, &DbExportsRegistryController::handleDeviceConnectedChanged);
-    connect(wsClient, &WSClient::dbExported, this, &DbExportsRegistryController::registerDbExported);
     dbExportsRegistry->setCurrentCardDbMetadata(wsClient->get_cardId(), wsClient->get_credentialsDbChangeNumber(), wsClient->get_dataDbChangeNumber());
 }
 
@@ -100,7 +107,10 @@ void DbExportsRegistryController::handleDbExportRecommended()
 
 void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool success)
 {
-    disconnect(wsClient, &WSClient::dbExported, this, &DbExportsRegistryController::handleExportDbResult);
+    if (! handleExportResultEnabled)
+        return;
+    handleExportResultEnabled = false;
+
     if (window)
         window->handleBackupExported();
 
@@ -138,8 +148,7 @@ void DbExportsRegistryController::writeDbToFile(const QByteArray &d, QString fna
 
 void DbExportsRegistryController::exportDbBackup()
 {
-    connect(wsClient, &WSClient::dbExported, this,
-            &DbExportsRegistryController::handleExportDbResult);
+    handleExportResultEnabled = true;
 
     QString format = "SympleCrypt";
 

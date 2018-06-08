@@ -32,7 +32,7 @@
 #include "DaemonMenuAction.h"
 #include <QtAwesome.h>
 
-class DbExportsRegistryController;
+class DbMasterController;
 class AppGui : public QApplication
 {
     Q_OBJECT
@@ -100,8 +100,7 @@ private:
      void startSSHAgent();
      void createMainWindow();
 
-     DbExportsRegistryController *dbExportsRegistryController;
-     void initializeDbExportsRegitry();
+     DbMasterController *dbMasterController;
 };
 
 #endif // APPGUI_H
