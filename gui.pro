@@ -49,7 +49,8 @@ SOURCES += src/main_gui.cpp \
     src/PromptWidget.cpp \
     src/DbExportsRegistry.cpp \
     src/DbExportsRegistryController.cpp \
-    src/DbBackupChangeNumbersComparator.cpp
+    src/DbBackupChangeNumbersComparator.cpp \
+    src/DbMasterController.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -85,7 +86,8 @@ HEADERS  += src/MainWindow.h \
     src/PromptWidget.h \
     src/DbExportsRegistry.h \
     src/DbExportsRegistryController.h \
-    src/DbBackupChangeNumbersComparator.h
+    src/DbBackupChangeNumbersComparator.h \
+    src/DbMasterController.h
 
 mac {
     HEADERS += src/MacUtils.h

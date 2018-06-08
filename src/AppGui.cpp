@@ -19,7 +19,7 @@
 #include "AppGui.h"
 #include "version.h"
 #include "QSimpleUpdater.h"
-#include "DbExportsRegistryController.h"
+#include "DbMasterController.h"
 
 #ifdef Q_OS_MAC
 #include "MacUtils.h"
@@ -41,7 +41,7 @@
 AppGui::AppGui(int & argc, char ** argv) :
     QApplication(argc, argv),
     sharedMem("moolticute"),
-    dbExportsRegistryController(nullptr)
+    dbMasterController(nullptr)
 {
 }
 
@@ -155,6 +155,9 @@ bool AppGui::initialize()
 
     connectedChanged();
 
+    dbMasterController = new DbMasterController(this);
+    dbMasterController->setWSClient(wsClient);
+
     if (!autoLaunched)
         mainWindowShow();
 
@@ -226,17 +229,7 @@ bool AppGui::initialize()
         createMainWindow();
     });
 
-    initializeDbExportsRegitry();
-
     return true;
-}
-
-void AppGui::initializeDbExportsRegitry()
-{
-    QString regitryFile = getDataDirPath() + "/dbExportsRegistry.ini";
-    dbExportsRegistryController = new DbExportsRegistryController(regitryFile, this);
-    dbExportsRegistryController->setMainWindow(win);
-    dbExportsRegistryController->setWSClient(wsClient);
 }
 
 void AppGui::startSSHAgent()
@@ -639,7 +632,9 @@ void AppGui::createMainWindow()
 
     qtAwesome()->initFontAwesome();
 
-    win = new MainWindow(wsClient);
+    Q_ASSERT(dbMasterController);
+
+    win = new MainWindow(wsClient, dbMasterController);
     connect(win, &MainWindow::destroyed, [this](QObject *)
     {
         win = nullptr;
@@ -649,6 +644,5 @@ void AppGui::createMainWindow()
         mainWindowHide();
     });
 
-    if (dbExportsRegistryController)
-        dbExportsRegistryController->setMainWindow(win);
+    dbMasterController->setMainWindow(win);
 }

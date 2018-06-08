@@ -99,6 +99,7 @@ Common::MPStatus Common::statusFromString(const QString &st)
             return it.key();
     }
 
+    qWarning() << "Unable to find value from enum for status" << st;
     return Common::UnknownStatus;
 }
 

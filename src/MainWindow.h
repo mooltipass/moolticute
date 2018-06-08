@@ -22,7 +22,7 @@
 #include <QtWidgets>
 #include "WSClient.h"
 #include <QtAwesome.h>
-#include "DbExportsRegistry.h"
+#include "DbMasterController.h"
 #include "WindowLog.h"
 
 #include <DbBackupsTrackerController.h>
@@ -38,7 +38,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(WSClient *client, QWidget *parent = 0);
+    explicit MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent = 0);
     ~MainWindow();
 
     void daemonLogAppend(const QByteArray &logdata);
@@ -151,7 +151,7 @@ private:
     QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;
     PasswordProfilesModel *m_passwordProfilesModel;
-    DbBackupsTrackerController *dbBackupsTrackerController;
+    DbMasterController *dbMasterController;
     void initHelpLabels();
 };
 
