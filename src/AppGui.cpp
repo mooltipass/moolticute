@@ -139,6 +139,7 @@ bool AppGui::initialize()
                 mainWindowHide();
         }
 #else
+        Q_UNUSED(this)
         Q_UNUSED(reason)
 #endif
     });
