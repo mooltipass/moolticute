@@ -22,8 +22,8 @@ public:
     QModelIndexList getNextRow(const QModelIndex &rowIdx);
 
 protected:
-    virtual bool filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const;
-    virtual bool lessThan(const QModelIndex &srcLeft, const QModelIndex &srcRight) const;
+    virtual bool filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const override;
+    virtual bool lessThan(const QModelIndex &srcLeft, const QModelIndex &srcRight) const override;
 
 private:
     bool acceptRow(int iSrcRow, const QModelIndex &srcParent) const;
