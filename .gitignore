@@ -40,3 +40,6 @@ lang/*.qm
 
 .env
 debian/changelog
+
+# Sublime Text project files.
+*.sublime-*
