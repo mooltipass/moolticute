@@ -61,7 +61,12 @@ void DbBackupsTrackerTests::trackFileNoCpz()
 
 QString DbBackupsTrackerTests::getTestsDataDirPath()
 {
+#ifdef SRCDIR
+    QString dir(SRCDIR);
+#else
     QString dir(__FILE__);
+#endif
+
     QFileInfo fileInfo(dir);
     dir = fileInfo.absoluteDir().absolutePath() + "/data/";
 
