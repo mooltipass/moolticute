@@ -96,7 +96,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     refreshAppLangCb();
 
     ui->checkBoxLongPress->setChecked(s.value("settings/long_press_cancel", true).toBool());
-    connect(ui->checkBoxLongPress, &QCheckBox::toggled, [this](bool checked)
+    connect(ui->checkBoxLongPress, &QCheckBox::toggled, [](bool checked)
     {
         QSettings settings;
         settings.setValue("settings/long_press_cancel", checked);
