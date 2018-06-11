@@ -3318,7 +3318,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     progressCurrent = 0;
     progressTotal = 0;
 
-    auto dataWriteProgressCb = [&](void)
+    auto dataWriteProgressCb = [this, cbProgress](void)
     {
         QVariantMap data = {
             {"total", progressTotal},
