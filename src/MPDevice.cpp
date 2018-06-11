@@ -870,7 +870,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
 
     /* Get CTR value */
     jobs->append(new MPCommandJob(this, MPCmd::GET_CTRVALUE,
-                                  [this, &jobs](const QByteArray &data, bool &) -> bool
+                                  [this, jobs](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -893,7 +893,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
 
     /* Get CPZ and CTR values */
     auto cpzJob = new MPCommandJob(this, MPCmd::GET_CARD_CPZ_CTR,
-                                  [this, &jobs](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs](const QByteArray &data, bool &done) -> bool
     {
         /* The Mooltipass answers with CPZ CTR packets containing the CPZ_CTR values, and then a final MPCmd::GET_CARD_CPZ_CTR packet */
         if ((quint8)data[1] == MPCmd::CARD_CPZ_CTR_PACKET)
@@ -947,7 +947,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             return true;
         },
-                                      [this, i, &jobs, cbProgress](const QByteArray &data, bool &) -> bool
+                                      [this, i, jobs, cbProgress](const QByteArray &data, bool &) -> bool
         {
             if (data[MP_LEN_FIELD_INDEX] == 1)
             {
@@ -981,7 +981,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     {
         /* Get parent node start address */
         jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
-                                      [this, &jobs, fullScan, cbProgress](const QByteArray &data, bool &) -> bool
+                                      [this, jobs, fullScan, cbProgress](const QByteArray &data, bool &) -> bool
         {
             if (data[MP_LEN_FIELD_INDEX] == 1)
             {
@@ -1024,7 +1024,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     {
         //Get parent data node start address
         jobs->append(new MPCommandJob(this, MPCmd::GET_DN_START_PARENT,
-                                      [this, &jobs, fullScan, getDataChilds, cbProgress](const QByteArray &data, bool &) -> bool
+                                      [this, jobs, fullScan, getDataChilds, cbProgress](const QByteArray &data, bool &) -> bool
         {
 
             if (data[MP_LEN_FIELD_INDEX] == 1)
@@ -1249,7 +1249,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     /* Send read node command, expecting 3 packets or 1 depending on if we're allowed to read a block*/
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, &jobs, pnodeClone, pnode, address, cbProgress](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnodeClone, pnode, address, cbProgress](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -1346,7 +1346,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDevic
     /* Send read node command, expecting 3 packets */
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, &jobs, pnode, pnodeClone, address, cbProgress](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnode, pnodeClone, address, cbProgress](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -1428,7 +1428,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     /* Query node */
     jobs->prepend(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, &jobs, cnode, cnodeClone, address, parent, parentClone](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, cnode, cnodeClone, address, parent, parentClone](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -1476,7 +1476,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
 
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, &jobs, pnode, pnodeClone, load_childs, cbProgress](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnode, pnodeClone, load_childs, cbProgress](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -1545,7 +1545,7 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
 
     jobs->prepend(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, &jobs, cnode, cnodeClone, cbProgress, nbBytesFetched, parent, parentClone](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, cnode, cnodeClone, cbProgress, nbBytesFetched, parent, parentClone](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -3844,7 +3844,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
 
     jobs->append(new MPCommandJob(this, MPCmd::CONTEXT,
                                   sdata,
-                                  [this, &jobs, fallback_service, service](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, fallback_service, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -3854,7 +3854,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
                 fsdata.append((char)0);
                 jobs->prepend(new MPCommandJob(this, MPCmd::CONTEXT,
                                               fsdata,
-                                              [&jobs, fallback_service](const QByteArray &data, bool &) -> bool
+                                              [jobs, fallback_service](const QByteArray &data, bool &) -> bool
                 {
                     if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
                     {
@@ -3888,7 +3888,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
 
     jobs->append(new MPCommandJob(this, MPCmd::GET_LOGIN,
                                   ldata,
-                                  [&jobs, login](const QByteArray &data, bool &) -> bool
+                                  [jobs, login](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0 && !login.isEmpty())
         {
@@ -3913,7 +3913,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
     if (isFw12())
     {
         jobs->append(new MPCommandJob(this, MPCmd::GET_DESCRIPTION,
-                                      [&jobs](const QByteArray &data, bool &) -> bool
+                                      [jobs](const QByteArray &data, bool &) -> bool
         {
             /// Commented below: in case there's an empty description it is impossible to distinguish between device refusal and empty description.
             /*if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
@@ -3930,7 +3930,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
     }
 
     jobs->append(new MPCommandJob(this, MPCmd::GET_PASSWORD,
-                                  [&jobs](const QByteArray &data, bool &) -> bool
+                                  [jobs](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
@@ -3940,7 +3940,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [&jobs, cb](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &data)
     {
         //data is last result
         //all jobs finished success
@@ -4064,7 +4064,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
     //Create context
     jobs->prepend(new MPCommandJob(this, cmdAddCtx,
                   sdata,
-                  [&jobs, service](const QByteArray &data, bool &) -> bool
+                  [jobs, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -4079,7 +4079,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
     //choose context
     jobs->insertAfter(new MPCommandJob(this, cmdSelectCtx,
                                   sdata,
-                                  [&jobs, service](const QByteArray &data, bool &) -> bool
+                                  [jobs, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -4118,7 +4118,7 @@ void MPDevice::setCredential(QString service, const QString &login,
     //First query if context exist
     jobs->append(new MPCommandJob(this, MPCmd::CONTEXT,
                                   sdata,
-                                  [this, &jobs, service](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -4136,7 +4136,7 @@ void MPDevice::setCredential(QString service, const QString &login,
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_LOGIN,
                                   ldata,
-                                  [&jobs, login](const QByteArray &data, bool &) -> bool
+                                  [jobs, login](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
@@ -4156,7 +4156,7 @@ void MPDevice::setCredential(QString service, const QString &login,
         //Set description should be done right after set login
         jobs->append(new MPCommandJob(this, MPCmd::SET_DESCRIPTION,
                                       ddata,
-                                      [&jobs, description](const QByteArray &data, bool &) -> bool
+                                      [jobs, description](const QByteArray &data, bool &) -> bool
         {
             if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
             {
@@ -4181,14 +4181,14 @@ void MPDevice::setCredential(QString service, const QString &login,
     if(!pass.isEmpty()) {
         jobs->append(new MPCommandJob(this, MPCmd::CHECK_PASSWORD,
                                       pdata,
-                                      [this, &jobs, pdata](const QByteArray &data, bool &) -> bool
+                                      [this, jobs, pdata](const QByteArray &data, bool &) -> bool
         {
             if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
             {
                 //Password does not match, update it
                 jobs->prepend(new MPCommandJob(this, MPCmd::SET_PASSWORD,
                                                pdata,
-                                               [&jobs](const QByteArray &data, bool &) -> bool
+                                               [jobs](const QByteArray &data, bool &) -> bool
                 {
                     if (data[2] == 0)
                     {
@@ -4327,7 +4327,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
                                   sdata,
-                                  [this, &jobs, service,fallback_service](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, service,fallback_service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -4337,7 +4337,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
                 fsdata.append((char)0);
                 jobs->prepend(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
                                               fsdata,
-                                              [&jobs, fallback_service](const QByteArray &data, bool &) -> bool
+                                              [jobs, fallback_service](const QByteArray &data, bool &) -> bool
                 {
                     if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
                     {
@@ -4372,7 +4372,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
     jobs->append(new MPCommandJob(this, MPCmd::READ_32B_IN_DN,
                                   std::bind(&MPDevice::getDataNodeCb, this, jobs, std::move(cbProgress), _1, _2)));
 
-    connect(jobs, &AsyncJobs::finished, [&jobs, cb](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &)
     {
         //all jobs finished success
         qInfo() << "get_data_node success";
@@ -4464,7 +4464,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
                                   sdata,
-                                  [this, &jobs, service](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -6139,7 +6139,7 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
 
     jobs->append(new MPCommandJob(this, MPCmd::GET_30_FREE_SLOTS,
                                   addressFrom,
-                                  [this, &jobs, discardFirstAddr, cbProgress](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, discardFirstAddr, cbProgress](const QByteArray &data, bool &) -> bool
     {
         quint32 nb_free_addresses_received = data[MP_LEN_FIELD_INDEX]/2;
         if (discardFirstAddr)
@@ -6315,7 +6315,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
 
     jobs->append(new MPCommandJob(this, isDatanode? MPCmd::SET_DATA_SERVICE : MPCmd::CONTEXT,
                                   sdata,
-                                  [&jobs, service](const QByteArray &data, bool &) -> bool
+                                  [jobs, service](const QByteArray &data, bool &) -> bool
     {
         QVariantMap m = {{ "service", service },
                          { "exists", data[MP_PAYLOAD_FIELD_INDEX] == 1 }};
@@ -6323,7 +6323,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [&jobs, cb](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &)
     {
         //all jobs finished success
         qInfo() << "service_exists success";
