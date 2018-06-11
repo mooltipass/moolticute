@@ -6877,7 +6877,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     runAndDequeueJobs();
 }
 
-void MPDevice::exportDatabase(QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
+void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                               MPDeviceProgressCb cbProgress)
 {
     /* New job for starting MMM */
