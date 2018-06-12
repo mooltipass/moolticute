@@ -76,6 +76,11 @@ void WSServerCon::processMessage(const QString &message)
         return;
     }
 
+    //Strip the data for the progress lambda,
+    //uneeded data should not be passed around
+    QJsonObject rootStripped = root;
+    rootStripped.remove("data");
+
     //Default progress callback handling
     auto defaultProgressCb = [=](QVariantMap progressData)
     {
@@ -89,7 +94,7 @@ void WSServerCon::processMessage(const QString &message)
             current = total;
 
         QJsonObject ores;
-        QJsonObject oroot = root;
+        QJsonObject oroot = rootStripped;
         ores["progress_total"] = total;
         ores["progress_current"] = current;
 
