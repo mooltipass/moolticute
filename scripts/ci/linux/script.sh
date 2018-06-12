@@ -8,7 +8,7 @@ make_version .
 
 # Linux build
 echo $DOCKER_EXEC
-$DOCKER_EXEC "mkdir -p /app/build-linux || true && cd /app/build-linux && qmake /app/Moolticute.pro && make"
+$DOCKER_EXEC "mkdir -p /app/build-linux || true && cd /app/build-linux && qmake /app/Moolticute.pro && make && ./tests/tests"
 
 # Windows build
 mkdir build
@@ -24,6 +24,8 @@ export PATH=$HOME/mxe/usr/bin:$PATH
 export MXE_BASE=$HOME/mxe
 
 $MXE_BASE/usr/i686-w64-mingw32.shared.posix/qt5/bin/qmake ../Moolticute.pro
-make
+
+# Compund exit codes of make and the tests.
+make && tests/release/tests.exe
 
 popd
