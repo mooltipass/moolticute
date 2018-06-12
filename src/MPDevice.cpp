@@ -30,13 +30,13 @@ MPDevice::MPDevice(QObject *parent):
 
     statusTimer = new QTimer(this);
     statusTimer->start(500);
-    connect(statusTimer, &QTimer::timeout, [=]()
+    connect(statusTimer, &QTimer::timeout, [this]()
     {
         //Do not interfer with any other operation by sending a MOOLTIPASS_STATUS command
         if (commandQueue.size() > 0)
             return;
 
-        sendData(MPCmd::MOOLTIPASS_STATUS, [=](bool success, const QByteArray &data, bool &)
+        sendData(MPCmd::MOOLTIPASS_STATUS, [this](bool success, const QByteArray &data, bool &)
         {
             if (!success)
                 return;
@@ -56,7 +56,7 @@ MPDevice::MPDevice(QObject *parent):
                 if (prevStatus == Common::UnknownStatus)
                 {
                     /* First start: load parameters */
-                    QTimer::singleShot(10, [=]()
+                    QTimer::singleShot(10, [this]()
                     {
                         loadParameters();
                         setCurrentDate();
@@ -65,7 +65,7 @@ MPDevice::MPDevice(QObject *parent):
 
                 if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
                 {
-                    QTimer::singleShot(20, [=]()
+                    QTimer::singleShot(20, [this]()
                     {
                         getCurrentCardCPZ();
                     });
@@ -78,7 +78,7 @@ MPDevice::MPDevice(QObject *parent):
                 if (s == Common::Unlocked)
                 {
                     /* If v1.2 firmware, query user change number */
-                    QTimer::singleShot(50, [=]()
+                    QTimer::singleShot(50, [this]()
                     {
                         if (isFw12())
                         {
@@ -119,7 +119,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
     cmd.sent_ts = QDateTime::currentMSecsSinceEpoch();
 
     cmd.timerTimeout = new QTimer(this);
-    connect(cmd.timerTimeout, &QTimer::timeout, [=]()
+    connect(cmd.timerTimeout, &QTimer::timeout, [this]()
     {
         commandQueue.head().retry--;
 
@@ -312,12 +312,12 @@ void MPDevice::runAndDequeueJobs()
 
     currentJobs = jobsQueue.dequeue();
 
-    connect(currentJobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(currentJobs, &AsyncJobs::finished, [this](const QByteArray &)
     {
         currentJobs = nullptr;
         runAndDequeueJobs();
     });
-    connect(currentJobs, &AsyncJobs::failed, [=](AsyncJob *)
+    connect(currentJobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
         currentJobs = nullptr;
         runAndDequeueJobs();
@@ -328,7 +328,7 @@ void MPDevice::runAndDequeueJobs()
 
 void MPDevice::updateFilesCache()
 {
-    getStoredFiles([=](bool success, QList<QVariantMap> files)
+    getStoredFiles([this](bool success, QList<QVariantMap> files)
     {
         if (success)
         {
@@ -423,7 +423,7 @@ void MPDevice::loadParameters()
 
     jobs->append(new MPCommandJob(this,
                                   MPCmd::VERSION,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received MP version FLASH size: " << (quint8)data.at(2) << "Mb";
         QString hw = QString(data.mid(3, (quint8)data.at(0) - 2));
@@ -447,7 +447,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::KEYBOARD_LAYOUT_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received language: " << (quint8)data.at(2);
         set_keyboardLayout((quint8)data.at(2));
@@ -457,7 +457,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::LOCK_TIMEOUT_ENABLE_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received lock timeout enable: " << (quint8)data.at(2);
         set_lockTimeoutEnabled(data.at(2) != 0);
@@ -467,7 +467,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::LOCK_TIMEOUT_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received lock timeout: " << (quint8)data.at(2);
         set_lockTimeout((quint8)data.at(2));
@@ -477,7 +477,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::SCREENSAVER_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received screensaver: " << (quint8)data.at(2);
         set_screensaver(data.at(2) != 0);
@@ -487,7 +487,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::USER_REQ_CANCEL_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received userRequestCancel: " << (quint8)data.at(2);
         set_userRequestCancel(data.at(2) != 0);
@@ -497,7 +497,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::USER_INTER_TIMEOUT_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received userInteractionTimeout: " << (quint8)data.at(2);
         set_userInteractionTimeout((quint8)data.at(2));
@@ -507,7 +507,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::FLASH_SCREEN_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received flashScreen: " << (quint8)data.at(2);
         set_flashScreen(data.at(2) != 0);
@@ -517,7 +517,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::OFFLINE_MODE_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received offlineMode: " << (quint8)data.at(2);
         set_offlineMode(data.at(2) != 0);
@@ -527,7 +527,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::TUTORIAL_BOOL_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received tutorialEnabled: " << (quint8)data.at(2);
         set_tutorialEnabled(data.at(2) != 0);
@@ -537,7 +537,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received screenBrightness: " << (quint8)data.at(2);
         set_screenBrightness((quint8)data.at(2));
@@ -547,7 +547,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received set_knockEnabled: " << (quint8)data.at(2);
         set_knockEnabled(data.at(2) != 0);
@@ -557,7 +557,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::MINI_KNOCK_THRES_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received knockSensitivity: " << (quint8)data.at(2);
         int v = 1;
@@ -570,7 +570,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::RANDOM_INIT_PIN_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received randomStartingPin: " << (quint8)data.at(2);
         set_randomStartingPin(data.at(2) != 0);
@@ -581,7 +581,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::HASH_DISPLAY_FEATURE_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received hashDisplay: " << (quint8)data.at(2);
         set_hashDisplay(data.at(2) != 0);
@@ -591,7 +591,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::LOCK_UNLOCK_FEATURE_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received lockUnlockMode: " << (quint8)data.at(2);
         set_lockUnlockMode(data.at(2));
@@ -602,7 +602,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received key after login send enabled: " << (quint8)data.at(2);
         set_keyAfterLoginSendEnable(data.at(2) != 0);
@@ -612,7 +612,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received key after login send " << (quint8)data.at(2);
         set_keyAfterLoginSend(data.at(2));
@@ -622,7 +622,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received key after pass send enabled: " << (quint8)data.at(2);
         set_keyAfterPassSendEnable(data.at(2) != 0);
@@ -632,7 +632,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received key after pass send " << (quint8)data.at(2);
         set_keyAfterPassSend(data.at(2));
@@ -642,7 +642,7 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received delay after key entry enabled: " << (quint8)data.at(2);
         set_delayAfterKeyEntryEnable(data.at(2) != 0);
@@ -652,14 +652,14 @@ void MPDevice::loadParameters()
     jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_MOOLTIPASS_PARM,
                                   QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM),
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         qDebug() << "received delay after key entry " << (quint8)data.at(2);
         set_delayAfterKeyEntry(data.at(2));
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this](const QByteArray &data)
     {
         Q_UNUSED(data);
         //data is last result
@@ -675,7 +675,7 @@ void MPDevice::loadParameters()
             /* Query serial number */
             v12jobs->append(new MPCommandJob(this,
                                           MPCmd::GET_SERIAL,
-                                          [=](const QByteArray &data, bool &) -> bool
+                                          [this](const QByteArray &data, bool &) -> bool
             {
                 set_serialNumber(((quint8)data[MP_PAYLOAD_FIELD_INDEX+3]) +
                         ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]) << 8) +
@@ -685,7 +685,7 @@ void MPDevice::loadParameters()
                 return true;
             }));
 
-            connect(v12jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+            connect(v12jobs, &AsyncJobs::finished, [this](const QByteArray &data)
             {
                 Q_UNUSED(data);
                 //data is last result
@@ -694,7 +694,7 @@ void MPDevice::loadParameters()
                 qInfo() << "Finished loading Mini serial number";
             });
 
-            connect(v12jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+            connect(v12jobs, &AsyncJobs::failed, [this](AsyncJob *failedJob)
             {
                 Q_UNUSED(failedJob);
                 qCritical() << "Loading Mini serial number failed";
@@ -706,7 +706,7 @@ void MPDevice::loadParameters()
         }
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [this](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Loading option failed";
@@ -731,11 +731,11 @@ void MPDevice::updateParam(MPParams::Param param, int val)
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [param](const QByteArray &)
     {
         qInfo() << param << " param updated with success";
     });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    connect(jobs, &AsyncJobs::failed, [param](AsyncJob *)
     {
         qWarning() << "Failed to change " << param;
     });
@@ -870,7 +870,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
 
     /* Get CTR value */
     jobs->append(new MPCommandJob(this, MPCmd::GET_CTRVALUE,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this, jobs](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -893,7 +893,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
 
     /* Get CPZ and CTR values */
     auto cpzJob = new MPCommandJob(this, MPCmd::GET_CARD_CPZ_CTR,
-                                  [=](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs](const QByteArray &data, bool &done) -> bool
     {
         /* The Mooltipass answers with CPZ CTR packets containing the CPZ_CTR values, and then a final MPCmd::GET_CARD_CPZ_CTR packet */
         if ((quint8)data[1] == MPCmd::CARD_CPZ_CTR_PACKET)
@@ -933,7 +933,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     {
         jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE,
                                       QByteArray(1, (quint8)i),
-                                      [=](const QByteArray &, QByteArray &) -> bool
+                                      [this, i, cbProgress](const QByteArray &, QByteArray &) -> bool
         {
             if (i == 0)
             {
@@ -947,7 +947,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             return true;
         },
-                                      [=](const QByteArray &data, bool &) -> bool
+                                      [this, i, jobs, cbProgress](const QByteArray &data, bool &) -> bool
         {
             if (data[MP_LEN_FIELD_INDEX] == 1)
             {
@@ -981,7 +981,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     {
         /* Get parent node start address */
         jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
-                                      [=](const QByteArray &data, bool &) -> bool
+                                      [this, jobs, fullScan, cbProgress](const QByteArray &data, bool &) -> bool
         {
             if (data[MP_LEN_FIELD_INDEX] == 1)
             {
@@ -1024,7 +1024,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     {
         //Get parent data node start address
         jobs->append(new MPCommandJob(this, MPCmd::GET_DN_START_PARENT,
-                                      [=](const QByteArray &data, bool &) -> bool
+                                      [this, jobs, fullScan, getDataChilds, cbProgress](const QByteArray &data, bool &) -> bool
         {
 
             if (data[MP_LEN_FIELD_INDEX] == 1)
@@ -1095,7 +1095,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, cb, wantData](const QByteArray &data)
     {
         Q_UNUSED(data);
 
@@ -1125,7 +1125,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
         }
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
@@ -1249,7 +1249,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     /* Send read node command, expecting 3 packets or 1 depending on if we're allowed to read a block*/
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [=](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnodeClone, pnode, address, cbProgress](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -1346,7 +1346,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDevic
     /* Send read node command, expecting 3 packets */
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [=](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnode, pnodeClone, address, cbProgress](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -1428,7 +1428,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     /* Query node */
     jobs->prepend(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [=](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, cnode, cnodeClone, address, parent, parentClone](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -1476,7 +1476,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
 
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [=](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnode, pnodeClone, load_childs, cbProgress](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -1545,7 +1545,7 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
 
     jobs->prepend(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [=](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, cnode, cnodeClone, cbProgress, nbBytesFetched, parent, parentClone](const QByteArray &data, bool &done) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
@@ -3292,7 +3292,8 @@ void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& addres
         packetToSend.append(i);
         packetToSend.append(data.mid(i*59, payload_size-3));
         //qDebug() << "Write node packet #" << i << " : " << packetToSend.toHex();
-        jobs->append(new MPCommandJob(this, MPCmd::WRITE_FLASH_NODE, packetToSend, [=](const QByteArray &data, bool &) -> bool
+        jobs->append(new MPCommandJob(this, MPCmd::WRITE_FLASH_NODE, packetToSend,
+            [writeCallback](const QByteArray &data, bool &) -> bool
         {
             if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
             {
@@ -3317,7 +3318,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     progressCurrent = 0;
     progressTotal = 0;
 
-    auto dataWriteProgressCb = [=](void)
+    auto dataWriteProgressCb = [this, cbProgress](void)
     {
         QVariantMap data = {
             {"total", progressTotal},
@@ -3581,7 +3582,7 @@ void MPDevice::exitMemMgmtMode(bool setMMMBool)
 
     jobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, setMMMBool](const QByteArray &)
     {
         qInfo() << "MMM exit ok";
         cleanMMMVars();
@@ -3591,7 +3592,7 @@ void MPDevice::exitMemMgmtMode(bool setMMMBool)
         }
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    connect(jobs, &AsyncJobs::failed, [this, setMMMBool](AsyncJob *)
     {
         qCritical() << "Failed to exit MMM";
         cleanMMMVars();
@@ -3610,7 +3611,7 @@ void MPDevice::setCurrentDate()
     AsyncJobs *jobs = new AsyncJobs("Send date to device", this);
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_DATE,
-                                  [=](const QByteArray &, QByteArray &data_to_send) -> bool
+                                  [](const QByteArray &, QByteArray &data_to_send) -> bool
     {
         data_to_send.clear();
         data_to_send.append(Common::dateToBytes(QDate::currentDate()));
@@ -3621,16 +3622,16 @@ void MPDevice::setCurrentDate()
 
         return true;
     },
-                                [=](const QByteArray &, bool &) -> bool
+                                [](const QByteArray &, bool &) -> bool
     {
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [](const QByteArray &)
     {
         qInfo() << "Date set success";
     });
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    connect(jobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
         qWarning() << "Failed to set date on device";
         setCurrentDate(); // memory: does it get piled on?
@@ -3660,7 +3661,7 @@ void MPDevice::getUID(const QByteArray & key)
 
         return true;
     },
-                                [=](const QByteArray &data, bool &) -> bool
+                                [this](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_LEN_FIELD_INDEX] == 1 )
         {
@@ -3675,7 +3676,7 @@ void MPDevice::getUID(const QByteArray & key)
         return ok;
     }));
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *)
+    connect(jobs, &AsyncJobs::failed, [](AsyncJob *)
     {
         qWarning() << "Failed get uid from device";
     });
@@ -3691,7 +3692,7 @@ void MPDevice::getCurrentCardCPZ()
     /* Query change number */
     cpzjobs->append(new MPCommandJob(this,
                                   MPCmd::GET_CUR_CARD_CPZ,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
@@ -3711,7 +3712,7 @@ void MPDevice::getCurrentCardCPZ()
         }
     }));
 
-    connect(cpzjobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(cpzjobs, &AsyncJobs::finished, [](const QByteArray &data)
     {
         Q_UNUSED(data);
         //data is last result
@@ -3719,7 +3720,7 @@ void MPDevice::getCurrentCardCPZ()
         qInfo() << "Finished loading card CPZ";
     });
 
-    connect(cpzjobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(cpzjobs, &AsyncJobs::failed, [this](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Loading card CPZ failed";
@@ -3737,7 +3738,7 @@ void MPDevice::getChangeNumbers()
     /* Query change number */
     v12jobs->append(new MPCommandJob(this,
                                   MPCmd::GET_USER_CHANGE_NB,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
@@ -3762,7 +3763,7 @@ void MPDevice::getChangeNumbers()
         }
     }));
 
-    connect(v12jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(v12jobs, &AsyncJobs::finished, [](const QByteArray &data)
     {
         Q_UNUSED(data);
         //data is last result
@@ -3770,7 +3771,7 @@ void MPDevice::getChangeNumbers()
         qInfo() << "Finished loading change numbers";
     });
 
-    connect(v12jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(v12jobs, &AsyncJobs::failed, [this](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Loading change numbers failed";
@@ -3843,7 +3844,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
 
     jobs->append(new MPCommandJob(this, MPCmd::CONTEXT,
                                   sdata,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, fallback_service, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -3853,7 +3854,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
                 fsdata.append((char)0);
                 jobs->prepend(new MPCommandJob(this, MPCmd::CONTEXT,
                                               fsdata,
-                                              [=](const QByteArray &data, bool &) -> bool
+                                              [jobs, fallback_service](const QByteArray &data, bool &) -> bool
                 {
                     if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
                     {
@@ -3887,7 +3888,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
 
     jobs->append(new MPCommandJob(this, MPCmd::GET_LOGIN,
                                   ldata,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [jobs, login](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0 && !login.isEmpty())
         {
@@ -3912,7 +3913,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
     if (isFw12())
     {
         jobs->append(new MPCommandJob(this, MPCmd::GET_DESCRIPTION,
-                                      [=](const QByteArray &data, bool &) -> bool
+                                      [jobs](const QByteArray &data, bool &) -> bool
         {
             /// Commented below: in case there's an empty description it is impossible to distinguish between device refusal and empty description.
             /*if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
@@ -3929,7 +3930,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
     }
 
     jobs->append(new MPCommandJob(this, MPCmd::GET_PASSWORD,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [jobs](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
@@ -3939,7 +3940,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &data)
     {
         //data is last result
         //all jobs finished success
@@ -3951,7 +3952,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
         cb(true, QString(), m["service"].toString(), m["login"].toString(), pass, m["description"].toString());
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         qCritical() << "Failed getting password: " << failedJob->getErrorStr();
         cb(false, failedJob->getErrorStr(), QString(), QString(), QString(), QString());
@@ -3965,7 +3966,7 @@ void MPDevice::delCredentialAndLeave(QString service, const QString &login,
                                      MPDeviceProgressCb cbProgress,
                                      std::function<void(bool success, QString errstr)> cb)
 {
-    auto deleteCred = [=]()
+    auto deleteCred = [this, service, login, cbProgress, cb]()
     {
         QJsonArray allCreds;
         bool found = false;
@@ -4001,7 +4002,7 @@ void MPDevice::delCredentialAndLeave(QString service, const QString &login,
             cb(false, "Credential was not found in database");
         }
         else
-            setMMCredentials(allCreds, false, cbProgress, [=](bool success, QString errstr)
+            setMMCredentials(allCreds, false, cbProgress, [this, cb](bool success, QString errstr)
             {
                 exitMemMgmtMode(); //just in case
                 cb(success, errstr);
@@ -4012,7 +4013,7 @@ void MPDevice::delCredentialAndLeave(QString service, const QString &login,
     {
         startMemMgmtMode(false,
                          cbProgress,
-                         [=](bool success, int, QString errMsg)
+                         [cb, deleteCred](bool success, int, QString errMsg)
         {
             if (!success)
                 cb(success, errMsg);
@@ -4032,7 +4033,7 @@ void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, 
     cmd->setTimeout(5000);
     jobs->append(cmd);
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &data)
     {
         //data is last result
         //all jobs finished success
@@ -4041,7 +4042,7 @@ void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, 
         cb(true, QString(), data.mid(0, 32));
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Failed generating rng";
@@ -4063,7 +4064,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
     //Create context
     jobs->prepend(new MPCommandJob(this, cmdAddCtx,
                   sdata,
-                  [=](const QByteArray &data, bool &) -> bool
+                  [jobs, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -4078,7 +4079,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
     //choose context
     jobs->insertAfter(new MPCommandJob(this, cmdSelectCtx,
                                   sdata,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [jobs, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -4117,7 +4118,7 @@ void MPDevice::setCredential(QString service, const QString &login,
     //First query if context exist
     jobs->append(new MPCommandJob(this, MPCmd::CONTEXT,
                                   sdata,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -4135,7 +4136,7 @@ void MPDevice::setCredential(QString service, const QString &login,
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_LOGIN,
                                   ldata,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [jobs, login](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
         {
@@ -4155,7 +4156,7 @@ void MPDevice::setCredential(QString service, const QString &login,
         //Set description should be done right after set login
         jobs->append(new MPCommandJob(this, MPCmd::SET_DESCRIPTION,
                                       ddata,
-                                      [=](const QByteArray &data, bool &) -> bool
+                                      [jobs, description](const QByteArray &data, bool &) -> bool
         {
             if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
             {
@@ -4180,14 +4181,14 @@ void MPDevice::setCredential(QString service, const QString &login,
     if(!pass.isEmpty()) {
         jobs->append(new MPCommandJob(this, MPCmd::CHECK_PASSWORD,
                                       pdata,
-                                      [=](const QByteArray &data, bool &) -> bool
+                                      [this, jobs, pdata](const QByteArray &data, bool &) -> bool
         {
             if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
             {
                 //Password does not match, update it
                 jobs->prepend(new MPCommandJob(this, MPCmd::SET_PASSWORD,
                                                pdata,
-                                               [=](const QByteArray &data, bool &) -> bool
+                                               [jobs](const QByteArray &data, bool &) -> bool
                 {
                     if (data[2] == 0)
                     {
@@ -4206,7 +4207,7 @@ void MPDevice::setCredential(QString service, const QString &login,
         }));
     }
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &)
     {
         //all jobs finished success
         qInfo() << "set_credential success";
@@ -4226,7 +4227,7 @@ void MPDevice::setCredential(QString service, const QString &login,
         }
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         qCritical() << "Failed adding new credential";
         cb(false, failedJob->getErrorStr());
@@ -4326,7 +4327,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
                                   sdata,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, service,fallback_service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -4336,7 +4337,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
                 fsdata.append((char)0);
                 jobs->prepend(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
                                               fsdata,
-                                              [=](const QByteArray &data, bool &) -> bool
+                                              [jobs, fallback_service](const QByteArray &data, bool &) -> bool
                 {
                     if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
                     {
@@ -4371,7 +4372,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
     jobs->append(new MPCommandJob(this, MPCmd::READ_32B_IN_DN,
                                   std::bind(&MPDevice::getDataNodeCb, this, jobs, std::move(cbProgress), _1, _2)));
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &)
     {
         //all jobs finished success
         qInfo() << "get_data_node success";
@@ -4385,7 +4386,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
         cb(true, QString(), m["service"].toString(), ndata.mid(4, sz));
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         qCritical() << "Failed getting data node";
         cb(false, failedJob->getErrorStr(), QString(), QByteArray());
@@ -4463,7 +4464,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
                                   sdata,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, service](const QByteArray &data, bool &) -> bool
     {
         if (data[MP_PAYLOAD_FIELD_INDEX] != 1)
         {
@@ -4500,7 +4501,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
                                   std::bind(&MPDevice::setDataNodeCb, this, jobs, MOOLTIPASS_BLOCK_SIZE,
                                             std::move(cbProgress), _1, _2)));
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, cb, service, nodeData](const QByteArray &)
     {
         //all jobs finished success
         qInfo() << "set_data_node success";
@@ -4525,7 +4526,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
         }
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         qCritical() << "Failed writing data node";
         cb(false, failedJob->getErrorStr());
@@ -4557,7 +4558,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
     cleanMMMVars();
     memMgmtModeReadFlash(jobs, false, cbProgress, false, true, true);
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, services, cb, cbProgress](const QByteArray &data)
     {
         Q_UNUSED(data);
 
@@ -4592,7 +4593,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
 
         /* Generate save packets */
         AsyncJobs* saveJobs = new AsyncJobs("Starting save operations...", this);
-        connect(saveJobs, &AsyncJobs::finished, [=](const QByteArray &data)
+        connect(saveJobs, &AsyncJobs::finished, [this, services, cb](const QByteArray &data)
         {
             Q_UNUSED(data);
             exitMemMgmtMode(true);
@@ -4608,7 +4609,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
 
             return;
         });
-        connect(saveJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+        connect(saveJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
         {
             Q_UNUSED(failedJob);
             exitMemMgmtMode(true);
@@ -4644,7 +4645,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
         }
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Couldn't Rescan The Memory";
@@ -5335,7 +5336,7 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
                             cbProgress,
                             true, true, true);
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, cb, cbProgress, noDelete](const QByteArray &data)
     {
         Q_UNUSED(data);
         qInfo() << "Mem management mode enabled";
@@ -5804,7 +5805,7 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
             AsyncJobs* getFreeAddressesJob = new AsyncJobs("Asking free adresses...", this);
             loadFreeAddresses(getFreeAddressesJob, MPNode::EmptyAddress, false, cbProgress);
 
-            connect(getFreeAddressesJob, &AsyncJobs::finished, [=](const QByteArray &data)
+            connect(getFreeAddressesJob, &AsyncJobs::finished, [this, cb, cbProgress, noDelete](const QByteArray &data)
             {
                 Q_UNUSED(data);
                 //data is last result
@@ -5819,7 +5820,7 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
                 if(finishImportFileMerging(stringError, noDelete))
                 {
                     AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
-                    connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
+                    connect(mergeOperations, &AsyncJobs::finished, [this, cb](const QByteArray &data)
                     {
                         Q_UNUSED(data);
 
@@ -5843,7 +5844,7 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
                         cb(true, "Import File Merged With Current Database");
                         return;
                     });
-                    connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+                    connect(mergeOperations, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
                     {
                         Q_UNUSED(failedJob);
                         cleanImportedVars();
@@ -5875,7 +5876,7 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
                 }
             });
 
-            connect(getFreeAddressesJob, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+            connect(getFreeAddressesJob, &AsyncJobs::failed, [](AsyncJob *failedJob)
             {
                 Q_UNUSED(failedJob);
                 qCritical() << "Couldn't get enough free addresses";
@@ -5891,7 +5892,7 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
             if(finishImportFileMerging(stringError, noDelete))
             {
                 AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
-                connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
+                connect(mergeOperations, &AsyncJobs::finished, [this, cb](const QByteArray &data)
                 {
                     Q_UNUSED(data);
 
@@ -5915,7 +5916,7 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
                     cb(true, "Import File Merged With Current Database");
                     return;
                 });
-                connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+                connect(mergeOperations, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
                 {
                     Q_UNUSED(failedJob);
                     cleanImportedVars();
@@ -5948,7 +5949,7 @@ void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::functi
         }
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
@@ -6138,7 +6139,7 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
 
     jobs->append(new MPCommandJob(this, MPCmd::GET_30_FREE_SLOTS,
                                   addressFrom,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [this, jobs, discardFirstAddr, cbProgress](const QByteArray &data, bool &) -> bool
     {
         quint32 nb_free_addresses_received = data[MP_LEN_FIELD_INDEX]/2;
         if (discardFirstAddr)
@@ -6221,7 +6222,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
     /* Load CTR, favorites, nodes... */
     memMgmtModeReadFlash(jobs, true, cbProgress, true, true, true);
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &)
     {
         qInfo() << "Finished loading the nodes in memory";
 
@@ -6247,7 +6248,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         /* Leave MMM */
         repairJobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
-        connect(repairJobs, &AsyncJobs::finished, [=](const QByteArray &data)
+        connect(repairJobs, &AsyncJobs::finished, [packets_generated, cb](const QByteArray &data)
         {
             Q_UNUSED(data);
 
@@ -6263,7 +6264,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
             }
         });
 
-        connect(repairJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+        connect(repairJobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
         {
             Q_UNUSED(failedJob);
             qCritical() << "Couldn't check memory contents";
@@ -6274,7 +6275,7 @@ void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errs
         runAndDequeueJobs();
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Failed scanning the flash memory";
@@ -6314,7 +6315,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
 
     jobs->append(new MPCommandJob(this, isDatanode? MPCmd::SET_DATA_SERVICE : MPCmd::CONTEXT,
                                   sdata,
-                                  [=](const QByteArray &data, bool &) -> bool
+                                  [jobs, service](const QByteArray &data, bool &) -> bool
     {
         QVariantMap m = {{ "service", service },
                          { "exists", data[MP_PAYLOAD_FIELD_INDEX] == 1 }};
@@ -6322,7 +6323,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &)
     {
         //all jobs finished success
         qInfo() << "service_exists success";
@@ -6330,7 +6331,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
         cb(true, QString(), m["service"].toString(), m["exists"].toBool());
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         qCritical() << "Failed getting data node";
         cb(false, failedJob->getErrorStr(), QString(), false);
@@ -6376,7 +6377,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgr
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false, cbProgress, true, false, true);
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, creds, cb, cbProgress](const QByteArray &data)
     {
         Q_UNUSED(data);
 
@@ -6478,7 +6479,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgr
         }
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
@@ -6716,7 +6717,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     /* Out of pure coding laziness, ask free addresses even if we don't need them */
     loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, cb, cbProgress](const QByteArray &)
     {
         qInfo() << "Received enough free addresses";
 
@@ -6747,7 +6748,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         }
 
         AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
-        connect(mergeOperations, &AsyncJobs::finished, [=](const QByteArray &data)
+        connect(mergeOperations, &AsyncJobs::finished, [this, cb, cbProgress](const QByteArray &data)
         {
             Q_UNUSED(data);
             exitMemMgmtMode(true);
@@ -6766,7 +6767,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     //First query if context exist
                     pwdChangeJobs->append(new MPCommandJob(this, MPCmd::CONTEXT,
                                                            sdata,
-                                                           [=](const QByteArray &data, bool &) -> bool
+                                                           [this, i, cbProgress](const QByteArray &data, bool &) -> bool
                     {
                         QVariantMap qmapdata = {
                             {"total", mmmPasswordChangeArray.size()},
@@ -6793,7 +6794,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 
                     pwdChangeJobs->append(new MPCommandJob(this, MPCmd::SET_LOGIN,
                                                   ldata,
-                                                  [=](const QByteArray &data, bool &) -> bool
+                                                  [this, &pwdChangeJobs, i](const QByteArray &data, bool &) -> bool
                     {
                         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
                         {
@@ -6813,7 +6814,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 
                     pwdChangeJobs->append(new MPCommandJob(this, MPCmd::SET_PASSWORD,
                                                    pdata,
-                                                   [=](const QByteArray &data, bool &) -> bool
+                                                   [this, &pwdChangeJobs, i](const QByteArray &data, bool &) -> bool
                     {
                         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
                         {
@@ -6827,14 +6828,14 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     }));
                 }
 
-                connect(pwdChangeJobs, &AsyncJobs::finished, [=](const QByteArray &)
+                connect(pwdChangeJobs, &AsyncJobs::finished, [this, cb](const QByteArray &)
                 {
                     cb(true, "Changes Applied to Memory");
                     qInfo() << "Passwords changed!";
                     mmmPasswordChangeArray.clear();
                 });
 
-                connect(pwdChangeJobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+                connect(pwdChangeJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
                 {
                     Q_UNUSED(failedJob);
                     mmmPasswordChangeArray.clear();
@@ -6851,7 +6852,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 qInfo() << "No passwords to be changed";
             }
         });
-        connect(mergeOperations, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+        connect(mergeOperations, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
         {
             Q_UNUSED(failedJob);
             exitMemMgmtMode(true);
@@ -6865,7 +6866,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         runAndDequeueJobs();
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "MMM save failed: couldn't load enough free addresses";
@@ -6877,7 +6878,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     runAndDequeueJobs();
 }
 
-void MPDevice::exportDatabase(QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
+void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                               MPDeviceProgressCb cbProgress)
 {
     /* New job for starting MMM */
@@ -6891,7 +6892,7 @@ void MPDevice::exportDatabase(QString &encryption, std::function<void(bool succe
                             cbProgress
                             , true, true, true);
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, cb, encryption](const QByteArray &)
     {
         qInfo() << "Memory management mode entered";
         exitMemMgmtMode(false);
@@ -6909,7 +6910,7 @@ void MPDevice::exportDatabase(QString &encryption, std::function<void(bool succe
         }
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
@@ -6944,7 +6945,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
             addcpzjobs->append(new MPCommandJob(this,
                                           MPCmd::ADD_UNKNOWN_CARD,
                                           unknownCardAddPayload,
-                                          [=](const QByteArray &data, bool &) -> bool
+                                          [](const QByteArray &data, bool &) -> bool
             {
                 if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
                     return false;
@@ -6952,7 +6953,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                     return true;
             }));
 
-            connect(addcpzjobs, &AsyncJobs::finished, [=](const QByteArray &data)
+            connect(addcpzjobs, &AsyncJobs::finished, [this, cbProgress, cb, noDelete](const QByteArray &data)
             {
                 Q_UNUSED(data);
                 qInfo() << "CPZ/CTR Added";
@@ -6961,7 +6962,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                 startImportFileMerging(cbProgress, cb, noDelete);
             });
 
-            connect(addcpzjobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+            connect(addcpzjobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
             {
                 Q_UNUSED(failedJob);
                 qCritical() << "Adding unknown card failed";
@@ -7005,7 +7006,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false, [](QVariant) {}, false, true, true);
 
-    connect(jobs, &AsyncJobs::finished, [=](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &data)
     {
         Q_UNUSED(data);
 
@@ -7029,7 +7030,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
         cb(true, list);
     });
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Setting device in MMM failed";
@@ -7047,7 +7048,7 @@ void MPDevice::resetSmartCard(std::function<void(bool success, QString errstr)> 
 
     jobs->append(new MPCommandJob(this, MPCmd::RESET_CARD, MPCommandJob::defaultCheckRet));
 
-    connect(jobs, &AsyncJobs::failed, [=](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Reseting smart card failed";

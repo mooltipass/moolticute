@@ -200,7 +200,7 @@ public:
                           std::function<void(bool success, QString errstr)> cb);
 
     //Export database
-    void exportDatabase(QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
+    void exportDatabase(const QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
                         MPDeviceProgressCb cbProgress);
     //Import database
     void importDatabase(const QByteArray &fileData, bool noDelete,
