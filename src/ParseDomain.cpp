@@ -5,8 +5,8 @@ ParseDomain::ParseDomain(const QString &url) :
     _url(QUrl::fromUserInput(url))
     , _isWebsite(false)
 {
-    if (! _url.isValid()) {
-        qDebug() << "ParseDomain error:" << _url.errorString();
+    if (!_url.isValid()) {
+        qDebug() << "ParseDomain error:" << _url.errorString() << "for:" << _url;
         return;
     }
 
