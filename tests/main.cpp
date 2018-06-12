@@ -15,39 +15,42 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
     app.setAttribute(Qt::AA_Use96Dpi, true);
 
-   int status = 0;
+    int status = 0;
+    const auto runTest = [&status](QObject *test) {
+        status += QTest::qExec(test);
+    };
 
-   {
-       TestTreeItem testTreeItem;
-       QTest::qExec(&testTreeItem);
-   }
+    {
+        TestTreeItem testTreeItem;
+        runTest(&testTreeItem);
+    }
 
-   {
-       TestCredentialModel testCredentialsModel;
-       QTest::qExec(&testCredentialsModel);
-   }
+    {
+        TestCredentialModel testCredentialsModel;
+        runTest(&testCredentialsModel);
+    }
 
-   {
-       TestCredentialModelFilter testCredentialsModelFilter;
-       QTest::qExec(&testCredentialsModelFilter);
-   }
+    {
+        TestCredentialModelFilter testCredentialsModelFilter;
+        runTest(&testCredentialsModelFilter);
+    }
 
-   {
-       DbBackupsTrackerTests dbBackupsTrackerTests;
-       QTest::qExec(&dbBackupsTrackerTests);
-   }
+    {
+        DbBackupsTrackerTests dbBackupsTrackerTests;
+        runTest(&dbBackupsTrackerTests);
+    }
 
-   {
-       TestDbExportsRegistry testDbExportsRegistry;
-       QTest::qExec(&testDbExportsRegistry);
-   }
+    {
+        TestDbExportsRegistry testDbExportsRegistry;
+        runTest(&testDbExportsRegistry);
+    }
 
-   {
-       TestParseDomain testParseDomain;
-       QTest::qExec(&testParseDomain);
-   }
+    {
+        TestParseDomain testParseDomain;
+        runTest(&testParseDomain);
+    }
 
-   return status;
+    return status;
 }
 
 
