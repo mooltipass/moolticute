@@ -288,76 +288,75 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPa
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue)
 {
     LoginItem *pLoginItem = getLoginItemByIndex(idx);
+    if (!pLoginItem) return;
+
     bool bChanged = false;
-    if (pLoginItem != nullptr)
+    switch (role)
     {
-        switch (role)
+    case ItemNameRole:
+    {
+        QString sName = vValue.toString();
+        if (sName != pLoginItem->name())
         {
-        case ItemNameRole:
-        {
-            QString sName = vValue.toString();
-            if (sName != pLoginItem->name())
-            {
-                pLoginItem->setName(sName);
-                bChanged = true;
-            }
-            break;
+            pLoginItem->setName(sName);
+            bChanged = true;
         }
-        case PasswordRole:
-        {
-            QString sPassword = vValue.toString();
-            if (sPassword != pLoginItem->password())
-            {
-                pLoginItem->setPassword(sPassword);
-                bChanged = true;
-            }
-            break;
-        }
-        case DescriptionRole:
-        {
-            QString sDescription = vValue.toString();
-            if (sDescription != pLoginItem->description())
-            {
-                pLoginItem->setDescription(sDescription);
-                bChanged = true;
-            }
-            break;
-        }
-        case DateUpdatedRole:
-        {
-            QDate dDate = vValue.toDate();
-            if (dDate != pLoginItem->updatedDate())
-            {
-                pLoginItem->setUpdatedDate(dDate);
-                bChanged = true;
-            }
-            break;
-        }
-        case DateAccessedRole:
-        {
-            QDate dDate = vValue.toDate();
-            if (dDate != pLoginItem->accessedDate())
-            {
-                pLoginItem->setAccessedDate(dDate);
-                bChanged = true;
-            }
-            break;
-        }
-        case FavoriteRole:
-        {
-            qint8 iFavorite = (qint8)vValue.toInt();
-            if (iFavorite != pLoginItem->favorite())
-            {
-                pLoginItem->setFavorite(iFavorite);
-                bChanged = true;
-            }
-            break;
-        }
-        default: break;
-        }
-        if (bChanged)
-            emit dataChanged(idx, idx);
+        break;
     }
+    case PasswordRole:
+    {
+        QString sPassword = vValue.toString();
+        if (sPassword != pLoginItem->password())
+        {
+            pLoginItem->setPassword(sPassword);
+            bChanged = true;
+        }
+        break;
+    }
+    case DescriptionRole:
+    {
+        QString sDescription = vValue.toString();
+        if (sDescription != pLoginItem->description())
+        {
+            pLoginItem->setDescription(sDescription);
+            bChanged = true;
+        }
+        break;
+    }
+    case DateUpdatedRole:
+    {
+        QDate dDate = vValue.toDate();
+        if (dDate != pLoginItem->updatedDate())
+        {
+            pLoginItem->setUpdatedDate(dDate);
+            bChanged = true;
+        }
+        break;
+    }
+    case DateAccessedRole:
+    {
+        QDate dDate = vValue.toDate();
+        if (dDate != pLoginItem->accessedDate())
+        {
+            pLoginItem->setAccessedDate(dDate);
+            bChanged = true;
+        }
+        break;
+    }
+    case FavoriteRole:
+    {
+        qint8 iFavorite = (qint8)vValue.toInt();
+        if (iFavorite != pLoginItem->favorite())
+        {
+            pLoginItem->setFavorite(iFavorite);
+            bChanged = true;
+        }
+        break;
+    }
+    default: break;
+    }
+    if (bChanged)
+        emit dataChanged(idx, idx);
 }
 
 void CredentialModel::clear()

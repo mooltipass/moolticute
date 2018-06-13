@@ -3103,8 +3103,6 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
 bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed)
 {
     QByteArray temp_pnode_address, temp_cnode_address;
-    MPNode* temp_pnode_pointer;
-    MPNode* temp_cnode_pointer;
     bool return_bool;
 
     qInfo() << "Checking database...";
@@ -3210,7 +3208,8 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
             if ((temp_pnode_address != MPNode::EmptyAddress) || (temp_pnode_address != MPNode::EmptyAddress))
             {
                 /* Find the nodes in memory */
-                temp_pnode_pointer = findNodeWithAddressInList(loginNodes, temp_pnode_address, 0);
+                MPNode *temp_cnode_pointer = nullptr;
+                MPNode *temp_pnode_pointer = findNodeWithAddressInList(loginNodes, temp_pnode_address, 0);
                 if (temp_pnode_pointer)
                 {
                     temp_cnode_pointer = findNodeWithAddressWithGivenParentInList(loginChildNodes,  temp_pnode_pointer, temp_cnode_address, 0);
