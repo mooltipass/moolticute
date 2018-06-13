@@ -21,6 +21,8 @@
 #include "Common.h"
 #include "version.h"
 
+#include <cassert>
+
 #ifdef Q_OS_MAC
 #include "MacUtils.h"
 #endif
@@ -36,6 +38,7 @@ AppDaemon::AppDaemon(int &argc, char **argv):
 
 bool AppDaemon::initialize()
 {
+    assert(!localLogServer);
     localLogServer = new QLocalServer(this);
     localLogServer->removeServer(MOOLTICUTE_DAEMON_LOG_SOCK);
     localLogServer->listen(MOOLTICUTE_DAEMON_LOG_SOCK);
