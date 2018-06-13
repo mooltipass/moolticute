@@ -69,7 +69,7 @@ private:
      QAction *showConfigApp = nullptr;
      DaemonMenuAction *daemonAction = nullptr;
 #ifndef Q_OS_WIN
-     QAction *restartDaemonAction;
+     QAction *restartDaemonAction = nullptr;
 #endif
 
      QProcess *daemonProcess = nullptr;
