@@ -2577,6 +2577,11 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             curNodeAddrVirtual = curNodePt->getNextParentVirtualAddress();
         }
 
+        if (!prevNodePt) {
+            qCritical() << "There is no last node to use!";
+            return false;
+        }
+
         /* If we are here it means we need to take the last spot */
         qDebug() << "Adding parent node after" << prevNodePt->getService();
         prevNodePt->setNextParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
