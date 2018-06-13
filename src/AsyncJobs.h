@@ -122,8 +122,8 @@ class MPCommandJob: public AsyncJob
     Q_OBJECT
 public:
     MPCommandJob(MPDevice *dev, quint8 c, const QByteArray &d,
-                 AsyncFunc beforefn,
-                 AsyncFuncDone afterfn):
+                 const AsyncFunc &beforefn,
+                 const AsyncFuncDone &afterfn):
         AsyncJob(),
         device(dev),
         cmd(c),
@@ -132,7 +132,7 @@ public:
         afterFunc(std::move(afterfn))
     {}
     MPCommandJob(MPDevice *dev, quint8 c, const QByteArray &d = QByteArray(),
-                 AsyncFuncDone afterfn = [](const QByteArray &, bool &) -> bool { return true; }):
+                 const AsyncFuncDone &afterfn = [](const QByteArray &, bool &) -> bool { return true; }):
         AsyncJob(),
         device(dev),
         cmd(c),
@@ -140,8 +140,8 @@ public:
         afterFunc(std::move(afterfn))
     {}
     MPCommandJob(MPDevice *dev, quint8 c,
-                 AsyncFunc beforefn,
-                 AsyncFuncDone afterfn):
+                 const AsyncFunc &beforefn,
+                 const AsyncFuncDone &afterfn):
         AsyncJob(),
         device(dev),
         cmd(c),
@@ -149,7 +149,7 @@ public:
         afterFunc(std::move(afterfn))
     {}
     MPCommandJob(MPDevice *dev, quint8 c,
-                 AsyncFuncDone afterfn = [](const QByteArray &, bool &) -> bool { return true; }):
+                 const AsyncFuncDone &afterfn = [](const QByteArray &, bool &) -> bool { return true; }):
         AsyncJob(),
         device(dev),
         cmd(c),

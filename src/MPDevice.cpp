@@ -857,7 +857,7 @@ void MPDevice::updateLockUnlockMode(int val)
 }
 
 void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
-                                    MPDeviceProgressCb cbProgress,bool getCreds,
+                                    const MPDeviceProgressCb &cbProgress,bool getCreds,
                                     bool getData, bool getDataChilds)
 {
     /* For when the MMM is left */
@@ -1068,8 +1068,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
 }
 
 void MPDevice::startMemMgmtMode(bool wantData,
-                                MPDeviceProgressCb cbProgress,
-                                std::function<void(bool success, int errCode, QString errMsg)> cb)
+                                const MPDeviceProgressCb &cbProgress,
+                                const std::function<void(bool success, int errCode, QString errMsg)> &cb)
 {
     /* Start MMM here, and load all memory data from the device */
 
@@ -1201,7 +1201,7 @@ QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
     return return_data;
 }
 
-void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
+void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress)
 {
     /* Because of recursive calls, make sure we haven't reached the end of the memory */
     if (getFlashPageFromAddress(address) == getNumberOfPages())
@@ -1323,7 +1323,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
-void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress)
 {
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
@@ -1455,7 +1455,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     }));
 }
 
-void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, MPDeviceProgressCb cbProgress)
+void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, const MPDeviceProgressCb &cbProgress)
 {
     MPNode *pnode = new MPNode(this, address);
     dataNodes.append(pnode);
@@ -1522,7 +1522,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
     }));
 }
 
-void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, MPDeviceProgressCb cbProgress, quint32 nbBytesFetched)
+void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress, quint32 nbBytesFetched)
 {
     MPNode *cnode = new MPNode(this, address);
     parent->appendChildData(cnode);
@@ -3294,7 +3294,7 @@ void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& addres
 }
 
 /* Return true if packets need to be sent */
-bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, MPDeviceProgressCb cbProgress)
+bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, const MPDeviceProgressCb &cbProgress)
 {
     qInfo() << "Generating Save Packets...";
     bool diagSavePacketsGenerated = false;
@@ -3947,7 +3947,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
 }
 
 void MPDevice::delCredentialAndLeave(QString service, const QString &login,
-                                     MPDeviceProgressCb cbProgress,
+                                     const MPDeviceProgressCb &cbProgress,
                                      std::function<void(bool success, QString errstr)> cb)
 {
     auto deleteCred = [this, service, login, cbProgress, cb]()
@@ -4222,7 +4222,7 @@ void MPDevice::setCredential(QString service, const QString &login,
 }
 
 bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
-                             MPDeviceProgressCb cbProgress,
+                             const MPDeviceProgressCb &cbProgress,
                              const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
@@ -4286,7 +4286,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
 
 void MPDevice::getDataNode(QString service, const QString &fallback_service, const QString &reqid,
                            std::function<void(bool success, QString errstr, QString serv, QByteArray rawData)> cb,
-                           MPDeviceProgressCb cbProgress)
+                           const MPDeviceProgressCb &cbProgress)
 {
     if (service.isEmpty())
     {
@@ -4381,7 +4381,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
 }
 
 bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
-                             MPDeviceProgressCb cbProgress,
+                             const MPDeviceProgressCb &cbProgress,
                              const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
@@ -4426,7 +4426,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 
 void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
                            std::function<void(bool success, QString errstr)> cb,
-                           MPDeviceProgressCb cbProgress)
+                           const MPDeviceProgressCb &cbProgress)
 {
     if (service.isEmpty())
     {
@@ -4522,7 +4522,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 
 void  MPDevice::deleteDataNodesAndLeave(QStringList services,
                                         std::function<void(bool success, QString errstr)> cb,
-                                        MPDeviceProgressCb cbProgress)
+                                        const MPDeviceProgressCb &cbProgress)
 {
     // TODO for the future:
     // When scanning the parent nodes, store their file sizes
@@ -5307,7 +5307,7 @@ void MPDevice::cleanMMMVars(void)
     freeAddresses.clear();
 }
 
-void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::function<void(bool success, QString errstr)> cb, bool noDelete)
+void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, std::function<void(bool success, QString errstr)> cb, bool noDelete)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
@@ -6117,7 +6117,7 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
     return true;
 }
 
-void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, MPDeviceProgressCb cbProgress)
+void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress)
 {
     qDebug() << "Loading free addresses from address:" << addressFrom.toHex();
 
@@ -6183,8 +6183,8 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
     }));
 }
 
-void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
-                                   MPDeviceProgressCb cbProgress)
+void MPDevice::startIntegrityCheck(const std::function<void(bool success, QString errstr)> &cb,
+                                   const MPDeviceProgressCb &cbProgress)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting integrity check", this);
@@ -6326,7 +6326,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
 }
 
 
-void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgress,
+void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &cbProgress,
                    std::function<void(bool success, QString errstr)> cb)
 {
     /* Loop through credentials to check them */
@@ -6476,7 +6476,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgr
 }
 
 void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
-                                MPDeviceProgressCb cbProgress,
+                                const MPDeviceProgressCb &cbProgress,
                                 std::function<void(bool success, QString errstr)> cb)
 {
     newAddressesNeededCounter = 0;
@@ -6863,7 +6863,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 }
 
 void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
-                              MPDeviceProgressCb cbProgress)
+                              const MPDeviceProgressCb &cbProgress)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for export file generation", this);
@@ -6907,7 +6907,7 @@ void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool
 
 void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                               std::function<void(bool success, QString errstr)> cb,
-                              MPDeviceProgressCb cbProgress)
+                              const MPDeviceProgressCb &cbProgress)
 {
     QString errorString;
 
