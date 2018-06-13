@@ -49,7 +49,6 @@ public:
     static QHostAddress getListenAddress();
 
 private:
-    WSServer *wsServer;
     HttpServer *httpServer = nullptr;
 
     //This is for communication between app/daemon
