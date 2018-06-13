@@ -21,6 +21,8 @@ CPPFLAGS=-I$QTDIR/include
 make_version ..
 
 qmake ../Moolticute.pro
-make
+
+# Compund exit codes of make and the tests.
+make && ./tests/tests
 
 popd

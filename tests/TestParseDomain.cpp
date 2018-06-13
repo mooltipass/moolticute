@@ -60,13 +60,15 @@ void TestParseDomain::test_URLs_data()
 
 
 
+// The output of QUrl::fromUserInput() isn't deemed valid using Qt 5.5!
+#if QT_VERSION >= 0x050600
     // invalid URLs but corrected up to some crazy values by QUrl::fromUserInput
 
     // became:  http://https//.weather.com/    ( host=https, path=//.weather.com/ )
     QTest::newRow("starts with dot") << "https://.weather.com/"
         << true << false << false
         << "" << "https" << "" << (-1);
-
+#endif
 
 
     // valid URL, invalid TLD (local sites)
