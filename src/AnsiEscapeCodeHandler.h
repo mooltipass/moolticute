@@ -30,10 +30,20 @@ namespace Utils {
 class FormattedText {
 public:
     FormattedText() { }
-    FormattedText(const FormattedText &other) : text(other.text), format(other.format) { }
+
+    FormattedText(const FormattedText &other) {
+        *this = other;
+    }
+
     FormattedText(const QString &txt, const QTextCharFormat &fmt = QTextCharFormat()) :
         text(txt), format(fmt)
     { }
+
+    FormattedText &operator=(const FormattedText &other) {
+        text = other.text;
+        format = other.format;
+        return *this;
+    }
 
     QString text;
     QTextCharFormat format;
