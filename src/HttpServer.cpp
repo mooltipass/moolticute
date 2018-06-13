@@ -36,10 +36,9 @@ HttpServer::~HttpServer()
 
 bool HttpServer::start(quint16 port)
 {
-    bool ret = false;
     m_tcpServer = new QTcpServer(this);
 
-    ret = m_tcpServer->listen(QHostAddress(QHostAddress::AnyIPv4), port);
+    bool ret = m_tcpServer->listen(QHostAddress(QHostAddress::AnyIPv4), port);
     if (!ret)
     {
         delete m_tcpServer;
