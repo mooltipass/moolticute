@@ -409,11 +409,6 @@ void MPDevice::removeFileFromCache(QString fileName)
     emit filesCacheChanged();
 }
 
-bool MPDevice::isJobsQueueBusy()
-{
-    return currentJobs;
-}
-
 void MPDevice::loadParameters()
 {
     readingParams = true;
@@ -1186,11 +1181,6 @@ quint16 MPDevice::getFlashPageFromAddress(const QByteArray &address)
     return (((quint16)address[1] << 5) & 0x1FE0) | (((quint16)address[0] >> 3) & 0x001F);
 }
 
-quint8 MPDevice::getNodeIdFromAddress(const QByteArray &address)
-{
-    return (quint8)address[0] & 0x07;
-}
-
 QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
 {
     /* Address format is 2 bytes little endian. last 3 bits are node number and first 13 bits are page address */
@@ -1796,17 +1786,6 @@ MPNode *MPDevice::findNodeWithServiceInList(const QString &service)
     });
 
     return it == loginNodes.end()?nullptr:*it;
-}
-
-/* Find a node inside the child list given his name */
-MPNode *MPDevice::findNodeWithLoginInList(const QString &login)
-{
-    auto it = std::find_if(loginChildNodes.begin(), loginChildNodes.end(), [&login](const MPNode *const node)
-    {
-        return node->getLogin() == login;
-    });
-
-    return it == loginChildNodes.end()?nullptr:*it;
 }
 
 bool MPDevice::tagFavoriteNodes(void)

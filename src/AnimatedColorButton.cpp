@@ -42,16 +42,6 @@ int AnimatedColorButton::getProgress()
     return bar->width();
 }
 
-void AnimatedColorButton::setAnimationDuration(int iAnimationDuration)
-{
-    m_iAnimationDuration = iAnimationDuration;
-}
-
-int AnimatedColorButton::animationDuration() const
-{
-    return m_iAnimationDuration;
-}
-
 void AnimatedColorButton::mousePressEvent(QMouseEvent *event)
 {
     QSettings s;

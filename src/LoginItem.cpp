@@ -45,11 +45,6 @@ void LoginItem::setPassword(const QString &sPassword)
     m_sPassword = sPassword;
 }
 
-const QString &LoginItem::passwordOrig() const
-{
-    return m_sPasswordOrig;
-}
-
 void LoginItem::setPasswordOrig(const QString &setPassword)
 {
     m_sPasswordOrig = setPassword;
@@ -80,14 +75,6 @@ QJsonObject LoginItem::toJson() const
             { "description", m_sDescription },
             { "address", addr },
             { "favorite", m_iFavorite }};
-}
-
-QString LoginItem::itemLabel() const
-{
-    QString sTargetDate = updatedDate().toString(Qt::DefaultLocaleShortDate);
-    if (!accessedDate().isNull())
-        sTargetDate = accessedDate().toString(Qt::DefaultLocaleShortDate);
-    return m_sName + QString(" (") + sTargetDate + QString(")");
 }
 
 void LoginItem::setPasswordLocked(bool bLocked)

@@ -109,18 +109,6 @@ MPDevice *MPManager::getDevice(int at)
     return it.value();
 }
 
-QList<MPDevice *> MPManager::getDevices()
-{
-    QList<MPDevice *> devs;
-    auto it = devices.begin();
-    while (it != devices.end())
-    {
-        devs.append(it.value());
-        it++;
-    }
-    return devs;
-}
-
 void MPManager::checkUsbDevices()
 {
     // discover devices

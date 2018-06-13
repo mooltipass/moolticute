@@ -14,9 +14,6 @@ class AnimatedColorButton : public QPushButton
 public:
     AnimatedColorButton(QWidget *parent = nullptr, int iAnimationDuration = 1300);
 
-    void setAnimationDuration(int iAnimationDuration);
-    int animationDuration() const;
-
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);

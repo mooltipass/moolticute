@@ -42,11 +42,6 @@ DaemonMenuAction::DaemonMenuAction(QWidget *parent):
     connect(restartButton, SIGNAL(clicked(bool)), this, SIGNAL(restartClicked()));
 }
 
-void DaemonMenuAction::forceRepaint()
-{
-    widget->update();
-}
-
 void DaemonMenuAction::updateStatus(DaemonStatus status)
 {
     if (status == StatusRunning)

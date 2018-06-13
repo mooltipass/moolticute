@@ -284,8 +284,6 @@ private:
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service);
-    MPNode *findNodeWithLoginInList(const QString &login);
-    quint8 getNodeIdFromAddress(const QByteArray &address);
     QByteArray getMemoryFirstNodeAddress(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
@@ -407,7 +405,6 @@ private:
     //All AsyncJobs does have an <id>
     QQueue<AsyncJobs *> jobsQueue;
     AsyncJobs *currentJobs = nullptr;
-    bool isJobsQueueBusy(); //helper to check if something is already running
 
     //this is a cache for data upload
     QByteArray currentDataNode;

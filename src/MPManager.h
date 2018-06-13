@@ -46,7 +46,6 @@ public:
     void stop();
     MPDevice *getDevice(int at);
     int getDeviceCount() { return devices.count(); }
-    QList<MPDevice *> getDevices();
 
 signals:
     void mpConnected(MPDevice *device);
