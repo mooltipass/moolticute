@@ -32,6 +32,10 @@ void hideDockIcon(bool hide)
         err = TransformProcessType(&psn, kProcessTransformToUIElementApplication);
     else
         err = TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+    if (err != noErr) {
+        NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:err userInfo:nil];
+        qWarning() << "Failed to hide dock icon:" << error;
+    }
 }
 
 void orderFrontRegardless(unsigned long long win_id, bool force)
