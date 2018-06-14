@@ -29,6 +29,7 @@
 
 - (void)screenLocked:(NSNotification *)notif
 {
+    (void) notif;
     _trigger(SCREEN_LOCKED, _instance);
 }
 
