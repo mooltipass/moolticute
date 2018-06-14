@@ -50,7 +50,8 @@ SOURCES += src/main_gui.cpp \
     src/DbExportsRegistry.cpp \
     src/DbExportsRegistryController.cpp \
     src/DbBackupChangeNumbersComparator.cpp \
-    src/DbMasterController.cpp
+    src/DbMasterController.cpp \
+    src/SystemEventHandler.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -87,11 +88,15 @@ HEADERS  += src/MainWindow.h \
     src/DbExportsRegistry.h \
     src/DbExportsRegistryController.h \
     src/DbBackupChangeNumbersComparator.h \
-    src/DbMasterController.h
+    src/DbMasterController.h \
+    src/SystemEventHandler.h \
+    src/SystemEvent.h
 
 mac {
-    HEADERS += src/MacUtils.h
-    OBJECTIVE_SOURCES += src/MacUtils.mm
+    HEADERS += src/MacUtils.h \
+        src/MacSystemEvents.h
+    OBJECTIVE_SOURCES += src/MacUtils.mm \
+        src/MacSystemEvents.mm
 }
 
 INCLUDEPATH += src\
