@@ -24,6 +24,7 @@
 #include <QtAwesome.h>
 #include "DbMasterController.h"
 #include "WindowLog.h"
+#include "SystemEventHandler.h"
 
 #include <DbBackupsTrackerController.h>
 
@@ -153,6 +154,8 @@ private:
     PasswordProfilesModel *m_passwordProfilesModel;
     DbMasterController *dbMasterController;
     void initHelpLabels();
+
+    SystemEventHandler eventHandler;
 };
 
 #endif // MAINWINDOW_H

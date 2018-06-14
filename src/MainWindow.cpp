@@ -508,6 +508,12 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     //Setup the confirm view
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
+    connect(&eventHandler, &SystemEventHandler::screenLocked, []
+    {
+        // TODO: Send 0xD9 to USB device to lock it!
+        qDebug() << "SCREEN LOCKED!";
+    });
+
     checkAutoStart();
 
     //Check is ssh agent opt has to be checked
