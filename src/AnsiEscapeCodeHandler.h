@@ -31,7 +31,8 @@ class FormattedText {
 public:
     FormattedText() { }
 
-    FormattedText(const FormattedText &other) {
+    FormattedText(const FormattedText &other)
+    {
         *this = other;
     }
 
@@ -39,7 +40,8 @@ public:
         text(txt), format(fmt)
     { }
 
-    FormattedText &operator=(const FormattedText &other) {
+    FormattedText &operator=(const FormattedText &other)
+    {
         text = other.text;
         format = other.format;
         return *this;
