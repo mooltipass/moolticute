@@ -205,15 +205,14 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
     {
         DWORD required_size = 0;
         HIDD_ATTRIBUTES attrib;
-        bool ret;
 
         //first call is to get the required_size
-        ret = SetupDiGetDeviceInterfaceDetailA(dev_info_set,
-                                               &dev_data,
-                                               nullptr,
-                                               0,
-                                               &required_size,
-                                               nullptr);
+        bool ret = SetupDiGetDeviceInterfaceDetailA(dev_info_set,
+                                                    &dev_data,
+                                                    nullptr,
+                                                    0,
+                                                    &required_size,
+                                                    nullptr);
 
         //alloc data
         dev_detail_data = (SP_DEVICE_INTERFACE_DETAIL_DATA_A*) malloc(required_size);

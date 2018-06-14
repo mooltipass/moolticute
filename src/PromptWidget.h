@@ -17,8 +17,8 @@ class PromptMessage
 {
 public:
     PromptMessage(const QString &text,
-                  std::function<void()> acceptCallBack = nullptr,
-                  std::function<void()> rejectCallBack = nullptr) :
+                  const std::function<void()> &acceptCallBack = nullptr,
+                  const std::function<void()> &rejectCallBack = nullptr) :
         m_text(text),
         m_acceptCallBack(acceptCallBack),
         m_rejectCallBack(rejectCallBack)

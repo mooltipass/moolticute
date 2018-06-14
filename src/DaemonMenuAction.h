@@ -35,8 +35,6 @@ public:
         StatusRestarting = 3,
     } DaemonStatus;
 
-    void forceRepaint();
-
 public slots:
     void updateStatus(DaemonStatus status);
 

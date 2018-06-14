@@ -20,10 +20,8 @@ public:
     void setFavorite(qint8 iFavorite);
     const QString &password() const;
     void setPassword(const QString &sPassword);
-    const QString &passwordOrig() const;
     void setPasswordOrig(const QString &setPassword);
     QJsonObject toJson() const;
-    QString itemLabel() const;
     void setPasswordLocked(bool bVisible);
     bool passwordLocked() const;
     virtual TreeType treeType()  const Q_DECL_OVERRIDE;

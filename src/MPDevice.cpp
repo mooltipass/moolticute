@@ -409,11 +409,6 @@ void MPDevice::removeFileFromCache(QString fileName)
     emit filesCacheChanged();
 }
 
-bool MPDevice::isJobsQueueBusy()
-{
-    return currentJobs;
-}
-
 void MPDevice::loadParameters()
 {
     readingParams = true;
@@ -862,7 +857,7 @@ void MPDevice::updateLockUnlockMode(int val)
 }
 
 void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
-                                    MPDeviceProgressCb cbProgress,bool getCreds,
+                                    const MPDeviceProgressCb &cbProgress,bool getCreds,
                                     bool getData, bool getDataChilds)
 {
     /* For when the MMM is left */
@@ -1073,8 +1068,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
 }
 
 void MPDevice::startMemMgmtMode(bool wantData,
-                                MPDeviceProgressCb cbProgress,
-                                std::function<void(bool success, int errCode, QString errMsg)> cb)
+                                const MPDeviceProgressCb &cbProgress,
+                                const std::function<void(bool success, int errCode, QString errMsg)> &cb)
 {
     /* Start MMM here, and load all memory data from the device */
 
@@ -1186,11 +1181,6 @@ quint16 MPDevice::getFlashPageFromAddress(const QByteArray &address)
     return (((quint16)address[1] << 5) & 0x1FE0) | (((quint16)address[0] >> 3) & 0x001F);
 }
 
-quint8 MPDevice::getNodeIdFromAddress(const QByteArray &address)
-{
-    return (quint8)address[0] & 0x07;
-}
-
 QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
 {
     /* Address format is 2 bytes little endian. last 3 bits are node number and first 13 bits are page address */
@@ -1211,7 +1201,7 @@ QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
     return return_data;
 }
 
-void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
+void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress)
 {
     /* Because of recursive calls, make sure we haven't reached the end of the memory */
     if (getFlashPageFromAddress(address) == getNumberOfPages())
@@ -1333,7 +1323,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
-void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, MPDeviceProgressCb cbProgress)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress)
 {
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
@@ -1465,7 +1455,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     }));
 }
 
-void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, MPDeviceProgressCb cbProgress)
+void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, const MPDeviceProgressCb &cbProgress)
 {
     MPNode *pnode = new MPNode(this, address);
     dataNodes.append(pnode);
@@ -1532,7 +1522,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
     }));
 }
 
-void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, MPDeviceProgressCb cbProgress, quint32 nbBytesFetched)
+void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress, quint32 nbBytesFetched)
 {
     MPNode *cnode = new MPNode(this, address);
     parent->appendChildData(cnode);
@@ -1796,17 +1786,6 @@ MPNode *MPDevice::findNodeWithServiceInList(const QString &service)
     });
 
     return it == loginNodes.end()?nullptr:*it;
-}
-
-/* Find a node inside the child list given his name */
-MPNode *MPDevice::findNodeWithLoginInList(const QString &login)
-{
-    auto it = std::find_if(loginChildNodes.begin(), loginChildNodes.end(), [&login](const MPNode *const node)
-    {
-        return node->getLogin() == login;
-    });
-
-    return it == loginChildNodes.end()?nullptr:*it;
 }
 
 bool MPDevice::tagFavoriteNodes(void)
@@ -2577,6 +2556,11 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             curNodeAddrVirtual = curNodePt->getNextParentVirtualAddress();
         }
 
+        if (!prevNodePt) {
+            qCritical() << "There is no last node to use!";
+            return false;
+        }
+
         /* If we are here it means we need to take the last spot */
         qDebug() << "Adding parent node after" << prevNodePt->getService();
         prevNodePt->setNextParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
@@ -3119,8 +3103,6 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
 bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed)
 {
     QByteArray temp_pnode_address, temp_cnode_address;
-    MPNode* temp_pnode_pointer;
-    MPNode* temp_cnode_pointer;
     bool return_bool;
 
     qInfo() << "Checking database...";
@@ -3226,7 +3208,8 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
             if ((temp_pnode_address != MPNode::EmptyAddress) || (temp_pnode_address != MPNode::EmptyAddress))
             {
                 /* Find the nodes in memory */
-                temp_pnode_pointer = findNodeWithAddressInList(loginNodes, temp_pnode_address, 0);
+                MPNode *temp_cnode_pointer = nullptr;
+                MPNode *temp_pnode_pointer = findNodeWithAddressInList(loginNodes, temp_pnode_address, 0);
                 if (temp_pnode_pointer)
                 {
                     temp_cnode_pointer = findNodeWithAddressWithGivenParentInList(loginChildNodes,  temp_pnode_pointer, temp_cnode_address, 0);
@@ -3310,7 +3293,7 @@ void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& addres
 }
 
 /* Return true if packets need to be sent */
-bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, MPDeviceProgressCb cbProgress)
+bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, const MPDeviceProgressCb &cbProgress)
 {
     qInfo() << "Generating Save Packets...";
     bool diagSavePacketsGenerated = false;
@@ -3963,7 +3946,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
 }
 
 void MPDevice::delCredentialAndLeave(QString service, const QString &login,
-                                     MPDeviceProgressCb cbProgress,
+                                     const MPDeviceProgressCb &cbProgress,
                                      std::function<void(bool success, QString errstr)> cb)
 {
     auto deleteCred = [this, service, login, cbProgress, cb]()
@@ -4238,7 +4221,7 @@ void MPDevice::setCredential(QString service, const QString &login,
 }
 
 bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
-                             MPDeviceProgressCb cbProgress,
+                             const MPDeviceProgressCb &cbProgress,
                              const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
@@ -4302,7 +4285,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
 
 void MPDevice::getDataNode(QString service, const QString &fallback_service, const QString &reqid,
                            std::function<void(bool success, QString errstr, QString serv, QByteArray rawData)> cb,
-                           MPDeviceProgressCb cbProgress)
+                           const MPDeviceProgressCb &cbProgress)
 {
     if (service.isEmpty())
     {
@@ -4397,7 +4380,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
 }
 
 bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
-                             MPDeviceProgressCb cbProgress,
+                             const MPDeviceProgressCb &cbProgress,
                              const QByteArray &data, bool &)
 {
     using namespace std::placeholders;
@@ -4442,7 +4425,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 
 void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
                            std::function<void(bool success, QString errstr)> cb,
-                           MPDeviceProgressCb cbProgress)
+                           const MPDeviceProgressCb &cbProgress)
 {
     if (service.isEmpty())
     {
@@ -4538,7 +4521,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 
 void  MPDevice::deleteDataNodesAndLeave(QStringList services,
                                         std::function<void(bool success, QString errstr)> cb,
-                                        MPDeviceProgressCb cbProgress)
+                                        const MPDeviceProgressCb &cbProgress)
 {
     // TODO for the future:
     // When scanning the parent nodes, store their file sizes
@@ -5323,7 +5306,7 @@ void MPDevice::cleanMMMVars(void)
     freeAddresses.clear();
 }
 
-void MPDevice::startImportFileMerging(MPDeviceProgressCb cbProgress, std::function<void(bool success, QString errstr)> cb, bool noDelete)
+void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, std::function<void(bool success, QString errstr)> cb, bool noDelete)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
@@ -6133,7 +6116,7 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
     return true;
 }
 
-void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, MPDeviceProgressCb cbProgress)
+void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress)
 {
     qDebug() << "Loading free addresses from address:" << addressFrom.toHex();
 
@@ -6199,8 +6182,8 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
     }));
 }
 
-void MPDevice::startIntegrityCheck(std::function<void(bool success, QString errstr)> cb,
-                                   MPDeviceProgressCb cbProgress)
+void MPDevice::startIntegrityCheck(const std::function<void(bool success, QString errstr)> &cb,
+                                   const MPDeviceProgressCb &cbProgress)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting integrity check", this);
@@ -6342,7 +6325,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
 }
 
 
-void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgress,
+void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &cbProgress,
                    std::function<void(bool success, QString errstr)> cb)
 {
     /* Loop through credentials to check them */
@@ -6492,7 +6475,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, MPDeviceProgressCb cbProgr
 }
 
 void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
-                                MPDeviceProgressCb cbProgress,
+                                const MPDeviceProgressCb &cbProgress,
                                 std::function<void(bool success, QString errstr)> cb)
 {
     newAddressesNeededCounter = 0;
@@ -6879,7 +6862,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 }
 
 void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
-                              MPDeviceProgressCb cbProgress)
+                              const MPDeviceProgressCb &cbProgress)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for export file generation", this);
@@ -6923,7 +6906,7 @@ void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool
 
 void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                               std::function<void(bool success, QString errstr)> cb,
-                              MPDeviceProgressCb cbProgress)
+                              const MPDeviceProgressCb &cbProgress)
 {
     QString errorString;
 

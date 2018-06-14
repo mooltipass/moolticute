@@ -36,6 +36,7 @@ AppDaemon::AppDaemon(int &argc, char **argv):
 
 bool AppDaemon::initialize()
 {
+    Q_ASSERT(!localLogServer);
     localLogServer = new QLocalServer(this);
     localLogServer->removeServer(MOOLTICUTE_DAEMON_LOG_SOCK);
     localLogServer->listen(MOOLTICUTE_DAEMON_LOG_SOCK);

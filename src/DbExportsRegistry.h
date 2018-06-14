@@ -7,8 +7,8 @@ class DbExportsRegistry : public QObject
 {
     Q_OBJECT
     QString cardId;
-    int credentialsDbChangeNumber;
-    int dataDbChangeNumber;
+    int credentialsDbChangeNumber = -1;
+    int dataDbChangeNumber = -1;
 
     QString settingsPath;
 public:
