@@ -946,6 +946,7 @@ void MainWindow::hidePrompt()
 void MainWindow::showDbBackTrackingControls(const bool &show)
 {
     dbBackupTrakingControlsVisible = show;
+    updatePage();
 }
 
 void MainWindow::wantExitFilesManagement()
