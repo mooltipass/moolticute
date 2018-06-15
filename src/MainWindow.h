@@ -117,6 +117,8 @@ private slots:
 
     void on_pushButtonImportCSV_clicked();
 
+    void onLockDeviceSystemEventsChanged(bool checked);
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 

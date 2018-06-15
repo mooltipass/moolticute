@@ -492,6 +492,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->checkBoxBoot, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxTuto, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
 
+    ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
+    connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
+
     connect(ui->comboBoxScreenBrightness, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxKnock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
@@ -510,7 +513,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(&eventHandler, &SystemEventHandler::screenLocked, this, [this]
     {
-        if (wsClient && wsClient->get_status() == Common::Unlocked) {
+        const bool exec = ui->checkBoxLockDevice->isChecked();
+        if (exec && wsClient->get_status() == Common::Unlocked) {
             qDebug() << "Screen locked! Locking device.";
             wsClient->sendLockDevice();
         }
@@ -1495,4 +1499,10 @@ void MainWindow::on_pushButtonImportCSV_clicked()
     wsClient->importCSVFile(readData);
     connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
     wantImportDatabase();
+}
+
+void MainWindow::onLockDeviceSystemEventsChanged(bool checked)
+{
+    QSettings s;
+    s.setValue("settings/LockDeviceOnSystemEvents", checked);
 }
