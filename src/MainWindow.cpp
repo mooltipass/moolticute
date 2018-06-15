@@ -492,7 +492,12 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->checkBoxBoot, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxTuto, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
 
+#ifdef Q_OS_LINUX
+    ui->checkBoxLockDevice->setChecked(false);
+    ui->checkBoxLockDevice->setEnabled(false);
+#else
     ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
+#endif
     connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
     connect(ui->comboBoxScreenBrightness, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
@@ -511,6 +516,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     //Setup the confirm view
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
     connect(&eventHandler, &SystemEventHandler::screenLocked, this, [this]
     {
         const bool exec = ui->checkBoxLockDevice->isChecked();
@@ -519,6 +525,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             wsClient->sendLockDevice();
         }
     });
+#endif
 
     checkAutoStart();
 
