@@ -20,10 +20,9 @@ signals:
     void screenLocked();
 
 private:
-    void init();
-    void uninit();
-
+#ifdef Q_OS_MAC
     void *eventHandler = nullptr;
+#endif
 };
 
 #endif // SRC_SYSTEMEVENTHANDLER_H

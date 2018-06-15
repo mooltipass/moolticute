@@ -596,6 +596,11 @@ void WSServerCon::processMessage(const QString &message)
         }
         );
     }
+    else if (root["msg"] == "lock_device")
+    {
+        const auto cb = [](bool, const QByteArray &, bool &){};
+        mpdevice->sendData(MPCmd::Command::LOCK_DEVICE, cb);
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)

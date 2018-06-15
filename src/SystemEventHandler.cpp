@@ -8,12 +8,18 @@
 
 SystemEventHandler::SystemEventHandler()
 {
-    init();
+#ifdef Q_OS_MAC
+    Q_ASSERT(!eventHandler);
+    eventHandler = registerSystemHandler(this, &SystemEventHandler::triggerEvent);
+#endif
 }
 
 SystemEventHandler::~SystemEventHandler()
 {
-    uninit();
+#ifdef Q_OS_MAC
+    Q_ASSERT(eventHandler);
+    unregisterSystemHandler(eventHandler);
+#endif
 }
 
 void SystemEventHandler::emitEvent(const SystemEvent event)
@@ -36,20 +42,4 @@ void SystemEventHandler::triggerEvent(const int type, void *instance)
     if (handler) {
         handler->emitEvent(static_cast<SystemEvent>(type));
     }
-}
-
-void SystemEventHandler::init()
-{
-#ifdef Q_OS_MAC
-    Q_ASSERT(!eventHandler);
-    eventHandler = registerSystemHandler(this, &SystemEventHandler::triggerEvent);
-#endif
-}
-
-void SystemEventHandler::uninit()
-{
-#ifdef Q_OS_MAC
-    Q_ASSERT(eventHandler);
-    unregisterSystemHandler(eventHandler);
-#endif
 }

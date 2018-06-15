@@ -508,10 +508,12 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     //Setup the confirm view
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
-    connect(&eventHandler, &SystemEventHandler::screenLocked, []
+    connect(&eventHandler, &SystemEventHandler::screenLocked, this, [this]
     {
-        // TODO: Send 0xD9 to USB device to lock it!
-        qDebug() << "SCREEN LOCKED!";
+        if (wsClient && wsClient->get_status() == Common::Unlocked) {
+            qDebug() << "Screen locked! Locking device.";
+            wsClient->sendLockDevice();
+        }
     });
 
     checkAutoStart();
