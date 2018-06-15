@@ -552,6 +552,7 @@ void MainWindow::changeEvent(QEvent *event)
 void MainWindow::updateBackupControlsVisibility()
 {
     ui->label_backupControlsTitle->setVisible(dbBackupTrakingControlsVisible);
+    ui->label_dbBackupMonitoringHelp->setVisible(dbBackupTrakingControlsVisible);
     ui->label_backupControlsDescription->setVisible(dbBackupTrakingControlsVisible);
     ui->lineEdit_dbBackupFilePath->setVisible(dbBackupTrakingControlsVisible);
     ui->toolButton_clearBackupFilePath->setVisible(dbBackupTrakingControlsVisible);
@@ -945,6 +946,7 @@ void MainWindow::hidePrompt()
 void MainWindow::showDbBackTrackingControls(const bool &show)
 {
     dbBackupTrakingControlsVisible = show;
+    updatePage();
 }
 
 void MainWindow::wantExitFilesManagement()
