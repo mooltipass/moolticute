@@ -3,7 +3,7 @@
 #ifdef Q_OS_MAC
 #include "MacSystemEvents.h"
 #elif defined(Q_OS_WIN)
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 #include <QDebug>
