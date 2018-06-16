@@ -65,6 +65,10 @@ void SystemEventHandler::emitEvent(const SystemEvent event)
             emit goingToSleep();
             break;
 
+       case SHUTTING_DOWN:
+            emit shuttingDown();
+            break;
+
         default:
             qCritical() << "Unknown system event:" << event;
             Q_ASSERT(false);

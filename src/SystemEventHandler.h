@@ -24,6 +24,7 @@ signals:
     void screenLocked();
     void loggingOff();
     void goingToSleep();
+    void shuttingDown();
 
 public slots:
 #ifdef Q_OS_MAC

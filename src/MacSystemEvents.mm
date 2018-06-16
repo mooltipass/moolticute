@@ -11,6 +11,7 @@
 - (void)screenLocked:(NSNotification *)notif;
 - (void)loggingOff:(NSNotification *)notif;
 - (void)goingToSleep:(NSNotification *)notif;
+- (void)shuttingDown:(NSNotification *)notif;
 
 @end
 
@@ -38,6 +39,11 @@
                         selector:@selector(goingToSleep:)
                             name:NSWorkspaceWillSleepNotification
                           object:nil];
+
+        [notifCenter addObserver:newSelf
+                        selector:@selector(shuttingDown:)
+                            name:NSWorkspaceWillPowerOffNotification
+                          object:nil];
     }
     return newSelf;
 }
@@ -60,6 +66,12 @@
     _trigger(GOING_TO_SLEEP, _instance);
 }
 
+- (void)shuttingDown:(NSNotification *)notif
+{
+    (void) notif;
+    _trigger(SHUTTING_DOWN, _instance);
+}
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
     (void) sender;
@@ -72,10 +84,15 @@
         {
             case kAELogOut:
             case kAEReallyLogOut:
-              _trigger(LOGGING_OFF, _instance);
+                _trigger(LOGGING_OFF, _instance);
 
-              // Give time to send lock message to device.
-              return NSTerminateLater;
+                // Give time to send lock message to device.
+                return NSTerminateLater;
+
+            case kAEShowShutdownDialog:
+            case kAEShutDown:
+                _trigger(SHUTTING_DOWN, _instance);
+                return NSTerminateLater;
 
             default:
               break;
