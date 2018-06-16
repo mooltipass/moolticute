@@ -520,6 +520,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(&eventHandler, &SystemEventHandler::screenLocked, this, &MainWindow::onSystemEvents);
     connect(&eventHandler, &SystemEventHandler::loggingOff, this, &MainWindow::onSystemEvents);
     connect(&eventHandler, &SystemEventHandler::goingToSleep, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::shuttingDown, this, &MainWindow::onSystemEvents);
 #endif
 
     checkAutoStart();
