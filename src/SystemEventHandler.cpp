@@ -92,10 +92,16 @@ bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *me
     if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
     {
         const auto *msg = (MSG*) message;
-        if ((msg->message == WM_ENDSESSION || msg->message == WM_QUERYENDSESSION) &&
-            msg->lParam == static_cast<int>(ENDSESSION_LOGOFF))
+        if (msg->message == WM_ENDSESSION || msg->message == WM_QUERYENDSESSION)
         {
-            emit loggingOff();
+            if (msg->lParam == static_cast<int>(ENDSESSION_LOGOFF))
+            {
+                emit loggingOff();
+            }
+            else
+            {
+                emit shuttingDown();
+            }
         }
         else if (msg->message == WM_POWERBROADCAST && msg->wParam == PBT_APMSUSPEND)
         {
