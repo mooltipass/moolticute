@@ -517,14 +517,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
 #if defined(Q_OS_MAC) || defined(Q_OS_WIN)
-    connect(&eventHandler, &SystemEventHandler::screenLocked, this, [this]
-    {
-        const bool exec = ui->checkBoxLockDevice->isChecked();
-        if (exec && wsClient->get_status() == Common::Unlocked) {
-            qDebug() << "Screen locked! Locking device.";
-            wsClient->sendLockDevice();
-        }
-    });
+    connect(&eventHandler, &SystemEventHandler::screenLocked, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::loggingOff, this, &MainWindow::onSystemEvents);
 #endif
 
     checkAutoStart();
@@ -1512,4 +1506,15 @@ void MainWindow::onLockDeviceSystemEventsChanged(bool checked)
 {
     QSettings s;
     s.setValue("settings/LockDeviceOnSystemEvents", checked);
+}
+
+
+void MainWindow::onSystemEvents()
+{
+    const bool exec = ui->checkBoxLockDevice->isChecked();
+    if (exec && wsClient->get_status() == Common::Unlocked)
+    {
+        qDebug() << "System event. Locking device!";
+        wsClient->sendLockDevice();
+    }
 }
