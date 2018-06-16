@@ -24,6 +24,11 @@ signals:
     void screenLocked();
     void loggingOff();
 
+public slots:
+#ifdef Q_OS_MAC
+    void readyToTerminate();
+#endif
+
 private:
 #ifdef Q_OS_MAC
     void *eventHandler = nullptr;

@@ -51,19 +51,20 @@ SystemEventHandler::~SystemEventHandler()
 
 void SystemEventHandler::emitEvent(const SystemEvent event)
 {
-    switch (event) {
-    case SCREEN_LOCKED:
-        emit screenLocked();
-        break;
+    switch (event)
+    {
+        case SCREEN_LOCKED:
+            emit screenLocked();
+            break;
 
-    case LOGGING_OFF:
-        emit loggingOff();
-        break;
+        case LOGGING_OFF:
+            emit loggingOff();
+            break;
 
-    default:
-        qCritical() << "Unknown system event:" << event;
-        Q_ASSERT(false);
-        break;
+        default:
+            qCritical() << "Unknown system event:" << event;
+            Q_ASSERT(false);
+            break;
     }
 }
 
@@ -96,3 +97,10 @@ bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *me
 
   return false;
 }
+
+#ifdef Q_OS_MAC
+void SystemEventHandler::readyToTerminate()
+{
+    ::readyToTerminate();
+}
+#endif

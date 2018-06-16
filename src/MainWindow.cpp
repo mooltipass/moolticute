@@ -1508,7 +1508,6 @@ void MainWindow::onLockDeviceSystemEventsChanged(bool checked)
     s.setValue("settings/LockDeviceOnSystemEvents", checked);
 }
 
-
 void MainWindow::onSystemEvents()
 {
     const bool exec = ui->checkBoxLockDevice->isChecked();
@@ -1517,4 +1516,11 @@ void MainWindow::onSystemEvents()
         qDebug() << "System event. Locking device!";
         wsClient->sendLockDevice();
     }
+
+    // In certain cases it is necessary to tell the system that it can proceed closing the
+    // application down. It doesn't have any effect if the application wasn't about to be closed
+    // down!
+#ifdef Q_OS_MAC
+    QTimer::singleShot(2 * 1000, &eventHandler, &SystemEventHandler::readyToTerminate);
+#endif
 }

@@ -8,6 +8,9 @@ extern "C" {
 void *registerSystemHandler(void *instance, void (*trigger)(const int, void *));
 void unregisterSystemHandler(void *instance);
 
+// If NSTerminateLater has been used it is necessary to instruct when it is okay to terminate.
+void readyToTerminate();
+
 #ifdef __cplusplus
 }
 #endif

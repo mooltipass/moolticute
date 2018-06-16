@@ -9,6 +9,7 @@
 @property(assign) void (*trigger)(const int, void *);
 
 - (void)screenLocked:(NSNotification *)notif;
+- (void)loggingOff:(NSNotification *)notif;
 
 @end
 
@@ -18,11 +19,19 @@
 {
     id newSelf = [super init];
     if (newSelf) {
+        [NSApp setDelegate:newSelf]; // To receive applicationShouldTerminate.
+
         id center = [NSDistributedNotificationCenter defaultCenter];
         [center addObserver:newSelf
                    selector:@selector(screenLocked:)
                        name:@"com.apple.screenIsLocked"
                      object:nil];
+
+        id notifCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+        [notifCenter addObserver:newSelf
+                        selector:@selector(loggingOff:)
+                            name:NSWorkspaceSessionDidResignActiveNotification
+                          object:nil];
     }
     return newSelf;
 }
@@ -31,6 +40,37 @@
 {
     (void) notif;
     _trigger(SCREEN_LOCKED, _instance);
+}
+
+- (void)loggingOff:(NSNotification *)notif
+{
+    (void) notif;
+    _trigger(LOGGING_OFF, _instance);
+}
+
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{
+    (void) sender;
+
+    id eventMgr = [NSAppleEventManager sharedAppleEventManager];
+    id reason = [[eventMgr currentAppleEvent] attributeDescriptorForKeyword:kAEQuitReason];
+    if (reason && [reason descriptorType] == typeType)
+    {
+        switch ([reason typeCodeValue])
+        {
+            case kAELogOut:
+            case kAEReallyLogOut:
+              _trigger(LOGGING_OFF, _instance);
+
+              // Give time to send lock message to device.
+              return NSTerminateLater;
+
+            default:
+              break;
+        }
+    }
+
+    return NSTerminateNow;
 }
 
 @end
@@ -48,7 +88,13 @@ void unregisterSystemHandler(void *instance)
     id handler = (MacSystemEventsHandler*) instance;
     if (handler)
     {
+        [[NSDistributedNotificationCenter defaultCenter] removeObserver:handler];
         [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:handler];
         [handler dealloc];
     }
+}
+
+void readyToTerminate()
+{
+    [NSApp replyToApplicationShouldTerminate:YES];
 }
