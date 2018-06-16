@@ -3,7 +3,8 @@
 
 enum SystemEvent
 {
-    SCREEN_LOCKED
+    SCREEN_LOCKED,
+    LOGGING_OFF
 };
 
 #endif // SRC_SYSTEMEVENT_H

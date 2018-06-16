@@ -1,12 +1,13 @@
 #ifndef SRC_SYSTEMEVENTHANDLER_H
 #define SRC_SYSTEMEVENTHANDLER_H
 
+#include <QAbstractNativeEventFilter>
 #include <QObject>
 #include <QTimer>
 
 #include "SystemEvent.h"
 
-class SystemEventHandler : public QObject
+class SystemEventHandler : public QObject, QAbstractNativeEventFilter
 {
     Q_OBJECT
 
@@ -17,8 +18,11 @@ public:
     void emitEvent(const SystemEvent event);
     static void triggerEvent(const int type, void *instance);
 
+    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
+
 signals:
     void screenLocked();
+    void loggingOff();
 
 private:
 #ifdef Q_OS_MAC
