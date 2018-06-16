@@ -519,6 +519,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 #if defined(Q_OS_MAC) || defined(Q_OS_WIN)
     connect(&eventHandler, &SystemEventHandler::screenLocked, this, &MainWindow::onSystemEvents);
     connect(&eventHandler, &SystemEventHandler::loggingOff, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::goingToSleep, this, &MainWindow::onSystemEvents);
 #endif
 
     checkAutoStart();
