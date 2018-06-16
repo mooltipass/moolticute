@@ -93,6 +93,10 @@ bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *me
         {
             emit loggingOff();
         }
+        else if (msg->message == WM_POWERBROADCAST && msg->wParam == PBT_APMSUSPEND)
+        {
+            emit goingToSleep();
+        }
     }
 #else
     Q_UNUSED(eventType);
