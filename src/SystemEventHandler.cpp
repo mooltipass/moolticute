@@ -75,18 +75,24 @@ void SystemEventHandler::triggerEvent(const int type, void *instance)
     }
 }
 
-bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *message, long */*result*/)
+bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
 {
+    Q_UNUSED(result);
+
 #ifdef Q_OS_WIN
-  if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
-  {
-    const auto *msg = (MSG*) message;
-    if ((msg->message == WM_ENDSESSION || msg->message == WM_QUERYENDSESSION) &&
-        msg->lParam == static_cast<int>(ENDSESSION_LOGOFF))
+    if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
     {
-        emit loggingOff();
+        const auto *msg = (MSG*) message;
+        if ((msg->message == WM_ENDSESSION || msg->message == WM_QUERYENDSESSION) &&
+            msg->lParam == static_cast<int>(ENDSESSION_LOGOFF))
+        {
+            emit loggingOff();
+        }
     }
-  }
+#else
+    Q_UNUSED(eventType);
+    Q_UNUSED(message);
 #endif
+
   return false;
 }
