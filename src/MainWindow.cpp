@@ -175,6 +175,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
 
+    // Don't show the "check for updates" button when built from git directly.
+    ui->pushButtonCheckUpdate->setVisible(QStringLiteral(APP_VERSION) != "git");
+
     ui->pushButtonCheckUpdate->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
