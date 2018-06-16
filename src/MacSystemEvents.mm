@@ -10,6 +10,7 @@
 
 - (void)screenLocked:(NSNotification *)notif;
 - (void)loggingOff:(NSNotification *)notif;
+- (void)goingToSleep:(NSNotification *)notif;
 
 @end
 
@@ -32,6 +33,11 @@
                         selector:@selector(loggingOff:)
                             name:NSWorkspaceSessionDidResignActiveNotification
                           object:nil];
+
+        [notifCenter addObserver:newSelf
+                        selector:@selector(goingToSleep:)
+                            name:NSWorkspaceWillSleepNotification
+                          object:nil];
     }
     return newSelf;
 }
@@ -46,6 +52,12 @@
 {
     (void) notif;
     _trigger(LOGGING_OFF, _instance);
+}
+
+- (void)goingToSleep:(NSNotification *)notif
+{
+    (void) notif;
+    _trigger(GOING_TO_SLEEP, _instance);
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender

@@ -61,6 +61,10 @@ void SystemEventHandler::emitEvent(const SystemEvent event)
             emit loggingOff();
             break;
 
+        case GOING_TO_SLEEP:
+            emit goingToSleep();
+            break;
+
         default:
             qCritical() << "Unknown system event:" << event;
             Q_ASSERT(false);
