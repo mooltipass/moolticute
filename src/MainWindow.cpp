@@ -494,7 +494,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
 #ifdef Q_OS_LINUX
     ui->checkBoxLockDevice->setChecked(false);
-    ui->checkBoxLockDevice->setEnabled(false);
+    ui->checkBoxLockDevice->setVisible(false);
 #else
     ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
 #endif
