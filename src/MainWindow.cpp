@@ -520,7 +520,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(&eventHandler, &SystemEventHandler::screenLocked, this, [this]
     {
         const bool exec = ui->checkBoxLockDevice->isChecked();
-        if (exec && wsClient->get_status() == Common::Unlocked) {
+        if (exec && wsClient->get_status() == Common::Unlocked)
+        {
             qDebug() << "Screen locked! Locking device.";
             wsClient->sendLockDevice();
         }
