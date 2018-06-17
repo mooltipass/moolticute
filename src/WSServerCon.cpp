@@ -598,8 +598,16 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "lock_device")
     {
-        const auto cb = [](bool, const QByteArray &, bool &){};
-        mpdevice->sendData(MPCmd::Command::LOCK_DEVICE, cb);
+        mpdevice->lockDevice([this, root](bool success, QString errstr)
+        {
+            if (!success) return;
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "false";
+            ores["errstr"] = errstr;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
     }
 }
 

@@ -7041,3 +7041,22 @@ void MPDevice::resetSmartCard(std::function<void(bool success, QString errstr)> 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
+
+void MPDevice::lockDevice(const std::function<void(bool success, QString errstr)> &cb)
+{
+    auto *jobs = new AsyncJobs("Locking the device", this);
+
+    // Currently the USB device doesn't return the correct value on success on 0xD9 (a bug!).
+    const auto afterFn = [](const QByteArray &, bool &) -> bool { return true; };
+    jobs->append(new MPCommandJob(this, MPCmd::LOCK_DEVICE, afterFn));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Failed to lock device!";
+        cb(false, {});
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
