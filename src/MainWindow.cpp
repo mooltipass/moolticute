@@ -175,6 +175,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
 
+    // Don't show the "check for updates" button when built from git directly.
+    ui->pushButtonCheckUpdate->setVisible(QStringLiteral(APP_VERSION) != "git");
+
     ui->pushButtonCheckUpdate->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonSettingsSave->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
@@ -517,15 +520,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 
 #if defined(Q_OS_MAC) || defined(Q_OS_WIN)
-    connect(&eventHandler, &SystemEventHandler::screenLocked, this, [this]
-    {
-        const bool exec = ui->checkBoxLockDevice->isChecked();
-        if (exec && wsClient->get_status() == Common::Unlocked)
-        {
-            qDebug() << "Screen locked! Locking device.";
-            wsClient->sendLockDevice();
-        }
-    });
+    connect(&eventHandler, &SystemEventHandler::screenLocked, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::loggingOff, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::goingToSleep, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::shuttingDown, this, &MainWindow::onSystemEvents);
 #endif
 
     checkAutoStart();
@@ -1513,4 +1511,21 @@ void MainWindow::onLockDeviceSystemEventsChanged(bool checked)
 {
     QSettings s;
     s.setValue("settings/LockDeviceOnSystemEvents", checked);
+}
+
+void MainWindow::onSystemEvents()
+{
+    const bool exec = ui->checkBoxLockDevice->isChecked();
+    if (exec && wsClient->get_status() == Common::Unlocked)
+    {
+        qDebug() << "System event. Locking device!";
+        wsClient->sendLockDevice();
+    }
+
+    // In certain cases it is necessary to tell the system that it can proceed closing the
+    // application down. It doesn't have any effect if the application wasn't about to be closed
+    // down!
+#ifdef Q_OS_MAC
+    QTimer::singleShot(2 * 1000, &eventHandler, &SystemEventHandler::readyToTerminate);
+#endif
 }

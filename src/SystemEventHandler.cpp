@@ -6,6 +6,7 @@
 #include <windows.h>
 #endif
 
+#include <QCoreApplication>
 #include <QDebug>
 
 SystemEventHandler::SystemEventHandler()
@@ -14,6 +15,8 @@ SystemEventHandler::SystemEventHandler()
     Q_ASSERT(!eventHandler);
     eventHandler = registerSystemHandler(this, &SystemEventHandler::triggerEvent);
 #elif defined(Q_OS_WIN)
+    qApp->installNativeEventFilter(this);
+
     timer.setInterval(2000);
     connect(&timer, &QTimer::timeout, this, [this]
     {
@@ -41,20 +44,35 @@ SystemEventHandler::~SystemEventHandler()
 #ifdef Q_OS_MAC
     Q_ASSERT(eventHandler);
     unregisterSystemHandler(eventHandler);
+#elif defined(Q_OS_WIN)
+    qApp->removeNativeEventFilter(this);
 #endif
 }
 
 void SystemEventHandler::emitEvent(const SystemEvent event)
 {
-    switch (event) {
-    case SCREEN_LOCKED:
-        emit screenLocked();
-        break;
+    switch (event)
+    {
+        case SCREEN_LOCKED:
+            emit screenLocked();
+            break;
 
-    default:
-        qCritical() << "Unknown system event:" << event;
-        Q_ASSERT(false);
-        break;
+        case LOGGING_OFF:
+            emit loggingOff();
+            break;
+
+        case GOING_TO_SLEEP:
+            emit goingToSleep();
+            break;
+
+       case SHUTTING_DOWN:
+            emit shuttingDown();
+            break;
+
+        default:
+            qCritical() << "Unknown system event:" << event;
+            Q_ASSERT(false);
+            break;
     }
 }
 
@@ -65,3 +83,42 @@ void SystemEventHandler::triggerEvent(const int type, void *instance)
         handler->emitEvent(static_cast<SystemEvent>(type));
     }
 }
+
+bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+{
+    Q_UNUSED(result);
+
+#ifdef Q_OS_WIN
+    if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
+    {
+        const auto *msg = (MSG*) message;
+        if (msg->message == WM_ENDSESSION || msg->message == WM_QUERYENDSESSION)
+        {
+            if (msg->lParam == static_cast<int>(ENDSESSION_LOGOFF))
+            {
+                emit loggingOff();
+            }
+            else
+            {
+                emit shuttingDown();
+            }
+        }
+        else if (msg->message == WM_POWERBROADCAST && msg->wParam == PBT_APMSUSPEND)
+        {
+            emit goingToSleep();
+        }
+    }
+#else
+    Q_UNUSED(eventType);
+    Q_UNUSED(message);
+#endif
+
+  return false;
+}
+
+#ifdef Q_OS_MAC
+void SystemEventHandler::readyToTerminate()
+{
+    ::readyToTerminate();
+}
+#endif
