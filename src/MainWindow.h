@@ -45,7 +45,7 @@ public:
 
     bool isHttpDebugChecked();
 
-    void updateBackupControlsVisibility();
+    void updateBackupControlsVisibility(bool visible);
 
 signals:
     void windowCloseRequested();

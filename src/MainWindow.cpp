@@ -552,14 +552,14 @@ void MainWindow::changeEvent(QEvent *event)
     QMainWindow::changeEvent(event);
 }
 
-void MainWindow::updateBackupControlsVisibility()
+void MainWindow::updateBackupControlsVisibility(bool visible)
 {
-    ui->label_backupControlsTitle->setVisible(dbBackupTrakingControlsVisible);
-    ui->label_dbBackupMonitoringHelp->setVisible(dbBackupTrakingControlsVisible);
-    ui->label_backupControlsDescription->setVisible(dbBackupTrakingControlsVisible);
-    ui->lineEdit_dbBackupFilePath->setVisible(dbBackupTrakingControlsVisible);
-    ui->toolButton_clearBackupFilePath->setVisible(dbBackupTrakingControlsVisible);
-    ui->toolButton_setBackupFilePath->setVisible(dbBackupTrakingControlsVisible);
+    ui->label_backupControlsTitle->setVisible(visible);
+    ui->label_dbBackupMonitoringHelp->setVisible(visible);
+    ui->label_backupControlsDescription->setVisible(visible);
+    ui->lineEdit_dbBackupFilePath->setVisible(visible);
+    ui->toolButton_clearBackupFilePath->setVisible(visible);
+    ui->toolButton_setBackupFilePath->setVisible(visible);
 }
 
 void MainWindow::updatePage()
@@ -624,7 +624,11 @@ void MainWindow::updatePage()
         ui->stackedWidget->setCurrentWidget(ui->pageSSH);
 
     updateTabButtons();
-    updateBackupControlsVisibility();
+
+    if (isCardUnknown)
+        updateBackupControlsVisibility(false);
+    else
+        updateBackupControlsVisibility(dbBackupTrakingControlsVisible);
 }
 
 void MainWindow::enableKnockSettings(bool enable)
