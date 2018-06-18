@@ -2,8 +2,9 @@
 #define SRC_SYSTEMEVENTHANDLER_H
 
 #include <QAbstractNativeEventFilter>
+#include <QLibrary>
 #include <QObject>
-#include <QTimer>
+#include <QWidget>
 
 #include "SystemEvent.h"
 
@@ -35,8 +36,8 @@ private:
 #ifdef Q_OS_MAC
     void *eventHandler = nullptr;
 #elif defined(Q_OS_WIN)
-    QTimer timer;
-    bool screenLocked_ = false;
+    QLibrary wtsApi32Lib;
+    QWidget widget;
 #endif
 };
 

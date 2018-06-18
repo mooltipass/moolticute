@@ -4,12 +4,16 @@
 #include "MacSystemEvents.h"
 #elif defined(Q_OS_WIN)
 #include <windows.h>
+#include <wtsapi32.h>
 #endif
 
 #include <QCoreApplication>
 #include <QDebug>
 
 SystemEventHandler::SystemEventHandler()
+#ifdef Q_OS_WIN
+    : wtsApi32Lib("wtsapi32")
+#endif
 {
 #ifdef Q_OS_MAC
     Q_ASSERT(!eventHandler);
@@ -17,25 +21,14 @@ SystemEventHandler::SystemEventHandler()
 #elif defined(Q_OS_WIN)
     qApp->installNativeEventFilter(this);
 
-    timer.setInterval(2000);
-    connect(&timer, &QTimer::timeout, this, [this]
+    if (wtsApi32Lib.load())
     {
-        // If the following function returns nullptr then the screen is locked because you can't
-        // have windows when locked.
-        const auto *ret =
-            OpenInputDesktop(DF_ALLOWOTHERACCOUNTHOOK, TRUE, DESKTOP_CREATEMENU |
-                             DESKTOP_CREATEWINDOW | DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
-                             DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS | DESKTOP_SWITCHDESKTOP |
-                             GENERIC_WRITE);
-        if (!ret && !screenLocked_) {
-            screenLocked_ = true;
-            emit screenLocked();
+        typedef WINBOOL (*RegFunc)(HWND, DWORD);
+        const auto regFunc = (RegFunc) wtsApi32Lib.resolve("WTSRegisterSessionNotification");
+        if (regFunc) {
+            regFunc((HWND) widget.winId(), 0);
         }
-        else if (ret) {
-            screenLocked_ = false;
-        }
-    });
-    timer.start();
+    }
 #endif
 }
 
@@ -46,6 +39,15 @@ SystemEventHandler::~SystemEventHandler()
     unregisterSystemHandler(eventHandler);
 #elif defined(Q_OS_WIN)
     qApp->removeNativeEventFilter(this);
+
+    if (wtsApi32Lib.isLoaded())
+    {
+        typedef WINBOOL (*UnRegFunc)(HWND);
+        const auto unRegFunc = (UnRegFunc) wtsApi32Lib.resolve("WTSUnRegisterSessionNotification");
+        if (unRegFunc) {
+            unRegFunc((HWND) widget.winId());
+        }
+    }
 #endif
 }
 
@@ -106,6 +108,10 @@ bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *me
         else if (msg->message == WM_POWERBROADCAST && msg->wParam == PBT_APMSUSPEND)
         {
             emit goingToSleep();
+        }
+        else if (msg->message == WM_WTSSESSION_CHANGE && msg->wParam == WTS_SESSION_LOCK)
+        {
+            emit screenLocked();
         }
     }
 #else
