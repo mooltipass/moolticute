@@ -600,11 +600,15 @@ void WSServerCon::processMessage(const QString &message)
     {
         mpdevice->lockDevice([this, root](bool success, QString errstr)
         {
-            if (!success) return;
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
             QJsonObject ores;
             QJsonObject oroot = root;
-            ores["success"] = "false";
-            ores["errstr"] = errstr;
+            ores["success"] = "true";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });
