@@ -1044,6 +1044,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxLockDevice">
+                 <property name="text">
+                  <string>Lock device when computer sleeps or shuts down, if screen is locked, or user logs off</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>

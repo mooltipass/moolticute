@@ -111,6 +111,8 @@ public:
 
     bool isFw12();
 
+    void sendLockDevice();
+
 signals:
     void wsConnected();
     void wsDisconnected();

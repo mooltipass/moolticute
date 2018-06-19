@@ -544,6 +544,11 @@ bool WSClient::isFw12()
         return false;
 }
 
+void WSClient::sendLockDevice()
+{
+    sendJsonData({{ "msg", "lock_device" }});
+}
+
 void WSClient::queryRandomNumbers()
 {
     sendJsonData({{ "msg", "get_random_numbers" }});

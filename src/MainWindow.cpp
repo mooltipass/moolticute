@@ -495,6 +495,14 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->checkBoxBoot, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxTuto, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
 
+#ifdef Q_OS_LINUX
+    ui->checkBoxLockDevice->setChecked(false);
+    ui->checkBoxLockDevice->setVisible(false);
+#else
+    ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
+#endif
+    connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
+
     connect(ui->comboBoxScreenBrightness, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxKnock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
@@ -510,6 +518,13 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     //Setup the confirm view
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
+
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
+    connect(&eventHandler, &SystemEventHandler::screenLocked, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::loggingOff, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::goingToSleep, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::shuttingDown, this, &MainWindow::onSystemEvents);
+#endif
 
     checkAutoStart();
 
@@ -1496,4 +1511,27 @@ void MainWindow::on_pushButtonImportCSV_clicked()
     wsClient->importCSVFile(readData);
     connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
     wantImportDatabase();
+}
+
+void MainWindow::onLockDeviceSystemEventsChanged(bool checked)
+{
+    QSettings s;
+    s.setValue("settings/LockDeviceOnSystemEvents", checked);
+}
+
+void MainWindow::onSystemEvents()
+{
+    const bool exec = ui->checkBoxLockDevice->isChecked();
+    if (exec && wsClient->get_status() == Common::Unlocked)
+    {
+        qDebug() << "System event. Locking device!";
+        wsClient->sendLockDevice();
+    }
+
+    // In certain cases it is necessary to tell the system that it can proceed closing the
+    // application down. It doesn't have any effect if the application wasn't about to be closed
+    // down!
+#ifdef Q_OS_MAC
+    QTimer::singleShot(2 * 1000, &eventHandler, &SystemEventHandler::readyToTerminate);
+#endif
 }

@@ -25,6 +25,10 @@
 #include "DbMasterController.h"
 #include "WindowLog.h"
 
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
+#include "SystemEventHandler.h"
+#endif
+
 #include <DbBackupsTrackerController.h>
 
 namespace Ui {
@@ -116,6 +120,9 @@ private slots:
 
     void on_pushButtonImportCSV_clicked();
 
+    void onLockDeviceSystemEventsChanged(bool checked);
+    void onSystemEvents();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -153,6 +160,10 @@ private:
     PasswordProfilesModel *m_passwordProfilesModel;
     DbMasterController *dbMasterController;
     void initHelpLabels();
+
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
+    SystemEventHandler eventHandler;
+#endif
 };
 
 #endif // MAINWINDOW_H

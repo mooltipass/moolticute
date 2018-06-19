@@ -210,6 +210,9 @@ public:
     // Reset smart card
     void resetSmartCard(std::function<void(bool success, QString errstr)> cb);
 
+    // Lock the devide.
+    void lockDevice(const std::function<void(bool success, QString errstr)> &cb);
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }
