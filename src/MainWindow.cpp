@@ -275,6 +275,49 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxPasswordOutput->addItem(tr("Enter"), 40);
     ui->comboBoxPasswordOutput->addItem(tr("Space"), 44);
 
+    // Close behavior
+#ifdef Q_OS_MAC
+    ui->closeBehaviorComboBox->addItem(
+        tr("Close Application"), static_cast<int>(CloseBehavior::CloseApp));
+    ui->closeBehaviorComboBox->addItem(
+        tr("Hide Window"), static_cast<int>(CloseBehavior::HideWindow));
+    ui->closeBehaviorComboBox->setCurrentIndex(
+        s.value("settings/CloseBehavior",
+                static_cast<int>(CloseBehavior::CloseApp)).toInt());
+
+    connect(ui->closeBehaviorComboBox,
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+            [this](int index)
+    {
+        Q_UNUSED(index);
+        const auto behavior = ui->closeBehaviorComboBox->currentData().toInt();
+        QSettings s;
+        s.setValue("settings/CloseBehavior", behavior);
+    });
+
+    // On macOS Command+Q will terminate the program without calling the proper destructors if not
+    // the following is defined.
+    auto *fileMenu = menuBar()->addMenu(tr("&File"));
+    auto *actionExit = fileMenu->addAction(tr("&Quit"));
+    connect(actionExit, &QAction::triggered, this, [this]
+    {
+        const auto behavior =
+            static_cast<CloseBehavior>(ui->closeBehaviorComboBox->currentData().toInt());
+        switch (behavior)
+        {
+            case CloseBehavior::CloseApp:
+                qApp->quit();
+                break;
+
+            case CloseBehavior::HideWindow:
+                close();
+                break;
+        }
+    });
+#else
+    ui->closeBehaviorLabel->setVisible(false);
+    ui->closeBehaviorComboBox->setVisible(false);
+#endif
 
     using LF = Common::LockUnlockModeFeatureFlags;
 
