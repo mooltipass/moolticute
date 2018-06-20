@@ -22,7 +22,7 @@ unzip $HOME/InnoSetup5.zip
 popd
 
 pushd $HOME
-wget_retry https://calaos.fr/download/misc/mxe_qt596.tar.xz
+wget_retry https://calaos.fr/download/misc/mxe_qt591.tar.xz
 popd
 
 if [ "$HOME" != "/home/ubuntu" ] ; then
