@@ -2,7 +2,7 @@
 set -ev
 
 pushd $HOME
-tar xJf mxe_qt591.tar.xz
+tar xJf mxe_qt*.tar.xz
 popd
 
 
