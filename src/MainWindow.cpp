@@ -540,10 +540,18 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     updateSerialInfos();
     updatePage();
+
+    // Restore geometry and state from last session.
+    restoreGeometry(s.value("MainWindow/geometry").toByteArray());
+    restoreState(s.value("MainWindow/windowState").toByteArray());
 }
 
 MainWindow::~MainWindow()
 {
+    QSettings s;
+    s.setValue("MainWindow/geometry", saveGeometry());
+    s.setValue("MainWindow/windowState", saveState());
+
     delete ui;
 }
 
