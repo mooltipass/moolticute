@@ -90,7 +90,7 @@ cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/* $TARGET_DIR/lib/x86_64-l
 #TOFIX: Actually copying openssl is not working. SSL is going to try to load root certificates from the system
 # and the path differs from all distro...
 # More information here:
-# https://github.com/AppImage/AppImageKit/wiki/Desktop-Linux-Platform-Issues#certificates
+# https://gitlab.com/probono/platformissues#certificates
 
 #mkdir -p $APPDIR/lib/x86_64-linux-gnu/
 #cp /lib/x86_64-linux-gnu/libcrypto* /lib/x86_64-linux-gnu/libssl* $APPDIR/lib/x86_64-linux-gnu/
