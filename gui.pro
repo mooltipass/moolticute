@@ -12,6 +12,9 @@ mac {
 win32 {
     LIBS += -luser32
 }
+linux {
+    QT += dbus
+}
 
 include(src/QtAwesome/QtAwesome/QtAwesome.pri)
 include (src/QSimpleUpdater/QSimpleUpdater.pri)
