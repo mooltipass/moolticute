@@ -234,5 +234,11 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                                 "border: 1px solid #FcFcFc;"\
                             "}"
 
+enum class CloseBehavior
+{
+    CloseApp,
+    HideWindow
+};
+
 #endif // COMMON_H
 
