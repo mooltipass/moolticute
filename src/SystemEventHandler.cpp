@@ -5,6 +5,8 @@
 #elif defined(Q_OS_WIN)
 #include <windows.h>
 #include <wtsapi32.h>
+#elif defined(Q_OS_LINUX)
+#include <QtDBus/QtDBus>
 #endif
 
 #include <QCoreApplication>
@@ -29,6 +31,10 @@ SystemEventHandler::SystemEventHandler()
             regFunc((HWND) widget.winId(), 0);
         }
     }
+#elif defined(Q_OS_LINUX)
+    // Catch Ubuntu events.
+    QDBusConnection::sessionBus().connect("", "/com/ubuntu/Upstart", "",
+        "EventEmitted", "sas", this, SLOT(upstartEventEmitted(QString,QStringList)));
 #endif
 }
 
@@ -48,6 +54,9 @@ SystemEventHandler::~SystemEventHandler()
             unRegFunc((HWND) widget.winId());
         }
     }
+#elif defined(Q_OS_LINUX)
+    QDBusConnection::sessionBus().disconnect("", "/com/ubuntu/Upstart", "",
+         "EventEmitted", "sas", this, SLOT(upstartEventEmitted(QString,QStringList)));
 #endif
 }
 
@@ -128,3 +137,12 @@ void SystemEventHandler::readyToTerminate()
     ::readyToTerminate();
 }
 #endif
+
+void SystemEventHandler::upstartEventEmitted(const QString &name, const QStringList &env)
+{
+    Q_UNUSED(env);
+    if (name == "desktop-lock")
+    {
+        emit screenLocked();
+    }
+}

@@ -32,6 +32,9 @@ public slots:
     void readyToTerminate();
 #endif
 
+private slots:
+    void upstartEventEmitted(const QString &name, const QStringList &env);
+
 private:
 #ifdef Q_OS_MAC
     void *eventHandler = nullptr;
