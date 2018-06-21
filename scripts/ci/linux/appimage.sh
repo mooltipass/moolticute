@@ -121,6 +121,7 @@ delete_blacklisted
 ########################################################################
 
 get_desktopintegration $LOWERAPP
+patch -p0 ./usr/bin/moolticute.sh.wrapper < moolticute.sh.wrapper.patch
 
 ########################################################################
 # Determine the version of the app; also include needed glibc version
