@@ -155,10 +155,13 @@ void SystemEventHandler::readyToTerminate()
 
 void SystemEventHandler::upstartEventEmitted(const QString &name, const QStringList &env)
 {
-    Q_UNUSED(env);
     if (name == "desktop-lock")
     {
         emit screenLocked();
+    }
+    else if (name == "session-end" && env.size() == 1 && env.first().toLower() == "type=shutdown")
+    {
+        emit shuttingDown();
     }
 }
 
