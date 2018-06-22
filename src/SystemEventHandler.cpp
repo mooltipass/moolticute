@@ -167,7 +167,8 @@ void SystemEventHandler::upstartEventEmitted(const QString &name, const QStringL
 
 void SystemEventHandler::clientPrivateEndSession(quint32 id)
 {
-  emit loggingOff();
+    Q_UNUSED(id);
+    emit loggingOff();
 }
 
 void SystemEventHandler::screenSaverActiveChanged(bool on)
