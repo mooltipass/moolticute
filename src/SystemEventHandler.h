@@ -35,6 +35,7 @@ public slots:
 private slots:
     void upstartEventEmitted(const QString &name, const QStringList &env);
     void clientPrivateEndSession(quint32 id);
+    void screenSaverActiveChanged(bool on);
 
 private:
 #ifdef Q_OS_MAC

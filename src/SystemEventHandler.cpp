@@ -41,6 +41,10 @@ SystemEventHandler::SystemEventHandler()
     // Catch Gnome shutdown events.
     bus.connect("", "", "org.gnome.SessionManager.ClientPrivate", "EndSession", "u", this,
                 SLOT(clientPrivateEndSession(quint32)));
+
+    // Catch org.freedesktop.ScreenSaver event (Used with KDE at least).
+    bus.connect("", "/org/freedesktop/ScreenSaver", "", "ActiveChanged", "b", this,
+                SLOT(screenSaverActiveChanged(bool)));
 #endif
 }
 
@@ -66,6 +70,8 @@ SystemEventHandler::~SystemEventHandler()
                 SLOT(upstartEventEmitted(QString,QStringList)));
     bus.disconnect("", "", "org.gnome.SessionManager.ClientPrivate", "EndSession", "u", this,
                 SLOT(clientPrivateEndSession(quint32)));
+    bus.disconnect("", "/org/freedesktop/ScreenSaver", "", "ActiveChanged", "b", this,
+                SLOT(screenSaverActiveChanged(bool)));
 #endif
 }
 
@@ -159,4 +165,12 @@ void SystemEventHandler::upstartEventEmitted(const QString &name, const QStringL
 void SystemEventHandler::clientPrivateEndSession(quint32 id)
 {
   emit loggingOff();
+}
+
+void SystemEventHandler::screenSaverActiveChanged(bool on)
+{
+    if (on)
+    {
+        emit screenLocked();
+    }
 }
