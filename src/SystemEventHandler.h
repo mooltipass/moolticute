@@ -34,6 +34,7 @@ public slots:
 
 private slots:
     void upstartEventEmitted(const QString &name, const QStringList &env);
+    void clientPrivateEndSession(quint32 id);
 
 private:
 #ifdef Q_OS_MAC

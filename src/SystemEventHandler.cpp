@@ -32,9 +32,15 @@ SystemEventHandler::SystemEventHandler()
         }
     }
 #elif defined(Q_OS_LINUX)
+    auto bus = QDBusConnection::sessionBus();
+
     // Catch Ubuntu events.
-    QDBusConnection::sessionBus().connect("", "/com/ubuntu/Upstart", "",
-        "EventEmitted", "sas", this, SLOT(upstartEventEmitted(QString,QStringList)));
+    bus.connect("", "/com/ubuntu/Upstart", "", "EventEmitted", "sas", this,
+                SLOT(upstartEventEmitted(QString,QStringList)));
+
+    // Catch Gnome shutdown events.
+    bus.connect("", "", "org.gnome.SessionManager.ClientPrivate", "EndSession", "u", this,
+                SLOT(clientPrivateEndSession(quint32)));
 #endif
 }
 
@@ -55,8 +61,11 @@ SystemEventHandler::~SystemEventHandler()
         }
     }
 #elif defined(Q_OS_LINUX)
-    QDBusConnection::sessionBus().disconnect("", "/com/ubuntu/Upstart", "",
-         "EventEmitted", "sas", this, SLOT(upstartEventEmitted(QString,QStringList)));
+    auto bus = QDBusConnection::sessionBus();
+    bus.disconnect("", "/com/ubuntu/Upstart", "", "EventEmitted", "sas", this,
+                SLOT(upstartEventEmitted(QString,QStringList)));
+    bus.disconnect("", "", "org.gnome.SessionManager.ClientPrivate", "EndSession", "u", this,
+                SLOT(clientPrivateEndSession(quint32)));
 #endif
 }
 
@@ -145,4 +154,9 @@ void SystemEventHandler::upstartEventEmitted(const QString &name, const QStringL
     {
         emit screenLocked();
     }
+}
+
+void SystemEventHandler::clientPrivateEndSession(quint32 id)
+{
+  emit loggingOff();
 }
