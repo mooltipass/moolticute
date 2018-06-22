@@ -37,6 +37,7 @@ private slots:
     void clientPrivateEndSession(quint32 id);
     void screenSaverActiveChanged(bool on);
     void kdeAboutToSuspend();
+    void login1PrepareForSleep(bool active);
 
 private:
 #ifdef Q_OS_MAC

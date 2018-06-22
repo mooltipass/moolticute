@@ -32,6 +32,7 @@ SystemEventHandler::SystemEventHandler()
         }
     }
 #elif defined(Q_OS_LINUX)
+    /* Session events */
     auto bus = QDBusConnection::sessionBus();
 
     // Catch Ubuntu events.
@@ -49,6 +50,13 @@ SystemEventHandler::SystemEventHandler()
     // Catch KDE about-to-suspend event.
     bus.connect("", "/org/kde/Solid/PowerManagement/Actions/SuspendSession", "", "aboutToSuspend",
                 this, SLOT(kdeAboutToSuspend()));
+
+    /* System events */
+    auto sysBus = QDBusConnection::systemBus();
+
+    // Catch suspend event from org.freedesktop.login1.
+    sysBus.connect("", "/org/freedesktop/login1", "", "PrepareForSleep", "b", this,
+                   SLOT(login1PrepareForSleep(bool)));
 #endif
 }
 
@@ -78,6 +86,10 @@ SystemEventHandler::~SystemEventHandler()
                 SLOT(screenSaverActiveChanged(bool)));
     bus.disconnect("", "/org/kde/Solid/PowerManagement/Actions/SuspendSession", "", "aboutToSuspend",
                 this, SLOT(kdeAboutToSuspend()));
+
+    auto sysBus = QDBusConnection::systemBus();
+    sysBus.disconnect("", "/org/freedesktop/login1", "", "PrepareForSleep", "b", this,
+                      SLOT(login1PrepareForSleep(bool)));
 #endif
 }
 
@@ -188,4 +200,12 @@ void SystemEventHandler::screenSaverActiveChanged(bool on)
 void SystemEventHandler::kdeAboutToSuspend()
 {
     emit goingToSleep();
+}
+
+void SystemEventHandler::login1PrepareForSleep(bool active)
+{
+    if (active)
+    {
+        emit goingToSleep();
+    }
 }
