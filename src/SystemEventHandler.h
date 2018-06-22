@@ -38,6 +38,7 @@ private slots:
     void screenSaverActiveChanged(bool on);
     void kdeAboutToSuspend();
     void login1PrepareForSleep(bool active);
+    void login1PrepareForShutdown(bool active);
 
 private:
 #ifdef Q_OS_MAC

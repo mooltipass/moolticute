@@ -57,6 +57,10 @@ SystemEventHandler::SystemEventHandler()
     // Catch suspend event from org.freedesktop.login1.
     sysBus.connect("", "/org/freedesktop/login1", "", "PrepareForSleep", "b", this,
                    SLOT(login1PrepareForSleep(bool)));
+
+    // Catch shutdown event from org.freedesktop.login1.
+    sysBus.connect("", "/org/freedesktop/login1", "", "PrepareForShutdown", "b", this,
+                   SLOT(login1PrepareForShutdown(bool)));
 #endif
 }
 
@@ -90,6 +94,8 @@ SystemEventHandler::~SystemEventHandler()
     auto sysBus = QDBusConnection::systemBus();
     sysBus.disconnect("", "/org/freedesktop/login1", "", "PrepareForSleep", "b", this,
                       SLOT(login1PrepareForSleep(bool)));
+    sysBus.connect("", "/org/freedesktop/login1", "", "PrepareForShutdown", "b", this,
+                   SLOT(login1PrepareForShutdown(bool)));
 #endif
 }
 
@@ -207,5 +213,13 @@ void SystemEventHandler::login1PrepareForSleep(bool active)
     if (active)
     {
         emit goingToSleep();
+    }
+}
+
+void SystemEventHandler::login1PrepareForShutdown(bool active)
+{
+    if (active)
+    {
+        emit shuttingDown();
     }
 }
