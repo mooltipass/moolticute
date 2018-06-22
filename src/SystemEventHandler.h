@@ -36,6 +36,7 @@ private slots:
     void upstartEventEmitted(const QString &name, const QStringList &env);
     void clientPrivateEndSession(quint32 id);
     void screenSaverActiveChanged(bool on);
+    void kdeAboutToSuspend();
 
 private:
 #ifdef Q_OS_MAC

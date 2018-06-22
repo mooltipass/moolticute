@@ -45,6 +45,10 @@ SystemEventHandler::SystemEventHandler()
     // Catch org.freedesktop.ScreenSaver event (Used with KDE at least).
     bus.connect("", "/org/freedesktop/ScreenSaver", "", "ActiveChanged", "b", this,
                 SLOT(screenSaverActiveChanged(bool)));
+
+    // Catch KDE about-to-suspend event.
+    bus.connect("", "/org/kde/Solid/PowerManagement/Actions/SuspendSession", "", "aboutToSuspend",
+                this, SLOT(kdeAboutToSuspend()));
 #endif
 }
 
@@ -72,6 +76,8 @@ SystemEventHandler::~SystemEventHandler()
                 SLOT(clientPrivateEndSession(quint32)));
     bus.disconnect("", "/org/freedesktop/ScreenSaver", "", "ActiveChanged", "b", this,
                 SLOT(screenSaverActiveChanged(bool)));
+    bus.disconnect("", "/org/kde/Solid/PowerManagement/Actions/SuspendSession", "", "aboutToSuspend",
+                this, SLOT(kdeAboutToSuspend()));
 #endif
 }
 
@@ -177,4 +183,9 @@ void SystemEventHandler::screenSaverActiveChanged(bool on)
     {
         emit screenLocked();
     }
+}
+
+void SystemEventHandler::kdeAboutToSuspend()
+{
+    emit goingToSleep();
 }
