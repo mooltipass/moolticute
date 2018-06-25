@@ -306,6 +306,9 @@ border-right: none;
            </item>
            <item>
             <widget class="QPushButton" name="pushButtonExport">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="minimumSize">
               <size>
                <width>200</width>
@@ -319,6 +322,9 @@ border-right: none;
            </item>
            <item>
             <widget class="QPushButton" name="pushButtonDelete">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="minimumSize">
               <size>
                <width>200</width>

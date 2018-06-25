@@ -50,6 +50,13 @@ SSHManagement::SSHManagement(QWidget *parent) :
     keysModel = new QStandardItemModel(this);
     ui->listViewKeys->setModel(keysModel);
 
+    // Enable button when a key is selected.
+    connect(ui->listViewKeys, &QListWidget::clicked, this, [this](const QModelIndex &/*index*/)
+    {
+        ui->pushButtonExport->setEnabled(true);
+        ui->pushButtonDelete->setEnabled(true);
+    });
+
     QMenu *menu = new QMenu(this);
     QAction *action;
     action = menu->addAction(tr("Export public key"));
