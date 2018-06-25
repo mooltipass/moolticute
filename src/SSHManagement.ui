@@ -51,7 +51,7 @@ border-right: none;
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>SSH Keys management</string>
+          <string>SSH Keys Management</string>
          </property>
          <property name="class" stdset="0">
           <string>FrameTitle</string>
@@ -91,7 +91,7 @@ border-right: none;
            <item>
             <widget class="QLabel" name="label_27">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;SSH is locked.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Press the unlock button to load SSH keys from the device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SSH Keys Not Loaded&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Press the load keys button to load SSH keys from your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -114,7 +114,7 @@ border-right: none;
            <item>
             <widget class="QPushButton" name="pushButtonUnlock">
              <property name="text">
-              <string>Unlock</string>
+              <string>Load Keys</string>
              </property>
             </widget>
            </item>
@@ -266,10 +266,17 @@ border-right: none;
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>SSH Keys management</string>
+          <string>SSH Keys Management</string>
          </property>
          <property name="class" stdset="0">
           <string>FrameTitle</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Only passphrase-free OpenSSH keys are supported at this moment.</string>
          </property>
         </widget>
        </item>
@@ -284,7 +291,7 @@ border-right: none;
             </size>
            </property>
            <property name="text">
-            <string>Import a key</string>
+            <string>Import A Key</string>
            </property>
           </widget>
          </item>
@@ -323,7 +330,7 @@ border-right: none;
               </size>
              </property>
              <property name="text">
-              <string>Export selected</string>
+              <string>Export Selected</string>
              </property>
             </widget>
            </item>
@@ -336,7 +343,7 @@ border-right: none;
               </size>
              </property>
              <property name="text">
-              <string>Delete selected</string>
+              <string>Delete Selected</string>
              </property>
             </widget>
            </item>
@@ -380,7 +387,7 @@ border-right: none;
             </size>
            </property>
            <property name="text">
-            <string>Quit SSH Management</string>
+            <string>Leave SSH Keys Management</string>
            </property>
           </widget>
          </item>
