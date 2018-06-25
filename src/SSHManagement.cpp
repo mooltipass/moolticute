@@ -214,6 +214,11 @@ void SSHManagement::readStdOutLoadKeys()
             }
         }
     }
+
+    // Clear selection and buttons after loading keys.
+    ui->listViewKeys->clearSelection();
+    ui->pushButtonExport->setEnabled(false);
+    ui->pushButtonDelete->setEnabled(false);
 }
 
 void SSHManagement::progressChanged(int total, int current)
