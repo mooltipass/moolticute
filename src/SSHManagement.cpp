@@ -97,19 +97,27 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
     if (exists)
     {
         sshProcess = new QProcess(this);
-        QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
+        const auto program = QCoreApplication::applicationDirPath () + "/mc-agent";
+        if (!QFile::exists(program))
+        {
+            QMessageBox::critical(this, "Moolticute",
+                tr("mc-agent isn't bundled with the Moolticute app!\n\nCannot manage SSH keys."));
+            ui->stackedWidget->setCurrentWidget(ui->pageLocked);
+            return;
+        }
+
         QStringList arguments;
         arguments << "--output_progress"
                   << "cli"
                   << "-c"
                   << "list";
 
-        qInfo() << "Running " << program << " " << arguments;
+        qInfo() << "Running" << program << arguments;
         connect(sshProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
             if (exitStatus != QProcess::NormalExit)
-                qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
+                qWarning() << "SSH agent exits with exit code" << exitCode << "Exit Status:" << exitStatus;
 
             if (loaded)
                 ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);
