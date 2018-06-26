@@ -39,7 +39,6 @@ public:
 
 private slots:
     void readStdOutLoadKeys();
-    void progressChanged(int total, int current);
     void onExportPublicKey();
     void onExportPrivateKey();
     void onServiceExists(const QString service, bool exists);
