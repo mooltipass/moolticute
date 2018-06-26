@@ -32,6 +32,14 @@ public slots:
     void readyToTerminate();
 #endif
 
+private slots:
+    void upstartEventEmitted(const QString &name, const QStringList &env);
+    void clientPrivateEndSession(quint32 id);
+    void screenSaverActiveChanged(bool on);
+    void kdeAboutToSuspend();
+    void login1PrepareForSleep(bool active);
+    void login1PrepareForShutdown(bool active);
+
 private:
 #ifdef Q_OS_MAC
     void *eventHandler = nullptr;
