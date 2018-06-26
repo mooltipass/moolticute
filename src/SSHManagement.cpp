@@ -311,6 +311,13 @@ void SSHManagement::on_pushButtonImport_clicked()
     if (fname.isEmpty())
         return;
 
+    if (QFileInfo(fname).suffix().toLower() == "ppk")
+    {
+        QMessageBox::warning(this, "Moolticute",
+            tr("PuTTY private keys are currently not supported!"));
+        return;
+    }
+
     ui->progressBarLoad2->setMinimum(0);
     ui->progressBarLoad2->setMaximum(0);
     ui->progressBarLoad2->setValue(0);
