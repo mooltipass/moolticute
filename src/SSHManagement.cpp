@@ -102,7 +102,11 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
     {
         sshProcess = new QProcess(this);
         const auto program = QCoreApplication::applicationDirPath () + "/mc-agent";
-        if (!QFile::exists(program))
+        auto actualProg = program;
+#ifdef Q_OS_WIN
+        actualProg += ".exe";
+#endif
+        if (!QFile::exists(actualProg))
         {
             QMessageBox::critical(this, "Moolticute",
                 tr("mc-agent isn't bundled with the Moolticute app!\n\nCannot manage SSH keys."));
