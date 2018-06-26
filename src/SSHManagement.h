@@ -66,6 +66,15 @@ private:
         RolePrivateKey,
     };
 
+    enum class Action
+    {
+        None,
+        ListKeys,
+        ImportKey,
+        DeleteKey
+    };
+    Action currentAction = Action::None;
+
     QStandardItemModel *keysModel;
 
     WSClient *wsClient = nullptr;

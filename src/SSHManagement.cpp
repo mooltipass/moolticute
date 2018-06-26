@@ -113,6 +113,8 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
             return;
         }
 
+        currentAction = Action::ListKeys;
+
         QStringList arguments;
         arguments << "--output_progress"
                   << "cli"
@@ -148,11 +150,37 @@ void SSHManagement::handleProgressErrors(const QJsonObject &rootobj)
 {
     if (rootobj.contains("error") && rootobj["error"].toBool())
     {
-        //Handle errors here
-        QString msg = rootobj["error_message"].toString();
+        // Errors go into the log file.
+        auto msg = rootobj["error_message"].toString();
         if (msg.isEmpty())
+        {
             msg = tr("Some internal errors occured. Please check the log and contact the dev team.");
-        QMessageBox::warning(this, "Moolticute", tr("Some errors occured:\n\n%1").arg(msg));
+        }
+        qWarning() << "Errors occurred:" << qPrintable(msg);
+
+        msg.clear();
+        switch (currentAction)
+        {
+            case Action::ListKeys:
+                msg = tr("Failed to retrieve keys from the device!");
+                break;
+
+            case Action::ImportKey:
+                msg = tr("Failed to import key into the device!") + "\n\n" +
+                      tr("Make sure it's an OpenSSH private key without a passphrase.");
+                break;
+
+            case Action::DeleteKey:
+                msg = tr("Failed to delete key from the device!");
+                break;
+
+            default: break;
+        }
+
+        if (!msg.isEmpty())
+        {
+            QMessageBox::warning(this, "Moolticute", msg);
+        }
     }
     else if (rootobj["msg"] == "progress_detailed")
     {
@@ -215,10 +243,11 @@ void SSHManagement::readStdOutLoadKeys()
         }
     }
 
-    // Clear selection and buttons after loading keys.
+    // Clear selection and buttons after loading keys or an error occurred.
     ui->listViewKeys->clearSelection();
     ui->pushButtonExport->setEnabled(false);
     ui->pushButtonDelete->setEnabled(false);
+    currentAction = Action::None;
 }
 
 void SSHManagement::progressChanged(int total, int current)
@@ -285,6 +314,8 @@ void SSHManagement::on_pushButtonImport_clicked()
     ui->progressBarLoad2->show();
     setEnabled(false);
 
+    currentAction = Action::ImportKey;
+
     sshProcess = new QProcess(this);
     QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
     QStringList arguments;
@@ -331,6 +362,8 @@ void SSHManagement::on_pushButtonDelete_clicked()
     ui->progressBarLoad2->setValue(0);
     ui->progressBarLoad2->show();
     setEnabled(false);
+
+    currentAction = Action::DeleteKey;
 
     sshProcess = new QProcess(this);
     QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
