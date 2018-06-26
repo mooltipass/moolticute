@@ -53,6 +53,7 @@ private:
     virtual void changeEvent(QEvent *event);
 
     void handleProgressErrors(const QJsonObject &rootobj);
+    void resetProgress();
 
     Ui::SSHManagement *ui;
 

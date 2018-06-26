@@ -94,9 +94,7 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
 
     disconnect(wsClient, &WSClient::dataNodeExists, this, &SSHManagement::onServiceExists);
 
-    ui->progressBarLoad->setMinimum(0);
-    ui->progressBarLoad->setMaximum(0);
-    ui->progressBarLoad->setValue(0);
+    resetProgress();
     loaded = false;
     keysModel->clear();
 
@@ -331,10 +329,7 @@ void SSHManagement::on_pushButtonImport_clicked()
         return;
     }
 
-    // TODO: Put the "reset and show page wait" into function and reuse
-    ui->progressBarLoad->setMinimum(0);
-    ui->progressBarLoad->setMaximum(0);
-    ui->progressBarLoad->setValue(0);
+    resetProgress();
     ui->stackedWidget->setCurrentWidget(ui->pageWait);
     setEnabled(false);
 
@@ -380,9 +375,7 @@ void SSHManagement::on_pushButtonDelete_clicked()
     if (QMessageBox::question(this, "Moolticute", tr("You are going to delete the selected key from the device.\n\nProceed?")) != QMessageBox::Yes)
         return;
 
-    ui->progressBarLoad->setMinimum(0);
-    ui->progressBarLoad->setMaximum(0);
-    ui->progressBarLoad->setValue(0);
+    resetProgress();
     ui->stackedWidget->setCurrentWidget(ui->pageWait);
     setEnabled(false);
 
@@ -410,4 +403,11 @@ void SSHManagement::on_pushButtonDelete_clicked()
 
     sshProcess->setReadChannel(QProcess::StandardOutput);
     sshProcess->start(program, arguments);
+}
+
+void SSHManagement::resetProgress()
+{
+    ui->progressBarLoad->setMinimum(0);
+    ui->progressBarLoad->setMaximum(0);
+    ui->progressBarLoad->setValue(0);
 }
