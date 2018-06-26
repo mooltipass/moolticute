@@ -305,8 +305,11 @@ void SSHManagement::buttonDiscardClicked()
 
 void SSHManagement::on_pushButtonImport_clicked()
 {
-    QString fname = QFileDialog::getOpenFileName(this, tr("Open SSH private key"), QString(), tr("OpenSsh private key (*.key *.*)"));
-    if (fname.isEmpty()) return;
+    const auto fname =
+        QFileDialog::getOpenFileName(this, tr("OpenSSH private key"), QString(),
+            tr("OpenSSH private key (*.key *.pem *.* *)"));
+    if (fname.isEmpty())
+        return;
 
     ui->progressBarLoad2->setMinimum(0);
     ui->progressBarLoad2->setMaximum(0);
