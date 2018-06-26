@@ -50,6 +50,13 @@ SSHManagement::SSHManagement(QWidget *parent) :
     keysModel = new QStandardItemModel(this);
     ui->listViewKeys->setModel(keysModel);
 
+    // Enable button when a key is selected.
+    connect(ui->listViewKeys, &QListWidget::clicked, this, [this](const QModelIndex &/*index*/)
+    {
+        ui->pushButtonExport->setEnabled(true);
+        ui->pushButtonDelete->setEnabled(true);
+    });
+
     QMenu *menu = new QMenu(this);
     QAction *action;
     action = menu->addAction(tr("Export public key"));
@@ -97,19 +104,27 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
     if (exists)
     {
         sshProcess = new QProcess(this);
-        QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
+        const auto program = QCoreApplication::applicationDirPath () + "/mc-agent";
+        if (!QFile::exists(program))
+        {
+            QMessageBox::critical(this, "Moolticute",
+                tr("mc-agent isn't bundled with the Moolticute app!\n\nCannot manage SSH keys."));
+            ui->stackedWidget->setCurrentWidget(ui->pageLocked);
+            return;
+        }
+
         QStringList arguments;
         arguments << "--output_progress"
                   << "cli"
                   << "-c"
                   << "list";
 
-        qInfo() << "Running " << program << " " << arguments;
+        qInfo() << "Running" << program << arguments;
         connect(sshProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
             if (exitStatus != QProcess::NormalExit)
-                qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
+                qWarning() << "SSH agent exits with exit code" << exitCode << "Exit Status:" << exitStatus;
 
             if (loaded)
                 ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);
@@ -199,6 +214,11 @@ void SSHManagement::readStdOutLoadKeys()
             }
         }
     }
+
+    // Clear selection and buttons after loading keys.
+    ui->listViewKeys->clearSelection();
+    ui->pushButtonExport->setEnabled(false);
+    ui->pushButtonDelete->setEnabled(false);
 }
 
 void SSHManagement::progressChanged(int total, int current)
