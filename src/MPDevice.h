@@ -137,7 +137,7 @@ public:
                           const MPDeviceProgressCb &cbProgress,
                           const std::function<void(bool success, int errCode, QString errMsg)> &cb);
     void exitMemMgmtMode(bool setMMMBool = true);
-    void startIntegrityCheck(const std::function<void(bool success, QString errstr)> &cb,
+    void startIntegrityCheck(const std::function<void(bool success, int freeBlocks, int totalBlocks, QString errstr)> &cb,
                              const MPDeviceProgressCb &cbProgress);
 
     //reload parameters from MP

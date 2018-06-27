@@ -75,7 +75,7 @@ private slots:
 //    void mpRemoved(MPDevice *);
 
     void integrityProgress(int total, int current, QString message);
-    void integrityFinished(bool success);
+    void integrityFinished(bool success, int freeBlocks, int totalBlocks);
 
     void loadingProgress(int total, int current, QString message);
 

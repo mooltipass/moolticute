@@ -121,7 +121,7 @@ signals:
     void credentialsUpdated(const QString & service, const QString & login, const QString & description, bool success);
     void showAppRequested();
     void progressChanged(int total, int current, QString statusMsg);
-    void memcheckFinished(bool success);
+    void memcheckFinished(bool success, int freeBlocks = 0, int totalBlocks = 0);
     void dataFileRequested(const QString &service, const QByteArray &data, bool success);
     void dataFileSent(const QString &service, bool success);
     void dataFileDeleted(const QString &service, bool success);
