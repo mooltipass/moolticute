@@ -28,7 +28,6 @@ SSHManagement::SSHManagement(QWidget *parent) :
     ui->setupUi(this);
 
     ui->stackedWidget->setCurrentWidget(ui->pageLocked);
-    ui->progressBarLoad2->hide();
 
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
@@ -95,9 +94,7 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
 
     disconnect(wsClient, &WSClient::dataNodeExists, this, &SSHManagement::onServiceExists);
 
-    ui->progressBarLoad->setMinimum(0);
-    ui->progressBarLoad->setMaximum(0);
-    ui->progressBarLoad->setValue(0);
+    resetProgress();
     loaded = false;
     keysModel->clear();
 
@@ -105,13 +102,19 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
     {
         sshProcess = new QProcess(this);
         const auto program = QCoreApplication::applicationDirPath () + "/mc-agent";
-        if (!QFile::exists(program))
+        auto actualProg = program;
+#ifdef Q_OS_WIN
+        actualProg += ".exe";
+#endif
+        if (!QFile::exists(actualProg))
         {
             QMessageBox::critical(this, "Moolticute",
                 tr("mc-agent isn't bundled with the Moolticute app!\n\nCannot manage SSH keys."));
             ui->stackedWidget->setCurrentWidget(ui->pageLocked);
             return;
         }
+
+        currentAction = Action::ListKeys;
 
         QStringList arguments;
         arguments << "--output_progress"
@@ -148,17 +151,66 @@ void SSHManagement::handleProgressErrors(const QJsonObject &rootobj)
 {
     if (rootobj.contains("error") && rootobj["error"].toBool())
     {
-        //Handle errors here
-        QString msg = rootobj["error_message"].toString();
+        // Errors go into the log file.
+        auto msg = rootobj["error_message"].toString();
         if (msg.isEmpty())
+        {
             msg = tr("Some internal errors occured. Please check the log and contact the dev team.");
-        QMessageBox::warning(this, "Moolticute", tr("Some errors occured:\n\n%1").arg(msg));
+        }
+        qWarning() << "Errors occurred:" << qPrintable(msg);
+        ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);
+
+        msg.clear();
+        switch (currentAction)
+        {
+            case Action::ListKeys:
+                msg = tr("Failed to retrieve keys from the device!");
+                break;
+
+            case Action::ImportKey:
+                msg = tr("Failed to import key into the device!") + "\n\n" +
+                      tr("Make sure it's an OpenSSH private key without a passphrase.");
+                break;
+
+            case Action::DeleteKey:
+                msg = tr("Failed to delete key from the device!");
+                break;
+
+            default: break;
+        }
+
+        if (!msg.isEmpty())
+        {
+            QMessageBox::warning(this, "Moolticute", msg);
+        }
     }
     else if (rootobj["msg"] == "progress_detailed")
     {
-        qDebug() << "Progress detailed";
         QJsonObject o = rootobj["data"].toObject();
-        progressChanged(o["progress_total"].toInt(), o["progress_current"].toInt());
+        qDebug() << "Progress detailed" << o;
+        const auto total = o["progress_total"].toInt();
+        const auto current = o["progress_current"].toInt();
+        const auto msg = o["progress_message"].toString();
+        Q_ASSERT(!msg.isEmpty());
+
+        ui->progressBarLoad->setMaximum(total);
+        ui->progressBarLoad->setValue(current);
+        ui->stackedWidget->setCurrentWidget(ui->pageWait);
+
+        if (current == total)
+        {
+            // If it's an intermediate step then show it's waiting for input on device.
+            ui->progressBarLoad->setMaximum(0);
+            ui->progressBarLoad->setValue(0);
+
+            // There are two phases of importing/deleting a key: getDataNodeCb and setDataNodeCb.
+            // Only change back to edit page in the end.
+            if ((currentAction == Action::ImportKey || currentAction == Action::DeleteKey)
+                && msg == "WORKING on setDataNodeCb")
+            {
+                ui->stackedWidget->setCurrentWidget(ui->pageEditSsh);
+            }
+        }
     }
 }
 
@@ -215,18 +267,10 @@ void SSHManagement::readStdOutLoadKeys()
         }
     }
 
-    // Clear selection and buttons after loading keys.
+    // Clear selection and buttons after loading keys or an error occurred.
     ui->listViewKeys->clearSelection();
     ui->pushButtonExport->setEnabled(false);
     ui->pushButtonDelete->setEnabled(false);
-}
-
-void SSHManagement::progressChanged(int total, int current)
-{
-    ui->progressBarLoad->setMaximum(total);
-    ui->progressBarLoad->setValue(current);
-    ui->progressBarLoad2->setMaximum(total);
-    ui->progressBarLoad2->setValue(current);
 }
 
 void SSHManagement::onExportPublicKey()
@@ -276,14 +320,24 @@ void SSHManagement::buttonDiscardClicked()
 
 void SSHManagement::on_pushButtonImport_clicked()
 {
-    QString fname = QFileDialog::getOpenFileName(this, tr("Open SSH private key"), QString(), tr("OpenSsh private key (*.key *.*)"));
-    if (fname.isEmpty()) return;
+    const auto fname =
+        QFileDialog::getOpenFileName(this, tr("OpenSSH private key"), QString(),
+            tr("OpenSSH private key (*.key *.pem *.* *)"));
+    if (fname.isEmpty())
+        return;
 
-    ui->progressBarLoad2->setMinimum(0);
-    ui->progressBarLoad2->setMaximum(0);
-    ui->progressBarLoad2->setValue(0);
-    ui->progressBarLoad2->show();
+    if (QFileInfo(fname).suffix().toLower() == "ppk")
+    {
+        QMessageBox::warning(this, "Moolticute",
+            tr("PuTTY private keys are currently not supported!"));
+        return;
+    }
+
+    resetProgress();
+    ui->stackedWidget->setCurrentWidget(ui->pageWait);
     setEnabled(false);
+
+    currentAction = Action::ImportKey;
 
     sshProcess = new QProcess(this);
     QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
@@ -301,7 +355,6 @@ void SSHManagement::on_pushButtonImport_clicked()
     {
         if (exitStatus != QProcess::NormalExit)
             qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
-        ui->progressBarLoad2->hide();
         setEnabled(true);
     });
 
@@ -326,11 +379,11 @@ void SSHManagement::on_pushButtonDelete_clicked()
     if (QMessageBox::question(this, "Moolticute", tr("You are going to delete the selected key from the device.\n\nProceed?")) != QMessageBox::Yes)
         return;
 
-    ui->progressBarLoad2->setMinimum(0);
-    ui->progressBarLoad2->setMaximum(0);
-    ui->progressBarLoad2->setValue(0);
-    ui->progressBarLoad2->show();
+    resetProgress();
+    ui->stackedWidget->setCurrentWidget(ui->pageWait);
     setEnabled(false);
+
+    currentAction = Action::DeleteKey;
 
     sshProcess = new QProcess(this);
     QString program = QCoreApplication::applicationDirPath () + "/mc-agent";
@@ -347,7 +400,6 @@ void SSHManagement::on_pushButtonDelete_clicked()
     {
         if (exitStatus != QProcess::NormalExit)
             qWarning() << "SSH agent exits with exit code " << exitCode << " Exit Status : " << exitStatus;
-        ui->progressBarLoad2->hide();
         setEnabled(true);
     });
 
@@ -355,4 +407,11 @@ void SSHManagement::on_pushButtonDelete_clicked()
 
     sshProcess->setReadChannel(QProcess::StandardOutput);
     sshProcess->start(program, arguments);
+}
+
+void SSHManagement::resetProgress()
+{
+    ui->progressBarLoad->setMinimum(0);
+    ui->progressBarLoad->setMaximum(0);
+    ui->progressBarLoad->setValue(0);
 }

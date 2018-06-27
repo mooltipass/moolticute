@@ -39,7 +39,6 @@ public:
 
 private slots:
     void readStdOutLoadKeys();
-    void progressChanged(int total, int current);
     void onExportPublicKey();
     void onExportPrivateKey();
     void onServiceExists(const QString service, bool exists);
@@ -54,6 +53,7 @@ private:
     virtual void changeEvent(QEvent *event);
 
     void handleProgressErrors(const QJsonObject &rootobj);
+    void resetProgress();
 
     Ui::SSHManagement *ui;
 
@@ -65,6 +65,15 @@ private:
         RolePublicKey = Qt::UserRole + 1,
         RolePrivateKey,
     };
+
+    enum class Action
+    {
+        None,
+        ListKeys,
+        ImportKey,
+        DeleteKey
+    };
+    Action currentAction = Action::None;
 
     QStandardItemModel *keysModel;
 
