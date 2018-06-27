@@ -337,6 +337,8 @@ private:
     qint64 diagLastSecs;
     quint32 diagNbBytesRec;
     quint32 diagLastNbBytesPSec;
+    int diagFreeBlocks = 0;
+    int diagTotalBlocks = 0;
 
     //command queue
     QQueue<MPCommand> commandQueue;

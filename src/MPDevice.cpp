@@ -1243,6 +1243,8 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
+            diagTotalBlocks++;
+
             /* Received one byte as answer: we are not allowed to read */
             //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address) << ": we are not allowed to read there";
 
@@ -1268,10 +1270,13 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
             }
             else
             {
+                diagTotalBlocks++;
+
                 // Node is loaded
                 if (!pnode->isValid())
                 {
                     //qDebug() << address.toHex() << ": empty node loaded";
+                    diagFreeBlocks++;
 
                     /* No point in keeping these nodes, simply delete them */
                     delete pnodeClone;
@@ -6201,6 +6206,8 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, QStrin
     diagLastNbBytesPSec = 0;
     lastFlashPageScanned = 0;
     diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
+    diagFreeBlocks = 0;
+    diagTotalBlocks = 0;
 
     /* Load CTR, favorites, nodes... */
     memMgmtModeReadFlash(jobs, true, cbProgress, true, true, true);
@@ -6208,6 +6215,10 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, QStrin
     connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &)
     {
         qInfo() << "Finished loading the nodes in memory";
+        qInfo() << "Total blocks:" << diagTotalBlocks;
+        qInfo() << "Free blocks:" << diagFreeBlocks;
+        qInfo() << "Available blocks:" << diagTotalBlocks - diagFreeBlocks;
+        qInfo() << "Available credentials:" << (diagTotalBlocks - diagFreeBlocks) / 2;
 
         /* We finished loading the nodes in memory */
         AsyncJobs* repairJobs = new AsyncJobs("Checking memory contents...", this);
