@@ -1238,7 +1238,8 @@ void MainWindow::on_pushButtonIntegrity_clicked()
     {
         wsClient->sendJsonData({{ "msg", "start_memcheck" }});
 
-        connect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
+        connect(wsClient, SIGNAL(memcheckFinished(bool,int,int)),
+                this, SLOT(integrityFinished(bool,int,int)));
         connect(wsClient, &WSClient::progressChanged, this, &MainWindow::integrityProgress);
 
         ui->widgetHeader->setEnabled(false);
@@ -1268,15 +1269,22 @@ void MainWindow::integrityProgress(int total, int current, QString message)
     ui->progressBarIntegrity->setValue(current);
 }
 
-void MainWindow::integrityFinished(bool success)
+void MainWindow::integrityFinished(bool success, int freeBlocks, int totalBlocks)
 {
-    disconnect(wsClient, SIGNAL(memcheckFinished(bool)), this, SLOT(integrityFinished(bool)));
+    disconnect(wsClient, SIGNAL(memcheckFinished(bool,int,int)),
+               this, SLOT(integrityFinished(bool,int,int)));
     disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::integrityProgress);
 
     if (!success)
         QMessageBox::warning(this, "Moolticute", tr("Memory integrity check failed!"));
     else
-        QMessageBox::information(this, "Moolticute", tr("Memory integrity check done successfully"));
+    {
+        const auto totalCreds = totalBlocks / 2;
+        const auto usedCreds = (totalBlocks - freeBlocks) / 2;
+        QMessageBox::information(this, "Moolticute",
+            tr("Memory integrity check done successfully!\n%1 of %2 credential slots used.")
+            .arg(usedCreds).arg(totalCreds));
+    }
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
     ui->widgetHeader->setEnabled(true);
 }

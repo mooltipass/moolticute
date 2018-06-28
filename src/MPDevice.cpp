@@ -1243,6 +1243,8 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     {
         if (data[MP_LEN_FIELD_INDEX] == 1)
         {
+            diagTotalBlocks++;
+
             /* Received one byte as answer: we are not allowed to read */
             //qDebug() << "Loading Node" << getNodeIdFromAddress(address) << "at page" << getFlashPageFromAddress(address) << ": we are not allowed to read there";
 
@@ -1268,10 +1270,13 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
             }
             else
             {
+                diagTotalBlocks++;
+
                 // Node is loaded
                 if (!pnode->isValid())
                 {
                     //qDebug() << address.toHex() << ": empty node loaded";
+                    diagFreeBlocks++;
 
                     /* No point in keeping these nodes, simply delete them */
                     delete pnodeClone;
@@ -6182,7 +6187,7 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
     }));
 }
 
-void MPDevice::startIntegrityCheck(const std::function<void(bool success, QString errstr)> &cb,
+void MPDevice::startIntegrityCheck(const std::function<void(bool success, int freeBlocks, int totalBlocks, QString errstr)> &cb,
                                    const MPDeviceProgressCb &cbProgress)
 {
     /* New job for starting MMM */
@@ -6201,6 +6206,8 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, QStrin
     diagLastNbBytesPSec = 0;
     lastFlashPageScanned = 0;
     diagLastSecs = QDateTime::currentMSecsSinceEpoch()/1000;
+    diagFreeBlocks = 0;
+    diagTotalBlocks = 0;
 
     /* Load CTR, favorites, nodes... */
     memMgmtModeReadFlash(jobs, true, cbProgress, true, true, true);
@@ -6208,6 +6215,10 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, QStrin
     connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &)
     {
         qInfo() << "Finished loading the nodes in memory";
+        qInfo() << "Total blocks:" << diagTotalBlocks;
+        qInfo() << "Free blocks:" << diagFreeBlocks;
+        qInfo() << "Available blocks:" << diagTotalBlocks - diagFreeBlocks;
+        qInfo() << "Available credentials:" << (diagTotalBlocks - diagFreeBlocks) / 2;
 
         /* We finished loading the nodes in memory */
         AsyncJobs* repairJobs = new AsyncJobs("Checking memory contents...", this);
@@ -6231,38 +6242,38 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, QStrin
         /* Leave MMM */
         repairJobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
 
-        connect(repairJobs, &AsyncJobs::finished, [packets_generated, cb](const QByteArray &data)
+        connect(repairJobs, &AsyncJobs::finished, [this, packets_generated, cb](const QByteArray &data)
         {
             Q_UNUSED(data);
 
             if (packets_generated)
             {
                 qInfo() << "Found and Corrected Errors in Database";
-                cb(true, "Errors Were Found And Corrected In The Database");
+                cb(true, diagFreeBlocks, diagTotalBlocks, "Errors Were Found And Corrected In The Database");
             }
             else
             {
                 qInfo() << "Nothing to correct in DB";
-                cb(true, "Database Is Free Of Errors");
+                cb(true, diagFreeBlocks, diagTotalBlocks, "Database Is Free Of Errors");
             }
         });
 
-        connect(repairJobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+        connect(repairJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
         {
             Q_UNUSED(failedJob);
             qCritical() << "Couldn't check memory contents";
-            cb(false, "Error While Correcting Database (Device Disconnected?)");
+            cb(false, diagFreeBlocks, diagTotalBlocks, "Error While Correcting Database (Device Disconnected?)");
         });
 
         jobsQueue.enqueue(repairJobs);
         runAndDequeueJobs();
     });
 
-    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Failed scanning the flash memory";
-        cb(false, "Couldn't scan the complete memory (Device Disconnected?)");
+        cb(false, diagFreeBlocks, diagTotalBlocks, "Couldn't scan the complete memory (Device Disconnected?)");
     });
 
     jobsQueue.enqueue(jobs);

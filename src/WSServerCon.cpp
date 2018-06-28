@@ -160,7 +160,7 @@ void WSServerCon::processMessage(const QString &message)
     {
         //start integrity check
         mpdevice->startIntegrityCheck(
-                    [=](bool success, QString errstr)
+                    [=](bool success, int freeBlocks, int totalBlocks, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
@@ -176,6 +176,8 @@ void WSServerCon::processMessage(const QString &message)
 
             QJsonObject ores;
             ores["memcheck_status"] = "done"; //TODO: add return info here about the result of memcheck?
+            ores["free_blocks"] = freeBlocks;
+            ores["total_blocks"] = totalBlocks;
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         },

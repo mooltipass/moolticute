@@ -203,9 +203,15 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         if (o.value("failed").toBool())
+        {
             emit memcheckFinished(false);
+        }
         else
-            emit memcheckFinished(true);
+        {
+            const auto freeBlocks = o.value("free_blocks").toInt();
+            const auto totalBlocks = o.value("total_blocks").toInt();
+            emit memcheckFinished(true, freeBlocks, totalBlocks);
+        }
     }
     else if (rootobj["msg"] == "progress_detailed")
     {
