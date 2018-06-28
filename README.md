@@ -7,7 +7,7 @@ Moolticute
 
 This project aims to be an easy companion to your [Mooltipass](http://www.themooltipass.com) device and extend
 the power of the device to more platform/tools.
-With it you can manage your Mooltipass with a crossplatform app, as well as provide a daemon service that
+With it you can manage your Mooltipass with a cross-platform app, as well as provide a daemon service that
 handle all USB communication with the device.
 
 This tool is written with a daemon that runs in background, and a user interface app to control you Mooltipass.
@@ -26,12 +26,16 @@ Packages are build and available here: https://github.com/mooltipass/moolticute/
 
 ##### Windows, Linux, OSX
  - Requires Qt 5.6 or higher.
- - Those Qt5 modules are required:
-  - qt-base, qt-widgets, qt-gui, qt-network, qt-websockets
+ - These Qt5 modules are required:
+   - qt-core
+   - qt-gui
+   - qt-widgets
+   - qt-network
+   - qt-websockets
 
 ##### Linux
- - Requires libusb
- - Requires a [udev rule for libusb](https://github.com/bobsaintcool/mooltipass-udev)
+ - Requires the qt-dbus module
+ - Requires libusb and a [udev rule](https://github.com/bobsaintcool/mooltipass-udev) for it
 
 ##### Ubuntu 16.04
 ```bash
