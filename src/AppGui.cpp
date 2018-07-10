@@ -69,7 +69,6 @@ bool AppGui::initialize()
 
     QSimpleUpdater::getInstance();
 
-    setAttribute(Qt::AA_UseHighDpiPixmaps);
     setQuitOnLastWindowClosed(false);
 
     QCommandLineParser parser;
