@@ -75,6 +75,7 @@ MPDevice_linux::~MPDevice_linux()
     if (detached_kernel)
         libusb_attach_kernel_driver(devicefd, 0);
     libusb_close(devicefd);
+    libusb_unref_device(device);
 
     worker->keepWoorking = false;
     worker->quit();
@@ -215,6 +216,8 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
                     getUsbString(devfd, desc.iSerialNumber) <<
                     ")";
 
+        libusb_close(devfd);
+
         if (conf_desc)
         {
             for (int j = 0;j < conf_desc->bNumInterfaces;j++)
@@ -230,11 +233,11 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
                         {
                             MPPlatformDef def;
                             def.ctx = UsbMonitor_linux::Instance()->getUsbContext();
+                            libusb_ref_device(dev);
                             def.dev = dev;
                             def.id = QString("%1").arg((quint64)dev); //use dev pointer for ID
                             devlist << def;
                         }
-                        libusb_close(dev);
                     }
                 }
             }
