@@ -246,6 +246,7 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
         }
 
         HID.HidD_GetAttributes(h, &attrib);
+        CloseHandle(h);
 
         if (attrib.VendorID != MOOLTIPASS_VENDORID ||
             attrib.ProductID != MOOLTIPASS_PRODUCTID)

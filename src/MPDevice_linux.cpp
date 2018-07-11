@@ -234,6 +234,7 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
                             def.id = QString("%1").arg((quint64)dev); //use dev pointer for ID
                             devlist << def;
                         }
+                        libusb_close(dev);
                     }
                 }
             }
