@@ -170,8 +170,11 @@ void DbBackupsTrackerController::exportDbBackup()
         format = "SympleCrypt";
     }
 
-
     window->wantExportDatabase();
+
+    // one-time connection, must be disconected immediately in the slot
+    connect(wsClient, &WSClient::dbExported, this, &DbBackupsTrackerController::handleExportDbResult);
+
     wsClient->exportDbFile(format);
 }
 
@@ -202,17 +205,23 @@ void DbBackupsTrackerController::clearTrackerCardInfo()
 
 void DbBackupsTrackerController::handleExportDbResult(const QByteArray &d, bool success)
 {
-    if (success)
-    {
-        QString file = getBackupFilePath();
-        writeDbBackup(file, d);
+    // one-time connection
+    disconnect(wsClient, &WSClient::dbExported, this, &DbBackupsTrackerController::handleExportDbResult);
 
-        window->handleBackupExported();
-    }
-    else
+    if (! success)
     {
         QMessageBox::warning(window, tr("Error"), tr(d));
+        return;
     }
+
+    QString file = getBackupFilePath();
+    if (file.isEmpty())
+        return;
+
+    writeDbBackup(file, d);
+
+    if (window)
+        window->handleBackupExported();
 }
 
 void DbBackupsTrackerController::handleNewTrack(const QString &cardId, const QString &path)
