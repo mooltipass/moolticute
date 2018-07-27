@@ -53,7 +53,7 @@ public:
 
     /**
      * Guess the current tracked backup file format,
-     * currently suported: "none" and "SympleCrypt"
+     * currently suported: "none" and "SimpleCrypt"
      * throws: DbBackupsTrackerNoBackupFileSet
      */
     QString getTrackedBackupFileFormat();

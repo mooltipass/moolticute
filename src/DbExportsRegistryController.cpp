@@ -164,7 +164,7 @@ void DbExportsRegistryController::exportDbBackup()
 {
     handleExportResultEnabled = true;
 
-    QString format = "SympleCrypt";
+    QString format = "SimpleCrypt";
 
     if (window)
         window->wantExportDatabase();

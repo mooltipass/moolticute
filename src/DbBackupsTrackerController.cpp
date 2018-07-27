@@ -167,7 +167,7 @@ void DbBackupsTrackerController::exportDbBackup()
     }
     catch (DbBackupsTrackerNoBackupFileSet)
     {
-        format = "SympleCrypt";
+        format = "SimpleCrypt";
     }
 
     window->wantExportDatabase();
