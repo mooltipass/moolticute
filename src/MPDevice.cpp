@@ -4971,6 +4971,8 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     QJsonDocument payloadDoc(exportTopArray);
     auto payload = payloadDoc.toJson();
 
+    qDebug() << "requested encryption for exported DB:" << encryption;
+
     if (encryption.isEmpty() || encryption == "none")
         return payload;
 
@@ -4983,6 +4985,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     } else
     {
         // Fallback in case of an unknown encryption method where specified
+        qWarning() << "DB export: Unknown encryption " << encryption << "is asked, fallback to 'none'";
         exportTopObject.insert("encryption", "none");
         exportTopObject.insert("payload", QString(payload));
     }

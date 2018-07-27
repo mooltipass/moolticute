@@ -498,6 +498,10 @@ void WSServerCon::processMessage(const QString &message)
         mpdevice->exportDatabase(encryptionMethod,
                                  [=](bool success, QString errstr, QByteArray fileData)
         {
+            qDebug() << "send exported DB on WS: success:" << success
+                     << ", fileData size:" << fileData.size()
+                     << ", errstr:" << errstr;
+
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
