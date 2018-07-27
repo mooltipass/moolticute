@@ -160,15 +160,7 @@ void DbBackupsTrackerController::askForExportBackup()
 
 void DbBackupsTrackerController::exportDbBackup()
 {
-    QString format;
-    try
-    {
-        format = dbBackupsTracker.getTrackedBackupFileFormat();
-    }
-    catch (DbBackupsTrackerNoBackupFileSet)
-    {
-        format = "SimpleCrypt";
-    }
+    QString format = "SimpleCrypt";
 
     window->wantExportDatabase();
 
