@@ -17,8 +17,6 @@ A Firefox (or any other browser) extension could easily be written by using the 
 
 It is completely cross platform, and runs on Linux (using libusb), OS X (native IOKit API), and Windows (native HID API).
 
-> Warning! This project is a work in progress!
-
 ### Downloads
 Packages are build and available here: https://github.com/mooltipass/moolticute/releases
 
