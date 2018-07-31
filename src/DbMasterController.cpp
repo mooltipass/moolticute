@@ -34,7 +34,6 @@ void DbMasterController::setWSClient(WSClient *client)
     connect(wsClient, &WSClient::cardDbMetadataChanged, this, &DbMasterController::handleCardIdChanged);
     connect(wsClient, &WSClient::statusChanged, this, &DbMasterController::handleDeviceStatusChanged);
     connect(wsClient, &WSClient::connectedChanged, this, &DbMasterController::handleDeviceConnectedChanged);
-    connect(wsClient, &WSClient::dbExported, this, &DbMasterController::registerDbExported);
 
     dbExportsRegistryController->setWSClient(wsClient);
 }
@@ -84,16 +83,4 @@ void DbMasterController::handleDeviceConnectedChanged(const bool &connected)
     }
 
     dbExportsRegistryController->handleDeviceConnectedChanged(connected);
-}
-
-void DbMasterController::registerDbExported(const QByteArray &data, bool success)
-{
-    if (dbBackupsTrackerController) {
-        dbBackupsTrackerController->handleExportDbResult(data, success);
-        if (! dbBackupsTrackerController->getBackupFilePath().isEmpty())
-            return;
-    }
-
-    dbExportsRegistryController->registerDbExported(data, success);
-    dbExportsRegistryController->handleExportDbResult(data, success);
 }

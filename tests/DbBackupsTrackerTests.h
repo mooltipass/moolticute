@@ -30,7 +30,7 @@ private slots:
     void credentialChangenumberWrapOver();
 
     void getFileFormatLegacy();
-    void getFileFormatSympleCrypt();
+    void getFileFormatSimpleCrypt();
 
 private:
     DbBackupsTracker tracker;

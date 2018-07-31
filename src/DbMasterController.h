@@ -44,7 +44,6 @@ private slots:
     void handleCardIdChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void handleDeviceStatusChanged(const Common::MPStatus &status);
     void handleDeviceConnectedChanged(const bool &connected);
-    void registerDbExported(const QByteArray &data, bool success);
 
 private:
     MainWindow *window = nullptr;

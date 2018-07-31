@@ -1168,8 +1168,9 @@ void MainWindow::on_pushButtonExportFile_clicked()
     else
         wsClient->exportDbFile("SimpleCrypt");
 
-
+    // one-time connection, must be disconected immediately in the slot
     connect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
+
     wantExportDatabase();
 }
 
@@ -1194,8 +1195,10 @@ void MainWindow::on_pushButtonImportFile_clicked()
 
 void MainWindow::dbExported(const QByteArray &d, bool success)
 {
-    ui->widgetHeader->setEnabled(true);
+    // one-time connection
     disconnect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
+
+    ui->widgetHeader->setEnabled(true);
     if (!success)
         QMessageBox::warning(this, tr("Error"), tr(d));
     else

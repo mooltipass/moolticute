@@ -323,13 +323,13 @@ void DbBackupsTrackerTests::getFileFormatLegacy()
     t->deleteLater();
 }
 
-void DbBackupsTrackerTests::getFileFormatSympleCrypt()
+void DbBackupsTrackerTests::getFileFormatSimpleCrypt()
 {
     DbBackupsTracker* t = new DbBackupsTracker("/tmp/test_db_backups_tracker.info");
     t->setCardId("00000");
     QString file = getTestsDataDirPath() + "tests_backup";
     t->track(file);
 
-    QCOMPARE(QString("SympleCrypt"), t->getTrackedBackupFileFormat());
+    QCOMPARE(QString("SimpleCrypt"), t->getTrackedBackupFileFormat());
     t->deleteLater();
 }

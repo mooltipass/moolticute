@@ -183,7 +183,7 @@ QString DbBackupsTracker::getTrackedBackupFileFormat()
         return "none";
 
     if (isAnEncryptedBackup(d))
-        return "SympleCrypt";
+        return "SimpleCrypt";
 
     return "none";
 }

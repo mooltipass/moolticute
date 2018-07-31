@@ -41,6 +41,7 @@ void DbExportsRegistryController::setWSClient(WSClient *wsClient)
 {
     DbExportsRegistryController::wsClient = wsClient;
     dbExportsRegistry->setCurrentCardDbMetadata(wsClient->get_cardId(), wsClient->get_credentialsDbChangeNumber(), wsClient->get_dataDbChangeNumber());
+    connect(wsClient, &WSClient::dbExported, this, &DbExportsRegistryController::registerDbExported, Qt::UniqueConnection);
 }
 
 void DbExportsRegistryController::hidePrompt()
@@ -62,6 +63,17 @@ void DbExportsRegistryController::handleCardIdChanged(QString cardId, int creden
         dbExportsRegistry->setCurrentCardDbMetadata(QString(), -1, -1);
 }
 
+/**! Register the last export time by any reason.
+ *  This method will be called every time WSClient::dbExported signal is fired.
+ *
+ * The reason export was done may be:
+ *  - user clicked 'Export to File' button;
+ *  - monitored backup file was updated
+ *  - periodic backup was done
+ *
+ * FIXME: the fact daemon sent a backup doesn't mean it was actually
+ * written to file.
+ */
 void DbExportsRegistryController::registerDbExported(const QByteArray &, bool success)
 {
     if (success)
@@ -107,22 +119,24 @@ void DbExportsRegistryController::handleDbExportRecommended()
 
 void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool success)
 {
-    if (! handleExportResultEnabled)
-        return;
-    handleExportResultEnabled = false;
+    // one-time connection
+    disconnect(wsClient, &WSClient::dbExported, this, &DbExportsRegistryController::handleExportDbResult);
 
     if (window)
         window->handleBackupExported();
 
-    if (success)
+    if (! success)
     {
-        QString fname = QFileDialog::getSaveFileName(window, tr("Save database export..."), QString(),
-                                                     "Memory exports (*.bin);;All files (*.*)");
-        if (!fname.isEmpty())
-            writeDbToFile(d, fname);
-    }
-    else
         QMessageBox::warning(window, tr("Error"), tr(d));
+        return;
+    }
+
+    QString fname = QFileDialog::getSaveFileName(window, tr("Save database export..."), QString(),
+                                                 "Memory exports (*.bin);;All files (*.*)");
+    if (fname.isEmpty())
+        return;
+
+    writeDbToFile(d, fname);
 }
 
 void DbExportsRegistryController::handleDeviceStatusChanged(const Common::MPStatus &status)
@@ -150,9 +164,13 @@ void DbExportsRegistryController::exportDbBackup()
 {
     handleExportResultEnabled = true;
 
-    QString format = "SympleCrypt";
+    QString format = "SimpleCrypt";
 
     if (window)
         window->wantExportDatabase();
+
+    // one-time connection, must be disconected immediately in the slot
+    connect(wsClient, &WSClient::dbExported, this, &DbExportsRegistryController::handleExportDbResult);
+
     wsClient->exportDbFile(format);
 }
