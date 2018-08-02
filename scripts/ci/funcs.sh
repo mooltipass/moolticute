@@ -135,7 +135,7 @@ function get_release_id_by_name()
 {
     local NAME="${1:?Release name required.}"
 
-    ok.sh list_releases "$GITHUB_ACCOUNT" "$GITHUB_REPO" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME" | awk '{ print $2 }'
+    ok.sh list_releases "$GITHUB_ACCOUNT" "$GITHUB_REPO" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME[^-]" | awk '{ print $2 }'
 }
 
 # Get a release asset ID specifying its name
@@ -151,7 +151,7 @@ function get_release_asset_id_by_name()
     local RELEASE_ID="${1:?Release ID name required.}"
     local NAME="${2:?Release asset name required.}"
 
-    ok.sh release_assets "$GITHUB_ACCOUNT" "$GITHUB_REPO" "$RELEASE_ID" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME" | awk '{ print $2 }'
+    ok.sh release_assets "$GITHUB_ACCOUNT" "$GITHUB_REPO" "$RELEASE_ID" _filter='.[] | "\(.name)\t\(.id)"' | grep "$NAME[^-]" | awk '{ print $2 }'
 }
 
 # Delete a release asset ID by its ID
