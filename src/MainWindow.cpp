@@ -1176,7 +1176,10 @@ void MainWindow::on_pushButtonExportFile_clicked()
 
 void MainWindow::on_pushButtonImportFile_clicked()
 {
-    QString fname = QFileDialog::getOpenFileName(this, tr("Select database export..."), QString(),
+    QSettings s;
+
+    QString fname = QFileDialog::getOpenFileName(this, tr("Select database export..."),
+                                                 s.value("last_used_path/import_dir", QDir::homePath()).toString(),
                                                  "Memory exports (*.bin);;All files (*.*)");
     if (fname.isEmpty())
         return;
@@ -1187,6 +1190,9 @@ void MainWindow::on_pushButtonImportFile_clicked()
         QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
         return;
     }
+
+    s.setValue("last_used_path/import_dir", QFileInfo(fname).canonicalPath());
+
     ui->widgetHeader->setEnabled(false);
     wsClient->importDbFile(f.readAll(), ui->checkBoxImport->isChecked());
     connect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
@@ -1198,12 +1204,15 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
     // one-time connection
     disconnect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
 
+    QSettings s;
+
     ui->widgetHeader->setEnabled(true);
     if (!success)
         QMessageBox::warning(this, tr("Error"), tr(d));
     else
     {
-        QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."), QString(),
+        QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."),
+                                                     s.value("last_used_path/export_dir", QDir::homePath()).toString(),
                                                      "Memory exports (*.bin);;All files (*.*)");
         if (!fname.isEmpty())
         {
@@ -1213,6 +1222,8 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
             else
                 f.write(d);
             f.close();
+
+            s.setValue("last_used_path/export_dir", QFileInfo(fname).canonicalPath());
         }
     }
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
@@ -1457,16 +1468,19 @@ void MainWindow::on_toolButton_clearBackupFilePath_released()
 
 void MainWindow::on_toolButton_setBackupFilePath_released()
 {
+    QSettings s;
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Memory exports (*.bin)"));
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setDirectory(s.value("last_used_path/monitored_backup_dir", QDir::homePath()).toString());
 
     if (dialog.exec())
     {
-        QStringList fileNames = dialog.selectedFiles();
-        ui->lineEdit_dbBackupFilePath->setText(fileNames.first());
-        dbMasterController->setBackupFilePath(fileNames.first());
+        QString fname = dialog.selectedFiles().first();
+        ui->lineEdit_dbBackupFilePath->setText(fname);
+        dbMasterController->setBackupFilePath(fname);
+        s.setValue("last_used_path/monitored_backup_dir", QFileInfo(fname).canonicalPath());
     }
 }
 
@@ -1494,7 +1508,10 @@ void MainWindow::onResetCardFinished(bool successfully)
 
 void MainWindow::on_pushButtonImportCSV_clicked()
 {
-    QString fname = QFileDialog::getOpenFileName(this, tr("Select CSV file to import..."), QString(),
+    QSettings s;
+
+    QString fname = QFileDialog::getOpenFileName(this, tr("Select CSV file to import..."),
+                                                 s.value("last_used_path/import_csv_dir", QDir::homePath()).toString(),
                                                  "CSV files (*.csv);;All files (*.*)");
     if (fname.isEmpty())
         return;
@@ -1505,6 +1522,8 @@ void MainWindow::on_pushButtonImportCSV_clicked()
         QMessageBox::warning(this, tr("Error"), tr("Unable to read file %1").arg(fname));
         return;
     }
+
+    s.setValue("last_used_path/import_csv_dir", QFileInfo(fname).canonicalPath());
 
     QList<QStringList> readData;
     QString probe_separators = ",;.\t";

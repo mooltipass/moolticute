@@ -2,6 +2,7 @@
 #include "PromptWidget.h"
 
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QSettings>
 
@@ -122,6 +123,8 @@ void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool
     // one-time connection
     disconnect(wsClient, &WSClient::dbExported, this, &DbExportsRegistryController::handleExportDbResult);
 
+    QSettings s;
+
     if (window)
         window->handleBackupExported();
 
@@ -131,12 +134,14 @@ void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool
         return;
     }
 
-    QString fname = QFileDialog::getSaveFileName(window, tr("Save database export..."), QString(),
+    QString fname = QFileDialog::getSaveFileName(window, tr("Save database export..."),
+                                                 s.value("last_used_path/export_dir", QDir::homePath()).toString(),
                                                  "Memory exports (*.bin);;All files (*.*)");
     if (fname.isEmpty())
         return;
 
     writeDbToFile(d, fname);
+    s.setValue("last_used_path/export_dir", QFileInfo(fname).canonicalPath());
 }
 
 void DbExportsRegistryController::handleDeviceStatusChanged(const Common::MPStatus &status)
