@@ -247,11 +247,17 @@ void FilesManagement::loadFilesCacheModel()
 
         connect(button, &QToolButton::clicked, [=]()
         {
+            QSettings s;
+            QDir d = s.value("last_used_path/save_file_dir", QDir::homePath()).toString();
+
             QString target_file = jsonObject.value("name").toString();
-            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), target_file);
+
+            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), d.filePath(target_file));
 
             if (fileName.isEmpty())
                 return;
+
+            s.setValue("last_used_path/save_file_dir", QFileInfo(fileName).canonicalPath());
 
             ui->progressBarQuick->setMinimum(0);
             ui->progressBarQuick->setMaximum(0);
@@ -315,10 +321,15 @@ void FilesManagement::on_pushButtonUpdateFile_clicked()
     if (!currentItem)
         return;
 
-    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."));
+    QSettings s;
+
+    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."),
+                                            s.value("last_used_path/load_file_dir", QDir::homePath()).toString());
 
     if (fileName.isEmpty())
         return;
+
+    s.setValue("last_used_path/load_file_dir", QFileInfo(fileName).canonicalPath());
 
     addUpdateFile(currentItem->text(), fileName, ui->progressBar);
 }
@@ -340,10 +351,15 @@ void FilesManagement::on_pushButtonSaveFile_clicked()
     if (!currentItem)
         return;
 
-    fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."));
+    QSettings s;
+
+    fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."),
+                                            s.value("last_used_path/save_file_dir", QDir::homePath()).toString());
 
     if (fileName.isEmpty())
         return;
+
+    s.setValue("last_used_path/save_file_dir", QFileInfo(fileName).canonicalPath());
 
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(0);
@@ -529,12 +545,17 @@ void FilesManagement::on_addFileButton_clicked()
 
 void FilesManagement::on_pushButtonFilename_clicked()
 {
-    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."), QDir::homePath());
+    QSettings s;
+
+    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."),
+                                            s.value("last_used_path/load_file_dir", QDir::homePath()).toString());
 
     if (fileName.isEmpty())
         return;
 
     QFileInfo fileInfo(fileName);
+    s.setValue("last_used_path/load_file_dir", fileInfo.canonicalPath());
+
     ui->lineEditFilename->setText(fileName);
 
     if (ui->addFileServiceInput->text().isEmpty())
