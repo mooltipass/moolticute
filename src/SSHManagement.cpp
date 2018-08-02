@@ -278,7 +278,10 @@ void SSHManagement::onExportPublicKey()
     QStandardItem *it = keysModel->itemFromIndex(ui->listViewKeys->currentIndex());
     if (!it) return;
 
-    QString fname = QFileDialog::getSaveFileName(this, tr("Save public key"), QString(), tr("OpenSsh public key (*.pub *.*)"));
+    QSettings s;
+    QString fname = QFileDialog::getSaveFileName(this, tr("Save public key"),
+                                                 s.value("last_used_path/ssh_key_dir", QDir::homePath()).toString(),
+                                                 tr("OpenSsh public key (*.pub *.*)"));
     if (fname.isEmpty()) return;
 
     QFile f(fname);
@@ -287,6 +290,8 @@ void SSHManagement::onExportPublicKey()
         QMessageBox::warning(this, "Moolticute", tr("Failed to open file for write"));
         return;
     }
+
+    s.setValue("last_used_path/ssh_key_dir", QFileInfo(fname).canonicalPath());
 
     f.write(it->data(RolePublicKey).toString().toLocal8Bit());
     QMessageBox::information(this, "Moolticute", tr("Public key successfully exported."));
@@ -297,7 +302,10 @@ void SSHManagement::onExportPrivateKey()
     QStandardItem *it = keysModel->itemFromIndex(ui->listViewKeys->currentIndex());
     if (!it) return;
 
-    QString fname = QFileDialog::getSaveFileName(this, tr("Save private key"), QString(), tr("OpenSsh private key (*.key *.*)"));
+    QSettings s;
+    QString fname = QFileDialog::getSaveFileName(this, tr("Save private key"),
+                                                 s.value("last_used_path/ssh_key_dir", QDir::homePath()).toString(),
+                                                 tr("OpenSsh private key (*.key *.*)"));
     if (fname.isEmpty()) return;
 
     QFile f(fname);
@@ -306,6 +314,8 @@ void SSHManagement::onExportPrivateKey()
         QMessageBox::warning(this, "Moolticute", tr("Failed to open file for write"));
         return;
     }
+
+    s.setValue("last_used_path/ssh_key_dir", QFileInfo(fname).canonicalPath());
 
     f.write(it->data(RolePrivateKey).toString().toLocal8Bit());
     QMessageBox::information(this, "Moolticute", tr("Private key successfully exported."));
@@ -320,11 +330,23 @@ void SSHManagement::buttonDiscardClicked()
 
 void SSHManagement::on_pushButtonImport_clicked()
 {
+    QSettings s;
+
+    QString def_dir = QDir::homePath();
+
+    if (QDir(def_dir + "/.ssh").exists())
+    {
+        def_dir += "/.ssh";
+    }
+
     const auto fname =
-        QFileDialog::getOpenFileName(this, tr("OpenSSH private key"), QString(),
-            tr("OpenSSH private key (*.key *.pem *.* *)"));
+        QFileDialog::getOpenFileName(this, tr("OpenSSH private key"),
+                                     s.value("last_used_path/ssh_key_dir", def_dir).toString(),
+                                     tr("OpenSSH private key (*.key *.pem *.* *)"));
     if (fname.isEmpty())
         return;
+
+    s.setValue("last_used_path/ssh_key_dir", QFileInfo(fname).canonicalPath());
 
     if (QFileInfo(fname).suffix().toLower() == "ppk")
     {
