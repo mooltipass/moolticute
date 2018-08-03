@@ -554,10 +554,16 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::MINI_KNOCK_THRES_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received knockSensitivity: " << (quint8)data.at(2);
-        int v = 1;
-        if (data.at(2) == 11) v = 0;
-        else if (data.at(2) == 5) v = 2;
+        qDebug() << "received knock threshold: " << (quint8)data.at(2);
+
+        // The conversion of the real-device 'knock threshold' property
+        // to our made-up 'knock sensitivity' property:
+        int v;
+        quint8 s = data.at(2);
+        if      (s >= KNOCKING_VERY_LOW) v = 0;
+        else if (s >= KNOCKING_LOW)      v = 1;
+        else if (s >= KNOCKING_MEDIUM)   v = 2;
+        else v = 3;
         set_knockSensitivity(v);
         return true;
     }));
@@ -833,11 +839,19 @@ void MPDevice::updateDelayAfterKeyEntry(int val)
     updateParam(MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, val);
 }
 
-void MPDevice::updateKnockSensitivity(int s) // 0-low, 1-medium, 2-high
+void MPDevice::updateKnockSensitivity(int s) // 0-very low, 1-low, 2-medium, 3-high
 {
-    quint8 v = 8;
-    if (s == 0) v = 11;
-    else if (s == 2) v = 5;
+    quint8 v;
+    switch(s)
+    {
+    case 0: v = KNOCKING_VERY_LOW; break;
+    case 1: v = KNOCKING_LOW; break;
+    case 2: v = KNOCKING_MEDIUM; break;
+    case 3: v = KNOCKING_HIGH; break;
+    default:
+        v = KNOCKING_MEDIUM;
+    }
+
     updateParam(MPParams::MINI_KNOCK_THRES_PARAM, v);
 }
 
