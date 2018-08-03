@@ -265,9 +265,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxScreenBrightness->addItem("65%", 166);
     ui->comboBoxScreenBrightness->addItem("80%", 204);
     ui->comboBoxScreenBrightness->addItem("100%", 255);
-    ui->comboBoxKnock->addItem(tr("Low"), 0);
-    ui->comboBoxKnock->addItem(tr("Medium"), 1);
-    ui->comboBoxKnock->addItem(tr("High"), 2);
+    ui->comboBoxKnock->addItem(tr("Very Low"), 0);
+    ui->comboBoxKnock->addItem(tr("Low"), 1);
+    ui->comboBoxKnock->addItem(tr("Medium"), 2);
+    ui->comboBoxKnock->addItem(tr("High"), 3);
     ui->comboBoxLoginOutput->addItem(tr("Tab"), 43);
     ui->comboBoxLoginOutput->addItem(tr("Enter"), 40);
     ui->comboBoxLoginOutput->addItem(tr("Space"), 44);

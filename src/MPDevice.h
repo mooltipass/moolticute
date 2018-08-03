@@ -83,7 +83,7 @@ class MPDevice: public QObject
     //MP Mini only
     QT_WRITABLE_PROPERTY(int, screenBrightness, 0) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
     QT_WRITABLE_PROPERTY(bool, knockEnabled, false)
-    QT_WRITABLE_PROPERTY(int, knockSensitivity, 0) // 0-low, 1-medium, 2-high
+    QT_WRITABLE_PROPERTY(int, knockSensitivity, 0) // 0-very low, 1-low, 2-medium, 3-high
     QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
     QT_WRITABLE_PROPERTY(bool, hashDisplay, false)
     QT_WRITABLE_PROPERTY(int, lockUnlockMode, 0)
@@ -98,6 +98,14 @@ class MPDevice: public QObject
 public:
     MPDevice(QObject *parent);
     virtual ~MPDevice();
+
+    enum KnockSensitivityThreshold
+    {
+        KNOCKING_VERY_LOW = 15,
+        KNOCKING_LOW = 11,
+        KNOCKING_MEDIUM = 8,
+        KNOCKING_HIGH = 5
+    };
 
     /* Send a command with data to the device */
     void sendData(MPCmd::Command cmd, const QByteArray &data = QByteArray(), quint32 timeout = CMD_DEFAULT_TIMEOUT, MPCommandCb cb = [](bool, const QByteArray &, bool &){}, bool checkReturn = true);
@@ -124,7 +132,7 @@ public:
     //MP Mini only
     void updateScreenBrightness(int bval); //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
     void updateKnockEnabled(bool en);
-    void updateKnockSensitivity(int s); // 0-low, 1-medium, 2-high
+    void updateKnockSensitivity(int s); // 0-very low, 1-low, 2-medium, 3-high
     void updateRandomStartingPin(bool);
     void updateHashDisplay(bool);
     void updateLockUnlockMode(int);
