@@ -1,0 +1,10 @@
+--- moolticute.sh.wrapper.orig	2018-06-20 20:33:04.704640676 +0700
++++ moolticute.sh.wrapper	2018-06-20 20:35:06.145255625 +0700
+@@ -257,6 +257,7 @@
+   # For Exec we must use quotes
+   # For TryExec quotes is not supported, so, space must be replaced to \s
+   # https://askubuntu.com/questions/175404/how-to-add-space-to-exec-path-in-a-thumbnailer-descrption/175567
++  mkdir -p "$STAMP_DIR"
+   RESOURCE_NAME=$(echo "$VENDORPREFIX-$DESKTOPFILE_NAME" | sed -e 's/\.desktop//g')
+   desktop-file-install --rebuild-mime-info-cache \
+     --vendor=$VENDORPREFIX --set-key=Exec --set-value="\"${APPIMAGE}\" %U" \
