@@ -19,7 +19,7 @@ Before you can start building the Debian packages, you'll have to configure GitH
 
 GitHub
 ------
-1. Log in to your (or for that matter - any valid / selected) GitHub account and go to "Settings / Personal access tokens".
+1. Log in to your (or for that matter - any valid / selected) GitHub account and go to "Settings / Developer settings / Personal access tokens".
 2. Generate a new token that has read/create/edit/delete permissions on your project's repository.
 3. Store the token somewhere as you won't get a second chance to do that.
 4. Store also your GitHub project username somewhere because you'll need it (i.e. if the URL is 
