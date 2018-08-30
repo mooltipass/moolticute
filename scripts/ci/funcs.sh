@@ -362,10 +362,15 @@ function osx_setup_netrc()
 {
     local DIR="${1:?Directory path required.}"
 
-    cp docker/config/.netrc $DIR
+    cat << EOF > $DIR/.netrc
+machine api.github.com
+    login ${GITHUB_LOGIN}
+    password ${GITHUB_TOKEN}
 
-    sed -i'' -e "s/<username>/${GITHUB_LOGIN}/g" $DIR/.netrc
-    sed -i'' -e "s/<token>/${GITHUB_TOKEN}/g" $DIR/.netrc
+machine uploads.github.com
+    login ${GITHUB_LOGIN}
+    password ${GITHUB_TOKEN}
+EOF
 
     chmod 600 ${DIR}/.netrc
 }
