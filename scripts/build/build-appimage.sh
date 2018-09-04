@@ -1,183 +1,75 @@
 #!/bin/bash
 
 ########################################################################
-# Package the binaries built on Travis-CI as an AppImage
-# By Simon Peter 2016
-# Modified for Moolticute by Alexis López 2017
-# For more information, see http://appimage.org/
+# A complete rewrite of AppImage build script
+# By Alexander Sashnov in 2018
+#
+# This script doesn't use bash script approach anymore.
+# Instead, according the latest recommendation, it uses
+# 'linuxdeploy' tool with appimage plugin which automates the process significantly.
+#
+# The result:
+#    moolticute/build-appimage/Moolticute-x86_64.AppImage
+#
+# Intermediate directories:
+#    /build-appimage/build-qmake-release/  - qmake build dir
+#    moolticute/build-appimage/moolticute.AppDir/    - make install dir
+#
 ########################################################################
 
+set -e
 set -x
 
 export ARCH=$(arch)
 
 APP=moolticute
 LOWERAPP=${APP,,}
+
 BASE_PATH="$PWD/build-appimage"
 
-BUILD_DIR="$BASE_PATH/build-ubt1404"
-APPDIR=$BASE_PATH/$APP.AppDir/
-TARGET_DIR=$APPDIR/usr/
+BUILD_DIR="$BASE_PATH/build-qmake-release"
+APPDIR="$BASE_PATH/$APP.AppDir/"
 
-mkdir -p $TARGET_DIR
-
-SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source $SCRIPTDIR/../libs/appimage_functions.sh
-source $SCRIPTDIR/../funcs.sh
+# it's just 7 sec to re-create, and linuxdeploy fails if it's not clean
+rm -rf "$APPDIR"
+rm -f  "Moolticute-x86_64.AppImage"
 
 
-# Compile binaries from sources and package as AppImage:
 # https://docs.appimage.org/packaging-guide/from-source/native-binaries.html#qmake
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
-ls ..
-qmake CONFIG+=release PREFIX=/usr ../
+qmake CONFIG+=release PREFIX=/usr ../../Moolticute.pro
 make
 make install INSTALL_ROOT=$APPDIR
 
-# ! app icon is required here!
-# if not, see how to do it:
-# https://github.com/probonopd/FeedTheMonkey/blob/master/FeedTheMonkey.pro
 
+
+cd $BASE_PATH
+
+cp ../data/moolticute.sh "$APPDIR/usr/bin/"
+sed -i 's#Exec=/usr/bin/moolticute#Exec=moolticute.sh#g' "$APPDIR/usr/share/applications/moolticute.desktop"
+
+
+# Example on how to use linuxdeploy Qt plugin properly:
+# https://github.com/linuxdeploy/linuxdeploy-plugin-qt-examples/blob/master/build_appimages.sh
 
 # https://docs.appimage.org/packaging-guide/from-source/native-binaries.html#qmake
 
-# linuxdeploy is more prefereble than linuxdeployqt
-# as this is more powerfull and alive continuation of the tool
 
-# run linuxdeploy and generate an AppImage
-~/linuxdeploy-x86_64.AppDir/AppRun --appdir "$APPDIR" --init-appdir
+# Fix for "ERROR: Could not find dependency: libicuuc.so.56"
+export LD_LIBRARY_PATH="/opt/Qt/5.9.6/gcc_64/lib/:$LD_LIBRARY_PATH"
 
-exit 0
-
-
-########################################################################
-# Install application binaries to the AppDir
-########################################################################
-cp ./debian/moolticute/usr/* $TARGET_DIR -r
-
-cp ./data/moolticute.desktop $BASE_PATH/$APP/$APP.AppDir
-cp ./img/AppIcon.svg $BASE_PATH/$APP/$APP.AppDir/moolticute.svg
-cp ./data/moolticute.sh $BASE_PATH/$APP/$APP.AppDir/usr/bin/
-
-# Use the wrapper instead of the
-sed -i 's/Exec=\/usr\/bin\/moolticute/Exec=moolticute.sh/g' /$BASE_PATH/$APP/$APP.AppDir/moolticute.desktop
-
-########################################################################
-# Copy desktop and icon file to AppDir for AppRun to pick them up
-########################################################################
-cd $BASE_PATH/$APP/$APP.AppDir
-
-get_apprun
-# get_desktop
-# get_icon
-
-cd ..
-########################################################################
-# Other appliaction-specific finishing touches
-########################################################################
-
-# Bundle Qt and all the plugins needed
-
-generate_status
-
-echo "deb http://archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse" > sources.list
-apt-get $OPTIONS update
-
-cd ./$APP.AppDir/
+# Use appimage plugin to create .AppImage also: https://github.com/linuxdeploy/linuxdeploy-plugin-appimage
+~/linuxdeploy-x86_64.AppDir/AppRun --appdir "$APPDIR" --output appimage
 
 
-apt-get install -y \
-    fuse \
-    libfuse-dev \
-    libfuse2 \
-    libc6 \
-    libgcc1 \
-    libqt5core5a \
-    libqt5gui5 \
-    libqt5network5 \
-    libqt5websockets5 \
-    libqt5widgets5 \
-    libstdc++6 \
-    libusb-1.0-0 \
-    libssl1.0.0
+# FIXME: Qt plugins are not packed into
+# and PATH, LD_LIBRARY_PATH, QTDIR seems also to be not set.
+# TODO: read packing manual, see examples of Qt apps package
+# (when it's packed from .deb package in AppImage/AppImages .deb doesn't include Qt plugins, right?
+# TODO: read through https://github.com/AppImage/AppImageSpec/blob/master/draft.md
+# TODO: look through AppRun sources- does it setup this variables?
 
-apt-get install -f -y
-
-########################################################################
-# Copy in the dependencies that cannot be assumed to be available
-# on all target systems
-########################################################################
-
-# copy all qt platform plugins
-mkdir -p $TARGET_DIR/lib/x86_64-linux-gnu/qt5/plugins/platforms/
-cp -r /usr/lib/x86_64-linux-gnu/qt5/plugins/platforms/* $TARGET_DIR/lib/x86_64-linux-gnu/qt5/plugins/platforms/
-
-#Copy openssl
-
-#TOFIX: Actually copying openssl is not working. SSL is going to try to load root certificates from the system
-# and the path differs from all distro...
-# More information here:
-# https://github.com/AppImage/AppImageKit/wiki/Desktop-Linux-Platform-Issues#certificates
-
-#mkdir -p $APPDIR/lib/x86_64-linux-gnu/
-#cp /lib/x86_64-linux-gnu/libcrypto* /lib/x86_64-linux-gnu/libssl* $APPDIR/lib/x86_64-linux-gnu/
-#cp -r /usr/lib/x86_64-linux-gnu/openssl* $TARGET_DIR/lib/x86_64-linux-gnu/
-
-# copy deps recursively
-old_list=""
-list=$(find .)
-while [ "$old_list" != "$list" ]
-do
-   copy_deps
-   old_list="$list"
-   list=$(find . | sort | uniq)
-done
-
-
-
-########################################################################
-# Delete stuff that should not go into the AppImage
-########################################################################
-
-# Delete dangerous libraries; see
-# https://github.com/probonopd/AppImages/blob/master/excludelist
-delete_blacklisted
-
-########################################################################
-# desktopintegration asks the user on first run to install a menu item
-########################################################################
-
-get_desktopintegration $LOWERAPP
-
-########################################################################
-# Determine the version of the app; also include needed glibc version
-########################################################################
-
-echo "OLD VERSION $VERSION"
-VERSION=$(get_version .)
-echo "new version $VERSION"
-
-########################################################################
-# Patch away absolute paths; it would be nice if they were relative
-########################################################################
-
-#Prevent our moolticute.sh and moolticute.sh.wrapper to be patched
-find usr/ -type f ! -path "usr/bin/moolticute.sh*" -exec sed -i -e 's|/usr|././|g' {} \;
-find usr/ -type f -exec sed -i -e 's@././/bin/env@/usr/bin/env@g' {} \;
-
-########################################################################
-# AppDir complete
-# Now packaging it as an AppImage
-########################################################################
-
-cd .. # Go out of AppImage
-
-generate_type2_appimage
-
-########################################################################
-# Upload the AppDir
-########################################################################
 
 # curl --upload-file *.AppImage https://transfer.sh/Moolticute.AppImage
 # echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"

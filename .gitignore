@@ -32,7 +32,7 @@ ui_*.h
 *.qmlproject.user
 *.qmlproject.user.*
 
-build
+build-appimage
 build-linux
 .idea
 

@@ -44,7 +44,7 @@ function docker_exec_in()
     local container_name="$1"
     shift
 
-    docker exec ${DOCKER_EXEC_ENV} ${container_name} /bin/bash -c" $@
+    docker exec ${DOCKER_EXEC_ENV} ${container_name} /bin/bash -c "$@"
 }
 
 #Usage: get_version /path/to/repo

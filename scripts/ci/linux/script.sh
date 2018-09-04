@@ -6,12 +6,13 @@ source $SCRIPTDIR/../funcs.sh
 
 make_version .
 
-
 docker_exec_in "$CONTAINER_WIN_NAME" \
-    "/moolticute/scripts/build/build-win.sh"
+    "cd moolticute ; ./scripts/build/build-win.sh"
 
-docker_exec_in "$CONTAINER_DEB_NAME" \
-    "/moolticute/scripts/build/build-deb.sh"
+#docker_exec_in "$CONTAINER_DEB_NAME" \
+    "cd moolticute ; ./scripts/build/build-deb.sh" &
 
-docker_exec_in "$CONTAINER_APPIMAGE_NAME" \
-    "/moolticute/scripts/build/build-appimage.sh"
+#docker_exec_in "$CONTAINER_APPIMAGE_NAME" \
+    "cd moolticute ; ./scripts/build/build-appimage.sh" &
+
+#wait
