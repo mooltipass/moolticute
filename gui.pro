@@ -14,6 +14,14 @@ win32 {
 }
 linux {
     QT += dbus
+
+    shortcutfiles.files = data/moolticute.desktop
+    shortcutfiles.path = $$PREFIX/share/applications/
+    data.files += img/AppIcon.svg
+    data.path = $$PREFIX/share/pixmaps/moolticute.svg
+
+    INSTALLS += shortcutfiles
+    INSTALLS += data
 }
 
 include(src/QtAwesome/QtAwesome/QtAwesome.pri)

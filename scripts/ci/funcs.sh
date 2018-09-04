@@ -8,9 +8,15 @@ export TRAVIS_BUILD_DIR=$(pwd)
 
 export BUILD_TAG=$(git tag --points-at=HEAD --sort version:refname | head -n 1)
 
-export CONTAINER_NAME=${PROJECT_NAME}
+export DOCKER_IMAGE_WIN_NAME="mc-win-builder"
+export DOCKER_IMAGE_DEB_NAME="mc-deb-builder"
+export DOCKER_IMAGE_APPIMAGE_NAME="mc-appimage-builder"
+
+export CONTAINER_WIN_NAME="win-builder"
+export CONTAINER_DEB_NAME="deb-builder"
+export CONTAINER_APPIMAGE_NAME="appimage-builder"
+
 export DOCKER_EXEC_ENV=
-export DOCKER_EXEC="docker exec ${DOCKER_EXEC_ENV} ${CONTAINER_NAME} /bin/bash -c"
 
 export DOCKER_COMPOSE_CONFIG=" -f docker-compose.base.yml"
 
@@ -27,6 +33,19 @@ export USER_EMAIL="limpkin@limpkin.fr"
 
 export GITHUB_REPO=$(echo "${TRAVIS_REPO_SLUG}" | rev | cut -d "/" -f1 | rev)
 export GITHUB_ACCOUNT=$(echo "${TRAVIS_REPO_SLUG}" | rev | cut -d "/" -f2 | rev)
+
+
+# Execute a command in one of docker container
+# Args:
+#  $1 - container name to execute in
+#  $2 ....   - the command and arguments to execute
+function docker_exec_in()
+{
+    local container_name="$1"
+    shift
+
+    docker exec ${DOCKER_EXEC_ENV} ${container_name} /bin/bash -c "$@"
+}
 
 #Usage: get_version /path/to/repo
 function get_version()
@@ -362,10 +381,15 @@ function osx_setup_netrc()
 {
     local DIR="${1:?Directory path required.}"
 
-    cp docker/config/.netrc $DIR
+    cat << EOF > $DIR/.netrc
+machine api.github.com
+    login ${GITHUB_LOGIN}
+    password ${GITHUB_TOKEN}
 
-    sed -i'' -e "s/<username>/${GITHUB_LOGIN}/g" $DIR/.netrc
-    sed -i'' -e "s/<token>/${GITHUB_TOKEN}/g" $DIR/.netrc
+machine uploads.github.com
+    login ${GITHUB_LOGIN}
+    password ${GITHUB_TOKEN}
+EOF
 
     chmod 600 ${DIR}/.netrc
 }

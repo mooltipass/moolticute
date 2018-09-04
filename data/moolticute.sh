@@ -26,6 +26,14 @@ Run only the moolticuted daemon
 
 UDEV_RULES_FILE_PATH="/etc/udev/rules.d/50-mooltipass.rules"
 
+
+# FIXME: why it wasn't added automatically??
+export PATH="$APPDIR/usr/bin:$PATH"
+
+export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${LD_LIBRARY_PATH}".
+export QT_PLUGIN_PATH="${APPDIR}/"
+
+
 function install_udev_rule()
 {
     SUDO_BIN="sudo"
@@ -68,7 +76,7 @@ EOF
         ;;
     esac
 
-    rm "$tmpfile"  
+    rm "$tmpfile"
 }
 
 DAEMON_ONLY=0

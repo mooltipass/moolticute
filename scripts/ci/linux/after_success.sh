@@ -1,6 +1,15 @@
 #!/bin/bash
 set -ev
 
+# TODO: use upload.sh script here, outside of any mc-*-builder docker container
+#
+# Build results should be now in
+#   * build-appimage/
+#   * build-win/
+#   * build-deb/
+#
+# https://docs.appimage.org/packaging-guide/hosted-services/travis-ci.html#ref-travis-ci
+
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/../funcs.sh
 
