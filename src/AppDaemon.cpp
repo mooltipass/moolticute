@@ -153,5 +153,5 @@ QHostAddress AppDaemon::getListenAddress()
     if (anyAddress)
         return QHostAddress::Any;
 
-    return QHostAddress::LocalHost;
+    return QHostAddress::LocalHostIPv6;
 }
