@@ -431,6 +431,10 @@ void Updater::setUpdateAvailable (const bool available)
 
     if (updateAvailable() && (notifyOnUpdate() || notifyOnFinish())) {
         QString text = tr ("Would you like to download the update now?");
+        if (!m_changelog.isEmpty())
+        {
+            text += getFormattedChangeLog();
+        }
         QString title = "<h3>"
                         + tr ("Version %1 of %2 has been released!")
                         .arg (latestVersion()).arg (moduleName())
@@ -492,4 +496,36 @@ bool Updater::compare (const QString& x, const QString& y)
     }
 
     return versionsY.count() < versionsX.count();
+}
+
+/**
+ * Returns the formatted changeLog with HTML tags.
+ */
+QString Updater::getFormattedChangeLog() const
+{
+    const QString LIST_NEWLINE = "\r\n";
+
+    QString formattedChangeLog = "<br><br><b>"
+            + tr("Change log:")
+            + "</b><br>";
+
+    /*Handling list, if the changeLog contains \r\n.*/
+    if (m_changelog.contains(LIST_NEWLINE))
+    {
+        QStringList listParts = m_changelog.split(LIST_NEWLINE);
+        auto listItr = listParts.begin();
+        formattedChangeLog += *listItr++;
+
+        formattedChangeLog += "<ul>";
+        while (listItr != listParts.end())
+        {
+            formattedChangeLog += "<li>" + *listItr++ + "</li>";
+        }
+        formattedChangeLog += "</ul>";
+    }
+    else
+    {
+        formattedChangeLog += m_changelog;
+    }
+    return formattedChangeLog;
 }
