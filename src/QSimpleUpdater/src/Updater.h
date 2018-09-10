@@ -89,6 +89,7 @@ private slots:
 
 private:
     bool compare (const QString& x, const QString& y);
+    QString getFormattedChangeLog() const;
 
 private:
     QString m_url;
