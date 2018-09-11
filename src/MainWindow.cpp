@@ -332,6 +332,15 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->lockUnlockModeComboBox->addItem(tr("Ctrl + Alt + Del / Win + L"), (uint)LF::SendCtrl_Alt_Del|(uint)LF::SendWin_L);
     ui->lockUnlockModeComboBox->setCurrentIndex(0);
 
+    ui->comboBoxSystrayIcon->blockSignals(true);
+    ui->comboBoxSystrayIcon->addItem(tr("Black"), tr(""));
+    ui->comboBoxSystrayIcon->addItem(tr("White"), tr("_white"));
+    int systrayIconIndex = ui->comboBoxSystrayIcon->findData(s.value("settings/systray_icon").toString());
+    if (systrayIconIndex != -1) {
+        ui->comboBoxSystrayIcon->setCurrentIndex(systrayIconIndex);
+    }
+    ui->comboBoxSystrayIcon->blockSignals(false);
+
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
     {
@@ -1609,4 +1618,11 @@ void MainWindow::onSystemEvents()
 #ifdef Q_OS_MAC
     QTimer::singleShot(2 * 1000, &eventHandler, &SystemEventHandler::readyToTerminate);
 #endif
+}
+
+void MainWindow::on_comboBoxSystrayIcon_currentIndexChanged(int index)
+{
+    QSettings s;
+    s.setValue("settings/systray_icon", ui->comboBoxSystrayIcon->itemData(index).toString());
+    emit iconChangeRequested();
 }
