@@ -99,7 +99,7 @@ bool AppGui::initialize()
     });
 
     QAction* quitAction = new QAction(tr("&Quit"), this);
-    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit, Qt::QueuedConnection);
 
     QMenu *systrayMenu = new QMenu();
 
@@ -334,6 +334,7 @@ void AppGui::updateSystrayTooltip()
 
 AppGui::~AppGui()
 {
+    timerDaemon->stop();
 #ifndef Q_OS_WIN
     if (sshAgentProcess)
     {
