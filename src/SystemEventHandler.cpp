@@ -70,6 +70,7 @@ SystemEventHandler::~SystemEventHandler()
     Q_ASSERT(eventHandler);
     unregisterSystemHandler(eventHandler);
 #elif defined(Q_OS_WIN)
+    qDebug() << "Closing SystemEventHandler";
     qApp->removeNativeEventFilter(this);
 
     if (wtsApi32Lib.isLoaded())
