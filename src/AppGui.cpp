@@ -54,6 +54,8 @@ bool AppGui::initialize()
     QCoreApplication::setApplicationName("moolticute");
     QCoreApplication::setApplicationVersion(APP_VERSION);
 
+    QSettings s;
+
     Common::installMessageOutputHandler(nullptr, [this](const QByteArray &d)
     {
         logBuffer.append(d);
@@ -82,7 +84,7 @@ bool AppGui::initialize()
         return false;
 
     systray = new QSystemTrayIcon(this);
-    QIcon icon(":/systray_disconnected.png");
+    QIcon icon(":/systray_disconnected" + s.value("settings/systray_icon").toString() + ".png");
 #ifdef Q_OS_MAC
     icon.setIsMask(true);
 #endif
@@ -275,6 +277,7 @@ void AppGui::startSSHAgent()
 
 void AppGui::connectedChanged()
 {
+    QSettings s;
     if (!wsClient->get_connected())
     {
 #ifdef Q_OS_WIN
@@ -282,6 +285,11 @@ void AppGui::connectedChanged()
 #else
         QIcon icon(":/systray_disconnected.png");
 #endif
+
+        if (s.contains("settings/systray_icon"))
+        {
+            icon = QIcon(":/systray_disconnected" + s.value("settings/systray_icon").toString() + ".png");
+        }
 
 #ifdef Q_OS_MAC
         icon.setIsMask(true);
@@ -296,6 +304,11 @@ void AppGui::connectedChanged()
 #else
         QIcon icon(":/systray.png");
 #endif
+
+        if (s.contains("settings/systray_icon"))
+        {
+            icon = QIcon(":/systray" + s.value("settings/systray_icon").toString() + ".png");
+        }
 
 #ifdef Q_OS_MAC
         icon.setIsMask(true);
@@ -643,6 +656,13 @@ void AppGui::createMainWindow()
     connect(win, &MainWindow::windowCloseRequested, [=]()
     {
         mainWindowHide();
+    });
+    connect(win, &MainWindow::iconChangeRequested, [this]()
+    {
+        QSettings s;
+        QString iconConnection = wsClient->get_connected() ? "" : "_disconnected";
+        QIcon icon(":/systray" + iconConnection + s.value("settings/systray_icon").toString() + ".png");
+        systray->setIcon(icon);
     });
 
     dbMasterController->setMainWindow(win);

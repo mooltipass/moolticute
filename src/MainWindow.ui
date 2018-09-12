@@ -238,7 +238,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>13</number>
+       <number>9</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -2942,6 +2942,33 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               </item>
               <item>
                <widget class="QComboBox" name="closeBehaviorComboBox"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_43">
+              <item>
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>Systray icon</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_43">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBoxSystrayIcon"/>
               </item>
              </layout>
             </item>
