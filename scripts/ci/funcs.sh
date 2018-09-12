@@ -237,7 +237,7 @@ function osx_setup_netrc()
 {
     local DIR="${1:?Directory path required.}"
 
-cat $DIR << EOF
+cat > $DIR <<EOF
 machine api.github.com
     login <username>
     password <token>
