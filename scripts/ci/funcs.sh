@@ -20,13 +20,14 @@ function get_version()
     popd > /dev/null
 }
 
-#Usage: make_version /path/to/repo
+#Usage: make_version /path/to/repo <type>
 function make_version()
 {
     VERSION="$(get_version $1)"
     echo "#ifndef VERSION__H" > $1/src/version.h
     echo "#define VERSION__H" >> $1/src/version.h
     echo "#define APP_VERSION \"$VERSION\"" >> $1/src/version.h
+    echo "#define APP_TYPE \"$2\"" >> $1/src/version.h
     if endsWith -testing "$VERSION"; then
         echo "#define APP_RELEASE_TESTING 1" >> $1/src/version.h
     fi

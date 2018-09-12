@@ -12,7 +12,7 @@ PATH="$QTDIR/bin:$PATH"
 LDFLAGS=-L$QTDIR/lib
 CPPFLAGS=-I$QTDIR/include
 
-make_version ..
+make_version .. macos
 
 qmake ../Moolticute.pro
 
