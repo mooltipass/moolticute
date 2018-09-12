@@ -4,26 +4,9 @@ set -e
 
 export PROJECT_NAME=moolticute
 
-export TRAVIS_BUILD_DIR=$(pwd)
-
 export BUILD_TAG=$(git tag --points-at=HEAD --sort version:refname | head -n 1)
 
-export CONTAINER_NAME=${PROJECT_NAME}
-export DOCKER_EXEC_ENV=
-export DOCKER_EXEC="docker exec ${DOCKER_EXEC_ENV} ${CONTAINER_NAME} /bin/bash -c"
-
-export DOCKER_COMPOSE_CONFIG=" -f docker-compose.base.yml"
-
-if [ "${ENV}" == "dev" ]; then
-    DOCKER_COMPOSE_CONFIG+=" -f docker-compose.dev.yml"
-else
-    DOCKER_COMPOSE_CONFIG+=" -f docker-compose.yml"
-fi
-
-export BUILD_DIR="${TRAVIS_BUILD_DIR}/build-linux"
 export DEB_VERSION=$(echo ${BUILD_TAG} | tr 'v' ' ' | xargs)
-
-export USER_EMAIL="limpkin@limpkin.fr"
 
 export GITHUB_REPO=$(echo "${TRAVIS_REPO_SLUG}" | rev | cut -d "/" -f1 | rev)
 export GITHUB_ACCOUNT=$(echo "${TRAVIS_REPO_SLUG}" | rev | cut -d "/" -f2 | rev)
@@ -68,22 +51,6 @@ function wget_retry()
         echo Download failed.
     done
     return 1
-}
-
-function upload_file()
-{
-    FNAME=$1
-    HASH=$2
-    INSTALLPATH=$3
-
-    curl -X POST \
-        -H "Content-Type: multipart/form-data" \
-        -F "upload_key=$UPLOAD_KEY" \
-        -F "upload_folder=$INSTALLPATH" \
-        -F "upload_sha256=$HASH" \
-        -F "upload_file=@$FNAME" \
-        -F "upload_replace=true" \
-        https://calaos.fr/mooltipass/upload
 }
 
 # Upload a release asset specifying a MIME type
@@ -225,98 +192,6 @@ function create_release_and_upload_asset()
 #
 # Usage:
 #
-#     create_github_release_linux version
-#
-# Positional arguments
-#
-function create_github_release_linux()
-{
-    local VERSION="${1:?Release version required.}"
-    local DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
-    local DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
-    local DEB_FILE="build-linux/deb/${DEB_NAME}"
-    local APPIMAGE_FILE=$(find build-appimage -iname '*.AppImage')
-    local EXE_FILE="$(ls win/build/*.exe 2> /dev/null | head -n 1)"
-    local ZIP_FILE="$(ls win/build/*.zip 2> /dev/null | head -n 1)"
-
-    if [ -z "$VERSION" ]; then
-        >&2 echo -e "Skipping GitHub release creation (current build does not have a tag)"
-        return 0
-    fi
-
-    >&2 echo -e "Creating (Linux) GitHub release (tag: $VERSION)"
-
-    create_release_and_upload_asset $VERSION $DEB_FILE
-    create_release_and_upload_asset $VERSION $APPIMAGE_FILE
-    create_release_and_upload_asset $VERSION $EXE_FILE
-    create_release_and_upload_asset $VERSION $ZIP_FILE
-}
-
-function create_beta_release_linux()
-{
-    local VERSION="${1:?Release version required.}"
-    local DEB_VERSION=$(echo $VERSION | tr 'v' ' ' | xargs)
-    local DEB_NAME="${PROJECT_NAME}_${DEB_VERSION}_amd64.deb"
-    local DEB_FILE="build-linux/deb/${DEB_NAME}"
-    local APPIMAGE_FILE=$(find build-appimage -iname '*.AppImage')
-    local EXE_FILE="$(ls win/build/*.exe 2> /dev/null | head -n 1)"
-    local ZIP_FILE="$(ls win/build/*.zip 2> /dev/null | head -n 1)"
-
-    if [ -z "$VERSION" ]; then
-        >&2 echo -e "Skipping GitHub release creation (current build does not have a tag)"
-        return 0
-    fi
-
-    >&2 echo -e "Creating (Linux) beta release (tag: $VERSION)"
-
-    cat > updater.json <<EOF
-[{
-    "tag_name": "$VERSION",
-    "html_url": "https://mooltipass-tests.com/mc_betas/$VERSION",
-    "body": "",
-    "assets": [
-        {
-            "name": "$(basename $EXE_FILE)",
-            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$(basename $EXE_FILE)"
-        },
-        {
-            "name": "$DEB_NAME",
-            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$DEB_NAME"
-        },
-        {
-            "name": "$(basename $APPIMAGE_FILE)",
-            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$(basename $APPIMAGE_FILE)"
-        },
-        {
-            "name": "$(basename $ZIP_FILE)",
-            "browser_download_url": "https://mooltipass-tests.com/mc_betas/$VERSION/$(basename $ZIP_FILE)"
-        }
-    ]
-}]
-EOF
-
-    mkdir -p ~/.ssh
-    ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
-
-    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com \
-        -e "set sftp:auto-confirm yes; \
-        cd mc_betas; \
-        mkdir -p -f $VERSION; \
-        cd $VERSION; \
-        put $DEB_FILE; \
-        put $APPIMAGE_FILE; \
-        put $EXE_FILE; \
-        put $ZIP_FILE; \
-        cd ..; \
-        rm -f updater.json; \
-        put updater.json; \
-        bye"
-}
-
-# Create a a GitHub release for the specified version and upload all applicable assets
-#
-# Usage:
-#
 #     create_github_release_osx version
 #
 # Positional arguments
@@ -368,65 +243,6 @@ function osx_setup_netrc()
     sed -i'' -e "s/<token>/${GITHUB_TOKEN}/g" $DIR/.netrc
 
     chmod 600 ${DIR}/.netrc
-}
-
-#signing of exe from server
-#Usage sign_binary $Path/file.exe
-function sign_binary()
-{
-    set +e
-    if [ -f $1 ]
-    then
-        echo "Signing binary file: $1"
-
-        #sign SHA1
-        $HOME/osslsigncode sign \
-            -pkcs12 $HOME/cert.p12 \
-            -pass "$CODESIGN_WIN_PASS" \
-            -h sha1 \
-            -n "Moolticute" \
-            -i "http://themooltipass.com" \
-            -t http://timestamp.comodoca.com \
-            -in "$1" -out "${1}_signed1"
-
-        if [ ! $? -eq 0 ] ; then
-            set -e
-            rm ${1}_signed1
-            echo "Failed to codesign SHA1"
-            return 255
-        fi
-
-        #Append SHA256
-        $HOME/osslsigncode sign \
-            -pkcs12 $HOME/cert.p12 \
-            -pass "$CODESIGN_WIN_PASS" \
-            -h sha256 \
-            -n "Moolticute" \
-            -i "http://themooltipass.com" \
-            -ts http://timestamp.comodoca.com \
-            -in "${1}_signed1" -out "${1}_signed2" \
-            -nest
-
-        if [ ! $? -eq 0 ] ; then
-            set -e
-            echo "Failed to codesign SHA256"
-            return 255
-        fi
-
-        mv ${1}_signed2 $1
-        rm ${1}_signed1
-        fi
-    set -e
-}
-
-
-#search for files in folder and sign all exe/dll
-#Usage: find_and_sign $Path
-function find_and_sign()
-{
-    Path=$1
-    find $Path -iname "*.exe" -type f | while read file; do sign_binary "$file"; done
-    find $Path -iname "*.dll" -type f | while read file; do sign_binary "$file"; done
 }
 
 function beginsWith()
