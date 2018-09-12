@@ -113,10 +113,10 @@ export QT_XKB_CONFIG_ROOT=/usr/share/X11/xkb
 if (( $DAEMON_ONLY == 1 )) ;
 then
     echo "Running daemon only"
-    moolticuted
+    $APPDIR/usr/bin/moolticuted
 elif (( $INSTALL == 0 )) && (( $UNINSTALL == 0 )) && (( $CHECK == 0 ));
 then
-    moolticute
+    $APPDIR/usr/bin/moolticute
 elif (( $INSTALL == 1 ));
 then
     echo "Installing moolticute UDEV rules"

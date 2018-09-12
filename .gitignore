@@ -34,6 +34,7 @@ ui_*.h
 
 build
 build-linux
+build-appimage/
 .idea
 
 lang/*.qm
