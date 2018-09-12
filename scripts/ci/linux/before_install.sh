@@ -17,5 +17,5 @@ echo $CODESIGN_WIN_CERT | base64 -d > $HOME/cert.p12
 rm -fr $HOME/build-debs && mkdir -p $HOME/build-debs
 echo -e $LAUNCHPAD_GPG_PUB > $HOME/build-debs/gpgkey_pub.asc
 echo -e $LAUNCHPAD_GPG_PRIV > $HOME/build-debs/gpgkey_sec.asc
-echo $LAUNCHPAD_GPG_PASS > $HOME/build-debs/passphrase.txt
+echo "$LAUNCHPAD_GPG_PASS" > $HOME/build-debs/passphrase.txt
 
