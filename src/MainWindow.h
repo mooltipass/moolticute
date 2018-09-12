@@ -120,6 +120,8 @@ private slots:
     void onLockDeviceSystemEventsChanged(bool checked);
     void onSystemEvents();
 
+    void on_comboBoxSystrayIcon_currentIndexChanged(int index);
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
