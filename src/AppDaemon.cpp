@@ -111,6 +111,10 @@ bool AppDaemon::initialize()
     emulationMode = parser.isSet(emulMode);
     anyAddress = parser.isSet(anyAddressOption);
 
+#ifdef Q_OS_MAC
+    anyAddress = true;
+#endif
+
     if (parser.isSet(debugHttpServer))
     {
         httpServer = new HttpServer(this);
@@ -153,5 +157,5 @@ QHostAddress AppDaemon::getListenAddress()
     if (anyAddress)
         return QHostAddress::Any;
 
-    return QHostAddress::LocalHostIPv6;
+    return QHostAddress::LocalHost;
 }
