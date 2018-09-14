@@ -96,9 +96,11 @@ bool AppDaemon::initialize()
                                      QCoreApplication::translate("main", "Activate emulation mode, all Websocket API function return emulated string, useful if you want to try the API."));
     parser.addOption(emulMode);
 
+#ifndef Q_OS_MAC
     QCommandLineOption anyAddressOption(QStringList() << "a" << "any-address",
                                      QCoreApplication::translate("main", "Listen on any address. By default, it listens only on localhost."));
     parser.addOption(anyAddressOption);
+#endif
 
     // An option with a value
     QCommandLineOption debugHttpServer(QStringList() << "s" << "debug-http-server",
@@ -109,7 +111,12 @@ bool AppDaemon::initialize()
     parser.process(qApp->arguments());
 
     emulationMode = parser.isSet(emulMode);
+
+#ifdef Q_OS_MAC
+    anyAddress = true;
+#else
     anyAddress = parser.isSet(anyAddressOption);
+#endif
 
     if (parser.isSet(debugHttpServer))
     {
@@ -153,5 +160,5 @@ QHostAddress AppDaemon::getListenAddress()
     if (anyAddress)
         return QHostAddress::Any;
 
-    return QHostAddress::LocalHostIPv6;
+    return QHostAddress::LocalHost;
 }
