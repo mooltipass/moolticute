@@ -181,6 +181,15 @@ void WSClient::onTextMessageReceived(const QString &message)
         set_hwSerial(o["hw_serial"].toInt());
         set_hwMemory(o["flash_size"].toInt());
     }
+    else if (rootobj["msg"] == "request_login")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        if (o["login"].toString().isEmpty())
+        {
+            emit displayLoginRequest(message);
+            return;
+        }
+    }
     else if (rootobj["msg"] == "set_credential")
     {
         QJsonObject o = rootobj["data"].toObject();

@@ -51,6 +51,7 @@ private slots:
     void onNewConnection();
     void socketDisconnected();
     void notifyClients(const QJsonObject &obj);
+    void notifyGUILoginRequest(const QString& message);
 
     void mpAdded(MPDevice *device);
     void mpRemoved(MPDevice *device);

@@ -151,6 +151,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
+    connect(wsClient, &WSClient::displayLoginRequest, this, &MainWindow::displayLoginRequestMessageBox);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
@@ -1036,6 +1037,36 @@ void MainWindow::wantExitFilesManagement()
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     updateTabButtons();
+}
+
+void MainWindow::displayLoginRequestMessageBox(const QString& message)
+{
+    QJsonParseError err;
+    QJsonDocument jdoc = QJsonDocument::fromJson(message.toUtf8(), &err);
+    if (err.error != QJsonParseError::NoError)
+    {
+        qWarning() << "JSON parse error " << err.errorString();
+        return;
+    }
+    QJsonObject rootobj = jdoc.object();
+    QJsonObject o = rootobj["data"].toObject();
+    bool ok;
+    QString loginRequestString = tr("Login name for ") + o["service"].toString() + ":";
+    QString loginName = QInputDialog::getText(this, tr("Login Request"),
+                                             loginRequestString , QLineEdit::Normal,
+                                             "", &ok, Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint);
+    if (ok && !loginName.isEmpty())
+    {
+        o["login"] = loginName;
+        rootobj["data"] = o;
+        qDebug() << "Login name is set: " << loginName;
+        rootobj["msg"] = "set_credential";
+        wsClient->sendJsonData(rootobj);
+    }
+    else
+    {
+        qDebug() << "The user did not give the login name, exitting set_credential";
+    }
 }
 
 void MainWindow::loadingProgress(int total, int current, QString message)

@@ -116,6 +116,7 @@ public:
 signals:
     void wsConnected();
     void wsDisconnected();
+    void displayLoginRequest(const QString& message);
     void memoryDataChanged();
     void passwordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
     void credentialsUpdated(const QString & service, const QString & login, const QString & description, bool success);

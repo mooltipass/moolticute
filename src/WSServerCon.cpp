@@ -41,6 +41,11 @@ void WSServerCon::sendJsonMessage(const QJsonObject &data)
     // wsClient->flush();
 }
 
+void WSServerCon::sendJsonMessage(const QString &data)
+{
+    wsClient->sendTextMessage(data);
+}
+
 void WSServerCon::processMessage(const QString &message)
 {
     QJsonParseError err;
@@ -219,6 +224,14 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "set_credential")
     {
         QJsonObject o = root["data"].toObject();
+        QString loginName = o["login"].toString();
+        if (loginName.isEmpty())
+        {
+            root["msg"] = "request_login";
+            QJsonDocument requestLoginDoc(root);
+            emit sendLoginMessage(requestLoginDoc.toJson());
+            return;
+        }
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)

@@ -66,6 +66,7 @@ void WSServer::onNewConnection()
     c->sendInitialStatus();
     //let clients send broadcast messages
     connect(c, &WSServerCon::notifyAllClients, this, &WSServer::notifyClients);
+    connect(c, &WSServerCon::sendLoginMessage, this, &WSServer::notifyGUILoginRequest);
 
     wsClients[wsocket] = c;
     wsClientsReverse[c] = wsocket;
@@ -98,6 +99,18 @@ void WSServer::notifyClients(const QJsonObject &obj)
     for (auto it = wsClients.begin();it != wsClients.end();it++)
     {
         it.value()->sendJsonMessage(obj);
+    }
+}
+
+void WSServer::notifyGUILoginRequest(const QString &message)
+{
+    for (auto it = wsClients.begin();it != wsClients.end();it++)
+    {
+        //Notify GUI
+        if (it.key()->resourceName().contains("localhost") && !(it.key()->origin().contains("extension")))
+        {
+            it.value()->sendJsonMessage(message);
+        }
     }
 }
 
