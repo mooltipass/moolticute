@@ -71,7 +71,7 @@ private slots:
     void wantEnterCredentialManagement();
     void wantSaveCredentialManagement();
     void wantExitFilesManagement();
-    void displayLoginRequestMessageBox(const QString& message);
+    void displayLoginRequestMessageBox(const QString& service, QString& loginName);
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);

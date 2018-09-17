@@ -186,8 +186,19 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         if (o["login"].toString().isEmpty())
         {
-            emit displayLoginRequest(message);
-            return;
+            QString loginName;
+            emit displayLoginRequest(o["service"].toString(), loginName);
+            rootobj["msg"] = "set_credential";
+            if (loginName.isEmpty())
+            {
+                o["saveConfirmed"] = "1";
+            }
+            else
+            {
+                o["login"] = loginName;
+            }
+            rootobj["data"] = o;
+            sendJsonData(rootobj);
         }
     }
     else if (rootobj["msg"] == "set_credential")

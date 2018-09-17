@@ -1039,33 +1039,16 @@ void MainWindow::wantExitFilesManagement()
     updateTabButtons();
 }
 
-void MainWindow::displayLoginRequestMessageBox(const QString& message)
+void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName)
 {
-    QJsonParseError err;
-    QJsonDocument jdoc = QJsonDocument::fromJson(message.toUtf8(), &err);
-    if (err.error != QJsonParseError::NoError)
-    {
-        qWarning() << "JSON parse error " << err.errorString();
-        return;
-    }
-    QJsonObject rootobj = jdoc.object();
-    QJsonObject o = rootobj["data"].toObject();
     bool ok;
-    QString loginRequestString = tr("Login name for ") + o["service"].toString() + ":";
-    QString loginName = QInputDialog::getText(this, tr("Login Request"),
+    QString loginRequestString = tr("Login name for ") + service + ":";
+    loginName = QInputDialog::getText(this, tr("Login Request"),
                                              loginRequestString , QLineEdit::Normal,
                                              "", &ok, Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint);
     if (ok && !loginName.isEmpty())
     {
-        o["login"] = loginName;
-        rootobj["data"] = o;
         qDebug() << "Login name is set: " << loginName;
-        rootobj["msg"] = "set_credential";
-        wsClient->sendJsonData(rootobj);
-    }
-    else
-    {
-        qDebug() << "The user did not give the login name, exitting set_credential";
     }
 }
 

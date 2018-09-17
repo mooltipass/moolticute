@@ -225,12 +225,17 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
         QString loginName = o["login"].toString();
-        if (loginName.isEmpty())
+        if (loginName.isEmpty() && !o.contains("saveConfirmed"))
         {
             root["msg"] = "request_login";
             QJsonDocument requestLoginDoc(root);
-            emit sendLoginMessage(requestLoginDoc.toJson());
-            return;
+            bool isGuiRunning = true;
+            emit sendLoginMessage(requestLoginDoc.toJson(), isGuiRunning);
+            if (isGuiRunning)
+            {
+                return;
+            }
+            qDebug() << "GUI is not running, saving credential with empty login";
         }
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),

@@ -42,7 +42,7 @@ public:
 
 signals:
     void notifyAllClients(const QJsonObject &obj);
-    void sendLoginMessage(const QString &msg);
+    void sendLoginMessage(const QString &msg, bool &isGuiRunning);
 
 private slots:
     void processMessage(const QString &msg);
