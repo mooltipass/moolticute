@@ -347,7 +347,9 @@ void AppGui::updateSystrayTooltip()
 
 AppGui::~AppGui()
 {
-    timerDaemon->stop();
+    if (timerDaemon)
+        timerDaemon->stop();
+
 #ifndef Q_OS_WIN
     if (sshAgentProcess)
     {
@@ -505,6 +507,10 @@ void AppGui::slotConnectionEstablished()
 {
     //We have a new instance that wants to be opened
     QLocalSocket *currSocket = localServer->nextPendingConnection();
+
+    connect(currSocket, &QLocalSocket::disconnected,
+            currSocket, &QLocalSocket::deleteLater);
+
     connect(currSocket, &QLocalSocket::readyRead, [=]()
     {
         QString data(currSocket->readAll());
@@ -526,10 +532,6 @@ void AppGui::slotConnectionEstablished()
             ::SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
 #endif
         }
-    });
-    connect(currSocket, &QLocalSocket::disconnected, [=]()
-    {
-        delete currSocket;
     });
 }
 
