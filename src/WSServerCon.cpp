@@ -229,7 +229,7 @@ void WSServerCon::processMessage(const QString &message)
         {
             root["msg"] = "request_login";
             QJsonDocument requestLoginDoc(root);
-            bool isGuiRunning = true;
+            bool isGuiRunning = false;
             emit sendLoginMessage(requestLoginDoc.toJson(), isGuiRunning);
             if (isGuiRunning)
             {
