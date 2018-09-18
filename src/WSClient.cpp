@@ -187,7 +187,13 @@ void WSClient::onTextMessageReceived(const QString &message)
         if (o["login"].toString().isEmpty())
         {
             QString loginName;
-            emit displayLoginRequest(o["service"].toString(), loginName);
+            bool abortRequest = false;
+            emit displayLoginRequest(o["service"].toString(), loginName, abortRequest);
+            if (abortRequest)
+            {
+                return;
+            }
+
             rootobj["msg"] = "set_credential";
             if (loginName.isEmpty())
             {

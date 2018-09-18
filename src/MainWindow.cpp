@@ -25,6 +25,7 @@
 #include "PasswordProfilesModel.h"
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
+#include "RequestLoginNameDialog.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -1039,14 +1040,13 @@ void MainWindow::wantExitFilesManagement()
     updateTabButtons();
 }
 
-void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName)
+void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest)
 {
-    bool ok;
-    QString loginRequestString = tr("Login name for ") + service + ":";
-    loginName = QInputDialog::getText(this, tr("Login Request"),
-                                             loginRequestString , QLineEdit::Normal,
-                                             "", &ok, Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint);
-    if (ok && !loginName.isEmpty())
+    RequestLoginNameDialog dlg(service);
+    dlg.exec();
+    loginName = dlg.getLoginName();
+    abortRequest = dlg.abortRequest;
+    if (!loginName.isEmpty())
     {
         qDebug() << "Login name is set: " << loginName;
     }
