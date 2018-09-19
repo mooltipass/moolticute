@@ -13,7 +13,8 @@ RequestLoginNameDialog::RequestLoginNameDialog(const QString &service, QWidget *
     ui->loginLabel->setText(tr("Login name for ") + "<b>" + service + "</b>:");
     const QString informationText = "<h2><b>"
                                   + tr("A credential without a login has been detected.")
-                                  + "</b></h2>";
+                                  + "</b></h2>"
+                                  + tr("You have the possibility to include a login before storing the credential in the device. If you don't need a login, you can ignore the request.");
     ui->informationLabel->setWordWrap(true);
     ui->informationLabel->setTextFormat(Qt::RichText);
     ui->informationLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
@@ -23,7 +24,8 @@ RequestLoginNameDialog::RequestLoginNameDialog(const QString &service, QWidget *
     ui->logoLabel->setPixmap(logo);
     setFocus();
 
-    connect(ui->buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, [this]() { abortRequest=true; });
+    connect(ui->buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &RequestLoginNameDialog::reject);
+    connect(ui->buttonBox->button(QDialogButtonBox::Ignore), &QPushButton::clicked, [this]() {ui->loginLineEdit->setText("");});
 }
 
 RequestLoginNameDialog::~RequestLoginNameDialog()

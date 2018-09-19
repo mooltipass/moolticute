@@ -17,8 +17,6 @@ public:
 
     QString getLoginName() const;
 
-    bool abortRequest = false;
-
 private:
     Ui::RequestLoginNameDialog *ui;
 };

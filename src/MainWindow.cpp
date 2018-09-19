@@ -1043,9 +1043,8 @@ void MainWindow::wantExitFilesManagement()
 void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest)
 {
     RequestLoginNameDialog dlg(service);
-    dlg.exec();
+    abortRequest = (dlg.exec() == QDialog::Rejected);
     loginName = dlg.getLoginName();
-    abortRequest = dlg.abortRequest;
     if (!loginName.isEmpty())
     {
         qDebug() << "Login name is set: " << loginName;
