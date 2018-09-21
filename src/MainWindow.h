@@ -138,7 +138,7 @@ private:
 
     void retranslateUi();
 
-    Ui::MainWindow *ui = NULL;
+    Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
 
     WSClient *wsClient;

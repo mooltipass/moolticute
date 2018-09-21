@@ -7,6 +7,7 @@ RequestLoginNameDialog::RequestLoginNameDialog(const QString &service, QWidget *
     ui(new Ui::RequestLoginNameDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     setFixedSize(size());
     setWindowTitle(tr("Request Login Name"));
     ui->loginLabel->setTextFormat(Qt::RichText);
