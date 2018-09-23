@@ -196,12 +196,9 @@ void WSClient::onTextMessageReceived(const QString &message)
                 return;
             }
 
-            if (!service.isEmpty())
-            {
-                rootobj["msg"] = "set_credential";
-                o["service"] = service;
-                o["saveDomainConfirmed"] = "1";
-            }
+            rootobj["msg"] = "set_credential";
+            o["service"] = service;
+            o["saveDomainConfirmed"] = "1";
             rootobj["data"] = o;
             sendJsonData(rootobj);
 

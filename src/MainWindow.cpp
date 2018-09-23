@@ -25,6 +25,7 @@
 #include "PasswordProfilesModel.h"
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
+#include "RequestDomainSelectionDialog.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -1041,23 +1042,9 @@ void MainWindow::wantExitFilesManagement()
 
 void MainWindow::displayDomainRequestMessageBox(const QString& domain, const QString& subdomain, QString& service, bool& abortRequest)
 {
-    bool ok;
-    QStringList options;
-    options.append(domain);
-    options.append(subdomain);
-    service = QInputDialog::getItem(this, tr("Domain Request"),
-                                          tr("Choose the domain name:") , options,
-                                          0, false, &ok, Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint);
-    if (ok && !service.isEmpty())
-    {
-        qDebug() << "Service name is set: " << service;
-        abortRequest = false;
-    }
-    else
-    {
-        qDebug() << "The user did not give the service name, exitting set_credential";
-        abortRequest = true;
-    }
+    RequestDomainSelectionDialog dlg(domain, subdomain);
+    abortRequest = (dlg.exec() == QDialog::Rejected);
+    service = dlg.getServiceName();
 }
 
 void MainWindow::loadingProgress(int total, int current, QString message)
