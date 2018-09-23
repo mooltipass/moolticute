@@ -151,6 +151,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
+    connect(wsClient, &WSClient::displayDomainRequest, this, &MainWindow::displayDomainRequestMessageBox);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
@@ -1036,6 +1037,27 @@ void MainWindow::wantExitFilesManagement()
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     updateTabButtons();
+}
+
+void MainWindow::displayDomainRequestMessageBox(const QString& domain, const QString& subdomain, QString& service, bool& abortRequest)
+{
+    bool ok;
+    QStringList options;
+    options.append(domain);
+    options.append(subdomain);
+    service = QInputDialog::getItem(this, tr("Domain Request"),
+                                          tr("Choose the domain name:") , options,
+                                          0, false, &ok, Qt::WindowStaysOnTopHint | Qt::MSWindowsFixedSizeDialogHint);
+    if (ok && !service.isEmpty())
+    {
+        qDebug() << "Service name is set: " << service;
+        abortRequest = false;
+    }
+    else
+    {
+        qDebug() << "The user did not give the service name, exitting set_credential";
+        abortRequest = true;
+    }
 }
 
 void MainWindow::loadingProgress(int total, int current, QString message)

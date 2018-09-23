@@ -49,6 +49,12 @@ public:
 
     QString subdomain() const { return _subdomain; }
 
+    // Domain with top-level domain ("domain.tld")
+    QString getFullDomain() const { return _domain + _tld; }
+
+    // Subdomain with domain and top-level domain ("subdomain.domain.tld")
+    QString getFullSubdomain() const { return _subdomain + "." + getFullDomain(); }
+
     int port() const { return _url.port(); }
 
     const QUrl qurl() const { return _url; }

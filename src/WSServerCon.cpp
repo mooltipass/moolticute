@@ -19,6 +19,7 @@
 #include "WSServerCon.h"
 #include "WSServer.h"
 #include "version.h"
+#include "ParseDomain.h"
 
 #include <QCryptographicHash>
 
@@ -39,6 +40,11 @@ void WSServerCon::sendJsonMessage(const QJsonObject &data)
     QJsonDocument jdoc(data);
     wsClient->sendTextMessage(jdoc.toJson(QJsonDocument::JsonFormat::Compact));
     // wsClient->flush();
+}
+
+void WSServerCon::sendJsonMessage(const QString &data)
+{
+    wsClient->sendTextMessage(data);
 }
 
 void WSServerCon::processMessage(const QString &message)
@@ -219,6 +225,22 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "set_credential")
     {
         QJsonObject o = root["data"].toObject();
+        ParseDomain url(o["service"].toString());
+        if (!url.subdomain().isEmpty() && /*o.contains("extension_version") &&*/ !o.contains("saveDomainConfirmed"))
+        {
+            root["msg"] = "request_domain";
+            o["domain"] = url.getFullDomain();
+            o["subdomain"] = url.getFullSubdomain();
+            root["data"] = o;
+            QJsonDocument requestLoginDoc(root);
+            bool isGuiRunning = false;
+            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
+            if (isGuiRunning)
+            {
+                return;
+            }
+            qDebug() << "GUI is not running, saving credential with subdomain";
+        }
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)

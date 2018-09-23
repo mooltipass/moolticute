@@ -181,6 +181,32 @@ void WSClient::onTextMessageReceived(const QString &message)
         set_hwSerial(o["hw_serial"].toInt());
         set_hwMemory(o["flash_size"].toInt());
     }
+    else if (rootobj["msg"] == "request_domain")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        QString domain = o["domain"].toString();
+        QString subdomain = o["subdomain"].toString();
+        if (!domain.isEmpty() && !subdomain.isEmpty())
+        {
+            QString service;
+            bool abortRequest = false;
+            emit displayDomainRequest(domain, subdomain, service, abortRequest);
+            if (abortRequest)
+            {
+                return;
+            }
+
+            if (!service.isEmpty())
+            {
+                rootobj["msg"] = "set_credential";
+                o["service"] = service;
+                o["saveDomainConfirmed"] = "1";
+            }
+            rootobj["data"] = o;
+            sendJsonData(rootobj);
+
+        }
+    }
     else if (rootobj["msg"] == "set_credential")
     {
         QJsonObject o = rootobj["data"].toObject();
