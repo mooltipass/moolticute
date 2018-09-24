@@ -225,7 +225,8 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
         QString loginName = o["login"].toString();
-        if (loginName.isEmpty() && o.contains("extension_version") && !o.contains("saveConfirmed"))
+        bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
+        if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveConfirmed"))
         {
             root["msg"] = "request_login";
             QJsonDocument requestLoginDoc(root);
