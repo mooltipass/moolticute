@@ -226,7 +226,8 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
         ParseDomain url(o["service"].toString());
-        if (!url.subdomain().isEmpty() && o.contains("extension_version") && !o.contains("saveDomainConfirmed"))
+        bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
+        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && !o.contains("saveDomainConfirmed"))
         {
             root["msg"] = "request_domain";
             o["domain"] = url.getFullDomain();
