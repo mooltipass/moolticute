@@ -41,7 +41,7 @@ void WSServerCon::sendJsonMessage(const QJsonObject &data)
     // wsClient->flush();
 }
 
-void WSServerCon::sendJsonMessage(const QString &data)
+void WSServerCon::sendJsonMessageString(const QString &data)
 {
     wsClient->sendTextMessage(data);
 }
