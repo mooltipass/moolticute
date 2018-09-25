@@ -109,7 +109,7 @@ void WSServer::notifyGUI(const QString &message, bool &isGuiRunning)
         //Notify GUI
         if (it.key()->resourceName().contains("localhost") && !(it.key()->origin().contains("extension")))
         {
-            it.value()->sendJsonMessage(message);
+            it.value()->sendJsonMessageString(message);
             isGuiRunning = true;
             return;
         }

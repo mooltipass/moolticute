@@ -34,7 +34,7 @@ public:
     virtual ~WSServerCon();
 
     void sendJsonMessage(const QJsonObject &data);
-    void sendJsonMessage(const QString &data);
+    void sendJsonMessageString(const QString &data);
     void resetDevice(MPDevice *dev);
     void sendInitialStatus();
 

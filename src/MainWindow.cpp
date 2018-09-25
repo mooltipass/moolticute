@@ -1048,6 +1048,7 @@ void MainWindow::displayDomainRequestMessageBox(const QString& domain, const QSt
     RequestDomainSelectionDialog dlg(domain, subdomain);
     abortRequest = (dlg.exec() == QDialog::Rejected);
     service = dlg.getServiceName();
+}
 
 void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest)
 {

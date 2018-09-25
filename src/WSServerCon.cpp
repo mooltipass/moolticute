@@ -42,7 +42,7 @@ void WSServerCon::sendJsonMessage(const QJsonObject &data)
     // wsClient->flush();
 }
 
-void WSServerCon::sendJsonMessage(const QString &data)
+void WSServerCon::sendJsonMessageString(const QString &data)
 {
     wsClient->sendTextMessage(data);
 }
@@ -232,7 +232,7 @@ void WSServerCon::processMessage(const QString &message)
             root["msg"] = "request_login";
             QJsonDocument requestLoginDoc(root);
             bool isGuiRunning = false;
-            emit sendLoginMessage(requestLoginDoc.toJson(), isGuiRunning);
+            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
             if (isGuiRunning)
             {
                 return;
