@@ -25,6 +25,7 @@
 #include "PasswordProfilesModel.h"
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
+#include "RequestLoginNameDialog.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -151,6 +152,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
+    connect(wsClient, &WSClient::displayLoginRequest, this, &MainWindow::displayLoginRequestMessageBox);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
@@ -1036,6 +1038,17 @@ void MainWindow::wantExitFilesManagement()
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     updateTabButtons();
+}
+
+void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest)
+{
+    RequestLoginNameDialog dlg(service);
+    abortRequest = (dlg.exec() == QDialog::Rejected);
+    loginName = dlg.getLoginName();
+    if (!loginName.isEmpty())
+    {
+        qDebug() << "Login name is set: " << loginName;
+    }
 }
 
 void MainWindow::loadingProgress(int total, int current, QString message)

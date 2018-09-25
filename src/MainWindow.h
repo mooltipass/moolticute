@@ -71,6 +71,7 @@ private slots:
     void wantEnterCredentialManagement();
     void wantSaveCredentialManagement();
     void wantExitFilesManagement();
+    void displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest);
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
@@ -137,7 +138,7 @@ private:
 
     void retranslateUi();
 
-    Ui::MainWindow *ui = NULL;
+    Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
 
     WSClient *wsClient;

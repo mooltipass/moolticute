@@ -34,6 +34,7 @@ public:
     virtual ~WSServerCon();
 
     void sendJsonMessage(const QJsonObject &data);
+    void sendJsonMessage(const QString &data);
     void resetDevice(MPDevice *dev);
     void sendInitialStatus();
 
@@ -41,6 +42,7 @@ public:
 
 signals:
     void notifyAllClients(const QJsonObject &obj);
+    void sendLoginMessage(const QString &msg, bool &isGuiRunning);
 
 private slots:
     void processMessage(const QString &msg);

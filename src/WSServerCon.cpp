@@ -41,6 +41,11 @@ void WSServerCon::sendJsonMessage(const QJsonObject &data)
     // wsClient->flush();
 }
 
+void WSServerCon::sendJsonMessage(const QString &data)
+{
+    wsClient->sendTextMessage(data);
+}
+
 void WSServerCon::processMessage(const QString &message)
 {
     QJsonParseError err;
@@ -219,6 +224,20 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "set_credential")
     {
         QJsonObject o = root["data"].toObject();
+        QString loginName = o["login"].toString();
+        bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
+        if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveConfirmed"))
+        {
+            root["msg"] = "request_login";
+            QJsonDocument requestLoginDoc(root);
+            bool isGuiRunning = false;
+            emit sendLoginMessage(requestLoginDoc.toJson(), isGuiRunning);
+            if (isGuiRunning)
+            {
+                return;
+            }
+            qDebug() << "GUI is not running, saving credential with empty login";
+        }
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)
