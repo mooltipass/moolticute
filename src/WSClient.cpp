@@ -195,13 +195,35 @@ void WSClient::onTextMessageReceived(const QString &message)
             {
                 return;
             }
-
             rootobj["msg"] = "set_credential";
             o["service"] = service;
             o["saveDomainConfirmed"] = "1";
             rootobj["data"] = o;
             sendJsonData(rootobj);
-
+        }
+    }
+    else if (rootobj["msg"] == "request_login")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        if (o["login"].toString().isEmpty())
+        {
+            QString loginName;
+            bool abortRequest = false;
+            emit displayLoginRequest(o["service"].toString(), loginName, abortRequest);
+            if (abortRequest)
+            {
+                return;
+            }
+            if (loginName.isEmpty())
+            {
+                o["saveConfirmed"] = "1";
+            }
+            else
+            {
+                o["login"] = loginName;
+            }
+            rootobj["data"] = o;
+            sendJsonData(rootobj);
         }
     }
     else if (rootobj["msg"] == "set_credential")

@@ -56,6 +56,7 @@ SOURCES += src/main_gui.cpp \
     src/DbMasterController.cpp \
     src/SystemEventHandler.cpp \
     src/RequestDomainSelectionDialog.cpp
+    src/RequestLoginNameDialog.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -96,6 +97,7 @@ HEADERS  += src/MainWindow.h \
     src/SystemEventHandler.h \
     src/SystemEvent.h \
     src/RequestDomainSelectionDialog.h
+    src/RequestLoginNameDialog.h
 
 mac {
     HEADERS += src/MacUtils.h \
@@ -114,6 +116,7 @@ FORMS    += src/MainWindow.ui \
     src/SSHManagement.ui \
     src/PassGenerationProfilesDialog.ui \
     src/RequestDomainSelectionDialog.ui
+    src/RequestLoginNameDialog.ui
 
 RESOURCES += \
     img/images.qrc \

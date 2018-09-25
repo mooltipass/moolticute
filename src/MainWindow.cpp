@@ -26,6 +26,7 @@
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
 #include "RequestDomainSelectionDialog.h"
+#include "RequestLoginNameDialog.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -153,6 +154,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::displayDomainRequest, this, &MainWindow::displayDomainRequestMessageBox);
+    connect(wsClient, &WSClient::displayLoginRequest, this, &MainWindow::displayLoginRequestMessageBox);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
@@ -1040,11 +1042,22 @@ void MainWindow::wantExitFilesManagement()
     updateTabButtons();
 }
 
+
 void MainWindow::displayDomainRequestMessageBox(const QString& domain, const QString& subdomain, QString& service, bool& abortRequest)
 {
     RequestDomainSelectionDialog dlg(domain, subdomain);
     abortRequest = (dlg.exec() == QDialog::Rejected);
     service = dlg.getServiceName();
+
+void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest)
+{
+    RequestLoginNameDialog dlg(service);
+    abortRequest = (dlg.exec() == QDialog::Rejected);
+    loginName = dlg.getLoginName();
+    if (!loginName.isEmpty())
+    {
+        qDebug() << "Login name is set: " << loginName;
+    }
 }
 
 void MainWindow::loadingProgress(int total, int current, QString message)

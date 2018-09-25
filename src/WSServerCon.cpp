@@ -224,9 +224,23 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "set_credential")
     {
-        QJsonObject o = root["data"].toObject();
-        ParseDomain url(o["service"].toString());
+        QJsonObject o = root["data"].toObject();  
+        QString loginName = o["login"].toString();
         bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
+        if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveConfirmed"))
+        {
+            root["msg"] = "request_login";
+            QJsonDocument requestLoginDoc(root);
+            bool isGuiRunning = false;
+            emit sendLoginMessage(requestLoginDoc.toJson(), isGuiRunning);
+            if (isGuiRunning)
+            {
+                return;
+            }
+            qDebug() << "GUI is not running, saving credential with empty login";
+        }
+          
+        ParseDomain url(o["service"].toString());
         if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && !o.contains("saveDomainConfirmed"))
         {
             root["msg"] = "request_domain";
@@ -242,6 +256,7 @@ void WSServerCon::processMessage(const QString &message)
             }
             qDebug() << "GUI is not running, saving credential with subdomain";
         }
+          
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)

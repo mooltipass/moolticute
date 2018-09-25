@@ -117,6 +117,7 @@ signals:
     void wsConnected();
     void wsDisconnected();
     void displayDomainRequest(const QString& domain, const QString& subdomain, QString& service, bool& abortRequest);
+    void displayLoginRequest(const QString& service, QString& loginName, bool& abortRequest);
     void memoryDataChanged();
     void passwordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
     void credentialsUpdated(const QString & service, const QString & login, const QString & description, bool success);
