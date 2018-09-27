@@ -58,6 +58,11 @@ docker run -t --name mc-upload -d \
 
 for f in $HOME/uploads
 do
-    docker exec mc-upload bash /scripts/upload.sh $VERSION $(basename $f)
+    ff=$(basename $f)
+    echo uploading $ff
+    if [ -f $HOME/uploads/$ff ]
+    then
+        docker exec mc-upload bash /scripts/upload.sh $VERSION $ff
+    fi
 done
 
