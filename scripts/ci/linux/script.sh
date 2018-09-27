@@ -6,6 +6,7 @@ source $SCRIPTDIR/../funcs.sh
 
 #copy source for debian package
 make_version . deb
+wget_retry https://github.com/mooltipass/mooltipass-udev/raw/master/udev/69-mooltipass.rules -O 69-mooltipass.rules
 cp -R . $HOME/build-debs/moolticute-${DEB_VERSION}
 
 # Linux build
