@@ -19,7 +19,7 @@ docker exec mc-deb bash /scripts/build_source.sh $VERSION cosmic
 
 #windows and appimage
 docker exec appimgbuilder bash /scripts/package.sh
-docker exec winbuilder bash /scripts/package.sh
+docker exec winbuilder bash -c "export CODESIGN_WIN_PASS=${CODESIGN_WIN_PASS}; /scripts/package.sh"
 
 #prepare files to upload volume
 mkdir -p $HOME/uploads
