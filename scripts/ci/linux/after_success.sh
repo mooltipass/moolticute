@@ -56,7 +56,7 @@ docker run -t --name mc-upload -d \
 	-e "GITHUB_TOKEN=${GITHUB_TOKEN}" \
     mooltipass/mc-upload
 
-for f in $HOME/uploads
+for f in $HOME/uploads/*
 do
     ff=$(basename $f)
     echo uploading $ff
