@@ -62,7 +62,7 @@ do
     echo uploading $ff
     if [ -f $HOME/uploads/$ff ]
     then
-        docker exec mc-upload bash /scripts/upload.sh $VERSION $ff
+        docker exec mc-upload bash -c "export SFTP_USER=${SFTP_USER} SFTP_PASS=${SFTP_PASS} ; /scripts/upload.sh $VERSION $ff"
     fi
 done
 
