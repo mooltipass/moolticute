@@ -1,7 +1,0 @@
-build-linux/moolticuted /usr/bin
-build-linux/moolticute /usr/bin
-build-linux/mc-agent /usr/bin
-build-linux/mc-cli /usr/bin
-systemd/moolticuted.service /lib/systemd/system
-mooltipass-udev/udev/69-mooltipass.rules /etc/udev/rules.d
-data/moolticute.desktop /usr/share/applications
