@@ -9,5 +9,6 @@
         <file>lang/mc_br.qm</file>
         <file>lang/mc_tr.qm</file>
         <file>lang/mc_sv.qm</file>
+        <file>lang/mc_hu.qm</file>
     </qresource>
 </RCC>
