@@ -55,7 +55,8 @@ SOURCES += src/main_gui.cpp \
     src/DbBackupChangeNumbersComparator.cpp \
     src/DbMasterController.cpp \
     src/SystemEventHandler.cpp \
-    src/RequestLoginNameDialog.cpp
+    src/RequestLoginNameDialog.cpp \
+    src/SystemNotification.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -95,7 +96,9 @@ HEADERS  += src/MainWindow.h \
     src/DbMasterController.h \
     src/SystemEventHandler.h \
     src/SystemEvent.h \
-    src/RequestLoginNameDialog.h
+    src/RequestLoginNameDialog.h \
+    src/ISystemNotification.h \
+    src/SystemNotification.h
 
 mac {
     HEADERS += src/MacUtils.h \
@@ -121,6 +124,14 @@ RESOURCES += \
 
 win32 {
     RC_FILE = win/windows_res.rc
+    HEADERS += src/SystemNotificationWindows.h
+    SOURCES += src/SystemNotificationWindows.cpp
+
+    copydata.commands = $(COPY_FILE) \"$$shell_path($$PWD\\win\\snoretoast\*)\" \"$$shell_path($$OUT_PWD)\"
+    first.depends = $(first) copydata
+    export(first.depends)
+    export(copydata.commands)
+    QMAKE_EXTRA_TARGETS += first copydata
 }
 
 mac {
