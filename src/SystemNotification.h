@@ -34,6 +34,7 @@ public:
     void createNotification(const QString& title, const QString text);
     void createButtonChoiceNotification(const QString& title, const QString text, const QStringList &buttons);
     void createTextBoxNotification(const QString& title, const QString text);
+    bool displayLoginRequestNotification(const QString& service, QString &loginName);
 };
 
 #endif // SYSTEMNOTIFICATION_H

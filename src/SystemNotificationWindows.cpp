@@ -1,18 +1,24 @@
 #include "SystemNotificationWindows.h"
 #include <QDebug>
 #include <QRegExp>
+#include <QSysInfo>
+
+#include "RequestLoginNameDialog.h"
+
+const QString SystemNotificationWindows::SNORETOAST_FORMAT= "SnoreToast.exe -t \"%1\" -m \"%2\" %3 -p icon.png -w";
+const int SystemNotificationWindows::NOTIFICATION_TIMEOUT = 20000;
 
 SystemNotificationWindows::SystemNotificationWindows(QObject *parent)
     : ISystemNotification(parent)
 {
     process = new QProcess();
-    connect(process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+    /* Processing result from an other thread.
+     * connect(process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
     [=]  (int exitCode, QProcess::ExitStatus exitStatus)
     {
         qDebug() << "Exit Code: " << exitCode;
         qDebug() << "ExitStatus: " << exitStatus;
         QString output(process->readAllStandardOutput());
-        qDebug() << output;
         QString result = "";
         bool isResultOK = this->processResult(output, result);
         if (isResultOK)
@@ -23,7 +29,7 @@ SystemNotificationWindows::SystemNotificationWindows(QObject *parent)
         {
             qDebug() << "No result found";
         }
-    });
+    });*/
 }
 
 SystemNotificationWindows::~SystemNotificationWindows()
@@ -62,6 +68,35 @@ void SystemNotificationWindows::createTextBoxNotification(const QString &title, 
 {
     QString notification = SNORETOAST_FORMAT.arg(title, text, "-tb");
     process->start(notification);
+}
+
+bool SystemNotificationWindows::displayLoginRequestNotification(const QString &service, QString &loginName)
+{
+    const QString WINDOWS10_VERSION = "10";
+
+    if (QSysInfo::productVersion() == WINDOWS10_VERSION)
+    {
+        // A text box notification is displayed on Win10
+        createTextBoxNotification(tr("A credential without a login has been detected."), tr("Login name for ") + service + ":");
+        if (process->waitForFinished(NOTIFICATION_TIMEOUT))
+        {
+            return processResult(process->readAllStandardOutput(), loginName);
+        }
+        else
+        {
+            qDebug() << "A text box notification timeout";
+            return false;
+        }
+    }
+    else
+    {
+        // A RequestLoginNameDialog is displayed on bellow Win10
+        bool isSuccess = false;
+        RequestLoginNameDialog dlg(service);
+        isSuccess = (dlg.exec() != QDialog::Rejected);
+        loginName = dlg.getLoginName();
+        return isSuccess;
+    }
 }
 
 bool SystemNotificationWindows::processResult(const QString &toastResponse, QString &result) const

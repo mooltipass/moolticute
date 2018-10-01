@@ -34,3 +34,12 @@ void SystemNotification::createTextBoxNotification(const QString &title, const Q
         notification->createTextBoxNotification(title, text);
     }
 }
+
+bool SystemNotification::displayLoginRequestNotification(const QString &service, QString& loginName)
+{
+    if (notification)
+    {
+        return notification->displayLoginRequestNotification(service, loginName);
+    }
+    return false;
+}

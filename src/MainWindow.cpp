@@ -25,7 +25,7 @@
 #include "PasswordProfilesModel.h"
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
-#include "RequestLoginNameDialog.h"
+#include "SystemNotification.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -1042,9 +1042,7 @@ void MainWindow::wantExitFilesManagement()
 
 void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest)
 {
-    RequestLoginNameDialog dlg(service);
-    abortRequest = (dlg.exec() == QDialog::Rejected);
-    loginName = dlg.getLoginName();
+    abortRequest = !SystemNotification::instance().displayLoginRequestNotification(service, loginName);
     if (!loginName.isEmpty())
     {
         qDebug() << "Login name is set: " << loginName;
