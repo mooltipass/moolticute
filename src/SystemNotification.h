@@ -35,6 +35,7 @@ public:
     void createButtonChoiceNotification(const QString& title, const QString text, const QStringList &buttons);
     void createTextBoxNotification(const QString& title, const QString text);
     bool displayLoginRequestNotification(const QString& service, QString &loginName);
+    bool displayDomainSelectionNotification(const QString& domain, const QString& subdomain, QString &serviceName);
 };
 
 #endif // SYSTEMNOTIFICATION_H

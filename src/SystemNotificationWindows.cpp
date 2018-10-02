@@ -4,9 +4,11 @@
 #include <QSysInfo>
 
 #include "RequestLoginNameDialog.h"
+#include "RequestDomainSelectionDialog.h"
 
 const QString SystemNotificationWindows::SNORETOAST_FORMAT= "SnoreToast.exe -t \"%1\" -m \"%2\" %3 -p icon.png -w";
 const int SystemNotificationWindows::NOTIFICATION_TIMEOUT = 20000;
+const QString SystemNotificationWindows::WINDOWS10_VERSION = "10";
 
 SystemNotificationWindows::SystemNotificationWindows(QObject *parent)
     : ISystemNotification(parent)
@@ -72,8 +74,6 @@ void SystemNotificationWindows::createTextBoxNotification(const QString &title, 
 
 bool SystemNotificationWindows::displayLoginRequestNotification(const QString &service, QString &loginName)
 {
-    const QString WINDOWS10_VERSION = "10";
-
     if (QSysInfo::productVersion() == WINDOWS10_VERSION)
     {
         // A text box notification is displayed on Win10
@@ -95,6 +95,35 @@ bool SystemNotificationWindows::displayLoginRequestNotification(const QString &s
         RequestLoginNameDialog dlg(service);
         isSuccess = (dlg.exec() != QDialog::Rejected);
         loginName = dlg.getLoginName();
+        return isSuccess;
+    }
+}
+
+bool SystemNotificationWindows::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName)
+{
+    if (QSysInfo::productVersion() == WINDOWS10_VERSION)
+    {
+        // A text box notification is displayed on Win10
+        QStringList buttons;
+        buttons.append({domain, subdomain});
+        createButtonChoiceNotification(tr("Subdomain Detected!"), tr("Choose the domain name:"), buttons);
+        if (process->waitForFinished(NOTIFICATION_TIMEOUT))
+        {
+            return processResult(process->readAllStandardOutput(), serviceName);
+        }
+        else
+        {
+            qDebug() << "A text box notification timeout";
+            return false;
+        }
+    }
+    else
+    {
+        // A RequestLoginNameDialog is displayed on bellow Win10
+        bool isSuccess = false;
+        RequestDomainSelectionDialog dlg(domain, subdomain);
+        isSuccess = (dlg.exec() != QDialog::Rejected);
+        serviceName = dlg.getServiceName();
         return isSuccess;
     }
 }

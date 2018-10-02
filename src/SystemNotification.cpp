@@ -43,3 +43,12 @@ bool SystemNotification::displayLoginRequestNotification(const QString &service,
     }
     return false;
 }
+
+bool SystemNotification::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName)
+{
+    if (notification)
+    {
+        return notification->displayDomainSelectionNotification(domain, subdomain, serviceName);
+    }
+    return false;
+}

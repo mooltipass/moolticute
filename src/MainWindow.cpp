@@ -26,7 +26,6 @@
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
 #include "SystemNotification.h"
-#include "RequestDomainSelectionDialog.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -1045,9 +1044,7 @@ void MainWindow::wantExitFilesManagement()
 
 void MainWindow::displayDomainRequestMessageBox(const QString& domain, const QString& subdomain, QString& service, bool& abortRequest)
 {
-    RequestDomainSelectionDialog dlg(domain, subdomain);
-    abortRequest = (dlg.exec() == QDialog::Rejected);
-    service = dlg.getServiceName();
+    abortRequest = !SystemNotification::instance().displayDomainSelectionNotification(domain, subdomain, service);
 }
 
 void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest)
