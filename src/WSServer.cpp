@@ -66,7 +66,7 @@ void WSServer::onNewConnection()
     c->sendInitialStatus();
     //let clients send broadcast messages
     connect(c, &WSServerCon::notifyAllClients, this, &WSServer::notifyClients);
-    connect(c, &WSServerCon::sendLoginMessage, this, &WSServer::notifyGUI);
+    connect(c, &WSServerCon::sendMessageToGUI, this, &WSServer::notifyGUI);
 
     wsClients[wsocket] = c;
     wsClientsReverse[c] = wsocket;

@@ -19,6 +19,7 @@
 #include "WSServerCon.h"
 #include "WSServer.h"
 #include "version.h"
+#include "ParseDomain.h"
 
 #include <QCryptographicHash>
 
@@ -223,7 +224,7 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "set_credential")
     {
-        QJsonObject o = root["data"].toObject();
+        QJsonObject o = root["data"].toObject();  
         QString loginName = o["login"].toString();
         bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
         if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveConfirmed"))
@@ -231,13 +232,31 @@ void WSServerCon::processMessage(const QString &message)
             root["msg"] = "request_login";
             QJsonDocument requestLoginDoc(root);
             bool isGuiRunning = false;
-            emit sendLoginMessage(requestLoginDoc.toJson(), isGuiRunning);
+            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
             if (isGuiRunning)
             {
                 return;
             }
             qDebug() << "GUI is not running, saving credential with empty login";
         }
+          
+        ParseDomain url(o["service"].toString());
+        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && !o.contains("saveDomainConfirmed"))
+        {
+            root["msg"] = "request_domain";
+            o["domain"] = url.getFullDomain();
+            o["subdomain"] = url.getFullSubdomain();
+            root["data"] = o;
+            QJsonDocument requestLoginDoc(root);
+            bool isGuiRunning = false;
+            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
+            if (isGuiRunning)
+            {
+                return;
+            }
+            qDebug() << "GUI is not running, saving credential with subdomain";
+        }
+          
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)

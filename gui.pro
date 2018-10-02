@@ -55,8 +55,9 @@ SOURCES += src/main_gui.cpp \
     src/DbBackupChangeNumbersComparator.cpp \
     src/DbMasterController.cpp \
     src/SystemEventHandler.cpp \
+    src/SystemNotification.cpp \
     src/RequestLoginNameDialog.cpp \
-    src/SystemNotification.cpp
+    src/RequestDomainSelectionDialog.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -97,6 +98,7 @@ HEADERS  += src/MainWindow.h \
     src/SystemEventHandler.h \
     src/SystemEvent.h \
     src/RequestLoginNameDialog.h \
+    src/RequestDomainSelectionDialog.h \
     src/ISystemNotification.h \
     src/SystemNotification.h
 
@@ -116,6 +118,7 @@ FORMS    += src/MainWindow.ui \
     src/FilesManagement.ui \
     src/SSHManagement.ui \
     src/PassGenerationProfilesDialog.ui \
+    src/RequestDomainSelectionDialog.ui \
     src/RequestLoginNameDialog.ui
 
 RESOURCES += \
