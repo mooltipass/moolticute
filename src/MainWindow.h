@@ -125,6 +125,8 @@ private slots:
 
     void on_comboBoxSystrayIcon_currentIndexChanged(int index);
 
+    void on_pushButtonSubDomain_clicked();
+    
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -132,6 +134,8 @@ private:
     virtual void changeEvent(QEvent *event);
 
     void checkAutoStart();
+    
+    void checkSubdomainSelection();
 
     void setKeysTabVisibleOnDemand(bool bValue);
 

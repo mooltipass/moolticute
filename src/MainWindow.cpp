@@ -177,6 +177,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonSubDomain->setStyleSheet(CSS_BLUE_BUTTON);
 
     // Don't show the "check for updates" button when built from git directly.
     ui->pushButtonCheckUpdate->setVisible(QStringLiteral(APP_VERSION) != "git");
@@ -576,6 +577,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(&eventHandler, &SystemEventHandler::shuttingDown, this, &MainWindow::onSystemEvents);
 
     checkAutoStart();
+    checkSubdomainSelection();
 
     //Check is ssh agent opt has to be checked
     ui->checkBoxSSHAgent->setChecked(s.value("settings/auto_start_ssh").toBool());
@@ -1127,6 +1129,19 @@ void MainWindow::checkAutoStart()
         ui->pushButtonAutoStart->setText(tr("Enable"));
 }
 
+void MainWindow::checkSubdomainSelection()
+{
+    QSettings s;
+
+    bool en = s.value("settings/enable_subdomain_selection").toBool();
+
+    ui->labelSubdomainSelection->setText(tr("Enable subdomain selection: %1").arg((en?tr("Enabled"):tr("Disabled"))));
+    if (en)
+        ui->pushButtonSubDomain->setText(tr("Disable"));
+    else
+        ui->pushButtonSubDomain->setText(tr("Enable"));
+}
+
 void MainWindow::setKeysTabVisibleOnDemand(bool bValue)
 {
     bSSHKeysTabVisibleOnDemand = bValue;
@@ -1643,4 +1658,25 @@ void MainWindow::on_comboBoxSystrayIcon_currentIndexChanged(int index)
     QSettings s;
     s.setValue("settings/systray_icon", ui->comboBoxSystrayIcon->itemData(index).toString());
     emit iconChangeRequested();
+}
+
+void MainWindow::on_pushButtonSubDomain_clicked()
+{
+    QSettings s;
+
+    bool en = s.value("settings/enable_subdomain_selection").toBool();
+
+    int ret;
+    if (en)
+        ret = QMessageBox::question(this, "Moolticute", tr("Disable subdomain selection?"));
+    else
+        ret = QMessageBox::question(this, "Moolticute", tr("Enable subdomain selection?"));
+
+    if (ret == QMessageBox::Yes)
+    {
+        s.setValue("settings/enable_subdomain_selection", !en);
+        s.sync();
+
+        checkSubdomainSelection();
+    }
 }

@@ -241,7 +241,9 @@ void WSServerCon::processMessage(const QString &message)
         }
           
         ParseDomain url(o["service"].toString());
-        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && !o.contains("saveDomainConfirmed"))
+        QSettings s;
+        bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool();
+        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !o.contains("saveDomainConfirmed"))
         {
             root["msg"] = "request_domain";
             o["domain"] = url.getFullDomain();
@@ -255,6 +257,11 @@ void WSServerCon::processMessage(const QString &message)
                 return;
             }
             qDebug() << "GUI is not running, saving credential with subdomain";
+        }
+
+        if (!o.contains("saveDomainConfirmed"))
+        {
+            o["service"] = url.getFullDomain();
         }
           
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
