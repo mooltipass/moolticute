@@ -195,6 +195,12 @@ void WSClient::onTextMessageReceived(const QString &message)
             {
                 return;
             }
+
+            if (service.isEmpty())
+            {
+                service = domain;
+            }
+
             rootobj["msg"] = "set_credential";
             o["service"] = service;
             o["saveDomainConfirmed"] = "1";

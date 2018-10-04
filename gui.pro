@@ -104,9 +104,13 @@ HEADERS  += src/MainWindow.h \
 
 mac {
     HEADERS += src/MacUtils.h \
-        src/MacSystemEvents.h
+        src/MacSystemEvents.h \
+        src/SystemNotificationMac.h \
+        src/MacNotify.h
+    SOURCES += src/SystemNotificationMac.cpp
     OBJECTIVE_SOURCES += src/MacUtils.mm \
-        src/MacSystemEvents.mm
+        src/MacSystemEvents.mm \
+        src/MacNotify.mm
 }
 
 INCLUDEPATH += src\

@@ -1,15 +1,15 @@
-#ifndef SYSTEMNOTIFICATIONWINDOWS_H
-#define SYSTEMNOTIFICATIONWINDOWS_H
+#ifndef SYSTEMNOTIFICATIONMAC_H
+#define SYSTEMNOTIFICATIONMAC_H
 
 #include "ISystemNotification.h"
-#include <QProcess>
+#include "MacNotify.h"
 
-class SystemNotificationWindows : public ISystemNotification
+class SystemNotificationMac : public ISystemNotification
 {
-    Q_OBJECT
+
 public:
-    explicit SystemNotificationWindows(QObject *parent = nullptr);
-    virtual ~SystemNotificationWindows() override;
+    explicit SystemNotificationMac(QObject *parent = nullptr);
+    virtual ~SystemNotificationMac() override;
 
     virtual void createNotification(const QString& title, const QString text) override;
     virtual void createButtonChoiceNotification(const QString& title, const QString text, const QStringList &buttons) override;
@@ -17,13 +17,19 @@ public:
     virtual bool displayLoginRequestNotification(const QString& service, QString &loginName) override;
     virtual bool displayDomainSelectionNotification(const QString& domain, const QString& subdomain, QString &serviceName) override;
 
-    const static QString SNORETOAST_FORMAT;
-    const static QString WINDOWS10_VERSION;
+signals:
+    void resultSet();
 
-protected:
-    bool processResult(const QString &toastResponse, QString &result) const;
+public slots:
+    void setResult(QString result);
 
-    QProcess* process = nullptr;
+private:
+    bool waitForNotification(QString &result);
+
+
+    MacNotify *m_macNotify = nullptr;
+    QString m_result = "";
+
 };
 
-#endif // SYSTEMNOTIFICATIONWINDOWS_H
+#endif // SYSTEMNOTIFICATIONMAC_H

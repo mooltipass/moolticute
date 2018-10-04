@@ -7,7 +7,6 @@
 #include "RequestDomainSelectionDialog.h"
 
 const QString SystemNotificationWindows::SNORETOAST_FORMAT= "SnoreToast.exe -t \"%1\" -m \"%2\" %3 -p icon.png -w";
-const int SystemNotificationWindows::NOTIFICATION_TIMEOUT = 20000;
 const QString SystemNotificationWindows::WINDOWS10_VERSION = "10";
 
 SystemNotificationWindows::SystemNotificationWindows(QObject *parent)

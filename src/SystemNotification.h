@@ -14,7 +14,7 @@ private:
     SystemNotification& operator=(const SystemNotification& other) = delete;
     SystemNotification& operator=(const SystemNotification&& other) = delete;
 
-    ISystemNotification *notification = nullptr;
+    ISystemNotification *m_notification = nullptr;
 
 public:
     static SystemNotification & instance()
@@ -28,7 +28,7 @@ public:
     }
     ~SystemNotification()
     {
-        delete notification;
+        delete m_notification;
     }
 
     void createNotification(const QString& title, const QString text);
