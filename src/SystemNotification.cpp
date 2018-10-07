@@ -1,20 +1,22 @@
 #include "SystemNotification.h"
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 #include "SystemNotificationWindows.h"
-#endif
-#ifdef Q_OS_MAC
+#elif defined(Q_OS_LINUX)
+#include "SystemNotificationUnix.h"
+#elif defined(Q_OS_MAC)
 #include "SystemNotificationMac.h"
 #endif
 
 SystemNotification::SystemNotification(QObject *parent)
     : QObject(parent)
 {
-#ifdef Q_OS_WIN
-     m_notification = new SystemNotificationWindows(this);
-#endif
-#ifdef Q_OS_MAC
-     m_notification = new SystemNotificationMac(this);
+#if defined(Q_OS_WIN)
+    m_notification = new SystemNotificationWindows(this);
+#elif defined(Q_OS_LINUX)
+    m_notification = new SystemNotificationUnix(this);
+#elif defined(Q_OS_MAC)
+    m_notification = new SystemNotificationMac(this);
 #endif
 }
 

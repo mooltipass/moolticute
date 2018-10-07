@@ -148,6 +148,12 @@ mac {
 }
 
 unix {
+    HEADERS += src/SystemNotificationUnix.h \
+        src/SystemNotificationImageUnix.h
+
+    SOURCES += src/SystemNotificationUnix.cpp \
+        src/SystemNotificationImageUnix.cpp
+
     # INSTALL RULES
     #
     isEmpty(PREFIX) {
