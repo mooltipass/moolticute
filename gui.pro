@@ -55,7 +55,7 @@ SOURCES += src/main_gui.cpp \
     src/DbBackupChangeNumbersComparator.cpp \
     src/DbMasterController.cpp \
     src/SystemEventHandler.cpp \
-    src/SystemNotification.cpp \
+    src/SystemNotifications/SystemNotification.cpp \
     src/RequestLoginNameDialog.cpp \
     src/RequestDomainSelectionDialog.cpp
 
@@ -99,18 +99,18 @@ HEADERS  += src/MainWindow.h \
     src/SystemEvent.h \
     src/RequestLoginNameDialog.h \
     src/RequestDomainSelectionDialog.h \
-    src/ISystemNotification.h \
-    src/SystemNotification.h
+    src/SystemNotifications/ISystemNotification.h \
+    src/SystemNotifications/SystemNotification.h
 
 mac {
     HEADERS += src/MacUtils.h \
         src/MacSystemEvents.h \
-        src/SystemNotificationMac.h \
-        src/MacNotify.h
-    SOURCES += src/SystemNotificationMac.cpp
+        src/SystemNotifications/SystemNotificationMac.h \
+        src/SystemNotifications/MacNotify.h
+    SOURCES += src/SystemNotifications/SystemNotificationMac.cpp
     OBJECTIVE_SOURCES += src/MacUtils.mm \
         src/MacSystemEvents.mm \
-        src/MacNotify.mm
+        src/SystemNotifications/MacNotify.mm
 }
 
 INCLUDEPATH += src\
@@ -131,8 +131,8 @@ RESOURCES += \
 
 win32 {
     RC_FILE = win/windows_res.rc
-    HEADERS += src/SystemNotificationWindows.h
-    SOURCES += src/SystemNotificationWindows.cpp
+    HEADERS += src/SystemNotifications/SystemNotificationWindows.h
+    SOURCES += src/SystemNotifications/SystemNotificationWindows.cpp
 
     copydata.commands = $(COPY_FILE) \"$$shell_path($$PWD\\win\\snoretoast\*)\" \"$$shell_path($$OUT_PWD)\"
     first.depends = $(first) copydata
@@ -148,11 +148,11 @@ mac {
 }
 
 unix {
-    HEADERS += src/SystemNotificationUnix.h \
-        src/SystemNotificationImageUnix.h
+    HEADERS += src/SystemNotifications/SystemNotificationUnix.h \
+        src/SystemNotifications/SystemNotificationImageUnix.h
 
-    SOURCES += src/SystemNotificationUnix.cpp \
-        src/SystemNotificationImageUnix.cpp
+    SOURCES += src/SystemNotifications/SystemNotificationUnix.cpp \
+        src/SystemNotifications/SystemNotificationImageUnix.cpp
 
     # INSTALL RULES
     #

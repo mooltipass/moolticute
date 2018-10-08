@@ -25,7 +25,7 @@
 #include "PasswordProfilesModel.h"
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
-#include "SystemNotification.h"
+#include "SystemNotifications/SystemNotification.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -1135,7 +1135,7 @@ void MainWindow::checkSubdomainSelection()
 
     bool en = s.value("settings/enable_subdomain_selection").toBool();
 
-    ui->labelSubdomainSelection->setText(tr("Enable subdomain selection: %1").arg((en?tr("Enabled"):tr("Disabled"))));
+    ui->labelSubdomainSelection->setText(tr("Subdomain selection: %1").arg((en?tr("Enabled"):tr("Disabled"))));
     if (en)
         ui->pushButtonSubDomain->setText(tr("Disable"));
     else

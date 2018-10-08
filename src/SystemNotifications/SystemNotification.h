@@ -2,7 +2,7 @@
 #define SYSTEMNOTIFICATION_H
 
 #include <QObject>
-#include <ISystemNotification.h>
+#include "ISystemNotification.h"
 
 class SystemNotification : QObject
 {

@@ -14,25 +14,25 @@ static inline QString toQString(NSString *string)
 }
 
 @interface MacNotificationCenterDelegate : NSObject <NSUserNotificationCenterDelegate> {
-	MacNotify* MacNotifyObserver;
+    MacNotify* MacNotifyObserver;
 }
-	- (MacNotificationCenterDelegate*) initialise:(MacNotify*)observer;
-	- (void) userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification;
+    - (MacNotificationCenterDelegate*) initialise:(MacNotify*)observer;
+    - (void) userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification;
     - (void) userNotificationCenter:(NSUserNotificationCenter *)center didDismissAlert:(NSUserNotification *)notification;
-	- (BOOL) userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification;
+    - (BOOL) userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification;
 @end
 
 @implementation MacNotificationCenterDelegate
 - (MacNotificationCenterDelegate*) initialise:(MacNotify*)observer
 {
-	if ( (self = [super init]) )
-		self->MacNotifyObserver = observer;
-	return self;
+    if ( (self = [super init]) )
+        self->MacNotifyObserver = observer;
+    return self;
 }
 
 - (void) userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification
 {
-	Q_UNUSED(center);
+    Q_UNUSED(center);
     QString result = "";
     if (notification.additionalActions != nil)
     {
@@ -62,34 +62,34 @@ static inline QString toQString(NSString *string)
 
 - (BOOL) userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification
 {
-	Q_UNUSED(center);
-	Q_UNUSED(notification);
-	return YES;
+    Q_UNUSED(center);
+    Q_UNUSED(notification);
+    return YES;
 }
 
 @end
 
 MacNotify::MacNotify(QObject *parent) : QObject(parent)
 {
-	MacNotificationCenterDelegate* macDelegate = [[MacNotificationCenterDelegate alloc] initialise: this];
-	MacNotificationCenterWrapped = macDelegate;
-	[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:macDelegate];
-	[[NSUserNotificationCenter defaultUserNotificationCenter] removeAllDeliveredNotifications];
+    MacNotificationCenterDelegate* macDelegate = [[MacNotificationCenterDelegate alloc] initialise: this];
+    MacNotificationCenterWrapped = macDelegate;
+    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:macDelegate];
+    [[NSUserNotificationCenter defaultUserNotificationCenter] removeAllDeliveredNotifications];
 }
 
 MacNotify::~MacNotify()
 {
-	[[NSUserNotificationCenter defaultUserNotificationCenter] removeAllDeliveredNotifications];
+    [[NSUserNotificationCenter defaultUserNotificationCenter] removeAllDeliveredNotifications];
 }
 
 void MacNotify::showNotification(const QString &title, const QString &text)
 {
-	NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+    NSUserNotification *userNotification = [[NSUserNotification alloc] init];
     userNotification.title = title.toNSString();
     userNotification.subtitle = text.toNSString();
     userNotification.soundName = NSUserNotificationDefaultSoundName;
 
-	[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 }
 
 void MacNotify::showButtonNotification(const QString &title, const QString &text, const QStringList &buttons)
