@@ -147,13 +147,15 @@ mac {
     ICON = img/AppIcon.svg
 }
 
-unix {
+linux {
     HEADERS += src/SystemNotifications/SystemNotificationUnix.h \
         src/SystemNotifications/SystemNotificationImageUnix.h
 
     SOURCES += src/SystemNotifications/SystemNotificationUnix.cpp \
         src/SystemNotifications/SystemNotificationImageUnix.cpp
+}
 
+unix {
     # INSTALL RULES
     #
     isEmpty(PREFIX) {
