@@ -13,10 +13,15 @@ public:
     virtual void createNotification(const QString& title, const QString text) = 0;
     virtual void createButtonChoiceNotification(const QString& title, const QString text, const QStringList &buttons) = 0;
     virtual void createTextBoxNotification(const QString& title, const QString text) = 0;
-    virtual bool displayLoginRequestNotification(const QString& service, QString &loginName) = 0;
-    virtual bool displayDomainSelectionNotification(const QString& domain, const QString& subdomain, QString &serviceName) = 0;
+    virtual bool displayLoginRequestNotification(const QString& service, QString &loginName, QString message) = 0;
+    virtual bool displayDomainSelectionNotification(const QString& domain, const QString& subdomain, QString &serviceName, QString message) = 0;
 
     const int NOTIFICATION_TIMEOUT = 20000;
+
+signals:
+    void sendLoginMessage(QString message, QString loginName);
+    void sendDomainMessage(QString message, QString loginName);
+
 };
 
 #endif // ISYSTEMNOTIFICATION_H

@@ -44,20 +44,25 @@ void SystemNotification::createTextBoxNotification(const QString &title, const Q
     }
 }
 
-bool SystemNotification::displayLoginRequestNotification(const QString &service, QString& loginName)
+bool SystemNotification::displayLoginRequestNotification(const QString &service, QString& loginName, QString message)
 {
     if (m_notification)
     {
-        return m_notification->displayLoginRequestNotification(service, loginName);
+        return m_notification->displayLoginRequestNotification(service, loginName, message);
     }
     return false;
 }
 
-bool SystemNotification::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName)
+bool SystemNotification::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName, QString message)
 {
     if (m_notification)
     {
-        return m_notification->displayDomainSelectionNotification(domain, subdomain, serviceName);
+        return m_notification->displayDomainSelectionNotification(domain, subdomain, serviceName, message);
     }
     return false;
+}
+
+ISystemNotification *SystemNotification::getNotification()
+{
+    return m_notification;
 }

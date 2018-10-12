@@ -25,7 +25,6 @@
 #include "PasswordProfilesModel.h"
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
-#include "SystemNotifications/SystemNotification.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -152,8 +151,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
-    connect(wsClient, &WSClient::displayDomainRequest, this, &MainWindow::displayDomainRequestMessageBox);
-    connect(wsClient, &WSClient::displayLoginRequest, this, &MainWindow::displayLoginRequestMessageBox);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
@@ -1041,21 +1038,6 @@ void MainWindow::wantExitFilesManagement()
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     updateTabButtons();
-}
-
-
-void MainWindow::displayDomainRequestMessageBox(const QString& domain, const QString& subdomain, QString& service, bool& abortRequest)
-{
-    abortRequest = !SystemNotification::instance().displayDomainSelectionNotification(domain, subdomain, service);
-}
-
-void MainWindow::displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest)
-{
-    abortRequest = !SystemNotification::instance().displayLoginRequestNotification(service, loginName);
-    if (!loginName.isEmpty())
-    {
-        qDebug() << "Login name is set: " << loginName;
-    }
 }
 
 void MainWindow::loadingProgress(int total, int current, QString message)

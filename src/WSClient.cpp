@@ -17,6 +17,7 @@
  **
  ******************************************************************************/
 #include "WSClient.h"
+#include "SystemNotifications/SystemNotification.h"
 
 #define WS_URI                      "ws://localhost"
 #define QUERY_RANDOM_NUMBER_TIME    10 * 60 * 1000 //10 min
@@ -28,6 +29,8 @@ WSClient::WSClient(QObject *parent):
 
     randomNumTimer = new QTimer(this);
     connect(randomNumTimer, &QTimer::timeout, this, &WSClient::queryRandomNumbers);
+    connect(SystemNotification::instance().getNotification(), &ISystemNotification::sendLoginMessage, this, &WSClient::sendLoginJson);
+    connect(SystemNotification::instance().getNotification(), &ISystemNotification::sendDomainMessage, this, &WSClient::sendDomainJson);
     randomNumTimer->start(QUERY_RANDOM_NUMBER_TIME);
 }
 
@@ -190,7 +193,7 @@ void WSClient::onTextMessageReceived(const QString &message)
         {
             QString service;
             bool abortRequest = false;
-            emit displayDomainRequest(domain, subdomain, service, abortRequest);
+            abortRequest = !SystemNotification::instance().displayDomainSelectionNotification(domain, subdomain, service, message);
             if (abortRequest)
             {
                 return;
@@ -215,7 +218,7 @@ void WSClient::onTextMessageReceived(const QString &message)
         {
             QString loginName;
             bool abortRequest = false;
-            emit displayLoginRequest(o["service"].toString(), loginName, abortRequest);
+            abortRequest = !SystemNotification::instance().displayLoginRequestNotification(o["service"].toString(), loginName, message);
             if (abortRequest)
             {
                 return;
@@ -224,7 +227,7 @@ void WSClient::onTextMessageReceived(const QString &message)
             rootobj["msg"] = "set_credential";
             if (loginName.isEmpty())
             {
-                o["saveConfirmed"] = "1";
+                o["saveLoginConfirmed"] = "1";
             }
             else
             {
@@ -611,4 +614,39 @@ void WSClient::sendLockDevice()
 void WSClient::queryRandomNumbers()
 {
     sendJsonData({{ "msg", "get_random_numbers" }});
+}
+
+void WSClient::sendLoginJson(QString message, QString loginName)
+{
+    QJsonDocument jdoc = QJsonDocument::fromJson(message.toUtf8());
+    QJsonObject rootobj = jdoc.object();
+    QJsonObject o = rootobj["data"].toObject();
+    rootobj["msg"] = "set_credential";
+    if (loginName.isEmpty())
+    {
+        o["saveLoginConfirmed"] = "1";
+    }
+    else
+    {
+        o["login"] = loginName;
+    }
+    rootobj["data"] = o;
+    sendJsonData(rootobj);
+}
+
+void WSClient::sendDomainJson(QString message, QString serviceName)
+{
+    QJsonDocument jdoc = QJsonDocument::fromJson(message.toUtf8());
+    QJsonObject rootobj = jdoc.object();
+    QJsonObject o = rootobj["data"].toObject();
+    rootobj["msg"] = "set_credential";
+    if (serviceName.isEmpty())
+    {
+        serviceName = o["domain"].toString();
+    }
+
+    o["service"] = serviceName;
+    o["saveDomainConfirmed"] = "1";
+    rootobj["data"] = o;
+    sendJsonData(rootobj);
 }

@@ -38,13 +38,13 @@ void SystemNotificationMac::createTextBoxNotification(const QString &title, cons
     m_macNotify->showTextBoxNotification(title, text);
 }
 
-bool SystemNotificationMac::displayLoginRequestNotification(const QString &service, QString &loginName)
+bool SystemNotificationMac::displayLoginRequestNotification(const QString &service, QString &loginName, QString message)
 {
     createTextBoxNotification(tr("A credential without a login has been detected."), tr("Login name for ") + service + ":");
     return waitForNotification(loginName);
 }
 
-bool SystemNotificationMac::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName)
+bool SystemNotificationMac::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName, QString message)
 {
     QStringList buttons;
     buttons.append({domain, subdomain});

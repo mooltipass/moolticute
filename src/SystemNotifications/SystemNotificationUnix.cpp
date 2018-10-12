@@ -52,7 +52,7 @@ void SystemNotificationUnix::createTextBoxNotification(const QString &title, con
     Q_UNIMPLEMENTED();
 }
 
-bool SystemNotificationUnix::displayLoginRequestNotification(const QString &service, QString &loginName)
+bool SystemNotificationUnix::displayLoginRequestNotification(const QString &service, QString &loginName, QString message)
 {
     bool isSuccess = false;
     RequestLoginNameDialog dlg(service);
@@ -61,7 +61,7 @@ bool SystemNotificationUnix::displayLoginRequestNotification(const QString &serv
     return isSuccess;
 }
 
-bool SystemNotificationUnix::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName)
+bool SystemNotificationUnix::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName, QString message)
 {
     bool isSuccess = false;
     RequestDomainSelectionDialog dlg(domain, subdomain);

@@ -6,41 +6,41 @@
 #include "RequestLoginNameDialog.h"
 #include "RequestDomainSelectionDialog.h"
 
-const QString SystemNotificationWindows::SNORETOAST_FORMAT= "SnoreToast.exe -t \"%1\" -m \"%2\" %3 -p icon.png -w";
+const QString SystemNotificationWindows::SNORETOAST_FORMAT= "SnoreToast.exe -t \"%1\" -m \"%2\" %3 %4 -p icon.png %5";
 const QString SystemNotificationWindows::WINDOWS10_VERSION = "10";
 
 SystemNotificationWindows::SystemNotificationWindows(QObject *parent)
     : ISystemNotification(parent)
 {
     process = new QProcess();
-    /* Processing result from an other thread.
-     * connect(process, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
-    [=]  (int exitCode, QProcess::ExitStatus exitStatus)
-    {
-        qDebug() << "Exit Code: " << exitCode;
-        qDebug() << "ExitStatus: " << exitStatus;
-        QString output(process->readAllStandardOutput());
-        QString result = "";
-        bool isResultOK = this->processResult(output, result);
-        if (isResultOK)
-        {
-            qDebug() << result;
-        }
-        else
-        {
-            qDebug() << "No result found";
-        }
-    });*/
+    notificationMap = new NotificationMap();
+    messageMap = new MessageMap();
 }
 
 SystemNotificationWindows::~SystemNotificationWindows()
 {
     delete process;
+    for (auto &proc : notificationMap->values())
+    {
+        if (proc != nullptr)
+        {
+            delete proc;
+        }
+    }
+    if (notificationMap != nullptr)
+    {
+        delete notificationMap;
+    }
+
+    if (messageMap != nullptr)
+    {
+        delete messageMap;
+    }
 }
 
 void SystemNotificationWindows::createNotification(const QString &title, const QString text)
 {
-    QString notification = SNORETOAST_FORMAT.arg(title, text, "");
+    QString notification = SNORETOAST_FORMAT.arg(title, text, "", "", "");
     qDebug() << notification;
     process->start(notification);
 }
@@ -60,32 +60,31 @@ void SystemNotificationWindows::createButtonChoiceNotification(const QString &ti
 
     buttonString = buttonString.replace(buttonString.size()-1, 1, "\"");
 
-    QString notification = SNORETOAST_FORMAT.arg(title, text, buttonString);
+    QProcess *proc = new QProcess();
+    notificationMap->insert(notificationId, proc);
+    QString notification = SNORETOAST_FORMAT.arg(title, text, buttonString, "-id " + QString::number(notificationId++), "-w");
+    connect(proc, static_cast<CallbackType>(&QProcess::finished), this, &SystemNotificationWindows::callbackFunction);
     qDebug() << notification;
-    process->start(notification);
+    proc->start(notification);
 }
 
 void SystemNotificationWindows::createTextBoxNotification(const QString &title, const QString text)
 {
-    QString notification = SNORETOAST_FORMAT.arg(title, text, "-tb");
-    process->start(notification);
+    QProcess *proc = new QProcess();
+    notificationMap->insert(notificationId, proc);
+    QString notification = SNORETOAST_FORMAT.arg(title, text, "-tb", "-id " + QString::number(notificationId++), "-w");
+    connect(proc, static_cast<CallbackType>(&QProcess::finished), this, &SystemNotificationWindows::callbackFunction);
+    proc->start(notification);
 }
 
-bool SystemNotificationWindows::displayLoginRequestNotification(const QString &service, QString &loginName)
+bool SystemNotificationWindows::displayLoginRequestNotification(const QString &service, QString &loginName, QString message)
 {
     if (QSysInfo::productVersion() == WINDOWS10_VERSION)
     {
         // A text box notification is displayed on Win10
+        messageMap->insert(notificationId, message);
         createTextBoxNotification(tr("A credential without a login has been detected."), tr("Login name for ") + service + ":");
-        if (process->waitForFinished(NOTIFICATION_TIMEOUT))
-        {
-            return processResult(process->readAllStandardOutput(), loginName);
-        }
-        else
-        {
-            qDebug() << "A text box notification timeout";
-            return false;
-        }
+        return false;
     }
     else
     {
@@ -98,23 +97,16 @@ bool SystemNotificationWindows::displayLoginRequestNotification(const QString &s
     }
 }
 
-bool SystemNotificationWindows::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName)
+bool SystemNotificationWindows::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName, QString message)
 {
     if (QSysInfo::productVersion() == WINDOWS10_VERSION)
     {
         // A text box notification is displayed on Win10
         QStringList buttons;
         buttons.append({domain, subdomain});
+        messageMap->insert(notificationId, message);
         createButtonChoiceNotification(tr("Subdomain Detected!"), tr("Choose the domain name:"), buttons);
-        if (process->waitForFinished(NOTIFICATION_TIMEOUT))
-        {
-            return processResult(process->readAllStandardOutput(), serviceName);
-        }
-        else
-        {
-            qDebug() << "A text box notification timeout";
-            return false;
-        }
+        return false;
     }
     else
     {
@@ -127,14 +119,50 @@ bool SystemNotificationWindows::displayDomainSelectionNotification(const QString
     }
 }
 
-bool SystemNotificationWindows::processResult(const QString &toastResponse, QString &result) const
+bool SystemNotificationWindows::processResult(const QString &toastResponse, QString &result, size_t &id) const
 {
     constexpr int RESULT_REGEX_NUM = 2;
-    const QRegExp rx("(Result:\\[)(.*)(\\]\r\n)");
+    constexpr int ID_REGEX_NUM = 4;
+    const QRegExp rx("(Result:\\[)(.*)(\\]\\[)(.*)(\\])(\r\n)");
 
     if (rx.indexIn(toastResponse) != -1) {
         result = rx.cap(RESULT_REGEX_NUM).trimmed();
+        id = rx.cap(ID_REGEX_NUM).toUInt();
         return true;
     }
     return false;
+}
+
+void SystemNotificationWindows::callbackFunction(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitCode);
+    Q_UNUSED(exitStatus);
+    QString output(static_cast<QProcess*>(QObject::sender())->readAllStandardOutput());
+    QString result = "";
+    size_t id = 0;
+    if (this->processResult(output, result, id))
+    {
+        if (messageMap->contains(id))
+        {
+            QString message = (*messageMap)[id];
+            if (message.contains("request_login"))
+            {
+                emit sendLoginMessage(message, result);
+            }
+            else if (message.contains("request_domain"))
+            {
+                emit sendDomainMessage(message, result);
+            }
+            messageMap->remove(id);
+        }
+        if (notificationMap->contains(id))
+        {
+            delete (*notificationMap)[id];
+            notificationMap->remove(id);
+        }
+    }
+    else
+    {
+        qDebug() << "No result found";
+    }
 }
