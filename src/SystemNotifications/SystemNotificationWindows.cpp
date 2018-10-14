@@ -155,11 +155,6 @@ void SystemNotificationWindows::callbackFunction(int exitCode, QProcess::ExitSta
             }
             messageMap->remove(id);
         }
-        if (notificationMap->contains(id))
-        {
-            delete (*notificationMap)[id];
-            notificationMap->remove(id);
-        }
     }
     else
     {
