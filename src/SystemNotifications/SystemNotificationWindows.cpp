@@ -2,12 +2,16 @@
 #include <QDebug>
 #include <QRegExp>
 #include <QSysInfo>
+#include <QSettings>
 
 #include "RequestLoginNameDialog.h"
 #include "RequestDomainSelectionDialog.h"
 
 const QString SystemNotificationWindows::SNORETOAST_FORMAT= "SnoreToast.exe -t \"%1\" -m \"%2\" %3 %4 -p icon.png %5";
 const QString SystemNotificationWindows::WINDOWS10_VERSION = "10";
+const QString SystemNotificationWindows::NOTIFICATIONS_SETTING_REGENTRY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
+const QString SystemNotificationWindows::DND_ENABLED_REGENTRY = "NOC_GLOBAL_SETTING_TOASTS_ENABLED";
+
 
 SystemNotificationWindows::SystemNotificationWindows(QObject *parent)
     : ISystemNotification(parent)
@@ -79,7 +83,7 @@ void SystemNotificationWindows::createTextBoxNotification(const QString &title, 
 
 bool SystemNotificationWindows::displayLoginRequestNotification(const QString &service, QString &loginName, QString message)
 {
-    if (QSysInfo::productVersion() == WINDOWS10_VERSION)
+    if (QSysInfo::productVersion() == WINDOWS10_VERSION && !isDoNotDisturbEnabled())
     {
         // A text box notification is displayed on Win10
         messageMap->insert(notificationId, message);
@@ -99,7 +103,7 @@ bool SystemNotificationWindows::displayLoginRequestNotification(const QString &s
 
 bool SystemNotificationWindows::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName, QString message)
 {
-    if (QSysInfo::productVersion() == WINDOWS10_VERSION)
+    if (QSysInfo::productVersion() == WINDOWS10_VERSION && !isDoNotDisturbEnabled())
     {
         // A text box notification is displayed on Win10
         QStringList buttons;
@@ -131,6 +135,19 @@ bool SystemNotificationWindows::processResult(const QString &toastResponse, QStr
         return true;
     }
     return false;
+}
+
+bool SystemNotificationWindows::isDoNotDisturbEnabled() const
+{
+    QSettings settings(NOTIFICATIONS_SETTING_REGENTRY, QSettings::NativeFormat);
+    if (settings.value(DND_ENABLED_REGENTRY).isNull())
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 void SystemNotificationWindows::callbackFunction(int exitCode, QProcess::ExitStatus exitStatus)

@@ -23,12 +23,15 @@ public:
 
     const static QString SNORETOAST_FORMAT;
     const static QString WINDOWS10_VERSION;
+    const static QString NOTIFICATIONS_SETTING_REGENTRY;
+    const static QString DND_ENABLED_REGENTRY;
 
 public slots:
     void callbackFunction(int exitCode, QProcess::ExitStatus exitStatus);
 
 protected:
     bool processResult(const QString &toastResponse, QString &result, size_t &id) const;
+    bool isDoNotDisturbEnabled() const;
 
     QProcess* process = nullptr;
     size_t notificationId = 0;
