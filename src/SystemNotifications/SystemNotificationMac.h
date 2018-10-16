@@ -21,14 +21,12 @@ signals:
     void resultSet();
 
 public slots:
-    void setResult(QString result);
+    void notificationResponse(QString result, int notificationId, QString jsonMsg);
+    void dismissedNotificationRespone(int notificationId, QString jsonMsg);
 
 private:
-    bool waitForNotification(QString &result);
-
-
     MacNotify *m_macNotify = nullptr;
-    QString m_result = "";
+    int notificationId = 0;
 
 };
 

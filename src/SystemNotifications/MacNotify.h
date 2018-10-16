@@ -17,15 +17,14 @@ public:
     explicit MacNotify(QObject *parent = nullptr);
 	~MacNotify();
 
-    void notificationClicked(QString result);
+    void notificationClicked(QString result, int notificationId, QString jsonMessage);
     void showNotification(const QString &title, const QString &text);
-    void showButtonNotification(const QString &title, const QString &message, const QStringList &buttons);
-    void showTextBoxNotification(const QString &title, const QString &message);
+    void showButtonNotification(const QString &title, const QString &text, const QStringList &buttons, int notifyId, const QString &jsonMsg);
+    void showTextBoxNotification(const QString &title, const QString &text, int notifyId, const QString &jsonMsg);
 
 signals:
-    void clicked(QString result);
-    void resultSet();
-    void dismissedNotification();
+    void clicked(QString result, int notificationId, QString jsonMessage);
+    void dismissedNotification(int notificationId, QString jsonMessage);
 
 private:
     MacNotificationCenterDelegate *MacNotificationCenterWrapped;

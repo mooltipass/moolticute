@@ -8,7 +8,8 @@ SystemNotificationMac::SystemNotificationMac(QObject *parent)
     : ISystemNotification(parent)
 {
     m_macNotify = new MacNotify(this);
-    connect(m_macNotify, &MacNotify::clicked, this, &SystemNotificationMac::setResult);
+    connect(m_macNotify, &MacNotify::clicked, this, &SystemNotificationMac::notificationResponse);
+    connect(m_macNotify, &MacNotify::dismissedNotification, this, &SystemNotificationMac::dismissedNotificationRespone);
 }
 
 SystemNotificationMac::~SystemNotificationMac()
@@ -25,7 +26,7 @@ void SystemNotificationMac::createButtonChoiceNotification(const QString &title,
 {
     if (!buttons.empty())
     {
-        m_macNotify->showButtonNotification(title, text, buttons);
+        m_macNotify->showButtonNotification(title, text, buttons, notificationId++, "");
     }
     else
     {
@@ -35,47 +36,47 @@ void SystemNotificationMac::createButtonChoiceNotification(const QString &title,
 
 void SystemNotificationMac::createTextBoxNotification(const QString &title, const QString text)
 {
-    m_macNotify->showTextBoxNotification(title, text);
+    m_macNotify->showTextBoxNotification(title, text, notificationId++, "");
 }
 
 bool SystemNotificationMac::displayLoginRequestNotification(const QString &service, QString &loginName, QString message)
 {
-    createTextBoxNotification(tr("A credential without a login has been detected."), tr("Login name for ") + service + ":");
-    return waitForNotification(loginName);
+    Q_UNUSED(loginName);
+    m_macNotify->showTextBoxNotification(tr("A credential without a login has been detected."), tr("Login name for ") + service + ":", notificationId++, message);
+    return false;
 }
 
 bool SystemNotificationMac::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName, QString message)
 {
+    Q_UNUSED(serviceName);
     QStringList buttons;
     buttons.append({domain, subdomain});
-    createButtonChoiceNotification(tr("Subdomain Detected!"), tr("Choose the domain name:"), buttons);
-    return waitForNotification(serviceName);
+    m_macNotify->showButtonNotification(tr("Subdomain Detected!"), tr("Choose the domain name:"), buttons, notificationId++, message);
+    return false;
 }
 
-void SystemNotificationMac::setResult(QString result)
+void SystemNotificationMac::notificationResponse(QString result, int notificationId, QString jsonMsg)
 {
-    m_result = result;
-}
-
-bool SystemNotificationMac::waitForNotification(QString &result)
-{
-    QEventLoop loop;
-    QTimer timer;
-    connect(m_macNotify, SIGNAL(resultSet()), &loop, SLOT(quit()));
-    connect(m_macNotify, SIGNAL(dismissedNotification()), &loop, SLOT(quit()));
-    connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-    timer.start(NOTIFICATION_TIMEOUT);
-    loop.exec(); //blocks until result is set or timeout or notification is dismissed
-    if (!m_result.isEmpty())
+    qDebug() << "Notification response for: " << notificationId;
+    if (jsonMsg.contains("request_login"))
     {
-        result = m_result;
-        m_result = "";
-        timer.stop();
-        return true;
+        emit sendLoginMessage(jsonMsg, result);
     }
-    else
+    else if (jsonMsg.contains("request_domain"))
     {
-        qDebug() << "Notification is dismissed";
-        return true;
+        emit sendDomainMessage(jsonMsg, result);
+    }
+}
+
+void SystemNotificationMac::dismissedNotificationRespone(int notificationId, QString jsonMsg)
+{
+    qDebug() << notificationId << " is dismissed";
+    if (jsonMsg.contains("request_login"))
+    {
+        emit sendLoginMessage(jsonMsg, "");
+    }
+    else if (jsonMsg.contains("request_domain"))
+    {
+        emit sendDomainMessage(jsonMsg, "");
     }
 }

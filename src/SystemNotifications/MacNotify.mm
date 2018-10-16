@@ -33,6 +33,8 @@ static inline QString toQString(NSString *string)
 - (void) userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification
 {
     Q_UNUSED(center);
+    int notifyId = [[[notification userInfo] objectForKey:@"notifyId"] intValue];
+    QString jsonMsg = toQString([[notification userInfo] objectForKey:@"jsonMsg"]);
     QString result = "";
     if (notification.additionalActions != nil)
     {
@@ -47,8 +49,7 @@ static inline QString toQString(NSString *string)
     }
     if (!result.isEmpty())
     {
-        self->MacNotifyObserver->notificationClicked(result);
-        self->MacNotifyObserver->resultSet();
+        self->MacNotifyObserver->notificationClicked(result, notifyId, jsonMsg);
     }
 }
 
@@ -56,7 +57,9 @@ static inline QString toQString(NSString *string)
 {
     Q_UNUSED(center);
     Q_UNUSED(notification);
-    self->MacNotifyObserver->dismissedNotification();
+    int notifyId = [[[notification userInfo] objectForKey:@"notifyId"] intValue];
+    QString jsonMsg = toQString([[notification userInfo] objectForKey:@"jsonMsg"]);
+    self->MacNotifyObserver->dismissedNotification(notifyId, jsonMsg);
 }
 
 
@@ -92,7 +95,7 @@ void MacNotify::showNotification(const QString &title, const QString &text)
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 }
 
-void MacNotify::showButtonNotification(const QString &title, const QString &text, const QStringList &buttons)
+void MacNotify::showButtonNotification(const QString &title, const QString &text, const QStringList &buttons, int notifyId, const QString &jsonMsg)
 {
     NSUserNotification *userNotification = [[NSUserNotification alloc] init];
     userNotification.title = title.toNSString();
@@ -107,12 +110,15 @@ void MacNotify::showButtonNotification(const QString &title, const QString &text
         [actions addObject:[NSUserNotificationAction actionWithIdentifier:button.toNSString() title:button.toNSString()]];
     }
 
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:notifyId], @"notifyId", jsonMsg.toNSString(), @"jsonMsg", nil];
+    [userNotification setUserInfo:userInfo];
+
     userNotification.additionalActions = actions;
     [userNotification setValue:[NSNumber numberWithBool:YES] forKey:@"_alwaysShowAlternateActionMenu"];
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 }
 
-void MacNotify::showTextBoxNotification(const QString &title, const QString &text)
+void MacNotify::showTextBoxNotification(const QString &title, const QString &text, int notifyId, const QString &jsonMsg)
 {
     NSUserNotification *userNotification = [[NSUserNotification alloc] init];
     userNotification.title = title.toNSString();
@@ -121,11 +127,14 @@ void MacNotify::showTextBoxNotification(const QString &title, const QString &tex
     userNotification.hasReplyButton = true;
     userNotification.responsePlaceholder = QString(tr("Type your reply here")).toNSString();
 
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:notifyId], @"notifyId", jsonMsg.toNSString(), @"jsonMsg", nil];
+    [userNotification setUserInfo:userInfo];
+
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 }
 
-void MacNotify::notificationClicked(QString result)
+void MacNotify::notificationClicked(QString result, int notificationId, QString jsonMessage)
 {
-    emit clicked(result);
+    emit clicked(result, notificationId, jsonMessage);
 }
 
