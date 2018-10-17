@@ -134,7 +134,7 @@ win32 {
     HEADERS += src/SystemNotifications/SystemNotificationWindows.h
     SOURCES += src/SystemNotifications/SystemNotificationWindows.cpp
 
-    copydata.commands = $(COPY_FILE) \"$$shell_path($$PWD\\win\\snoretoast\*)\" \"$$shell_path($$OUT_PWD)\"
+    copydata.commands = $(COPY_FILE) $$shell_path($$PWD\\win\\snoretoast\\*) \"$$shell_path($$OUT_PWD)\"
     first.depends = $(first) copydata
     export(first.depends)
     export(copydata.commands)

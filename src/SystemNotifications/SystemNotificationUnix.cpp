@@ -54,6 +54,7 @@ void SystemNotificationUnix::createTextBoxNotification(const QString &title, con
 
 bool SystemNotificationUnix::displayLoginRequestNotification(const QString &service, QString &loginName, QString message)
 {
+    Q_UNUSED(message);
     bool isSuccess = false;
     RequestLoginNameDialog dlg(service);
     isSuccess = (dlg.exec() != QDialog::Rejected);
@@ -63,6 +64,7 @@ bool SystemNotificationUnix::displayLoginRequestNotification(const QString &serv
 
 bool SystemNotificationUnix::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName, QString message)
 {
+    Q_UNUSED(message);
     bool isSuccess = false;
     RequestDomainSelectionDialog dlg(domain, subdomain);
     isSuccess = (dlg.exec() != QDialog::Rejected);
@@ -74,6 +76,5 @@ void SystemNotificationUnix::notifyFreedesktop(const QString &title, const QStri
 {
     QList<QVariant> argumentList;
     argumentList << "Moolticute" << uint(0) << "" << title << text << m_actions << m_hints << FREEDESKTOP_NOTIFICATION_TIMEOUT;
-    QDBusPendingReply<uint> id = m_interface->asyncCallWithArgumentList("Notify", argumentList);
-    id.waitForFinished();
+    m_interface->asyncCallWithArgumentList("Notify", argumentList);
 }
