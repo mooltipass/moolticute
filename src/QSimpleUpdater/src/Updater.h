@@ -50,6 +50,7 @@ signals:
     void checkingFinished (const QString& url);
     void downloadFinished (const QString& url, const QString& filepath);
     void appcastDownloaded (const QString& url, const QByteArray& data);
+    void updateReady(QString version, QString changesetURL);
 
 public:
     Updater();
@@ -82,6 +83,8 @@ public slots:
     void setPlatformKey (const QString& platformKey);
     void setUseCustomAppcast (const bool customAppcast);
     void setUseCustomInstallProcedures (const bool custom);
+    void setDisplayDialog(const bool display);
+    void downloadFile();
 
 private slots:
     void onReply (QNetworkReply* reply);
@@ -99,6 +102,7 @@ private:
     bool m_notifyOnFinish;
     bool m_updateAvailable;
     bool m_downloaderEnabled;
+    bool m_displayDialog;
 
     QString m_openUrl;
     QString m_platform;

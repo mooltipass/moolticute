@@ -61,6 +61,7 @@ private slots:
     void searchDaemonTick();
     void slotConnectionEstablished();
     void daemonLogRead();
+    void updateAvailableReceived(QString version, QString changesetURL);
 
 private:
      MainWindow *win = nullptr;
