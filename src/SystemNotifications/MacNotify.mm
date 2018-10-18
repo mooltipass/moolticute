@@ -39,13 +39,11 @@ static inline QString toQString(NSString *string)
     if (notification.additionalActions != nil)
     {
         result = toQString(notification.additionalActivationAction.title);
-        qDebug() << "additionalActions: " << result;
     }
 
     if (notification.response != nil)
     {
         result = toQString(notification.response.string);
-        qDebug() << "Respone:  " << result;
     }
     if (!result.isEmpty())
     {

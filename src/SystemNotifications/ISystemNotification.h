@@ -16,8 +16,6 @@ public:
     virtual bool displayLoginRequestNotification(const QString& service, QString &loginName, QString message) = 0;
     virtual bool displayDomainSelectionNotification(const QString& domain, const QString& subdomain, QString &serviceName, QString message) = 0;
 
-    const int NOTIFICATION_TIMEOUT = 20000;
-
 signals:
     void sendLoginMessage(QString message, QString loginName);
     void sendDomainMessage(QString message, QString loginName);

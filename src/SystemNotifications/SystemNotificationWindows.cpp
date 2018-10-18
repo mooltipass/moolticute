@@ -45,7 +45,6 @@ SystemNotificationWindows::~SystemNotificationWindows()
 void SystemNotificationWindows::createNotification(const QString &title, const QString text)
 {
     QString notification = SNORETOAST_FORMAT.arg(title, text, "", "", "");
-    qDebug() << notification;
     process->start(notification);
 }
 
@@ -105,7 +104,7 @@ bool SystemNotificationWindows::displayDomainSelectionNotification(const QString
 {
     if (QSysInfo::productVersion() == WINDOWS10_VERSION && !isDoNotDisturbEnabled())
     {
-        // A text box notification is displayed on Win10
+        // A button choice notification is displayed on Win10
         QStringList buttons;
         buttons.append({domain, subdomain});
         messageMap->insert(notificationId, message);
@@ -140,14 +139,7 @@ bool SystemNotificationWindows::processResult(const QString &toastResponse, QStr
 bool SystemNotificationWindows::isDoNotDisturbEnabled() const
 {
     QSettings settings(NOTIFICATIONS_SETTING_REGENTRY, QSettings::NativeFormat);
-    if (settings.value(DND_ENABLED_REGENTRY).isNull())
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
+    return !settings.value(DND_ENABLED_REGENTRY).isNull();
 }
 
 void SystemNotificationWindows::callbackFunction(int exitCode, QProcess::ExitStatus exitStatus)

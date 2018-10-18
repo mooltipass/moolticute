@@ -1,8 +1,6 @@
 #include "SystemNotificationMac.h"
 #include "MacUtils.h"
 #include <QDebug>
-#include <QEventLoop>
-#include <QTimer>
 
 SystemNotificationMac::SystemNotificationMac(QObject *parent)
     : ISystemNotification(parent)
