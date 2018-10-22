@@ -278,17 +278,22 @@ void AppGui::startSSHAgent()
 void AppGui::connectedChanged()
 {
     QSettings s;
+    QIcon icon;
     if (!wsClient->get_connected())
     {
-#ifdef Q_OS_WIN
-        QIcon icon(":/systray_disconnected_white.png");
-#else
-        QIcon icon(":/systray_disconnected.png");
-#endif
-
         if (s.contains("settings/systray_icon"))
         {
             icon = QIcon(":/systray_disconnected" + s.value("settings/systray_icon").toString() + ".png");
+        }
+        else
+        {
+#ifdef Q_OS_WIN
+            icon = QIcon(":/systray_disconnected_white.png");
+            s.setValue("settings/systray_icon", "_white");
+#else
+            icon = QIcon(":/systray_disconnected.png");
+            s.setValue("settings/systray_icon", "");
+#endif
         }
 
 #ifdef Q_OS_MAC
@@ -299,15 +304,19 @@ void AppGui::connectedChanged()
     }
     else
     {
-#ifdef Q_OS_WIN
-        QIcon icon(":/systray_white.png");
-#else
-        QIcon icon(":/systray.png");
-#endif
-
         if (s.contains("settings/systray_icon"))
         {
             icon = QIcon(":/systray" + s.value("settings/systray_icon").toString() + ".png");
+        }
+        else
+        {
+#ifdef Q_OS_WIN
+            icon = QIcon(":/systray_white.png");
+            s.setValue("settings/systray_icon", "_white");
+#else
+            icon = QIcon(":/systray.png");
+            s.setValue("settings/systray_icon", "");
+#endif
         }
 
 #ifdef Q_OS_MAC
