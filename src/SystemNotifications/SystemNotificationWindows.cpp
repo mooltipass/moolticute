@@ -8,6 +8,7 @@
 #include "RequestDomainSelectionDialog.h"
 
 const QString SystemNotificationWindows::SNORETOAST_FORMAT= "SnoreToast.exe -t \"%1\" -m \"%2\" %3 %4 -p icon.png %5";
+const QString SystemNotificationWindows::SNORETOAST_INSTALL= "SnoreToast.exe -install";
 const QString SystemNotificationWindows::WINDOWS10_VERSION = "10";
 const QString SystemNotificationWindows::NOTIFICATIONS_SETTING_REGENTRY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
 const QString SystemNotificationWindows::DND_ENABLED_REGENTRY = "NOC_GLOBAL_SETTING_TOASTS_ENABLED";
@@ -19,6 +20,7 @@ SystemNotificationWindows::SystemNotificationWindows(QObject *parent)
     process = new QProcess();
     notificationMap = new NotificationMap();
     messageMap = new MessageMap();
+    installSnoreToast();
 }
 
 SystemNotificationWindows::~SystemNotificationWindows()
@@ -120,6 +122,11 @@ bool SystemNotificationWindows::displayDomainSelectionNotification(const QString
         serviceName = dlg.getServiceName();
         return isSuccess;
     }
+}
+
+void SystemNotificationWindows::installSnoreToast()
+{
+    process->start(SNORETOAST_INSTALL);
 }
 
 bool SystemNotificationWindows::processResult(const QString &toastResponse, QString &result, size_t &id) const

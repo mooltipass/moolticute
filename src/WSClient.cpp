@@ -237,6 +237,10 @@ void WSClient::onTextMessageReceived(const QString &message)
             sendJsonData(rootobj);
         }
     }
+    else if (rootobj["msg"] == "credential_detected")
+    {
+        SystemNotification::instance().createNotification(tr("Credentials Detected!"), tr("Please Approve their Storage on the Mooltipass"));
+    }
     else if (rootobj["msg"] == "set_credential")
     {
         QJsonObject o = rootobj["data"].toObject();

@@ -22,6 +22,7 @@ public:
     virtual bool displayDomainSelectionNotification(const QString& domain, const QString& subdomain, QString &serviceName, QString message) override;
 
     const static QString SNORETOAST_FORMAT;
+    const static QString SNORETOAST_INSTALL;
     const static QString WINDOWS10_VERSION;
     const static QString NOTIFICATIONS_SETTING_REGENTRY;
     const static QString DND_ENABLED_REGENTRY;
@@ -32,6 +33,7 @@ public slots:
 protected:
     bool processResult(const QString &toastResponse, QString &result, size_t &id) const;
     bool isDoNotDisturbEnabled() const;
+    void installSnoreToast();
 
     QProcess* process = nullptr;
     size_t notificationId = 0;
