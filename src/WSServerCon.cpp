@@ -242,7 +242,7 @@ void WSServerCon::processMessage(const QString &message)
           
         ParseDomain url(o["service"].toString());
         QSettings s;
-        bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool();
+        bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool() && url.isWebsite();
         if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !o.contains("saveDomainConfirmed"))
         {
             root["msg"] = "request_domain";
@@ -259,7 +259,7 @@ void WSServerCon::processMessage(const QString &message)
             qDebug() << "GUI is not running, saving credential with subdomain";
         }
 
-        if (!o.contains("saveDomainConfirmed"))
+        if (!o.contains("saveDomainConfirmed") && url.isWebsite())
         {
             o["service"] = url.getFullDomain();
         }
