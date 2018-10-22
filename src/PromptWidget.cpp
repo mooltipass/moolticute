@@ -28,7 +28,6 @@ PromptWidget::PromptWidget(QWidget *parent) :
 
     m_messageLabel->setAlignment(Qt::AlignCenter);
     m_messageLabel->setTextFormat(Qt::RichText);
-    m_messageLabel->setWordWrap(true);
     m_messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     m_messageLabel->setOpenExternalLinks(true);
 
