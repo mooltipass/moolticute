@@ -72,7 +72,10 @@ bool AppGui::initialize()
     setupLanguage();
 
     QSimpleUpdater::getInstance();
+
+#ifdef Q_OS_WIN
     SystemNotification::instance();
+#endif
 
     setQuitOnLastWindowClosed(false);
 
