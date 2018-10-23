@@ -163,6 +163,8 @@ private:
     void initHelpLabels();
 
     SystemEventHandler eventHandler;
+
+    const static QString AUTO_START_SETTING;
 };
 
 #endif // MAINWINDOW_H

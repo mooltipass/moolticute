@@ -30,6 +30,8 @@
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
 
+const QString MainWindow::AUTO_START_SETTING = "settings/auto_start";
+
 template <typename T>
 static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
 {
@@ -1091,7 +1093,7 @@ void MainWindow::on_pushButtonAutoStart_clicked()
 {
     QSettings s;
 
-    bool en = s.value("settings/auto_start").toBool();
+    bool en = s.value(AUTO_START_SETTING).toBool();
 
     int ret;
     if (en)
@@ -1101,7 +1103,7 @@ void MainWindow::on_pushButtonAutoStart_clicked()
 
     if (ret == QMessageBox::Yes)
     {
-        s.setValue("settings/auto_start", !en);
+        s.setValue(AUTO_START_SETTING, !en);
         s.sync();
 
         checkAutoStart();
@@ -1112,7 +1114,19 @@ void MainWindow::checkAutoStart()
 {
     QSettings s;
 
-    bool en = s.value("settings/auto_start").toBool();
+    bool en = false;
+
+    if (s.contains(AUTO_START_SETTING))
+    {
+        en = s.value(AUTO_START_SETTING).toBool();
+    }
+    else
+    {
+        //Setting enabled during first MC start
+        en = true;
+        s.setValue(AUTO_START_SETTING, en);
+        s.sync();
+    }
 
     AutoStartup::enableAutoStartup(en);
     ui->labelAutoStart->setText(tr("Start Moolticute with the computer: %1").arg((en?tr("Enabled"):tr("Disabled"))));
