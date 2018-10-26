@@ -630,6 +630,9 @@ void AppGui::checkUpdate(bool displayMessage)
     u->setNotifyOnFinish(GITHUB_UPDATE_URL, displayMessage);
     u->setDisplayDialog(GITHUB_UPDATE_URL, false);
 
+    if (QStringLiteral(APP_TYPE) == "appimage")
+        u->setPlatformKey(GITHUB_UPDATE_URL, "appimage");
+
     u->checkForUpdates(GITHUB_UPDATE_URL);
 
     //Recheck in at least 30minutes plus some random time
