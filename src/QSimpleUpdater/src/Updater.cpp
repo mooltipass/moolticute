@@ -376,6 +376,9 @@ void Updater::onReply (QNetworkReply* reply)
     if (platformKey().compare("linux") == 0)
         releaseFileSuffix = ".deb";
 
+    if (platformKey().compare("appimage") == 0)
+        releaseFileSuffix = ".AppImage";
+
     if (platformKey().compare("windows") == 0)
         releaseFileSuffix = ".exe";
 
@@ -413,6 +416,9 @@ void Updater::onReply (QNetworkReply* reply)
 
         /* Compare latest and current version */
         setUpdateAvailable (latestVersion() != moduleVersion());
+    }
+    else {
+        qInfo() << "No any appropriate update was found";
     }
     emit checkingFinished (url());
 }

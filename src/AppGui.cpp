@@ -597,6 +597,9 @@ void AppGui::checkUpdate(bool displayMessage)
     u->setDownloaderEnabled(GITHUB_UPDATE_URL, true);
     u->setNotifyOnFinish(GITHUB_UPDATE_URL, displayMessage);
 
+    if (QStringLiteral(APP_TYPE) == "appimage")
+        u->setPlatformKey(GITHUB_UPDATE_URL, "appimage");
+
     u->checkForUpdates(GITHUB_UPDATE_URL);
 
     //Recheck in at least 30minutes plus some random time
