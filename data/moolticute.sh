@@ -115,8 +115,53 @@ export QT_XKB_CONFIG_ROOT=/usr/share/X11/xkb
 # $ cd squashfs-root
 # $ ./AppRun
 if [ -z "$APPDIR" ] ; then
-    APPDIR=`dirname $0`
+    APPDIR=`dirname -- "$0"`
 fi
+
+# Point our lib OpenSSL to its bundled config:
+export OPENSSL_CONF="$APPDIR/usr/lib/ssl/openssl.cnf"
+
+
+# Search root certificates on a system in well-known locations:
+# https://github.com/darealshinji/vlc-AppImage/issues/1#issuecomment-321041496
+# https://serverfault.com/questions/62496/ssl-certificate-location-on-unix-linux
+# https://www.happyassassin.net/2015/01/12/a-note-about-ssltls-trusted-certificate-stores-and-platforms/
+if [ -s "/etc/ssl/ca-bundle.pem" ] ; then
+    # OpenSuSE
+    export SSL_CERT_FILE="/etc/ssl/ca-bundle.pem"
+elif [ -s "/var/lib/ca-certificates/ca-bundle.pem" ] ; then
+    # alternative OpenSuSE path (different versions have different locations)
+    export SSL_CERT_FILE="/var/lib/ca-certificates/ca-bundle.pem"
+elif [ -s "/etc/pki/tls/cacert.pem" ] ; then
+    # OpenELEC
+    export SSL_CERT_FILE="/etc/pki/tls/cacert.pem"
+elif [ -s "/etc/ssl/certs/ca-certificates.crt" ] ; then
+    # Debian/Ubuntu/Gentoo etc.
+    export SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
+elif [ -s "/etc/pki/tls/cert.pem" ] ; then
+    export SSL_CERT_FILE="/etc/pki/tls/cert.pem"
+elif [ -s "/usr/local/share/certs/ca-root-nss.crt" ] ; then
+    export SSL_CERT_FILE="/usr/local/share/certs/ca-root-nss.crt"
+elif [ -s "/etc/ssl/cert.pem" ] ; then
+    export SSL_CERT_FILE="/etc/ssl/cert.pem"
+elif [ -s "/etc/pki/tls/certs/ca-bundle.crt" ] ; then
+    # Fedora/RHEL 6
+    export SSL_CERT_FILE="/etc/pki/tls/certs/ca-bundle.crt"
+elif [ -s "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem" ] ; then
+    # CentOS/RHEL 7
+    export SSL_CERT_FILE="/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
+elif [ -s "/usr/local/ssl/cert.pem" ] ; then
+    # OpenSSL library default
+    export SSL_CERT_FILE="/usr/local/ssl/cert.pem"
+fi
+
+if [ -d "/usr/local/ssl" ] ; then
+    # OpenSSL library default
+    export SSL_CERT_DIR="/usr/local/ssl"
+elif [ -d "/etc/ssl/certs" ] ; then
+    export SSL_CERT_DIR="/etc/ssl/certs"
+fi
+
 
 if (( $DAEMON_ONLY == 1 )) ;
 then
