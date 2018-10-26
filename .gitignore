@@ -41,3 +41,5 @@ lang/*.qm
 
 .env
 debian/changelog
+
+win/snoretoast/*.exe
