@@ -1101,7 +1101,8 @@ void MainWindow::checkAutoStart()
 {
     QSettings s;
 
-    bool en = s.value("settings/auto_start").toBool();
+    //Autostart should be enabled by default
+    bool en = s.value("settings/auto_start", true).toBool();
 
     AutoStartup::enableAutoStartup(en);
     ui->labelAutoStart->setText(tr("Start Moolticute with the computer: %1").arg((en?tr("Enabled"):tr("Disabled"))));
