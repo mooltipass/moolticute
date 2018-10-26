@@ -1080,7 +1080,7 @@ void MainWindow::on_pushButtonAutoStart_clicked()
 {
     QSettings s;
 
-    bool en = s.value("settings/auto_start").toBool();
+    bool en = s.value("settings/auto_start", true).toBool();
 
     int ret;
     if (en)
