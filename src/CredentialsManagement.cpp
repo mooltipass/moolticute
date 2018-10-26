@@ -50,6 +50,10 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
 
+    ui->buttonExit->setText(tr("Exit Credential Management"));
+    ui->buttonExit->setStyleSheet(CSS_BLUE_BUTTON);
+    connect(ui->buttonExit, &QPushButton::clicked, this, &CredentialsManagement::onButtonDiscard_confirmed);
+
     ui->horizontalLayout_filterCred->removeWidget(ui->toolButtonClearFilter);
 
     setFilterCredLayout();
@@ -162,9 +166,14 @@ void CredentialsManagement::setPasswordProfilesModel(PasswordProfilesModel *pass
 void CredentialsManagement::enableCredentialsManagement(bool enable)
 {
     if (enable)
+    {
         ui->stackedWidget->setCurrentWidget(ui->pageUnlocked);
+        setCredentialsClean();
+    }
     else
+    {
         ui->stackedWidget->setCurrentWidget(ui->pageLocked);
+    }
 
     ui->pageUnlocked->setFocus();
 }
@@ -684,6 +693,16 @@ QModelIndex CredentialsManagement::getProxyIndexFromSourceIndex(const QModelInde
     return m_pCredModelFilter->mapFromSource(srcIndex);
 }
 
+void CredentialsManagement::setCredentialsClean()
+{
+    ui->buttonExit->setVisible(true);
+    ui->buttonDiscard->setVisible(false);
+    ui->buttonSaveChanges->setVisible(false);
+    connect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::credentialDataChanged);
+    connect(m_pCredModel, &CredentialModel::rowsInserted, this, &CredentialsManagement::credentialDataChanged);
+    connect(m_pCredModel, &CredentialModel::rowsRemoved, this, &CredentialsManagement::credentialDataChanged);
+}
+
 void CredentialsManagement::disableNonCredentialEditWidgets()
 {
     ui->quickInsertWidget->setEnabled(false);
@@ -791,6 +810,16 @@ void CredentialsManagement::updateFavMenu()
             }
         }
     }
+}
+
+void CredentialsManagement::credentialDataChanged()
+{
+    ui->buttonExit->setVisible(false);
+    ui->buttonSaveChanges->setVisible(true);
+    ui->buttonDiscard->setVisible(true);
+    disconnect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::credentialDataChanged);
+    disconnect(m_pCredModel, &CredentialModel::rowsInserted, this, &CredentialsManagement::credentialDataChanged);
+    disconnect(m_pCredModel, &CredentialModel::rowsRemoved, this, &CredentialsManagement::credentialDataChanged);
 }
 
 void CredentialsManagement::changeEvent(QEvent *event)

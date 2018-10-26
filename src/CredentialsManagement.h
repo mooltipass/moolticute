@@ -75,6 +75,7 @@ private slots:
     void onSelectLoginItem(LoginItem *pLoginItem);
     void onSelectLoginTimerTimeOut();
     void updateFavMenu();
+    void credentialDataChanged();
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
@@ -82,6 +83,7 @@ private:
     void clearLoginDescription();
     QModelIndex getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex);
     QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
+    void setCredentialsClean();
 
 private:
     void disableNonCredentialEditWidgets();
