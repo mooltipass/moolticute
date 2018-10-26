@@ -110,6 +110,14 @@ fi
 #fix https://github.com/mooltipass/moolticute/issues/245
 export QT_XKB_CONFIG_ROOT=/usr/share/X11/xkb
 
+# support for running extracted AppImage like this:
+# $ ./Moolticute-x86_64.AppImage --appimage-extract
+# $ cd squashfs-root
+# $ ./AppRun
+if [ -z "$APPDIR" ] ; then
+    APPDIR=`dirname $0`
+fi
+
 if (( $DAEMON_ONLY == 1 )) ;
 then
     echo "Running daemon only"

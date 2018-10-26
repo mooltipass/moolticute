@@ -71,7 +71,6 @@ private slots:
     void wantEnterCredentialManagement();
     void wantSaveCredentialManagement();
     void wantExitFilesManagement();
-    void displayLoginRequestMessageBox(const QString& service, QString& loginName, bool& abortRequest);
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
@@ -124,6 +123,8 @@ private slots:
 
     void on_comboBoxSystrayIcon_currentIndexChanged(int index);
 
+    void on_pushButtonSubDomain_clicked();
+    
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -131,6 +132,8 @@ private:
     virtual void changeEvent(QEvent *event);
 
     void checkAutoStart();
+    
+    void checkSubdomainSelection();
 
     void setKeysTabVisibleOnDemand(bool bValue);
 

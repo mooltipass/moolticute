@@ -17,6 +17,7 @@
  **
  ******************************************************************************/
 #include "WSClient.h"
+#include "SystemNotifications/SystemNotification.h"
 
 #define WS_URI                      "ws://localhost"
 #define QUERY_RANDOM_NUMBER_TIME    10 * 60 * 1000 //10 min
@@ -28,6 +29,8 @@ WSClient::WSClient(QObject *parent):
 
     randomNumTimer = new QTimer(this);
     connect(randomNumTimer, &QTimer::timeout, this, &WSClient::queryRandomNumbers);
+    connect(SystemNotification::instance().getNotification(), &ISystemNotification::sendLoginMessage, this, &WSClient::sendLoginJson);
+    connect(SystemNotification::instance().getNotification(), &ISystemNotification::sendDomainMessage, this, &WSClient::sendDomainJson);
     randomNumTimer->start(QUERY_RANDOM_NUMBER_TIME);
 }
 
@@ -181,6 +184,33 @@ void WSClient::onTextMessageReceived(const QString &message)
         set_hwSerial(o["hw_serial"].toInt());
         set_hwMemory(o["flash_size"].toInt());
     }
+    else if (rootobj["msg"] == "request_domain")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        QString domain = o["domain"].toString();
+        QString subdomain = o["subdomain"].toString();
+        if (!domain.isEmpty() && !subdomain.isEmpty())
+        {
+            QString service;
+            bool abortRequest = false;
+            abortRequest = !SystemNotification::instance().displayDomainSelectionNotification(domain, subdomain, service, message);
+            if (abortRequest)
+            {
+                return;
+            }
+
+            if (service.isEmpty())
+            {
+                service = domain;
+            }
+
+            rootobj["msg"] = "set_credential";
+            o["service"] = service;
+            o["saveDomainConfirmed"] = "1";
+            rootobj["data"] = o;
+            sendJsonData(rootobj);
+        }
+    }
     else if (rootobj["msg"] == "request_login")
     {
         QJsonObject o = rootobj["data"].toObject();
@@ -188,7 +218,7 @@ void WSClient::onTextMessageReceived(const QString &message)
         {
             QString loginName;
             bool abortRequest = false;
-            emit displayLoginRequest(o["service"].toString(), loginName, abortRequest);
+            abortRequest = !SystemNotification::instance().displayLoginRequestNotification(o["service"].toString(), loginName, message);
             if (abortRequest)
             {
                 return;
@@ -197,7 +227,7 @@ void WSClient::onTextMessageReceived(const QString &message)
             rootobj["msg"] = "set_credential";
             if (loginName.isEmpty())
             {
-                o["saveConfirmed"] = "1";
+                o["saveLoginConfirmed"] = "1";
             }
             else
             {
@@ -206,6 +236,10 @@ void WSClient::onTextMessageReceived(const QString &message)
             rootobj["data"] = o;
             sendJsonData(rootobj);
         }
+    }
+    else if (rootobj["msg"] == "credential_detected")
+    {
+        SystemNotification::instance().createNotification(tr("Credentials Detected!"), tr("Please Approve their Storage on the Mooltipass"));
     }
     else if (rootobj["msg"] == "set_credential")
     {
@@ -584,4 +618,39 @@ void WSClient::sendLockDevice()
 void WSClient::queryRandomNumbers()
 {
     sendJsonData({{ "msg", "get_random_numbers" }});
+}
+
+void WSClient::sendLoginJson(QString message, QString loginName)
+{
+    QJsonDocument jdoc = QJsonDocument::fromJson(message.toUtf8());
+    QJsonObject rootobj = jdoc.object();
+    QJsonObject o = rootobj["data"].toObject();
+    rootobj["msg"] = "set_credential";
+    if (loginName.isEmpty())
+    {
+        o["saveLoginConfirmed"] = "1";
+    }
+    else
+    {
+        o["login"] = loginName;
+    }
+    rootobj["data"] = o;
+    sendJsonData(rootobj);
+}
+
+void WSClient::sendDomainJson(QString message, QString serviceName)
+{
+    QJsonDocument jdoc = QJsonDocument::fromJson(message.toUtf8());
+    QJsonObject rootobj = jdoc.object();
+    QJsonObject o = rootobj["data"].toObject();
+    rootobj["msg"] = "set_credential";
+    if (serviceName.isEmpty())
+    {
+        serviceName = o["domain"].toString();
+    }
+
+    o["service"] = serviceName;
+    o["saveDomainConfirmed"] = "1";
+    rootobj["data"] = o;
+    sendJsonData(rootobj);
 }

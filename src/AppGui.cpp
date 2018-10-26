@@ -20,6 +20,8 @@
 #include "version.h"
 #include "QSimpleUpdater.h"
 #include "DbMasterController.h"
+#include "PromptWidget.h"
+#include "SystemNotifications/SystemNotification.h"
 
 #ifdef Q_OS_MAC
 #include "MacUtils.h"
@@ -70,6 +72,10 @@ bool AppGui::initialize()
     setupLanguage();
 
     QSimpleUpdater::getInstance();
+
+#ifdef Q_OS_WIN
+    SystemNotification::instance();
+#endif
 
     setQuitOnLastWindowClosed(false);
 
@@ -223,7 +229,11 @@ bool AppGui::initialize()
 
     startSSHAgent();
 
-    QTimer::singleShot(15000, [this]() { checkUpdate(false); });
+    connect(QSimpleUpdater::getInstance(), &QSimpleUpdater::updateAvailable, this, &AppGui::updateAvailableReceived);
+
+    QTimer::singleShot(15000, [this]() {
+        checkUpdate(false);
+    });
 
     QTimer::singleShot(GUI_STARTUP_DELAY, [this]()
     {
@@ -554,6 +564,28 @@ void AppGui::daemonLogRead()
     }
 }
 
+void AppGui::updateAvailableReceived(QString version, QString changesetURL)
+{
+    const QString NEWVERSION_STRING = tr("%1 version has been released!").arg(version);
+    SystemNotification::instance().createNotification(NEWVERSION_STRING, tr("Open MC client to download it."));
+
+    const auto onAccept = []()
+    {
+        QSimpleUpdater::getInstance()->downloadFile(GITHUB_UPDATE_URL);
+    };
+
+    const auto onReject = [this]()
+    {
+        win->hidePrompt();
+    };
+
+    PromptMessage *message = new PromptMessage("<b>" + NEWVERSION_STRING + "</b><br>" +
+                                                  tr("Would you like to download the update now?") + "<br>" +
+                                                  "<a href=\"" + changesetURL + "\">" + tr("Open changelog") + "</a>",
+                                               onAccept, onReject);
+    win->showPrompt(message);
+}
+
 QtAwesome *AppGui::qtAwesome()
 {
     static QtAwesome *a = new QtAwesome(qApp);
@@ -596,6 +628,7 @@ void AppGui::checkUpdate(bool displayMessage)
     u->setNotifyOnUpdate(GITHUB_UPDATE_URL, true);
     u->setDownloaderEnabled(GITHUB_UPDATE_URL, true);
     u->setNotifyOnFinish(GITHUB_UPDATE_URL, displayMessage);
+    u->setDisplayDialog(GITHUB_UPDATE_URL, false);
 
     u->checkForUpdates(GITHUB_UPDATE_URL);
 

@@ -51,6 +51,7 @@ Updater::Updater()
     m_notifyOnFinish = false;
     m_updateAvailable = false;
     m_downloaderEnabled = true;
+    m_displayDialog = true;
     m_moduleName = qApp->applicationName();
     m_moduleVersion = qApp->applicationVersion();
 
@@ -320,6 +321,34 @@ void Updater::setUseCustomInstallProcedures (const bool custom)
 }
 
 /**
+ * If the \a display parameter is set to \c true, the \c Updater will display
+ * a dialog to inform the user to update the client.
+ * If the \a display parameter is set to \c false, the \c Updater will send
+ * an updateReady signal with the version string and changeset url.
+ */
+void Updater::setDisplayDialog(const bool display)
+{
+    m_displayDialog = display;
+}
+
+/**
+ * Starts to download the file stored in \c m_downloadUrl.
+ */
+void Updater::downloadFile()
+{
+    if (downloadUrl().isEmpty())
+        QDesktopServices::openUrl (QUrl (openUrl()));
+
+    if (downloaderEnabled()) {
+        m_downloader->setUrlId (url());
+        m_downloader->setFileName (downloadUrl().split ("/").last());
+        m_downloader->startDownload (QUrl (downloadUrl()));
+    }
+    else
+        QDesktopServices::openUrl (QUrl (downloadUrl()));
+}
+
+/**
  * Called when the download of the update definitions file is finished.
  */
 void Updater::onReply (QNetworkReply* reply)
@@ -430,32 +459,31 @@ void Updater::setUpdateAvailable (const bool available)
     box.setIcon (QMessageBox::Information);
 
     if (updateAvailable() && (notifyOnUpdate() || notifyOnFinish())) {
-        QString text = tr ("Would you like to download the update now?");
-        if (!m_changelog.isEmpty())
+
+        if (m_displayDialog)
         {
-            text += getFormattedChangeLog();
-        }
-        QString title = "<h3>"
-                        + tr ("Version %1 of %2 has been released!")
-                        .arg (latestVersion()).arg (moduleName())
-                        + "</h3>";
-
-        box.setText (title);
-        box.setInformativeText (text);
-        box.setStandardButtons (QMessageBox::No | QMessageBox::Yes);
-        box.setDefaultButton   (QMessageBox::Yes);
-
-        if (box.exec() == QMessageBox::Yes) {
-            if (downloadUrl().isEmpty())
-                QDesktopServices::openUrl (QUrl (openUrl()));
-
-            if (downloaderEnabled()) {
-                m_downloader->setUrlId (url());
-                m_downloader->setFileName (downloadUrl().split ("/").last());
-                m_downloader->startDownload (QUrl (downloadUrl()));
+            QString text = tr ("Would you like to download the update now?");
+            if (!m_changelog.isEmpty())
+            {
+                text += getFormattedChangeLog();
             }
-            else
-                QDesktopServices::openUrl (QUrl (downloadUrl()));
+            QString title = "<h3>"
+                            + tr ("Version %1 of %2 has been released!")
+                            .arg (latestVersion()).arg (moduleName())
+                            + "</h3>";
+
+            box.setText (title);
+            box.setInformativeText (text);
+            box.setStandardButtons (QMessageBox::No | QMessageBox::Yes);
+            box.setDefaultButton   (QMessageBox::Yes);
+
+            if (box.exec() == QMessageBox::Yes) {
+                downloadFile();
+            }
+        }
+        else
+        {
+            emit updateReady(latestVersion(), m_openUrl);
         }
     }
 

@@ -19,6 +19,7 @@
 #include "WSServerCon.h"
 #include "WSServer.h"
 #include "version.h"
+#include "ParseDomain.h"
 
 #include <QCryptographicHash>
 
@@ -223,21 +224,48 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "set_credential")
     {
-        QJsonObject o = root["data"].toObject();
+        QJsonObject o = root["data"].toObject();  
         QString loginName = o["login"].toString();
         bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
-        if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveConfirmed"))
+        bool isGuiRunning = false;
+        if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveLoginConfirmed"))
         {
             root["msg"] = "request_login";
             QJsonDocument requestLoginDoc(root);
-            bool isGuiRunning = false;
-            emit sendLoginMessage(requestLoginDoc.toJson(), isGuiRunning);
+            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
             if (isGuiRunning)
             {
                 return;
             }
             qDebug() << "GUI is not running, saving credential with empty login";
         }
+          
+        ParseDomain url(o["service"].toString());
+        QSettings s;
+        bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool() && url.isWebsite();
+        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !o.contains("saveDomainConfirmed"))
+        {
+            root["msg"] = "request_domain";
+            o["domain"] = url.getFullDomain();
+            o["subdomain"] = url.getFullSubdomain();
+            root["data"] = o;
+            QJsonDocument requestLoginDoc(root);
+            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
+            if (isGuiRunning)
+            {
+                return;
+            }
+            qDebug() << "GUI is not running, saving credential with subdomain";
+        }
+
+        if (!o.contains("saveDomainConfirmed") && url.isWebsite())
+        {
+            o["service"] = url.getFullDomain();
+        }
+
+        const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
+        emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
+          
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)

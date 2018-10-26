@@ -33,6 +33,7 @@
 static QList<QString> URLS;
 static QList<Updater*> UPDATERS;
 
+
 QSimpleUpdater::~QSimpleUpdater()
 {
     URLS.clear();
@@ -363,6 +364,40 @@ void QSimpleUpdater::setUseCustomInstallProcedures (const QString& url,
 }
 
 /**
+ * If the \a display parameter is set to \c true, the \c Updater instance
+ * registered with the given \a url will show a dialog for requesting the
+ * user to update the client.
+ *
+ * \note If an \c Updater instance registered with the given \a url is not
+ *       found, that \c Updater instance will be initialized automatically
+ */
+void QSimpleUpdater::setDisplayDialog(const QString &url, const bool display)
+{
+    getUpdater (url)->setDisplayDialog (display);
+}
+
+/**
+ * The \c Updater instance registered with the given \a url will show start
+ * to download the file and start the update process.
+ *
+ * \note If an \c Updater instance registered with the given \a url is not
+ *       found, that \c Updater instance will be initialized automatically
+ */
+void QSimpleUpdater::downloadFile(const QString &url)
+{
+    getUpdater (url)->downloadFile();
+}
+
+/**
+ * Emits an \a updateAvailable signal with the newest version and the
+ * changeset url.
+ */
+void QSimpleUpdater::sendUpdateVersion(QString version, QString changesetURL)
+{
+    emit updateAvailable(version, changesetURL);
+}
+
+/**
  * Returns the \c Updater instance registered with the given \a url.
  *
  * If an \c Updater instance registered with teh given \a url does not exist,
@@ -383,6 +418,8 @@ Updater* QSimpleUpdater::getUpdater (const QString& url) const
                  this,    SIGNAL (downloadFinished  (QString, QString)));
         connect (updater, SIGNAL (appcastDownloaded (QString, QByteArray)),
                  this,    SIGNAL (appcastDownloaded (QString, QByteArray)));
+        connect (updater, SIGNAL(updateReady(QString, QString)),
+                 this, SLOT(sendUpdateVersion(QString, QString)));
     }
 
     return UPDATERS.at (URLS.indexOf (url));

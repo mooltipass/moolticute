@@ -63,6 +63,7 @@ class Updater;
  * By default, the downloader will try to open the file as if you opened it
  * from a file manager or a web browser (with the "file:*" url).
  */
+
 class QSU_DECL QSimpleUpdater : public QObject
 {
     Q_OBJECT
@@ -71,6 +72,7 @@ signals:
     void checkingFinished (const QString& url);
     void appcastDownloaded (const QString& url, const QByteArray& data);
     void downloadFinished (const QString& url, const QString& filepath);
+    void updateAvailable(QString version, QString changesetURL);
 
 public:
     static QSimpleUpdater* getInstance();
@@ -100,6 +102,9 @@ public slots:
     void setDownloaderEnabled (const QString& url, const bool enabled);
     void setUseCustomAppcast (const QString& url, const bool customAppcast);
     void setUseCustomInstallProcedures (const QString& url, const bool custom);
+    void setDisplayDialog(const QString& url, const bool display);
+    void downloadFile(const QString& url);
+    void sendUpdateVersion(QString version, QString changesetURL);
 
 protected:
     ~QSimpleUpdater();

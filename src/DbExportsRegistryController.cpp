@@ -108,8 +108,8 @@ void DbExportsRegistryController::handleDbExportRecommended()
             }
         };
 
-        PromptMessage *message = new PromptMessage(tr("You haven't made a backup of your database for a while. "
-                                                      "Do you want to backup your credentials now?"),
+        PromptMessage *message = new PromptMessage(tr("You haven't made a backup of your database for a while. ") + "<br>" +
+                                                      tr("Do you want to backup your credentials now?"),
                                                    onAccept, onReject);
         window->showPrompt(message);
         isExportRequestMessageVisible = true;

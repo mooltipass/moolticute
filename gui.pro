@@ -55,7 +55,9 @@ SOURCES += src/main_gui.cpp \
     src/DbBackupChangeNumbersComparator.cpp \
     src/DbMasterController.cpp \
     src/SystemEventHandler.cpp \
-    src/RequestLoginNameDialog.cpp
+    src/SystemNotifications/SystemNotification.cpp \
+    src/RequestLoginNameDialog.cpp \
+    src/RequestDomainSelectionDialog.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Common.h \
@@ -95,13 +97,20 @@ HEADERS  += src/MainWindow.h \
     src/DbMasterController.h \
     src/SystemEventHandler.h \
     src/SystemEvent.h \
-    src/RequestLoginNameDialog.h
+    src/RequestLoginNameDialog.h \
+    src/RequestDomainSelectionDialog.h \
+    src/SystemNotifications/ISystemNotification.h \
+    src/SystemNotifications/SystemNotification.h
 
 mac {
     HEADERS += src/MacUtils.h \
-        src/MacSystemEvents.h
+        src/MacSystemEvents.h \
+        src/SystemNotifications/SystemNotificationMac.h \
+        src/SystemNotifications/MacNotify.h
+    SOURCES += src/SystemNotifications/SystemNotificationMac.cpp
     OBJECTIVE_SOURCES += src/MacUtils.mm \
-        src/MacSystemEvents.mm
+        src/MacSystemEvents.mm \
+        src/SystemNotifications/MacNotify.mm
 }
 
 INCLUDEPATH += src\
@@ -113,6 +122,7 @@ FORMS    += src/MainWindow.ui \
     src/FilesManagement.ui \
     src/SSHManagement.ui \
     src/PassGenerationProfilesDialog.ui \
+    src/RequestDomainSelectionDialog.ui \
     src/RequestLoginNameDialog.ui
 
 RESOURCES += \
@@ -121,12 +131,28 @@ RESOURCES += \
 
 win32 {
     RC_FILE = win/windows_res.rc
+    HEADERS += src/SystemNotifications/SystemNotificationWindows.h
+    SOURCES += src/SystemNotifications/SystemNotificationWindows.cpp
+
+    copydata.commands = $(COPY_FILE) $$shell_path($$PWD\\win\\snoretoast\\*) \"$$shell_path($$OUT_PWD)\"
+    first.depends = $(first) copydata
+    export(first.depends)
+    export(copydata.commands)
+    QMAKE_EXTRA_TARGETS += first copydata
 }
 
 mac {
     ICON = img/AppIcon.icns
 } else {
     ICON = img/AppIcon.svg
+}
+
+linux {
+    HEADERS += src/SystemNotifications/SystemNotificationUnix.h \
+        src/SystemNotifications/SystemNotificationImageUnix.h
+
+    SOURCES += src/SystemNotifications/SystemNotificationUnix.cpp \
+        src/SystemNotifications/SystemNotificationImageUnix.cpp
 }
 
 unix {

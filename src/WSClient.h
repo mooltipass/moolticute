@@ -116,7 +116,6 @@ public:
 signals:
     void wsConnected();
     void wsDisconnected();
-    void displayLoginRequest(const QString& service, QString& loginName, bool& abortRequest);
     void memoryDataChanged();
     void passwordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
     void credentialsUpdated(const QString & service, const QString & login, const QString & description, bool success);
@@ -138,6 +137,8 @@ signals:
 public slots:
     void sendJsonData(const QJsonObject &data);
     void queryRandomNumbers();
+    void sendLoginJson(QString message, QString loginName);
+    void sendDomainJson(QString message, QString serviceName);
 
 private slots:
     void onWsConnected();

@@ -27,7 +27,9 @@ PromptWidget::PromptWidget(QWidget *parent) :
     setStyleSheet("PromptWidget {border: 5px solid #60B1C7;}");
 
     m_messageLabel->setAlignment(Qt::AlignCenter);
-    m_messageLabel->setWordWrap(true);
+    m_messageLabel->setTextFormat(Qt::RichText);
+    m_messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    m_messageLabel->setOpenExternalLinks(true);
 
     connect(m_buttonBox, &QDialogButtonBox::accepted, this, &PromptWidget::onAccepted);
     connect(m_buttonBox, &QDialogButtonBox::rejected, this, &PromptWidget::onRejected);
