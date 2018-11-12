@@ -6805,11 +6805,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 
                     pwdChangeJobs->append(new MPCommandJob(this, MPCmd::SET_LOGIN,
                                                   ldata,
-                                                  [this, &pwdChangeJobs, i](const QByteArray &data, bool &) -> bool
+                                                  [this, i](const QByteArray &data, bool &) -> bool
                     {
                         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
                         {
-                            pwdChangeJobs->setCurrentJobError("set_login failed on device");
+                            this->currentJobs->setCurrentJobError("set_login failed on device");
                             qWarning() << "failed to set login to " << mmmPasswordChangeArray[i][1];
                             return false;
                         }
@@ -6825,11 +6825,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 
                     pwdChangeJobs->append(new MPCommandJob(this, MPCmd::SET_PASSWORD,
                                                    pdata,
-                                                   [this, &pwdChangeJobs, i](const QByteArray &data, bool &) -> bool
+                                                   [this, i](const QByteArray &data, bool &) -> bool
                     {
                         if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
                         {
-                            pwdChangeJobs->setCurrentJobError("set_password failed on device");
+                            this->currentJobs->setCurrentJobError("set_password failed on device");
                             qWarning() << "failed to set_password for " << mmmPasswordChangeArray[i][0];
                             /* Below: no call back as the user can approve the next changes */
                             //return false;
