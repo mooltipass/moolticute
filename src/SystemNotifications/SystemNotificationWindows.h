@@ -26,6 +26,10 @@ public:
     const static QString WINDOWS10_VERSION;
     const static QString NOTIFICATIONS_SETTING_REGENTRY;
     const static QString DND_ENABLED_REGENTRY;
+    const static bool IS_WIN10;
+
+signals:
+    void notifySystray(QString title, QString text);
 
 public slots:
     void callbackFunction(int exitCode, QProcess::ExitStatus exitStatus);
