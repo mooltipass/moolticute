@@ -23,6 +23,10 @@
 #include "PromptWidget.h"
 #include "SystemNotifications/SystemNotification.h"
 
+#ifdef Q_OS_WIN
+#include "SystemNotifications/SystemNotificationWindows.h"
+#endif
+
 #ifdef Q_OS_MAC
 #include "MacUtils.h"
 #endif
@@ -96,6 +100,22 @@ bool AppGui::initialize()
 #endif
     systray->setIcon(icon);
     systray->show();
+
+#ifdef Q_OS_WIN
+    const auto *winNotification = dynamic_cast<SystemNotificationWindows*>(SystemNotification::instance().getNotification());
+    if (winNotification != nullptr)
+    {
+        connect(winNotification, &SystemNotificationWindows::notifySystray,
+                [this] (QString title, QString text)
+                {
+                    if (systray)
+                    {
+                        systray->showMessage(title, text, QIcon(":/AppIcon_128.png"));
+                    }
+                }
+        );
+    }
+#endif
 
     showConfigApp = new QAction(tr("&Show Moolticute Application"), this);
     connect(showConfigApp, &QAction::triggered, [=]()
