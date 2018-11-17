@@ -404,6 +404,10 @@ void WSClient::onTextMessageReceived(const QString &message)
         else
             emit cardResetFinished(false);
     }
+    else if (rootobj["msg"] == "show_status_notification_warning")
+    {
+        emit displayStatusWarning();
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
