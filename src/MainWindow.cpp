@@ -330,7 +330,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->lockUnlockModeComboBox->addItem(tr("Password / Win + L")  , (uint)LF::Password|(uint)LF::SendWin_L);
     ui->lockUnlockModeComboBox->addItem(tr("Login + Pass / Win + L"), (uint)LF::Password|(uint)LF::Login|(uint)LF::SendWin_L);
     ui->lockUnlockModeComboBox->addItem(tr("Enter + Pass / Win + L"), (uint)LF::Password|(uint)LF::SendEnter|(uint)LF::SendWin_L);
-    ui->lockUnlockModeComboBox->addItem(tr("Ctrl + Alt + Del / Win + L"), (uint)LF::SendCtrl_Alt_Del|(uint)LF::SendWin_L);
+    ui->lockUnlockModeComboBox->addItem(tr("Ctrl + Alt + Del / Win + L"), (uint)LF::SendCtrl_Alt_Del|(uint)LF::Password|(uint)LF::SendWin_L);
     ui->lockUnlockModeComboBox->setCurrentIndex(0);
 
     ui->comboBoxSystrayIcon->blockSignals(true);
