@@ -105,6 +105,7 @@ begin
     ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im moolticuted.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
     ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im mc-agent.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
     ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im mc-cli.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+    ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im SnoreToast.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode)
   end;
 
   if RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1') then
@@ -181,5 +182,6 @@ begin
     ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im moolticuted.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
     ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im mc-agent.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
     ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im mc-cli.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+    ShellExec('', ExpandConstant('{sys}\taskkill.exe'),'/f /im SnoreToast.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
   END
 end;
