@@ -133,6 +133,7 @@ signals:
     void filesCacheChanged();
     void cardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void cardResetFinished(bool successfully);
+    void displayStatusWarning();
 
 public slots:
     void sendJsonData(const QJsonObject &data);

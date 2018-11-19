@@ -180,6 +180,7 @@ bool AppGui::initialize()
            mainWindowShow();
     });
 
+    connect(wsClient, &WSClient::displayStatusWarning, this, &AppGui::displayStatusWarningNotification);
 
     connectedChanged();
 
@@ -613,6 +614,44 @@ void AppGui::updateAvailableReceived(QString version, QString changesetURL)
                                                   "<a href=\"" + changesetURL + "\">" + tr("Open changelog") + "</a>",
                                                onAccept, onReject);
     win->showPrompt(message);
+}
+
+void AppGui::displayStatusWarningNotification()
+{
+    const auto actStatus = wsClient->get_status();
+    //Init with Error8, because it is not used
+    static Common::MPStatus lastStatus = Common::Error8;
+
+    if (actStatus != lastStatus)
+    {
+        lastStatus = actStatus;
+        QString title, message;
+        if (actStatus == Common::UnknownStatus)
+        {
+            title = tr("Mooltipass Not Connected");
+            message = tr("Please Connect Your Mooltipass");
+        }
+        else if (actStatus == Common::NoCardInserted)
+        {
+            title = tr("No Card in Mooltipass!");
+            message = tr("Please Insert Your Smartcard and Enter Your PIN");
+        }
+        else if (actStatus == Common::Unlocked && wsClient->get_memMgmtMode())
+        {
+            title = tr("Mooltipass in Management Mode!");
+            message = tr("Please leave management mode in the App");
+        }
+        else if (actStatus != Common::Unlocked)
+        {
+            title = tr("Mooltipass Locked");
+            message = tr("Please Unlock Your Mooltipass");
+        }
+        else
+        {
+            return;
+        }
+        SystemNotification::instance().createNotification(title, message);
+    }
 }
 
 QtAwesome *AppGui::qtAwesome()

@@ -81,6 +81,17 @@ void WSServerCon::processMessage(const QString &message)
         sendJsonMessage(oroot);
         return;
     }
+    else if (root["msg"] == "show_status_notification_warning")
+    {
+        QJsonDocument showWarningDoc(root);
+        bool isGuiRunning = false;
+        emit sendMessageToGUI(showWarningDoc.toJson(), isGuiRunning);
+        if (!isGuiRunning)
+        {
+            qDebug() << "Cannot show status notification warning, because Moolticute is not running";
+        }
+        return;
+    }
 
     //Strip the data for the progress lambda,
     //uneeded data should not be passed around
