@@ -20,6 +20,13 @@ void CredentialModelFilter::setFilter(const QString &sFilter)
     invalidateFilter();
 }
 
+bool CredentialModelFilter::switchFavFilter()
+{
+    m_favFilter = !m_favFilter;
+    invalidateFilter();
+    return m_favFilter;
+}
+
 TreeItem *CredentialModelFilter::getItemByProxyIndex(const QModelIndex &proxyIndex)
 {
     QModelIndex srcIndex = mapToSource(proxyIndex);
@@ -79,6 +86,14 @@ QModelIndexList CredentialModelFilter::getNextRow(const QModelIndex& rowIdx)
     return nextRow;
 }
 
+void CredentialModelFilter::refreshFavorites()
+{
+    if (m_favFilter)
+    {
+        invalidateFilter();
+    }
+}
+
 bool CredentialModelFilter::filterAcceptsRow(int iSrcRow, const QModelIndex &srcParent) const
 {
     // Get source index
@@ -123,15 +138,29 @@ bool CredentialModelFilter::acceptRow(int iSrcRow, const QModelIndex &srcParent)
         {
             // Is it a login item?
             LoginItem *pLoginItem = dynamic_cast<LoginItem *>(pItem);
+
+            bool shouldDisplayByFavFilter = true;
+            if (m_favFilter)
+            {
+                if (pLoginItem != nullptr)
+                {
+                    shouldDisplayByFavFilter = !m_favFilter || (pLoginItem->favorite() != -1 && m_favFilter);
+                }
+                else
+                {
+                    shouldDisplayByFavFilter = !m_favFilter;
+                }
+            }
+
             if (pLoginItem != nullptr)
             {
                 TreeItem *pParentItem = pLoginItem->parentItem();
-                bool bCondition = testItemAgainstNameAndDescription(pParentItem, m_sFilter);
+                bool bCondition = testItemAgainstNameAndDescription(pParentItem, m_sFilter) && shouldDisplayByFavFilter;
                 if (bCondition)
                     return true;
             }
 
-            return testItemAgainstNameAndDescription(pItem, m_sFilter);
+            return testItemAgainstNameAndDescription(pItem, m_sFilter) && shouldDisplayByFavFilter;
         }
     }
 

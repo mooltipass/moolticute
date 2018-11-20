@@ -77,6 +77,8 @@ private slots:
     void updateFavMenu();
     void credentialDataChanged();
 
+    void on_toolButtonFavFilter_clicked();
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);

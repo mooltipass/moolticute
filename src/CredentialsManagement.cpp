@@ -129,6 +129,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
 void CredentialsManagement::setFilterCredLayout()
 {
+    ui->toolButtonFavFilter->setIcon(AppGui::qtAwesome()->icon(fa::staro));
     QHBoxLayout *filterLayout = new QHBoxLayout(ui->lineEditFilterCred);
     filterLayout->setMargin(0);
     filterLayout->addStretch();
@@ -534,6 +535,10 @@ void CredentialsManagement::changeCurrentFavorite(int iFavorite)
     {
         m_pCredModel->updateLoginItem(srcIndex, CredentialModel::FavoriteRole, iFavorite);
         ui->credentialTreeView->refreshLoginItem(srcIndex, true);
+        if (iFavorite == -1)
+        {
+            m_pCredModelFilter->refreshFavorites();
+        }
     }
 }
 
@@ -827,4 +832,10 @@ void CredentialsManagement::changeEvent(QEvent *event)
     if (event->type() == QEvent::LanguageChange)
         ui->retranslateUi(this);
     QWidget::changeEvent(event);
+}
+
+void CredentialsManagement::on_toolButtonFavFilter_clicked()
+{
+    bool favFilter = m_pCredModelFilter->switchFavFilter();
+    ui->toolButtonFavFilter->setIcon(AppGui::qtAwesome()->icon(favFilter ? fa::star : fa::staro));
 }
