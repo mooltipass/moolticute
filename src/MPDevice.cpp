@@ -6599,6 +6599,13 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 /* Set favorite */
                 nodePtr->setFavoriteProperty(favorite);
 
+                /* Check for changed service */
+                if (service != nodePtr->getService())
+                {
+                    qDebug() << "Detected service change new: " << service << ", old: " << nodePtr->getService();
+                    //TODO implement service change
+                }
+
                 /* Check for changed description */
                 if (description != nodePtr->getDescription())
                 {

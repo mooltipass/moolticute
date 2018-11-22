@@ -352,6 +352,11 @@ void CredentialsManagement::saveCredential(const QModelIndex currentSelectionInd
     if (pLoginItem != nullptr) {
         m_pCredModel->updateLoginItem(srcIndex, ui->credDisplayPasswordInput->text(), ui->credDisplayDescriptionInput->text(), ui->credDisplayLoginInput->text());
         ui->credentialTreeView->refreshLoginItem(srcIndex);
+        if (pLoginItem->parentItem()->name() != ui->credDisplayServiceInput->text())
+        {
+            pLoginItem->parentItem()->setName(ui->credDisplayServiceInput->text());
+            qDebug() << "Service name is changed";
+        }
     }
 }
 
