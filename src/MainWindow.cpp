@@ -155,6 +155,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantSaveMemMode, this, &MainWindow::wantSaveCredentialManagement);
+    connect(this, &MainWindow::saveMMMChanges, ui->widgetCredentials, &CredentialsManagement::saveChanges);
     connect(ui->widgetFiles, &FilesManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
 
@@ -605,12 +606,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    // Leave MMM on main window closed
+    if (wsClient != nullptr && wsClient->get_memMgmtMode())
+    {
+        if (!ui->widgetCredentials->isClean())
+        {
+            int ret = QMessageBox::warning(this, "Moolticute",
+                                           tr("Credentials have been modified.\n"
+                                              "Do you want to save your changes?"),
+                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+            if (ret == QMessageBox::Yes)
+            {
+                emit saveMMMChanges();
+            }
+            else
+            {
+                wsClient->sendLeaveMMRequest();
+            }
+        }
+    }
+
     event->accept();
     emit windowCloseRequested();
-
-    // Leave MMM on main window closed
-    if (wsClient != NULL && wsClient->get_memMgmtMode())
-        wsClient->sendLeaveMMRequest();
 }
 
 void MainWindow::changeEvent(QEvent *event)
