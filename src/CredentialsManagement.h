@@ -42,9 +42,11 @@ public:
     ~CredentialsManagement();
     void setWsClient(WSClient *c);
     void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);
+    bool isClean() const;
 
 public slots:
     bool confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex = {});
+    void saveChanges();
 
 private slots:
     void enableCredentialsManagement(bool);
@@ -104,6 +106,7 @@ private:
     QMenu m_favMenu;
     QJsonArray m_loadedModelSerialiation;
     bool m_selectionCanceled;
+    bool m_isClean = true;
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 
