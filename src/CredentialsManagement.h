@@ -81,6 +81,8 @@ private slots:
 
     void on_toolButtonFavFilter_clicked();
 
+    void on_toolButtonEditService_clicked();
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);
@@ -92,6 +94,8 @@ private:
 private:
     void disableNonCredentialEditWidgets();
     void enableNonCredentialEditWidgets();
+    bool isServiceNameExist(const QString& serviceName) const;
+    void setServiceInputAttributes(const QString& tooltipText, Qt::GlobalColor col);
 
     void changeCurrentFavorite(int iFavorite);
     virtual void changeEvent(QEvent *event);

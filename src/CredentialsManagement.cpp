@@ -66,6 +66,9 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonDelete->setIcon(AppGui::qtAwesome()->icon(fa::trash, whiteButtons));
     ui->pushButtonFavorite->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonFavorite->setIcon(AppGui::qtAwesome()->icon(fa::star, whiteButtons));
+    ui->toolButtonEditService->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->toolButtonEditService->setIcon(AppGui::qtAwesome()->icon(fa::edit));
+    ui->toolButtonEditService->setToolTip(tr("Editing Service name"));
 
     QAction *action = m_favMenu.addAction(tr("Not a favorite"));
     connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
@@ -105,9 +108,17 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->addCredPasswordInput, &QLineEdit::returnPressed, this, &CredentialsManagement::onPasswordInputReturnPressed);
     updateQuickAddCredentialsButtonState();
 
+    connect(ui->credDisplayServiceInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayLoginInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayDescriptionInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayPasswordInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
+    connect(ui->credDisplayServiceInput, &QLineEdit::editingFinished,
+        [this] {
+            ui->toolButtonEditService->show();
+            ui->credDisplayServiceInput->setReadOnly(true);
+            ui->credDisplayServiceInput->setFrame(false);
+        }
+    );
     ui->credDisplayFrame->setEnabled(false);
     updateSaveDiscardState();
 
@@ -355,12 +366,15 @@ void CredentialsManagement::saveCredential(const QModelIndex currentSelectionInd
     // Do we have a login item?
     LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
     if (pLoginItem != nullptr) {
+        const QString newServiceName = ui->credDisplayServiceInput->text();
         m_pCredModel->updateLoginItem(srcIndex, ui->credDisplayPasswordInput->text(), ui->credDisplayDescriptionInput->text(), ui->credDisplayLoginInput->text());
         ui->credentialTreeView->refreshLoginItem(srcIndex);
-        if (pLoginItem->parentItem()->name() != ui->credDisplayServiceInput->text())
+        if (pLoginItem->parentItem()->name() != newServiceName)
         {
-            pLoginItem->parentItem()->setName(ui->credDisplayServiceInput->text());
-            qDebug() << "Service name is changed";
+            pLoginItem->parentItem()->setName(newServiceName);
+            const QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(newServiceName);
+            //Service name changed, sort to the correct order
+            m_pCredModel->dataChanged(serviceIdx, serviceIdx);
         }
     }
 }
@@ -500,14 +514,33 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
         if (pLoginItem != nullptr)
         {
             // Retrieve item info
+            QString sService = ui->credDisplayServiceInput->text();
             QString sPassword = ui->credDisplayPasswordInput->text();
             QString sDescription = ui->credDisplayDescriptionInput->text();
             QString sLogin = ui->credDisplayLoginInput->text();
 
+            bool bServiceCondition = sService != pLoginItem->parentItem()->name();
             bool bPasswordCondition = !sPassword.isEmpty() && (sPassword != pLoginItem->password());
             bool bDescriptionCondition = !sDescription.isEmpty() && (sDescription != pLoginItem->description());
             bool bLoginCondition = !sLogin.isEmpty() && (sLogin != pLoginItem->name());
-            if (bPasswordCondition || bDescriptionCondition || bLoginCondition)
+
+            bool isServiceExist = false;
+            if (bServiceCondition)
+            {
+                isServiceExist = isServiceNameExist(sService);
+
+                if (isServiceExist)
+                {
+                    setServiceInputAttributes(tr("Service name is already exist"), Qt::red);
+                }
+            }
+
+            if (!bServiceCondition || !isServiceExist)
+            {
+                setServiceInputAttributes("", Qt::black);
+            }
+
+            if (!isServiceExist && !sService.isEmpty() && (bServiceCondition || bPasswordCondition || bDescriptionCondition || bLoginCondition))
             {
                 ui->pushButtonCancel->show();
                 ui->pushButtonConfirm->show();
@@ -738,6 +771,25 @@ void CredentialsManagement::enableNonCredentialEditWidgets()
     ui->credentialsListWdiget->setEnabled(true);
 }
 
+bool CredentialsManagement::isServiceNameExist(const QString &serviceName) const
+{
+    auto found = std::find_if(m_loadedModelSerialiation.begin(), m_loadedModelSerialiation.end(),
+                 [&serviceName] (const QJsonValue &cred)
+                    {
+                        return serviceName == cred["service"].toString();
+                    }
+                 );
+    return found != m_loadedModelSerialiation.end();
+}
+
+void CredentialsManagement::setServiceInputAttributes(const QString &tooltipText, Qt::GlobalColor col)
+{
+    QPalette pal;
+    pal.setColor(QPalette::Text, col);
+    ui->credDisplayServiceInput->setPalette(pal);
+    ui->credDisplayServiceInput->setToolTip(tooltipText);
+}
+
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
 {
     QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
@@ -857,4 +909,12 @@ void CredentialsManagement::on_toolButtonFavFilter_clicked()
 {
     bool favFilter = m_pCredModelFilter->switchFavFilter();
     ui->toolButtonFavFilter->setIcon(AppGui::qtAwesome()->icon(favFilter ? fa::star : fa::staro));
+}
+
+void CredentialsManagement::on_toolButtonEditService_clicked()
+{
+    ui->toolButtonEditService->hide();
+    ui->credDisplayServiceInput->setReadOnly(false);
+    ui->credDisplayServiceInput->setFrame(true);
+    ui->credDisplayServiceInput->setFocus();
 }
