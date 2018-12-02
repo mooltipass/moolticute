@@ -309,7 +309,7 @@ private:
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
     bool readExportPayload(QJsonArray dataArray, QString &errorString);
-    bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent);
+    bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
     bool deleteDataParentChilds(MPNode *parentNodePt);
     MPNode* addNewServiceToDB(const QString &service);

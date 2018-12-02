@@ -164,6 +164,11 @@ void CredentialsManagement::setPasswordProfilesModel(PasswordProfilesModel *pass
     ui->credDisplayPasswordInput->setPasswordProfilesModel(passwordProfilesModel);
 }
 
+bool CredentialsManagement::isClean() const
+{
+    return m_isClean;
+}
+
 void CredentialsManagement::enableCredentialsManagement(bool enable)
 {
     if (enable)
@@ -425,6 +430,13 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
     }
 
     return true;
+}
+
+void CredentialsManagement::saveChanges()
+{
+    saveSelectedCredential();
+    wsClient->sendCredentialsMM(m_pCredModel->getJsonChanges());
+    emit wantSaveMemMode();
 }
 
 void CredentialsManagement::on_pushButtonConfirm_clicked()
@@ -705,6 +717,7 @@ QModelIndex CredentialsManagement::getProxyIndexFromSourceIndex(const QModelInde
 
 void CredentialsManagement::setCredentialsClean()
 {
+    m_isClean = true;
     ui->buttonExit->setVisible(true);
     ui->buttonDiscard->setVisible(false);
     ui->buttonSaveChanges->setVisible(false);
@@ -824,6 +837,7 @@ void CredentialsManagement::updateFavMenu()
 
 void CredentialsManagement::credentialDataChanged()
 {
+    m_isClean = false;
     ui->buttonExit->setVisible(false);
     ui->buttonSaveChanges->setVisible(true);
     ui->buttonDiscard->setVisible(true);

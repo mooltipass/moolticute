@@ -495,7 +495,8 @@ void WSClient::addOrUpdateCredential(const QString &service, const QString &logi
     QJsonObject o = {{ "service", service.toLower()},
                      { "login",   login},
                      { "password", password },
-                     { "description", description}};
+                     { "description", description},
+                     { "saveDomainConfirmed", 1}};
     sendJsonData({{ "msg", "set_credential" },
                   { "data", o }});
 }
