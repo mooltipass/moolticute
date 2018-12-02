@@ -781,7 +781,7 @@ bool CredentialsManagement::isServiceNameExist(const QString &serviceName) const
     auto found = std::find_if(m_loadedModelSerialiation.begin(), m_loadedModelSerialiation.end(),
                  [&serviceName] (const QJsonValue &cred)
                     {
-                        return serviceName == cred["service"].toString();
+                        return serviceName == cred.toObject().value("service").toString();
                     }
                  );
     return found != m_loadedModelSerialiation.end();
