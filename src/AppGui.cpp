@@ -187,8 +187,7 @@ bool AppGui::initialize()
     dbMasterController = new DbMasterController(this);
     dbMasterController->setWSClient(wsClient);
 
-    if (!autoLaunched)
-        mainWindowShow();
+    mainWindowShow(autoLaunched);
 
     connect(wsClient, &WSClient::showAppRequested, [=]()
     {
@@ -408,13 +407,17 @@ AppGui::~AppGui()
     delete win;
 }
 
-void AppGui::mainWindowShow()
+void AppGui::mainWindowShow(bool autoLaunched)
 {
     if (!win)
     {
         //Postpone qtawesome initialisation when the windows is showed
         //This fix a crash when starting the app with system in macOS
         createMainWindow();
+        if (autoLaunched)
+        {
+            return;
+        }
     }
 
     win->show();
