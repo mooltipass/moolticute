@@ -2962,9 +2962,13 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
     }
 }
 
-bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent)
+bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList)
 {
-    qDebug() << "Removing child " << childNodePt->getLogin() << " with parent " << parentNodePt->getService() << " from DB";
+    if (deleteFromList)
+        qDebug() << "Removing child " << childNodePt->getLogin() << " with parent " << parentNodePt->getService() << " from DB";
+    else
+        qDebug() << "Removing child " << childNodePt->getLogin() << " from parent " << parentNodePt->getService();
+
     MPNode* tempChildNodePt = nullptr;
     MPNode* tempNextChildNodePt;
 
@@ -3025,8 +3029,11 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
 
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
-                        loginChildNodes.removeOne(childNodePt);
-                        delete(childNodePt);
+                        if (deleteFromList)
+                        {
+                            loginChildNodes.removeOne(childNodePt);
+                            delete(childNodePt);
+                        }
 
                         /* Remove parent */
                         if (deleteEmptyParent)
@@ -3047,8 +3054,11 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
 
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
-                        loginChildNodes.removeOne(childNodePt);
-                        delete(childNodePt);
+                        if (deleteFromList)
+                        {
+                            loginChildNodes.removeOne(childNodePt);
+                            delete(childNodePt);
+                        }
                         return true;
                     }
                 }
@@ -3064,8 +3074,11 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
 
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
-                        loginChildNodes.removeOne(childNodePt);
-                        delete(childNodePt);
+                        if (deleteFromList)
+                        {
+                            loginChildNodes.removeOne(childNodePt);
+                            delete(childNodePt);
+                        }
                         return true;
                     }
                     else
@@ -3079,8 +3092,11 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
 
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
-                        loginChildNodes.removeOne(childNodePt);
-                        delete(childNodePt);
+                        if (deleteFromList)
+                        {
+                            loginChildNodes.removeOne(childNodePt);
+                            delete(childNodePt);
+                        }
                         return true;
                     }
                 }
@@ -4844,7 +4860,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting first child node and adding it again";
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
     temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
-    removeChildFromDB(loginNodes[0], temp_node_pt, true);
+    removeChildFromDB(loginNodes[0], temp_node_pt, true, true);
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
     checkLoadedNodes(true, true, true);
@@ -4854,7 +4870,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
-    removeChildFromDB(loginNodes[0], temp_node_pt, true);
+    removeChildFromDB(loginNodes[0], temp_node_pt, true, true);
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
     checkLoadedNodes(true, true, true);
@@ -4865,7 +4881,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
-    removeChildFromDB(loginNodes[0], temp_node_pt, true);
+    removeChildFromDB(loginNodes[0], temp_node_pt, true, true);
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
     checkLoadedNodes(true, true, true);
@@ -4876,7 +4892,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     temp_cnode = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
     temp_node = new MPNode(loginNodes[1]->getNodeData(), this, loginNodes[1]->getAddress(), loginNodes[1]->getVirtualAddress());
     temp_node->setStartChildAddress(MPNode::EmptyAddress, 0);
-    removeChildFromDB(loginNodes[1], temp_node_pt, true);
+    removeChildFromDB(loginNodes[1], temp_node_pt, true, true);
     loginNodes.append(temp_node);
     addOrphanParentToDB(temp_node, false, true);
     loginChildNodes.append(temp_cnode);
@@ -6007,7 +6023,7 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
                 /* Marked for deletion? */
                 if (!curNode->getMergeTagged())
                 {
-                    removeChildFromDB(nodeItem, curNode, true);
+                    removeChildFromDB(nodeItem, curNode, true, true);
                 }
             }
         }
@@ -6542,6 +6558,29 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             /* Find node in our list */
             MPNode* nodePtr = findNodeWithAddressInList(loginChildNodes, nodeAddr);
 
+            /* If not a new node, look for parent Node */
+            MPNode* parentNodePtr = nullptr;
+            bool loginHasNewParent = false;
+            if (!nodeAddr.isNull())
+            {
+                /* Find parent node that has as a children the currently investigated one */
+                parentNodePtr = findCredParentNodeGivenChildNodeAddr(nodeAddr, 0);
+                if (!parentNodePtr)
+                {
+                    qCritical() << "Error in our local DB (algo PB?)";
+                    cb(false, "Moolticute Internal Error (SMMC#4)");
+                    exitMemMgmtMode(true);
+                    return;
+                }
+
+                /* Check its name */
+                if (service != parentNodePtr->getService())
+                {
+                    qDebug() << "Login" << login << " has new service " << service;
+                    loginHasNewParent = true;
+                }
+            }
+
             if (nodeAddr.isNull())
             {
                 qDebug() << "New login" << qjobject["login"].toString() << " for service " << qjobject["service"].toString() << " at address " << nodeAddr.toHex();
@@ -6584,6 +6623,43 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 exitMemMgmtMode(true);
                 return;
             }
+            else if (loginHasNewParent)
+            {
+                /* Look if there's a parent node with that name */
+                MPNode* parentPtr = findNodeWithServiceInList(service);
+
+                /* If no parent, create it */
+                if (!parentPtr)
+                {
+                    parentPtr = addNewServiceToDB(service);
+                }
+
+                /* Increment new addresses counter */
+                newAddressesNeededCounter += 1;
+
+                /* Remove child from previous parent */
+                removeChildFromDB(parentNodePtr, nodePtr, true, false);
+
+                /* Overwrite login & description just in case they changed */
+                nodePtr->setNotDeletedTagged();
+                nodePtr->setLogin(login);
+                nodePtr->setDescription(description);
+                nodePtr->setFavoriteProperty(favorite);
+                addChildToDB(parentPtr, nodePtr);
+
+                /* Check for changed password */
+                if (!password.isEmpty())
+                {
+                    qDebug() << "Detected password change for" << login << "on" << service;
+
+                    QStringList changeList;
+                    changeList << service << login << password;
+                    mmmPasswordChangeArray.append(changeList);
+                }
+
+                /* Set bool */
+                packet_send_needed = true;
+            }
             else
             {
                 /* Tag it as not deleted */
@@ -6598,6 +6674,13 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 
                 /* Set favorite */
                 nodePtr->setFavoriteProperty(favorite);
+
+                /* Check for changed service */
+                if (service != nodePtr->getService())
+                {
+                    qDebug() << "Detected service change new: " << service << ", old: " << nodePtr->getService();
+                    //TODO implement service change
+                }
 
                 /* Check for changed description */
                 if (description != nodePtr->getDescription())
@@ -6627,7 +6710,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     newNode->setLogin(login);
                     newNode->setNotDeletedTagged();
                     loginChildNodes.append(newNode);
-                    removeChildFromDB(parentNodePtr, nodePtr, false);
+                    removeChildFromDB(parentNodePtr, nodePtr, false, true);
                     addChildToDB(parentNodePtr, newNode);
                     packet_send_needed = true;
 
@@ -6688,7 +6771,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             /* Marked for deletion? */
             if (!noDelete && !curNode->getNotDeletedTagged())
             {
-                removeChildFromDB(nodeItem, curNode, true);
+                removeChildFromDB(nodeItem, curNode, true, true);
                 packet_send_needed = true;
             }
         }
