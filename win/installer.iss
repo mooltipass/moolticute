@@ -57,7 +57,6 @@ Filename: "{app}\moolticute.exe"; WorkingDir: "{app}"; Description: "Start Moolt
 
 [Registry]
 Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Moolticute"; ValueData: "{app}\moolticute.exe --autolaunched"; Flags: uninsdeletevalue
-Root: "HKCU"; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; ValueData: "{olddata};{app}\cli"
 
 [Code]
 function IsAppRunning(const FileName : string): Boolean;
