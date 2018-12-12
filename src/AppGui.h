@@ -42,7 +42,7 @@ public:
 
     bool initialize();
 
-    void mainWindowShow();
+    void mainWindowShow(bool autoLaunched = false);
     void mainWindowHide();
     void enableDaemon();
     void disableDaemon();
