@@ -396,7 +396,7 @@
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="154"/>
         <source>Credentials on the device are more recent. </source>
-        <translation>Les identifiants présents sur le préiphérique sont plus récents. </translation>
+        <translation>Les identifiants présents sur le périphérique sont plus récents. </translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="155"/>
