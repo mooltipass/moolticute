@@ -128,6 +128,7 @@ public:
     static bool isUserRequired(Command c);
     static QString toHexString(Command c);
     static QString printCmd(const QByteArray &ba);
+    static QString printCmd(const Command &cmd);
 };
 
 class MPParams: public QObject

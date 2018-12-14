@@ -38,6 +38,8 @@ typedef std::function<void(const QVariantMap &data)> MPDeviceProgressCb;
  * cb(data)
 */
 
+class IMessageProtocol;
+
 class MPCommand
 {
 public:
@@ -430,6 +432,9 @@ private:
 
     //flag set when loading all parameters
     bool readingParams = false;
+
+    //Message Protocol
+    IMessageProtocol *pMesProt = nullptr;
 };
 
 #endif // MPDEVICE_H
