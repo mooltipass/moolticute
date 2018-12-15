@@ -44,8 +44,8 @@
  * of the data received from the device.
  */
 
-typedef std::function<bool(const QByteArray &prev_data, QByteArray &data_to_send)> AsyncFunc;
-typedef std::function<bool(const QByteArray &data, bool &done)> AsyncFuncDone;
+using AsyncFunc = std::function<bool(const QByteArray &prev_data, QByteArray &data_to_send)>;
+using AsyncFuncDone = std::function<bool(const QByteArray &data, bool &done)> ;
 
 class AsyncJob: public QObject
 {
@@ -155,9 +155,6 @@ public:
         cmd(c),
         afterFunc(std::move(afterfn))
     {}
-
-    //This default func only checks if return value from device is ok or not
-    static AsyncFuncDone defaultCheckRet;
 
     void setReturnCheck(bool enable) { checkReturn = enable; }
     void setTimeout(int t) { timeout = t; }

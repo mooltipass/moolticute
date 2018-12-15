@@ -425,10 +425,11 @@ void MPDevice::loadParameters()
                                   MPCmd::VERSION,
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received MP version FLASH size: " << pMesProt->getFirstPayloadByte(data) << "Mb";
-        QString hw = QString(data.mid(3, (quint8)data.at(0) - 2));
+        const auto flashSize = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received MP version FLASH size: " << flashSize << "Mb";
+        QString hw = QString(pMesProt->getPayloadBytes(data, 1, pMesProt->getMessageSize(data) - 2));
         qDebug() << "received MP version hw: " << hw;
-        set_flashMbSize(pMesProt->getFirstPayloadByte(data));
+        set_flashMbSize(flashSize);
         set_hwVersion(hw);
 
         QRegularExpressionMatchIterator i = regVersion.globalMatch(hw);
@@ -449,8 +450,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::KEYBOARD_LAYOUT_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received language: " << pMesProt->getFirstPayloadByte(data);
-        set_keyboardLayout(pMesProt->getFirstPayloadByte(data));
+        const auto language = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received language: " << language;
+        set_keyboardLayout(language);
         return true;
     }));
 
@@ -459,8 +461,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::LOCK_TIMEOUT_ENABLE_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received lock timeout enable: " << pMesProt->getFirstPayloadByte(data);
-        set_lockTimeoutEnabled(data.at(2) != 0);
+        const auto lockTimeoutEnabled = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received lock timeout enable: " << lockTimeoutEnabled;
+        set_lockTimeoutEnabled(lockTimeoutEnabled != 0);
         return true;
     }));
 
@@ -469,8 +472,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::LOCK_TIMEOUT_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received lock timeout: " << pMesProt->getFirstPayloadByte(data);
-        set_lockTimeout(pMesProt->getFirstPayloadByte(data));
+        const auto lockTimeout = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received lock timeout: " << lockTimeout;
+        set_lockTimeout(lockTimeout);
         return true;
     }));
 
@@ -479,8 +483,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::SCREENSAVER_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received screensaver: " << pMesProt->getFirstPayloadByte(data);
-        set_screensaver(data.at(2) != 0);
+        const auto screensaver = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received screensaver: " << screensaver;
+        set_screensaver(screensaver != 0);
         return true;
     }));
 
@@ -489,8 +494,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::USER_REQ_CANCEL_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received userRequestCancel: " << pMesProt->getFirstPayloadByte(data);
-        set_userRequestCancel(data.at(2) != 0);
+        const auto userRequestCancel = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received userRequestCancel: " << userRequestCancel;
+        set_userRequestCancel(userRequestCancel != 0);
         return true;
     }));
 
@@ -499,8 +505,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::USER_INTER_TIMEOUT_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received userInteractionTimeout: " << pMesProt->getFirstPayloadByte(data);
-        set_userInteractionTimeout(pMesProt->getFirstPayloadByte(data));
+        const auto userInteractionTimeout = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received userInteractionTimeout: " << userInteractionTimeout;
+        set_userInteractionTimeout(userInteractionTimeout);
         return true;
     }));
 
@@ -509,8 +516,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::FLASH_SCREEN_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received flashScreen: " << pMesProt->getFirstPayloadByte(data);
-        set_flashScreen(data.at(2) != 0);
+        const auto flashScreen = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received flashScreen: " << flashScreen;
+        set_flashScreen(flashScreen != 0);
         return true;
     }));
 
@@ -519,8 +527,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::OFFLINE_MODE_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received offlineMode: " << pMesProt->getFirstPayloadByte(data);
-        set_offlineMode(data.at(2) != 0);
+        const auto offlineMode = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received offlineMode: " << offlineMode;
+        set_offlineMode(offlineMode != 0);
         return true;
     }));
 
@@ -529,8 +538,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::TUTORIAL_BOOL_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received tutorialEnabled: " << pMesProt->getFirstPayloadByte(data);
-        set_tutorialEnabled(data.at(2) != 0);
+        const auto tutorialEnabled = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received tutorialEnabled: " << tutorialEnabled;
+        set_tutorialEnabled(tutorialEnabled != 0);
         return true;
     }));
 
@@ -539,8 +549,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received screenBrightness: " << pMesProt->getFirstPayloadByte(data);
-        set_screenBrightness(pMesProt->getFirstPayloadByte(data));
+        const auto screenBrightness = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received screenBrightness: " << screenBrightness;
+        set_screenBrightness(screenBrightness);
         return true;
     }));
 
@@ -549,8 +560,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received set_knockEnabled: " << pMesProt->getFirstPayloadByte(data);
-        set_knockEnabled(data.at(2) != 0);
+        const auto knockEnabled = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received set_knockEnabled: " << knockEnabled;
+        set_knockEnabled(knockEnabled != 0);
         return true;
     }));
 
@@ -559,12 +571,13 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::MINI_KNOCK_THRES_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received knock threshold: " << pMesProt->getFirstPayloadByte(data);
+        const auto knockEnabled = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received knock threshold: " << knockEnabled;
 
         // The conversion of the real-device 'knock threshold' property
         // to our made-up 'knock sensitivity' property:
         int v;
-        quint8 s = data.at(2);
+        quint8 s = knockEnabled;
         if      (s >= KNOCKING_VERY_LOW) v = 0;
         else if (s >= KNOCKING_LOW)      v = 1;
         else if (s >= KNOCKING_MEDIUM)   v = 2;
@@ -578,8 +591,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::RANDOM_INIT_PIN_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received randomStartingPin: " << pMesProt->getFirstPayloadByte(data);
-        set_randomStartingPin(data.at(2) != 0);
+        const auto randomStartingPin = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received randomStartingPin: " << randomStartingPin;
+        set_randomStartingPin(randomStartingPin != 0);
         return true;
     }));
 
@@ -589,8 +603,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::HASH_DISPLAY_FEATURE_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received hashDisplay: " << pMesProt->getFirstPayloadByte(data);
-        set_hashDisplay(data.at(2) != 0);
+        const auto hashDisplay = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received hashDisplay: " << hashDisplay;
+        set_hashDisplay(hashDisplay != 0);
         return true;
     }));
 
@@ -599,8 +614,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::LOCK_UNLOCK_FEATURE_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received lockUnlockMode: " << pMesProt->getFirstPayloadByte(data);
-        set_lockUnlockMode(data.at(2));
+        const auto lockUnlockMode = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received lockUnlockMode: " << lockUnlockMode;
+        set_lockUnlockMode(lockUnlockMode);
         return true;
     }));
 
@@ -610,8 +626,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received key after login send enabled: " << pMesProt->getFirstPayloadByte(data);
-        set_keyAfterLoginSendEnable(data.at(2) != 0);
+        const auto keyAfterLoginSend = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received key after login send enabled: " << keyAfterLoginSend;
+        set_keyAfterLoginSendEnable(keyAfterLoginSend != 0);
         return true;
     }));
 
@@ -620,8 +637,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received key after login send " << pMesProt->getFirstPayloadByte(data);
-        set_keyAfterLoginSend(data.at(2));
+        const auto keyAfterLoginSend = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received key after login send " << keyAfterLoginSend;
+        set_keyAfterLoginSend(keyAfterLoginSend);
         return true;
     }));
 
@@ -630,8 +648,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received key after pass send enabled: " << pMesProt->getFirstPayloadByte(data);
-        set_keyAfterPassSendEnable(data.at(2) != 0);
+        const auto keyAfterPassSend = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received key after pass send enabled: " << keyAfterPassSend;
+        set_keyAfterPassSendEnable(keyAfterPassSend != 0);
         return true;
     }));
 
@@ -640,8 +659,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received key after pass send " << pMesProt->getFirstPayloadByte(data);
-        set_keyAfterPassSend(data.at(2));
+        const auto keyAfterPassSend = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received key after pass send " << keyAfterPassSend;
+        set_keyAfterPassSend(keyAfterPassSend);
         return true;
     }));
 
@@ -650,8 +670,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received delay after key entry enabled: " << pMesProt->getFirstPayloadByte(data);
-        set_delayAfterKeyEntryEnable(data.at(2) != 0);
+        const auto delayAfterKeyEntry = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received delay after key entry enabled: " << delayAfterKeyEntry;
+        set_delayAfterKeyEntryEnable(delayAfterKeyEntry != 0);
         return true;
     }));
 
@@ -660,8 +681,9 @@ void MPDevice::loadParameters()
                                   QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        qDebug() << "received delay after key entry " << pMesProt->getFirstPayloadByte(data);
-        set_delayAfterKeyEntry(data.at(2));
+        const auto delayAfterKeyEntry = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received delay after key entry " << delayAfterKeyEntry;
+        set_delayAfterKeyEntry(delayAfterKeyEntry);
         return true;
     }));
 
@@ -683,11 +705,9 @@ void MPDevice::loadParameters()
                                           MPCmd::GET_SERIAL,
                                           [this](const QByteArray &data, bool &) -> bool
             {
-                set_serialNumber(((quint8)data[MP_PAYLOAD_FIELD_INDEX+3]) +
-                        ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]) << 8) +
-                        ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]) << 16) +
-                        ((quint32)((quint8)data[MP_PAYLOAD_FIELD_INDEX+0]) << 24));
-                qDebug() << "Mooltipass Mini serial number:" << get_serialNumber();
+                const auto serialNumber = pMesProt->getSerialNumber(data);
+                set_serialNumber(serialNumber);
+                qDebug() << "Mooltipass Mini serial number:" << serialNumber;
                 return true;
             }));
 
@@ -732,10 +752,10 @@ void MPDevice::updateParam(MPParams::Param param, int val)
     AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
     QByteArray ba;
-    ba.append((quint8)param);
-    ba.append((quint8)val);
+    ba.append(static_cast<quint8>(param));
+    ba.append(static_cast<quint8>(val));
 
-    jobs->append(new MPCommandJob(this, MPCmd::SET_MOOLTIPASS_PARM, ba, MPCommandJob::defaultCheckRet));
+    jobs->append(new MPCommandJob(this, MPCmd::SET_MOOLTIPASS_PARM, ba, pMesProt->getDefaultFuncDone()));
 
     connect(jobs, &AsyncJobs::finished, [param](const QByteArray &)
     {
@@ -886,7 +906,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     jobs->append(new MPCommandJob(this, MPCmd::GET_CTRVALUE,
                                   [this, jobs](const QByteArray &data, bool &) -> bool
     {
-        if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (pMesProt->getMessageSize(data) == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Mooltipass refused to send us a CTR packet");
@@ -895,8 +915,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         }
         else
         {
-            ctrValue = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-            ctrValueClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            ctrValue = pMesProt->getFullPayload(data);
+            ctrValueClone = pMesProt->getFullPayload(data);
             qDebug() << "CTR value:" << ctrValue.toHex();
 
             progressTotal = 100 + MOOLTIPASS_FAV_MAX;
@@ -909,10 +929,11 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     auto cpzJob = new MPCommandJob(this, MPCmd::GET_CARD_CPZ_CTR,
                                   [this, jobs](const QByteArray &data, bool &done) -> bool
     {
+        const auto command = pMesProt->getCommand(data);
         /* The Mooltipass answers with CPZ CTR packets containing the CPZ_CTR values, and then a final MPCmd::GET_CARD_CPZ_CTR packet */
-        if ((quint8)data[1] == MPCmd::CARD_CPZ_CTR_PACKET)
+        if (command == MPCmd::CARD_CPZ_CTR_PACKET)
         {
-            QByteArray cpz = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            QByteArray cpz = pMesProt->getFullPayload(data);
             if(cpzCtrValue.contains(cpz))
             {
                 qDebug() << "Duplicate CPZ CTR value:" << cpz.toHex();
@@ -926,7 +947,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             done = false;
             return true;
         }
-        else if((quint8)data[1] == MPCmd::GET_CARD_CPZ_CTR)
+        else if(command == MPCmd::GET_CARD_CPZ_CTR)
         {
             /* Received packet indicating we received all CPZ CTR packets */
             qDebug() << "All CPZ CTR packets received";
@@ -934,7 +955,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         }
         else
         {
-            qCritical() << "Get CPZ CTR: wrong command received as answer:" << MPCmd::printCmd(data);
+            qCritical() << "Get CPZ CTR: wrong command received as answer:" << MPCmd::printCmd(command);
             jobs->setCurrentJobError("Get CPZ/CTR: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
@@ -943,10 +964,10 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     jobs->append(cpzJob);
 
     /* Get favorites */
-    for (int i = 0; i<MOOLTIPASS_FAV_MAX; i++)
+    for (uint i = 0; i<MOOLTIPASS_FAV_MAX; i++)
     {
         jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE,
-                                      QByteArray(1, (quint8)i),
+                                      QByteArray(1, static_cast<quint8>(i)),
                                       [this, i, cbProgress](const QByteArray &, QByteArray &) -> bool
         {
             if (i == 0)
@@ -963,7 +984,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         },
                                       [this, i, jobs, cbProgress](const QByteArray &data, bool &) -> bool
         {
-            if (data[MP_LEN_FIELD_INDEX] == 1)
+            if (pMesProt->getMessageSize(data) == 1)
             {
                 /* Received one byte as answer: command fail */
                 jobs->setCurrentJobError("Mooltipass refused to send us favorites");
@@ -973,9 +994,9 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             else
             {
                 /* Append favorite to list */
-                qDebug() << "Favorite" << i << ": parent address:" << data.mid(MP_PAYLOAD_FIELD_INDEX, 2).toHex() << ", child address:" << data.mid(MP_PAYLOAD_FIELD_INDEX+2, 2).toHex();
-                favoritesAddrs.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
-                favoritesAddrsClone.append(data.mid(MP_PAYLOAD_FIELD_INDEX, MOOLTIPASS_ADDRESS_SIZE));
+                qDebug() << "Favorite" << i << ": parent address:" << pMesProt->getPayloadBytes(data, 0, 2).toHex() << ", child address:" << pMesProt->getPayloadBytes(data, 2, 2).toHex();
+                favoritesAddrs.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
+                favoritesAddrsClone.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
 
                 progressCurrent++;
                 QVariantMap data = {
@@ -997,7 +1018,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
                                       [this, jobs, fullScan, cbProgress](const QByteArray &data, bool &) -> bool
         {
-            if (data[MP_LEN_FIELD_INDEX] == 1)
+            if (pMesProt->getMessageSize(data) == 1)
             {
                 /* Received one byte as answer: command fail */
                 jobs->setCurrentJobError("Mooltipass refused to send us starting parent");
@@ -1006,8 +1027,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             else
             {
-                startNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-                startNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+                startNode = pMesProt->getFullPayload(data);
+                startNodeClone = pMesProt->getFullPayload(data);
                 qDebug() << "Start node addr:" << startNode.toHex();
 
                 //if parent address is not null, load nodes
@@ -1041,7 +1062,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                                       [this, jobs, fullScan, getDataChilds, cbProgress](const QByteArray &data, bool &) -> bool
         {
 
-            if (data[MP_LEN_FIELD_INDEX] == 1)
+            if (pMesProt->getMessageSize(data) == 1)
             {
                 /* Received one byte as answer: command fail */
                 jobs->setCurrentJobError("Mooltipass refused to send us data starting parent");
@@ -1050,8 +1071,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             else
             {
-                startDataNode = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
-                startDataNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+                startDataNode = data.mid(MP_PAYLOAD_FIELD_INDEX, pMesProt->getMessageSize(data));
+                startDataNodeClone = data.mid(MP_PAYLOAD_FIELD_INDEX, pMesProt->getMessageSize(data));
                 qDebug() << "Start data node addr:" << startDataNode.toHex();
 
                 //if data parent address is not null, load nodes
@@ -1102,7 +1123,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
 
     /* Ask device to go into MMM first */
-    auto startMmmJob = new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet);
+    auto startMmmJob = new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone());
     startMmmJob->setTimeout(15000); //We need a big timeout here in case user enter a wrong pin code
     jobs->append(startMmmJob);
 
@@ -1260,7 +1281,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
                                   address,
                                   [this, jobs, pnodeClone, pnode, address, cbProgress](const QByteArray &data, bool &done) -> bool
     {
-        if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (pMesProt->getMessageSize(data) == 1)
         {
             diagTotalBlocks++;
 
@@ -1279,8 +1300,9 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
         else
         {
             /* Append received data to node data */
-            pnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
-            pnodeClone->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            const auto payload = pMesProt->getFullPayload(data);
+            pnode->appendData(payload);
+            pnodeClone->appendData(payload);
 
             // Continue to read data until the node is fully received
             if (!pnode->isDataLengthValid())
@@ -1362,7 +1384,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
                                   address,
                                   [this, jobs, pnode, pnodeClone, address, cbProgress](const QByteArray &data, bool &done) -> bool
     {
-        if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (pMesProt->getMessageSize(data) == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Couldn't read parent node, card removed or database corrupted");
@@ -1372,8 +1394,10 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
         else
         {
             /* Append received data to node data */
-            pnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
-            pnodeClone->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            const auto payload = pMesProt->getFullPayload(data);
+            pnode->appendData(payload);
+            pnodeClone->appendData(payload);
+            QString srv = pnode->getService();
 
             //Continue to read data until the node is fully received
             if (!pnode->isDataLengthValid())
@@ -1382,7 +1406,6 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
             }
             else
             {
-                QString srv = pnode->getService();
                 if (srv.size() > 0)
                 {
                     double currentFirstCharVal = srv.at(0).toLower().toLatin1();
@@ -1395,19 +1418,19 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
                 }
 
                 //Node is loaded
-                qDebug() << address.toHex() << ": parent node loaded:" << pnode->getService();
+                qDebug() << address.toHex() << ": parent node loaded:" << srv;
 
                 QVariantMap data = {
                     {"total", progressTotal},
                     {"current", progressCurrent},
                     {"msg", "Loading credentials for %1" },
-                    {"msg_args", QVariantList({pnode->getService()})}
+                    {"msg_args", QVariantList({srv})}
                 };
                 cbProgress(data);
 
                 if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
                 {
-                    qDebug() << pnode->getService() << ": loading child nodes...";
+                    qDebug() << srv << ": loading child nodes...";
                     loadLoginChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress());
                 }
                 else
@@ -1444,7 +1467,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
                                   address,
                                   [this, jobs, cnode, cnodeClone, address, parent, parentClone](const QByteArray &data, bool &done) -> bool
     {
-        if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (pMesProt->getMessageSize(data) == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Couldn't read child node, card removed or database corrupted");
@@ -1454,8 +1477,9 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
         else
         {
             /* Append received data to node data */
-            cnode->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
-            cnodeClone->appendData(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            const auto payload = pMesProt->getFullPayload(data);
+            cnode->appendData(payload);
+            cnodeClone->appendData(payload);
 
             //Continue to read data until the node is fully received
             if (!cnode->isDataLengthValid())
@@ -1492,7 +1516,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
                                   address,
                                   [this, jobs, pnode, pnodeClone, load_childs, cbProgress](const QByteArray &data, bool &done) -> bool
     {
-        if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (pMesProt->getMessageSize(data) == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Couldn't read data node, card removed or database corrupted");
@@ -1500,8 +1524,9 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             return false;
         }
 
-        pnode->appendData(data.mid(2, data[0]));
-        pnodeClone->appendData(data.mid(2, data[0]));
+        const auto payload = pMesProt->getFullPayload(data);
+        pnode->appendData(payload);
+        pnodeClone->appendData(payload);
 
         //Continue to read data until the node is fully received
         if (!pnode->isValid())
@@ -1561,7 +1586,7 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
                                   address,
                                   [this, jobs, cnode, cnodeClone, cbProgress, nbBytesFetched, parent, parentClone](const QByteArray &data, bool &done) -> bool
     {
-        if (data[MP_LEN_FIELD_INDEX] == 1)
+        if (pMesProt->getMessageSize(data) == 1)
         {
             /* Received one byte as answer: command fail */
             jobs->setCurrentJobError("Couldn't read data child node, card removed or database corrupted");
@@ -1569,8 +1594,9 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
             return false;
         }
 
-        cnode->appendData(data.mid(2, data[0]));
-        cnodeClone->appendData(data.mid(2, data[0]));
+        const auto payload = pMesProt->getFullPayload(data);
+        cnode->appendData(payload);
+        cnodeClone->appendData(payload);
 
         //Continue to read data until the node is fully received
         if (!cnode->isValid())
@@ -3302,20 +3328,9 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
 void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& address, const QByteArray& data, std::function<void(void)> writeCallback)
 {
-    for (quint32 i = 0; i < 3; i++)
+    for (auto packet : pMesProt->createWriteNodePackets(data, address))
     {
-        quint32 payload_size = MP_MAX_PACKET_LENGTH - MP_PAYLOAD_FIELD_INDEX;
-        if (i == 2)
-        {
-            payload_size = 17;
-        }
-
-        QByteArray packetToSend = QByteArray();
-        packetToSend.append(address);
-        packetToSend.append(i);
-        packetToSend.append(data.mid(i*59, payload_size-3));
-        //qDebug() << "Write node packet #" << i << " : " << packetToSend.toHex();
-        jobs->append(new MPCommandJob(this, MPCmd::WRITE_FLASH_NODE, packetToSend,
+        jobs->append(new MPCommandJob(this, MPCmd::WRITE_FLASH_NODE, packet,
             [this, writeCallback](const QByteArray &data, bool &) -> bool
         {
             if (pMesProt->getFirstPayloadByte(data) == 0)
@@ -3329,6 +3344,9 @@ void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& addres
                 return true;
             }
         }));
+#ifdef DEV_DEBUG
+        qDebug() << "Write node packet #" << static_cast<quint8>(packet[2]) << " : " << packet.toHex();
+#endif
     }
 }
 
@@ -3365,7 +3383,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             QByteArray updateChangeNumbersPacket = QByteArray();
             updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
             updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-            jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+            jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
         }
     }
 
@@ -3508,7 +3526,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
                 QByteArray updateFavPacket = QByteArray();
                 updateFavPacket.append(i);
                 updateFavPacket.append(favoritesAddrs[i]);
-                jobs->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, updateFavPacket, MPCommandJob::defaultCheckRet));
+                jobs->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, updateFavPacket, pMesProt->getDefaultFuncDone()));
             }
         }
 
@@ -3517,7 +3535,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         {
             qDebug() << "Updating start node";
             diagSavePacketsGenerated = true;
-            jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, startNode, MPCommandJob::defaultCheckRet));
+            jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, startNode, pMesProt->getDefaultFuncDone()));
         }
     }
     if (tackleData)
@@ -3554,7 +3572,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         {
             qDebug() << "Updating start data node";
             diagSavePacketsGenerated = true;
-            jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startDataNode, MPCommandJob::defaultCheckRet));
+            jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startDataNode, pMesProt->getDefaultFuncDone()));
         }
     }
 
@@ -3563,7 +3581,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     {
         qDebug() << "Updating CTR value";
         diagSavePacketsGenerated = true;
-        jobs->append(new MPCommandJob(this, MPCmd::SET_CTRVALUE, ctrValue, MPCommandJob::defaultCheckRet));
+        jobs->append(new MPCommandJob(this, MPCmd::SET_CTRVALUE, ctrValue, pMesProt->getDefaultFuncDone()));
     }
 
     /* We need to diff cpz ctr values for firmwares running < v1.2 */
@@ -3583,7 +3601,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         {
             qDebug() << "Adding missing cpzctr";
             diagSavePacketsGenerated = true;
-            jobs->append(new MPCommandJob(this, MPCmd::ADD_CARD_CPZ_CTR, cpzCtrValue[i], MPCommandJob::defaultCheckRet));
+            jobs->append(new MPCommandJob(this, MPCmd::ADD_CARD_CPZ_CTR, cpzCtrValue[i], pMesProt->getDefaultFuncDone()));
         }
     }
 
@@ -3603,7 +3621,7 @@ void MPDevice::exitMemMgmtMode(bool setMMMBool)
 {
     AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
-    jobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+    jobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
 
     connect(jobs, &AsyncJobs::finished, [this, setMMMBool](const QByteArray &)
     {
@@ -3694,7 +3712,7 @@ void MPDevice::getUID(const QByteArray & key)
         }
 
         bool ok;
-        quint64 uid = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]).toHex().toULongLong(&ok, 16);
+        quint64 uid = pMesProt->getFullPayload(data).toHex().toULongLong(&ok, 16);
         set_uid(ok ? uid : - 1);
         return ok;
     }));
@@ -3717,14 +3735,14 @@ void MPDevice::getCurrentCardCPZ()
                                   MPCmd::GET_CUR_CARD_CPZ,
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
+        if (pMesProt->getFirstPayloadByte(data) == 0)
         {
             qWarning() << "Couldn't request card CPZ";
             return false;
         }
         else
         {
-            set_cardCPZ(data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]));
+            set_cardCPZ(pMesProt->getFullPayload(data));
             qDebug() << "Card CPZ: " << get_cardCPZ().toHex();
             if (filesCache.setCardCPZ(get_cardCPZ()))
             {
@@ -3735,17 +3753,15 @@ void MPDevice::getCurrentCardCPZ()
         }
     }));
 
-    connect(cpzjobs, &AsyncJobs::finished, [](const QByteArray &data)
+    connect(cpzjobs, &AsyncJobs::finished, [](const QByteArray &)
     {
-        Q_UNUSED(data);
         //data is last result
         //all jobs finished success
         qInfo() << "Finished loading card CPZ";
     });
 
-    connect(cpzjobs, &AsyncJobs::failed, [this](AsyncJob *failedJob)
+    connect(cpzjobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
-        Q_UNUSED(failedJob);
         qCritical() << "Loading card CPZ failed";
         getCurrentCardCPZ();
     });
@@ -3770,11 +3786,13 @@ void MPDevice::getChangeNumbers()
         }
         else
         {
-            set_credentialsDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+1]);
-            credentialsDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+1];
-            set_dataDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]);
-            dataDbChangeNumberClone = (quint8)data[MP_PAYLOAD_FIELD_INDEX+2];
-            if (filesCache.setDbChangeNumber((quint8)data[MP_PAYLOAD_FIELD_INDEX+2]))
+            const auto credDbChangeNum = pMesProt->getPayloadByteAt(data, 1);
+            set_credentialsDbChangeNumber(credDbChangeNum);
+            credentialsDbChangeNumberClone = credDbChangeNum;
+            const auto dataDbChangeNum = pMesProt->getPayloadByteAt(data, 2);
+            set_dataDbChangeNumber(dataDbChangeNum);
+            dataDbChangeNumberClone = dataDbChangeNum;
+            if (filesCache.setDbChangeNumber(dataDbChangeNum))
             {
                 qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
                 emit filesCacheChanged();
@@ -3786,17 +3804,15 @@ void MPDevice::getChangeNumbers()
         }
     }));
 
-    connect(v12jobs, &AsyncJobs::finished, [](const QByteArray &data)
+    connect(v12jobs, &AsyncJobs::finished, [](const QByteArray &)
     {
-        Q_UNUSED(data);
         //data is last result
         //all jobs finished success
         qInfo() << "Finished loading change numbers";
     });
 
-    connect(v12jobs, &AsyncJobs::failed, [this](AsyncJob *failedJob)
+    connect(v12jobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
-        Q_UNUSED(failedJob);
         qCritical() << "Loading change numbers failed";
         getChangeNumbers(); // memory: does it get piled on?
     });
@@ -3881,7 +3897,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
                 {
                     if (pMesProt->getFirstPayloadByte(data) != 1)
                     {
-                        qWarning() << "Error setting context: " << (quint8)data[2];
+                        qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
                         jobs->setCurrentJobError("failed to select context and fallback_context on device");
                         return false;
                     }
@@ -3894,7 +3910,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
                 return true;
             }
 
-            qWarning() << "Error setting context: " << (quint8)data[2];
+            qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
             jobs->setCurrentJobError("failed to select context on device");
             return false;
         }
@@ -3919,7 +3935,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
             return false;
         }
 
-        QString l = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+        QString l = pMesProt->getFullPayload(data);
         if (!login.isEmpty() && l != login)
         {
             jobs->setCurrentJobError("login mismatch");
@@ -3936,7 +3952,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
     if (isFw12())
     {
         jobs->append(new MPCommandJob(this, MPCmd::GET_DESCRIPTION,
-                                      [jobs](const QByteArray &data, bool &) -> bool
+                                      [this, jobs](const QByteArray &data, bool &) -> bool
         {
             /// Commented below: in case there's an empty description it is impossible to distinguish between device refusal and empty description.
             /*if (data[MP_PAYLOAD_FIELD_INDEX] == 0)
@@ -3946,7 +3962,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
                 return true; //Do not fail if description is not available for this node
             }*/
             QVariantMap m = jobs->user_data.toMap();
-            m["description"] = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+            m["description"] = pMesProt->getFullPayload(data);
             jobs->user_data = m;
             return true;
         }));
@@ -3963,13 +3979,13 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, jobs, cb](const QByteArray &data)
     {
         //data is last result
         //all jobs finished success
 
         qInfo() << "Password retreived ok";
-        QString pass = data.mid(MP_PAYLOAD_FIELD_INDEX, data[MP_LEN_FIELD_INDEX]);
+        QString pass = pMesProt->getFullPayload(data);
 
         QVariantMap m = jobs->user_data.toMap();
         cb(true, QString(), m["service"].toString(), m["login"].toString(), pass, m["description"].toString());
@@ -4189,7 +4205,9 @@ void MPDevice::setCredential(QString service, const QString &login,
                     jobs->setCurrentJobError(QString("set_description failed on device, max text length allowed is %1 characters").arg(MOOLTIPASS_DESC_SIZE));
                 }
                 else
+                {
                     jobs->setCurrentJobError("set_description failed on device");
+                }
                 qWarning() << "Failed to set description to: " << description;
                 return false;
             }
@@ -4211,9 +4229,9 @@ void MPDevice::setCredential(QString service, const QString &login,
                 //Password does not match, update it
                 jobs->prepend(new MPCommandJob(this, MPCmd::SET_PASSWORD,
                                                pdata,
-                                               [jobs](const QByteArray &data, bool &) -> bool
+                                               [this, jobs](const QByteArray &data, bool &) -> bool
                 {
-                    if (data[2] == 0)
+                    if (pMesProt->getFirstPayloadByte(data) == 0)
                     {
                         jobs->setCurrentJobError("set_password failed on device");
                         qWarning() << "failed to set_password";
@@ -4281,7 +4299,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
         return true;
     }
 
-    if (data[MP_LEN_FIELD_INDEX] != 0)
+    if (pMesProt->getMessageSize(data) != 0)
     {
         QVariantMap m = jobs->user_data.toMap();
         QByteArray ba = m["data"].toByteArray();
@@ -4289,7 +4307,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
         //first packet, we can read the file size
         if (ba.isEmpty())
         {
-            ba.append(data.mid(MP_PAYLOAD_FIELD_INDEX, (int)data.at(0)));
+            ba.append(pMesProt->getFirstPayloadByte(data));
             quint32 sz = qFromBigEndian<quint32>((quint8 *)ba.data());
             m["progress_total"] = sz;
             // TODO: send a more significative message
@@ -4302,7 +4320,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
         }
         else
         {
-            ba.append(data.mid(MP_PAYLOAD_FIELD_INDEX, (int)data.at(0)));
+            ba.append(pMesProt->getFirstPayloadByte(data));
             // TODO: send a more significative message
             QVariantMap data = {
                 {"total", m["progress_total"].toInt()},
@@ -4364,7 +4382,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
                 {
                     if (pMesProt->getFirstPayloadByte(data) != 1)
                     {
-                        qWarning() << "Error setting context: " << (quint8)data[2];
+                        qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
                         jobs->setCurrentJobError("failed to select context and fallback_context on device");
                         return false;
                     }
@@ -4377,7 +4395,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
                 return true;
             }
 
-            qWarning() << "Error setting context: " << (quint8)data[2];
+            qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
             jobs->setCurrentJobError("failed to select context on device");
             return false;
         }
@@ -4651,7 +4669,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
                 QByteArray updateChangeNumbersPacket = QByteArray();
                 updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
                 updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-                saveJobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+                saveJobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
                 emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
             }
 
@@ -5355,7 +5373,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, std:
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
 
     /* Ask device to go into MMM first */
-    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
@@ -6167,7 +6185,7 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
                                   addressFrom,
                                   [this, jobs, discardFirstAddr, cbProgress](const QByteArray &data, bool &) -> bool
     {
-        quint32 nb_free_addresses_received = data[MP_LEN_FIELD_INDEX]/2;
+        quint32 nb_free_addresses_received = pMesProt->getMessageSize(data)/2;
         if (discardFirstAddr)
         {
             nb_free_addresses_received--;
@@ -6195,13 +6213,17 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
             {
                 if (discardFirstAddr)
                 {
-                    freeAddresses.append(data.mid(MP_PAYLOAD_FIELD_INDEX + 2 + i*2, 2));
-                    //qDebug() << "Received free address " << data.mid(MP_PAYLOAD_FIELD_INDEX + 2 + i*2, 2).toHex();
+                    freeAddresses.append(pMesProt->getPayloadBytes(data, 2 + i*2, 2));
+#ifdef DEV_DEBUG
+                    qDebug() << "Received free address " << pMesProt->getPayloadBytes(data, 2 + i*2, 2).toHex();
+#endif
                 }
                 else
                 {
-                    freeAddresses.append(data.mid(MP_PAYLOAD_FIELD_INDEX + i*2, 2));
-                    //qDebug() << "Received free address " << data.mid(MP_PAYLOAD_FIELD_INDEX + i*2, 2).toHex();
+                    freeAddresses.append(pMesProt->getPayloadBytes(data,i*2, 2));
+#ifdef DEV_DEBUG
+                    qDebug() << "Received free address " << pMesProt->getPayloadBytes(data,i*2, 2).toHex();
+#endif
                 }
             }
 
@@ -6232,7 +6254,7 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
     AsyncJobs *jobs = new AsyncJobs("Starting integrity check", this);
 
     /* Ask device to go into MMM first */
-    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
 
     /* Ask one free address just in case we need it for creating a _recovered_ service */
     newAddressesNeededCounter = 1;
@@ -6278,7 +6300,7 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
         bool packets_generated = generateSavePackets(repairJobs, true, true, [](QVariantMap){});
 
         /* Leave MMM */
-        repairJobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+        repairJobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
 
         connect(repairJobs, &AsyncJobs::finished, [this, packets_generated, cb](const QByteArray &data)
         {
@@ -6402,7 +6424,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for CSV import", this);
 
     /* Ask device to go into MMM first */
-    auto startMmmJob = new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet);
+    auto startMmmJob = new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone());
     startMmmJob->setTimeout(15000); //We need a big timeout here in case user enter a wrong pin code
     jobs->append(startMmmJob);
 
@@ -6439,25 +6461,11 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
                 {
                     if (!url.subdomain().isEmpty())
                     {
-                        if (url.port() < 0)
-                        {
-                            qjobject["service"] = url.subdomain() + "." + url.domain() + url.tld();
-                        }
-                        else
-                        {
-                            qjobject["service"] = url.subdomain() + "." + url.domain() + url.tld() + ":" + QString::number(url.port());
-                        }
+                        qjobject["service"] = url.getFullSubdomain();
                     }
                     else
                     {
-                        if (url.port() < 0)
-                        {
-                            qjobject["service"] = url.domain() + url.tld();
-                        }
-                        else
-                        {
-                            qjobject["service"] = url.domain() + url.tld() + ":" + QString::number(url.port());
-                        }
+                        qjobject["service"] = url.getFullDomain();
                     }
                 }
 
@@ -6808,7 +6816,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         QByteArray updateChangeNumbersPacket = QByteArray();
         updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
         updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-        jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, MPCommandJob::defaultCheckRet));
+        jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
     }
 
     emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
@@ -6984,7 +6992,7 @@ void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for export file generation", this);
 
     /* Ask device to go into MMM first */
-    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
@@ -7046,10 +7054,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
                                           unknownCardAddPayload,
                                           [this](const QByteArray &data, bool &) -> bool
             {
-                if (pMesProt->getFirstPayloadByte(data) == 0)
-                    return false;
-                else
-                    return true;
+                return (pMesProt->getFirstPayloadByte(data) != 0);
             }));
 
             connect(addcpzjobs, &AsyncJobs::finished, [this, cbProgress, cb, noDelete](const QByteArray &data)
@@ -7100,7 +7105,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode", this);
 
     /* Ask device to go into MMM first */
-    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, MPCommandJob::defaultCheckRet));
+    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
 
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false, [](QVariant) {}, false, true, true);
@@ -7145,7 +7150,7 @@ void MPDevice::resetSmartCard(std::function<void(bool success, QString errstr)> 
 {
     AsyncJobs *jobs = new AsyncJobs("Reseting smart card...", this);
 
-    jobs->append(new MPCommandJob(this, MPCmd::RESET_CARD, MPCommandJob::defaultCheckRet));
+    jobs->append(new MPCommandJob(this, MPCmd::RESET_CARD, pMesProt->getDefaultFuncDone()));
 
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
