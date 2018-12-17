@@ -1634,7 +1634,7 @@ MPNode* MPDevice::findCredParentNodeGivenChildNodeAddr(const QByteArray &address
         /* Check every children */
         while ((curChildNodeAddr != MPNode::EmptyAddress) || (curChildNodeAddr.isNull() && curChildNodeAddr_v != 0))
         {
-            MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr);
+            MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr, curChildNodeAddr_v);
 
             /* Safety checks */
             if (!curNode)
@@ -6674,13 +6674,6 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 
                 /* Set favorite */
                 nodePtr->setFavoriteProperty(favorite);
-
-                /* Check for changed service */
-                if (service != nodePtr->getService())
-                {
-                    qDebug() << "Detected service change new: " << service << ", old: " << nodePtr->getService();
-                    //TODO implement service change
-                }
 
                 /* Check for changed description */
                 if (description != nodePtr->getDescription())
