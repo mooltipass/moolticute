@@ -12,6 +12,7 @@
 #include "ServiceItem.h"
 #include "LoginItem.h"
 #include "TreeItem.h"
+#include "ParseDomain.h"
 
 CredentialModel::CredentialModel(QObject *parent) : QAbstractItemModel(parent)
 {
@@ -405,7 +406,7 @@ QJsonArray CredentialModel::getJsonChanges()
 void CredentialModel::addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription)
 {
     //Force all service names to lowercase
-    sServiceName = sServiceName.toLower();
+    sServiceName = ParseDomain(sServiceName).getManuallyEnteredDomainName(sServiceName);
 
     // Retrieve target service
     ServiceItem *pTargetService = m_pRootItem->findServiceByName(sServiceName);
