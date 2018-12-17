@@ -251,10 +251,12 @@ void WSServerCon::processMessage(const QString &message)
             qDebug() << "GUI is not running, saving credential with empty login";
         }
           
-        ParseDomain url(o["service"].toString());
+        QString originalService = o["service"].toString();
+        ParseDomain url(originalService);
         QSettings s;
         bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool() && url.isWebsite();
-        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !o.contains("saveDomainConfirmed"))
+        bool isManualCredential = o.contains("saveManualCredential");
+        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !isManualCredential && !o.contains("saveDomainConfirmed"))
         {
             root["msg"] = "request_domain";
             o["domain"] = url.getFullDomain();
@@ -272,6 +274,11 @@ void WSServerCon::processMessage(const QString &message)
         if (!o.contains("saveDomainConfirmed") && url.isWebsite())
         {
             o["service"] = url.getFullDomain();
+        }
+
+        if (isManualCredential)
+        {
+            o["service"] = url.getManuallyEnteredDomainName(originalService);
         }
 
         const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
