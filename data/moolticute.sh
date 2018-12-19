@@ -11,6 +11,8 @@ $me <arg>
 
 Arguments:
 -d --daemon         Runs daemon only mode.
+-a --agent          Runs mc-agent only, with passed arguments
+-l --cli            Runs mc-cli only, with passed arguments
 -i --install        Install moolticute UDev rules
 -c --check          Check moolticute UDev rules
 -u --uninstall      Uninstall moolticute UDev rules
@@ -22,6 +24,15 @@ Run Moolticute normaly
 
 Run only the moolticuted daemon
 ./$me --daemon
+
+Get help on how to use mc-cli:
+./$me --cli --help
+
+Get a password via mc-cli:
+./$me --cli login get site1.com user1
+
+Run mc-agent:
+./$me --agent --address /tmp/mc-agent.socket
 ";
 
 UDEV_RULES_FILE_PATH="/etc/udev/rules.d/50-mooltipass.rules"
@@ -68,17 +79,23 @@ EOF
         ;;
     esac
 
-    rm "$tmpfile"  
+    rm "$tmpfile"
 }
 
-DAEMON_ONLY=0
+SINGLE_EXE=""
 INSTALL=0
 UNINSTALL=0
 CHECK=0
 
 case "$1" in
     -d|--daemon)
-        DAEMON_ONLY=1
+        SINGLE_EXE="moolticuted"
+        ;;
+    -a|--agent)
+        SINGLE_EXE="mc-agent"
+        ;;
+    -l|--cli)
+        SINGLE_EXE="mc-cli"
         ;;
     -i|--install)
         INSTALL=1
@@ -163,10 +180,11 @@ elif [ -d "/etc/ssl/certs" ] ; then
 fi
 
 
-if (( $DAEMON_ONLY == 1 )) ;
+if [ -n "$SINGLE_EXE" ] ;
 then
-    echo "Running daemon only"
-    $APPDIR/usr/bin/moolticuted
+    test "SINGLE_EXE" = "moolticuted" && echo "Running daemon only"
+    shift
+    $APPDIR/usr/bin/$SINGLE_EXE "$@"
 elif (( $INSTALL == 0 )) && (( $UNINSTALL == 0 )) && (( $CHECK == 0 ));
 then
     $APPDIR/usr/bin/moolticute
