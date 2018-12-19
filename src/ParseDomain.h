@@ -59,6 +59,8 @@ public:
 
     const QUrl qurl() const { return _url; }
 
+    QString getManuallyEnteredDomainName(const QString &service);
+
 private:
     ParseDomain();
 

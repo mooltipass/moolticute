@@ -59,3 +59,18 @@ ParseDomain::ParseDomain(const QString &url) :
         _subdomain = domainParts.join('.');
     }
 }
+
+QString ParseDomain::getManuallyEnteredDomainName(const QString &service)
+{
+    if (!isWebsite())
+    {
+        return service;
+    }
+
+    if (subdomain().isEmpty())
+    {
+        return getFullDomain();
+    }
+
+    return getFullSubdomain();
+}

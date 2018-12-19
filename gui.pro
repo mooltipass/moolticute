@@ -22,6 +22,7 @@ include (src/qtcsv/qtcsv.pri)
 
 SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \
+    src/ParseDomain.cpp \
     src/Common.cpp \
     src/WSClient.cpp \
     src/RotateSpinner.cpp \
@@ -60,6 +61,7 @@ SOURCES += src/main_gui.cpp \
     src/RequestDomainSelectionDialog.cpp
 
 HEADERS  += src/MainWindow.h \
+    src/ParseDomain.h \
     src/Common.h \
     src/QtHelper.h \
     src/WSClient.h \

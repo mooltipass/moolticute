@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/AnimatedColorButton.cpp" line="54"/>
         <source>Hold to Confirm</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintenir pour confirmer</translation>
     </message>
 </context>
 <context>
@@ -29,62 +29,62 @@
     <message>
         <location filename="../src/AppGui.cpp" line="599"/>
         <source>%1 version has been released!</source>
-        <translation type="unfinished"></translation>
+        <translation>la version %1 est disponible!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="600"/>
         <source>Open MC client to download it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrez l&apos;application MC pour la télécharger.</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="613"/>
         <source>Would you like to download the update now?</source>
-        <translation type="unfinished">Voulez vous télécharger la mise à jour maintenant?</translation>
+        <translation>Voulez vous télécharger la mise à jour maintenant?</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="614"/>
         <source>Open changelog</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher la liste des changements</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="631"/>
         <source>Mooltipass Not Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun mooltipass connecté</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="632"/>
         <source>Please Connect Your Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez connecter votre Mooltipass</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="636"/>
         <source>No Card in Mooltipass!</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de carte dans votre Mooltipass!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="637"/>
         <source>Please Insert Your Smartcard and Enter Your PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuiilez insérer votre carte à puce et composer votre code PIN</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="641"/>
         <source>Mooltipass in Management Mode!</source>
-        <translation type="unfinished"></translation>
+        <translation>Votre Mooltipass est en mode gestion!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="642"/>
         <source>Please leave management mode in the App</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez quitter le mode de gestion depuis l&apos;application</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="646"/>
         <source>Mooltipass Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Mooltipass verrouillé</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="647"/>
         <source>Please Unlock Your Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez déverrouiller votre Mooltipass</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="669"/>
@@ -236,7 +236,7 @@
         <location filename="../src/CredentialsManagement.ui" line="773"/>
         <location filename="../src/CredentialsManagement.cpp" line="53"/>
         <source>Exit Credential Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter la gestion des identifiants</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="786"/>
@@ -264,7 +264,7 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="71"/>
         <source>Editing Service name</source>
-        <translation type="unfinished"></translation>
+        <translation>Editer le nom du service</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="73"/>
@@ -320,7 +320,7 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="539"/>
         <source>Service name is already exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce nom de service existe déjà</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="622"/>
@@ -396,12 +396,12 @@
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="154"/>
         <source>Credentials on the device are more recent. </source>
-        <translation type="unfinished"></translation>
+        <translation>Les identifiants présents sur le périphérique sont plus récents. </translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="155"/>
         <source>Do you want export credentials to backup file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Voulez-vous exporter les identifiants vers le fichier de sauvegarde ?</translation>
     </message>
     <message>
         <source>Credentials on the device are more recent. Do you want export credentials to backup file?</source>
@@ -418,38 +418,38 @@
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="100"/>
         <source>Be careful</source>
-        <translation type="unfinished">Soyez prudent</translation>
+        <translation>Soyez prudent</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="101"/>
         <source>It&apos;s always good to make a backup of your database. Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>C&apos;est une bonne pratique de faire une sauvegarde de votre base de données. Etes-vous sûr de vouloir continuer ?</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="137"/>
         <source>Save database export...</source>
-        <translation type="unfinished">Exporter la base de donnée...</translation>
+        <translation>Exporter la base de donnée...</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="133"/>
         <location filename="../src/DbExportsRegistryController.cpp" line="162"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="111"/>
         <source>You haven&apos;t made a backup of your database for a while. </source>
-        <translation type="unfinished"></translation>
+        <translation>Vous n&apos;avez pas fait de sauvegarde de votre base de données depuis longtemps. </translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="112"/>
         <source>Do you want to backup your credentials now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Voulez-vous sauvegarder vos identifiants maintenant ?</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="162"/>
         <source>Unable to write to file %1</source>
-        <translation type="unfinished">Impossible d&apos;écrire dans le fichier %1</translation>
+        <translation>Impossible d&apos;écrire dans le fichier %1</translation>
     </message>
 </context>
 <context>
@@ -983,7 +983,7 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="1050"/>
         <source>Lock device when computer sleeps or shuts down, if screen is locked, or user logs off</source>
-        <translation type="unfinished"></translation>
+        <translation>Verrouiller l&apos;appareil quand l&apos;ordinateur passe en veille, s&apos;éteint, si l&apos;écran est verrouillé ou si l&apos;utilisateur se déconnecte</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1063"/>
@@ -1028,32 +1028,32 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="2514"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2926"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Behavior of ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Comportement de ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2953"/>
         <source>Systray icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Icone de la zone de notification</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2986"/>
         <source>Subdomain selection: Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélection de sous-domaine: activée</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3326"/>
         <source>Reset card</source>
-        <translation type="unfinished"></translation>
+        <translation>Réinitialiser la carte</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3360"/>
         <source>Erase Inserted Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer la carte insérée dans l&apos;appareil</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3370"/>
@@ -1065,32 +1065,32 @@ Maximum allowed size is %2 bytes.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="3379"/>
         <source>Reset Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Réinitialiser la carte</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3391"/>
         <source>CSV file import/export</source>
-        <translation type="unfinished"></translation>
+        <translation>Import/Export de fichier CSV</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3413"/>
         <source>Import unencrypted passwords</source>
-        <translation type="unfinished"></translation>
+        <translation>Imported des mots de passe non chiffrés</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3429"/>
         <source>Import CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer un fichier CSV</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3438"/>
         <source>Export passwords unencrypted</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter les mots de passe sans les chiffrer</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3454"/>
         <source>Export CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter un fichier CSV</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1611"/>
@@ -1551,22 +1551,22 @@ You will be prompted for import or export operations if any changes to your Mool
     <message>
         <location filename="../src/MainWindow.cpp" line="284"/>
         <source>Close Application</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer l&apos;application</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="286"/>
         <source>Hide Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Cacher la fenêtre</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="303"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Fichier</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="304"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Quitter</translation>
+        <translation>&amp;Quitter</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="327"/>
@@ -1608,22 +1608,22 @@ You will be prompted for import or export operations if any changes to your Mool
     <message>
         <location filename="../src/MainWindow.cpp" line="334"/>
         <source>Ctrl + Alt + Del / Win + L</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl + Alt +Supprl / Win + L</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="338"/>
         <source>Black</source>
-        <translation type="unfinished"></translation>
+        <translation>Noir</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="339"/>
         <source>White</source>
-        <translation type="unfinished"></translation>
+        <translation>Blanc</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="339"/>
         <source>_white</source>
-        <translation type="unfinished"></translation>
+        <translation>_blanc</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="390"/>
@@ -1644,7 +1644,8 @@ You will be prompted for import or export operations if any changes to your Mool
         <location filename="../src/MainWindow.cpp" line="615"/>
         <source>Credentials have been modified.
 Do you want to save your changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Les identifiants ont été modifiés.
+Voulez-vous sauvegarder vos modifications?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="726"/>
@@ -1702,23 +1703,26 @@ Do you want to save your changes?</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="1138"/>
         <source>Subdomain selection: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sous-domaine sélectionné: %1</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1224"/>
         <source>Select database export...</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>not 100% sure</translatorcomment>
+        <translation>Selectionner la base de données</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1342"/>
         <source>Memory integrity check done successfully!
 %1 of %2 credential slots used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le contrôle de l&apos;intégrité de la mémoire est réussi!
+%1 emplacements utilisés  sur %2 possible.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1351"/>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>I made the translation guessing it was &quot;tampered&quot; instead of tempered</translatorcomment>
+        <translation>Pour être sûr que personne n&apos;a altéré votre appareil, vous pouvez demander un mot de passe qui vousd permettra de récupérer l&apos;UID de votre appareil.&lt;ol&gt;&lt;li&gt;Récupérer le mot de passe au dos de votre appareil&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: METTER VOTRE NUMERO DE COMMANDE ICI&quot;&gt;Envoyez nous un emaill&lt;/a&gt; avec votre numéro de série et votre numéro de commande en demandant votre mot de passe.&lt;/li&gt;&lt;li&gt;Entrez le mot de passe que nous vous avons envoyé&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1516"/>
@@ -1728,47 +1732,47 @@ Do you want to save your changes?</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="1547"/>
         <source>Reset card failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>La réinitialisation de la carte a échoué!</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1549"/>
         <source>Reset card done successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>La carte a été correctement réinitialisée</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1556"/>
         <source>Select CSV file to import...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner le fichier CSV à importer...</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1584"/>
         <source>Nothing is read from %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Rien à lire dans %1</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1611"/>
         <source>Unable to import %1: Each row must contain exact 3 items. Some lines don&apos;t (lines number: %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;importer %1: chaque ligne doit contenir exactement 3 éléments. Certaines lignes sont incorrectes (lignes numéro: %2)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1615"/>
         <source>Unable to import %1: Each row must contain exact 3 items (more than 10 lines don&apos;t)</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;importer %1: chaque ligne doit contenir exactement 3 éléments.(Plus de 10  lignes sont incorrectes)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1623"/>
         <source>Unable to import %1: Each row must contain exact 3 items using comma as a delimiter</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;importer %1: chaque ligne doit contenir exactement 3 éléments séparés par une virgule</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1671"/>
         <source>Disable subdomain selection?</source>
-        <translation type="unfinished"></translation>
+        <translation>Désactiver la détection de sous-domaine ?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1673"/>
         <source>Enable subdomain selection?</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer la sélection de sous-domaine?</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Wait for device confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -1852,49 +1856,33 @@ Do you want to save your changes?</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="53"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="56"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="62"/>
-        <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
-You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.cpp" line="65"/>
         <source>The MooltiApp backup file doesn&apos;t have encrypted usernames.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le fichier de sauvegarde de l&apos;application MooltiApp ne contient pas de noms d&apos;utilisateurs chiffrés.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="68"/>
         <source>When an unknown card message is displayed that means you have no database for this user in your Mooltipass device.
 Hovewer you or other users may have a backup file or may use this card in another device.
 Think twice before resetting a card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lorsque le message &quot;Carte inconnue&quot; est affiché, cela signifie qu&apos;il n&apos;y a aucune base de données pour cet utilisateur dans votre Mooltipass.
+Cependant vous (ou un autre utilisateur) avez peut-être un fichier de sauvegarde ou la carte peut être utilisée dans un autre appareil
+Réfléchissez-y à 2 fois avant de réinitialiser une carte.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="71"/>
         <source>Import unencrypted passwords from comma-separated values text file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer des mots de passe non-chiffrés depuis un fichier CSV.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="74"/>
         <source>Export unencrypted passwords to comma-separated values text file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter des mots de passe non-chiffrés vers un fichier CSV</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="270"/>
         <source>Very Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Très bas</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1233"/>
@@ -2210,32 +2198,32 @@ Think twice before resetting a card.</source>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="14"/>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="12"/>
         <source>Request Domain Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Demande du nom du domaine</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="44"/>
         <source>Select domain</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisir le domaine</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="69"/>
         <source>Domain</source>
-        <translation type="unfinished"></translation>
+        <translation>Domaine</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="14"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisissez le nom du domaine:</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="16"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Sous-domaine détecté!</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="18"/>
         <source>You have the possibility to store subdomain or domain as service name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous pouvez utilisier le sous-domaine ou le domaine comme nom de service.</translation>
     </message>
 </context>
 <context>
@@ -2244,28 +2232,28 @@ Think twice before resetting a card.</source>
         <location filename="../src/RequestLoginNameDialog.ui" line="14"/>
         <location filename="../src/RequestLoginNameDialog.cpp" line="12"/>
         <source>Request Login Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Demande du nom d&apos;utilisateur</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.ui" line="44"/>
         <location filename="../src/RequestLoginNameDialog.cpp" line="16"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Un identifiant sans nom d&apos;utilisateur a été détecté.</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.ui" line="69"/>
         <source>Login</source>
-        <translation type="unfinished">Nom d&apos;utilisateur</translation>
+        <translation>Nom d&apos;utilisateur</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.cpp" line="14"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Nom d&apos;utilisateur pour </translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.cpp" line="18"/>
         <source>You have the possibility to include a login before storing the credential in the device. If you don&apos;t need a login, you can ignore the request.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous avez la possibilité d&apos;inclure un nom d&apos;utilisateur avant de sauvegarder les identifiants sur votre appareil. Si vous n&apos;en avez pas besoin, vous pouvez ignorer la reqête.</translation>
     </message>
 </context>
 <context>
@@ -2273,48 +2261,48 @@ Think twice before resetting a card.</source>
     <message>
         <location filename="../src/SSHManagement.ui" line="14"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="54"/>
         <location filename="../src/SSHManagement.ui" line="269"/>
         <source>SSH Keys Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestion des clés SSH</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SSH Keys Not Loaded&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Press the load keys button to load SSH keys from your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Les clés SSH ne sont pas chargées&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Appuyez sur le bouton de chargement des clés pour charger les clés SSH depuis votre appareil.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="117"/>
         <source>Load Keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Charger les clés</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="279"/>
         <source>Only passphrase-free OpenSSH keys are supported at this moment.</source>
-        <translation type="unfinished"></translation>
+        <translation>Seules les clés de type OpenSSH sans mot de passe sont prises en charge pour le moment.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="303"/>
         <source>Import A Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer une clé</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="319"/>
         <source>Export Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter la sélection</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="335"/>
         <source>Delete Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer la sélection</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="370"/>
         <source>Leave SSH Keys Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortir du mode de gestion des clés SSH</translation>
     </message>
     <message>
         <source>SSH Keys management</source>
@@ -2378,7 +2366,9 @@ Think twice before resetting a card.</source>
         <source>mc-agent isn&apos;t bundled with the Moolticute app!
 
 Cannot manage SSH keys.</source>
-        <translation type="unfinished"></translation>
+        <translation>mc-agent n&apos;est pas inclus dans l&apos;application Moolticute!
+
+Impossible de gérer les clés SSH.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="158"/>
@@ -2394,22 +2384,22 @@ Cannot manage SSH keys.</source>
     <message>
         <location filename="../src/SSHManagement.cpp" line="167"/>
         <source>Failed to retrieve keys from the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de récupérer les clés depuis votre appareil!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="171"/>
         <source>Failed to import key into the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;importer la clé dans votre appareil!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="172"/>
         <source>Make sure it&apos;s an OpenSSH private key without a passphrase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez vous assurer qu&apos;il s&apos;agit d&apos;une clé privée OpenSSH sans mot de passe.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="176"/>
         <source>Failed to delete key from the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;effacer la clé du votre appareil!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="282"/>
@@ -2450,17 +2440,17 @@ Cannot manage SSH keys.</source>
     <message>
         <location filename="../src/SSHManagement.cpp" line="343"/>
         <source>OpenSSH private key</source>
-        <translation type="unfinished"></translation>
+        <translation>Clé privée OpenSSH</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="345"/>
         <source>OpenSSH private key (*.key *.pem *.* *)</source>
-        <translation type="unfinished"></translation>
+        <translation>Clé privée OpenSSH (*.key *.pem *.* *)</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="354"/>
         <source>PuTTY private keys are currently not supported!</source>
-        <translation type="unfinished"></translation>
+        <translation>Les clé privées de type Putty ne sont actuellement pas supportées!</translation>
     </message>
     <message>
         <source>Open SSH private key</source>
@@ -2479,22 +2469,22 @@ Proceed?</source>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="43"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Un identifiant sans nom d&apos;utilisateur a été détecté.</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="43"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Nom d&apos;utilisateur pour </translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="52"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Sous-domaine détecté!</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="52"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisissez le nom du domaine:</translation>
     </message>
 </context>
 <context>
@@ -2502,22 +2492,22 @@ Proceed?</source>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="99"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Un identifiant sans nom d&apos;utilisateur a été détecté.</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="99"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Nom d&apos;utilisateur pour </translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="121"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Sous-domaine détecté!</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="121"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisissez le nom du domaine:</translation>
     </message>
 </context>
 <context>
@@ -2545,7 +2535,7 @@ Proceed?</source>
     <message>
         <location filename="../src/QSimpleUpdater/src/Updater.cpp" line="543"/>
         <source>Change log:</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste des changements:</translation>
     </message>
 </context>
 <context>
@@ -2553,12 +2543,12 @@ Proceed?</source>
     <message>
         <location filename="../src/WSClient.cpp" line="242"/>
         <source>Credentials Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifiants détectés!</translation>
     </message>
     <message>
         <location filename="../src/WSClient.cpp" line="242"/>
         <source>Please Approve their Storage on the Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez confirmer leur stockage dans votre Mooltipass</translation>
     </message>
 </context>
 <context>
