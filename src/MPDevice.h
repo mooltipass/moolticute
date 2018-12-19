@@ -43,7 +43,7 @@ class IMessageProtocol;
 class MPCommand
 {
 public:
-    QByteArray data;
+    QVector<QByteArray> data;
     MPCommandCb cb;
     bool running = false;
 

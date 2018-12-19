@@ -115,7 +115,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
     MPCommand cmd;
 
     // Prepare MP packet
-    pMesProt->getPackets(cmd.data, data, c);
+    cmd.data = pMesProt->createPackets(data, c);
     cmd.cb = std::move(cb);
     cmd.checkReturn = checkReturn;
     cmd.retries_done = 0;
@@ -128,11 +128,14 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
 
         if (commandQueue.head().retry > 0)
         {
-            qDebug() << "> Retry command: " << MPCmd::printCmd(commandQueue.head().data);
+            qDebug() << "> Retry command: " << MPCmd::printCmd(pMesProt->getCommand(commandQueue.head().data[0]));
             commandQueue.head().sent_ts = QDateTime::currentMSecsSinceEpoch();
             commandQueue.head().timerTimeout->start(); //restart timer
             commandQueue.head().retries_done++;
-            platformWrite(commandQueue.head().data);
+            for (const auto &data : commandQueue.head().data)
+            {
+                platformWrite(data);
+            }
         }
         else
         {
@@ -140,7 +143,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
             MPCommand currentCmd = commandQueue.head();
             delete currentCmd.timerTimeout;
 
-            qWarning() << "> Retry command: " << MPCmd::printCmd(commandQueue.head().data) << " has failed too many times. Give up.";
+            qWarning() << "> Retry command: " << MPCmd::printCmd(pMesProt->getCommand(commandQueue.head().data[0])) << " has failed too many times. Give up.";
 
             bool done = true;
             currentCmd.cb(false, QByteArray(3, 0x00), done);
@@ -209,7 +212,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     }
 
     MPCommand currentCmd = commandQueue.head();
-    const auto currentCommand = pMesProt->getCommand(currentCmd.data);
+    const auto currentCommand = pMesProt->getCommand(currentCmd.data[0]);
 
     // First if: Resend the command, if device ask for retrying
     // Second if: Special case: if command check was requested but the device returned a mooltipass status (user entering his PIN), resend packet
@@ -246,7 +249,10 @@ void MPDevice::newDataRead(const QByteArray &data)
             {
                 timer->stop();
                 timer->deleteLater();
-                platformWrite(commandQueue.head().data);
+                for (const auto &data : commandQueue.head().data)
+                {
+                    platformWrite(data);
+                }
                 commandQueue.head().timerTimeout->start(); //restart timer
             });
             timer->start(300);
@@ -290,22 +296,27 @@ void MPDevice::sendDataDequeue()
     currentCmd.running = true;
 
 #ifdef DEV_DEBUG
-    qDebug() << "Platform send command: " << MPCmd::printCmd(currentCmd.data);
-
-    auto toHex = [](quint8 b) -> QString { return QString("0x%1").arg((quint8)b, 2, 16, QChar('0')); };
-    QString a = "[";
-    for (int i = 0;i < currentCmd.data.size();i++)
+    int i = 0;
+    qDebug() << "Platform send command: " << MPCmd::printCmd(pMesProt->getCommand(currentCmd.data[0]));
+#endif
+    // send data with platform code
+    for (const auto &data : currentCmd.data)
     {
-        a += toHex((quint8)currentCmd.data.at(i));
-        if (i < currentCmd.data.size() - 1) a += ", ";
-    }
-    a += "]";
+#ifdef DEV_DEBUG
+        auto toHex = [](quint8 b) -> QString { return QString("0x%1").arg((quint8)b, 2, 16, QChar('0')); };
+        QString a = "[";
+        for (int i = 0;i < data.size();i++)
+        {
+            a += toHex((quint8)data.at(i));
+            if (i < data.size() - 1) a += ", ";
+        }
+        a += "]";
 
-    qDebug() << "Full packet: " << a;
+        qDebug() << "Full packet#" << i++ << ": " << a;
 #endif
 
-    // send data with platform code
-    platformWrite(currentCmd.data);
+        platformWrite(data);
+    }
 
     currentCmd.timerTimeout->start();
 }

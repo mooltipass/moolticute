@@ -4,11 +4,13 @@ MessageProtocolMini::MessageProtocolMini()
 {
 }
 
-void MessageProtocolMini::getPackets(/*OUT*/ QByteArray &packet, const QByteArray &data, MPCmd::Command c)
+QVector<QByteArray> MessageProtocolMini::createPackets(const QByteArray &data, MPCmd::Command c)
 {
+    QByteArray packet;
     packet.append(static_cast<char>(data.size()));
     packet.append(static_cast<char>(c));
     packet.append(data);
+    return {packet};
 }
 
 Common::MPStatus MessageProtocolMini::getStatus(const QByteArray &data)
