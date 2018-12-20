@@ -32,6 +32,8 @@ public:
     libusb_context *ctx = nullptr;
     libusb_device *dev = nullptr;
 
+    bool isBLE = false;
+
 };
 
 inline bool operator==(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return lhs.id == rhs.id; }

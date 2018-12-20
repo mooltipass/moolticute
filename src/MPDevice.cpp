@@ -23,7 +23,7 @@
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
-MPDevice::MPDevice(QObject *parent):
+MPDevice::MPDevice(QObject *parent, bool isBLE /*=false*/):
     QObject(parent)
 {
     set_status(Common::UnknownStatus);
@@ -97,7 +97,14 @@ MPDevice::MPDevice(QObject *parent):
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
+    //TODO: Implement MessageProtocolBLE
+    //pMesProt = isBLE? new MessageProtocolBLE{} : new MessageProtocolMini{};
     pMesProt = new MessageProtocolMini{};
+    if (isBLE)
+    {
+        qDebug() << "Mooltipass Mini BLE is connected";
+    }
+
     QTimer::singleShot(100, [this]() { exitMemMgmtMode(false); });
 }
 

@@ -98,7 +98,7 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(qint64, uid, -1)
 
 public:
-    MPDevice(QObject *parent);
+    MPDevice(QObject *parent, bool isBLE = false);
     virtual ~MPDevice();
 
     enum KnockSensitivityThreshold

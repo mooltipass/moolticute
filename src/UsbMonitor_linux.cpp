@@ -144,6 +144,30 @@ void UsbMonitor_linux::attachCallbacks()
     if (err != LIBUSB_SUCCESS)
         qWarning() << "Failed to register LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT callback";
 
+    err = libusb_hotplug_register_callback(usb_ctx,
+                                           LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
+                                           (libusb_hotplug_flag)0,
+                                           MOOLTIPASS_BLE_VENDORID,
+                                           MOOLTIPASS_BLE_PRODUCTID,
+                                           LIBUSB_HOTPLUG_MATCH_ANY,
+                                           libusb_device_add_cb,
+                                           this,
+                                           &cbaddhandle);
+    if (err != LIBUSB_SUCCESS)
+        qWarning() << "Failed to register LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED callback";
+
+    err = libusb_hotplug_register_callback(usb_ctx,
+                                           LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
+                                           (libusb_hotplug_flag)0,
+                                           MOOLTIPASS_BLE_VENDORID,
+                                           MOOLTIPASS_BLE_PRODUCTID,
+                                           LIBUSB_HOTPLUG_MATCH_ANY,
+                                           libusb_device_del_cb,
+                                           this,
+                                           &cbdelhandle);
+    if (err != LIBUSB_SUCCESS)
+        qWarning() << "Failed to register LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT callback";
+
     libusb_set_pollfd_notifiers(usb_ctx, libusb_fd_add_cb, libusb_fd_del_cb, this);
 
     auto fds = libusb_get_pollfds(usb_ctx);

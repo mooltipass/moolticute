@@ -23,7 +23,7 @@
 static GUID IClassGuid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30} };
 
 MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
-    MPDevice(parent),
+    MPDevice(parent, p.isBLE),
     platformDef(std::move(p))
 {
     HID.load();
@@ -248,8 +248,8 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
         HID.HidD_GetAttributes(h, &attrib);
         CloseHandle(h);
 
-        if (attrib.VendorID != MOOLTIPASS_VENDORID ||
-            attrib.ProductID != MOOLTIPASS_PRODUCTID)
+        if ((attrib.VendorID != MOOLTIPASS_VENDORID && attrib.VendorID != MOOLTIPASS_BLE_VENDORID) ||
+            (attrib.ProductID != MOOLTIPASS_PRODUCTID && attrib.ProductID != MOOLTIPASS_BLE_PRODUCTID))
         {
             idx++;
             continue;
@@ -262,6 +262,7 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
         MPPlatformDef def;
         def.path = path;
         def.id = path; //use path for ID
+        def.isBLE = attrib.VendorID == MOOLTIPASS_BLE_VENDORID;
         devlist << def;
         idx++;
     }
