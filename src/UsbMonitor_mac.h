@@ -44,8 +44,10 @@ signals:
 
 private:
     UsbMonitor_mac();
+    void initHidmanager(IOHIDManagerRef& hidMan, int vendorId, int productId);
 
     IOHIDManagerRef hidmanager;
+    IOHIDManagerRef hidmanagerBLE;
     QHash<IOHIDDeviceRef, MPPlatformDef> deviceHash;
 
     //Callbacks from IOHIDManager

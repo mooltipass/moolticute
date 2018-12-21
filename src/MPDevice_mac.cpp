@@ -39,7 +39,7 @@ void _read_report_callback(void *context,
 }
 
 MPDevice_mac::MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef):
-    MPDevice(parent),
+    MPDevice(parent, platformDef.isBLE),
     hidref(platformDef.hidref)
 {
     IOReturn ret = IOHIDDeviceOpen(hidref, kIOHIDOptionsTypeSeizeDevice);
