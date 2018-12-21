@@ -20,6 +20,7 @@
 #include <functional>
 #include "ParseDomain.h"
 #include "MessageProtocol/MessageProtocolMini.h"
+#include "MessageProtocol/MessageProtocolBLE.h"
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
@@ -97,12 +98,15 @@ MPDevice::MPDevice(QObject *parent, bool isBLE /*=false*/):
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
-    //TODO: Implement MessageProtocolBLE
-    //pMesProt = isBLE? new MessageProtocolBLE{} : new MessageProtocolMini{};
-    pMesProt = new MessageProtocolMini{};
     if (isBLE)
     {
+        pMesProt = new MessageProtocolBLE{};
         qDebug() << "Mooltipass Mini BLE is connected";
+    }
+    else
+    {
+        pMesProt = new MessageProtocolMini{};
+        qDebug() << "Mooltipass Mini is connected";
     }
 
     QTimer::singleShot(100, [this]() { exitMemMgmtMode(false); });
