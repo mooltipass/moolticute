@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="nl_NL">
+<TS version="2.0" language="nl_NL">
 <context>
     <name>AnimatedColorButton</name>
     <message>
         <location filename="../src/AnimatedColorButton.cpp" line="54"/>
         <source>Hold to Confirm</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingedrukt houden om te Bevestigen</translation>
     </message>
 </context>
 <context>
@@ -67,62 +67,62 @@
     <message>
         <location filename="../src/AppGui.cpp" line="599"/>
         <source>%1 version has been released!</source>
-        <translation type="unfinished"></translation>
+        <translation>Versie %1 is vrijgegeven!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="600"/>
         <source>Open MC client to download it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Open de MC client om te beginnen downloaden.</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="613"/>
         <source>Would you like to download the update now?</source>
-        <translation type="unfinished">Wil u de update nu downloaden?</translation>
+        <translation>Wil u de update nu downloaden?</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="614"/>
         <source>Open changelog</source>
-        <translation type="unfinished"></translation>
+        <translation>Open het veranderingslogboek</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="631"/>
         <source>Mooltipass Not Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Mooltipass is niet verbonden</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="632"/>
         <source>Please Connect Your Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelieve je Mooltipass te verbinden</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="636"/>
         <source>No Card in Mooltipass!</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zit geen kaart in je Mooltipass!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="637"/>
         <source>Please Insert Your Smartcard and Enter Your PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelieve je smartcard in te brengen en je pincode in te geven</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="641"/>
         <source>Mooltipass in Management Mode!</source>
-        <translation type="unfinished"></translation>
+        <translation>Je Mooltipass is in beheermodus!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="642"/>
         <source>Please leave management mode in the App</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelieve beheersmodus af te sluiten in de App</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="646"/>
         <source>Mooltipass Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Mooltipass is vergrendeld</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="647"/>
         <source>Please Unlock Your Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelieve je Mooltipass te ontgrendelen</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="669"/>
@@ -235,7 +235,7 @@
         <location filename="../src/CredentialsManagement.ui" line="773"/>
         <location filename="../src/CredentialsManagement.cpp" line="53"/>
         <source>Exit Credential Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Logingegevensbeheer afsluiten</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="786"/>
@@ -255,7 +255,7 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="71"/>
         <source>Editing Service name</source>
-        <translation type="unfinished"></translation>
+        <translation>Dienstnaam aan het aanpassen</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="73"/>
@@ -312,7 +312,7 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="539"/>
         <source>Service name is already exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dienstnaam is reeds in gebruik</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="622"/>
@@ -383,25 +383,25 @@
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="144"/>
         <source>By denying you can lose your changes. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Door te weigeren zouden je wijzigingen verloren kunnen gaan. Wil je verdergaan?</translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="154"/>
         <source>Credentials on the device are more recent. </source>
-        <translation type="unfinished"></translation>
+        <translation>Logingegevens op je apparaat zijn recenter. </translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="155"/>
         <source>Do you want export credentials to backup file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenst u logingegevens te exporteren naar een backupbestand?</translation>
     </message>
     <message>
         <source>By denying you can loose your changes. Do you want to continue?</source>
-        <translation type="vanished">Door te weigeren zouden je wijzigingen verloren kunnen gaan. Wil je verdergaan?</translation>
+        <translation>Door te weigeren zouden je wijzigingen verloren kunnen gaan. Wil je verdergaan?</translation>
     </message>
     <message>
         <source>Credentials on the device are more recent. Do you want export credentials to backup file?</source>
-        <translation type="vanished">Logingegevens op je apparaat zijn recenter. Wil je deze logingegevens exporteren naar je backupbestand?</translation>
+        <translation>Logingegevens op je apparaat zijn recenter. Wil je deze logingegevens exporteren naar je backupbestand?</translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="205"/>
@@ -414,38 +414,38 @@
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="100"/>
         <source>Be careful</source>
-        <translation type="unfinished">Wees voorzichtig</translation>
+        <translation>Wees voorzichtig</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="101"/>
         <source>It&apos;s always good to make a backup of your database. Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Het is altijd een goed idee om een backup te maken van je database. Ben je zeker dat je verder wil gaan?</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="111"/>
         <source>You haven&apos;t made a backup of your database for a while. </source>
-        <translation type="unfinished"></translation>
+        <translation>Je hebt al een tijdje geen backup van je database meer gemaakt. </translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="112"/>
         <source>Do you want to backup your credentials now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wil je nu een backup nemen van je logingegevens?</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="133"/>
         <location filename="../src/DbExportsRegistryController.cpp" line="162"/>
         <source>Error</source>
-        <translation type="unfinished">Fout</translation>
+        <translation>Fout</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="137"/>
         <source>Save database export...</source>
-        <translation type="unfinished">Database export opslaan...</translation>
+        <translation>Database export opslaan...</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="162"/>
         <source>Unable to write to file %1</source>
-        <translation type="unfinished">Kon niet schrijven naar bestand %1</translation>
+        <translation>Kon niet schrijven naar bestand %1</translation>
     </message>
 </context>
 <context>
@@ -1037,7 +1037,7 @@ Hint: zweef met je muis boven een bepaalde optie om meer details weer te geven.<
     <message>
         <location filename="../src/MainWindow.ui" line="1050"/>
         <source>Lock device when computer sleeps or shuts down, if screen is locked, or user logs off</source>
-        <translation type="unfinished"></translation>
+        <translation>Vergrendel het apparaat wanneer de computer in slaapstand gaat of wordt uitgeschakeld, wanneer het scherm wordt vergrendeld, of wanneer de gebruiker uitlogt</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1063"/>
@@ -1092,32 +1092,33 @@ Hint: zweef met je muis boven een bepaalde optie om meer details weer te geven.<
     <message>
         <location filename="../src/MainWindow.ui" line="2514"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2926"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Behavior of ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gedrag van ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2953"/>
         <source>Systray icon</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Systray is a technical term, the question is whether it warrants translation</translatorcomment>
+        <translation>Systray icoon</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2986"/>
         <source>Subdomain selection: Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomeinselectie: Ingeschakeld</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3326"/>
         <source>Reset card</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaart herinitialiseren</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3360"/>
         <source>Erase Inserted Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingegeven kaart wissen</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3370"/>
@@ -1129,32 +1130,32 @@ Hint: zweef met je muis boven een bepaalde optie om meer details weer te geven.<
     <message>
         <location filename="../src/MainWindow.ui" line="3379"/>
         <source>Reset Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaart Herinitialiseren</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3391"/>
         <source>CSV file import/export</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV-bestand importeren/exporteren</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3413"/>
         <source>Import unencrypted passwords</source>
-        <translation type="unfinished"></translation>
+        <translation>Importeer versleutelde wachtwoorden</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3429"/>
         <source>Import CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV importeren</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3438"/>
         <source>Export passwords unencrypted</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporteer onversleutelde wachtwoorden</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3454"/>
         <source>Export CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV exporteren</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1611"/>
@@ -1299,7 +1300,7 @@ Hint: zweef met je muis boven een bepaalde optie om meer details weer te geven.<
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/raoulh/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/raoulh/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/raoulh/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/raoulh/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/raoulh/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/raoulh/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2583"/>
@@ -1402,13 +1403,13 @@ Hint: zweef met je muis boven een bepaalde optie om meer details weer te geven.<
         <location filename="../src/MainWindow.ui" line="3306"/>
         <source>Visible ON DE&amp;MAND  (use CTRL+SHIFT+F1 keyboard shortcut)</source>
         <translatorcomment>No M in this translation, what should I do?</translatorcomment>
-        <translation type="unfinished">Zichtbaar op aanvraag  (gebruik CTRL+SHIFT+F1 sneltoets)</translation>
+        <translation>Zichtbaar op aanvraag  (gebruik CTRL+SHIFT+F1 sneltoets)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3316"/>
         <source>ALWA&amp;YS visible</source>
         <translatorcomment>No Y in this translation, what should I do?</translatorcomment>
-        <translation type="unfinished">Altijd zichtbaar</translation>
+        <translation>Altijd zichtbaar</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="59"/>
@@ -1418,24 +1419,24 @@ Hint: zweef met je muis boven een bepaalde optie om meer details weer te geven.<
     <message>
         <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
 Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
-        <translation type="vanished">Al je gebruikersnamen en wachtwoorden worden opgeslagen in een geëncrypteerde database op je Mooltipass apparaat.
+        <translation>Al je gebruikersnamen en wachtwoorden worden opgeslagen in een geëncrypteerde database op je Mooltipass apparaat.
 Samen met je smartcard, maakt dit het mogelijk om je gebruikers database te exporteren naar je computer, om deze later in andere apparaten te importeren.</translation>
     </message>
     <message>
         <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
 Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
-        <translation type="vanished">Al je gebruikersnamen en wachtwoorden worden opgeslagen in een geëncrypteerde database op je Mooltipass apparaat.
+        <translation>Al je gebruikersnamen en wachtwoorden worden opgeslagen in een geëncrypteerde database op je Mooltipass apparaat.
 Samen met je smartcard, maakt dit het mogelijk om de database van een andere Mooltipass te importeren in dit apparaat.</translation>
     </message>
     <message>
         <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
 You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
-        <translation type="vanished">Kies een backupbestand om zeker te zijn dat je Mooltipass database daar altijd mee gesynchroniseerd blijft.
+        <translation>Kies een backupbestand om zeker te zijn dat je Mooltipass database daar altijd mee gesynchroniseerd blijft.
 Je zal meldingen krijgen voor import- of exportoperaties indien er wijzigingen aan je Mooltipass database of bestand met toezicht worden gedetecteerd.</translation>
     </message>
     <message>
         <source>The MooltiApp backup file doesn&apos;t have encrypted logins.</source>
-        <translation type="vanished">Het MooltiApp backupbestand bevat geen geëncrypteerde logingegevens.</translation>
+        <translation>Het MooltiApp backupbestand bevat geen geëncrypteerde logingegevens.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="271"/>
@@ -1473,22 +1474,24 @@ Je zal meldingen krijgen voor import- of exportoperaties indien er wijzigingen a
     <message>
         <location filename="../src/MainWindow.cpp" line="284"/>
         <source>Close Application</source>
-        <translation type="unfinished"></translation>
+        <translation>Toepassing Afsluiten</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="286"/>
         <source>Hide Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Venster Verbergen</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="303"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>No F in this translation, what should I do?</translatorcomment>
+        <translation>Bestand</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="304"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Sluiten</translation>
+        <translatorcomment>No Q in this translation, what should I do?</translatorcomment>
+        <translation>Sluiten</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="327"/>
@@ -1530,22 +1533,22 @@ Je zal meldingen krijgen voor import- of exportoperaties indien er wijzigingen a
     <message>
         <location filename="../src/MainWindow.cpp" line="334"/>
         <source>Ctrl + Alt + Del / Win + L</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl + Alt + Del / Win + L</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="338"/>
         <source>Black</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwart</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="339"/>
         <source>White</source>
-        <translation type="unfinished"></translation>
+        <translation>Wit</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="339"/>
         <source>_white</source>
-        <translation type="unfinished"></translation>
+        <translation>_wit</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="390"/>
@@ -1556,7 +1559,7 @@ Je zal meldingen krijgen voor import- of exportoperaties indien er wijzigingen a
         <location filename="../src/MainWindow.cpp" line="406"/>
         <source>Either the device have been tempered with or the input key is invalid.</source>
         <translatorcomment>Key as in keyboard key or key as in private key public key? Cause that&apos;s a different word. Invoersleutel is for a private key, use &quot;invoertoets&quot; is it&apos;s a keyboard key</translatorcomment>
-        <translation type="unfinished">Ofwel is er geknoeid met het apparaat, ofwel is de invoersleutel ongeldig.</translation>
+        <translation>Ofwel is er geknoeid met het apparaat, ofwel is de invoersleutel ongeldig.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="410"/>
@@ -1567,7 +1570,8 @@ Je zal meldingen krijgen voor import- of exportoperaties indien er wijzigingen a
         <location filename="../src/MainWindow.cpp" line="615"/>
         <source>Credentials have been modified.
 Do you want to save your changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Logingegevens zijn aangepast.
+Wilt je je wijzigingen opslaan?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="726"/>
@@ -1600,7 +1604,7 @@ Do you want to save your changes?</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="979"/>
         <source>Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout bij het opslaan</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="979"/>
@@ -1669,12 +1673,12 @@ Do you want to save your changes?</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="1138"/>
         <source>Subdomain selection: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomeinselectie: %1</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1224"/>
         <source>Select database export...</source>
-        <translation type="unfinished"></translation>
+        <translation>Geëxporteerde database selecteren...</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1257"/>
@@ -1685,57 +1689,58 @@ Do you want to save your changes?</source>
         <location filename="../src/MainWindow.cpp" line="1342"/>
         <source>Memory integrity check done successfully!
 %1 of %2 credential slots used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geheugenintegriteitscontrole succesvol afgerond!
+%1 van de %2 logingegevenssloten in gebruik.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1351"/>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Om zeker te zijn dat er niet is geknoeid met je toestel kan je een wachtwoord opvragen dat het mogelijk maakt de UID van je apparaat te achterhalen.&lt;ol&gt;&lt;li&gt;Vind het serienummer op de achterkant van je apparaat.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1&quot;&gt;Stuur ons een mail (in het Engels)&lt;/a&gt; met het serienummer en de vraag voor het wachtwoord.&lt;/li&gt;&lt;li&gt;Geef vervolgens het ontvangen wachtwoord in.&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1547"/>
         <source>Reset card failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Herinitialiseren van de kaart is msilukt!</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1549"/>
         <source>Reset card done successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Herinitialiseren van de kaart was succesvol</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1556"/>
         <source>Select CSV file to import...</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer het CSV-bestand om te importeren...</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1584"/>
         <source>Nothing is read from %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Er is niets om te lezen in %1</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1611"/>
         <source>Unable to import %1: Each row must contain exact 3 items. Some lines don&apos;t (lines number: %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kon niets importeren uit %1: Elke rij moet precies 3 delen bevatten. Bij sommige lijnen is dat niet zo (lijnnummers: %2)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1615"/>
         <source>Unable to import %1: Each row must contain exact 3 items (more than 10 lines don&apos;t)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kon niets importeren uit %1: Elke rij moet precies 3 delen bevatten. Bij sommige lijnen is dat niet zo (meer dan 10 lijnen)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1623"/>
         <source>Unable to import %1: Each row must contain exact 3 items using comma as a delimiter</source>
-        <translation type="unfinished"></translation>
+        <translation>Kon niets importeren uit %1: Elke rij moet precies 3 delen bevatten gescheiden door komma&apos;s</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1671"/>
         <source>Disable subdomain selection?</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomeinselectie uitschakelen?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1673"/>
         <source>Enable subdomain selection?</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomeinselectie inschakelen?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1233"/>
@@ -1751,49 +1756,33 @@ Do you want to save your changes?</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="53"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="56"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="62"/>
-        <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
-You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.cpp" line="65"/>
         <source>The MooltiApp backup file doesn&apos;t have encrypted usernames.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het MooltiApp backupbestand bevat geen geëncrypteerde gebruikersnamen.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="68"/>
         <source>When an unknown card message is displayed that means you have no database for this user in your Mooltipass device.
 Hovewer you or other users may have a backup file or may use this card in another device.
 Think twice before resetting a card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wanneer een melding over een onbekende kaart wordt weergegeven, betekent dat dat er geen database aanwezig is op je Mooltipass apparaat voor deze gebruiker.
+Echter, jijzelf of andere gebruikers hebben misschien een backupbestand of gebruiken deze kaart misschien in een ander apparaat.
+Denk dus goed na voordat je de kaart herinitialiseert.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="71"/>
         <source>Import unencrypted passwords from comma-separated values text file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Importeer versleutelde wachtwoorden uit een CSV-tekstbestand (komma gescheiden waarden).</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="74"/>
         <source>Export unencrypted passwords to comma-separated values text file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporteer versleutelde wachtwoorden naar een CSV-tekstbestand (komma gescheiden waarden).</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="270"/>
         <source>Very Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Heel Leeg</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1233"/>
@@ -1828,12 +1817,12 @@ Think twice before resetting a card.</source>
     </message>
     <message>
         <source>Memory integrity check done successfully</source>
-        <translation type="vanished">Geheugenintegriteitscontrole succesvol afegrond</translation>
+        <translation>Geheugenintegriteitscontrole succesvol afgerond</translation>
     </message>
     <message>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1&quot;&gt;Send us an email&lt;/a&gt; with the serial number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translatorcomment>added a note that emails should be in English</translatorcomment>
-        <translation type="vanished">Om zeker te zijn dat er niet is geknoeid met je toestel kan je een wachtwoord opvragen dat het mogelijk maakt de UID van je apparaat te achterhalen.&lt;ol&gt;&lt;li&gt;Vindt het serienummer op de achterkant van je apparaat.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1&quot;&gt;Stuur ons een mail (in het Engels)&lt;/a&gt; met het serienummer en de vraag voor het wachtwoord.&lt;/li&gt;&lt;li&gt;Geef vervolgens het ontvangen wachtwoord in.&lt;/li&gt;&lt;/ol&gt;</translation>
+        <translation>Om zeker te zijn dat er niet is geknoeid met je toestel kan je een wachtwoord opvragen dat het mogelijk maakt de UID van je apparaat te achterhalen.&lt;ol&gt;&lt;li&gt;Vind het serienummer op de achterkant van je apparaat.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1&quot;&gt;Stuur ons een mail (in het Engels)&lt;/a&gt; met het serienummer en de vraag voor het wachtwoord.&lt;/li&gt;&lt;li&gt;Geef vervolgens het ontvangen wachtwoord in.&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1422"/>
@@ -2113,32 +2102,33 @@ Think twice before resetting a card.</source>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="14"/>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="12"/>
         <source>Request Domain Name</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Difficult to translate verb without context</translatorcomment>
+        <translation>Domeinnaam opvragen</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="44"/>
         <source>Select domain</source>
-        <translation type="unfinished"></translation>
+        <translation>Domein selecteren</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="69"/>
         <source>Domain</source>
-        <translation type="unfinished"></translation>
+        <translation>Domein</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="14"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies de domeinaam:</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="16"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomein Gedetecteerd!</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="18"/>
         <source>You have the possibility to store subdomain or domain as service name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Je kan een subdomein of domein opslaan als dienstnaam.</translation>
     </message>
 </context>
 <context>
@@ -2147,28 +2137,29 @@ Think twice before resetting a card.</source>
         <location filename="../src/RequestLoginNameDialog.ui" line="14"/>
         <location filename="../src/RequestLoginNameDialog.cpp" line="12"/>
         <source>Request Login Name</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Same problem as &quot;Request Domain Name&quot;</translatorcomment>
+        <translation>Gebruikersnaam opvragen</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.ui" line="44"/>
         <location filename="../src/RequestLoginNameDialog.cpp" line="16"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Logingegevens zonder een gebruikersnaam werden gedetecteerd.</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.ui" line="69"/>
         <source>Login</source>
-        <translation type="unfinished">Login</translation>
+        <translation>Gebruikersnaam</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.cpp" line="14"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikersnaam voor </translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.cpp" line="18"/>
         <source>You have the possibility to include a login before storing the credential in the device. If you don&apos;t need a login, you can ignore the request.</source>
-        <translation type="unfinished"></translation>
+        <translation>Je kan een gebruikersnaam toevoegen voordat de logingegevens worden opgeslagen op het apparaat. Als je geen gebruikersnaam nodig hebt mag je deze vraag negeren.</translation>
     </message>
 </context>
 <context>
@@ -2182,60 +2173,60 @@ Think twice before resetting a card.</source>
         <location filename="../src/SSHManagement.ui" line="54"/>
         <location filename="../src/SSHManagement.ui" line="269"/>
         <source>SSH Keys Management</source>
-        <translation type="unfinished"></translation>
+        <translation>SSH Sleutelbeheer</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SSH Keys Not Loaded&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Press the load keys button to load SSH keys from your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SSH-sleutels niet geladen&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Druk op de knop Sleutels Laden om SSH sleutels te laden vanuit je apparaat.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="117"/>
         <source>Load Keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Sleutels Laden</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="279"/>
         <source>Only passphrase-free OpenSSH keys are supported at this moment.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alleen OpenSSH-sleutels zonder wachtwoordzin worden monenteel ondersteund.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="303"/>
         <source>Import A Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Een sleutel importeren</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="319"/>
         <source>Export Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporteer geselecteerde</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="335"/>
         <source>Delete Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder geselecteerde</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="370"/>
         <source>Leave SSH Keys Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Verlaat SSH Sleutelbeheer</translation>
     </message>
     <message>
         <source>SSH Keys management</source>
-        <translation type="vanished">SSH sleutelbeheer</translation>
+        <translation>SSH sleutelbeheer</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="57"/>
         <location filename="../src/SSHManagement.ui" line="272"/>
         <source>FrameTitle</source>
-        <translation type="unfinished"></translation>
+        <translation>FrameTitle</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;SSH is locked.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Press the unlock button to load SSH keys from the device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; fontsize:12pt;font-weight:600;&quot;&gt;SSH is vergrendeld&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Druk op de ontgrendelingsknop om SSH sleutels vanaf het apparaat te laden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; fontsize:12pt;font-weight:600;&quot;&gt;SSH is vergrendeld&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Druk op de ontgrendelingsknop om SSH sleutels vanaf het apparaat te laden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Unlock</source>
-        <translation type="vanished">Ontgrendelen</translation>
+        <translation>Ontgrendelen</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="189"/>
@@ -2244,19 +2235,19 @@ Think twice before resetting a card.</source>
     </message>
     <message>
         <source>Import a key</source>
-        <translation type="vanished">Een sleutel importeren</translation>
+        <translation>Een sleutel importeren</translation>
     </message>
     <message>
         <source>Export selected</source>
-        <translation type="vanished">Exporteer geselecteerde</translation>
+        <translation>Exporteer geselecteerde</translation>
     </message>
     <message>
         <source>Delete selected</source>
-        <translation type="vanished">Verwijder geselecteerde</translation>
+        <translation>Verwijder geselecteerde</translation>
     </message>
     <message>
         <source>Quit SSH Management</source>
-        <translation type="vanished">Sluit SSH-beheer</translation>
+        <translation>Sluit SSH-beheer</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="61"/>
@@ -2273,7 +2264,9 @@ Think twice before resetting a card.</source>
         <source>mc-agent isn&apos;t bundled with the Moolticute app!
 
 Cannot manage SSH keys.</source>
-        <translation type="unfinished"></translation>
+        <translation>mc-agent wordt niet gebundeld met de Moolticute app!
+
+Kan SSH-sleutels niet beheren.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="158"/>
@@ -2284,29 +2277,29 @@ Cannot manage SSH keys.</source>
         <source>Some errors occured:
 
 %1</source>
-        <translation type="vanished">Er is een fout opgetreden:
+        <translation>Er is een fout opgetreden:
 
 %1</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="167"/>
         <source>Failed to retrieve keys from the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Kon sleutels niet uit het apparaat ophalen!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="171"/>
         <source>Failed to import key into the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Kon de sleutel niet in het apparaat importeren!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="172"/>
         <source>Make sure it&apos;s an OpenSSH private key without a passphrase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zorg ervoor dat het zeker gaat om een OpenSSH privésleutel zonder wachtwoordzin.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="176"/>
         <source>Failed to delete key from the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Kon sleutel niet van het apparaat verwijderen!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="282"/>
@@ -2342,26 +2335,26 @@ Cannot manage SSH keys.</source>
     <message>
         <location filename="../src/SSHManagement.cpp" line="321"/>
         <source>Private key successfully exported.</source>
-        <translation>Private sleutel succesvol geëxporteerd.</translation>
+        <translation>Privésleutel succesvol geëxporteerd.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="343"/>
         <source>OpenSSH private key</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenSSH privésleutel</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="345"/>
         <source>OpenSSH private key (*.key *.pem *.* *)</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenSSH privésleutel (*.key *.pem *.* *)</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="354"/>
         <source>PuTTY private keys are currently not supported!</source>
-        <translation type="unfinished"></translation>
+        <translation>PuTTY privésleutels worden momenteel niet ondersteund!</translation>
     </message>
     <message>
         <source>Open SSH private key</source>
-        <translation type="vanished">Open SSH private sleutel</translation>
+        <translation>Open SSH private sleutel</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="401"/>
@@ -2378,22 +2371,22 @@ Wilt u doorgaan?</translation>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="43"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Logingegevens zonder gebruikersnaam getecteerd.</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="43"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikersnaam voor </translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="52"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomein Gedetecteerd!</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="52"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies de domeinaam:</translation>
     </message>
 </context>
 <context>
@@ -2401,22 +2394,22 @@ Wilt u doorgaan?</translation>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="99"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Logingegevens zonder een gebruikersnaam werden gedetecteerd.</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="99"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikersnaam voor </translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="121"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomein Gedetecteerd!</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="121"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies de domeinaam:</translation>
     </message>
 </context>
 <context>
@@ -2444,7 +2437,7 @@ Wilt u doorgaan?</translation>
     <message>
         <location filename="../src/QSimpleUpdater/src/Updater.cpp" line="543"/>
         <source>Change log:</source>
-        <translation type="unfinished"></translation>
+        <translation>Veranderingslogboek:</translation>
     </message>
 </context>
 <context>
@@ -2452,12 +2445,12 @@ Wilt u doorgaan?</translation>
     <message>
         <location filename="../src/WSClient.cpp" line="242"/>
         <source>Credentials Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Logingegevens Gedetecteerd!</translation>
     </message>
     <message>
         <location filename="../src/WSClient.cpp" line="242"/>
         <source>Please Approve their Storage on the Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelieve de opslag van de logingegevens in de Mooltipass goed te keuren</translation>
     </message>
 </context>
 <context>
