@@ -65,6 +65,7 @@ public:
         STACK_FREE            = 0x9C,
         CLONE_SMARTCARD       = 0x9D,
         DEBUG                 = 0xA0,
+        PING                  = 0xA1,
         VERSION               = 0xA2,
         CONTEXT               = 0xA3,
         GET_LOGIN             = 0xA4,

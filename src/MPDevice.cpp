@@ -24,6 +24,8 @@
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
+#define DEV_DEBUG
+
 MPDevice::MPDevice(QObject *parent, bool isBLE /*=false*/):
     QObject(parent)
 {
@@ -38,61 +40,101 @@ MPDevice::MPDevice(QObject *parent, bool isBLE /*=false*/):
         if (commandQueue.size() > 0)
             return;
 
-        sendData(MPCmd::MOOLTIPASS_STATUS, [this](bool success, const QByteArray &data, bool &)
+        /**
+         * @brief Testing PING for BLE
+         */
+        QByteArray test;
+        test.append(static_cast<char>(39));
+        sendData(MPCmd::PING_BLE, test, CMD_DEFAULT_TIMEOUT, [] (bool success, const QByteArray &data, bool &)
         {
-            if (!success)
-                return;
+            qDebug() << "testing ping";
+        }
+        );
 
-            /* Map status from received val */
-            Common::MPStatus s = pMesProt->getStatus(data);
-            Common::MPStatus prevStatus = get_status();
+        /**
+         * @brief Testing CMD_DBG_GET_PLAT_INFO for BLE
+         */
+//        sendData(MPCmd::CMD_DBG_GET_PLAT_INFO, [] (bool success, const QByteArray &data, bool &)
+//        {
+//            qDebug() << "testing platInfo";
+//        }
+//        );
 
-            /* Trigger on status change */
-            if (s != prevStatus)
-            {
-                qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
+        /**
+         * @brief Testing CMD_DBG_GET_ACC_32_SAMPLES for BLE
+         */
+//        sendData(MPCmd::CMD_DBG_GET_ACC_32_SAMPLES, QByteArray(), 50000, [] (bool success, const QByteArray &data, bool &done)
+//        {
+//            qDebug() << "testing 32 bit sample";
+//            quint8 total = data[1] & 0x0F;
+//            quint8 act = (data[1] & 0xF0) >> 4;
+//            qDebug() << "Actual packet: " << act << ", total packets: " << total;
+//            if (act != total)
+//            {
+//                done = false;
+//            }
+//            else
+//            {
+//                qDebug() << "ALL packets received!";
+//            }
+//        }
+//        );
 
-                /* Update status */
-                set_status(s);
+//        sendData(MPCmd::MOOLTIPASS_STATUS, [this](bool success, const QByteArray &data, bool &)
+//        {
+//            if (!success)
+//                return;
 
-                if (prevStatus == Common::UnknownStatus)
-                {
-                    /* First start: load parameters */
-                    QTimer::singleShot(10, [this]()
-                    {
-                        loadParameters();
-                        setCurrentDate();
-                    });
-                }
+//            /* Map status from received val */
+//            Common::MPStatus s = pMesProt->getStatus(data);
+//            Common::MPStatus prevStatus = get_status();
 
-                if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
-                {
-                    QTimer::singleShot(20, [this]()
-                    {
-                        getCurrentCardCPZ();
-                    });
-                }
-                else
-                {
-                    filesCache.resetState();
-                }
+//            /* Trigger on status change */
+//            if (s != prevStatus)
+//            {
+//                qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
 
-                if (s == Common::Unlocked)
-                {
-                    /* If v1.2 firmware, query user change number */
-                    QTimer::singleShot(50, [this]()
-                    {
-                        if (isFw12())
-                        {
-                            qInfo() << "Firmware above v1.2, requesting change numbers";
-                            getChangeNumbers();
-                        }
-                        else
-                            qInfo() << "Firmware below v1.2, do not request change numbers";
-                    });
-                }
-            }
-        });
+//                /* Update status */
+//                set_status(s);
+
+//                if (prevStatus == Common::UnknownStatus)
+//                {
+//                    /* First start: load parameters */
+//                    QTimer::singleShot(10, [this]()
+//                    {
+//                        loadParameters();
+//                        setCurrentDate();
+//                    });
+//                }
+
+//                if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
+//                {
+//                    QTimer::singleShot(20, [this]()
+//                    {
+//                        getCurrentCardCPZ();
+//                    });
+//                }
+//                else
+//                {
+//                    filesCache.resetState();
+//                }
+
+//                if (s == Common::Unlocked)
+//                {
+//                    /* If v1.2 firmware, query user change number */
+//                    QTimer::singleShot(50, [this]()
+//                    {
+//                        if (isFw12())
+//                        {
+//                            qInfo() << "Firmware above v1.2, requesting change numbers";
+//                            getChangeNumbers();
+//                        }
+//                        else
+//                            qInfo() << "Firmware below v1.2, do not request change numbers";
+//                    });
+//                }
+//            }
+//        });
     });
 
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
@@ -109,7 +151,7 @@ MPDevice::MPDevice(QObject *parent, bool isBLE /*=false*/):
         qDebug() << "Mooltipass Mini is connected";
     }
 
-    QTimer::singleShot(100, [this]() { exitMemMgmtMode(false); });
+    //QTimer::singleShot(100, [this]() { exitMemMgmtMode(false); });
 }
 
 MPDevice::~MPDevice()
@@ -273,13 +315,13 @@ void MPDevice::newDataRead(const QByteArray &data)
 
     //Only check returned command if it was asked
     //If the returned command does not match, fail
-    if (currentCmd.checkReturn &&
-        dataCommand != currentCommand)
-    {
-        qWarning() << "Wrong answer received: " << MPCmd::printCmd(dataCommand)
-                   << " for command: " << MPCmd::printCmd(currentCommand);
-        return;
-    }
+//    if (currentCmd.checkReturn &&
+//        dataCommand != currentCommand)
+//    {
+//        qWarning() << "Wrong answer received: " << MPCmd::printCmd(dataCommand)
+//                   << " for command: " << MPCmd::printCmd(currentCommand);
+//        return;
+//    }
 
 #ifdef DEV_DEBUG
     qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
@@ -296,6 +338,10 @@ void MPDevice::newDataRead(const QByteArray &data)
     {
         commandQueue.dequeue();
         sendDataDequeue();
+    }
+    else
+    {
+        currentCmd.checkReturn = false;
     }
 }
 
