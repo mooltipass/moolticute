@@ -41,8 +41,9 @@ class MPCmd: public QObject
     Q_OBJECT
 public:
 
-    enum Command: unsigned char
+    enum Command: unsigned short int
     {
+        PING_BLE              = 0x0001,
         EXPORT_FLASH_START    = 0x8A,
         EXPORT_FLASH          = 0x8B,
         EXPORT_FLASH_END      = 0x8C,
@@ -64,7 +65,6 @@ public:
         STACK_FREE            = 0x9C,
         CLONE_SMARTCARD       = 0x9D,
         DEBUG                 = 0xA0,
-        PING                  = 0xA1,
         VERSION               = 0xA2,
         CONTEXT               = 0xA3,
         GET_LOGIN             = 0xA4,
@@ -121,6 +121,8 @@ public:
         SET_DESCRIPTION       = 0xD8,
         LOCK_DEVICE           = 0xD9,
         GET_SERIAL            = 0xDA,
+        CMD_DBG_GET_ACC_32_SAMPLES = 0x8008,
+        CMD_DBG_GET_PLAT_INFO = 0x800A,
     };
     Q_ENUM(Command)
 

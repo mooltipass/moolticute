@@ -18,7 +18,7 @@ Common::MPStatus MessageProtocolMini::getStatus(const QByteArray &data)
     return Common::MPStatus(data[MP_PAYLOAD_FIELD_INDEX]);
 }
 
-quint8 MessageProtocolMini::getMessageSize(const QByteArray &data)
+quint16 MessageProtocolMini::getMessageSize(const QByteArray &data)
 {
     return static_cast<quint8>(data[MP_LEN_FIELD_INDEX]);
 }

@@ -23,7 +23,7 @@ public:
      */
     virtual QVector<QByteArray> createPackets(const QByteArray &data, MPCmd::Command c) = 0;
     virtual Common::MPStatus getStatus(const QByteArray &data) = 0;
-    virtual quint8 getMessageSize(const QByteArray &data) = 0;
+    virtual quint16 getMessageSize(const QByteArray &data) = 0;
     virtual MPCmd::Command getCommand(const QByteArray &data) = 0;
 
     // Payload related functions

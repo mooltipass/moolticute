@@ -11,7 +11,7 @@ public:
     // IMessageProtocol interface
     virtual QVector<QByteArray> createPackets(const QByteArray &data, MPCmd::Command c) override;
     virtual Common::MPStatus getStatus(const QByteArray &data) override;
-    virtual quint8 getMessageSize(const QByteArray &data) override;
+    virtual quint16 getMessageSize(const QByteArray &data) override;
     virtual MPCmd::Command getCommand(const QByteArray &data) override;
 
     virtual quint8 getFirstPayloadByte(const QByteArray &data) override;

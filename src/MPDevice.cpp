@@ -218,7 +218,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     if (commandQueue.isEmpty())
     {
         qWarning() << "Command queue is empty!";
-        qWarning() << "Packet data " << " size:" << pMesProt->getMessageSize(data) << " data:" << data;
+        qWarning() << "Packet data " << " size:" << pMesProt->getMessageSize(data) << " data:" << data.toHex();
         return;
     }
 
@@ -282,6 +282,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     }
 
 #ifdef DEV_DEBUG
+    qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
     qDebug() << "Received answer:" << MPCmd::printCmd(dataCommand)
              << "Full packet:" << data.toHex();
 #endif
@@ -314,7 +315,7 @@ void MPDevice::sendDataDequeue()
     for (const auto &data : currentCmd.data)
     {
 #ifdef DEV_DEBUG
-        auto toHex = [](quint8 b) -> QString { return QString("0x%1").arg((quint8)b, 2, 16, QChar('0')); };
+        auto toHex = [](quint16 b) -> QString { return QString("0x%1").arg((quint16)b, 2, 16, QChar('0')); };
         QString a = "[";
         for (int i = 0;i < data.size();i++)
         {
