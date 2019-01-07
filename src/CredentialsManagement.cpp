@@ -68,7 +68,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonFavorite->setIcon(AppGui::qtAwesome()->icon(fa::star, whiteButtons));
     ui->toolButtonEditService->setStyleSheet(CSS_BLUE_BUTTON);
     ui->toolButtonEditService->setIcon(AppGui::qtAwesome()->icon(fa::edit));
-    ui->toolButtonEditService->setToolTip(tr("Editing Service name"));
+    ui->toolButtonEditService->setToolTip(tr("Edit Service Name"));
 
     QAction *action = m_favMenu.addAction(tr("Not a favorite"));
     connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
@@ -536,7 +536,7 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
 
                 if (isServiceExist)
                 {
-                    setServiceInputAttributes(tr("Service name is already exist"), Qt::red);
+                    setServiceInputAttributes(tr("Service already exists"), Qt::red);
                 }
             }
 
