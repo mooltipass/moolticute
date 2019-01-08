@@ -44,10 +44,16 @@ public:
 Q_DECLARE_METATYPE(USBTransfer*)
 
 MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef):
-    MPDevice(parent, platformDef.isBLE),
+    MPDevice(parent),
     usb_ctx(platformDef.ctx),
     device(platformDef.dev)
 {
+    if (platformDef.isBLE)
+    {
+        deviceType = DeviceType::BLE;
+    }
+    setupMessageProtocol();
+
     worker = new TransferThread(usb_ctx);
     connect(worker, &TransferThread::finished, worker, &QObject::deleteLater);
     worker->keepWoorking = true;

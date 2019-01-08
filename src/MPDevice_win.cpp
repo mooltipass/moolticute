@@ -23,7 +23,7 @@
 static GUID IClassGuid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30} };
 
 MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
-    MPDevice(parent, p.isBLE),
+    MPDevice(parent),
     platformDef(std::move(p))
 {
     HID.load();
@@ -31,6 +31,12 @@ MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
     oNotifier = new QWinOverlappedIoNotifier(this);
     connect(oNotifier, SIGNAL(notified(quint32,quint32,OVERLAPPED*)),
             this, SLOT(ovlpNotified(quint32,quint32,OVERLAPPED*)));
+
+    if (p.isBLE)
+    {
+        deviceType = DeviceType::BLE;
+    }
+    setupMessageProtocol();
 
     if (!openPath())
         qWarning() << "Error opening device";

@@ -24,7 +24,7 @@
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
-MPDevice::MPDevice(QObject *parent, bool isBLE /*=false*/):
+MPDevice::MPDevice(QObject *parent):
     QObject(parent)
 {
     set_status(Common::UnknownStatus);
@@ -98,7 +98,17 @@ MPDevice::MPDevice(QObject *parent, bool isBLE /*=false*/):
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
-    if (isBLE)
+}
+
+MPDevice::~MPDevice()
+{
+    filesCache.resetState();
+    delete pMesProt;
+}
+
+void MPDevice::setupMessageProtocol()
+{
+    if (isBLE())
     {
         pMesProt = new MessageProtocolBLE{};
         qDebug() << "Mooltipass Mini BLE is connected";
@@ -110,15 +120,6 @@ MPDevice::MPDevice(QObject *parent, bool isBLE /*=false*/):
     }
 
     QTimer::singleShot(100, [this]() { exitMemMgmtMode(false); });
-}
-
-MPDevice::~MPDevice()
-{
-    filesCache.resetState();
-    if (nullptr != pMesProt)
-    {
-        delete pMesProt;
-    }
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
@@ -461,7 +462,10 @@ void MPDevice::loadParameters()
             int v = match.captured(1).toInt() * 10 +
                     match.captured(2).toInt();
             isFw12Flag = v >= 12;
-            isMiniFlag = match.captured(3) == "_mini";
+            if (match.captured(3) == "_mini")
+            {
+                deviceType = DeviceType::MINI;
+            }
         }
 
         return true;

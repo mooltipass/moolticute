@@ -98,7 +98,7 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(qint64, uid, -1)
 
 public:
-    MPDevice(QObject *parent, bool isBLE = false);
+    MPDevice(QObject *parent);
     virtual ~MPDevice();
 
     enum KnockSensitivityThreshold
@@ -109,6 +109,14 @@ public:
         KNOCKING_HIGH = 5
     };
 
+    enum class DeviceType
+    {
+        MOOLTIPASS = 0,
+        MINI = 1,
+        BLE = 2
+    };
+
+    void setupMessageProtocol();
     /* Send a command with data to the device */
     void sendData(MPCmd::Command cmd, const QByteArray &data = QByteArray(), quint32 timeout = CMD_DEFAULT_TIMEOUT, MPCommandCb cb = [](bool, const QByteArray &, bool &){}, bool checkReturn = true);
     void sendData(MPCmd::Command cmd, quint32 timeout, MPCommandCb cb);
@@ -228,9 +236,11 @@ public:
     QList<MPNode *> &getDataNodes() { return dataNodes; }
 
     //true if device is a mini
-    bool isMini() { return isMiniFlag; }
+    inline bool isMini() const { return DeviceType::MINI == deviceType; }
+    //true if device is a ble
+    inline bool isBLE() const { return DeviceType::BLE == deviceType;}
     //true if device fw version is at least 1.2
-    bool isFw12() { return isFw12Flag; }
+    inline bool isFw12() const { return isFw12Flag; }
 
     QList<QVariantMap> getFilesCache();
     bool hasFilesCache();
@@ -410,7 +420,6 @@ private:
     QList<MPNode *> importedDataNodes;          //list of all parent nodes for data nodes
     QList<MPNode *> importedDataChildNodes;     //list of all parent nodes for data nodes
 
-    bool isMiniFlag = false;            // true if fw is mini
     bool isFw12Flag = false;            // true if fw is at least v1.2
 
     //this queue is used to put jobs list in a wait
@@ -435,6 +444,9 @@ private:
 
     //Message Protocol
     IMessageProtocol *pMesProt = nullptr;
+
+protected:
+    DeviceType deviceType = DeviceType::MOOLTIPASS;
 };
 
 #endif // MPDEVICE_H
