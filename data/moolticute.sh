@@ -41,6 +41,7 @@ ACTION!="add|change", GOTO="mooltipass_end"
 
 # console user
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", MODE="0660", SYMLINK+="mooltipass_keyboard", TAG+="uaccess"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="4321", MODE="0660", SYMLINK+="mooltipass_keyboard", TAG+="uaccess"
 # libusb
 SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", MODE="0660", SYMLINK+="mooltipass_device", TAG+="uaccess"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="4321", MODE="0660", SYMLINK+="mooltipass_device", TAG+="uaccess"

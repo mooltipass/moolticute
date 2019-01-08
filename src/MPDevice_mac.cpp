@@ -39,9 +39,15 @@ void _read_report_callback(void *context,
 }
 
 MPDevice_mac::MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef):
-    MPDevice(parent, platformDef.isBLE),
+    MPDevice(parent),
     hidref(platformDef.hidref)
 {
+    if (platformDef.isBLE)
+    {
+        deviceType = DeviceType::BLE;
+    }
+    setupMessageProtocol();
+
     IOReturn ret = IOHIDDeviceOpen(hidref, kIOHIDOptionsTypeSeizeDevice);
     if (ret != kIOReturnSuccess)
     {
