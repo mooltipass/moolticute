@@ -27,9 +27,21 @@ void _device_matching_callback(void *user_data,
     Q_UNUSED(inSender);
     UsbMonitor_mac *um = reinterpret_cast<UsbMonitor_mac *>(user_data);
 
+    int vendorID = 0;
+    CFNumberRef vendorNumRef = (CFNumberRef)IOHIDDeviceGetProperty(inIOHIDDeviceRef, CFSTR(kIOHIDVendorIDKey)) ;
+    if (vendorNumRef)
+    {
+        CFNumberGetValue(vendorNumRef, kCFNumberSInt32Type, &vendorID);
+    }
+    else
+    {
+        qWarning("VendorID is not found.");
+    }
+
     MPPlatformDef def;
     def.hidref = inIOHIDDeviceRef;
     def.id = QString("%1").arg((quint64)def.hidref);
+    def.isBLE = vendorID == MOOLTIPASS_BLE_VENDORID;
 
     if (!um->deviceHash.contains(def.hidref))
     {
@@ -60,8 +72,16 @@ void _device_removal_callback(void *user_data,
 UsbMonitor_mac::UsbMonitor_mac():
     QObject()
 {
+    // Init HID Manager
+    initHidmanager(hidmanager, MOOLTIPASS_VENDORID, MOOLTIPASS_PRODUCTID);
+    // Init HID Manager for BLE
+    initHidmanager(hidmanagerBLE, MOOLTIPASS_BLE_VENDORID, MOOLTIPASS_BLE_PRODUCTID);
+}
+
+void UsbMonitor_mac::initHidmanager(IOHIDManagerRef &hidMan, int vendorId, int productId)
+{
     // Create an HID Manager
-    hidmanager = IOHIDManagerCreate(kCFAllocatorDefault,
+    hidMan = IOHIDManagerCreate(kCFAllocatorDefault,
                                                     kIOHIDOptionsTypeNone);
 
     // Create a Matching Dictionary for filtering HID devices
@@ -73,13 +93,13 @@ UsbMonitor_mac::UsbMonitor_mac():
     // Set device info in the Matching Dictionary (pid/vid/usage/usagepage)
 
     //VendorID
-    int val = MOOLTIPASS_VENDORID;
+    int val = vendorId;
     CFNumberRef vid = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &val);
     CFDictionarySetValue(matchDict, CFSTR(kIOHIDVendorIDKey), vid);
     CFRelease(vid);
 
     //ProductID
-    val = MOOLTIPASS_PRODUCTID;
+    val = productId;
     CFNumberRef pid = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &val);
     CFDictionarySetValue(matchDict, CFSTR(kIOHIDProductIDKey), pid);
     CFRelease(pid);
@@ -97,20 +117,20 @@ UsbMonitor_mac::UsbMonitor_mac():
     CFRelease(usagep);
 
     // Register the Matching Dictionary to the HID Manager
-    IOHIDManagerSetDeviceMatching(hidmanager, matchDict);
+    IOHIDManagerSetDeviceMatching(hidMan, matchDict);
 
     // Register a callback for USB device detection with the HID Manager
-    IOHIDManagerRegisterDeviceMatchingCallback(hidmanager, &_device_matching_callback, this);
+    IOHIDManagerRegisterDeviceMatchingCallback(hidMan, &_device_matching_callback, this);
 
     // Register a callback fro USB device removal with the HID Manager
-    IOHIDManagerRegisterDeviceRemovalCallback(hidmanager, &_device_removal_callback, this);
+    IOHIDManagerRegisterDeviceRemovalCallback(hidMan, &_device_removal_callback, this);
 
     // Register the HID Manager on our app’s run loop
     // CFRunLoopGetCurrent() can safely be used because Qt uses CFRunloop in its backend platform plugin
-    IOHIDManagerScheduleWithRunLoop(hidmanager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+    IOHIDManagerScheduleWithRunLoop(hidMan, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 
     // Open the HID Manager
-    IOReturn ioret = IOHIDManagerOpen(hidmanager, kIOHIDOptionsTypeNone);
+    IOReturn ioret = IOHIDManagerOpen(hidMan, kIOHIDOptionsTypeNone);
     if (ioret)
         qWarning() << "Failed to open IOHIDManager";
 }
@@ -119,6 +139,8 @@ UsbMonitor_mac::~UsbMonitor_mac()
 {
     IOHIDManagerClose(hidmanager, kIOHIDOptionsTypeNone);
     CFRelease(hidmanager);
+    IOHIDManagerClose(hidmanagerBLE, kIOHIDOptionsTypeNone);
+    CFRelease(hidmanagerBLE);
 }
 
 QList<MPPlatformDef> UsbMonitor_mac::getDeviceList()

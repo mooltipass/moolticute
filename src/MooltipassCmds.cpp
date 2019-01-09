@@ -59,7 +59,15 @@ QString MPCmd::printCmd(const QByteArray &ba)
             .arg(MPCmd::toHexString(c));
 }
 
+QString MPCmd::printCmd(const MPCmd::Command &cmd)
+{
+    QMetaEnum m = QMetaEnum::fromType<MPCmd::Command>();
+    return QString("%1 (%2)")
+            .arg(m.valueToKey(cmd))
+            .arg(MPCmd::toHexString(cmd));
+}
+
 MPCmd::Command MPCmd::from(char c)
 {
-    return static_cast<MPCmd::Command>((quint8)c);
+    return static_cast<MPCmd::Command>(static_cast<quint8>(c));
 }

@@ -1,0 +1,28 @@
+#ifndef MESSAGEPROTOCOLBLE_H
+#define MESSAGEPROTOCOLBLE_H
+
+#include "IMessageProtocol.h"
+
+class MessageProtocolBLE : public IMessageProtocol
+{
+public:
+    MessageProtocolBLE();
+
+    // IMessageProtocol interface
+    virtual QVector<QByteArray> createPackets(const QByteArray &data, MPCmd::Command c) override;
+    virtual Common::MPStatus getStatus(const QByteArray &data) override;
+    virtual quint8 getMessageSize(const QByteArray &data) override;
+    virtual MPCmd::Command getCommand(const QByteArray &data) override;
+
+    virtual quint8 getFirstPayloadByte(const QByteArray &data) override;
+    virtual quint8 getPayloadByteAt(const QByteArray &data, int at) override;
+    virtual QByteArray getFullPayload(const QByteArray &data) override;
+    virtual QByteArray getPayloadBytes(const QByteArray &data, int fromPayload, int to) override;
+
+    virtual quint32 getSerialNumber(const QByteArray &data) override;
+    virtual QVector<QByteArray> createWriteNodePackets(const QByteArray& data, const QByteArray& address) override;
+    //This default func only checks if return value from device is ok or not
+    virtual AsyncFuncDone getDefaultFuncDone() override;
+};
+
+#endif // MESSAGEPROTOCOLBLE_H

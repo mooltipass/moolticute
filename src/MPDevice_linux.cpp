@@ -48,6 +48,12 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
     usb_ctx(platformDef.ctx),
     device(platformDef.dev)
 {
+    if (platformDef.isBLE)
+    {
+        deviceType = DeviceType::BLE;
+    }
+    setupMessageProtocol();
+
     worker = new TransferThread(usb_ctx);
     connect(worker, &TransferThread::finished, worker, &QObject::deleteLater);
     worker->keepWoorking = true;
@@ -179,8 +185,11 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
         int res;
 
         res = libusb_get_device_descriptor(dev, &desc);
-        if (desc.idVendor != MOOLTIPASS_VENDORID || desc.idProduct != MOOLTIPASS_PRODUCTID)
+        if ((desc.idVendor != MOOLTIPASS_VENDORID && desc.idVendor != MOOLTIPASS_BLE_VENDORID) ||
+            (desc.idProduct != MOOLTIPASS_PRODUCTID && desc.idProduct != MOOLTIPASS_BLE_PRODUCTID))
+        {
             continue;
+        }
 
         res = libusb_get_active_config_descriptor(dev, &conf_desc);
         if (res < 0)
@@ -228,14 +237,15 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
                     const struct libusb_interface_descriptor *intf_desc = &intf->altsetting[k];
                     if (intf_desc->bInterfaceClass == LIBUSB_CLASS_HID)
                     {
-                        if (desc.idVendor == MOOLTIPASS_VENDORID &&
-                            desc.idProduct == MOOLTIPASS_PRODUCTID)
+                        if ((desc.idVendor == MOOLTIPASS_VENDORID || desc.idVendor == MOOLTIPASS_BLE_VENDORID) &&
+                            (desc.idProduct == MOOLTIPASS_PRODUCTID || desc.idProduct == MOOLTIPASS_BLE_PRODUCTID))
                         {
                             MPPlatformDef def;
                             def.ctx = UsbMonitor_linux::Instance()->getUsbContext();
                             libusb_ref_device(dev);
                             def.dev = dev;
                             def.id = QString("%1").arg((quint64)dev); //use dev pointer for ID
+                            def.isBLE = desc.idVendor == MOOLTIPASS_BLE_VENDORID;
                             devlist << def;
                         }
                     }

@@ -29,6 +29,7 @@ public:
     QString id; //unique id for all platform
 
     IOHIDDeviceRef hidref;
+    bool isBLE = false;
 };
 
 inline bool operator==(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return lhs.id == rhs.id; }

@@ -69,7 +69,9 @@ SOURCES += src/main_daemon.cpp \
     src/MooltipassCmds.cpp \
     src/FilesCache.cpp \
     src/SimpleCrypt/SimpleCrypt.cpp \
-    src/ParseDomain.cpp
+    src/ParseDomain.cpp \
+    src/MessageProtocol/MessageProtocolMini.cpp \
+    src/MessageProtocol/MessageProtocolBLE.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -89,7 +91,10 @@ HEADERS  += \
     src/HttpServer.h \
     src/FilesCache.h \
     src/SimpleCrypt/SimpleCrypt.h \
-    src/ParseDomain.h
+    src/ParseDomain.h \
+    src/MessageProtocol/IMessageProtocol.h \
+    src/MessageProtocol/MessageProtocolMini.h \
+    src/MessageProtocol/MessageProtocolBLE.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \

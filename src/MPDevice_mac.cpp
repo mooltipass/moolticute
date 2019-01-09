@@ -42,6 +42,12 @@ MPDevice_mac::MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef):
     MPDevice(parent),
     hidref(platformDef.hidref)
 {
+    if (platformDef.isBLE)
+    {
+        deviceType = DeviceType::BLE;
+    }
+    setupMessageProtocol();
+
     IOReturn ret = IOHIDDeviceOpen(hidref, kIOHIDOptionsTypeSeizeDevice);
     if (ret != kIOReturnSuccess)
     {

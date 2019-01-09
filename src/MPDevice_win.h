@@ -62,6 +62,7 @@ public:
     QString path;
     USHORT outReportLen = 0;
     USHORT inReportLen = 0;
+    bool isBLE = false;
 };
 
 inline bool operator==(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return lhs.id == rhs.id; }

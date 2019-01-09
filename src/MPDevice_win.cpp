@@ -32,6 +32,12 @@ MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
     connect(oNotifier, SIGNAL(notified(quint32,quint32,OVERLAPPED*)),
             this, SLOT(ovlpNotified(quint32,quint32,OVERLAPPED*)));
 
+    if (p.isBLE)
+    {
+        deviceType = DeviceType::BLE;
+    }
+    setupMessageProtocol();
+
     if (!openPath())
         qWarning() << "Error opening device";
     else
@@ -248,8 +254,8 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
         HID.HidD_GetAttributes(h, &attrib);
         CloseHandle(h);
 
-        if (attrib.VendorID != MOOLTIPASS_VENDORID ||
-            attrib.ProductID != MOOLTIPASS_PRODUCTID)
+        if ((attrib.VendorID != MOOLTIPASS_VENDORID && attrib.VendorID != MOOLTIPASS_BLE_VENDORID) ||
+            (attrib.ProductID != MOOLTIPASS_PRODUCTID && attrib.ProductID != MOOLTIPASS_BLE_PRODUCTID))
         {
             idx++;
             continue;
@@ -262,6 +268,7 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
         MPPlatformDef def;
         def.path = path;
         def.id = path; //use path for ID
+        def.isBLE = attrib.VendorID == MOOLTIPASS_BLE_VENDORID;
         devlist << def;
         idx++;
     }

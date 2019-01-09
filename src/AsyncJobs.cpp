@@ -19,11 +19,6 @@
 #include "AsyncJobs.h"
 #include "MPDevice.h"
 
-AsyncFuncDone MPCommandJob::defaultCheckRet = [](const QByteArray &data, bool &) -> bool
-{
-    return (quint8)data.at(2) == 0x01;
-};
-
 void MPCommandJob::start(const QByteArray &previous_data)
 {
     if (!beforeFunc(previous_data, data))
