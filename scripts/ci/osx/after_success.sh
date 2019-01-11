@@ -81,8 +81,7 @@ codesign --verify --verbose=4 build/$APP.app
 spctl --assess --verbose=4 --raw build/$APP.app
 
 #install https://github.com/al45tair/dmgbuild
-brew install python
-sudo pip install dmgbuild
+pip install dmgbuild
 dmgbuild -s mac/settings.py "Moolticute" build/$APP-$VERSION.dmg
 
 #sign dmg
