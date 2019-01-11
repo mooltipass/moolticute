@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import biplist
 import os.path
 
-application = defines.get('app', '../build/Moolticute.app')
+application = defines.get('app', 'build/Moolticute.app')
 appname = os.path.basename(application)
 
 def icon_from_app(app_path):
@@ -64,7 +64,7 @@ icon_locations = {
 #
 # Other color components may be expressed either in the range 0 to 1, or
 # as percentages (e.g. 60% is equivalent to 0.6).
-background = '../img/dmg_background.png'
+background = 'img/dmg_background.png'
 
 show_status_bar = False
 show_tab_view = False
