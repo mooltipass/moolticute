@@ -9,11 +9,11 @@ QVector<QByteArray> MessageProtocolMini::createPackets(const QByteArray &data, M
 {
     QByteArray packet;
     packet.append(static_cast<char>(data.size()));
-    const auto miniCommandIter = commandMapping.find(c);
-    if (miniCommandIter == commandMapping.end())
+    const auto miniCommandIter = m_commandMapping.find(c);
+    if (miniCommandIter == m_commandMapping.end())
     {
         qCritical() << MPCmd::printCmd(c) << " is not implemented for Mini";
-        packet.append(static_cast<char>(commandMapping[MPCmd::PING]));
+        packet.append(static_cast<char>(m_commandMapping[MPCmd::PING]));
         return {packet};
     }
     const quint16 commandId = miniCommandIter.value();
@@ -34,7 +34,7 @@ quint16 MessageProtocolMini::getMessageSize(const QByteArray &data)
 
 MPCmd::Command MessageProtocolMini::getCommand(const QByteArray &data)
 {
-    return MPCmd::Command(commandMapping.key(static_cast<quint8>(data[MP_CMD_FIELD_INDEX])));
+    return MPCmd::Command(m_commandMapping.key(static_cast<quint8>(data[MP_CMD_FIELD_INDEX])));
 }
 
 quint8 MessageProtocolMini::getFirstPayloadByte(const QByteArray &data)
@@ -93,9 +93,14 @@ AsyncFuncDone MessageProtocolMini::getDefaultFuncDone()
     };
 }
 
+QString MessageProtocolMini::getDeviceName()
+{
+    return "Mini";
+}
+
 void MessageProtocolMini::fillCommandMapping()
 {
-    commandMapping = {
+    m_commandMapping = {
         {MPCmd::EXPORT_FLASH_START    , 0x8A},
         {MPCmd::EXPORT_FLASH          , 0x8B},
         {MPCmd::EXPORT_FLASH_END      , 0x8C},

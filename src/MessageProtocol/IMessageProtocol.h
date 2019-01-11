@@ -71,11 +71,47 @@ public:
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() = 0;
 
+    /**
+     * @brief getDeviceName
+     * @return the used device name (BLE or Mini)
+     */
+    virtual QString getDeviceName() = 0;
+
+    /**
+     * @brief fillCommandMapping
+     * Fill commandMap according to the given device
+     */
     virtual void fillCommandMapping() = 0;
+
+    /**
+     * @brief getDeviceMappedCommandId
+     * @param cmd: general command id
+     * @return mapped commandId according to the given device
+     */
+    quint16 getDeviceMappedCommandId(const MPCmd::Command &cmd)
+    {
+        const auto commandIter = m_commandMapping.find(cmd);
+        if (commandIter == m_commandMapping.end())
+        {
+            qCritical() << MPCmd::printCmd(cmd) << " is not implemented for " << getDeviceName();
+            return m_commandMapping[MPCmd::PING];
+        }
+        return commandIter.value();
+    }
+
+    /**
+     * @brief getGeneralCommandId
+     * @param cmd: mapped commandId according to the given device
+     * @return cmd: general command id
+     */
+    MPCmd::Command getGeneralCommandId(const quint16 cmd)
+    {
+        return MPCmd::Command(m_commandMapping.key(cmd, MPCmd::PING));
+    }
 
     QString printCmd(const MPCmd::Command &cmd)
     {
-        const auto commandId = commandMapping[cmd];
+        const auto commandId = m_commandMapping[cmd];
         QMetaEnum m = QMetaEnum::fromType<MPCmd::Command>();
         return QString("%1 (%2)")
                 .arg(m.valueToKey(cmd))
@@ -88,7 +124,7 @@ public:
         return printCmd(cmd);
     }
 
-    QMap<quint16,quint16> commandMapping;
+    QMap<quint16,quint16> m_commandMapping;
 };
 
 

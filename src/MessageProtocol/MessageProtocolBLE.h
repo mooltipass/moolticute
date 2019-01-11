@@ -23,6 +23,7 @@ public:
     virtual QVector<QByteArray> createWriteNodePackets(const QByteArray& data, const QByteArray& address) override;
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() override;
+    virtual QString getDeviceName() override;
 
     inline void setAckFlag(bool on);
 

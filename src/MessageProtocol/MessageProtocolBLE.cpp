@@ -8,8 +8,8 @@ MessageProtocolBLE::MessageProtocolBLE()
 QVector<QByteArray> MessageProtocolBLE::createPackets(const QByteArray &data, MPCmd::Command c)
 {
     QByteArray messagePayload;
-    const auto bleCommandIter = commandMapping.find(c);
-    if (bleCommandIter == commandMapping.end())
+    const auto bleCommandIter = m_commandMapping.find(c);
+    if (bleCommandIter == m_commandMapping.end())
     {
         qCritical() << MPCmd::printCmd(c) << " is not implemented for BLE";
         return QVector<QByteArray>();
@@ -57,7 +57,7 @@ quint16 MessageProtocolBLE::getMessageSize(const QByteArray &data)
 MPCmd::Command MessageProtocolBLE::getCommand(const QByteArray &data)
 {
    const quint16 bleCommandId = (static_cast<quint8>(data[CMD_LOWER_BYTE])|(static_cast<quint8>(data[CMD_UPPER_BYTE])<<8));
-   return MPCmd::Command(commandMapping.key(bleCommandId));
+   return MPCmd::Command(m_commandMapping.key(bleCommandId));
 }
 
 quint8 MessageProtocolBLE::getFirstPayloadByte(const QByteArray &data)
@@ -118,6 +118,11 @@ AsyncFuncDone MessageProtocolBLE::getDefaultFuncDone()
     };
 }
 
+QString MessageProtocolBLE::getDeviceName()
+{
+    return "BLE";
+}
+
 void MessageProtocolBLE::setAckFlag(bool on)
 {
     m_ackFlag = on ? ACK_FLAG_BIT : 0x00;
@@ -130,7 +135,7 @@ void MessageProtocolBLE::flipBit()
 
 void MessageProtocolBLE::fillCommandMapping()
 {
-    commandMapping = {
+    m_commandMapping = {
         {MPCmd::EXPORT_FLASH_START    , 0x8A},
         {MPCmd::EXPORT_FLASH          , 0x8B},
         {MPCmd::EXPORT_FLASH_END      , 0x8C},
