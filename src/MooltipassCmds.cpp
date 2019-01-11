@@ -44,6 +44,11 @@ QString MPCmd::toHexString(Command c)
     return QString("0x%1").arg((quint16)c, 4, 16, QChar('0'));
 }
 
+QString MPCmd::toHexString(quint16 c)
+{
+    return QString("0x%1").arg(c, 4, 16, QChar('0'));
+}
+
 QString MPCmd::printCmd(const QByteArray &ba)
 {
     if (ba.isEmpty())

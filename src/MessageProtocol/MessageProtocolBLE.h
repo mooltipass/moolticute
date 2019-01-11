@@ -24,13 +24,17 @@ public:
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() override;
 
+    inline void setAckFlag(bool on);
+
 private:
     inline void flipBit();
+    virtual void fillCommandMapping() override;
 
     quint8 m_ackFlag = 0x00;
     quint8 m_flipBit = 0x00;
 
     const static quint8 MESSAGE_FLIP_BIT = 0x80;
+    const static quint8 ACK_FLAG_BIT = 0x40;
     const static int HID_PACKET_DATA_PAYLOAD = 62;
     const static quint8 CMD_LOWER_BYTE = 2;
     const static quint8 CMD_UPPER_BYTE = 3;

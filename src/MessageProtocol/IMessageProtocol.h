@@ -70,6 +70,25 @@ public:
 
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() = 0;
+
+    virtual void fillCommandMapping() = 0;
+
+    QString printCmd(const MPCmd::Command &cmd)
+    {
+        const auto commandId = commandMapping[cmd];
+        QMetaEnum m = QMetaEnum::fromType<MPCmd::Command>();
+        return QString("%1 (%2)")
+                .arg(m.valueToKey(cmd))
+                .arg(MPCmd::toHexString(commandId));
+    }
+
+    QString printCmd(const QByteArray &data)
+    {
+        MPCmd::Command cmd = getCommand(data);
+        return printCmd(cmd);
+    }
+
+    QMap<quint16,quint16> commandMapping;
 };
 
 

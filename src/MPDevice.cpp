@@ -38,101 +38,61 @@ MPDevice::MPDevice(QObject *parent):
         if (commandQueue.size() > 0)
             return;
 
-        /**
-         * @brief Testing PING for BLE
-         */
-        QByteArray test;
-        test.append(static_cast<char>(39));
-        sendData(MPCmd::PING_BLE, test, CMD_DEFAULT_TIMEOUT, [] (bool success, const QByteArray &data, bool &)
+        sendData(MPCmd::MOOLTIPASS_STATUS, [this](bool success, const QByteArray &data, bool &)
         {
-            qDebug() << "testing ping";
-        }
-        );
+            if (!success)
+                return;
 
-        /**
-         * @brief Testing CMD_DBG_GET_PLAT_INFO for BLE
-         */
-//        sendData(MPCmd::CMD_DBG_GET_PLAT_INFO, [] (bool success, const QByteArray &data, bool &)
-//        {
-//            qDebug() << "testing platInfo";
-//        }
-//        );
+            /* Map status from received val */
+            Common::MPStatus s = pMesProt->getStatus(data);
+            Common::MPStatus prevStatus = get_status();
 
-        /**
-         * @brief Testing CMD_DBG_GET_ACC_32_SAMPLES for BLE
-         */
-//        sendData(MPCmd::CMD_DBG_GET_ACC_32_SAMPLES, QByteArray(), 50000, [] (bool success, const QByteArray &data, bool &done)
-//        {
-//            qDebug() << "testing 32 bit sample";
-//            quint8 total = data[1] & 0x0F;
-//            quint8 act = (data[1] & 0xF0) >> 4;
-//            qDebug() << "Actual packet: " << act << ", total packets: " << total;
-//            if (act != total)
-//            {
-//                done = false;
-//            }
-//            else
-//            {
-//                qDebug() << "ALL packets received!";
-//            }
-//        }
-//        );
+            /* Trigger on status change */
+            if (s != prevStatus)
+            {
+                qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
 
-//        sendData(MPCmd::MOOLTIPASS_STATUS, [this](bool success, const QByteArray &data, bool &)
-//        {
-//            if (!success)
-//                return;
+                /* Update status */
+                set_status(s);
 
-//            /* Map status from received val */
-//            Common::MPStatus s = pMesProt->getStatus(data);
-//            Common::MPStatus prevStatus = get_status();
+                if (prevStatus == Common::UnknownStatus)
+                {
+                    /* First start: load parameters */
+                    QTimer::singleShot(10, [this]()
+                    {
+                        loadParameters();
+                        setCurrentDate();
+                    });
+                }
 
-//            /* Trigger on status change */
-//            if (s != prevStatus)
-//            {
-//                qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
+                if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
+                {
+                    QTimer::singleShot(20, [this]()
+                    {
+                        getCurrentCardCPZ();
+                    });
+                }
+                else
+                {
+                    filesCache.resetState();
+                }
 
-//                /* Update status */
-//                set_status(s);
-
-//                if (prevStatus == Common::UnknownStatus)
-//                {
-//                    /* First start: load parameters */
-//                    QTimer::singleShot(10, [this]()
-//                    {
-//                        loadParameters();
-//                        setCurrentDate();
-//                    });
-//                }
-
-//                if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
-//                {
-//                    QTimer::singleShot(20, [this]()
-//                    {
-//                        getCurrentCardCPZ();
-//                    });
-//                }
-//                else
-//                {
-//                    filesCache.resetState();
-//                }
-
-//                if (s == Common::Unlocked)
-//                {
-//                    /* If v1.2 firmware, query user change number */
-//                    QTimer::singleShot(50, [this]()
-//                    {
-//                        if (isFw12())
-//                        {
-//                            qInfo() << "Firmware above v1.2, requesting change numbers";
-//                            getChangeNumbers();
-//                        }
-//                        else
-//                            qInfo() << "Firmware below v1.2, do not request change numbers";
-//                    });
-//                }
-//            }
-//        });
+                if (s == Common::Unlocked)
+                {
+                    /* If v1.2 firmware, query user change number */
+                    QTimer::singleShot(50, [this]()
+                    {
+                        if (isFw12())
+                        {
+                            qInfo() << "Firmware above v1.2, requesting change numbers";
+                            getChangeNumbers();
+                        }
+                        else
+                            qInfo() << "Firmware below v1.2, do not request change numbers";
+                    });
+                }
+            }
+        });
     });
 
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
@@ -180,7 +140,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
 
         if (commandQueue.head().retry > 0)
         {
-            qDebug() << "> Retry command: " << MPCmd::printCmd(pMesProt->getCommand(commandQueue.head().data[0]));
+            qDebug() << "> Retry command: " << pMesProt->printCmd(commandQueue.head().data[0]);
             commandQueue.head().sent_ts = QDateTime::currentMSecsSinceEpoch();
             commandQueue.head().timerTimeout->start(); //restart timer
             commandQueue.head().retries_done++;
@@ -195,7 +155,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
             MPCommand currentCmd = commandQueue.head();
             delete currentCmd.timerTimeout;
 
-            qWarning() << "> Retry command: " << MPCmd::printCmd(pMesProt->getCommand(commandQueue.head().data[0])) << " has failed too many times. Give up.";
+            qWarning() << "> Retry command: " << pMesProt->printCmd(commandQueue.head().data[0]) << " has failed too many times. Give up.";
 
             bool done = true;
             currentCmd.cb(false, QByteArray(3, 0x00), done);
@@ -291,11 +251,11 @@ void MPDevice::newDataRead(const QByteArray &data)
          */
         if ((commandQueue.head().retries_done == 1) && ((QDateTime::currentMSecsSinceEpoch() - commandQueue.head().sent_ts) < 200))
         {
-            qDebug() << MPCmd::printCmd(dataCommand) << " was received for a packet that was sent due to a timeout, not resending";
+            qDebug() << pMesProt->printCmd(dataCommand) << " was received for a packet that was sent due to a timeout, not resending";
         }
         else
         {
-            qDebug() << MPCmd::printCmd(dataCommand) << " received, resending command " << MPCmd::printCmd(currentCommand);
+            qDebug() << pMesProt->printCmd(dataCommand) << " received, resending command " << pMesProt->printCmd(currentCommand);
             QTimer *timer = new QTimer(this);
             connect(timer, &QTimer::timeout, [this, timer]()
             {
@@ -314,17 +274,17 @@ void MPDevice::newDataRead(const QByteArray &data)
 
     //Only check returned command if it was asked
     //If the returned command does not match, fail
-//    if (currentCmd.checkReturn &&
-//        dataCommand != currentCommand)
-//    {
-//        qWarning() << "Wrong answer received: " << MPCmd::printCmd(dataCommand)
-//                   << " for command: " << MPCmd::printCmd(currentCommand);
-//        return;
-//    }
+    if (currentCmd.checkReturn &&
+        dataCommand != currentCommand)
+    {
+        qWarning() << "Wrong answer received: " << pMesProt->printCmd(dataCommand)
+                   << " for command: " << pMesProt->printCmd(currentCommand);
+        return;
+    }
 
 #ifdef DEV_DEBUG
     qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
-    qDebug() << "Received answer:" << MPCmd::printCmd(dataCommand)
+    qDebug() << "Received answer:" << pMesProt->printCmd(dataCommand)
              << "Full packet:" << data.toHex();
 #endif
 
@@ -340,7 +300,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     }
     else
     {
-        currentCmd.checkReturn = false;
+        commandQueue.head().checkReturn = false;
     }
 }
 
@@ -354,7 +314,7 @@ void MPDevice::sendDataDequeue()
 
 #ifdef DEV_DEBUG
     int i = 0;
-    qDebug() << "Platform send command: " << MPCmd::printCmd(pMesProt->getCommand(currentCmd.data[0]));
+    qDebug() << "Platform send command: " << pMesProt->printCmd(currentCmd.data[0]);
 #endif
     // send data with platform code
     for (const auto &data : currentCmd.data)
@@ -1026,7 +986,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         }
         else
         {
-            qCritical() << "Get CPZ CTR: wrong command received as answer:" << MPCmd::printCmd(command);
+            qCritical() << "Get CPZ CTR: wrong command received as answer:" << pMesProt->printCmd(command);
             jobs->setCurrentJobError("Get CPZ/CTR: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
@@ -3777,7 +3737,7 @@ void MPDevice::getUID(const QByteArray & key)
     {
         if (pMesProt->getMessageSize(data) == 1 )
         {
-            qWarning() << "Couldn't request uid" << pMesProt->getFirstPayloadByte(data) << pMesProt->getMessageSize(data) << MPCmd::printCmd(pMesProt->getCommand(data)) << data.toHex();
+            qWarning() << "Couldn't request uid" << pMesProt->getFirstPayloadByte(data) << pMesProt->getMessageSize(data) << pMesProt->printCmd(data) << data.toHex();
             set_uid(-1);
             return false;
         }
