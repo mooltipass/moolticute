@@ -58,7 +58,8 @@ SOURCES += src/main_gui.cpp \
     src/SystemEventHandler.cpp \
     src/SystemNotifications/SystemNotification.cpp \
     src/RequestLoginNameDialog.cpp \
-    src/RequestDomainSelectionDialog.cpp
+    src/RequestDomainSelectionDialog.cpp \
+    src/BleDev.cpp
 
 HEADERS  += src/MainWindow.h \
     src/ParseDomain.h \
@@ -102,7 +103,8 @@ HEADERS  += src/MainWindow.h \
     src/RequestLoginNameDialog.h \
     src/RequestDomainSelectionDialog.h \
     src/SystemNotifications/ISystemNotification.h \
-    src/SystemNotifications/SystemNotification.h
+    src/SystemNotifications/SystemNotification.h \
+    src/BleDev.h
 
 mac {
     HEADERS += src/MacUtils.h \
@@ -125,7 +127,8 @@ FORMS    += src/MainWindow.ui \
     src/SSHManagement.ui \
     src/PassGenerationProfilesDialog.ui \
     src/RequestDomainSelectionDialog.ui \
-    src/RequestLoginNameDialog.ui
+    src/RequestLoginNameDialog.ui \
+    src/BleDev.ui
 
 RESOURCES += \
     img/images.qrc \

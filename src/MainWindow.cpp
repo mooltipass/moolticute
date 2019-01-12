@@ -110,6 +110,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     m_tabMap[ui->pageSync] = ui->pushButtonSync;
     m_tabMap[ui->pageFiles] = ui->pushButtonFiles;
     m_tabMap[ui->pageSSH] = ui->pushButtonSSH;
+    m_tabMap[ui->pageBleDev] = ui->pushButtonBleDev;
     connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::onCurrentTabChanged);
 
     ui->widgetCredentials->setWsClient(wsClient);
@@ -146,6 +147,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->radioButtonSSHTabAlways, &QRadioButton::toggled, this, &MainWindow::onRadioButtonSSHTabsAlwaysToggled);
     m_advancedTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F2), this);
     connect(m_advancedTabShortcut, SIGNAL(activated()), this, SLOT(onAdvancedTabShortcutActivated()));
+    m_BleDevTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F3), this);
+    ui->pushButtonBleDev->setIcon(AppGui::qtAwesome()->icon(fa::wrench));
+    ui->pushButtonBleDev->setVisible(false);
+    connect(m_BleDevTabShortcut, SIGNAL(activated()), this, SLOT(onBleDevTabShortcutActivated()));
 
     connect(wsClient, &WSClient::wsConnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
@@ -204,6 +209,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->pushButtonFiles, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonSSH, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonAdvanced, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonBleDev, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->btnPassGenerationProfiles, &QPushButton::clicked, [this]()
     {
         PassGenerationProfilesDialog dlg(this);
@@ -692,6 +698,9 @@ void MainWindow::updatePage()
     else if (ui->pushButtonAdvanced->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageAdvanced);
 
+    else if (ui->pushButtonBleDev->isChecked())
+        ui->stackedWidget->setCurrentWidget(ui->pageBleDev);
+
     else if (wsClient->get_status() == Common::NoCardInserted)
         ui->stackedWidget->setCurrentWidget(ui->pageMissingSecurityCard);
 
@@ -934,6 +943,25 @@ void MainWindow::onAdvancedTabShortcutActivated()
 void MainWindow::onRadioButtonSSHTabsAlwaysToggled(bool bChecked)
 {
     setKeysTabVisibleOnDemand(!bChecked);
+}
+
+void MainWindow::onBleDevTabShortcutActivated()
+{
+    bBleDevTabVisible = !bBleDevTabVisible;
+    qDebug() << "Ble Dev Tab is " << (bBleDevTabVisible ? "" : "not") << " visible";
+    ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
+
+    if (bBleDevTabVisible) {
+        previousWidget = ui->stackedWidget->currentWidget();
+        ui->stackedWidget->setCurrentWidget(ui->pageBleDev);
+    }
+    else
+    {
+        if (previousWidget != nullptr)
+            ui->stackedWidget->setCurrentWidget(previousWidget);
+        else
+            ui->stackedWidget->setCurrentWidget(ui->pageSettings);
+    }
 }
 
 void MainWindow::onCurrentTabChanged(int)
