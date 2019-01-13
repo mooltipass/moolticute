@@ -16,6 +16,9 @@ public:
     ~BleDev();
 
 private:
+    void initUITexts();
+
+
     Ui::BleDev *ui;
 };
 
