@@ -119,7 +119,19 @@ void MPDevice::setupMessageProtocol()
         qDebug() << "Mooltipass Mini is connected";
     }
 
-    QTimer::singleShot(100, [this]() { exitMemMgmtMode(false); });
+    QTimer::singleShot(100, [this]() {
+        exitMemMgmtMode(false);
+        //TODO
+        /**
+          * Temporary solution until GET_MOOLTIPASS_PARM
+          * is not implemented for the ble device we do not
+          * get if BLE is detected.
+          */
+        if (isBLE())
+        {
+            flashMbSizeChanged(0);
+        }
+    });
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
