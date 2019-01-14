@@ -80,6 +80,8 @@ public:
 
     bool isMPMini() const;
 
+    bool isMPBLE() const;
+
     bool isConnected() const;
 
     bool requestDeviceUID(const QByteArray &key);

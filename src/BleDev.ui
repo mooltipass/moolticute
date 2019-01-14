@@ -507,7 +507,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Reflash Aux MCU:</string>
+           <string>Flash Aux MCU:</string>
           </property>
          </widget>
         </item>
@@ -528,7 +528,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Reflash</string>
+             <string>Flash</string>
             </property>
            </widget>
           </item>

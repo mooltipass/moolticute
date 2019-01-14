@@ -15,6 +15,9 @@ public:
     explicit BleDev(QWidget *parent = nullptr);
     ~BleDev();
 
+private slots:
+    void on_btnFileBrowser_clicked();
+
 private:
     void initUITexts();
 

@@ -947,6 +947,16 @@ void MainWindow::onRadioButtonSSHTabsAlwaysToggled(bool bChecked)
 
 void MainWindow::onBleDevTabShortcutActivated()
 {
+    /**
+      * Only display BLE dev tab is Ble is connected
+      * However until GET_PARAM is not implemented for
+      * the ble device we do not get this information.
+      */
+//    if (!wsClient->isMPBLE())
+//    {
+//        qDebug() << "Ble Dev Tab is only available for BLE device.";
+//        return;
+//    }
     bBleDevTabVisible = !bBleDevTabVisible;
     qDebug() << "Ble Dev Tab is " << (bBleDevTabVisible ? "" : "not") << " visible";
     ui->pushButtonBleDev->setVisible(bBleDevTabVisible);

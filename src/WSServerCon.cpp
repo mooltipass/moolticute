@@ -1023,6 +1023,10 @@ void WSServerCon::sendVersion()
     {
         data["hw_serial"] = (qint64)mpdevice->get_serialNumber();
     }
+    if (mpdevice->isBLE())
+    {
+        data["hw_version"] = "ble";
+    }
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
 }
 

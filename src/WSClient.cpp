@@ -177,9 +177,17 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         if (o["hw_version"].toString().contains("mini"))
+        {
             set_mpHwVersion(Common::MP_Mini);
+        }
+        else if (o["hw_version"].toString().contains("ble"))
+        {
+            set_mpHwVersion(Common::MP_BLE);
+        }
         else
+        {
             set_mpHwVersion(Common::MP_Classic);
+        }
         set_fwVersion(o["hw_version"].toString());
         set_hwSerial(o["hw_serial"].toInt());
         set_hwMemory(o["flash_size"].toInt());
@@ -462,6 +470,11 @@ void WSClient::udateParameters(const QJsonObject &data)
 bool WSClient::isMPMini() const
 {
     return  get_mpHwVersion() == Common::MP_Mini;
+}
+
+bool WSClient::isMPBLE() const
+{
+    return  get_mpHwVersion() == Common::MP_BLE;
 }
 
 
