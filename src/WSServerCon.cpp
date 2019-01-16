@@ -684,6 +684,28 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "get_platinfo")
+    {
+        mpdevice->getPlatInfo([this, root](bool success, QString errstr)
+        {
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            auto platInfo = mpdevice->calcPlatInfo();
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["aux_major"] = platInfo[0];
+            ores["aux_minor"] = platInfo[1];
+            ores["main_major"] = platInfo[2];
+            ores["main_minor"] = platInfo[3];
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)

@@ -111,6 +111,8 @@ public:
     void sendListFilesCacheRequest();
     void sendRefreshFilesCacheRequest();
 
+    void sendPlatInfoRequest();
+
     bool isFw12();
 
     void sendLockDevice();
@@ -136,6 +138,7 @@ signals:
     void cardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void cardResetFinished(bool successfully);
     void displayStatusWarning();
+    void displayPlatInfo(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

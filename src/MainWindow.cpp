@@ -116,6 +116,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->widgetCredentials->setWsClient(wsClient);
     ui->widgetFiles->setWsClient(wsClient);
     ui->widgetSSH->setWsClient(wsClient);
+    ui->widgetBleDev->setWsClient(wsClient);
 
     ui->widgetCredentials->setPasswordProfilesModel(m_passwordProfilesModel);
 

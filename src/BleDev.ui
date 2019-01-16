@@ -270,6 +270,9 @@
               <bold>false</bold>
              </font>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -305,6 +308,9 @@
               <weight>50</weight>
               <bold>false</bold>
              </font>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -342,6 +348,9 @@
               <bold>false</bold>
              </font>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -377,6 +386,9 @@
               <weight>50</weight>
               <bold>false</bold>
              </font>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
             <property name="readOnly">
              <bool>true</bool>

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class WSClient;
+
 namespace Ui {
 class BleDev;
 }
@@ -15,13 +17,20 @@ public:
     explicit BleDev(QWidget *parent = nullptr);
     ~BleDev();
 
+    void setWsClient(WSClient *c);
+
 private slots:
     void on_btnFileBrowser_clicked();
 
+    void on_btnPlatInfo_clicked();
+
+    void displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
+    
 private:
     void initUITexts();
 
 
+    WSClient *wsClient = nullptr;
     Ui::BleDev *ui;
 };
 

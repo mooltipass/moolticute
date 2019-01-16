@@ -124,6 +124,11 @@ public:
         return printCmd(cmd);
     }
 
+    quint16 toIntFromBigEndian(quint8 lowerByte, quint8 upperByte)
+    {
+        return (lowerByte|(upperByte<<8));
+    }
+
     QMap<quint16,quint16> m_commandMapping;
 };
 

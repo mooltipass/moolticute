@@ -56,7 +56,7 @@ quint16 MessageProtocolBLE::getMessageSize(const QByteArray &data)
 
 MPCmd::Command MessageProtocolBLE::getCommand(const QByteArray &data)
 {
-   const quint16 bleCommandId = (static_cast<quint8>(data[CMD_LOWER_BYTE])|(static_cast<quint8>(data[CMD_UPPER_BYTE])<<8));
+   const quint16 bleCommandId = toIntFromBigEndian(static_cast<quint8>(data[CMD_LOWER_BYTE]), static_cast<quint8>(data[CMD_UPPER_BYTE]));
    return MPCmd::Command(m_commandMapping.key(bleCommandId));
 }
 
@@ -77,9 +77,13 @@ quint8 MessageProtocolBLE::getPayloadByteAt(const QByteArray &data, int at)
 
 QByteArray MessageProtocolBLE::getFullPayload(const QByteArray &data)
 {
-    Q_UNUSED(data);
-    qWarning("Not implemented yet");
-    return QByteArray();
+    quint8 act = (data[1] & 0xF0) >> 4;
+    int startingByte = 2;
+    if (0 == act)
+    {
+        startingByte = 6;
+    }
+    return data.mid(startingByte);
 }
 
 QByteArray MessageProtocolBLE::getPayloadBytes(const QByteArray &data, int fromPayload, int to)
@@ -168,7 +172,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::ADD_CONTEXT           , 0xA9},
         {MPCmd::SET_BOOTLOADER_PWD    , 0xAA},
         {MPCmd::JUMP_TO_BOOTLOADER    , 0xAB},
-        {MPCmd::GET_RANDOM_NUMBER     , 0xAC},
+        {MPCmd::GET_RANDOM_NUMBER     , 0x0001},
         {MPCmd::START_MEMORYMGMT      , 0xAD},
         {MPCmd::IMPORT_MEDIA_START    , 0xAE},
         {MPCmd::IMPORT_MEDIA          , 0xAF},

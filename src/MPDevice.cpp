@@ -7223,3 +7223,51 @@ void MPDevice::lockDevice(const std::function<void(bool success, QString errstr)
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
 }
+
+void MPDevice::getPlatInfo(const std::function<void (bool, QString)> &cb)
+{
+    auto *jobs = new AsyncJobs("Get PlatInfo", this);
+
+    AsyncFuncDone processPlatformInfo = [this](const QByteArray &data, bool &done) -> bool
+    {
+        quint8 total = data[1] & 0x0F;
+        quint8 act = (data[1] & 0xF0) >> 4;
+        if (0 == act)
+        {
+            platInfo.clear();
+        }
+        qDebug() << "Actual packet: " << act << ", total packets: " << total;
+        platInfo.append(pMesProt->getFullPayload(data));
+        if (act != total)
+        {
+            done = false;
+        }
+        else
+        {
+            qDebug() << "ALL packets received!";
+        }
+        return true;
+    };
+
+    jobs->append(new MPCommandJob(this, MPCmd::CMD_DBG_GET_PLAT_INFO, processPlatformInfo));
+
+    connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+        /* Callback */
+        cb(true, "");
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+QVector<int> MPDevice::calcPlatInfo()
+{
+    QVector<int> platInfos;
+    platInfos.append(pMesProt->toIntFromBigEndian(static_cast<quint8>(platInfo[0]), static_cast<quint8>(platInfo[1])));
+    platInfos.append(pMesProt->toIntFromBigEndian(static_cast<quint8>(platInfo[2]), static_cast<quint8>(platInfo[3])));
+    platInfos.append(pMesProt->toIntFromBigEndian(static_cast<quint8>(platInfo[64]), static_cast<quint8>(platInfo[65])));
+    platInfos.append(pMesProt->toIntFromBigEndian(static_cast<quint8>(platInfo[66]), static_cast<quint8>(platInfo[67])));
+    return platInfos;
+}

@@ -416,6 +416,11 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         emit displayStatusWarning();
     }
+    else if (rootobj["msg"] == "get_platinfo")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit displayPlatInfo(o["aux_major"].toInt(), o["aux_minor"].toInt(), o["main_major"].toInt(), o["aux_minor"].toInt());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -612,6 +617,11 @@ void WSClient::sendListFilesCacheRequest()
 void WSClient::sendRefreshFilesCacheRequest()
 {
     sendJsonData({{ "msg", "refresh_files_cache" }});
+}
+
+void WSClient::sendPlatInfoRequest()
+{
+    sendJsonData({{ "msg", "get_platinfo" }});
 }
 
 bool WSClient::isFw12()

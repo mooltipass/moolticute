@@ -2,6 +2,7 @@
 #include "ui_BleDev.h"
 #include "Common.h"
 #include "AppGui.h"
+#include "WSClient.h"
 
 BleDev::BleDev(QWidget *parent) :
     QWidget(parent),
@@ -23,6 +24,12 @@ BleDev::BleDev(QWidget *parent) :
 BleDev::~BleDev()
 {
     delete ui;
+}
+
+void BleDev::setWsClient(WSClient *c)
+{
+    wsClient = c;
+    connect(wsClient, &WSClient::displayPlatInfo, this, &BleDev::displayPlatInfoReceived);
 }
 
 void BleDev::initUITexts()
@@ -61,4 +68,17 @@ void BleDev::on_btnFileBrowser_clicked()
 
     ui->lineEditBundlePath->setText(fileName);
     s.setValue("last_used_path/bundle_dir", QFileInfo(fileName).canonicalPath());
+}
+
+void BleDev::on_btnPlatInfo_clicked()
+{
+    wsClient->sendPlatInfoRequest();
+}
+
+void BleDev::displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor)
+{
+    ui->lineEditAuxMCUMaj->setText(QString::number(auxMajor));
+    ui->lineEditAuxMCUMin->setText(QString::number(auxMinor));
+    ui->lineEditMainMCUMaj->setText(QString::number(mainMajor));
+    ui->lineEditMainMCUMin->setText(QString::number(mainMinor));
 }
