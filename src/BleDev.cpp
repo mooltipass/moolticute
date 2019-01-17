@@ -82,3 +82,8 @@ void BleDev::displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, 
     ui->lineEditMainMCUMaj->setText(QString::number(mainMajor));
     ui->lineEditMainMCUMin->setText(QString::number(mainMinor));
 }
+
+void BleDev::on_btnReflashAuxMCU_clicked()
+{
+    wsClient->sendFlashAuxMCU();
+}

@@ -121,8 +121,18 @@ public:
             SET_DESCRIPTION     ,
             LOCK_DEVICE         ,
             GET_SERIAL          ,
-            CMD_DBG_GET_ACC_32_SAMPLES,
-            CMD_DBG_GET_PLAT_INFO,
+            CMD_DBG_MESSAGE     ,
+            CMD_DBG_OPEN_DISP_BUFFER    ,
+            CMD_DBG_SEND_TO_DISP_BUFFER ,
+            CMD_DBG_CLOSE_DISP_BUFFER   ,
+            CMD_DBG_ERASE_DATA_FLASH    ,
+            CMD_DBG_IS_DATA_FLASH_READY ,
+            CMD_DBG_DATAFLASH_WRITE_256B,
+            CMD_DBG_REBOOT_TO_BOOTLOADER,
+            CMD_DBG_GET_ACC_32_SAMPLES  ,
+            CMD_DBG_FLASH_AUX_MCU       ,
+            CMD_DBG_GET_PLAT_INFO       ,
+            CMD_DBG_REINDEX_BUNDLE      ,
         };
         Q_ENUM(Command)
 

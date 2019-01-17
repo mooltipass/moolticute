@@ -4046,7 +4046,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
 
 void MPDevice::delCredentialAndLeave(QString service, const QString &login,
                                      const MPDeviceProgressCb &cbProgress,
-                                     std::function<void(bool success, QString errstr)> cb)
+                                     MessageHandlerCb cb)
 {
     auto deleteCred = [this, service, login, cbProgress, cb]()
     {
@@ -4176,7 +4176,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
 
 void MPDevice::setCredential(QString service, const QString &login,
                              const QString &pass, const QString &description, bool setDesc,
-                             std::function<void(bool success, QString errstr)> cb)
+                             MessageHandlerCb cb)
 {
     if (service.isEmpty())
     {
@@ -4530,7 +4530,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 }
 
 void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
-                           std::function<void(bool success, QString errstr)> cb,
+                           MessageHandlerCb cb,
                            const MPDeviceProgressCb &cbProgress)
 {
     if (service.isEmpty())
@@ -4627,7 +4627,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 }
 
 void  MPDevice::deleteDataNodesAndLeave(QStringList services,
-                                        std::function<void(bool success, QString errstr)> cb,
+                                        MessageHandlerCb cb,
                                         const MPDeviceProgressCb &cbProgress)
 {
     // TODO for the future:
@@ -5416,7 +5416,7 @@ void MPDevice::cleanMMMVars(void)
     freeAddresses.clear();
 }
 
-void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, std::function<void(bool success, QString errstr)> cb, bool noDelete)
+void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, MessageHandlerCb cb, bool noDelete)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
@@ -6446,7 +6446,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
 
 
 void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &cbProgress,
-                   std::function<void(bool success, QString errstr)> cb)
+                   MessageHandlerCb cb)
 {
     /* Loop through credentials to check them */
     for (qint32 i = 0; i < creds.size(); i++)
@@ -6582,7 +6582,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
 
 void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                                 const MPDeviceProgressCb &cbProgress,
-                                std::function<void(bool success, QString errstr)> cb)
+                                MessageHandlerCb cb)
 {
     newAddressesNeededCounter = 0;
     newAddressesReceivedCounter = 0;
@@ -7071,7 +7071,7 @@ void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool
 }
 
 void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
-                              std::function<void(bool success, QString errstr)> cb,
+                              MessageHandlerCb cb,
                               const MPDeviceProgressCb &cbProgress)
 {
     QString errorString;
@@ -7188,7 +7188,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
     runAndDequeueJobs();
 }
 
-void MPDevice::resetSmartCard(std::function<void(bool success, QString errstr)> cb)
+void MPDevice::resetSmartCard(MessageHandlerCb cb)
 {
     AsyncJobs *jobs = new AsyncJobs("Reseting smart card...", this);
 
@@ -7205,7 +7205,7 @@ void MPDevice::resetSmartCard(std::function<void(bool success, QString errstr)> 
     runAndDequeueJobs();
 }
 
-void MPDevice::lockDevice(const std::function<void(bool success, QString errstr)> &cb)
+void MPDevice::lockDevice(const MessageHandlerCb &cb)
 {
     auto *jobs = new AsyncJobs("Locking the device", this);
 
@@ -7224,7 +7224,7 @@ void MPDevice::lockDevice(const std::function<void(bool success, QString errstr)
     runAndDequeueJobs();
 }
 
-void MPDevice::getPlatInfo(const std::function<void (bool, QString)> &cb)
+void MPDevice::getPlatInfo(const MessageHandlerCb &cb)
 {
     auto *jobs = new AsyncJobs("Get PlatInfo", this);
 
@@ -7256,6 +7256,22 @@ void MPDevice::getPlatInfo(const std::function<void (bool, QString)> &cb)
         Q_UNUSED(data);
         /* Callback */
         cb(true, "");
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+void MPDevice::flashAuxMCU(const MessageHandlerCb &cb)
+{
+    auto *jobs = new AsyncJobs("Flashing Aux MCU", this);
+
+    jobs->append(new MPCommandJob(this, MPCmd::CMD_DBG_FLASH_AUX_MCU, pMesProt->getDefaultFuncDone()));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        cb(false, "Failed to flash Aux MCU!");
     });
 
     jobsQueue.enqueue(jobs);

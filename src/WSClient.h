@@ -112,6 +112,7 @@ public:
     void sendRefreshFilesCacheRequest();
 
     void sendPlatInfoRequest();
+    void sendFlashAuxMCU();
 
     bool isFw12();
 

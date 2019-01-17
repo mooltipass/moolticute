@@ -624,6 +624,11 @@ void WSClient::sendPlatInfoRequest()
     sendJsonData({{ "msg", "get_platinfo" }});
 }
 
+void WSClient::sendFlashAuxMCU()
+{
+    sendJsonData({{ "msg", "flash_auxmcu" }});
+}
+
 bool WSClient::isFw12()
 {
     static QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");

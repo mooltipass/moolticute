@@ -26,6 +26,8 @@ private slots:
 
     void displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
     
+    void on_btnReflashAuxMCU_clicked();
+    
 private:
     void initUITexts();
 

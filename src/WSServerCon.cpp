@@ -706,6 +706,18 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "flash_auxmcu")
+    {
+        mpdevice->flashAuxMCU([this, root](bool success, QString errstr)
+        {
+            if (!success)
+            {
+                qCritical() << errstr;
+                sendFailedJson(root, errstr);
+                return;
+            }
+        });
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)

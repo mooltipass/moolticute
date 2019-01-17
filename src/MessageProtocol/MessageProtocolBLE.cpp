@@ -218,7 +218,17 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::SET_DESCRIPTION       , 0xD8},
         {MPCmd::LOCK_DEVICE           , 0xD9},
         {MPCmd::GET_SERIAL            , 0xDA},
-        {MPCmd::CMD_DBG_GET_ACC_32_SAMPLES , 0x8008},
-        {MPCmd::CMD_DBG_GET_PLAT_INFO , 0x800A}
+        {MPCmd::CMD_DBG_MESSAGE       , 0x8000},
+        {MPCmd::CMD_DBG_OPEN_DISP_BUFFER    , 0x8001},
+        {MPCmd::CMD_DBG_SEND_TO_DISP_BUFFER , 0x8002},
+        {MPCmd::CMD_DBG_CLOSE_DISP_BUFFER   , 0x8003},
+        {MPCmd::CMD_DBG_ERASE_DATA_FLASH    , 0x8004},
+        {MPCmd::CMD_DBG_IS_DATA_FLASH_READY , 0x8005},
+        {MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, 0x8006},
+        {MPCmd::CMD_DBG_REBOOT_TO_BOOTLOADER, 0x8007},
+        {MPCmd::CMD_DBG_GET_ACC_32_SAMPLES  , 0x8008},
+        {MPCmd::CMD_DBG_FLASH_AUX_MCU       , 0x8009},
+        {MPCmd::CMD_DBG_GET_PLAT_INFO       , 0x800A},
+        {MPCmd::CMD_DBG_REINDEX_BUNDLE      , 0x800B},
     };
 }
