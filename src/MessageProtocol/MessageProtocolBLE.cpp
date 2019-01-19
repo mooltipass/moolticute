@@ -117,8 +117,7 @@ AsyncFuncDone MessageProtocolBLE::getDefaultFuncDone()
     return [](const QByteArray &data, bool &) -> bool
     {
         Q_UNUSED(data);
-        qWarning("Not implemented yet");
-        return false;
+        return true;
     };
 }
 

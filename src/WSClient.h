@@ -112,7 +112,7 @@ public:
     void sendRefreshFilesCacheRequest();
 
     void sendPlatInfoRequest();
-    void sendFlashAuxMCU();
+    void sendFlashMCU(QString type);
 
     bool isFw12();
 

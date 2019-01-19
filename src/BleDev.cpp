@@ -85,5 +85,10 @@ void BleDev::displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, 
 
 void BleDev::on_btnReflashAuxMCU_clicked()
 {
-    wsClient->sendFlashAuxMCU();
+    wsClient->sendFlashMCU("aux");
+}
+
+void BleDev::on_btnFlashMainMCU_clicked()
+{
+    wsClient->sendFlashMCU("main");
 }

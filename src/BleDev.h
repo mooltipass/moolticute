@@ -28,6 +28,8 @@ private slots:
     
     void on_btnReflashAuxMCU_clicked();
     
+    void on_btnFlashMainMCU_clicked();
+
 private:
     void initUITexts();
 

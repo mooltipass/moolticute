@@ -7262,16 +7262,38 @@ void MPDevice::getPlatInfo(const MessageHandlerCb &cb)
     runAndDequeueJobs();
 }
 
-void MPDevice::flashAuxMCU(const MessageHandlerCb &cb)
+void MPDevice::flashMCU(QString type, const MessageHandlerCb &cb)
 {
-    auto *jobs = new AsyncJobs("Flashing Aux MCU", this);
+    if (type != "aux" && type != "main")
+    {
+        qCritical() << "Flashing called for an invalid type of " << type;
+        cb(false, "Failed flash.");
+        return;
+    }
+    auto *jobs = new AsyncJobs(QString("Flashing %1 MCU").arg(type), this);
+    const bool isAuxFlash = type == "aux";
+    const quint8 cmd = isAuxFlash ? MPCmd::CMD_DBG_FLASH_AUX_MCU : MPCmd::CMD_DBG_REBOOT_TO_BOOTLOADER;
+    jobs->append(new MPCommandJob(this, cmd, pMesProt->getDefaultFuncDone()));
 
-    jobs->append(new MPCommandJob(this, MPCmd::CMD_DBG_FLASH_AUX_MCU, pMesProt->getDefaultFuncDone()));
-
-    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    connect(jobs, &AsyncJobs::failed, [cb, isAuxFlash](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
-        cb(false, "Failed to flash Aux MCU!");
+        if (isAuxFlash)
+        {
+            cb(false, "Failed to flash Aux MCU!");
+        }
+        else
+        {
+            /**
+              * Main MCU flash does not cause a reconnect of the device,
+              * so daemon keeps sending messages to the device, which
+              * is causing failure in the communication, this is why
+              * this sleep is added.
+              */
+            qDebug() << "Waiting for device to start after Main MCU flash";
+            QThread::sleep(5);
+            cb(true, "");
+        }
     });
 
     jobsQueue.enqueue(jobs);

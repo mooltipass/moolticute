@@ -235,8 +235,8 @@ public:
     // Get platform informations.
     void getPlatInfo(const MessageHandlerCb &cb);
 
-    // Get platform informations.
-    void flashAuxMCU(const MessageHandlerCb &cb);
+    // Flash type MCU.
+    void flashMCU(QString type, const MessageHandlerCb &cb);
 
     QVector<int> calcPlatInfo();
 

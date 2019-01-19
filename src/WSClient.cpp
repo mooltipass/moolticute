@@ -624,9 +624,12 @@ void WSClient::sendPlatInfoRequest()
     sendJsonData({{ "msg", "get_platinfo" }});
 }
 
-void WSClient::sendFlashAuxMCU()
+void WSClient::sendFlashMCU(QString type)
 {
-    sendJsonData({{ "msg", "flash_auxmcu" }});
+    QJsonObject o;
+    o["type"] = type;
+    sendJsonData({{ "msg", "flash_mcu" },
+                  {"data", o}});
 }
 
 bool WSClient::isFw12()

@@ -706,9 +706,10 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
-    else if (root["msg"] == "flash_auxmcu")
+    else if (root["msg"] == "flash_mcu")
     {
-        mpdevice->flashAuxMCU([this, root](bool success, QString errstr)
+        QJsonObject o = root["data"].toObject();
+        mpdevice->flashMCU(o["type"].toString(), [this, root](bool success, QString errstr)
         {
             if (!success)
             {
