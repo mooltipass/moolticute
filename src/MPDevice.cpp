@@ -148,11 +148,12 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
     cmd.timerTimeout = new QTimer(this);
     connect(cmd.timerTimeout, &QTimer::timeout, [this]()
     {
+        auto cmd = pMesProt->getCommand(commandQueue.head().data[0]);
         commandQueue.head().retry--;
 
-        if (commandQueue.head().retry > 0)
+        if (commandQueue.head().retry > 0 && !isBLE())
         {
-            qDebug() << "> Retry command: " << pMesProt->printCmd(commandQueue.head().data[0]);
+            qDebug() << "> Retry command: " << pMesProt->printCmd(cmd);
             commandQueue.head().sent_ts = QDateTime::currentMSecsSinceEpoch();
             commandQueue.head().timerTimeout->start(); //restart timer
             commandQueue.head().retries_done++;
@@ -167,7 +168,14 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
             MPCommand currentCmd = commandQueue.head();
             delete currentCmd.timerTimeout;
 
-            qWarning() << "> Retry command: " << pMesProt->printCmd(commandQueue.head().data[0]) << " has failed too many times. Give up.";
+            if (!isBLE())
+            {
+                qWarning() << "> Retry command: " << pMesProt->printCmd(cmd) << " has failed too many times. Give up.";
+            }
+            else
+            {
+                qDebug() << "No response received from the device for: " << pMesProt->printCmd(cmd);
+            }
 
             bool done = true;
             currentCmd.cb(false, QByteArray(3, 0x00), done);
