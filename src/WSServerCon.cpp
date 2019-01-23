@@ -719,6 +719,22 @@ void WSServerCon::processMessage(const QString &message)
             }
         });
     }
+    else if (root["msg"] == "upload_bundle")
+    {
+        QJsonObject o = root["data"].toObject();
+        mpdevice->uploadBundle(o["file"].toString(), [this, root](bool success, QString errstr)
+        {
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            if (!success)
+            {
+                qCritical() << errstr;
+            }
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)

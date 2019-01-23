@@ -62,9 +62,7 @@ MPCmd::Command MessageProtocolBLE::getCommand(const QByteArray &data)
 
 quint8 MessageProtocolBLE::getFirstPayloadByte(const QByteArray &data)
 {
-    Q_UNUSED(data);
-    qWarning("Not implemented yet");
-    return 0;
+    return static_cast<quint8>(data[FIRST_PAYLOAD_BYTE]);
 }
 
 quint8 MessageProtocolBLE::getPayloadByteAt(const QByteArray &data, int at)
@@ -81,7 +79,7 @@ QByteArray MessageProtocolBLE::getFullPayload(const QByteArray &data)
     int startingByte = 2;
     if (0 == act)
     {
-        startingByte = 6;
+        startingByte = FIRST_PAYLOAD_BYTE;
     }
     return data.mid(startingByte);
 }

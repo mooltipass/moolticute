@@ -238,6 +238,11 @@ public:
     // Flash type MCU.
     void flashMCU(QString type, const MessageHandlerCb &cb);
 
+    // Upload bundle file.
+    void uploadBundle(QString filePath, const MessageHandlerCb &cb);
+    void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath);
+    void sendBundleToDevice(QString filePath, AsyncJobs *jobs);
+
     QVector<int> calcPlatInfo();
 
     //After successfull mem mgmt mode, clients can query data

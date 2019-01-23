@@ -18,6 +18,7 @@ public:
     ~BleDev();
 
     void setWsClient(WSClient *c);
+    void clearWidgets();
 
 private slots:
     void on_btnFileBrowser_clicked();
@@ -25,10 +26,14 @@ private slots:
     void on_btnPlatInfo_clicked();
 
     void displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
+
+    void displayUploadBundleResultReceived(bool success);
     
     void on_btnReflashAuxMCU_clicked();
     
     void on_btnFlashMainMCU_clicked();
+
+    void on_btnUpload_clicked();
 
 private:
     void initUITexts();

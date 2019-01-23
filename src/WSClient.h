@@ -84,6 +84,8 @@ public:
 
     bool isConnected() const;
 
+    bool isDeviceConnected() const;
+
     bool requestDeviceUID(const QByteArray &key);
 
     void sendEnterMMRequest(bool wantData = false);
@@ -113,6 +115,7 @@ public:
 
     void sendPlatInfoRequest();
     void sendFlashMCU(QString type);
+    void sendUploadBundle(QString bundleFilePath);
 
     bool isFw12();
 
@@ -140,6 +143,7 @@ signals:
     void cardResetFinished(bool successfully);
     void displayStatusWarning();
     void displayPlatInfo(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
+    void displayUploadBundleResult(bool success);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

@@ -41,6 +41,7 @@ private:
     const static quint8 CMD_UPPER_BYTE = 3;
     const static quint8 PAYLOAD_LEN_LOWER_BYTE = 4;
     const static quint8 PAYLOAD_LEN_UPPER_BYTE = 5;
+    const static quint8 FIRST_PAYLOAD_BYTE = 6;
 };
 
 #endif // MESSAGEPROTOCOLBLE_H

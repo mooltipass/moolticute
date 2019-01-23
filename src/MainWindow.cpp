@@ -727,6 +727,11 @@ void MainWindow::updatePage()
         updateBackupControlsVisibility(false);
     else
         updateBackupControlsVisibility(dbBackupTrakingControlsVisible);
+
+    if (wsClient->isMPBLE() && bBleDevTabVisible && !wsClient->isDeviceConnected())
+    {
+        emit onBleDevTabShortcutActivated();
+    }
 }
 
 void MainWindow::enableKnockSettings(bool enable)
@@ -948,7 +953,7 @@ void MainWindow::onRadioButtonSSHTabsAlwaysToggled(bool bChecked)
 
 void MainWindow::onBleDevTabShortcutActivated()
 {
-    if (!wsClient->isMPBLE())
+    if (!bBleDevTabVisible && (!wsClient->isMPBLE() || !wsClient->isDeviceConnected()))
     {
         qDebug() << "Ble Dev Tab is only available for BLE device.";
         return;
@@ -967,6 +972,8 @@ void MainWindow::onBleDevTabShortcutActivated()
             ui->stackedWidget->setCurrentWidget(previousWidget);
         else
             ui->stackedWidget->setCurrentWidget(ui->pageSettings);
+
+        ui->widgetBleDev->clearWidgets();
     }
 }
 

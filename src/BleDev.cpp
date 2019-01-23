@@ -30,6 +30,16 @@ void BleDev::setWsClient(WSClient *c)
 {
     wsClient = c;
     connect(wsClient, &WSClient::displayPlatInfo, this, &BleDev::displayPlatInfoReceived);
+    connect(wsClient, &WSClient::displayUploadBundleResult, this, &BleDev::displayUploadBundleResultReceived);
+}
+
+void BleDev::clearWidgets()
+{
+    ui->lineEditBundlePath->clear();
+    ui->lineEditAuxMCUMaj->clear();
+    ui->lineEditAuxMCUMin->clear();
+    ui->lineEditMainMCUMaj->clear();
+    ui->lineEditMainMCUMin->clear();
 }
 
 void BleDev::initUITexts()
@@ -61,7 +71,7 @@ void BleDev::on_btnFileBrowser_clicked()
     QSettings s;
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select bundle file"),
-                                            s.value("last_used_path/load_file_dir", QDir::homePath()).toString());
+                                            s.value("last_used_path/bundle_dir", QDir::homePath()).toString());
 
     if (fileName.isEmpty())
         return;
@@ -83,6 +93,21 @@ void BleDev::displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, 
     ui->lineEditMainMCUMin->setText(QString::number(mainMinor));
 }
 
+void BleDev::displayUploadBundleResultReceived(bool success)
+{
+    const auto title = tr("Upload Bundle Result");
+    if (success)
+    {
+        QMessageBox::information(this, title,
+                                 tr("Upload bundle finished successfully."));
+    }
+    else
+    {
+        QMessageBox::critical(this, title,
+                                 tr("Upload bundle finished with error."));
+    }
+}
+
 void BleDev::on_btnReflashAuxMCU_clicked()
 {
     wsClient->sendFlashMCU("aux");
@@ -91,4 +116,19 @@ void BleDev::on_btnReflashAuxMCU_clicked()
 void BleDev::on_btnFlashMainMCU_clicked()
 {
     wsClient->sendFlashMCU("main");
+}
+
+void BleDev::on_btnUpload_clicked()
+{
+    QString filePath = ui->lineEditBundlePath->text();
+    QFileInfo file(filePath);
+
+    if (!file.exists() || !file.isFile())
+    {
+        qCritical() << filePath << " is not a file.";
+        QMessageBox::warning(this, tr("Invalid path"),
+                             tr("The choosen path for bundle is not a file."));
+        return;
+    }
+    wsClient->sendUploadBundle(filePath);
 }
