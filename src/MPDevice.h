@@ -39,6 +39,7 @@ using MPDeviceProgressCb = std::function<void(const QVariantMap &data)>;
 */
 using MessageHandlerCb = std::function<void(bool success, QString errstr)>;
 
+class MPDeviceBleImpl;
 class IMessageProtocol;
 
 class MPCommand
@@ -101,6 +102,8 @@ class MPDevice: public QObject
 public:
     MPDevice(QObject *parent);
     virtual ~MPDevice();
+
+    friend class MPDeviceBleImpl;
 
     enum KnockSensitivityThreshold
     {
@@ -240,8 +243,6 @@ public:
 
     // Upload bundle file.
     void uploadBundle(QString filePath, const MessageHandlerCb &cb);
-    void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath);
-    void sendBundleToDevice(QString filePath, AsyncJobs *jobs);
 
     QVector<int> calcPlatInfo();
 
@@ -458,7 +459,7 @@ private:
 
     //Message Protocol
     IMessageProtocol *pMesProt = nullptr;
-    QByteArray platInfo;
+    MPDeviceBleImpl *bleImpl = nullptr;
 
 protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
