@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>504</height>
+    <width>800</width>
+    <height>568</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>700</width>
+    <width>800</width>
     <height>16777215</height>
    </size>
   </property>
@@ -112,9 +112,15 @@
         </property>
         <item>
          <widget class="QLabel" name="label_bundleText">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="maximumSize">
            <size>
-            <width>100</width>
+            <width>125</width>
             <height>16777215</height>
            </size>
           </property>
@@ -126,6 +132,9 @@
           </property>
           <property name="text">
            <string>Select Bundle File:</string>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -139,7 +148,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>300</width>
+            <width>325</width>
             <height>16777215</height>
            </size>
           </property>
@@ -158,7 +167,7 @@
          <widget class="QPushButton" name="btnFileBrowser">
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>100</width>
             <height>16777215</height>
            </size>
           </property>

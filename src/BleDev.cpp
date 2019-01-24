@@ -9,6 +9,7 @@ BleDev::BleDev(QWidget *parent) :
     ui(new Ui::BleDev)
 {
     ui->setupUi(this);
+    ui->label_bundleText->setMaximumWidth(ui->label_bundleText->sizeHint().width());
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
                                 { "color-active", QColor(Qt::white) }};
