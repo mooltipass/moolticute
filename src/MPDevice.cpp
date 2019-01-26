@@ -114,6 +114,7 @@ void MPDevice::setupMessageProtocol()
     {
         pMesProt = new MessageProtocolBLE{};
         bleImpl = new MPDeviceBleImpl(dynamic_cast<MessageProtocolBLE*>(pMesProt), this);
+
         qDebug() << "Mooltipass Mini BLE is connected";
     }
     else
@@ -123,6 +124,14 @@ void MPDevice::setupMessageProtocol()
     }
 
     QTimer::singleShot(100, [this]() {
+        if (isBLE())
+        {
+#ifdef DEV_DEBUG
+            qDebug() << "Resetting flip bit for BLE";
+#endif
+            bleImpl->sendResetFlipBit();
+        }
+
         exitMemMgmtMode(false);
         //TODO
         /**

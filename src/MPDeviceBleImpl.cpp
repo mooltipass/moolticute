@@ -1,5 +1,6 @@
 #include "MPDeviceBleImpl.h"
 #include "AsyncJobs.h"
+#include "MessageProtocol/MessageProtocolBLE.h"
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),
@@ -113,7 +114,7 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb)
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
-        cb(false, "Erase Data failed");
+        cb(false, "Upload bundle failed");
     });
 
     connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &)
@@ -122,6 +123,14 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb)
     });
 
     dequeueAndRun(jobs);
+}
+
+void MPDeviceBleImpl::sendResetFlipBit()
+{
+    QByteArray clearFlip;
+    clearFlip.fill(static_cast<char>(0xFF), 2);
+    mpDev->platformWrite(clearFlip);
+    bleProt->resetFlipBit();
 }
 
 void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath)

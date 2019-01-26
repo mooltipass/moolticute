@@ -129,6 +129,11 @@ void MessageProtocolBLE::setAckFlag(bool on)
     m_ackFlag = on ? ACK_FLAG_BIT : 0x00;
 }
 
+void MessageProtocolBLE::resetFlipBit()
+{
+    m_flipBit = 0x00;
+}
+
 void MessageProtocolBLE::flipBit()
 {
     m_flipBit = m_flipBit ? 0x00 : MESSAGE_FLIP_BIT;

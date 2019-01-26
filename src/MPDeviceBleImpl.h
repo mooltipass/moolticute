@@ -1,8 +1,9 @@
 #ifndef MPDEVICEBLEIMPL_H
 #define MPDEVICEBLEIMPL_H
 
-#include "MessageProtocol/MessageProtocolBLE.h"
 #include "MPDevice.h"
+
+class MessageProtocolBLE;
 
 class MPDeviceBleImpl: public QObject
 {
@@ -14,6 +15,8 @@ public:
 
     void flashMCU(QString type, const MessageHandlerCb &cb);
     void uploadBundle(QString filePath, const MessageHandlerCb &cb);
+
+    void sendResetFlipBit();
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath);

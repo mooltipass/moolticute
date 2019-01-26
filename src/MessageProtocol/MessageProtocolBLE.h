@@ -25,6 +25,7 @@ public:
     virtual AsyncFuncDone getDefaultFuncDone() override;
     virtual QString getDeviceName() override;
 
+    void resetFlipBit();
     inline void setAckFlag(bool on);
 
 private:
