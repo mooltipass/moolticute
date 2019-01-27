@@ -733,7 +733,7 @@ void WSServerCon::processMessage(const QString &message)
             }
             oroot["data"] = ores;
             sendJsonMessage(oroot);
-        });
+        }, defaultProgressCb);
     }
 }
 

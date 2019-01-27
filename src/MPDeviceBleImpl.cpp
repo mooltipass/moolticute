@@ -97,17 +97,27 @@ void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
     dequeueAndRun(jobs);
 }
 
-void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb)
+void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress)
 {
     QElapsedTimer *timer = new QElapsedTimer{};
     timer->start();
     auto *jobs = new AsyncJobs(QString("Upload bundle file"), this);
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_ERASE_DATA_FLASH, bleProt->getDefaultFuncDone()));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_ERASE_DATA_FLASH,
+                      [cbProgress] (const QByteArray &data, bool &) -> bool
+                    {
+                        QVariantMap progress = {
+                            {"total", 0},
+                            {"current", 0},
+                            {"msg", tr("Erasing device data...") }
+                        };
+                        cbProgress(progress);
+                        return true;
+                    }));
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_IS_DATA_FLASH_READY,
-                    [this, timer, jobs, filePath](const QByteArray &data, bool &) -> bool
+                    [this, timer, jobs, filePath, cbProgress](const QByteArray &data, bool &) -> bool
                     {
-                        checkDataFlash(data, timer, jobs, filePath);
+                        checkDataFlash(data, timer, jobs, filePath, cbProgress);
                         return true;
                     }));
 
@@ -133,27 +143,27 @@ void MPDeviceBleImpl::sendResetFlipBit()
     bleProt->resetFlipBit();
 }
 
-void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath)
+void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress)
 {
     if (0x01 == bleProt->getFirstPayloadByte(data))
     {
         qDebug() << "Erase done in: " << timer->nsecsElapsed() / 1000000 << " ms";
         delete timer;
-        sendBundleToDevice(filePath, jobs);
+        sendBundleToDevice(filePath, jobs, cbProgress);
     }
     else
     {
         //Erase is not done yet.
         jobs->prepend(new MPCommandJob(mpDev, MPCmd::CMD_DBG_IS_DATA_FLASH_READY,
-                       [this, timer, jobs, filePath](const QByteArray &data, bool &) -> bool
+                       [this, timer, jobs, filePath, cbProgress](const QByteArray &data, bool &) -> bool
                        {
-                           checkDataFlash(data, timer, jobs, filePath);
+                           checkDataFlash(data, timer, jobs, filePath, cbProgress);
                            return true;
                        }));
     }
 }
 
-void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs)
+void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))
@@ -162,7 +172,8 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs)
         return;
     }
     QByteArray blob = file.readAll();
-    qDebug() << "Bundle size: " << blob.size();
+    const auto fileSize = blob.size();
+    qDebug() << "Bundle size: " << fileSize;
     int byteCounter = 4;
     int curAddress = 0;
     QByteArray message;
@@ -174,9 +185,15 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs)
         if (260 == byteCounter)
         {
             jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, message,
-                              [curAddress](const QByteArray &data, bool &) -> bool
+                              [curAddress, cbProgress, fileSize](const QByteArray &data, bool &) -> bool
                                   {
                                       Q_UNUSED(data);
+                                      QVariantMap progress = QVariantMap {
+                                          {"total", fileSize},
+                                          {"current", curAddress},
+                                          {"msg", tr("Writing bundle data to device...") }
+                                      };
+                                      cbProgress(progress);
 #ifdef DEV_DEBUG
                                       qDebug() << "Sending message to address #" << curAddress;
 #endif

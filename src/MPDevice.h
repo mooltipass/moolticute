@@ -242,7 +242,7 @@ public:
     void flashMCU(QString type, const MessageHandlerCb &cb);
 
     // Upload bundle file.
-    void uploadBundle(QString filePath, const MessageHandlerCb &cb);
+    void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
 
     QVector<int> calcPlatInfo();
 

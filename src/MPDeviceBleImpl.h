@@ -14,13 +14,13 @@ public:
     QVector<int> calcPlatInfo();
 
     void flashMCU(QString type, const MessageHandlerCb &cb);
-    void uploadBundle(QString filePath, const MessageHandlerCb &cb);
+    void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
 
     void sendResetFlipBit();
 
 private:
-    void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath);
-    void sendBundleToDevice(QString filePath, AsyncJobs *jobs);
+    void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
+    void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
 
     void dequeueAndRun(AsyncJobs *job);
 

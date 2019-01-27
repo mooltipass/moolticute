@@ -35,6 +35,8 @@ private slots:
 
     void on_btnUpload_clicked();
 
+    void updateProgress(int total, int curr, QString msg);
+
 private:
     void initUITexts();
 

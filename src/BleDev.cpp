@@ -18,6 +18,10 @@ BleDev::BleDev(QWidget *parent) :
     {
         btn->setStyleSheet(CSS_BLUE_BUTTON);
     }
+
+    ui->progressBarUpload->hide();
+    ui->label_UploadProgress->hide();
+
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
     initUITexts();
 }
@@ -96,6 +100,10 @@ void BleDev::displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, 
 
 void BleDev::displayUploadBundleResultReceived(bool success)
 {
+    ui->label_UploadProgress->hide();
+    ui->progressBarUpload->hide();
+    disconnect(wsClient, &WSClient::progressChanged, this, &BleDev::updateProgress);
+
     const auto title = tr("Upload Bundle Result");
     if (success)
     {
@@ -131,5 +139,19 @@ void BleDev::on_btnUpload_clicked()
                              tr("The choosen path for bundle is not a file."));
         return;
     }
+    connect(wsClient, &WSClient::progressChanged, this, &BleDev::updateProgress);
+    ui->progressBarUpload->show();
+    ui->progressBarUpload->setMinimum(0);
+    ui->progressBarUpload->setMaximum(0);
+    ui->progressBarUpload->setValue(0);
+    ui->label_UploadProgress->setText(tr("Starting upload bundle file."));
+    ui->label_UploadProgress->show();
     wsClient->sendUploadBundle(filePath);
+}
+
+void BleDev::updateProgress(int total, int curr, QString msg)
+{
+    ui->progressBarUpload->setMaximum(total);
+    ui->progressBarUpload->setValue(curr);
+    ui->label_UploadProgress->setText(msg);
 }

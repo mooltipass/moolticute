@@ -7254,9 +7254,9 @@ void MPDevice::flashMCU(QString type, const MessageHandlerCb &cb)
     bleImpl->flashMCU(type, cb);
 }
 
-void MPDevice::uploadBundle(QString filePath, const MessageHandlerCb &cb)
+void MPDevice::uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress)
 {
-    bleImpl->uploadBundle(filePath, cb);
+    bleImpl->uploadBundle(filePath, cb, cbProgress);
 }
 
 QVector<int> MPDevice::calcPlatInfo()
