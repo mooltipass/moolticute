@@ -83,17 +83,13 @@ QList<MPPlatformDef> MPDevice_mac::enumerateDevices()
 
 void MPDevice_mac::platformWrite(const QByteArray &data)
 {
-    //Do the write operation in a thread to avoid blocking
-    QtConcurrent::run([=]()
-    {
-        IOReturn res = IOHIDDeviceSetReport(hidref,
-                                            kIOHIDReportTypeOutput,
-                                            0,
-                                            (const uint8_t *)data.constData(),
-                                            data.size());
-        if (res != kIOReturnSuccess)
-            qWarning() << "Failed to write data to device";
-    });
+    IOReturn res = IOHIDDeviceSetReport(hidref,
+                                        kIOHIDReportTypeOutput,
+                                        0,
+                                        (const uint8_t *)data.constData(),
+                                        data.size());
+    if (res != kIOReturnSuccess)
+        qWarning() << "Failed to write data to device";
 }
 
 void MPDevice_mac::platformRead()
