@@ -47,6 +47,12 @@ MPDevice_mac::MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef):
         deviceType = DeviceType::BLE;
     }
     setupMessageProtocol();
+    /**
+      * With only one thread for the threadpool
+      * the writes will keep the original order.
+      */
+    usbWriteThreadPool = new QThreadPool(this);
+    usbWriteThreadPool->setMaxThreadCount(1);
 
     IOReturn ret = IOHIDDeviceOpen(hidref, kIOHIDOptionsTypeSeizeDevice);
     if (ret != kIOReturnSuccess)
@@ -83,13 +89,16 @@ QList<MPPlatformDef> MPDevice_mac::enumerateDevices()
 
 void MPDevice_mac::platformWrite(const QByteArray &data)
 {
-    IOReturn res = IOHIDDeviceSetReport(hidref,
-                                        kIOHIDReportTypeOutput,
-                                        0,
-                                        (const uint8_t *)data.constData(),
-                                        data.size());
-    if (res != kIOReturnSuccess)
-        qWarning() << "Failed to write data to device";
+    QtConcurrent::run(usbWriteThreadPool, [=]()
+    {
+        IOReturn res = IOHIDDeviceSetReport(hidref,
+                                            kIOHIDReportTypeOutput,
+                                            0,
+                                            (const uint8_t *)data.constData(),
+                                            data.size());
+        if (res != kIOReturnSuccess)
+            qWarning() << "Failed to write data to device";
+    });
 }
 
 void MPDevice_mac::platformRead()

@@ -52,6 +52,7 @@ private:
     IOHIDDeviceRef hidref;
     qint32 maxInReportLen = 0;
     QByteArray readBuf;
+    QThreadPool *usbWriteThreadPool;
 
     friend void _read_report_callback(void *context, IOReturn result, void *sender, IOHIDReportType report_type, uint32_t report_id, uint8_t *report, CFIndex report_length);
 };
