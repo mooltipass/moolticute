@@ -55,7 +55,6 @@ void BleDev::initUITexts()
     ui->groupBoxUploadBundle->setTitle(tr("Upload Bundle"));
     ui->label_bundleText->setText(tr("Select Bundle File:"));
     ui->btnFileBrowser->setText(tr("Browse"));
-    ui->btnUpload->setText(tr("Upload"));
 
     ui->groupBoxPlatInfo->setTitle(tr("Platform informations"));
     ui->label_AuxMCUMaj->setText(tr("Aux MCU major:"));
@@ -76,13 +75,33 @@ void BleDev::on_btnFileBrowser_clicked()
     QSettings s;
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select bundle file"),
-                                            s.value("last_used_path/bundle_dir", QDir::homePath()).toString());
+                                            s.value("last_used_path/bundle_dir", QDir::homePath()).toString(),
+                                            "*.img");
 
     if (fileName.isEmpty())
         return;
 
     ui->lineEditBundlePath->setText(fileName);
     s.setValue("last_used_path/bundle_dir", QFileInfo(fileName).canonicalPath());
+
+    QFileInfo file(fileName);
+
+    if (!file.exists() || !file.isFile())
+    {
+        qCritical() << fileName << " is not a file.";
+        QMessageBox::warning(this, tr("Invalid path"),
+                             tr("The choosen path for bundle is not a file."));
+        return;
+    }
+
+    connect(wsClient, &WSClient::progressChanged, this, &BleDev::updateProgress);
+    ui->progressBarUpload->show();
+    ui->progressBarUpload->setMinimum(0);
+    ui->progressBarUpload->setMaximum(0);
+    ui->progressBarUpload->setValue(0);
+    ui->label_UploadProgress->setText(tr("Starting upload bundle file."));
+    ui->label_UploadProgress->show();
+    wsClient->sendUploadBundle(fileName);
 }
 
 void BleDev::on_btnPlatInfo_clicked()
@@ -102,6 +121,8 @@ void BleDev::displayUploadBundleResultReceived(bool success)
 {
     ui->label_UploadProgress->hide();
     ui->progressBarUpload->hide();
+
+    ui->groupBoxUploadBundle->repaint();
     disconnect(wsClient, &WSClient::progressChanged, this, &BleDev::updateProgress);
 
     const auto title = tr("Upload Bundle Result");
@@ -125,28 +146,6 @@ void BleDev::on_btnReflashAuxMCU_clicked()
 void BleDev::on_btnFlashMainMCU_clicked()
 {
     wsClient->sendFlashMCU("main");
-}
-
-void BleDev::on_btnUpload_clicked()
-{
-    QString filePath = ui->lineEditBundlePath->text();
-    QFileInfo file(filePath);
-
-    if (!file.exists() || !file.isFile())
-    {
-        qCritical() << filePath << " is not a file.";
-        QMessageBox::warning(this, tr("Invalid path"),
-                             tr("The choosen path for bundle is not a file."));
-        return;
-    }
-    connect(wsClient, &WSClient::progressChanged, this, &BleDev::updateProgress);
-    ui->progressBarUpload->show();
-    ui->progressBarUpload->setMinimum(0);
-    ui->progressBarUpload->setMaximum(0);
-    ui->progressBarUpload->setValue(0);
-    ui->label_UploadProgress->setText(tr("Starting upload bundle file."));
-    ui->label_UploadProgress->show();
-    wsClient->sendUploadBundle(filePath);
 }
 
 void BleDev::updateProgress(int total, int curr, QString msg)
