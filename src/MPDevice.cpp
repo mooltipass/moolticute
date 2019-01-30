@@ -242,6 +242,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     //we assume that the QByteArray size is at least 64 bytes
     //this should be done by the platform code
 
+    QByteArray dataTmp = data;
     if (pMesProt->getCommand(data) == MPCmd::DEBUG)
     {
         qWarning() << data;
@@ -315,13 +316,52 @@ void MPDevice::newDataRead(const QByteArray &data)
     }
 
 #ifdef DEV_DEBUG
-    qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
-    qDebug() << "Received answer:" << pMesProt->printCmd(dataCommand)
-             << "Full packet:" << data.toHex();
+    QString resMsg = "Received answer: ";
+    if (isBLE() && !bleImpl->isFirstPacket(data))
+    {
+        resMsg += pMesProt->printCmd(pMesProt->getCommand(currentCmd.data[0]));
+    }
+    else
+    {
+        qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
+        resMsg += pMesProt->printCmd(dataCommand);
+    }
+    qDebug() << resMsg << " Full packet:" << data.toHex();
 #endif
 
+    if (isBLE())
+    {
+        bool isFirst = bleImpl->isFirstPacket(data);
+        if (isFirst)
+        {
+            commandQueue.head().responseSize = pMesProt->getMessageSize(data);
+            commandQueue.head().response.append(data);
+        }
+
+        if (bleImpl->isLastPacket(data))
+        {
+            if (!isFirst)
+            {
+                int fullPayloadSize = commandQueue.head().responseSize + 6;
+                qDebug() << "Full data after last package: " << fullPayloadSize;
+                QByteArray responseData = commandQueue.head().response;
+                responseData.append(pMesProt->getFullPayload(data).left(fullPayloadSize - responseData.size()));
+                dataTmp = responseData;
+            }
+        }
+        else
+        {
+            if (!isFirst)
+            {
+                commandQueue.head().response.append(pMesProt->getFullPayload(data));
+            }
+            commandQueue.head().checkReturn = false;
+            return;
+        }
+    }
+
     bool done = true;
-    currentCmd.cb(true, data, done);
+    currentCmd.cb(true, dataTmp, done);
     delete currentCmd.timerTimeout;
     commandQueue.head().timerTimeout = nullptr;
 
@@ -7244,22 +7284,7 @@ void MPDevice::lockDevice(const MessageHandlerCb &cb)
     runAndDequeueJobs();
 }
 
-void MPDevice::getPlatInfo(const MessageHandlerCb &cb)
+MPDeviceBleImpl *MPDevice::ble()
 {
-    bleImpl->getPlatInfo(cb);
-}
-
-void MPDevice::flashMCU(QString type, const MessageHandlerCb &cb)
-{
-    bleImpl->flashMCU(type, cb);
-}
-
-void MPDevice::uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress)
-{
-    bleImpl->uploadBundle(filePath, cb, cbProgress);
-}
-
-QVector<int> MPDevice::calcPlatInfo()
-{
-    return bleImpl->calcPlatInfo();
+    return bleImpl;
 }

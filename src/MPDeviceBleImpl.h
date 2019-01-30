@@ -10,8 +10,11 @@ class MPDeviceBleImpl: public QObject
     Q_OBJECT
 public:
     MPDeviceBleImpl(MessageProtocolBLE *mesProt, MPDevice *dev);
-    void getPlatInfo(const MessageHandlerCb &cb);
-    QVector<int> calcPlatInfo();
+
+    bool isFirstPacket(const QByteArray &data);
+    bool isLastPacket(const QByteArray &data);
+    void getPlatInfo(const MessageHandlerCbData &cb);
+    QVector<int> calcPlatInfo(const QByteArray &platInfo);
 
     void flashMCU(QString type, const MessageHandlerCb &cb);
     void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
@@ -27,8 +30,6 @@ private:
 
     MessageProtocolBLE *bleProt;
     MPDevice *mpDev;
-
-    QByteArray platInfo;
 };
 
 #endif // MPDEVICEBLEIMPL_H

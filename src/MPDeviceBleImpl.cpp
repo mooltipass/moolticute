@@ -9,48 +9,36 @@ MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
 
 }
 
-void MPDeviceBleImpl::getPlatInfo(const MessageHandlerCb &cb)
+bool MPDeviceBleImpl::isFirstPacket(const QByteArray &data)
+{
+    quint8 actPacket = (data[1] & 0xF0) >> 4;
+    return actPacket == 0;
+}
+
+bool MPDeviceBleImpl::isLastPacket(const QByteArray &data)
+{
+    quint8 totalPacketNum = data[1] & 0x0F;
+    quint8 actPacket = (data[1] & 0xF0) >> 4;
+    return actPacket == totalPacketNum;
+}
+
+void MPDeviceBleImpl::getPlatInfo(const MessageHandlerCbData &cb)
 {
     auto *jobs = new AsyncJobs("Get PlatInfo", mpDev);
 
-    AsyncFuncDone processPlatformInfo = [this](const QByteArray &data, bool &done) -> bool
-    {
-        quint8 total = data[1] & 0x0F;
-        quint8 act = (data[1] & 0xF0) >> 4;
-        if (0 == act)
-        {
-            platInfo.clear();
-        }
-#ifdef DEV_DEBUG
-        qDebug() << "Actual packet: " << act << ", total packets: " << total;
-#endif
-        platInfo.append(bleProt->getFullPayload(data));
-        if (act != total)
-        {
-            done = false;
-        }
-#ifdef DEV_DEBUG
-        else
-        {
-            qDebug() << "ALL packets received!";
-        }
-#endif
-        return true;
-    };
+    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_GET_PLAT_INFO, bleProt->getDefaultFuncDone()));
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_GET_PLAT_INFO, processPlatformInfo));
-
-    connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &data)
     {
         Q_UNUSED(data);
         /* Callback */
-        cb(true, "");
+        cb(true, "", bleProt->getFullPayload(data));
     });
 
     dequeueAndRun(jobs);
 }
 
-QVector<int> MPDeviceBleImpl::calcPlatInfo()
+QVector<int> MPDeviceBleImpl::calcPlatInfo(const QByteArray &platInfo)
 {
     QVector<int> platInfos;
     platInfos.append(bleProt->toIntFromBigEndian(static_cast<quint8>(platInfo[0]), static_cast<quint8>(platInfo[1])));

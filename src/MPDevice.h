@@ -38,6 +38,7 @@ using MPDeviceProgressCb = std::function<void(const QVariantMap &data)>;
  * cb(data)
 */
 using MessageHandlerCb = std::function<void(bool success, QString errstr)>;
+using MessageHandlerCbData = std::function<void(bool success, QString errstr, QByteArray data)>;
 
 class MPDeviceBleImpl;
 class IMessageProtocol;
@@ -55,6 +56,10 @@ public:
     qint64 sent_ts = 0;
 
     bool checkReturn = true;
+
+    // For BLE
+    QByteArray response;
+    int responseSize = 0;
 };
 
 class MPDevice: public QObject
@@ -124,7 +129,7 @@ public:
     /* Send a command with data to the device */
     void sendData(MPCmd::Command cmd, const QByteArray &data = QByteArray(), quint32 timeout = CMD_DEFAULT_TIMEOUT, MPCommandCb cb = [](bool, const QByteArray &, bool &){}, bool checkReturn = true);
     void sendData(MPCmd::Command cmd, quint32 timeout, MPCommandCb cb);
-    void sendData(MPCmd::Command cmd, MPCommandCb cb = [](bool, const QByteArray &, bool &){});
+    void sendData(MPCmd::Command cmd, MPCommandCb cb);
 
     void updateKeyboardLayout(int lang);
     void updateLockTimeoutEnabled(bool en);
@@ -235,16 +240,8 @@ public:
     // Lock the devide.
     void lockDevice(const MessageHandlerCb &cb);
 
-    // Get platform informations.
-    void getPlatInfo(const MessageHandlerCb &cb);
-
-    // Flash type MCU.
-    void flashMCU(QString type, const MessageHandlerCb &cb);
-
-    // Upload bundle file.
-    void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
-
-    QVector<int> calcPlatInfo();
+    // Returns bleImpl
+    MPDeviceBleImpl* ble();
 
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
