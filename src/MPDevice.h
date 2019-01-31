@@ -241,7 +241,7 @@ public:
     void lockDevice(const MessageHandlerCb &cb);
 
     // Returns bleImpl
-    MPDeviceBleImpl* ble();
+    MPDeviceBleImpl* ble() const;
 
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }

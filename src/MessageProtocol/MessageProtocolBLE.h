@@ -31,6 +31,7 @@ public:
 private:
     inline void flipBit();
     virtual void fillCommandMapping() override;
+    int getStartingPayloadPosition(const QByteArray &data) const;
 
     quint8 m_ackFlag = 0x00;
     quint8 m_flipBit = 0x00;
@@ -42,7 +43,8 @@ private:
     const static quint8 CMD_UPPER_BYTE = 3;
     const static quint8 PAYLOAD_LEN_LOWER_BYTE = 4;
     const static quint8 PAYLOAD_LEN_UPPER_BYTE = 5;
-    const static quint8 FIRST_PAYLOAD_BYTE = 6;
+    const static quint8 FIRST_PAYLOAD_BYTE_MESSAGE = 6;
+    const static quint8 FIRST_PAYLOAD_BYTE_PACKET = 2;
 };
 
 #endif // MESSAGEPROTOCOLBLE_H

@@ -959,7 +959,6 @@ void MainWindow::onBleDevTabShortcutActivated()
         return;
     }
     bBleDevTabVisible = !bBleDevTabVisible;
-    qDebug() << "Ble Dev Tab is " << (bBleDevTabVisible ? "" : "not") << " visible";
     ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
 
     if (bBleDevTabVisible) {

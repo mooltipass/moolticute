@@ -91,7 +91,7 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb,
     timer->start();
     auto *jobs = new AsyncJobs(QString("Upload bundle file"), this);
     jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_ERASE_DATA_FLASH,
-                      [cbProgress] (const QByteArray &data, bool &) -> bool
+                      [cbProgress] (const QByteArray &, bool &) -> bool
                     {
                         QVariantMap progress = {
                             {"total", 0},
@@ -162,15 +162,15 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
     QByteArray blob = file.readAll();
     const auto fileSize = blob.size();
     qDebug() << "Bundle size: " << fileSize;
-    int byteCounter = 4;
+    int byteCounter = DATA_ADDRESS_SIZE;
     int curAddress = 0;
     QByteArray message;
-    message.fill(static_cast<char>(0), 4);
+    message.fill(static_cast<char>(0), DATA_ADDRESS_SIZE);
     for (const auto byte : blob)
     {
         message.append(byte);
         ++byteCounter;
-        if (260 == byteCounter)
+        if ((DATA_WRITE_SIZE + DATA_ADDRESS_SIZE) == byteCounter)
         {
             jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, message,
                               [curAddress, cbProgress, fileSize](const QByteArray &data, bool &) -> bool
@@ -187,15 +187,15 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
 #endif
                                       return true;
                                   }));
-            curAddress += 256;
+            curAddress += DATA_WRITE_SIZE;
             message.clear();
             quint32 qCurAddress = static_cast<quint32>(curAddress);
             //Add write address to message (Big endian)
-            message.append((qCurAddress&0xFF));
-            message.append(((qCurAddress&0xFF00)>>8));
-            message.append(((qCurAddress&0xFF0000)>>16));
-            message.append(((qCurAddress&0xFF000000)>>24));
-            byteCounter = 4;
+            message.append(static_cast<char>((qCurAddress&0xFF)));
+            message.append(static_cast<char>(((qCurAddress&0xFF00)>>8)));
+            message.append(static_cast<char>(((qCurAddress&0xFF0000)>>16)));
+            message.append(static_cast<char>(((qCurAddress&0xFF000000)>>24)));
+            byteCounter = DATA_ADDRESS_SIZE;
         }
     }
     jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, message,

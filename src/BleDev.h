@@ -39,8 +39,8 @@ private:
     void initUITexts();
 
 
-    WSClient *wsClient = nullptr;
     Ui::BleDev *ui;
+    WSClient *wsClient = nullptr;
 };
 
 #endif // BLEDEV_H

@@ -63,11 +63,12 @@ void BleDev::initUITexts()
     ui->label_MainMCUMin->setText(tr("Main MCU minor:"));
     ui->btnPlatInfo->setText(tr("Get Plat Info"));
 
+    const auto flashText = tr("Flash");
     ui->groupBoxSettings->setTitle(tr("Settings"));
     ui->label_ReflashAuxMCU->setText(tr("Flash Aux MCU:"));
-    ui->btnReflashAuxMCU->setText(tr("Flash"));
+    ui->btnReflashAuxMCU->setText(flashText);
     ui->label_FlashMainMCU->setText(tr("Flash Main MCU:"));
-    ui->btnFlashMainMCU->setText(tr("Flash"));
+    ui->btnFlashMainMCU->setText(flashText);
 }
 
 void BleDev::on_btnFileBrowser_clicked()
@@ -79,7 +80,9 @@ void BleDev::on_btnFileBrowser_clicked()
                                             "*.img");
 
     if (fileName.isEmpty())
+    {
         return;
+    }
 
     ui->lineEditBundlePath->setText(fileName);
     s.setValue("last_used_path/bundle_dir", QFileInfo(fileName).canonicalPath());
@@ -122,7 +125,6 @@ void BleDev::displayUploadBundleResultReceived(bool success)
     ui->label_UploadProgress->hide();
     ui->progressBarUpload->hide();
 
-    ui->groupBoxUploadBundle->repaint();
     disconnect(wsClient, &WSClient::progressChanged, this, &BleDev::updateProgress);
 
     const auto title = tr("Upload Bundle Result");

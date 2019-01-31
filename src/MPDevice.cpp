@@ -133,7 +133,7 @@ void MPDevice::setupMessageProtocol()
         }
 
         exitMemMgmtMode(false);
-        //TODO
+        //TODO Remove when GET_MOOLTIPASS_PARM implemented for BLE
         /**
           * Temporary solution until GET_MOOLTIPASS_PARM
           * is not implemented for the ble device we do not
@@ -163,6 +163,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
         auto cmd = pMesProt->getCommand(commandQueue.head().data[0]);
         commandQueue.head().retry--;
 
+        //Retry is disabled for BLE
         if (commandQueue.head().retry > 0 && !isBLE())
         {
             qDebug() << "> Retry command: " << pMesProt->printCmd(cmd);
@@ -180,13 +181,13 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
             MPCommand currentCmd = commandQueue.head();
             delete currentCmd.timerTimeout;
 
-            if (!isBLE())
+            if (isBLE())
             {
-                qWarning() << "> Retry command: " << pMesProt->printCmd(cmd) << " has failed too many times. Give up.";
+                qDebug() << "No response received from the device for: " << pMesProt->printCmd(cmd);
             }
             else
             {
-                qDebug() << "No response received from the device for: " << pMesProt->printCmd(cmd);
+                qWarning() << "> Retry command: " << pMesProt->printCmd(cmd) << " has failed too many times. Give up.";
             }
 
             bool done = true;
@@ -205,7 +206,9 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
 
         //If user interaction is required, add additional timeout
         if (MPCmd::isUserRequired(c))
+        {
             timeout += get_userInteractionTimeout() * 1000;
+        }
     }
     cmd.timerTimeout->setInterval(static_cast<int>(timeout));
 
@@ -242,7 +245,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     //we assume that the QByteArray size is at least 64 bytes
     //this should be done by the platform code
 
-    QByteArray dataTmp = data;
+    QByteArray dataReceived = data;
     if (pMesProt->getCommand(data) == MPCmd::DEBUG)
     {
         qWarning() << data;
@@ -329,6 +332,14 @@ void MPDevice::newDataRead(const QByteArray &data)
     qDebug() << resMsg << " Full packet:" << data.toHex();
 #endif
 
+    /**
+      * For BLE it is waiting while every packet is received,
+      * because the response has information about packet id
+      * and full packet number.
+      * For the first packet the entire packet is added to the
+      * response QByteArray for backward compatibility reasons
+      * with Mini and Classic.
+      */
     if (isBLE())
     {
         bool isFirst = bleImpl->isFirstPacket(data);
@@ -342,11 +353,17 @@ void MPDevice::newDataRead(const QByteArray &data)
         {
             if (!isFirst)
             {
-                int fullPayloadSize = commandQueue.head().responseSize + 6;
-                qDebug() << "Full data after last package: " << fullPayloadSize;
+                /**
+                 * @brief EXTRA_INFO_SIZE
+                 * Extra bytes of the first packet.
+                 * In the last package only the remaining bytes
+                 * of payload is appended.
+                 */
+                constexpr int EXTRA_INFO_SIZE = 6;
+                int fullResponseSize = commandQueue.head().responseSize + EXTRA_INFO_SIZE;
                 QByteArray responseData = commandQueue.head().response;
-                responseData.append(pMesProt->getFullPayload(data).left(fullPayloadSize - responseData.size()));
-                dataTmp = responseData;
+                responseData.append(pMesProt->getFullPayload(data).left(fullResponseSize - responseData.size()));
+                dataReceived = responseData;
             }
         }
         else
@@ -361,7 +378,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     }
 
     bool done = true;
-    currentCmd.cb(true, dataTmp, done);
+    currentCmd.cb(true, dataReceived, done);
     delete currentCmd.timerTimeout;
     commandQueue.head().timerTimeout = nullptr;
 
@@ -7284,7 +7301,7 @@ void MPDevice::lockDevice(const MessageHandlerCb &cb)
     runAndDequeueJobs();
 }
 
-MPDeviceBleImpl *MPDevice::ble()
+MPDeviceBleImpl *MPDevice::ble() const
 {
     return bleImpl;
 }

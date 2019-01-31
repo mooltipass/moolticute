@@ -179,6 +179,5 @@ void MessageProtocolMini::fillCommandMapping()
         {MPCmd::SET_DESCRIPTION       , 0xD8},
         {MPCmd::LOCK_DEVICE           , 0xD9},
         {MPCmd::GET_SERIAL            , 0xDA},
-        {MPCmd::CMD_DBG_GET_ACC_32_SAMPLES , 0x00}
     };
 }

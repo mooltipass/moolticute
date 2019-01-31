@@ -41,6 +41,11 @@ class MPCmd: public QObject
     Q_OBJECT
 public:
 
+    /**
+     * @brief The Command enum
+     * Generic ids for commands
+     * Mapping is created in device message protocols
+     */
     enum Command: quint16
         {
             EXPORT_FLASH_START=0,

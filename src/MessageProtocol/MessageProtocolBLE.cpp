@@ -62,35 +62,23 @@ MPCmd::Command MessageProtocolBLE::getCommand(const QByteArray &data)
 
 quint8 MessageProtocolBLE::getFirstPayloadByte(const QByteArray &data)
 {
-    return static_cast<quint8>(data[FIRST_PAYLOAD_BYTE]);
+    return static_cast<quint8>(data[FIRST_PAYLOAD_BYTE_MESSAGE]);
 }
 
 quint8 MessageProtocolBLE::getPayloadByteAt(const QByteArray &data, int at)
 {
-    Q_UNUSED(data);
-    Q_UNUSED(at);
-    qWarning("Not implemented yet");
-    return 0;
+    return static_cast<quint8>(data[at + getStartingPayloadPosition(data)]);
 }
 
 QByteArray MessageProtocolBLE::getFullPayload(const QByteArray &data)
 {
-    quint8 act = (data[1] & 0xF0) >> 4;
-    int startingByte = 2;
-    if (0 == act)
-    {
-        startingByte = FIRST_PAYLOAD_BYTE;
-    }
-    return data.mid(startingByte);
+    return data.mid(getStartingPayloadPosition(data));
 }
 
 QByteArray MessageProtocolBLE::getPayloadBytes(const QByteArray &data, int fromPayload, int to)
 {
-    Q_UNUSED(data);
-    Q_UNUSED(fromPayload);
-    Q_UNUSED(to);
-    qWarning("Not implemented yet");
-    return QByteArray();
+    int start = getStartingPayloadPosition(data);
+    return data.mid(fromPayload + start, to + start);
 }
 
 quint32 MessageProtocolBLE::getSerialNumber(const QByteArray &data)
@@ -141,6 +129,7 @@ void MessageProtocolBLE::flipBit()
 
 void MessageProtocolBLE::fillCommandMapping()
 {
+    //TODO fill commandId mapping, when they are implemented for BLE
     m_commandMapping = {
         {MPCmd::EXPORT_FLASH_START    , 0x8A},
         {MPCmd::EXPORT_FLASH          , 0x8B},
@@ -233,4 +222,10 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::CMD_DBG_GET_PLAT_INFO       , 0x800A},
         {MPCmd::CMD_DBG_REINDEX_BUNDLE      , 0x800B},
     };
+}
+
+int MessageProtocolBLE::getStartingPayloadPosition(const QByteArray &data) const
+{
+    quint8 actPacketNum = (data[1] & 0xF0) >> 4;
+    return 0 == actPacketNum ? FIRST_PAYLOAD_BYTE_MESSAGE : FIRST_PAYLOAD_BYTE_PACKET;
 }

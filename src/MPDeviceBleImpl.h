@@ -5,6 +5,11 @@
 
 class MessageProtocolBLE;
 
+/**
+ * @brief The MPDeviceBleImpl class
+ * Implementations of only BLE related commands
+ * and helper functions
+ */
 class MPDeviceBleImpl: public QObject
 {
     Q_OBJECT
@@ -30,6 +35,9 @@ private:
 
     MessageProtocolBLE *bleProt;
     MPDevice *mpDev;
+
+    static constexpr int DATA_WRITE_SIZE = 256;
+    static constexpr int DATA_ADDRESS_SIZE = 4;
 };
 
 #endif // MPDEVICEBLEIMPL_H
