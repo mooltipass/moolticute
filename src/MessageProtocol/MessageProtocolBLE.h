@@ -36,15 +36,15 @@ private:
     quint8 m_ackFlag = 0x00;
     quint8 m_flipBit = 0x00;
 
-    const static quint8 MESSAGE_FLIP_BIT = 0x80;
-    const static quint8 ACK_FLAG_BIT = 0x40;
-    const static int HID_PACKET_DATA_PAYLOAD = 62;
-    const static quint8 CMD_LOWER_BYTE = 2;
-    const static quint8 CMD_UPPER_BYTE = 3;
-    const static quint8 PAYLOAD_LEN_LOWER_BYTE = 4;
-    const static quint8 PAYLOAD_LEN_UPPER_BYTE = 5;
-    const static quint8 FIRST_PAYLOAD_BYTE_MESSAGE = 6;
-    const static quint8 FIRST_PAYLOAD_BYTE_PACKET = 2;
+    static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
+    static constexpr quint8 ACK_FLAG_BIT = 0x40;
+    static constexpr int HID_PACKET_DATA_PAYLOAD = 62;
+    static constexpr quint8 CMD_LOWER_BYTE = 2;
+    static constexpr quint8 CMD_UPPER_BYTE = 3;
+    static constexpr quint8 PAYLOAD_LEN_LOWER_BYTE = 4;
+    static constexpr quint8 PAYLOAD_LEN_UPPER_BYTE = 5;
+    static constexpr quint8 FIRST_PAYLOAD_BYTE_MESSAGE = 6;
+    static constexpr quint8 FIRST_PAYLOAD_BYTE_PACKET = 2;
 };
 
 #endif // MESSAGEPROTOCOLBLE_H

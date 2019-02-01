@@ -36,8 +36,8 @@ private:
     MessageProtocolBLE *bleProt;
     MPDevice *mpDev;
 
-    static constexpr int DATA_WRITE_SIZE = 256;
-    static constexpr int DATA_ADDRESS_SIZE = 4;
+    static constexpr int BUNBLE_DATA_WRITE_SIZE = 256;
+    static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;
 };
 
 #endif // MPDEVICEBLEIMPL_H
