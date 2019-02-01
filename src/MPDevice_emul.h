@@ -20,6 +20,7 @@
 #define MPDEVICE_EMUL_H
 #include <QHash>
 #include "MPDevice.h"
+#include "MessageProtocol/MessageProtocolMini.h"
 
 class MPDevice_emul : public MPDevice
 {
@@ -33,6 +34,7 @@ private:
     QHash<QString, QString> logins;
     QHash<QString, QString> descriptions;
     QString context;
+    MessageProtocolMini mesProtMini;
 
     void sendReadSignal(const QByteArray &data);
 };

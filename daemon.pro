@@ -71,7 +71,8 @@ SOURCES += src/main_daemon.cpp \
     src/SimpleCrypt/SimpleCrypt.cpp \
     src/ParseDomain.cpp \
     src/MessageProtocol/MessageProtocolMini.cpp \
-    src/MessageProtocol/MessageProtocolBLE.cpp
+    src/MessageProtocol/MessageProtocolBLE.cpp \
+    src/MPDeviceBleImpl.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -94,7 +95,8 @@ HEADERS  += \
     src/ParseDomain.h \
     src/MessageProtocol/IMessageProtocol.h \
     src/MessageProtocol/MessageProtocolMini.h \
-    src/MessageProtocol/MessageProtocolBLE.h
+    src/MessageProtocol/MessageProtocolBLE.h \
+    src/MPDeviceBleImpl.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \

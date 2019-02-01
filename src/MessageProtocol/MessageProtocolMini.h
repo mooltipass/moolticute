@@ -11,7 +11,7 @@ public:
     // IMessageProtocol interface
     virtual QVector<QByteArray> createPackets(const QByteArray &data, MPCmd::Command c) override;
     virtual Common::MPStatus getStatus(const QByteArray &data) override;
-    virtual quint8 getMessageSize(const QByteArray &data) override;
+    virtual quint16 getMessageSize(const QByteArray &data) override;
     virtual MPCmd::Command getCommand(const QByteArray &data) override;
 
     virtual quint8 getFirstPayloadByte(const QByteArray &data) override;
@@ -23,6 +23,9 @@ public:
     virtual QVector<QByteArray> createWriteNodePackets(const QByteArray& data, const QByteArray& address) override;
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() override;
+    virtual QString getDeviceName() override;
+
+    virtual void fillCommandMapping() override;
 };
 
 #endif // MESSAGEPROTOCOLMINI_H

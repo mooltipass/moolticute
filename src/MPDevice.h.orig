@@ -456,7 +456,10 @@ private:
 
     //Message Protocol
     IMessageProtocol *pMesProt = nullptr;
+<<<<<<< HEAD
+=======
     MPDeviceBleImpl *bleImpl = nullptr;
+>>>>>>> develop383ImplementNewProtocolSupport
 
 protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;

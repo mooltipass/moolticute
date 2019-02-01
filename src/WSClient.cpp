@@ -93,6 +93,11 @@ bool WSClient::isConnected() const
             wsocket->state() == QAbstractSocket::ConnectedState;
 }
 
+bool WSClient::isDeviceConnected() const
+{
+    return get_connected();
+}
+
 void WSClient::onWsDisconnected()
 {
     qDebug() << "Websocket disconnect";
@@ -177,9 +182,17 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         if (o["hw_version"].toString().contains("mini"))
+        {
             set_mpHwVersion(Common::MP_Mini);
+        }
+        else if (o["hw_version"].toString().contains("ble"))
+        {
+            set_mpHwVersion(Common::MP_BLE);
+        }
         else
+        {
             set_mpHwVersion(Common::MP_Classic);
+        }
         set_fwVersion(o["hw_version"].toString());
         set_hwSerial(o["hw_serial"].toInt());
         set_hwMemory(o["flash_size"].toInt());
@@ -408,6 +421,16 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         emit displayStatusWarning();
     }
+    else if (rootobj["msg"] == "get_platinfo")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit displayPlatInfo(o["aux_major"].toInt(), o["aux_minor"].toInt(), o["main_major"].toInt(), o["main_minor"].toInt());
+    }
+    else if (rootobj["msg"] == "upload_bundle")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit displayUploadBundleResult(o["success"].toBool());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -462,6 +485,11 @@ void WSClient::udateParameters(const QJsonObject &data)
 bool WSClient::isMPMini() const
 {
     return  get_mpHwVersion() == Common::MP_Mini;
+}
+
+bool WSClient::isMPBLE() const
+{
+    return  get_mpHwVersion() == Common::MP_BLE;
 }
 
 
@@ -599,6 +627,27 @@ void WSClient::sendListFilesCacheRequest()
 void WSClient::sendRefreshFilesCacheRequest()
 {
     sendJsonData({{ "msg", "refresh_files_cache" }});
+}
+
+void WSClient::sendPlatInfoRequest()
+{
+    sendJsonData({{ "msg", "get_platinfo" }});
+}
+
+void WSClient::sendFlashMCU(QString type)
+{
+    QJsonObject o;
+    o["type"] = type;
+    sendJsonData({{ "msg", "flash_mcu" },
+                  {"data", o}});
+}
+
+void WSClient::sendUploadBundle(QString bundleFilePath)
+{
+    QJsonObject o;
+    o["file"] = bundleFilePath;
+    sendJsonData({{ "msg", "upload_bundle" },
+                  {"data", o}});
 }
 
 bool WSClient::isFw12()

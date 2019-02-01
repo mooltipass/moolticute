@@ -80,7 +80,11 @@ public:
 
     bool isMPMini() const;
 
+    bool isMPBLE() const;
+
     bool isConnected() const;
+
+    bool isDeviceConnected() const;
 
     bool requestDeviceUID(const QByteArray &key);
 
@@ -109,6 +113,10 @@ public:
     void sendListFilesCacheRequest();
     void sendRefreshFilesCacheRequest();
 
+    void sendPlatInfoRequest();
+    void sendFlashMCU(QString type);
+    void sendUploadBundle(QString bundleFilePath);
+
     bool isFw12();
 
     void sendLockDevice();
@@ -134,6 +142,8 @@ signals:
     void cardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void cardResetFinished(bool successfully);
     void displayStatusWarning();
+    void displayPlatInfo(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
+    void displayUploadBundleResult(bool success);
 
 public slots:
     void sendJsonData(const QJsonObject &data);
