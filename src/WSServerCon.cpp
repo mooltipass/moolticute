@@ -689,6 +689,11 @@ void WSServerCon::processMessage(const QString &message)
     {
         //Only ble related commands
         MPDeviceBleImpl *bleImpl = mpdevice->ble();
+        if (nullptr == bleImpl)
+        {
+            return;
+        }
+
         if (root["msg"] == "get_platinfo")
         {
             bleImpl->getPlatInfo([this, root, bleImpl](bool success, QString errstr, QByteArray data)

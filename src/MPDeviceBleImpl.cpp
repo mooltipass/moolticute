@@ -70,19 +70,27 @@ void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
         }
         else
         {
-            /**
-              * Main MCU flash does not cause a reconnect of the device,
-              * so daemon keeps sending messages to the device, which
-              * is causing failure in the communication, this is why
-              * this sleep is added.
-              */
-            qDebug() << "Waiting for device to start after Main MCU flash";
-            QThread::sleep(5);
             cb(true, "");
         }
     });
 
-    dequeueAndRun(jobs);
+    mpDev->jobsQueue.enqueue(jobs);
+
+    if (!isAuxFlash)
+    {
+        /**
+          * Main MCU flash does not cause a reconnect of the device,
+          * so daemon keeps sending messages to the device, which
+          * is causing failure in the communication, this is why
+          * this sleep is added.*/
+
+        auto *waitingJob = new AsyncJobs(QString("Waiting job for Main MCU flash"), this);
+        qDebug() << "Waiting for device to start after Main MCU flash";
+        waitingJob->append(new TimerJob{5000});
+        mpDev->jobsQueue.enqueue(waitingJob);
+    }
+
+    mpDev->runAndDequeueJobs();
 }
 
 void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress)
@@ -141,7 +149,7 @@ void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *time
     }
     else
     {
-        //Erase is not done yet.
+        //Dataflash is not done yet.
         jobs->prepend(new MPCommandJob(mpDev, MPCmd::CMD_DBG_IS_DATA_FLASH_READY,
                        [this, timer, jobs, filePath, cbProgress](const QByteArray &data, bool &) -> bool
                        {
