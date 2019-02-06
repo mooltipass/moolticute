@@ -26,6 +26,7 @@ public slots:
     bool setCardCPZ(QByteArray cardCPZ);
     bool setDbChangeNumber(quint8 changeNumber);
     bool exist();
+    bool isInSync() const;
 private:
     QByteArray m_cardCPZ;
     QString m_filePath;
@@ -33,6 +34,7 @@ private:
     bool m_dbChangeNumberSet = false;
     quint8 m_dbChangeNumber = -1;
     SimpleCrypt m_simpleCrypt;
+    bool m_isFileCacheInSync = true;
 };
 
 #endif // FILESCACHE_H

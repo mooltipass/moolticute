@@ -24,6 +24,7 @@ QByteArray FilesCache::cardCPZ() const
 
 bool FilesCache::save(QList<QVariantMap> files)
 {
+    m_isFileCacheInSync = true;
     QFile file(m_filePath);
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -74,10 +75,12 @@ QList<QVariantMap> FilesCache::load()
         if (cacheDbChangeNumber != m_dbChangeNumber)
         {
             qDebug() << "dbChangeNumber miss";
+            m_isFileCacheInSync = false;
         }
         else
         {
             qDebug() << "dbChangeNumber match";
+            m_isFileCacheInSync = true;
             QJsonArray filesJson = jsonRoot.value("files").toArray();
             for (QJsonValue file : filesJson)
             {
@@ -101,6 +104,7 @@ void FilesCache::resetState()
 {
     m_dbChangeNumberSet = false;
     m_cardCPZ = QByteArray();
+    m_isFileCacheInSync = true;
 }
 
 bool FilesCache::setDbChangeNumber(quint8 changeNumber)
@@ -127,6 +131,11 @@ bool FilesCache::exist()
 {
     QFile cache_file(m_filePath);
     return cache_file.exists();
+}
+
+bool FilesCache::isInSync() const
+{
+    return m_isFileCacheInSync;
 }
 
 bool FilesCache::setCardCPZ(QByteArray cardCPZ)

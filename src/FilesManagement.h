@@ -81,9 +81,10 @@ private slots:
 
     void on_pushButtonFilename_clicked();
 
+    void loadFilesCacheModel(bool isInSync);
+
 private:
     void loadModel();
-    void loadFilesCacheModel();
     void addUpdateFile(QString service, QString filename, QProgressBar *pbar);
 
     virtual void changeEvent(QEvent *event);
