@@ -3389,12 +3389,11 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     {
         QVariantMap data = {
             {"total", progressTotal},
-            {"current", progressCurrent},
+            {"current", ++progressCurrent},
             {"msg", "Writing Data To Device: %1/%2 Packets Sent" },
             {"msg_args", QVariantList({progressCurrent, progressTotal})}
         };
         cbProgress(data);
-        progressCurrent++;
     };
 
     /* Change numbers */
@@ -7122,6 +7121,11 @@ QList<QVariantMap> MPDevice::getFilesCache()
 bool MPDevice::hasFilesCache()
 {
     return filesCache.exist();
+}
+
+bool MPDevice::isFilesCacheInSync() const
+{
+    return filesCache.isInSync();
 }
 
 void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)

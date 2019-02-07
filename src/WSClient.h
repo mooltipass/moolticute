@@ -130,10 +130,11 @@ signals:
     void dbExported(const QByteArray &fileData, bool success);
     void dbImported(bool success, QString message);
     void memMgmtModeFailed(int errCode, QString errMsg);
-    void filesCacheChanged();
+    void filesCacheChanged(bool isInSync);
     void cardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void cardResetFinished(bool successfully);
     void displayStatusWarning();
+    void deleteDataNodesFinished();
 
 public slots:
     void sendJsonData(const QJsonObject &data);

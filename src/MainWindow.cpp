@@ -1053,6 +1053,14 @@ void MainWindow::wantExitFilesManagement()
     ui->labelProgressMessage->hide();
 
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+    auto conn = std::make_shared<QMetaObject::Connection>();
+    *conn = connect(wsClient, &WSClient::deleteDataNodesFinished, [this, conn]()
+                {
+                    qDebug() << "Removing files is finished";
+                    updatePage();
+                    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+                    disconnect(*conn);
+                });
 
     updateTabButtons();
 }

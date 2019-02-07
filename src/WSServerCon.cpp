@@ -1057,6 +1057,7 @@ void WSServerCon::sendFilesCache()
         array.append(QJsonDocument::fromVariant(item).object());
 
     oroot["data"] = array;
+    oroot["sync"] = mpdevice->isFilesCacheInSync();
     sendJsonMessage(oroot);
 }
 
