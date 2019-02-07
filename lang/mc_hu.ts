@@ -66,62 +66,62 @@
     <message>
         <location filename="../src/AppGui.cpp" line="599"/>
         <source>%1 version has been released!</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 frissített verzió elérhető!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="600"/>
         <source>Open MC client to download it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyissa meg az MC klienset, hogy letölthesse a frissítéseket.</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="613"/>
         <source>Would you like to download the update now?</source>
-        <translation type="unfinished">Le szerenté most tölteni a legújabb frissítéseket?</translation>
+        <translation>Le szerenté most tölteni a legújabb frissítéseket?</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="614"/>
         <source>Open changelog</source>
-        <translation type="unfinished"></translation>
+        <translation>Változások naplója</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="631"/>
         <source>Mooltipass Not Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Mooltipass nincs csatlakoztatva</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="632"/>
         <source>Please Connect Your Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem csatlakoztassa a Mooltipassot</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="636"/>
         <source>No Card in Mooltipass!</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs kártya a Mooltipassban!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="637"/>
         <source>Please Insert Your Smartcard and Enter Your PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem helyezze be a kártyát és tekerje be a PIN kódot</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="641"/>
         <source>Mooltipass in Management Mode!</source>
-        <translation type="unfinished"></translation>
+        <translation>A Mooltipass menedzsment módban van!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="642"/>
         <source>Please leave management mode in the App</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem lépjen ki a menedzsdment módból az applikációban</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="646"/>
         <source>Mooltipass Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>A mooltipass lezárva</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="647"/>
         <source>Please Unlock Your Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem oldja fel a Mooltipassot</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="669"/>
@@ -191,7 +191,7 @@
     <message>
         <location filename="../src/CredentialsManagement.ui" line="300"/>
         <source>Filter credentials...</source>
-        <translation>Hitelesítő adatok szűrése</translation>
+        <translation>Hitelesítő adatok szűrése...</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="332"/>
@@ -233,7 +233,7 @@
         <location filename="../src/CredentialsManagement.ui" line="773"/>
         <location filename="../src/CredentialsManagement.cpp" line="53"/>
         <source>Exit Credential Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Lépjen ki a jelszó menedzsment módból</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="786"/>
@@ -253,7 +253,7 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="71"/>
         <source>Editing Service name</source>
-        <translation type="unfinished"></translation>
+        <translation>Szolgáltatás Nevének Megváltoztatása</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="73"/>
@@ -309,7 +309,7 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="539"/>
         <source>Service name is already exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Szolgáltatás név már létezik</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="622"/>
@@ -385,16 +385,16 @@
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="154"/>
         <source>Credentials on the device are more recent. </source>
-        <translation type="unfinished"></translation>
+        <translation>Az azonosítók még nem annyira régiek az eszközön. </translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="155"/>
         <source>Do you want export credentials to backup file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Szeretné exportálni az azonosítókat fájba?</translation>
     </message>
     <message>
         <source>Credentials on the device are more recent. Do you want export credentials to backup file?</source>
-        <translation type="vanished">A hitelesítő adatok az eszközön nemrég készültek. Biztosan ki akarja exportálni egy biztonsági mentésbe?</translation>
+        <translation>A hitelesítő adatok az eszközön nemrég készültek. Biztosan ki akarja exportálni egy biztonsági mentésbe?</translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="205"/>
@@ -416,7 +416,7 @@
     </message>
     <message>
         <source>You haven&apos;t made a backup of your database for a while. Do you want to backup your credentials now?</source>
-        <translation type="vanished">Egy ideje már nem készített biztonsági másolatot az adatbázisról. Szeretne most készíteni egyet? Nem tart olyan sokáig!</translation>
+        <translation>Egy ideje már nem készített biztonsági másolatot az adatbázisról. Szeretne most készíteni egyet? Nem tart olyan sokáig!</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="137"/>
@@ -432,12 +432,12 @@
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="111"/>
         <source>You haven&apos;t made a backup of your database for a while. </source>
-        <translation type="unfinished"></translation>
+        <translation>Már egz ideje nem csinált biztonsági mentést. </translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="112"/>
         <source>Do you want to backup your credentials now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Szeretne biztonsági mentést csinálni most?</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="162"/>
@@ -1036,7 +1036,7 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
     <message>
         <location filename="../src/MainWindow.ui" line="1050"/>
         <source>Lock device when computer sleeps or shuts down, if screen is locked, or user logs off</source>
-        <translation type="unfinished"></translation>
+        <translation>Zárja le az eszközt mikor alvó üzemmódban van a számítógép vagy mikor kikapcsol, ha a kijelzó zárva van vagy a felhasználó kilép a fiókból</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1063"/>
@@ -1127,54 +1127,54 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
     <message>
         <location filename="../src/MainWindow.ui" line="2514"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3326"/>
         <source>Reset card</source>
-        <translation type="unfinished"></translation>
+        <translation>Kártya visszaállítása</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3360"/>
         <source>Erase Inserted Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Behelyezett kártya törlése</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3370"/>
         <location filename="../src/MainWindow.ui" line="3420"/>
         <location filename="../src/MainWindow.ui" line="3445"/>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3379"/>
         <source>Reset Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Kártya Visszaállítása</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3391"/>
         <source>CSV file import/export</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV fájl importálása</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3413"/>
         <source>Import unencrypted passwords</source>
-        <translation type="unfinished"></translation>
+        <translation>Titkosítatlan jelszavak importálása</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3429"/>
         <source>Import CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV Importálása</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3438"/>
         <source>Export passwords unencrypted</source>
-        <translation type="unfinished"></translation>
+        <translation>Titkosítatlan jelszavak exportálása</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3454"/>
         <source>Export CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV Explortálása</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1451"/>
@@ -1285,7 +1285,7 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/raoulh/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/raoulh/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/raoulh/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/raoulh/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/raoulh/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/raoulh/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2583"/>
@@ -1372,17 +1372,17 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
     <message>
         <location filename="../src/MainWindow.ui" line="2926"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Behavior of ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A viselkedése ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2953"/>
         <source>Systray icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendszertálca ikon</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2986"/>
         <source>Subdomain selection: Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomain kijelölése: Bekapcsolva</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3135"/>
@@ -1414,13 +1414,13 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
     <message>
         <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
 Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
-        <translation type="vanished">Az összes belépési adata és jelszava a Mooltipass eszközén van tárolva egy titkosított adatbázisban.
+        <translation>Az összes belépési adata és jelszava a Mooltipass eszközén van tárolva egy titkosított adatbázisban.
 Az okos kártyával együtt, ez lehetővé teszi azt, hogy biztonságosan kiexportálja ls lemetse a számítógépre az eszközről a titkosított adatbázist, hogy később egy másik eszközre beimportálhassa.</translation>
     </message>
     <message>
         <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
 Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
-        <translation type="vanished">Az összes belépési adata és jelszava a Mooltipass eszközén van tárolva egy titkosított adatbázisban.
+        <translation>Az összes belépési adata és jelszava a Mooltipass eszközén van tárolva egy titkosított adatbázisban.
 Az okos kártyával együtt ez lehetővé teszi azt, hogy betöltse az adatbázist egy másik Mooltipass eszközről, ezen eszközre.</translation>
     </message>
     <message>
@@ -1431,57 +1431,41 @@ Az okos kártyával együtt ez lehetővé teszi azt, hogy betöltse az adatbázi
     <message>
         <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
 You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
-        <translation type="vanished">Jelöljön ki egy biztonsági mentést, hogy biztos legyen abban, hogy az ön Mooltipass eszköze mindig szinkronizált legyen azzal.
+        <translation>Jelöljön ki egy biztonsági mentést, hogy biztos legyen abban, hogy az ön Mooltipass eszköze mindig szinkronizált legyen azzal.
 A rendszer felfogja szólítani az importálási vagy exportálási művelet elvégzésére, ha a Mooltipass adatbázisában vagy a megfigyelt fájl(ok)ban változtatást észlel a program.</translation>
     </message>
     <message>
         <source>The MooltiApp backup file doesn&apos;t have encrypted logins.</source>
-        <translation type="vanished">A MooltiApp biztonsági mentésen nincsenek titkosított loginok.</translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="53"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="56"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="62"/>
-        <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
-You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>A MooltiApp biztonsági mentésen nincsenek titkosított loginok.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="65"/>
         <source>The MooltiApp backup file doesn&apos;t have encrypted usernames.</source>
-        <translation type="unfinished"></translation>
+        <translation>A MooltiApp biztonsásgi mentései nem tartalmaznak titkosított felhasználó neveket.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="68"/>
         <source>When an unknown card message is displayed that means you have no database for this user in your Mooltipass device.
 Hovewer you or other users may have a backup file or may use this card in another device.
 Think twice before resetting a card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mikor &quot;Unknown Card&quot; üzenetet lát, akkor ezen eszköz nem rendelkezik ehhez a kártyához tartozó adatbázissal ezen a Mooltipass eszközön.
+Lehetséges, hogy önnek vagy másnak van egy biztonsági másolata a valahol amit ezen kártya old fel egy másik eszközben.
+Gondolja át újra mielőtt egy ismeretlen kártyát letöröl.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="71"/>
         <source>Import unencrypted passwords from comma-separated values text file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Importálja a kódolatlan jelszavakat a vesszővel elválasztott értékes text fájlból.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="74"/>
         <source>Export unencrypted passwords to comma-separated values text file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportálja a kódolatlan formátumban a jelszavakat csak vesszővel szeparált érékeként text fáljba.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="270"/>
         <source>Very Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagyon Alacsony</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="271"/>
@@ -1520,22 +1504,22 @@ Think twice before resetting a card.</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="284"/>
         <source>Close Application</source>
-        <translation type="unfinished"></translation>
+        <translation>Program Bezárása</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="286"/>
         <source>Hide Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Ablak elrejtése</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="303"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Fálj</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="304"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Kilépés</translation>
+        <translation>&amp;Kilépés</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="327"/>
@@ -1577,22 +1561,22 @@ Think twice before resetting a card.</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="334"/>
         <source>Ctrl + Alt + Del / Win + L</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl + Alt + Del / Win + L</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="338"/>
         <source>Black</source>
-        <translation type="unfinished"></translation>
+        <translation>Fekete</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="339"/>
         <source>White</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehér</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="339"/>
         <source>_white</source>
-        <translation type="unfinished"></translation>
+        <translation>_fehér</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="390"/>
@@ -1614,7 +1598,8 @@ Think twice before resetting a card.</source>
         <location filename="../src/MainWindow.cpp" line="615"/>
         <source>Credentials have been modified.
 Do you want to save your changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Belépési azonosító változott.
+Elszerené menteni a változtatásokat?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="726"/>
@@ -1715,7 +1700,7 @@ Do you want to save your changes?</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="1138"/>
         <source>Subdomain selection: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomain kijelölés: %1</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1224"/>
@@ -1776,66 +1761,67 @@ Do you want to save your changes?</source>
         <location filename="../src/MainWindow.cpp" line="1342"/>
         <source>Memory integrity check done successfully!
 %1 of %2 credential slots used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Memória integritás vizsgálat skieresen befejeződött!
+%1 a %2 jelszó tárhelyből már foglalt.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1351"/>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Hogy megyőződjünk arról, hogy senki sem babrált az eszközével szállitás közben, ön kérhet a készitőtől egy egyedi eszökz azonositó jelszavat amelyel előhivhatja az eszköze UID-ját.&lt;ol&gt;&lt;li&gt;Készitse elő az eszköze széria számát a hátoldaláról.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Küldjön nekünk egy e-mail-t.&lt;/a&gt; az ön széria számával a jelszóért cserébe.&lt;/li&gt;&lt;li&gt;A kapott jelszavat irja be.&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1547"/>
         <source>Reset card failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Kártya visszaállítás sikertelen!</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1549"/>
         <source>Reset card done successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Kártya vissza állítás sikeres volt</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1556"/>
         <source>Select CSV file to import...</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelölje ki a CSV fájlt importálásra...</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1584"/>
         <source>Nothing is read from %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Semmi nem lett beolvasva a %1 -tól</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1611"/>
         <source>Unable to import %1: Each row must contain exact 3 items. Some lines don&apos;t (lines number: %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehetséges importálni a %1: Minden sornak pontosan 3 elemet kell tartalmaznia. Néhány sor nem (ezen sorokban: %2)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1615"/>
         <source>Unable to import %1: Each row must contain exact 3 items (more than 10 lines don&apos;t)</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehetséges importálni a %1: Minden sornak pontosan 3 elemet kell tartalmaznia. (több mint 10 sornak nincs ilyen)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1623"/>
         <source>Unable to import %1: Each row must contain exact 3 items using comma as a delimiter</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehetséges importálni a %1: Minden sornak pontosan 3 elemet kell tartalmaznia és vesszőt kell használni a delimitálóként.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1671"/>
         <source>Disable subdomain selection?</source>
-        <translation type="unfinished"></translation>
+        <translation>Kikapcsolja a subdomain funkciót?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1673"/>
         <source>Enable subdomain selection?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekapcsolja a subdomain funkciót?</translation>
     </message>
     <message>
         <source>Memory integrity check done successfully</source>
-        <translation type="vanished">A memória integritás vizsgálata sikeres befejeződött</translation>
+        <translation>A memória integritás vizsgálata sikeres befejeződött</translation>
     </message>
     <message>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1&quot;&gt;Send us an email&lt;/a&gt; with the serial number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translatorcomment>I hope I managed to re-interpret the meaning of the original message becuase it requires a culture specific translation here.</translatorcomment>
-        <translation type="vanished">Ahhoz hogy megyőződjünk, hogy illtéktelenek nem módosították az eszközét, a fejlesztőtől kérhet egy jelszót melye ellenőrízheti az UID kódot mely képes megmutatni az eltérést.&lt;ol&gt;&lt;li&gt;Az szériaszáma megtalálható az eszköz hátlapján.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=A széria számom a következő (My serial number is) %1&quot;&gt;Küldjön nekünk egy e-mail-t&lt;/a&gt; az eszköz széria számával, hogy kikérhesse tőlünk a jelszavát a integritás hitelesítéséhez.&lt;/li&gt;&lt;li&gt;Kérem írja be azon jelszót amelyet a fejlesztőtől kapott&lt;/li&gt;&lt;/ol&gt;</translation>
+        <translation>Ahhoz hogy megyőződjünk, hogy illtéktelenek nem módosították az eszközét, a fejlesztőtől kérhet egy jelszót melye ellenőrízheti az UID kódot mely képes megmutatni az eltérést.&lt;ol&gt;&lt;li&gt;Az szériaszáma megtalálható az eszköz hátlapján.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=A széria számom a következő (My serial number is) %1&quot;&gt;Küldjön nekünk egy e-mail-t&lt;/a&gt; az eszköz széria számával, hogy kikérhesse tőlünk a jelszavát a integritás hitelesítéséhez.&lt;/li&gt;&lt;li&gt;Kérem írja be azon jelszót amelyet a fejlesztőtől kapott&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1422"/>
@@ -2114,32 +2100,32 @@ Do you want to save your changes?</source>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="14"/>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="12"/>
         <source>Request Domain Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Domain Névet Kér</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="44"/>
         <source>Select domain</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelölje ki a domain-t</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="69"/>
         <source>Domain</source>
-        <translation type="unfinished"></translation>
+        <translation>Domain</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="14"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Válassza ki a domain nevet:</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="16"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomain érzékelve!</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="18"/>
         <source>You have the possibility to store subdomain or domain as service name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elmenthet subdomain vagy domain nevet szolgáltatási néven.</translation>
     </message>
 </context>
 <context>
@@ -2148,28 +2134,28 @@ Do you want to save your changes?</source>
         <location filename="../src/RequestLoginNameDialog.ui" line="14"/>
         <location filename="../src/RequestLoginNameDialog.cpp" line="12"/>
         <source>Request Login Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználó nevet kér</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.ui" line="44"/>
         <location filename="../src/RequestLoginNameDialog.cpp" line="16"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Belépési adat felhasználó név nélkül érzékelve.</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.ui" line="69"/>
         <source>Login</source>
-        <translation type="unfinished">Felhasználónév</translation>
+        <translation>Felhasználónév</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.cpp" line="14"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Belépési adat a 1% -nak</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.cpp" line="18"/>
         <source>You have the possibility to include a login before storing the credential in the device. If you don&apos;t need a login, you can ignore the request.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lehetőség van felhasználó nevek mentésére a bejelentkezési adatokhoz ezen az eszözön. Ha nincs szüksége felhasználó névre akkor kihagyhatja ezen kérést.</translation>
     </message>
 </context>
 <context>
@@ -2183,46 +2169,46 @@ Do you want to save your changes?</source>
         <location filename="../src/SSHManagement.ui" line="54"/>
         <location filename="../src/SSHManagement.ui" line="269"/>
         <source>SSH Keys Management</source>
-        <translation type="unfinished"></translation>
+        <translation>SSH Kulcs Menedzsment</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SSH Keys Not Loaded&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Press the load keys button to load SSH keys from your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SSH kulcsok nincsenek betöltve&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Nyomja meg a kulcsok betöltése gombot, hogy az SSH kulcsokat előhivja az eszközről.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="117"/>
         <source>Load Keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Kulcsok Betöltése</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="279"/>
         <source>Only passphrase-free OpenSSH keys are supported at this moment.</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak jelszó nélküli OpenSSH kulcsokat támogatunk jelenleg.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="303"/>
         <source>Import A Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Kulcs importálása</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="319"/>
         <source>Export Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Kijelölt Exportálása</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="335"/>
         <source>Delete Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Kijelölt Törlése</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="370"/>
         <source>Leave SSH Keys Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilépés az SSH Kulcs Menedzsmentből</translation>
     </message>
     <message>
         <source>SSH Keys management</source>
-        <translation type="vanished">SSH Kulcs Menedzsment</translation>
+        <translation>SSH Kulcs Menedzsment</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="57"/>
@@ -2232,11 +2218,11 @@ Do you want to save your changes?</source>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;SSH is locked.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Press the unlock button to load SSH keys from the device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;SSH le van zárva.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Nyomja meg a feloldás gombot hogy betöltse a SSH kulcsokat az eszközről.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;SSH le van zárva.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Nyomja meg a feloldás gombot hogy betöltse a SSH kulcsokat az eszközről.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Unlock</source>
-        <translation type="vanished">Feloldás</translation>
+        <translation>Feloldás</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="189"/>
@@ -2245,19 +2231,19 @@ Do you want to save your changes?</source>
     </message>
     <message>
         <source>Import a key</source>
-        <translation type="vanished">Kulcs importálása</translation>
+        <translation>Kulcs importálása</translation>
     </message>
     <message>
         <source>Export selected</source>
-        <translation type="vanished">Kijelölt exportálása</translation>
+        <translation>Kijelölt exportálása</translation>
     </message>
     <message>
         <source>Delete selected</source>
-        <translation type="vanished">Kijelölt törlése</translation>
+        <translation>Kijelölt törlése</translation>
     </message>
     <message>
         <source>Quit SSH Management</source>
-        <translation type="vanished">Kilépés az SSH Menedzsmentből</translation>
+        <translation>Kilépés az SSH Menedzsmentből</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="61"/>
@@ -2274,7 +2260,9 @@ Do you want to save your changes?</source>
         <source>mc-agent isn&apos;t bundled with the Moolticute app!
 
 Cannot manage SSH keys.</source>
-        <translation type="unfinished"></translation>
+        <translation>mc-agent nincs összecsomagolva a Moolticute app-al!
+
+Nem lehetséges SSH kulcsok menedzselése.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="158"/>
@@ -2285,29 +2273,29 @@ Cannot manage SSH keys.</source>
         <source>Some errors occured:
 
 %1</source>
-        <translation type="vanished">Néhány hiba történt:
+        <translation>Néhány hiba történt:
 
 %1</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="167"/>
         <source>Failed to retrieve keys from the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem sikerült a kucslokat előhivni az eszközről!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="171"/>
         <source>Failed to import key into the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem sikerült importálni a kulcsukat erre az eszközre!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="172"/>
         <source>Make sure it&apos;s an OpenSSH private key without a passphrase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Győződjön meg róla, hogy ez egy jelszó nélküli OpenSSH privát kulcs.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="176"/>
         <source>Failed to delete key from the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem sikerült eltávolitani a kucsot erről az eszközről!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="282"/>
@@ -2348,21 +2336,21 @@ Cannot manage SSH keys.</source>
     <message>
         <location filename="../src/SSHManagement.cpp" line="343"/>
         <source>OpenSSH private key</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenSSH privát kulcs</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="345"/>
         <source>OpenSSH private key (*.key *.pem *.* *)</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenSSH privát kulcs (*.key *.pem *.* *)</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="354"/>
         <source>PuTTY private keys are currently not supported!</source>
-        <translation type="unfinished"></translation>
+        <translation>PuTTY típusú jelszavak nem támogatottak jelenleg!</translation>
     </message>
     <message>
         <source>Open SSH private key</source>
-        <translation type="vanished">SSH privát kulcs megnyitása</translation>
+        <translation>SSH privát kulcs megnyitása</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="401"/>
@@ -2370,7 +2358,7 @@ Cannot manage SSH keys.</source>
 
 Proceed?</source>
         <translation>Lefogja törölni a kiválasztott kulcsot az eszközről.
-
+		
 Biztosan folytatja?</translation>
     </message>
 </context>
@@ -2379,22 +2367,22 @@ Biztosan folytatja?</translation>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="43"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználó név nélküli belépési információt talált.</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="43"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználónév a részére</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="52"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomain Találat!</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="52"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Válassza ki a subdomain nevet:</translation>
     </message>
 </context>
 <context>
@@ -2402,22 +2390,22 @@ Biztosan folytatja?</translation>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="99"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználónév nélküli jelszó észlelve.</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="99"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Bejelentkezésinév a 1% számára</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="121"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Subdomain-t talált!</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="121"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Válassza ki a domain nevet:</translation>
     </message>
 </context>
 <context>
@@ -2447,7 +2435,7 @@ Biztosan folytatja?</translation>
     <message>
         <location filename="../src/QSimpleUpdater/src/Updater.cpp" line="543"/>
         <source>Change log:</source>
-        <translation type="unfinished"></translation>
+        <translation>Esemény naplók:</translation>
     </message>
 </context>
 <context>
@@ -2455,12 +2443,12 @@ Biztosan folytatja?</translation>
     <message>
         <location filename="../src/WSClient.cpp" line="242"/>
         <source>Credentials Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Azonosítók Érzékelve!</translation>
     </message>
     <message>
         <location filename="../src/WSClient.cpp" line="242"/>
         <source>Please Approve their Storage on the Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem engedélyezze a tárolását a Mooltipasson</translation>
     </message>
 </context>
 <context>
@@ -2478,7 +2466,7 @@ Biztosan folytatja?</translation>
     <message>
         <location filename="../src/WindowLog.ui" line="46"/>
         <source>Close</source>
-        <translatorcomment>MooltiCute app Hungarian Translation by https://keybase.io/soret</translatorcomment>
+        <translatorcomment>MooltiCute app Hungarian Translation by https://keybase.io/soret v2 2019</translatorcomment>
         <translation>Bezárás</translation>
     </message>
 </context>

@@ -256,6 +256,7 @@ public:
 
     QList<QVariantMap> getFilesCache();
     bool hasFilesCache();
+    bool isFilesCacheInSync() const;
     void getStoredFiles(std::function<void(bool, QList<QVariantMap>)> cb);
     void updateFilesCache();
     void addFileToCache(QString fileName, int size);

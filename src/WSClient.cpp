@@ -385,7 +385,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "files_cache_list")
     {
         filesCache = rootobj["data"].toArray();
-        emit filesCacheChanged();
+        emit filesCacheChanged(rootobj["sync"].toBool());
     }
     else if (rootobj["msg"] == "get_random_numbers")
     {
@@ -420,6 +420,10 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "show_status_notification_warning")
     {
         emit displayStatusWarning();
+    }
+    else if (rootobj["msg"] == "delete_data_nodes")
+    {
+        emit deleteDataNodesFinished();
     }
     else if (rootobj["msg"] == "get_platinfo")
     {

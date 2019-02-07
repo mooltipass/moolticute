@@ -80,9 +80,9 @@ echo "Verifying code signed app"
 codesign --verify --verbose=4 build/$APP.app
 spctl --assess --verbose=4 --raw build/$APP.app
 
-#install appdmg https://github.com/LinusU/node-appdmg a tool to create awesome dmg !
-npm install -g appdmg
-appdmg mac/appdmg.json build/$APP-$VERSION.dmg
+#install https://github.com/al45tair/dmgbuild
+pip install dmgbuild
+dmgbuild -s mac/settings.py "Moolticute" build/$APP-$VERSION.dmg
 
 #sign dmg
 codesign --force --verify --verbose --sign "$ID" build/$APP-$VERSION.dmg

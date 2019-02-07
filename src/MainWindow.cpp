@@ -65,7 +65,7 @@ void MainWindow::initHelpLabels()
     ui->label_MooltiAppHelp->setToolTip(tr("The MooltiApp backup file doesn't have encrypted usernames."));
 
     ui->label_resetCardHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
-    ui->label_resetCardHelp->setToolTip(tr("When an unknown card message is displayed that means you have no database for this user in your Mooltipass device.\nHovewer you or other users may have a backup file or may use this card in another device.\nThink twice before resetting a card."));
+    ui->label_resetCardHelp->setToolTip(tr("When an unknown card message is displayed that means you have no database for this user in your Mooltipass device.\nHowever you or other users may have a backup file or may use this card in another device.\nThink twice before resetting a card."));
 
     ui->label_ImportCSVHelp->setPixmap(getFontAwesomeIconPixmap(fa::infocircle));
     ui->label_ImportCSVHelp->setToolTip(tr("Import unencrypted passwords from comma-separated values text file."));
@@ -1093,6 +1093,14 @@ void MainWindow::wantExitFilesManagement()
     ui->labelProgressMessage->hide();
 
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+    auto conn = std::make_shared<QMetaObject::Connection>();
+    *conn = connect(wsClient, &WSClient::deleteDataNodesFinished, [this, conn]()
+                {
+                    qDebug() << "Removing files is finished";
+                    updatePage();
+                    disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
+                    disconnect(*conn);
+                });
 
     updateTabButtons();
 }

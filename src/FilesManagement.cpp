@@ -136,10 +136,7 @@ void FilesManagement::setWsClient(WSClient *c)
         loadModel();
         ui->lineEditFilterFiles->clear();
     });
-    connect(wsClient, &WSClient::filesCacheChanged, [=]()
-    {
-        loadFilesCacheModel();
-    });
+    connect(wsClient, &WSClient::filesCacheChanged, this, &FilesManagement::loadFilesCacheModel);
 
     setFileCacheControlsVisible(wsClient->isFw12());
     connect(wsClient, &WSClient::fwVersionChanged, [=](const QString &)
@@ -218,7 +215,7 @@ void FilesManagement::loadModel()
     currentSelectionChanged(index, QModelIndex());
 }
 
-void FilesManagement::loadFilesCacheModel()
+void FilesManagement::loadFilesCacheModel(bool isInSync)
 {
     if (!wsClient->isFw12())
     {
@@ -285,13 +282,25 @@ void FilesManagement::loadFilesCacheModel()
     }
 
     listWidget->setVisible(listWidget->count() > 0);
-    ui->emptyCacheLabel->setVisible(listWidget->count() == 0);
+    bool isListWidgetEmpty = listWidget->count() == 0;
+    ui->emptyCacheLabel->setVisible(isListWidgetEmpty);
+    if (isListWidgetEmpty)
+    {
+        if (isInSync)
+        {
+            ui->emptyCacheLabel->setText(tr("No files in the device."));
+        }
+        else
+        {
+            ui->emptyCacheLabel->setText(tr("Please enter file management mode to list the files in your device."));
+        }
+    }
+
     ui->listFilesButton->setVisible(false);
 }
 
 void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QModelIndex &)
 {
-    qDebug() << "Selection changed";
     if (!curr.isValid())
     {
         ui->filesDisplayFrame->hide();

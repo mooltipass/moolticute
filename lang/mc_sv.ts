@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/AnimatedColorButton.cpp" line="54"/>
         <source>Hold to Confirm</source>
-        <translation type="unfinished"></translation>
+        <translation>Håll inne för att bekräfta</translation>
     </message>
 </context>
 <context>
@@ -65,62 +65,63 @@
     <message>
         <location filename="../src/AppGui.cpp" line="599"/>
         <source>%1 version has been released!</source>
-        <translation type="unfinished"></translation>
+        <translation>Version %1 har släppts!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="600"/>
         <source>Open MC client to download it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Öppna MC-klient för att ladda ner.</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="613"/>
         <source>Would you like to download the update now?</source>
-        <translation type="unfinished">Vill du ladda ner uppdateringen nu?</translation>
+        <translation>Vill du ladda ner uppdateringen nu?</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="614"/>
         <source>Open changelog</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Not sure if there is a more commonly used translation for &quot;changelog&quot; than &quot;ändringsförtäckning&quot;, but it means &quot;list of changes&quot;, so it should be acceptable.</translatorcomment>
+        <translation>Öppna ändringsförteckning</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="631"/>
         <source>Mooltipass Not Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Mooltipass är inte ansluten</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="632"/>
         <source>Please Connect Your Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Anslut din Mooltipass</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="636"/>
         <source>No Card in Mooltipass!</source>
-        <translation type="unfinished"></translation>
+        <translation>Inget kort i Mooltipass!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="637"/>
         <source>Please Insert Your Smartcard and Enter Your PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätt i ditt smartcard och skriv in din PIN-kod</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="641"/>
         <source>Mooltipass in Management Mode!</source>
-        <translation type="unfinished"></translation>
+        <translation>Mooltipass är i minneshanteringsläge!</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="642"/>
         <source>Please leave management mode in the App</source>
-        <translation type="unfinished"></translation>
+        <translation>Lämna minneshanteringsläge i appen</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="646"/>
         <source>Mooltipass Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Mooltipass är låst</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="647"/>
         <source>Please Unlock Your Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Lås upp din Mooltipass</translation>
     </message>
     <message>
         <location filename="../src/AppGui.cpp" line="669"/>
@@ -232,7 +233,7 @@
         <location filename="../src/CredentialsManagement.ui" line="773"/>
         <location filename="../src/CredentialsManagement.cpp" line="53"/>
         <source>Exit Credential Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Avsluta identifikationshantering</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="786"/>
@@ -252,7 +253,7 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="71"/>
         <source>Editing Service name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändrar tjänstnamn</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="73"/>
@@ -308,7 +309,7 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="539"/>
         <source>Service name is already exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Tjänstnamnet finns redan</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="622"/>
@@ -384,12 +385,12 @@
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="154"/>
         <source>Credentials on the device are more recent. </source>
-        <translation type="unfinished"></translation>
+        <translation>Identifikationerna på enheten är nyare. </translation>
     </message>
     <message>
         <location filename="../src/DbBackupsTrackerController.cpp" line="155"/>
         <source>Do you want export credentials to backup file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vill du säkerhetskopiera identifikationerna till en fil?</translation>
     </message>
     <message>
         <source>Credentials on the device are more recent. Do you want export credentials to backup file?</source>
@@ -406,38 +407,38 @@
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="100"/>
         <source>Be careful</source>
-        <translation type="unfinished">Akta</translation>
+        <translation>Akta</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="101"/>
         <source>It&apos;s always good to make a backup of your database. Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Det är alltid bra att skapa en säkerhetskopia av din databas. Är du säker på att du vill fortsätta?</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="137"/>
         <source>Save database export...</source>
-        <translation type="unfinished">Spara säkerhetskopia av databas...</translation>
+        <translation>Spara säkerhetskopia av databas...</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="133"/>
         <location filename="../src/DbExportsRegistryController.cpp" line="162"/>
         <source>Error</source>
-        <translation type="unfinished">Fel</translation>
+        <translation>Fel</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="111"/>
         <source>You haven&apos;t made a backup of your database for a while. </source>
-        <translation type="unfinished"></translation>
+        <translation>Du har inte skapat någon säkerhetskopia av din databas på ett tag. </translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="112"/>
         <source>Do you want to backup your credentials now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vill du säkerhetskopiera dina identifikationer nu?</translation>
     </message>
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="162"/>
         <source>Unable to write to file %1</source>
-        <translation type="unfinished">Kunde inte skriva till fil %1</translation>
+        <translation>Kunde inte skriva till filen %1</translation>
     </message>
 </context>
 <context>
@@ -1027,7 +1028,7 @@ Tips: Håll muspekaren över en inställning för mer information.</translation>
     <message>
         <location filename="../src/MainWindow.ui" line="1050"/>
         <source>Lock device when computer sleeps or shuts down, if screen is locked, or user logs off</source>
-        <translation type="unfinished"></translation>
+        <translation>Lås enheten om datorn går i sovläge eller stängs av, om skärmen låses eller om användaren loggar ut</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1063"/>
@@ -1082,32 +1083,32 @@ Tips: Håll muspekaren över en inställning för mer information.</translation>
     <message>
         <location filename="../src/MainWindow.ui" line="2514"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2926"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Behavior of ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beteende för ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2953"/>
         <source>Systray icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Systray-ikon</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2986"/>
         <source>Subdomain selection: Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Val av underdomäner: På</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3326"/>
         <source>Reset card</source>
-        <translation type="unfinished"></translation>
+        <translation>Nollställ kort</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3360"/>
         <source>Erase Inserted Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera istoppat kort</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3370"/>
@@ -1119,32 +1120,32 @@ Tips: Håll muspekaren över en inställning för mer information.</translation>
     <message>
         <location filename="../src/MainWindow.ui" line="3379"/>
         <source>Reset Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Nollställ kort</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3391"/>
         <source>CSV file import/export</source>
-        <translation type="unfinished"></translation>
+        <translation>Importera/exportera CSV-fil</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3413"/>
         <source>Import unencrypted passwords</source>
-        <translation type="unfinished"></translation>
+        <translation>Importera okrypterade lösenord</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3429"/>
         <source>Import CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Importera CSV</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3438"/>
         <source>Export passwords unencrypted</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportera lösenorden okrypterade</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3454"/>
         <source>Export CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportera CSV</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1611"/>
@@ -1461,22 +1462,22 @@ Du kommer bli tillfrågad om export eller import om ändringar i din Mooltipass 
     <message>
         <location filename="../src/MainWindow.cpp" line="284"/>
         <source>Close Application</source>
-        <translation type="unfinished"></translation>
+        <translation>Stäng applikationen</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="286"/>
         <source>Hide Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Göm fönstret</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="303"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Fil</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="304"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Avsluta</translation>
+        <translation>&amp;Avsluta</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="327"/>
@@ -1518,22 +1519,22 @@ Du kommer bli tillfrågad om export eller import om ändringar i din Mooltipass 
     <message>
         <location filename="../src/MainWindow.cpp" line="334"/>
         <source>Ctrl + Alt + Del / Win + L</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl + Alt + Del / Win + L</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="338"/>
         <source>Black</source>
-        <translation type="unfinished"></translation>
+        <translation>Svart</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="339"/>
         <source>White</source>
-        <translation type="unfinished"></translation>
+        <translation>Vit</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="339"/>
         <source>_white</source>
-        <translation type="unfinished"></translation>
+        <translation>_vit</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="390"/>
@@ -1554,7 +1555,8 @@ Du kommer bli tillfrågad om export eller import om ändringar i din Mooltipass 
         <location filename="../src/MainWindow.cpp" line="615"/>
         <source>Credentials have been modified.
 Do you want to save your changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifikationer har ändrats.
+Vill du spara dina ändringar?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="726"/>
@@ -1655,12 +1657,12 @@ Do you want to save your changes?</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="1138"/>
         <source>Subdomain selection: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Val av underdomäner: %1</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1224"/>
         <source>Select database export...</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj säkerhetskopia av databas...</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1257"/>
@@ -1671,57 +1673,58 @@ Do you want to save your changes?</source>
         <location filename="../src/MainWindow.cpp" line="1342"/>
         <source>Memory integrity check done successfully!
 %1 of %2 credential slots used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Minnesintegritetskontroll lyckades!
+%1 identifikationer av %2 möjliga används.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1351"/>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>För att säkerställa att ingen mixtrat med din enhet kan du be om ett lösenord för tillåtelse att hämta UID från din enhet.&lt;ol&gt;&lt;li&gt;Kolla serienumret på baksidan av din enhet.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Skicka oss ett mail&lt;/a&gt; med serienumret och ditt ordernummer där du ber att få lösenordet.&lt;/li&gt;&lt;li&gt;Skriv in lösenordet vi gav dig&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1547"/>
         <source>Reset card failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Nollställning av kort misslyckades!</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1549"/>
         <source>Reset card done successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Kortet nollställt</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1556"/>
         <source>Select CSV file to import...</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj CSV-fil att importera...</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1584"/>
         <source>Nothing is read from %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Inget läst från %1</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1611"/>
         <source>Unable to import %1: Each row must contain exact 3 items. Some lines don&apos;t (lines number: %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde inte importera %1: Varje rad måste innehålla exakt 3 fält. Några rader gör inte det (felaktiga rader: %2)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1615"/>
         <source>Unable to import %1: Each row must contain exact 3 items (more than 10 lines don&apos;t)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde inte importera %1: Varje rad måste innehålla exakt 3 fält (fler än 10 rader gör inte det)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1623"/>
         <source>Unable to import %1: Each row must contain exact 3 items using comma as a delimiter</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde inte importera %1: Varje rad måste innehålla exakt 3 fält separerade med kommatecken</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1671"/>
         <source>Disable subdomain selection?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå av val av underdomäner?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1673"/>
         <source>Enable subdomain selection?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på val av underdomäner?</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1233"/>
@@ -1737,49 +1740,33 @@ Do you want to save your changes?</source>
         <translation>Fel</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="53"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to securely export your user&apos;s database to your computer to later import it on other devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="56"/>
-        <source>All your logins and passwords are stored inside an encrypted database on your Mooltipass device.
-Together with your smartcard, this feature allows you to import a database from another Mooltipass into this device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="62"/>
-        <source>Select a backup file to make sure your Mooltipass database is always in sync with it.
-You will be prompted for import or export operations if any changes to your Mooltipass database or monitored file are detected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/MainWindow.cpp" line="65"/>
         <source>The MooltiApp backup file doesn&apos;t have encrypted usernames.</source>
-        <translation type="unfinished"></translation>
+        <translation>MooltiApp-säkerhetskopian har inte krypterade användarnamn.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="68"/>
         <source>When an unknown card message is displayed that means you have no database for this user in your Mooltipass device.
 Hovewer you or other users may have a backup file or may use this card in another device.
 Think twice before resetting a card.</source>
-        <translation type="unfinished"></translation>
+        <translation>När ett felmeddelande om okänt kort visas betyder det att du inte har någon databas för den här användaren i din Mooltipass-enhet.
+Däremot kan du eller andra användare ha en säkerhetskopia eller kan använda kortet i en annan enhet.
+Tänk efter innan du nollställer ett kort.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="71"/>
         <source>Import unencrypted passwords from comma-separated values text file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Importera okrypterade lösenord från textfil med kommaseparerade värden.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="74"/>
         <source>Export unencrypted passwords to comma-separated values text file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportera okrypterade lösenord till textfil med kommaseparerade värden.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="270"/>
         <source>Very Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Väldigt låg</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="1233"/>
@@ -1976,7 +1963,7 @@ Think twice before resetting a card.</source>
     <message>
         <location filename="../src/PasswordLineEdit.cpp" line="242"/>
         <source>Length: %1 </source>
-        <translation>Längd: %1</translation>
+        <translation>Längd: %1 </translation>
     </message>
     <message>
         <location filename="../src/PasswordLineEdit.cpp" line="329"/>
@@ -2096,32 +2083,32 @@ Think twice before resetting a card.</source>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="14"/>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="12"/>
         <source>Request Domain Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj domännamn</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="44"/>
         <source>Select domain</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj domän</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.ui" line="69"/>
         <source>Domain</source>
-        <translation type="unfinished"></translation>
+        <translation>Domän</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="14"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj domännamn:</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="16"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Underdomän hittad!</translation>
     </message>
     <message>
         <location filename="../src/RequestDomainSelectionDialog.cpp" line="18"/>
         <source>You have the possibility to store subdomain or domain as service name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du kan välja att spara underdomänen eller domänen som tjänstnamn.</translation>
     </message>
 </context>
 <context>
@@ -2130,28 +2117,28 @@ Think twice before resetting a card.</source>
         <location filename="../src/RequestLoginNameDialog.ui" line="14"/>
         <location filename="../src/RequestLoginNameDialog.cpp" line="12"/>
         <source>Request Login Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj användarnamn</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.ui" line="44"/>
         <location filename="../src/RequestLoginNameDialog.cpp" line="16"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>En identifikation utan användarnamn har hittats.</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.ui" line="69"/>
         <source>Login</source>
-        <translation type="unfinished">Användarnamn</translation>
+        <translation>Användarnamn</translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.cpp" line="14"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Användarnamn för </translation>
     </message>
     <message>
         <location filename="../src/RequestLoginNameDialog.cpp" line="18"/>
         <source>You have the possibility to include a login before storing the credential in the device. If you don&apos;t need a login, you can ignore the request.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du kan välja att ange ett användarnamn innan du sparar identifikationen i enheten. Om du inte behöver ett användarnamn kan du ignorera den här dialogen.</translation>
     </message>
 </context>
 <context>
@@ -2165,42 +2152,42 @@ Think twice before resetting a card.</source>
         <location filename="../src/SSHManagement.ui" line="54"/>
         <location filename="../src/SSHManagement.ui" line="269"/>
         <source>SSH Keys Management</source>
-        <translation type="unfinished"></translation>
+        <translation>SSH-nyckelhantering</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SSH Keys Not Loaded&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Press the load keys button to load SSH keys from your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Inga SSH-nycklar laddade&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Tryck på knappen ladda nycklar för att ladda SSH-nycklar från din enhet.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="117"/>
         <source>Load Keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Ladda nycklar</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="279"/>
         <source>Only passphrase-free OpenSSH keys are supported at this moment.</source>
-        <translation type="unfinished"></translation>
+        <translation>Endast OpenSSH-nycklar utan lösen stöds för tillfället.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="303"/>
         <source>Import A Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Importera en nyckel</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="319"/>
         <source>Export Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportera valda nycklar</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="335"/>
         <source>Delete Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort valda nycklar</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.ui" line="370"/>
         <source>Leave SSH Keys Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Avsluta SSH-nyckelhantering</translation>
     </message>
     <message>
         <source>SSH Keys management</source>
@@ -2256,7 +2243,9 @@ Think twice before resetting a card.</source>
         <source>mc-agent isn&apos;t bundled with the Moolticute app!
 
 Cannot manage SSH keys.</source>
-        <translation type="unfinished"></translation>
+        <translation>mc-agent är inte inbyggd i Moolticute-appen!
+
+Kan inte hantera SSH-nycklar.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="158"/>
@@ -2274,22 +2263,22 @@ Cannot manage SSH keys.</source>
     <message>
         <location filename="../src/SSHManagement.cpp" line="167"/>
         <source>Failed to retrieve keys from the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades med att hämta nycklar från enheten!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="171"/>
         <source>Failed to import key into the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades med att importera nyckel till enheten!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="172"/>
         <source>Make sure it&apos;s an OpenSSH private key without a passphrase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dubbelkolla att det är en privat OpenSSH-nyckel utan lösen.</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="176"/>
         <source>Failed to delete key from the device!</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades med att ta bort nyckel från enheten!</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="282"/>
@@ -2330,17 +2319,17 @@ Cannot manage SSH keys.</source>
     <message>
         <location filename="../src/SSHManagement.cpp" line="343"/>
         <source>OpenSSH private key</source>
-        <translation type="unfinished"></translation>
+        <translation>Privat OpenSSH-nyckel</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="345"/>
         <source>OpenSSH private key (*.key *.pem *.* *)</source>
-        <translation type="unfinished"></translation>
+        <translation>Privat OpenSSH-nyckel (*.key *.pem *.* *)</translation>
     </message>
     <message>
         <location filename="../src/SSHManagement.cpp" line="354"/>
         <source>PuTTY private keys are currently not supported!</source>
-        <translation type="unfinished"></translation>
+        <translation>Privata PuTTY-nycklar stöds tyvärr inte för tillfället!</translation>
     </message>
     <message>
         <source>Open SSH private key</source>
@@ -2361,22 +2350,22 @@ Fortsätt?</translation>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="43"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>En identifikation utan användarnamn har hittats.</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="43"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Användarnamn för </translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="52"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Underdomän hittad!</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationMac.cpp" line="52"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj domännamn:</translation>
     </message>
 </context>
 <context>
@@ -2384,22 +2373,22 @@ Fortsätt?</translation>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="99"/>
         <source>A credential without a login has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>En identifikation utan användarnamn har hittats.</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="99"/>
         <source>Login name for </source>
-        <translation type="unfinished"></translation>
+        <translation>Användarnamn för </translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="121"/>
         <source>Subdomain Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Underdomän hittad!</translation>
     </message>
     <message>
         <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="121"/>
         <source>Choose the domain name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj domännamn:</translation>
     </message>
 </context>
 <context>
@@ -2427,7 +2416,7 @@ Fortsätt?</translation>
     <message>
         <location filename="../src/QSimpleUpdater/src/Updater.cpp" line="543"/>
         <source>Change log:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändringsförteckning:</translation>
     </message>
 </context>
 <context>
@@ -2435,12 +2424,12 @@ Fortsätt?</translation>
     <message>
         <location filename="../src/WSClient.cpp" line="242"/>
         <source>Credentials Detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifikationer hittade!</translation>
     </message>
     <message>
         <location filename="../src/WSClient.cpp" line="242"/>
         <source>Please Approve their Storage on the Mooltipass</source>
-        <translation type="unfinished"></translation>
+        <translation>Godkänn att de lagras på Mooltipass-enheten</translation>
     </message>
 </context>
 <context>
