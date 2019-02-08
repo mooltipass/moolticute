@@ -102,6 +102,7 @@ private slots:
     void onFilesAndSSHTabsShortcutActivated();
     void onAdvancedTabShortcutActivated();
     void onRadioButtonSSHTabsAlwaysToggled(bool bChecked);
+    void onBleDevTabShortcutActivated();
     void onCurrentTabChanged(int);
 
     void on_comboBoxAppLang_currentIndexChanged(int index);
@@ -125,7 +126,7 @@ private slots:
     void on_comboBoxSystrayIcon_currentIndexChanged(int index);
 
     void on_pushButtonSubDomain_clicked();
-    
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -156,9 +157,11 @@ private:
     bool bSSHKeyTabVisible;
     bool bAdvancedTabVisible;
     bool bSSHKeysTabVisibleOnDemand;
+    bool bBleDevTabVisible = false;
     bool dbBackupTrakingControlsVisible;
 
     QShortcut *m_FilesAndSSHKeysTabsShortcut;
+    QShortcut *m_BleDevTabShortcut;
     QShortcut *m_advancedTabShortcut;
     QMap<QWidget *, QPushButton *> m_tabMap;
     QWidget *previousWidget;

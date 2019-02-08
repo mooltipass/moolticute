@@ -208,6 +208,19 @@ QWidget {background-color: #EFEFEF;}</string>
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonBleDev">
+         <property name="text">
+          <string>BLE Dev</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonAbout">
          <property name="text">
           <string>About</string>
@@ -3462,7 +3475,26 @@ Hint: keep your mouse positioned over an option to get more details.</string>
         </item>
        </layout>
       </widget>
-     </widget>
+     <widget class="QWidget" name="pageBleDev">
+       <layout class="QHBoxLayout" name="horizontalLayout_45">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="BleDev" name="widgetBleDev" native="true"/>
+        </item>
+       </layout>
+      </widget>
+	 </widget>
     </item>
     <item>
      <widget class="PromptWidget" name="promptWidget">
@@ -3495,6 +3527,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
    <class>SSHManagement</class>
    <extends>QWidget</extends>
    <header>SSHManagement.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BleDev</class>
+   <extends>QWidget</extends>
+   <header>BleDev.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

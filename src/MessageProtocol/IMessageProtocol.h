@@ -23,7 +23,7 @@ public:
      */
     virtual QVector<QByteArray> createPackets(const QByteArray &data, MPCmd::Command c) = 0;
     virtual Common::MPStatus getStatus(const QByteArray &data) = 0;
-    virtual quint8 getMessageSize(const QByteArray &data) = 0;
+    virtual quint16 getMessageSize(const QByteArray &data) = 0;
     virtual MPCmd::Command getCommand(const QByteArray &data) = 0;
 
     // Payload related functions
@@ -70,6 +70,66 @@ public:
 
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() = 0;
+
+    /**
+     * @brief getDeviceName
+     * @return the used device name (BLE or Mini)
+     */
+    virtual QString getDeviceName() = 0;
+
+    /**
+     * @brief fillCommandMapping
+     * Fill commandMap according to the given device
+     */
+    virtual void fillCommandMapping() = 0;
+
+    /**
+     * @brief getDeviceMappedCommandId
+     * @param cmd: general command id
+     * @return mapped commandId according to the given device
+     */
+    quint16 getDeviceMappedCommandId(const MPCmd::Command &cmd)
+    {
+        const auto commandIter = m_commandMapping.find(cmd);
+        if (commandIter == m_commandMapping.end())
+        {
+            qCritical() << MPCmd::printCmd(cmd) << " is not implemented for " << getDeviceName();
+            return m_commandMapping[MPCmd::PING];
+        }
+        return commandIter.value();
+    }
+
+    /**
+     * @brief getGeneralCommandId
+     * @param cmd: mapped commandId according to the given device
+     * @return cmd: general command id
+     */
+    MPCmd::Command getGeneralCommandId(const quint16 cmd)
+    {
+        return MPCmd::Command(m_commandMapping.key(cmd, MPCmd::PING));
+    }
+
+    QString printCmd(const MPCmd::Command &cmd)
+    {
+        const auto commandId = m_commandMapping[cmd];
+        QMetaEnum m = QMetaEnum::fromType<MPCmd::Command>();
+        return QString("%1 (%2)")
+                .arg(m.valueToKey(cmd))
+                .arg(MPCmd::toHexString(commandId));
+    }
+
+    QString printCmd(const QByteArray &data)
+    {
+        MPCmd::Command cmd = getCommand(data);
+        return printCmd(cmd);
+    }
+
+    quint16 toIntFromBigEndian(quint8 lowerByte, quint8 upperByte)
+    {
+        return (lowerByte|(upperByte<<8));
+    }
+
+    QMap<quint16,quint16> m_commandMapping;
 };
 
 

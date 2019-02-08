@@ -20,6 +20,7 @@
 #include "WSServer.h"
 #include "version.h"
 #include "ParseDomain.h"
+#include "MPDeviceBleImpl.h"
 
 #include <QCryptographicHash>
 
@@ -684,6 +685,68 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else
+    {
+        //Only ble related commands
+        MPDeviceBleImpl *bleImpl = mpdevice->ble();
+        if (nullptr == bleImpl)
+        {
+            return;
+        }
+
+        if (root["msg"] == "get_platinfo")
+        {
+            bleImpl->getPlatInfo([this, root, bleImpl](bool success, QString errstr, QByteArray data)
+            {
+                if (!success)
+                {
+                    sendFailedJson(root, errstr);
+                    return;
+                }
+
+                auto platInfo = bleImpl->calcPlatInfo(data);
+                QJsonObject ores;
+                QJsonObject oroot = root;
+                ores["aux_major"] = platInfo[0];
+                ores["aux_minor"] = platInfo[1];
+                ores["main_major"] = platInfo[2];
+                ores["main_minor"] = platInfo[3];
+                ores["success"] = "true";
+                oroot["data"] = ores;
+                sendJsonMessage(oroot);
+            });
+        }
+        else if (root["msg"] == "flash_mcu")
+        {
+            QJsonObject o = root["data"].toObject();
+            bleImpl->flashMCU(o["type"].toString(), [this, root](bool success, QString errstr)
+            {
+                if (!success)
+                {
+                    qCritical() << errstr;
+                    sendFailedJson(root, errstr);
+                    return;
+                }
+            });
+        }
+        else if (root["msg"] == "upload_bundle")
+        {
+            QJsonObject o = root["data"].toObject();
+            bleImpl->uploadBundle(o["file"].toString(), [this, root](bool success, QString errstr)
+            {
+                QJsonObject ores;
+                QJsonObject oroot = root;
+                ores["success"] = success;
+                if (!success)
+                {
+                    qCritical() << errstr;
+                }
+                oroot["data"] = ores;
+                sendJsonMessage(oroot);
+            }, defaultProgressCb);
+        }
+    }
+
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)
@@ -1022,6 +1085,10 @@ void WSServerCon::sendVersion()
     if (mpdevice->isMini())
     {
         data["hw_serial"] = (qint64)mpdevice->get_serialNumber();
+    }
+    if (mpdevice->isBLE())
+    {
+        data["hw_version"] = "ble";
     }
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
 }

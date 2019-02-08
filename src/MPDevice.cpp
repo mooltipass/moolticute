@@ -21,6 +21,7 @@
 #include "ParseDomain.h"
 #include "MessageProtocol/MessageProtocolMini.h"
 #include "MessageProtocol/MessageProtocolBLE.h"
+#include "MPDeviceBleImpl.h"
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
@@ -104,6 +105,7 @@ MPDevice::~MPDevice()
 {
     filesCache.resetState();
     delete pMesProt;
+    delete bleImpl;
 }
 
 void MPDevice::setupMessageProtocol()
@@ -111,6 +113,8 @@ void MPDevice::setupMessageProtocol()
     if (isBLE())
     {
         pMesProt = new MessageProtocolBLE{};
+        bleImpl = new MPDeviceBleImpl(dynamic_cast<MessageProtocolBLE*>(pMesProt), this);
+
         qDebug() << "Mooltipass Mini BLE is connected";
     }
     else
@@ -119,7 +123,27 @@ void MPDevice::setupMessageProtocol()
         qDebug() << "Mooltipass Mini is connected";
     }
 
-    QTimer::singleShot(100, [this]() { exitMemMgmtMode(false); });
+    QTimer::singleShot(100, [this]() {
+        if (isBLE())
+        {
+#ifdef DEV_DEBUG
+            qDebug() << "Resetting flip bit for BLE";
+#endif
+            bleImpl->sendResetFlipBit();
+        }
+
+        exitMemMgmtMode(false);
+        //TODO Remove when GET_MOOLTIPASS_PARM implemented for BLE
+        /**
+          * Temporary solution until GET_MOOLTIPASS_PARM
+          * is not implemented for the ble device we do not
+          * get if BLE is detected.
+          */
+        if (isBLE())
+        {
+            flashMbSizeChanged(0);
+        }
+    });
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
@@ -136,11 +160,13 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
     cmd.timerTimeout = new QTimer(this);
     connect(cmd.timerTimeout, &QTimer::timeout, [this]()
     {
+        auto cmd = pMesProt->getCommand(commandQueue.head().data[0]);
         commandQueue.head().retry--;
 
-        if (commandQueue.head().retry > 0)
+        //Retry is disabled for BLE
+        if (commandQueue.head().retry > 0 && !isBLE())
         {
-            qDebug() << "> Retry command: " << MPCmd::printCmd(pMesProt->getCommand(commandQueue.head().data[0]));
+            qDebug() << "> Retry command: " << pMesProt->printCmd(cmd);
             commandQueue.head().sent_ts = QDateTime::currentMSecsSinceEpoch();
             commandQueue.head().timerTimeout->start(); //restart timer
             commandQueue.head().retries_done++;
@@ -155,7 +181,14 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
             MPCommand currentCmd = commandQueue.head();
             delete currentCmd.timerTimeout;
 
-            qWarning() << "> Retry command: " << MPCmd::printCmd(pMesProt->getCommand(commandQueue.head().data[0])) << " has failed too many times. Give up.";
+            if (isBLE())
+            {
+                qDebug() << "No response received from the device for: " << pMesProt->printCmd(cmd);
+            }
+            else
+            {
+                qWarning() << "> Retry command: " << pMesProt->printCmd(cmd) << " has failed too many times. Give up.";
+            }
 
             bool done = true;
             currentCmd.cb(false, QByteArray(3, 0x00), done);
@@ -173,7 +206,9 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
 
         //If user interaction is required, add additional timeout
         if (MPCmd::isUserRequired(c))
+        {
             timeout += get_userInteractionTimeout() * 1000;
+        }
     }
     cmd.timerTimeout->setInterval(static_cast<int>(timeout));
 
@@ -210,6 +245,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     //we assume that the QByteArray size is at least 64 bytes
     //this should be done by the platform code
 
+    QByteArray dataReceived = data;
     if (pMesProt->getCommand(data) == MPCmd::DEBUG)
     {
         qWarning() << data;
@@ -219,7 +255,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     if (commandQueue.isEmpty())
     {
         qWarning() << "Command queue is empty!";
-        qWarning() << "Packet data " << " size:" << pMesProt->getMessageSize(data) << " data:" << data;
+        qWarning() << "Packet data " << " size:" << pMesProt->getMessageSize(data) << " data:" << data.toHex();
         return;
     }
 
@@ -251,11 +287,11 @@ void MPDevice::newDataRead(const QByteArray &data)
          */
         if ((commandQueue.head().retries_done == 1) && ((QDateTime::currentMSecsSinceEpoch() - commandQueue.head().sent_ts) < 200))
         {
-            qDebug() << MPCmd::printCmd(dataCommand) << " was received for a packet that was sent due to a timeout, not resending";
+            qDebug() << pMesProt->printCmd(dataCommand) << " was received for a packet that was sent due to a timeout, not resending";
         }
         else
         {
-            qDebug() << MPCmd::printCmd(dataCommand) << " received, resending command " << MPCmd::printCmd(currentCommand);
+            qDebug() << pMesProt->printCmd(dataCommand) << " received, resending command " << pMesProt->printCmd(currentCommand);
             QTimer *timer = new QTimer(this);
             connect(timer, &QTimer::timeout, [this, timer]()
             {
@@ -277,18 +313,72 @@ void MPDevice::newDataRead(const QByteArray &data)
     if (currentCmd.checkReturn &&
         dataCommand != currentCommand)
     {
-        qWarning() << "Wrong answer received: " << MPCmd::printCmd(dataCommand)
-                   << " for command: " << MPCmd::printCmd(currentCommand);
+        qWarning() << "Wrong answer received: " << pMesProt->printCmd(dataCommand)
+                   << " for command: " << pMesProt->printCmd(currentCommand);
         return;
     }
 
 #ifdef DEV_DEBUG
-    qDebug() << "Received answer:" << MPCmd::printCmd(dataCommand)
-             << "Full packet:" << data.toHex();
+    QString resMsg = "Received answer: ";
+    if (isBLE() && !bleImpl->isFirstPacket(data))
+    {
+        resMsg += pMesProt->printCmd(pMesProt->getCommand(currentCmd.data[0]));
+    }
+    else
+    {
+        qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
+        resMsg += pMesProt->printCmd(dataCommand);
+    }
+    qDebug() << resMsg << " Full packet:" << data.toHex();
 #endif
 
+    /**
+      * For BLE it is waiting while every packet is received,
+      * because the response has information about packet id
+      * and full packet number.
+      * For the first packet the entire packet is added to the
+      * response QByteArray for backward compatibility reasons
+      * with Mini and Classic.
+      */
+    if (isBLE())
+    {
+        bool isFirst = bleImpl->isFirstPacket(data);
+        if (isFirst)
+        {
+            commandQueue.head().responseSize = pMesProt->getMessageSize(data);
+            commandQueue.head().response.append(data);
+        }
+
+        if (bleImpl->isLastPacket(data))
+        {
+            if (!isFirst)
+            {
+                /**
+                 * @brief EXTRA_INFO_SIZE
+                 * Extra bytes of the first packet.
+                 * In the last package only the remaining bytes
+                 * of payload is appended.
+                 */
+                constexpr int EXTRA_INFO_SIZE = 6;
+                int fullResponseSize = commandQueue.head().responseSize + EXTRA_INFO_SIZE;
+                QByteArray responseData = commandQueue.head().response;
+                responseData.append(pMesProt->getFullPayload(data).left(fullResponseSize - responseData.size()));
+                dataReceived = responseData;
+            }
+        }
+        else
+        {
+            if (!isFirst)
+            {
+                commandQueue.head().response.append(pMesProt->getFullPayload(data));
+            }
+            commandQueue.head().checkReturn = false;
+            return;
+        }
+    }
+
     bool done = true;
-    currentCmd.cb(true, data, done);
+    currentCmd.cb(true, dataReceived, done);
     delete currentCmd.timerTimeout;
     commandQueue.head().timerTimeout = nullptr;
 
@@ -296,6 +386,10 @@ void MPDevice::newDataRead(const QByteArray &data)
     {
         commandQueue.dequeue();
         sendDataDequeue();
+    }
+    else
+    {
+        commandQueue.head().checkReturn = false;
     }
 }
 
@@ -309,13 +403,13 @@ void MPDevice::sendDataDequeue()
 
 #ifdef DEV_DEBUG
     int i = 0;
-    qDebug() << "Platform send command: " << MPCmd::printCmd(pMesProt->getCommand(currentCmd.data[0]));
+    qDebug() << "Platform send command: " << pMesProt->printCmd(currentCmd.data[0]);
 #endif
     // send data with platform code
     for (const auto &data : currentCmd.data)
     {
 #ifdef DEV_DEBUG
-        auto toHex = [](quint8 b) -> QString { return QString("0x%1").arg((quint8)b, 2, 16, QChar('0')); };
+        auto toHex = [](quint16 b) -> QString { return QString("0x%1").arg((quint16)b, 2, 16, QChar('0')); };
         QString a = "[";
         for (int i = 0;i < data.size();i++)
         {
@@ -981,7 +1075,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         }
         else
         {
-            qCritical() << "Get CPZ CTR: wrong command received as answer:" << MPCmd::printCmd(command);
+            qCritical() << "Get CPZ CTR: wrong command received as answer:" << pMesProt->printCmd(command);
             jobs->setCurrentJobError("Get CPZ/CTR: Mooltipass sent an answer packet with a different command ID");
             return false;
         }
@@ -3731,7 +3825,7 @@ void MPDevice::getUID(const QByteArray & key)
     {
         if (pMesProt->getMessageSize(data) == 1 )
         {
-            qWarning() << "Couldn't request uid" << pMesProt->getFirstPayloadByte(data) << pMesProt->getMessageSize(data) << MPCmd::printCmd(pMesProt->getCommand(data)) << data.toHex();
+            qWarning() << "Couldn't request uid" << pMesProt->getFirstPayloadByte(data) << pMesProt->getMessageSize(data) << pMesProt->printCmd(data) << data.toHex();
             set_uid(-1);
             return false;
         }
@@ -4028,7 +4122,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
 
 void MPDevice::delCredentialAndLeave(QString service, const QString &login,
                                      const MPDeviceProgressCb &cbProgress,
-                                     std::function<void(bool success, QString errstr)> cb)
+                                     MessageHandlerCb cb)
 {
     auto deleteCred = [this, service, login, cbProgress, cb]()
     {
@@ -4158,7 +4252,7 @@ void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool
 
 void MPDevice::setCredential(QString service, const QString &login,
                              const QString &pass, const QString &description, bool setDesc,
-                             std::function<void(bool success, QString errstr)> cb)
+                             MessageHandlerCb cb)
 {
     if (service.isEmpty())
     {
@@ -4512,7 +4606,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 }
 
 void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
-                           std::function<void(bool success, QString errstr)> cb,
+                           MessageHandlerCb cb,
                            const MPDeviceProgressCb &cbProgress)
 {
     if (service.isEmpty())
@@ -4609,7 +4703,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 }
 
 void  MPDevice::deleteDataNodesAndLeave(QStringList services,
-                                        std::function<void(bool success, QString errstr)> cb,
+                                        MessageHandlerCb cb,
                                         const MPDeviceProgressCb &cbProgress)
 {
     // TODO for the future:
@@ -5398,7 +5492,7 @@ void MPDevice::cleanMMMVars(void)
     freeAddresses.clear();
 }
 
-void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, std::function<void(bool success, QString errstr)> cb, bool noDelete)
+void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, MessageHandlerCb cb, bool noDelete)
 {
     /* New job for starting MMM */
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
@@ -6428,7 +6522,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
 
 
 void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &cbProgress,
-                   std::function<void(bool success, QString errstr)> cb)
+                   MessageHandlerCb cb)
 {
     /* Loop through credentials to check them */
     for (qint32 i = 0; i < creds.size(); i++)
@@ -6564,7 +6658,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
 
 void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                                 const MPDeviceProgressCb &cbProgress,
-                                std::function<void(bool success, QString errstr)> cb)
+                                MessageHandlerCb cb)
 {
     newAddressesNeededCounter = 0;
     newAddressesReceivedCounter = 0;
@@ -7053,7 +7147,7 @@ void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool
 }
 
 void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
-                              std::function<void(bool success, QString errstr)> cb,
+                              MessageHandlerCb cb,
                               const MPDeviceProgressCb &cbProgress)
 {
     QString errorString;
@@ -7175,7 +7269,7 @@ void MPDevice::getStoredFiles(std::function<void (bool, QList<QVariantMap>)> cb)
     runAndDequeueJobs();
 }
 
-void MPDevice::resetSmartCard(std::function<void(bool success, QString errstr)> cb)
+void MPDevice::resetSmartCard(MessageHandlerCb cb)
 {
     AsyncJobs *jobs = new AsyncJobs("Reseting smart card...", this);
 
@@ -7192,7 +7286,7 @@ void MPDevice::resetSmartCard(std::function<void(bool success, QString errstr)> 
     runAndDequeueJobs();
 }
 
-void MPDevice::lockDevice(const std::function<void(bool success, QString errstr)> &cb)
+void MPDevice::lockDevice(const MessageHandlerCb &cb)
 {
     auto *jobs = new AsyncJobs("Locking the device", this);
 
@@ -7209,4 +7303,9 @@ void MPDevice::lockDevice(const std::function<void(bool success, QString errstr)
 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
+}
+
+MPDeviceBleImpl *MPDevice::ble() const
+{
+    return bleImpl;
 }
