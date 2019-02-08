@@ -11,7 +11,7 @@ PromptWidget::PromptWidget(QWidget *parent) :
     QFrame(parent),
     m_hideAfterAccepted(true),
     m_messageLabel(new QLabel),
-    m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No)),
+    m_buttonBox(new QDialogButtonBox),
     m_promptMessage(nullptr)
 {
     QHBoxLayout *lay = new QHBoxLayout(this);
@@ -22,8 +22,8 @@ PromptWidget::PromptWidget(QWidget *parent) :
     lay->addWidget(m_buttonBox);
     lay->addStretch();
 
-    for (auto btn : m_buttonBox->buttons())
-        btn->setStyleSheet(CSS_BLUE_BUTTON);
+    initButtons();
+
     setStyleSheet("PromptWidget {border: 5px solid #60B1C7;}");
 
     m_messageLabel->setAlignment(Qt::AlignCenter);
@@ -53,10 +53,21 @@ void PromptWidget::setPromptMessage(PromptMessage *promptMessage)
 
     if (m_promptMessage)
         m_messageLabel->setText(m_promptMessage->getText());
+
+    if (!promptMessage->containsButtonCb())
+    {
+        m_buttonBox->setStandardButtons(QDialogButtonBox::Ok);
+        for (auto btn : m_buttonBox->buttons())
+        {
+            btn->setStyleSheet(CSS_BLUE_BUTTON);
+        }
+    }
 }
 
 void PromptWidget::cleanPromptMessage()
 {
+    initButtons();
+
     if (m_promptMessage)
     {
         delete m_promptMessage;
@@ -81,4 +92,13 @@ void PromptWidget::onRejected()
         m_promptMessage->runRejectCallBack();
 
     emit rejected();
+}
+
+void PromptWidget::initButtons()
+{
+    m_buttonBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
+    for (auto btn : m_buttonBox->buttons())
+    {
+        btn->setStyleSheet(CSS_BLUE_BUTTON);
+    }
 }

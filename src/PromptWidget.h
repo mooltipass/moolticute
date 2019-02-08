@@ -25,6 +25,7 @@ public:
     {}
 
     QString getText() const { return m_text; }
+    bool containsButtonCb() const { return nullptr != m_acceptCallBack; }
     void runAcceptCallBack() { if (m_acceptCallBack) m_acceptCallBack(); }
     void runRejectCallBack() { if (m_rejectCallBack) m_rejectCallBack(); }
 
@@ -60,6 +61,9 @@ protected slots:
     void onRejected();
 
 private:
+    void initButtons();
+
+
     bool m_hideAfterAccepted;
     QLabel *m_messageLabel;
     QDialogButtonBox *m_buttonBox;

@@ -1426,9 +1426,9 @@ void MainWindow::updateTabButtons()
 void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
 {
     Q_UNUSED(errCode)
-    QMessageBox::warning(this,
-                         tr("Memory Management Error"),
-                         tr("An error occured when trying to go into Memory Management mode.\n\n%1").arg(errMsg));
+    updatePage();
+    showPrompt(new PromptMessage{"<b>" + tr("Memory Management Error") + "</b><br>" +
+                                 tr("An error occured when trying to go into Memory Management mode.\n\n%1").arg(errMsg)});
 }
 
 void MainWindow::refreshAppLangCb()
