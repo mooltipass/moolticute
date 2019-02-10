@@ -3960,10 +3960,10 @@ void MPDevice::cancelUserRequest(const QString &reqid)
         qInfo() << "request_id match current one. Cancel current request";
 
         QByteArray ba;
-        ba.append((char)0);
-        ba.append(MPCmd::CANCEL_USER_REQUEST);
+        ba.append(static_cast<char>(0));
+        ba.append(static_cast<char>(pMesProt->getDeviceMappedCommandId(MPCmd::CANCEL_USER_REQUEST)));
 
-        qDebug() << "Platform send command: " << QString("0x%1").arg((quint8)ba[1], 2, 16, QChar('0'));
+        qDebug() << "Platform send command: " << QString("0x%1").arg(static_cast<quint8>(ba[1]), 2, 16, QChar('0'));
         platformWrite(ba);
         return;
     }
