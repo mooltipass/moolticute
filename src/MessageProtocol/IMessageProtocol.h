@@ -83,6 +83,8 @@ public:
      */
     virtual void fillCommandMapping() = 0;
 
+    virtual QByteArray toByteArray(const QString &input) = 0;
+
     /**
      * @brief getDeviceMappedCommandId
      * @param cmd: general command id

@@ -98,6 +98,11 @@ QString MessageProtocolMini::getDeviceName()
     return "Mini";
 }
 
+QByteArray MessageProtocolMini::toByteArray(const QString &input)
+{
+    return input.toUtf8();
+}
+
 void MessageProtocolMini::fillCommandMapping()
 {
     m_commandMapping = {

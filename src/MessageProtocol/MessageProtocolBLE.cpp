@@ -112,6 +112,19 @@ QString MessageProtocolBLE::getDeviceName()
     return "BLE";
 }
 
+QByteArray MessageProtocolBLE::toByteArray(const QString &input)
+{
+    //Convert string to unicode byte array (2 bytes for 1 char)
+    QByteArray unicodeArray;
+    for (QChar ch : input)
+    {
+        quint16 uniChar = ch.unicode();
+        unicodeArray.append(static_cast<char>((0xFF00&uniChar)>>8));
+        unicodeArray.append(static_cast<char>((0xFF&uniChar)));
+    }
+    return unicodeArray;
+}
+
 void MessageProtocolBLE::setAckFlag(bool on)
 {
     m_ackFlag = on ? ACK_FLAG_BIT : 0x00;

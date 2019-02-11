@@ -25,6 +25,8 @@ public:
     virtual AsyncFuncDone getDefaultFuncDone() override;
     virtual QString getDeviceName() override;
 
+    virtual QByteArray toByteArray(const QString &input) override;
+
     virtual void fillCommandMapping() override;
 };
 
