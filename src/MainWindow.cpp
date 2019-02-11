@@ -1307,6 +1307,18 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
                                                      "Memory exports (*.bin);;All files (*.*)");
         if (!fname.isEmpty())
         {
+#if defined(Q_OS_LINUX)
+            /**
+             * getSaveFileName is using native dialog
+             * On Linux it is not saving the choosen extension,
+             * so need to add it from code.
+             */
+            const QString BIN_EXT = ".bin";
+            if (!fname.endsWith(BIN_EXT))
+            {
+                fname += BIN_EXT;
+            }
+#endif
             QFile f(fname);
             if (!f.open(QFile::WriteOnly | QFile::Truncate))
                 QMessageBox::warning(this, tr("Error"), tr("Unable to write to file %1").arg(fname));
