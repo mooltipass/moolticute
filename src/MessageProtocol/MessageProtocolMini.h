@@ -26,6 +26,7 @@ public:
     virtual QString getDeviceName() override;
 
     virtual QByteArray toByteArray(const QString &input) override;
+    virtual QString toQString(const QByteArray &data) override;
 
     virtual void fillCommandMapping() override;
 };

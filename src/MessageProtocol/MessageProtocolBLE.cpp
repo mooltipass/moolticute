@@ -125,6 +125,18 @@ QByteArray MessageProtocolBLE::toByteArray(const QString &input)
     return unicodeArray;
 }
 
+QString MessageProtocolBLE::toQString(const QByteArray &data)
+{
+    QString out = "";
+    for (int i = 0; i < data.size(); i+=2)
+    {
+        quint16 unicode = static_cast<quint8>(data[i+1]);
+        unicode |= (data[i]<<8);
+        out += QChar(unicode);
+    }
+    return out;
+}
+
 void MessageProtocolBLE::setAckFlag(bool on)
 {
     m_ackFlag = on ? ACK_FLAG_BIT : 0x00;

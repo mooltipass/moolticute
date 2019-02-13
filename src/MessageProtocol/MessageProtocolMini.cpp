@@ -103,6 +103,11 @@ QByteArray MessageProtocolMini::toByteArray(const QString &input)
     return input.toUtf8();
 }
 
+QString MessageProtocolMini::toQString(const QByteArray &data)
+{
+    return QString::fromUtf8(data);
+}
+
 void MessageProtocolMini::fillCommandMapping()
 {
     m_commandMapping = {

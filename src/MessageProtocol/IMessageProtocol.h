@@ -84,6 +84,7 @@ public:
     virtual void fillCommandMapping() = 0;
 
     virtual QByteArray toByteArray(const QString &input) = 0;
+    virtual QString toQString(const QByteArray &data) = 0;
 
     /**
      * @brief getDeviceMappedCommandId
