@@ -243,6 +243,8 @@ public:
     // Returns bleImpl
     MPDeviceBleImpl* ble() const;
 
+    IMessageProtocol* getMesProt() const;
+
     //After successfull mem mgmt mode, clients can query data
     QList<MPNode *> &getLoginNodes() { return loginNodes; }
     QList<MPNode *> &getDataNodes() { return dataNodes; }

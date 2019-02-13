@@ -128,8 +128,14 @@ QByteArray MessageProtocolBLE::toByteArray(const QString &input)
 QString MessageProtocolBLE::toQString(const QByteArray &data)
 {
     QString out = "";
-    for (int i = 0; i < data.size(); i+=2)
+    const auto size = data.size();
+    for (int i = 0; i < size; i+=2)
     {
+        if (i+1 >= size)
+        {
+            qCritical() << "Out of bounds";
+            break;
+        }
         quint16 unicode = static_cast<quint8>(data[i+1]);
         unicode |= (data[i]<<8);
         out += QChar(unicode);

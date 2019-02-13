@@ -3997,7 +3997,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
     else
         jobs = new AsyncJobs(logInf, reqid, this);
 
-    QByteArray sdata = service.toUtf8();
+    QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
     jobs->append(new MPCommandJob(this, MPCmd::CONTEXT,
@@ -4008,7 +4008,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
         {
             if (!fallback_service.isEmpty())
             {
-                QByteArray fsdata = fallback_service.toUtf8();
+                QByteArray fsdata = pMesProt->toByteArray(fallback_service);
                 fsdata.append((char)0);
                 jobs->prepend(new MPCommandJob(this, MPCmd::CONTEXT,
                                               fsdata,
@@ -4040,7 +4040,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
         return true;
     }));
 
-    QByteArray ldata = login.toUtf8();
+    QByteArray ldata = pMesProt->toByteArray(login);
     if (!ldata.isEmpty())
         ldata.append((char)0);
 
@@ -4213,7 +4213,7 @@ void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, 
 
 void MPDevice::createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode)
 {
-    QByteArray sdata = service.toUtf8();
+    QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
     quint8 cmdAddCtx = isDataNode?MPCmd::ADD_DATA_SERVICE:MPCmd::ADD_CONTEXT;
@@ -4270,7 +4270,7 @@ void MPDevice::setCredential(QString service, const QString &login,
 
     AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
-    QByteArray sdata = service.toUtf8();
+    QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
     //First query if context exist
@@ -4289,7 +4289,7 @@ void MPDevice::setCredential(QString service, const QString &login,
         return true;
     }));
 
-    QByteArray ldata = login.toUtf8();
+    QByteArray ldata = pMesProt->toByteArray(service);
     ldata.append((char)0);
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_LOGIN,
@@ -4308,7 +4308,7 @@ void MPDevice::setCredential(QString service, const QString &login,
 
     if (isFw12() && setDesc && description != "None")
     {
-        QByteArray ddata = description.toUtf8();
+        QByteArray ddata = pMesProt->toByteArray(description);
         ddata.append((char)0);
 
         //Set description should be done right after set login
@@ -4335,7 +4335,7 @@ void MPDevice::setCredential(QString service, const QString &login,
         }));
     }
 
-    QByteArray pdata = pass.toUtf8();
+    QByteArray pdata = pMesProt->toByteArray(pass);
     pdata.append((char)0);
 
     if(!pass.isEmpty()) {
@@ -4484,7 +4484,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
     else
         jobs = new AsyncJobs(logInf, reqid, this);
 
-    QByteArray sdata = service.toUtf8();
+    QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
@@ -4495,7 +4495,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
         {
             if (!fallback_service.isEmpty())
             {
-                QByteArray fsdata = fallback_service.toUtf8();
+                QByteArray fsdata = pMesProt->toByteArray(fallback_service);
                 fsdata.append((char)0);
                 jobs->prepend(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
                                               fsdata,
@@ -4624,7 +4624,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 
     AsyncJobs *jobs = new AsyncJobs(logInf, this);
 
-    QByteArray sdata = service.toUtf8();
+    QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
@@ -5242,7 +5242,7 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
             else if  (encryptionMethod == "none")
             {
                 /* Legacy, not generated anymore */
-                return readExportPayload(QJsonDocument::fromJson(importFile.value("payload").toString().toUtf8()).array(), errorString);
+                return readExportPayload(QJsonDocument::fromJson(pMesProt->toByteArray(importFile.value("payload").toString())).array(), errorString);
             }
             else
             {
@@ -6489,7 +6489,7 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
     else
         jobs = new AsyncJobs(logInf, reqid, this);
 
-    QByteArray sdata = service.toUtf8();
+    QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
     jobs->append(new MPCommandJob(this, isDatanode? MPCmd::SET_DATA_SERVICE : MPCmd::CONTEXT,
@@ -6986,7 +6986,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 /* Create password change jobs */
                 for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
                 {
-                    QByteArray sdata = mmmPasswordChangeArray[i][0].toUtf8();
+                    QByteArray sdata = pMesProt->toByteArray(mmmPasswordChangeArray[i][0]);
                     sdata.append((char)0);
 
                     //First query if context exist
@@ -7014,7 +7014,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                         }
                     }));
 
-                    QByteArray ldata = mmmPasswordChangeArray[i][1].toUtf8();
+                    QByteArray ldata = pMesProt->toByteArray(mmmPasswordChangeArray[i][1]);
                     ldata.append((char)0);
 
                     pwdChangeJobs->append(new MPCommandJob(this, MPCmd::SET_LOGIN,
@@ -7034,7 +7034,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                         }
                     }));
 
-                    QByteArray pdata = mmmPasswordChangeArray[i][2].toUtf8();
+                    QByteArray pdata = pMesProt->toByteArray(mmmPasswordChangeArray[i][2]);
                     pdata.append((char)0);
 
                     pwdChangeJobs->append(new MPCommandJob(this, MPCmd::SET_PASSWORD,
@@ -7308,4 +7308,9 @@ void MPDevice::lockDevice(const MessageHandlerCb &cb)
 MPDeviceBleImpl *MPDevice::ble() const
 {
     return bleImpl;
+}
+
+IMessageProtocol *MPDevice::getMesProt() const
+{
+    return pMesProt;
 }
