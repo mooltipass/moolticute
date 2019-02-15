@@ -5242,7 +5242,7 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
             else if  (encryptionMethod == "none")
             {
                 /* Legacy, not generated anymore */
-                return readExportPayload(QJsonDocument::fromJson(pMesProt->toByteArray(importFile.value("payload").toString())).array(), errorString);
+                return readExportPayload(QJsonDocument::fromJson(importFile.value("payload").toString().toUtf8()).array(), errorString);
             }
             else
             {
