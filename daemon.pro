@@ -72,7 +72,8 @@ SOURCES += src/main_daemon.cpp \
     src/ParseDomain.cpp \
     src/MessageProtocol/MessageProtocolMini.cpp \
     src/MessageProtocol/MessageProtocolBLE.cpp \
-    src/MPDeviceBleImpl.cpp
+    src/MPDeviceBleImpl.cpp \
+    src/HaveIBeenPwned.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -96,7 +97,8 @@ HEADERS  += \
     src/MessageProtocol/IMessageProtocol.h \
     src/MessageProtocol/MessageProtocolMini.h \
     src/MessageProtocol/MessageProtocolBLE.h \
-    src/MPDeviceBleImpl.h
+    src/MPDeviceBleImpl.h \
+    src/HaveIBeenPwned.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \

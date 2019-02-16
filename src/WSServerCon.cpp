@@ -21,14 +21,17 @@
 #include "version.h"
 #include "ParseDomain.h"
 #include "MPDeviceBleImpl.h"
+#include "HaveIBeenPwned.h"
 
 #include <QCryptographicHash>
 
 WSServerCon::WSServerCon(QWebSocket *conn):
     wsClient(conn),
-    clientUid(Common::createUid(QStringLiteral("ws-")))
+    clientUid(Common::createUid(QStringLiteral("ws-"))),
+    hibp(new HaveIBeenPwned(this))
 {
     connect(wsClient, &QWebSocket::textMessageReceived, this, &WSServerCon::processMessage);
+    connect(hibp, &HaveIBeenPwned::sendPwnedResult, this, &WSServerCon::sendHibpNotification);
 }
 
 WSServerCon::~WSServerCon()
@@ -1156,6 +1159,17 @@ void WSServerCon::sendCardDbMetadata()
         sendJsonMessage(oroot);
         qDebug() << "Sended card db metadata";
     }
+}
+
+void WSServerCon::sendHibpNotification(QString pwned)
+{
+    QJsonObject oroot = { {"msg", "send_hibp"} };
+    QJsonObject data;
+    data.insert("message", pwned);
+    oroot["data"] = data;
+
+    sendJsonMessage(oroot);
+    qDebug() << "Sending hibp notification request";
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

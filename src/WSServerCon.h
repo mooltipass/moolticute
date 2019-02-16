@@ -25,6 +25,7 @@
 #include "MPManager.h"
 
 class WSServer;
+class HaveIBeenPwned;
 
 class WSServerCon: public QObject
 {
@@ -77,6 +78,8 @@ private slots:
     void sendFilesCache();
 
     void sendCardDbMetadata();
+
+    void sendHibpNotification(QString pwned);
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
 
@@ -85,6 +88,8 @@ private:
     MPDevice *mpdevice = nullptr;
 
     QString clientUid;
+
+    HaveIBeenPwned *hibp = nullptr;
 
     void processParametersSet(const QJsonObject &data);
     void sendFailedJson(QJsonObject obj, QString errstr = QString(), int errCode = -999);
