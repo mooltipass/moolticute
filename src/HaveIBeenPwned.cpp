@@ -33,10 +33,6 @@ void HaveIBeenPwned::processReply(QNetworkReply *reply)
         QString fromPwned = answer.mid(answer.indexOf(hash.mid(HIBP_REQUEST_SHA_LENGTH)));
         QString pwned = fromPwned.left(fromPwned.indexOf("\r\n"));
         QString pwnedNum = pwned.mid(pwned.indexOf(':') + 1);
-        emit sendPwnedResult("Password has been pwned " + pwnedNum + " times before!");
-    }
-    else
-    {
-        emit sendPwnedResult("Password is safe.");
+        emit sendPwnedResult("Pwned " + pwnedNum + " times before!");
     }
 }

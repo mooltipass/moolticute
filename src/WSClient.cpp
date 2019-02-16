@@ -435,6 +435,11 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit displayUploadBundleResult(o["success"].toBool());
     }
+    else if (rootobj["msg"] == "send_hibp")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        SystemNotification::instance().createNotification(tr("Password has been pwned!"), o["message"].toString());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)

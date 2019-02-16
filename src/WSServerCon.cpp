@@ -287,6 +287,11 @@ void WSServerCon::processMessage(const QString &message)
 
         const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
         emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
+
+        if (s.value("settings/enable_hibp_check").toBool())
+        {
+            hibp->isPasswordPwned(o["password"].toString());
+        }
           
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
@@ -1168,8 +1173,13 @@ void WSServerCon::sendHibpNotification(QString pwned)
     data.insert("message", pwned);
     oroot["data"] = data;
 
-    sendJsonMessage(oroot);
-    qDebug() << "Sending hibp notification request";
+    bool isGuiRunning;
+    emit sendMessageToGUI(QJsonDocument(oroot).toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
+
+    if (!isGuiRunning)
+    {
+        qDebug() << "Cannot send pwned notification to GUI: " << pwned;
+    }
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)
