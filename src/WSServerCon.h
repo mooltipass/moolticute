@@ -79,7 +79,7 @@ private slots:
 
     void sendCardDbMetadata();
 
-    void sendHibpNotification(QString pwned);
+    void sendHibpNotification(QString message);
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
 
@@ -90,6 +90,8 @@ private:
     QString clientUid;
 
     HaveIBeenPwned *hibp = nullptr;
+
+    QString HIBP_COMPROMISED_FORMAT = tr("this password has been compromised %1 times.");
 
     void processParametersSet(const QJsonObject &data);
     void sendFailedJson(QJsonObject obj, QString errstr = QString(), int errCode = -999);

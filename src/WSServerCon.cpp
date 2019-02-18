@@ -31,7 +31,7 @@ WSServerCon::WSServerCon(QWebSocket *conn):
     hibp(new HaveIBeenPwned(this))
 {
     connect(wsClient, &QWebSocket::textMessageReceived, this, &WSServerCon::processMessage);
-    connect(hibp, &HaveIBeenPwned::sendPwnedResult, this, &WSServerCon::sendHibpNotification);
+    connect(hibp, &HaveIBeenPwned::sendPwnedMessage, this, &WSServerCon::sendHibpNotification);
 }
 
 WSServerCon::~WSServerCon()
@@ -226,6 +226,13 @@ void WSServerCon::processMessage(const QString &message)
                 return;
             }
 
+            QSettings s;
+            if (s.value("settings/enable_hibp_check").toBool())
+            {
+                QString formatString = o["service"].toString() + ": " + o["login"].toString() + ": ";
+                formatString += HIBP_COMPROMISED_FORMAT;
+                hibp->isPasswordPwned(pass, formatString);
+            }
             QJsonObject ores;
             QJsonObject oroot = root;
             ores["service"] = service;
@@ -290,7 +297,9 @@ void WSServerCon::processMessage(const QString &message)
 
         if (s.value("settings/enable_hibp_check").toBool())
         {
-            hibp->isPasswordPwned(o["password"].toString());
+            QString formatString = o["service"].toString() + ": " + loginName + ": ";
+            formatString += HIBP_COMPROMISED_FORMAT;
+            hibp->isPasswordPwned(o["password"].toString(), formatString);
         }
           
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
@@ -1166,11 +1175,11 @@ void WSServerCon::sendCardDbMetadata()
     }
 }
 
-void WSServerCon::sendHibpNotification(QString pwned)
+void WSServerCon::sendHibpNotification(QString message)
 {
     QJsonObject oroot = { {"msg", "send_hibp"} };
     QJsonObject data;
-    data.insert("message", pwned);
+    data.insert("message", message);
     oroot["data"] = data;
 
     bool isGuiRunning;
@@ -1178,7 +1187,7 @@ void WSServerCon::sendHibpNotification(QString pwned)
 
     if (!isGuiRunning)
     {
-        qDebug() << "Cannot send pwned notification to GUI: " << pwned;
+        qDebug() << "Cannot send pwned notification to GUI: " << message;
     }
 }
 
