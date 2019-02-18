@@ -1198,7 +1198,7 @@ void MainWindow::checkHIBPSetting()
 
     bool en = s.value("settings/enable_hibp_check", false).toBool();
 
-    ui->labelHIBPCheck->setText(tr("HIBP check: %1").arg((en?tr("Enabled"):tr("Disabled"))));
+    ui->labelHIBPCheck->setText(tr("Integration with Have I Been Pwned: %1").arg((en?tr("Enabled"):tr("Disabled"))));
     if (en)
     {
         ui->pushButtonHIBP->setText(tr("Disable"));
