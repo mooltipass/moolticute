@@ -1200,9 +1200,13 @@ void MainWindow::checkHIBPSetting()
 
     ui->labelHIBPCheck->setText(tr("HIBP check: %1").arg((en?tr("Enabled"):tr("Disabled"))));
     if (en)
+    {
         ui->pushButtonHIBP->setText(tr("Disable"));
+    }
     else
+    {
         ui->pushButtonHIBP->setText(tr("Enable"));
+    }
 
 }
 
@@ -1765,9 +1769,13 @@ void MainWindow::on_pushButtonHIBP_clicked()
 
     int ret;
     if (en)
+    {
         ret = QMessageBox::question(this, "Moolticute", tr("Disable HIBP check?"));
+    }
     else
+    {
         ret = QMessageBox::question(this, "Moolticute", tr("Enable HIBP check?"));
+    }
 
     if (ret == QMessageBox::Yes)
     {

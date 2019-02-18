@@ -34,7 +34,8 @@ void HaveIBeenPwned::isPasswordPwned(const QString &pwd, const QString &formatSt
  */
 void HaveIBeenPwned::processReply(QNetworkReply *reply)
 {
-    if (reply->error()) {
+    if (reply->error())
+    {
         qDebug() << reply->errorString();
         return;
     }
