@@ -19,20 +19,24 @@
 #include "MPNode.h"
 #include "MooltipassCmds.h"
 
+#include "MPDevice.h"
+
 QByteArray MPNode::EmptyAddress = QByteArray(2, 0);
 
 MPNode::MPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr):
     QObject(parent),
     data(std::move(d)),
     address(std::move(nodeAddress)),
-    virtualAddress(virt_addr)
+    virtualAddress(virt_addr),
+    pMesProt(getMesProt(parent))
 {
 }
 
 MPNode::MPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr):
     QObject(parent),
     address(std::move(nodeAddress)),
-    virtualAddress(virt_addr)
+    virtualAddress(virt_addr),
+    pMesProt(getMesProt(parent))
 {
 }
 
@@ -228,14 +232,14 @@ void MPNode::setStartChildAddress(const QByteArray &d, const quint32 virt_addr)
 QString MPNode::getService() const
 {
     if (!isValid()) return QString();
-    return QString::fromUtf8(data.mid(8, MP_NODE_SIZE - 8 - 3));
+    return pMesProt->toQString(data.mid(8, MP_NODE_SIZE - 8 - 3));
 }
 
 void MPNode::setService(const QString &service)
 {
     if (isValid())
     {
-        QByteArray serviceArray = service.toUtf8();
+        QByteArray serviceArray = pMesProt->toByteArray(service);
         serviceArray.append('\0');
         serviceArray.resize(MP_MAX_PAYLOAD_LENGTH);
         serviceArray[serviceArray.size()-1] = '\0';
@@ -334,14 +338,14 @@ QByteArray MPNode::getCTR() const
 QString MPNode::getDescription() const
 {
     if (!isValid()) return QString();
-    return QString::fromUtf8(data.mid(6, 24));
+    return pMesProt->toQString(data.mid(6, 24));
 }
 
 void MPNode::setDescription(const QString &newDescription)
 {
     if (isValid())
     {
-        QByteArray desc = newDescription.toUtf8();
+        QByteArray desc = pMesProt->toByteArray(newDescription);
         desc.append('\0');
         desc.resize(MP_MAX_DESC_LENGTH);
         desc[desc.size()-1] = '\0';
@@ -352,14 +356,14 @@ void MPNode::setDescription(const QString &newDescription)
 QString MPNode::getLogin() const
 {
     if (!isValid()) return QString();
-    return QString::fromUtf8(data.mid(37, 63));
+    return pMesProt->toQString(data.mid(37, 63));
 }
 
 void MPNode::setLogin(const QString &newLogin)
 {
     if (isValid())
     {
-        QByteArray login = newLogin.toUtf8();
+        QByteArray login = pMesProt->toByteArray(newLogin);
         login.append('\0');
         login.resize(MP_MAX_PAYLOAD_LENGTH);
         login[login.size()-1] = '\0';
@@ -515,4 +519,13 @@ QJsonObject MPNode::toJson() const
     }
 
     return obj;
+}
+
+IMessageProtocol *MPNode::getMesProt(QObject *parent)
+{
+    if (MPDevice* test = dynamic_cast<MPDevice*>(parent))
+    {
+        return test->getMesProt();
+    }
+    return nullptr;
 }

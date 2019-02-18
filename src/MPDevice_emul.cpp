@@ -104,7 +104,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
     }
     case MPCmd::CONTEXT:
     {
-        context = QString::fromUtf8(data.mid(2, data.length()));
+        context = mesProtMini.toQString(data.mid(2, data.length()));
         qDebug() << "Context : " << context;
         QByteArray d;
         d[0] = 1;
@@ -148,7 +148,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[0] = 1;
         d[1] = commandData;
 
-        context = QString::fromUtf8(data.mid(2, data.length()));
+        context = mesProtMini.toQString(data.mid(2, data.length()));
         qDebug() << "Context : " << context;
         if (!passwords.contains(context))
         {
@@ -169,7 +169,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QByteArray d;
         d[0] = 1;
         d[1] = commandData;
-        QString login = QString::fromUtf8(data.mid(2, data.length()));
+        QString login = mesProtMini.toQString(data.mid(2, data.length()));
         logins[context] = login;
         d[2] = 0x01;
         d.resize(64);
@@ -178,7 +178,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
     }
     case MPCmd::SET_PASSWORD:
     {
-        QString password = QString::fromUtf8(data.mid(2, data.length()));
+        QString password = mesProtMini.toQString(data.mid(2, data.length()));
         passwords[context] = password;
 
         QByteArray d;

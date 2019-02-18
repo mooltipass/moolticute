@@ -112,6 +112,37 @@ QString MessageProtocolBLE::getDeviceName()
     return "BLE";
 }
 
+QByteArray MessageProtocolBLE::toByteArray(const QString &input)
+{
+    //Convert string to unicode byte array (2 bytes for 1 char)
+    QByteArray unicodeArray;
+    for (QChar ch : input)
+    {
+        quint16 uniChar = ch.unicode();
+        unicodeArray.append(static_cast<char>((0xFF00&uniChar)>>8));
+        unicodeArray.append(static_cast<char>((0xFF&uniChar)));
+    }
+    return unicodeArray;
+}
+
+QString MessageProtocolBLE::toQString(const QByteArray &data)
+{
+    QString out = "";
+    const auto size = data.size();
+    for (int i = 0; i < size; i+=2)
+    {
+        if (i+1 >= size)
+        {
+            qCritical() << "Out of bounds";
+            break;
+        }
+        quint16 unicode = static_cast<quint8>(data[i+1]);
+        unicode |= (data[i]<<8);
+        out += QChar(unicode);
+    }
+    return out;
+}
+
 void MessageProtocolBLE::setAckFlag(bool on)
 {
     m_ackFlag = on ? ACK_FLAG_BIT : 0x00;

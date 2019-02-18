@@ -20,6 +20,7 @@
 #define MPNODE_H
 
 #include "Common.h"
+#include "MessageProtocol/IMessageProtocol.h"
 
 class MPNode: public QObject
 {
@@ -132,6 +133,8 @@ public:
     QJsonObject toJson() const;
 
 private:
+    IMessageProtocol* getMesProt(QObject *parent);
+
     QByteArray data;
     QByteArray address;
     bool mergeTagged = false;
@@ -149,6 +152,8 @@ private:
 
     QList<MPNode *> childNodes;
     QList<MPNode *> childDataNodes;
+
+    IMessageProtocol *pMesProt = nullptr;
 };
 
 #endif // MPNODE_H
