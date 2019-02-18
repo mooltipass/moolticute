@@ -229,7 +229,7 @@ void WSServerCon::processMessage(const QString &message)
             QSettings s;
             if (s.value("settings/enable_hibp_check").toBool())
             {
-                QString formatString = o["service"].toString() + ": " + o["login"].toString() + ": ";
+                QString formatString = service + ": " + login + ": ";
                 formatString += HIBP_COMPROMISED_FORMAT;
                 hibp->isPasswordPwned(pass, formatString);
             }
