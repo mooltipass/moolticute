@@ -1198,7 +1198,11 @@ void MainWindow::checkHIBPSetting()
 
     bool en = s.value("settings/enable_hibp_check", false).toBool();
 
-    ui->labelHIBPCheck->setText(tr("Integration with Have I Been Pwned: %1").arg((en?tr("Enabled"):tr("Disabled"))));
+    ui->labelHIBPCheck->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    ui->labelHIBPCheck->setOpenExternalLinks(true);
+    ui->labelHIBPCheck->setText(tr("Integration with <a href=\"%1\">Have I Been Pwned</a>: %2")
+                                .arg(HIBP_URL)
+                                .arg((en?tr("Enabled"):tr("Disabled"))));
     if (en)
     {
         ui->pushButtonHIBP->setText(tr("Disable"));
@@ -1770,11 +1774,11 @@ void MainWindow::on_pushButtonHIBP_clicked()
     int ret;
     if (en)
     {
-        ret = QMessageBox::question(this, "Moolticute", tr("Disable HIBP check?"));
+        ret = QMessageBox::question(this, "Moolticute", tr("Disable Have I Been Pwned check?"));
     }
     else
     {
-        ret = QMessageBox::question(this, "Moolticute", tr("Enable HIBP check?"));
+        ret = QMessageBox::question(this, "Moolticute", tr("Enable Have I Been Pwned check?"));
     }
 
     if (ret == QMessageBox::Yes)

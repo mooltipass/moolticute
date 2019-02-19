@@ -174,6 +174,8 @@ private:
     void initHelpLabels();
 
     SystemEventHandler eventHandler;
+
+    const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
 };
 
 #endif // MAINWINDOW_H

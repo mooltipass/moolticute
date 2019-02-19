@@ -39,6 +39,7 @@ private:
     QString formatString;
 
     const QString HIBP_API = "https://api.pwnedpasswords.com/range/";
+    const QString HASH_SEPARATOR = "\r\n";
     const int HIBP_REQUEST_SHA_LENGTH = 5;
 };
 

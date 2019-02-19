@@ -3033,7 +3033,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               <item>
                <widget class="QLabel" name="labelHIBPCheck">
                 <property name="text">
-                 <string>HIBP check: Enabled</string>
+                 <string>Integration with Have I Been Pwned: Enabled</string>
                 </property>
                </widget>
               </item>
