@@ -182,6 +182,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonIntegrity->setStyleSheet(CSS_BLUE_BUTTON);
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSubDomain->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonHIBP->setStyleSheet(CSS_BLUE_BUTTON);
 
     // Don't show the "check for updates" button when built from git directly.
     ui->pushButtonCheckUpdate->setVisible(QStringLiteral(APP_VERSION) != "git");
@@ -583,6 +584,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     checkAutoStart();
     checkSubdomainSelection();
+    checkHIBPSetting();
 
     //Check is ssh agent opt has to be checked
     ui->checkBoxSSHAgent->setChecked(s.value("settings/auto_start_ssh").toBool());
@@ -1190,6 +1192,28 @@ void MainWindow::checkSubdomainSelection()
         ui->pushButtonSubDomain->setText(tr("Enable"));
 }
 
+void MainWindow::checkHIBPSetting()
+{
+    QSettings s;
+
+    bool en = s.value("settings/enable_hibp_check", false).toBool();
+
+    ui->labelHIBPCheck->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    ui->labelHIBPCheck->setOpenExternalLinks(true);
+    ui->labelHIBPCheck->setText(tr("Integration with <a href=\"%1\">Have I Been Pwned</a>: %2")
+                                .arg(HIBP_URL)
+                                .arg((en?tr("Enabled"):tr("Disabled"))));
+    if (en)
+    {
+        ui->pushButtonHIBP->setText(tr("Disable"));
+    }
+    else
+    {
+        ui->pushButtonHIBP->setText(tr("Enable"));
+    }
+
+}
+
 void MainWindow::setKeysTabVisibleOnDemand(bool bValue)
 {
     bSSHKeysTabVisibleOnDemand = bValue;
@@ -1738,5 +1762,30 @@ void MainWindow::on_pushButtonSubDomain_clicked()
         s.sync();
 
         checkSubdomainSelection();
+    }
+}
+
+void MainWindow::on_pushButtonHIBP_clicked()
+{
+    QSettings s;
+
+    bool en = s.value("settings/enable_hibp_check", false).toBool();
+
+    int ret;
+    if (en)
+    {
+        ret = QMessageBox::question(this, "Moolticute", tr("Disable Have I Been Pwned check?"));
+    }
+    else
+    {
+        ret = QMessageBox::question(this, "Moolticute", tr("Enable Have I Been Pwned check?"));
+    }
+
+    if (ret == QMessageBox::Yes)
+    {
+        s.setValue("settings/enable_hibp_check", !en);
+        s.sync();
+
+        checkHIBPSetting();
     }
 }

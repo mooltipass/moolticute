@@ -21,14 +21,17 @@
 #include "version.h"
 #include "ParseDomain.h"
 #include "MPDeviceBleImpl.h"
+#include "HaveIBeenPwned.h"
 
 #include <QCryptographicHash>
 
 WSServerCon::WSServerCon(QWebSocket *conn):
     wsClient(conn),
-    clientUid(Common::createUid(QStringLiteral("ws-")))
+    clientUid(Common::createUid(QStringLiteral("ws-"))),
+    hibp(new HaveIBeenPwned(this))
 {
     connect(wsClient, &QWebSocket::textMessageReceived, this, &WSServerCon::processMessage);
+    connect(hibp, &HaveIBeenPwned::sendPwnedMessage, this, &WSServerCon::sendHibpNotification);
 }
 
 WSServerCon::~WSServerCon()
@@ -223,6 +226,13 @@ void WSServerCon::processMessage(const QString &message)
                 return;
             }
 
+            QSettings s;
+            if (s.value("settings/enable_hibp_check").toBool())
+            {
+                QString formatString = service + ": " + login + ": ";
+                formatString += HIBP_COMPROMISED_FORMAT;
+                hibp->isPasswordPwned(pass, formatString);
+            }
             QJsonObject ores;
             QJsonObject oroot = root;
             ores["service"] = service;
@@ -284,6 +294,13 @@ void WSServerCon::processMessage(const QString &message)
 
         const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
         emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
+
+        if (s.value("settings/enable_hibp_check").toBool())
+        {
+            QString formatString = o["service"].toString() + ": " + loginName + ": ";
+            formatString += HIBP_COMPROMISED_FORMAT;
+            hibp->isPasswordPwned(o["password"].toString(), formatString);
+        }
           
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
@@ -1155,6 +1172,22 @@ void WSServerCon::sendCardDbMetadata()
 
         sendJsonMessage(oroot);
         qDebug() << "Sended card db metadata";
+    }
+}
+
+void WSServerCon::sendHibpNotification(QString message)
+{
+    QJsonObject oroot = { {"msg", "send_hibp"} };
+    QJsonObject data;
+    data.insert("message", message);
+    oroot["data"] = data;
+
+    bool isGuiRunning;
+    emit sendMessageToGUI(QJsonDocument(oroot).toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
+
+    if (!isGuiRunning)
+    {
+        qDebug() << "Cannot send pwned notification to GUI: " << message;
     }
 }
 

@@ -127,6 +127,8 @@ private slots:
 
     void on_pushButtonSubDomain_clicked();
 
+    void on_pushButtonHIBP_clicked();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -136,6 +138,8 @@ private:
     void checkAutoStart();
     
     void checkSubdomainSelection();
+
+    void checkHIBPSetting();
 
     void setKeysTabVisibleOnDemand(bool bValue);
 
@@ -170,6 +174,8 @@ private:
     void initHelpLabels();
 
     SystemEventHandler eventHandler;
+
+    const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
 };
 
 #endif // MAINWINDOW_H
