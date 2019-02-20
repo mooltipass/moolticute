@@ -758,17 +758,22 @@ void MainWindow::updateSerialInfos() {
 
     ui->deviceInfoWidget->setVisible(connected);
 
+    const QString noneString = tr("None");
     if(connected)
     {
         ui->labelAboutFwVersValue->setText(wsClient->get_fwVersion());
-        ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? QString::number(wsClient->get_hwSerial()) : tr("None"));
-        ui->labelAbouHwMemoryValue->setText(tr("%1Mb").arg(wsClient->get_hwMemory()));
+        ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? QString::number(wsClient->get_hwSerial()) : noneString);
+        ui->labelAbouHwMemoryValue->setText(wsClient->get_hwMemory() > 0 ? tr("%1Mb").arg(wsClient->get_hwMemory()): noneString);
     }
     else
     {
-        ui->labelAboutFwVersValue->setText(tr("None"));
-        ui->labelAbouHwSerialValue->setText(tr("None"));
-        ui->labelAbouHwMemoryValue->setText(tr("None"));
+        ui->labelAboutFwVersValue->setText(noneString);
+        ui->labelAbouHwSerialValue->setText(noneString);
+        ui->labelAbouHwMemoryValue->setText(noneString);
+        wsClient->set_fwVersion(noneString);
+        wsClient->set_hwSerial(0);
+        wsClient->set_hwMemory(0);
+
     }
 }
 
