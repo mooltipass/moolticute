@@ -25,7 +25,7 @@ private slots:
 
     void on_btnPlatInfo_clicked();
 
-    void displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
+    void displayDebugPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
 
     void displayUploadBundleResultReceived(bool success);
     

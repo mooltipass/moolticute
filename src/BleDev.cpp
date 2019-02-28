@@ -34,7 +34,7 @@ BleDev::~BleDev()
 void BleDev::setWsClient(WSClient *c)
 {
     wsClient = c;
-    connect(wsClient, &WSClient::displayPlatInfo, this, &BleDev::displayPlatInfoReceived);
+    connect(wsClient, &WSClient::displayDebugPlatInfo, this, &BleDev::displayDebugPlatInfoReceived);
     connect(wsClient, &WSClient::displayUploadBundleResult, this, &BleDev::displayUploadBundleResultReceived);
 }
 
@@ -112,7 +112,7 @@ void BleDev::on_btnPlatInfo_clicked()
     wsClient->sendPlatInfoRequest();
 }
 
-void BleDev::displayPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor)
+void BleDev::displayDebugPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor)
 {
     ui->lineEditAuxMCUMaj->setText(QString::number(auxMajor));
     ui->lineEditAuxMCUMin->setText(QString::number(auxMinor));

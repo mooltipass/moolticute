@@ -425,10 +425,10 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         emit deleteDataNodesFinished();
     }
-    else if (rootobj["msg"] == "get_platinfo")
+    else if (rootobj["msg"] == "get_debug_platinfo")
     {
         QJsonObject o = rootobj["data"].toObject();
-        emit displayPlatInfo(o["aux_major"].toInt(), o["aux_minor"].toInt(), o["main_major"].toInt(), o["main_minor"].toInt());
+        emit displayDebugPlatInfo(o["aux_major"].toInt(), o["aux_minor"].toInt(), o["main_major"].toInt(), o["main_minor"].toInt());
     }
     else if (rootobj["msg"] == "upload_bundle")
     {
@@ -640,7 +640,7 @@ void WSClient::sendRefreshFilesCacheRequest()
 
 void WSClient::sendPlatInfoRequest()
 {
-    sendJsonData({{ "msg", "get_platinfo" }});
+    sendJsonData({{ "msg", "get_debug_platinfo" }});
 }
 
 void WSClient::sendFlashMCU(QString type)

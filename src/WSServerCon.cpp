@@ -711,9 +711,9 @@ void WSServerCon::processMessage(const QString &message)
             return;
         }
 
-        if (root["msg"] == "get_platinfo")
+        if (root["msg"] == "get_debug_platinfo")
         {
-            bleImpl->getPlatInfo([this, root, bleImpl](bool success, QString errstr, QByteArray data)
+            bleImpl->getDebugPlatInfo([this, root, bleImpl](bool success, QString errstr, QByteArray data)
             {
                 if (!success)
                 {

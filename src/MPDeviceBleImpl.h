@@ -18,7 +18,7 @@ public:
 
     bool isFirstPacket(const QByteArray &data);
     bool isLastPacket(const QByteArray &data);
-    void getPlatInfo(const MessageHandlerCbData &cb);
+    void getDebugPlatInfo(const MessageHandlerCbData &cb);
     QVector<int> calcPlatInfo(const QByteArray &platInfo);
 
     void flashMCU(QString type, const MessageHandlerCb &cb);

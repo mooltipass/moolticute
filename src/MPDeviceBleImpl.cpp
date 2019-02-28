@@ -22,9 +22,9 @@ bool MPDeviceBleImpl::isLastPacket(const QByteArray &data)
     return actPacket == totalPacketNum;
 }
 
-void MPDeviceBleImpl::getPlatInfo(const MessageHandlerCbData &cb)
+void MPDeviceBleImpl::getDebugPlatInfo(const MessageHandlerCbData &cb)
 {
-    auto *jobs = new AsyncJobs("Get PlatInfo", mpDev);
+    auto *jobs = new AsyncJobs("Get Debug PlatInfo", mpDev);
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_GET_PLAT_INFO, bleProt->getDefaultFuncDone()));
 

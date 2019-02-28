@@ -142,7 +142,7 @@ signals:
     void cardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void cardResetFinished(bool successfully);
     void displayStatusWarning();
-    void displayPlatInfo(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
+    void displayDebugPlatInfo(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
     void displayUploadBundleResult(bool success);
     void deleteDataNodesFinished();
 
