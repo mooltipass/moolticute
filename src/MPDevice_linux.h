@@ -21,21 +21,18 @@
 
 #include <libusb.h>
 #include "MPDevice.h"
+#include <QSocketNotifier>
 
 class MPPlatformDef
 {
 public:
     QString id; //unique id for all platform
 
-    libusb_context *ctx = nullptr;
-    libusb_device *dev = nullptr;
-
+    QString path;
 };
 
 inline bool operator==(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return lhs.id == rhs.id; }
 inline bool operator!=(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return !(lhs == rhs); }
-
-class USBTransfer;
 
 class MPDevice_linux: public MPDevice
 {
@@ -48,23 +45,21 @@ public:
     static QList<MPPlatformDef> enumerateDevices();
 
 private slots:
-    void usbSendCb(struct libusb_transfer *trf);
-    void usbReceiveCb(struct libusb_transfer *trf);
+    void readyRead(int fd);
+    void readyWritten(int fd);
+    void writeNextPacket();
 
 private:
     virtual void platformRead();
     virtual void platformWrite(const QByteArray &data);
 
-    bool detached_kernel = false;
-    libusb_context *usb_ctx;
-    libusb_device *device;
-    libusb_device_handle *devicefd;
+    QString devPath;
+    int devfd = 0; //device fd
+    QSocketNotifier *sockNotifRead = nullptr;
+    QSocketNotifier *sockNotifWrite = nullptr;
 
-    void usbSendData(unsigned char cmd, const QByteArray &data = QByteArray());
-    void usbRequestReceive();
-
-    friend void _usbSendCallback(struct libusb_transfer *trf);
-    friend void _usbReceiveCallback(struct libusb_transfer *trf);
+    //Bufferize the data sent by sending 64bytes paquet at a time
+    QQueue<QByteArray> sendBuffer;
 };
 
 #endif // MPDEVICE_LINUX_H

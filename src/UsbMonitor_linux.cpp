@@ -89,6 +89,7 @@ UsbMonitor_linux::UsbMonitor_linux()
 
 void UsbMonitor_linux::start()
 {
+    return;
     int err;
     err = libusb_hotplug_register_callback(usb_ctx,
                                            LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
