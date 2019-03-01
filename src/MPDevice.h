@@ -102,6 +102,8 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(quint8, dataDbChangeNumber, 0)         // data db change number
     QT_WRITABLE_PROPERTY(QByteArray, cardCPZ, QByteArray())     // Card CPZ
 
+    QT_WRITABLE_PROPERTY(QString, mainMCUVersion, QString())
+    QT_WRITABLE_PROPERTY(QString, auxMCUVersion, QString())
     QT_WRITABLE_PROPERTY(qint64, uid, -1)
 
 public:

@@ -127,7 +127,7 @@ public:
         return printCmd(cmd);
     }
 
-    quint16 toIntFromBigEndian(quint8 lowerByte, quint8 upperByte)
+    quint16 toIntFromLittleEndian(quint8 lowerByte, quint8 upperByte)
     {
         return (lowerByte|(upperByte<<8));
     }

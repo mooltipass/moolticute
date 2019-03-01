@@ -22,6 +22,33 @@ bool MPDeviceBleImpl::isLastPacket(const QByteArray &data)
     return actPacket == totalPacketNum;
 }
 
+void MPDeviceBleImpl::getPlatInfo()
+{
+    auto *jobs = new AsyncJobs("Get PlatInfo", mpDev);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_PLAT_INFO, bleProt->getDefaultFuncDone()));
+
+    connect(jobs, &AsyncJobs::finished, [this](const QByteArray &data)
+    {
+        QByteArray response = bleProt->getFullPayload(data);
+        const auto auxMajor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[0]), static_cast<quint8>(response[1]));
+        const auto auxMinor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[2]), static_cast<quint8>(response[3]));
+        mpDev->set_auxMCUVersion(QString::number(auxMajor) + "." + QString::number(auxMinor));
+        const auto mainMajor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[4]), static_cast<quint8>(response[5]));
+        const auto mainMinor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[6]), static_cast<quint8>(response[7]));
+        mpDev->set_mainMCUVersion(QString::number(mainMajor) + "." + QString::number(mainMinor));
+        const auto serialLower = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[8]), static_cast<quint8>(response[9]));
+        const auto serialUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[10]), static_cast<quint8>(response[11]));
+        quint32 serialNum = serialLower;
+        serialNum |= static_cast<quint32>((serialUpper<<16));
+        mpDev->set_serialNumber(serialNum);
+        const auto memorySize = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[12]), static_cast<quint8>(response[13]));
+        mpDev->set_flashMbSize(memorySize);
+    });
+
+    dequeueAndRun(jobs);
+}
+
 void MPDeviceBleImpl::getDebugPlatInfo(const MessageHandlerCbData &cb)
 {
     auto *jobs = new AsyncJobs("Get Debug PlatInfo", mpDev);
@@ -38,13 +65,13 @@ void MPDeviceBleImpl::getDebugPlatInfo(const MessageHandlerCbData &cb)
     dequeueAndRun(jobs);
 }
 
-QVector<int> MPDeviceBleImpl::calcPlatInfo(const QByteArray &platInfo)
+QVector<int> MPDeviceBleImpl::calcDebugPlatInfo(const QByteArray &platInfo)
 {
     QVector<int> platInfos;
-    platInfos.append(bleProt->toIntFromBigEndian(static_cast<quint8>(platInfo[0]), static_cast<quint8>(platInfo[1])));
-    platInfos.append(bleProt->toIntFromBigEndian(static_cast<quint8>(platInfo[2]), static_cast<quint8>(platInfo[3])));
-    platInfos.append(bleProt->toIntFromBigEndian(static_cast<quint8>(platInfo[64]), static_cast<quint8>(platInfo[65])));
-    platInfos.append(bleProt->toIntFromBigEndian(static_cast<quint8>(platInfo[66]), static_cast<quint8>(platInfo[67])));
+    platInfos.append(bleProt->toIntFromLittleEndian(static_cast<quint8>(platInfo[0]), static_cast<quint8>(platInfo[1])));
+    platInfos.append(bleProt->toIntFromLittleEndian(static_cast<quint8>(platInfo[2]), static_cast<quint8>(platInfo[3])));
+    platInfos.append(bleProt->toIntFromLittleEndian(static_cast<quint8>(platInfo[64]), static_cast<quint8>(platInfo[65])));
+    platInfos.append(bleProt->toIntFromLittleEndian(static_cast<quint8>(platInfo[66]), static_cast<quint8>(platInfo[67])));
     return platInfos;
 }
 

@@ -354,8 +354,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
     {
+        const auto hwVersion = wsClient->get_mpHwVersion();
         ui->widgetParamMini->setVisible(wsClient->get_mpHwVersion() == Common::MP_Mini);
-        ui->labelAbouHwSerial->setVisible(wsClient->get_mpHwVersion() == Common::MP_Mini);
+        ui->labelAbouHwSerial->setVisible(hwVersion == Common::MP_Mini || hwVersion == Common::MP_BLE);
     });
 
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updateSerialInfos);

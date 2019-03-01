@@ -721,7 +721,7 @@ void WSServerCon::processMessage(const QString &message)
                     return;
                 }
 
-                auto platInfo = bleImpl->calcPlatInfo(data);
+                auto platInfo = bleImpl->calcDebugPlatInfo(data);
                 QJsonObject ores;
                 QJsonObject oroot = root;
                 ores["aux_major"] = platInfo[0];
@@ -1099,13 +1099,12 @@ void WSServerCon::sendVersion()
         return;
     QJsonObject data = {{ "hw_version", mpdevice->get_hwVersion() },
                         { "flash_size", mpdevice->get_flashMbSize() }};
-    if (mpdevice->isMini())
-    {
-        data["hw_serial"] = (qint64)mpdevice->get_serialNumber();
-    }
+    data["hw_serial"] = static_cast<qint64>(mpdevice->get_serialNumber());
     if (mpdevice->isBLE())
     {
         data["hw_version"] = "ble";
+        data["aux_mcu_version"] = mpdevice->get_auxMCUVersion();
+        data["main_mcu_version"] = mpdevice->get_mainMCUVersion();
     }
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
 }

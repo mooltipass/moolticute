@@ -56,7 +56,7 @@ quint16 MessageProtocolBLE::getMessageSize(const QByteArray &data)
 
 MPCmd::Command MessageProtocolBLE::getCommand(const QByteArray &data)
 {
-   const quint16 bleCommandId = toIntFromBigEndian(static_cast<quint8>(data[CMD_LOWER_BYTE]), static_cast<quint8>(data[CMD_UPPER_BYTE]));
+   const quint16 bleCommandId = toIntFromLittleEndian(static_cast<quint8>(data[CMD_LOWER_BYTE]), static_cast<quint8>(data[CMD_UPPER_BYTE]));
    return MPCmd::Command(m_commandMapping.key(bleCommandId));
 }
 
@@ -209,7 +209,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::ADD_UNKNOWN_CARD      , 0xB8},
         {MPCmd::MOOLTIPASS_STATUS     , 0x0001},
         {MPCmd::FUNCTIONAL_TEST_RES   , 0xBA},
-        {MPCmd::SET_DATE              , 0xBB},
+        {MPCmd::SET_DATE              , 0x0004},
         {MPCmd::SET_UID               , 0xBC},
         {MPCmd::GET_UID               , 0xBD},
         {MPCmd::SET_DATA_SERVICE      , 0xBE},
@@ -218,7 +218,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::READ_32B_IN_DN        , 0xC1},
         {MPCmd::GET_CUR_CARD_CPZ      , 0xC2},
         {MPCmd::CANCEL_USER_REQUEST   , 0xC3},
-        {MPCmd::PLEASE_RETRY          , 0xC4},
+        {MPCmd::PLEASE_RETRY          , 0x0002},
         {MPCmd::READ_FLASH_NODE       , 0xC5},
         {MPCmd::WRITE_FLASH_NODE      , 0xC6},
         {MPCmd::GET_FAVORITE          , 0xC7},
@@ -241,6 +241,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::LOCK_DEVICE           , 0xD9},
         {MPCmd::GET_SERIAL            , 0xDA},
         {MPCmd::CMD_DBG_MESSAGE       , 0x8000},
+        {MPCmd::GET_PLAT_INFO         , 0x0003},
         {MPCmd::CMD_DBG_OPEN_DISP_BUFFER    , 0x8001},
         {MPCmd::CMD_DBG_SEND_TO_DISP_BUFFER , 0x8002},
         {MPCmd::CMD_DBG_CLOSE_DISP_BUFFER   , 0x8003},
