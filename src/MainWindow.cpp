@@ -768,6 +768,9 @@ void MainWindow::updateSerialInfos() {
         ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? QString::number(wsClient->get_hwSerial()) : NONE_STRING);
         ui->labelAbouHwMemoryValue->setText(wsClient->get_hwMemory() > 0 ? tr("%1Mb").arg(wsClient->get_hwMemory()): NONE_STRING);
         displayMCUVersion(wsClient->isMPBLE());
+        //When ble is detected not displaying fw version
+        ui->labelAboutFwVers->setVisible(!wsClient->isMPBLE());
+        ui->labelAboutFwVersValue->setVisible(!wsClient->isMPBLE());
     }
     else
     {
