@@ -68,6 +68,9 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(int, credentialsDbChangeNumber, 0)
     QT_WRITABLE_PROPERTY(int, dataDbChangeNumber, 0)
 
+    QT_WRITABLE_PROPERTY(QString, mainMCUVersion, QString())
+    QT_WRITABLE_PROPERTY(QString, auxMCUVersion, QString())
+
 public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();

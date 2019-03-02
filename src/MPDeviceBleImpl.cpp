@@ -31,12 +31,12 @@ void MPDeviceBleImpl::getPlatInfo()
     connect(jobs, &AsyncJobs::finished, [this](const QByteArray &data)
     {
         QByteArray response = bleProt->getFullPayload(data);
-        const auto auxMajor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[0]), static_cast<quint8>(response[1]));
-        const auto auxMinor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[2]), static_cast<quint8>(response[3]));
-        mpDev->set_auxMCUVersion(QString::number(auxMajor) + "." + QString::number(auxMinor));
-        const auto mainMajor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[4]), static_cast<quint8>(response[5]));
-        const auto mainMinor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[6]), static_cast<quint8>(response[7]));
+        const auto mainMajor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[0]), static_cast<quint8>(response[1]));
+        const auto mainMinor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[2]), static_cast<quint8>(response[3]));
         mpDev->set_mainMCUVersion(QString::number(mainMajor) + "." + QString::number(mainMinor));
+        const auto auxMajor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[4]), static_cast<quint8>(response[5]));
+        const auto auxMinor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[6]), static_cast<quint8>(response[7]));
+        mpDev->set_auxMCUVersion(QString::number(auxMajor) + "." + QString::number(auxMinor));
         const auto serialLower = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[8]), static_cast<quint8>(response[9]));
         const auto serialUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[10]), static_cast<quint8>(response[11]));
         quint32 serialNum = serialLower;

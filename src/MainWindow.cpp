@@ -122,6 +122,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
 
+    ui->labelAboutAuxMCU->setText(tr("Aux MCU version:"));
+    ui->labelAboutMainMCU->setText(tr("Main MCU version:"));
+
     initHelpLabels();
 
     //Disable this option for now, firmware does not support it
@@ -354,9 +357,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
     {
-        const auto hwVersion = wsClient->get_mpHwVersion();
-        ui->widgetParamMini->setVisible(wsClient->get_mpHwVersion() == Common::MP_Mini);
-        ui->labelAbouHwSerial->setVisible(hwVersion == Common::MP_Mini || hwVersion == Common::MP_BLE);
+        ui->widgetParamMini->setVisible(wsClient->isMPMini());
+        ui->labelAbouHwSerial->setVisible(wsClient->isMPMini() || wsClient->isMPBLE());
+        displayMCUVersion(wsClient->isMPBLE());
     });
 
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updateSerialInfos);
@@ -759,21 +762,23 @@ void MainWindow::updateSerialInfos() {
 
     ui->deviceInfoWidget->setVisible(connected);
 
-    const QString noneString = tr("None");
     if(connected)
     {
         ui->labelAboutFwVersValue->setText(wsClient->get_fwVersion());
-        ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? QString::number(wsClient->get_hwSerial()) : noneString);
-        ui->labelAbouHwMemoryValue->setText(wsClient->get_hwMemory() > 0 ? tr("%1Mb").arg(wsClient->get_hwMemory()): noneString);
+        ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? QString::number(wsClient->get_hwSerial()) : NONE_STRING);
+        ui->labelAbouHwMemoryValue->setText(wsClient->get_hwMemory() > 0 ? tr("%1Mb").arg(wsClient->get_hwMemory()): NONE_STRING);
+        displayMCUVersion(wsClient->isMPBLE());
     }
     else
     {
-        ui->labelAboutFwVersValue->setText(noneString);
-        ui->labelAbouHwSerialValue->setText(noneString);
-        ui->labelAbouHwMemoryValue->setText(noneString);
-        wsClient->set_fwVersion(noneString);
+        ui->labelAboutFwVersValue->setText(NONE_STRING);
+        ui->labelAbouHwSerialValue->setText(NONE_STRING);
+        ui->labelAbouHwMemoryValue->setText(NONE_STRING);
+        wsClient->set_fwVersion(NONE_STRING);
         wsClient->set_hwSerial(0);
         wsClient->set_hwMemory(0);
+        wsClient->set_auxMCUVersion(NONE_STRING);
+        wsClient->set_mainMCUVersion(NONE_STRING);
 
     }
 }
@@ -1591,6 +1596,16 @@ void MainWindow::retranslateUi()
 {
     ui->labelAboutVers->setText(ui->labelAboutVers->text().arg(APP_VERSION));
     updateSerialInfos();
+}
+
+void MainWindow::displayMCUVersion(bool visible)
+{
+    ui->labelAboutAuxMCU->setVisible(visible);
+    ui->labelAboutAuxMCUValue->setVisible(visible);
+    ui->labelAboutAuxMCUValue->setText(wsClient->get_auxMCUVersion());
+    ui->labelAboutMainMCU->setVisible(visible);
+    ui->labelAboutMainMCUValue->setVisible(visible);
+    ui->labelAboutMainMCUValue->setText(wsClient->get_mainMCUVersion());
 }
 
 void MainWindow::on_toolButton_clearBackupFilePath_released()

@@ -188,6 +188,8 @@ void WSClient::onTextMessageReceived(const QString &message)
         else if (o["hw_version"].toString().contains("ble"))
         {
             set_mpHwVersion(Common::MP_BLE);
+            set_auxMCUVersion(o["aux_mcu_version"].toString());
+            set_mainMCUVersion(o["main_mcu_version"].toString());
         }
         else
         {
