@@ -1103,8 +1103,11 @@ void WSServerCon::sendVersion()
     if (mpdevice->isBLE())
     {
         data["hw_version"] = "ble";
-        data["aux_mcu_version"] = mpdevice->get_auxMCUVersion();
-        data["main_mcu_version"] = mpdevice->get_mainMCUVersion();
+        if (auto bleImpl = mpdevice->ble())
+        {
+            data["aux_mcu_version"] = bleImpl->get_auxMCUVersion();
+            data["main_mcu_version"] = bleImpl->get_mainMCUVersion();
+        }
     }
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
 }

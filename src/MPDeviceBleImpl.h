@@ -13,6 +13,10 @@ class MessageProtocolBLE;
 class MPDeviceBleImpl: public QObject
 {
     Q_OBJECT
+
+    QT_WRITABLE_PROPERTY(QString, mainMCUVersion, QString())
+    QT_WRITABLE_PROPERTY(QString, auxMCUVersion, QString())
+
 public:
     MPDeviceBleImpl(MessageProtocolBLE *mesProt, MPDevice *dev);
 
