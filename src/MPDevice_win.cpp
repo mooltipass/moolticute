@@ -75,7 +75,7 @@ HANDLE MPDevice_win::openDevice(QString path)
 {
     HANDLE h = CreateFileA(qToChar(path),
                            GENERIC_WRITE | GENERIC_READ,
-                           FILE_SHARE_READ | FILE_SHARE_WRITE,
+                           0, //Open exclusively
                            NULL,
                            OPEN_EXISTING,
                            FILE_FLAG_OVERLAPPED,
@@ -84,7 +84,7 @@ HANDLE MPDevice_win::openDevice(QString path)
     if (GetLastError() == ERROR_ACCESS_DENIED)
         h = CreateFileA(qToChar(path),
                         GENERIC_READ,
-                        FILE_SHARE_READ,
+                        0,
                         NULL,
                         OPEN_EXISTING,
                         FILE_FLAG_OVERLAPPED,
