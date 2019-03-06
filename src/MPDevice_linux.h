@@ -39,6 +39,12 @@ inline bool operator!=(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { ret
 
 class MPDevice_linux: public MPDevice
 {
+    enum class ExclusiveAccess
+    {
+        RELEASE = 0,
+        GRAB = 1
+    };
+
     Q_OBJECT
 public:
     MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef);
@@ -46,10 +52,11 @@ public:
 
     //Static function for enumerating devices on platform
     static QList<MPPlatformDef> enumerateDevices();
+    static int getDescriptorSize(const char* devpath);
+    static int INVALID_VALUE;
 
 private slots:
     void readyRead(int fd);
-    void readyWritten(int fd);
     void writeNextPacket();
 
 private:
@@ -60,6 +67,7 @@ private:
     int devfd = 0; //device fd
     QSocketNotifier *sockNotifRead = nullptr;
     QSocketNotifier *sockNotifWrite = nullptr;
+    int grabbed = -1;
 
     //Bufferize the data sent by sending 64bytes paquet at a time
     QQueue<QByteArray> sendBuffer;

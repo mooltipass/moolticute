@@ -29,6 +29,8 @@
 #include <string.h>
 #include <unistd.h>
 
+int MPDevice_linux::INVALID_VALUE = -1;
+
 MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef):
     MPDevice(parent),
     devPath(platformDef.path)
@@ -39,29 +41,40 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
     }
     setupMessageProtocol();
 
-    devfd = ::open(devPath.toLocal8Bit(), O_RDWR | O_NONBLOCK);
+    devfd = open(devPath.toLocal8Bit(), O_RDWR);
     if (devfd < 0)
     {
         qWarning() << "Error opening usb device: " << strerror(errno);
     }
     else
     {
+        grabbed = ioctl(devfd, EVIOCGRAB, ExclusiveAccess::GRAB);
+        if (INVALID_VALUE == grabbed)
+        {
+            qDebug() << "Exclusive device grab wasn't successful";
+        }
         sockNotifRead = new QSocketNotifier(devfd, QSocketNotifier::Read);
         sockNotifRead->setEnabled(true);
         connect(sockNotifRead, &QSocketNotifier::activated, this, &MPDevice_linux::readyRead);
 
         sockNotifWrite = new QSocketNotifier(devfd, QSocketNotifier::Write);
-        sockNotifWrite->setEnabled(false);
-        connect(sockNotifWrite, &QSocketNotifier::activated, this, &MPDevice_linux::readyWritten);
+        sockNotifWrite->setEnabled(true);
     }
 }
 
 MPDevice_linux::~MPDevice_linux()
 {
+    if (INVALID_VALUE != grabbed)
+    {
+        ioctl(devfd, EVIOCGRAB, ExclusiveAccess::RELEASE);
+    }
+
     delete sockNotifRead;
     delete sockNotifWrite;
     if (devfd > 0)
+    {
         ::close(devfd);
+    }
 }
 
 void MPDevice_linux::readyRead(int fd)
@@ -71,48 +84,57 @@ void MPDevice_linux::readyRead(int fd)
     ssize_t sz = ::read(fd, recvData.data(), 64);
 
     if (sz < 0)
+    {
         qWarning() << "Failed to read from device: " << strerror(errno);
-
-    if (sz > 0) //only emit when there is data
+    }
+    else
+    {
         emit platformDataRead(recvData);
+    }
 
-    if (sz > 64)
-        qDebug() << "More than 64 bytes...?";
+    sockNotifWrite->setEnabled(false);
+    writeNextPacket();
 }
 
 //Start a send request, buffer the data if needed
 void MPDevice_linux::platformWrite(const QByteArray &ba)
 {
-    if (ba.size() > 64)
-        sendBuffer.enqueue(ba.mid(0, 64));
-    else
-        sendBuffer.enqueue(ba);
+    sendBuffer.enqueue(ba);
+    writeNextPacket();
+}
 
-    if (!sockNotifWrite->isEnabled())
-        writeNextPacket();
+int MPDevice_linux::getDescriptorSize(const char *devpath)
+{
+    int descSize = 0;
+    auto fd = open(devpath, O_RDONLY);
+    if (fd != -1)
+    {
+        int res = ioctl(fd, HIDIOCGRDESCSIZE, &descSize);
+        if (res < 0)
+            perror("HIDIOCGRDESCSIZE");
+        else
+            printf("Report Descriptor Size: %d\n", descSize);
+        close(fd);
+    }
+    return descSize;
 }
 
 void MPDevice_linux::writeNextPacket()
 {
     if (sendBuffer.isEmpty())
+    {
         return; //nothing to write anymore
+    }
 
     QByteArray ba = sendBuffer.dequeue();
+    ba.insert(0, static_cast<char>(0x0));
+    ssize_t res = ::write(devfd, ba.data(), static_cast<size_t>(ba.size()));
 
-    ssize_t sz = ::write(devfd, ba.data(), ba.size());
-    sockNotifWrite->setEnabled(true);
-
-    if (sz < 0)
+    if (res < 0)
     {
         qWarning() << "Failed to write data to device: " << strerror(errno);
         QTimer::singleShot(0, this, &MPDevice_linux::writeNextPacket);
     }
-}
-
-void MPDevice_linux::readyWritten(int)
-{
-    sockNotifWrite->setEnabled(false);
-    writeNextPacket();
 }
 
 void MPDevice_linux::platformRead()
@@ -178,7 +200,8 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
 
         if (bus_type == BUS_USB &&
             dev_vid == MOOLTIPASS_VENDORID &&
-            dev_pid == MOOLTIPASS_PRODUCTID)
+            dev_pid == MOOLTIPASS_PRODUCTID &&
+            getDescriptorSize(dev_path) == MOOLTIPASS_USBHID_DESC_SIZE)
         {
             MPPlatformDef def;
             def.path = QString::fromUtf8(dev_path);
