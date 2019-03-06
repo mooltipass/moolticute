@@ -130,6 +130,7 @@ void MPDevice::setupMessageProtocol()
             qDebug() << "Resetting flip bit for BLE";
 #endif
             bleImpl->sendResetFlipBit();
+            bleImpl->getPlatInfo();
         }
 
         exitMemMgmtMode(false);

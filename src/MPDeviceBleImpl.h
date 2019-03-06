@@ -13,13 +13,19 @@ class MessageProtocolBLE;
 class MPDeviceBleImpl: public QObject
 {
     Q_OBJECT
+
+    QT_WRITABLE_PROPERTY(QString, mainMCUVersion, QString())
+    QT_WRITABLE_PROPERTY(QString, auxMCUVersion, QString())
+
 public:
     MPDeviceBleImpl(MessageProtocolBLE *mesProt, MPDevice *dev);
 
     bool isFirstPacket(const QByteArray &data);
     bool isLastPacket(const QByteArray &data);
-    void getPlatInfo(const MessageHandlerCbData &cb);
-    QVector<int> calcPlatInfo(const QByteArray &platInfo);
+
+    void getPlatInfo();
+    void getDebugPlatInfo(const MessageHandlerCbData &cb);
+    QVector<int> calcDebugPlatInfo(const QByteArray &platInfo);
 
     void flashMCU(QString type, const MessageHandlerCb &cb);
     void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);

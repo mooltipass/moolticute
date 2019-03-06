@@ -68,6 +68,9 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(int, credentialsDbChangeNumber, 0)
     QT_WRITABLE_PROPERTY(int, dataDbChangeNumber, 0)
 
+    QT_WRITABLE_PROPERTY(QString, mainMCUVersion, QString())
+    QT_WRITABLE_PROPERTY(QString, auxMCUVersion, QString())
+
 public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();
@@ -142,7 +145,7 @@ signals:
     void cardDbMetadataChanged(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber);
     void cardResetFinished(bool successfully);
     void displayStatusWarning();
-    void displayPlatInfo(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
+    void displayDebugPlatInfo(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
     void displayUploadBundleResult(bool success);
     void deleteDataNodesFinished();
 
