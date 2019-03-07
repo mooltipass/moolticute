@@ -51,7 +51,7 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
         grabbed = ioctl(devfd, EVIOCGRAB, ExclusiveAccess::GRAB);
         if (INVALID_VALUE == grabbed)
         {
-            qDebug() << "Exclusive device grab wasn't successful";
+            qWarning() << "Exclusive device grab wasn't successful";
         }
         sockNotifRead = new QSocketNotifier(devfd, QSocketNotifier::Read);
         sockNotifRead->setEnabled(true);
@@ -107,13 +107,13 @@ int MPDevice_linux::getDescriptorSize(const char *devpath)
 {
     int descSize = 0;
     auto fd = open(devpath, O_RDONLY);
-    if (fd != -1)
+    if (fd != INVALID_VALUE)
     {
         int res = ioctl(fd, HIDIOCGRDESCSIZE, &descSize);
-        if (res < 0)
-            perror("HIDIOCGRDESCSIZE");
-        else
-            printf("Report Descriptor Size: %d\n", descSize);
+        if (res == INVALID_VALUE)
+        {
+            qDebug() << "Getting descriptor size failed.";
+        }
         close(fd);
     }
     return descSize;
@@ -133,7 +133,6 @@ void MPDevice_linux::writeNextPacket()
     if (res < 0)
     {
         qWarning() << "Failed to write data to device: " << strerror(errno);
-        QTimer::singleShot(0, this, &MPDevice_linux::writeNextPacket);
     }
 }
 

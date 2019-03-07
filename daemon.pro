@@ -16,7 +16,7 @@ win32 {
 } else:linux {
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
-    PKGCONFIG += libusb-1.0 libudev
+    PKGCONFIG += libudev
     QT -= widgets
 } else:mac {
     LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation

@@ -19,7 +19,6 @@
 #ifndef MPDEVICE_LINUX_H
 #define MPDEVICE_LINUX_H
 
-#include <libusb.h>
 #include "MPDevice.h"
 #include <QSocketNotifier>
 
@@ -67,9 +66,10 @@ private:
     int devfd = 0; //device fd
     QSocketNotifier *sockNotifRead = nullptr;
     QSocketNotifier *sockNotifWrite = nullptr;
+
     int grabbed = -1;
 
-    //Bufferize the data sent by sending 64bytes paquet at a time
+    //Bufferize the data sent by sending 64bytes packet at a time
     QQueue<QByteArray> sendBuffer;
 };
 
