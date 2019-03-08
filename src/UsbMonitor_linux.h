@@ -20,8 +20,6 @@
 #define USBMONITOR_LINUX_H
 
 #include <QtCore>
-#include <QThread>
-#include <QMap>
 
 #include "MPDevice_linux.h"
 
@@ -47,6 +45,9 @@ private:
 
     QSocketNotifier *sockMonitor = nullptr;
     struct udev_monitor* mon;
+
+    static QString ADD_ACTION;
+    static QString REMOVE_ACTION;
 };
 
 #endif // USBMONITOR_LINUX_H

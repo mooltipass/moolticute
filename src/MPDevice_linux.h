@@ -67,10 +67,11 @@ private:
     QSocketNotifier *sockNotifRead = nullptr;
     QSocketNotifier *sockNotifWrite = nullptr;
 
-    int grabbed = -1;
+    int grabbed = INVALID_VALUE;
 
     //Bufferize the data sent by sending 64bytes packet at a time
     QQueue<QByteArray> sendBuffer;
+    bool failToWriteLogged = false;
 };
 
 #endif // MPDEVICE_LINUX_H

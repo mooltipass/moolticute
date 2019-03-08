@@ -71,6 +71,7 @@ MPDevice_linux::~MPDevice_linux()
 
     delete sockNotifRead;
     delete sockNotifWrite;
+
     if (devfd > 0)
     {
         ::close(devfd);
@@ -85,14 +86,23 @@ void MPDevice_linux::readyRead(int fd)
 
     if (sz < 0)
     {
-        qWarning() << "Failed to read from device: " << strerror(errno);
+        /**
+          * If usb is removed it is keep spamming the log
+          * with failed message if I do not wrap with this
+          * failToWriteLogged bool.
+          */
+        if (!failToWriteLogged)
+        {
+            qWarning() << "Failed to read from device: " << strerror(errno);
+        }
+        failToWriteLogged = true;
     }
     else
     {
         emit platformDataRead(recvData);
+        failToWriteLogged = false;
     }
 
-    sockNotifWrite->setEnabled(false);
     writeNextPacket();
 }
 
@@ -127,6 +137,10 @@ void MPDevice_linux::writeNextPacket()
     }
 
     QByteArray ba = sendBuffer.dequeue();
+    /**
+      * Adding a plus 0x00 byte before the message
+      * for setting the report number.
+      */
     ba.insert(0, static_cast<char>(0x0));
     ssize_t res = ::write(devfd, ba.data(), static_cast<size_t>(ba.size()));
 
@@ -172,7 +186,7 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
         struct udev_device *raw_dev = udev_device_new_from_syspath(udev, sysfs_path);
         const char *dev_path = udev_device_get_devnode(raw_dev);
 
-        struct udev_device *hid_dev = udev_device_get_parent_with_subsystem_devtype(raw_dev, "hid", NULL);
+        struct udev_device *hid_dev = udev_device_get_parent_with_subsystem_devtype(raw_dev, "hid", nullptr);
 
         if (!hid_dev)
         {
@@ -192,8 +206,8 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
                 if (idval.size() < 3)
                     continue;
                 bus_type = idval.at(0).toInt(nullptr, 16);
-                dev_vid = idval.at(1).toInt(nullptr, 16);
-                dev_pid = idval.at(2).toInt(nullptr, 16);
+                dev_vid = static_cast<quint16>(idval.at(1).toInt(nullptr, 16));
+                dev_pid = static_cast<quint16>(idval.at(2).toInt(nullptr, 16));
             }
         }
 

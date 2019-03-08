@@ -21,12 +21,15 @@
 #include <libudev.h>
 #include <QTimer>
 
+QString UsbMonitor_linux::ADD_ACTION = "add";
+QString UsbMonitor_linux::REMOVE_ACTION = "remove";
+
 UsbMonitor_linux::UsbMonitor_linux()
 {
     struct udev* udev = udev_new();
     mon = udev_monitor_new_from_netlink(udev, "udev");
 
-    udev_monitor_filter_add_match_subsystem_devtype(mon, "usb", NULL);
+    udev_monitor_filter_add_match_subsystem_devtype(mon, "usb", nullptr);
     udev_monitor_enable_receiving(mon);
 
     int fd = udev_monitor_get_fd(mon);
@@ -50,22 +53,24 @@ void UsbMonitor_linux::monitorUSB(int fd)
         QString node(udev_device_get_devnode(dev));
         QString action(udev_device_get_action(dev));
         qDebug() << "Node: " << node;
-        qDebug() << "Subsystem: " << udev_device_get_subsystem(dev);
-        qDebug() << "Devtype: " << udev_device_get_devtype(dev);
+        //qDebug() << "Subsystem: " << udev_device_get_subsystem(dev);
+        //qDebug() << "Devtype: " << udev_device_get_devtype(dev);
         qDebug() << "Action: " << action;
-        if ("add" == action && node.contains("usb"))
+        if (ADD_ACTION == action && node.contains("usb"))
         {
+            /**
+              * Need to add a delay, because without
+              * it the device haven't detected yet
+              * during usb enumeration.
+              */
             QTimer::singleShot(100, [this]()
             {
                 emit usbDeviceAdded();
             });
         }
-        else
+        else if (REMOVE_ACTION == action)
         {
-            if ("remove" == action)
-            {
-                emit usbDeviceRemoved();
-            }
+            emit usbDeviceRemoved();
         }
         udev_device_unref(dev);
     }
