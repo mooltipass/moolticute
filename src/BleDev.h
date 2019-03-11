@@ -13,6 +13,12 @@ class BleDev : public QWidget
 {
     Q_OBJECT
 
+    enum class AccState
+    {
+        STOPPED,
+        STARTED
+    };
+
 public:
     explicit BleDev(QWidget *parent = nullptr);
     ~BleDev();
@@ -35,12 +41,17 @@ private slots:
 
     void updateProgress(int total, int curr, QString msg);
 
+    void on_btnAccDataBrowse_clicked();
+
+    void on_btnFetchAccData_clicked();
+
 private:
     void initUITexts();
 
 
     Ui::BleDev *ui;
     WSClient *wsClient = nullptr;
+    AccState accState = AccState::STOPPED;
 };
 
 #endif // BLEDEV_H

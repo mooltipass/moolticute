@@ -23,6 +23,9 @@ BleDev::BleDev(QWidget *parent) :
     ui->label_UploadProgress->hide();
 
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
+    ui->btnAccDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
+    ui->progressBarAccData->setVisible(false);
+    ui->horizontalLayout_11->setAlignment(Qt::AlignLeft);
     initUITexts();
 }
 
@@ -49,12 +52,13 @@ void BleDev::clearWidgets()
 
 void BleDev::initUITexts()
 {
+    const auto browseText = tr("Browse");
     ui->label_DevTab->setText(tr("BLE Developer Tab"));
     ui->label_BLEDesc->setText(tr("BLE description"));
 
     ui->groupBoxUploadBundle->setTitle(tr("Upload Bundle"));
     ui->label_bundleText->setText(tr("Select Bundle File:"));
-    ui->btnFileBrowser->setText(tr("Browse"));
+    ui->btnFileBrowser->setText(browseText);
 
     ui->groupBoxPlatInfo->setTitle(tr("Platform informations"));
     ui->label_AuxMCUMaj->setText(tr("Aux MCU major:"));
@@ -69,6 +73,11 @@ void BleDev::initUITexts()
     ui->btnReflashAuxMCU->setText(flashText);
     ui->label_FlashMainMCU->setText(tr("Flash Main MCU:"));
     ui->btnFlashMainMCU->setText(flashText);
+
+    ui->groupBoxAccData->setTitle(tr("Acceleration Data"));
+    ui->label_AccDataFile->setText(tr("Acceleration Data File:"));
+    ui->btnAccDataBrowse->setText(browseText);
+    ui->btnFetchAccData->setText(tr("Fetch"));
 }
 
 void BleDev::on_btnFileBrowser_clicked()
@@ -155,4 +164,34 @@ void BleDev::updateProgress(int total, int curr, QString msg)
     ui->progressBarUpload->setMaximum(total);
     ui->progressBarUpload->setValue(curr);
     ui->label_UploadProgress->setText(msg);
+}
+
+void BleDev::on_btnAccDataBrowse_clicked()
+{
+    QSettings s;
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select file to fetch acceleration data"),
+                                            s.value("last_used_path/accdata_dir", QDir::homePath()).toString(),
+                                            "*.bin");
+
+    ui->lineEditAccData->setText(fileName);
+    s.setValue("last_used_path/accdata_dir", fileName.mid(0, fileName.lastIndexOf('/')));
+}
+
+void BleDev::on_btnFetchAccData_clicked()
+{
+    if (AccState::STOPPED == accState && !ui->lineEditAccData->text().isEmpty())
+    {
+        ui->progressBarAccData->show();
+        ui->progressBarAccData->setMinimum(0);
+        ui->progressBarAccData->setMaximum(0);
+        ui->btnFetchAccData->setText(tr("Stop Fetch"));
+        accState = AccState::STARTED;
+    }
+    else
+    {
+        ui->progressBarAccData->hide();
+        ui->btnFetchAccData->setText(tr("Fetch"));
+        accState = AccState::STOPPED;
+    }
 }
