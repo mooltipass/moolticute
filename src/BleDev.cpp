@@ -180,18 +180,21 @@ void BleDev::on_btnAccDataBrowse_clicked()
 
 void BleDev::on_btnFetchAccData_clicked()
 {
-    if (AccState::STOPPED == accState && !ui->lineEditAccData->text().isEmpty())
+    QString fileName = ui->lineEditAccData->text();
+    if (Common::AccState::STOPPED == accState && !ui->lineEditAccData->text().isEmpty())
     {
         ui->progressBarAccData->show();
         ui->progressBarAccData->setMinimum(0);
         ui->progressBarAccData->setMaximum(0);
         ui->btnFetchAccData->setText(tr("Stop Fetch"));
-        accState = AccState::STARTED;
+        accState = Common::AccState::STARTED;
+        wsClient->sendFetchAccData(fileName);
     }
     else
     {
         ui->progressBarAccData->hide();
         ui->btnFetchAccData->setText(tr("Fetch"));
-        accState = AccState::STOPPED;
+        accState = Common::AccState::STOPPED;
+        wsClient->sendStopFetchAccData();
     }
 }

@@ -2,6 +2,7 @@
 #define BLEDEV_H
 
 #include <QWidget>
+#include <Common.h>
 
 class WSClient;
 
@@ -12,12 +13,6 @@ class BleDev;
 class BleDev : public QWidget
 {
     Q_OBJECT
-
-    enum class AccState
-    {
-        STOPPED,
-        STARTED
-    };
 
 public:
     explicit BleDev(QWidget *parent = nullptr);
@@ -51,7 +46,7 @@ private:
 
     Ui::BleDev *ui;
     WSClient *wsClient = nullptr;
-    AccState accState = AccState::STOPPED;
+    Common::AccState accState = Common::AccState::STOPPED;
 };
 
 #endif // BLEDEV_H

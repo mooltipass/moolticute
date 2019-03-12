@@ -158,6 +158,29 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb,
     dequeueAndRun(jobs);
 }
 
+void MPDeviceBleImpl::fetchAccData(QString filePath, const MessageHandlerCb &cb)
+{
+    Q_UNUSED(cb);
+    qDebug() << "Fetching acc data: " << filePath;
+
+    accState = Common::AccState::STARTED;
+    auto *jobs = new AsyncJobs(QString("Fetch Acc Data"), this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_GET_ACC_32_SAMPLES,
+                    [this, filePath](const QByteArray &data, bool &) -> bool
+                    {
+                        QFile *file = new QFile(filePath);
+                        if (file->open(QIODevice::WriteOnly))
+                        {
+                            file->write(bleProt->getFullPayload(data).toHex() + "\n");
+                        }
+                        writeAccData(file);
+                        return true;
+                    }));
+
+    dequeueAndRun(jobs);
+}
+
 void MPDeviceBleImpl::sendResetFlipBit()
 {
     QByteArray clearFlip;
@@ -242,6 +265,24 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
                       }));
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_REINDEX_BUNDLE, bleProt->getDefaultFuncDone()));
+}
+
+void MPDeviceBleImpl::writeAccData(QFile *file)
+{
+    mpDev->sendData(MPCmd::CMD_DBG_GET_ACC_32_SAMPLES,
+                    [this, file](bool, const QByteArray &data, bool &) -> bool
+                    {
+                        file->write(bleProt->getFullPayload(data).toHex() + "\n");
+                        if (Common::AccState::STARTED == accState)
+                        {
+                            writeAccData(file);
+                        }
+                        else
+                        {
+                            delete file;
+                        }
+                        return true;
+                    });
 }
 
 void MPDeviceBleImpl::dequeueAndRun(AsyncJobs *jobs)

@@ -194,6 +194,12 @@ public:
         FAV_13,
         FAV_14,
     };
+
+    enum class AccState
+    {
+        STOPPED,
+        STARTED
+    };
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)
