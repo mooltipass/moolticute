@@ -26,6 +26,12 @@ BleDev::BleDev(QWidget *parent) :
     ui->btnAccDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
     ui->progressBarAccData->setVisible(false);
     ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
+    ui->progressBarAccData->setMinimum(0);
+    ui->progressBarAccData->setMaximum(0);
+
+#if defined(Q_OS_LINUX)
+    ui->label_AccDataFile->setMaximumWidth(150);
+#endif
     initUITexts();
 }
 
@@ -174,6 +180,19 @@ void BleDev::on_btnAccDataBrowse_clicked()
                                             s.value("last_used_path/accdata_dir", QDir::homePath()).toString(),
                                             "*.bin");
 
+#if defined(Q_OS_LINUX)
+            /**
+             * getSaveFileName is using native dialog
+             * On Linux it is not saving the choosen extension,
+             * so need to add it from code.
+             */
+            const QString BIN_EXT = ".bin";
+            if (!fileName.endsWith(BIN_EXT))
+            {
+                fileName += BIN_EXT;
+            }
+#endif
+
     ui->lineEditAccData->setText(fileName);
     s.setValue("last_used_path/accdata_dir", fileName.mid(0, fileName.lastIndexOf('/')));
 }
@@ -184,8 +203,6 @@ void BleDev::on_btnFetchAccData_clicked()
     if (Common::AccState::STOPPED == accState && !ui->lineEditAccData->text().isEmpty())
     {
         ui->progressBarAccData->show();
-        ui->progressBarAccData->setMinimum(0);
-        ui->progressBarAccData->setMaximum(0);
         ui->btnFetchAccData->setText(tr("Stop Fetch"));
         accState = Common::AccState::STARTED;
         wsClient->sendFetchAccData(fileName);

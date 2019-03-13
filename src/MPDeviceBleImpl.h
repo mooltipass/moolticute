@@ -29,7 +29,7 @@ public:
 
     void flashMCU(QString type, const MessageHandlerCb &cb);
     void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
-    void fetchAccData(QString filePath, const MessageHandlerCb &cb);
+    void fetchAccData(QString filePath);
     inline void stopFetchAccData() { accState = Common::AccState::STOPPED; }
 
     void sendResetFlipBit();

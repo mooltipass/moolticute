@@ -158,11 +158,8 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb,
     dequeueAndRun(jobs);
 }
 
-void MPDeviceBleImpl::fetchAccData(QString filePath, const MessageHandlerCb &cb)
+void MPDeviceBleImpl::fetchAccData(QString filePath)
 {
-    Q_UNUSED(cb);
-    qDebug() << "Fetching acc data: " << filePath;
-
     accState = Common::AccState::STARTED;
     auto *jobs = new AsyncJobs(QString("Fetch Acc Data"), this);
 

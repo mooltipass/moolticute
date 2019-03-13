@@ -765,18 +765,7 @@ void WSServerCon::processMessage(const QString &message)
         else if (root["msg"] == "fetch_acc_data")
         {
             QJsonObject o = root["data"].toObject();
-            bleImpl->fetchAccData(o["file"].toString(), [this, root](bool success, QString errstr)
-            {
-                QJsonObject ores;
-                QJsonObject oroot = root;
-                ores["success"] = success;
-                if (!success)
-                {
-                    qCritical() << errstr;
-                }
-                oroot["data"] = ores;
-                sendJsonMessage(oroot);
-            });
+            bleImpl->fetchAccData(o["file"].toString());
         }
         else if (root["msg"] == "stop_fetch_acc_data")
         {
