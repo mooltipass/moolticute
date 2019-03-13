@@ -172,7 +172,7 @@ void MPDeviceBleImpl::fetchAccData(QString filePath, const MessageHandlerCb &cb)
                         QFile *file = new QFile(filePath);
                         if (file->open(QIODevice::WriteOnly))
                         {
-                            file->write(bleProt->getFullPayload(data).toHex() + "\n");
+                            file->write(bleProt->getFullPayload(data));
                         }
                         writeAccData(file);
                         return true;
@@ -272,7 +272,7 @@ void MPDeviceBleImpl::writeAccData(QFile *file)
     mpDev->sendData(MPCmd::CMD_DBG_GET_ACC_32_SAMPLES,
                     [this, file](bool, const QByteArray &data, bool &) -> bool
                     {
-                        file->write(bleProt->getFullPayload(data).toHex() + "\n");
+                        file->write(bleProt->getFullPayload(data));
                         if (Common::AccState::STARTED == accState)
                         {
                             writeAccData(file);

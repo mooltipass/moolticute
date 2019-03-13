@@ -25,7 +25,7 @@ BleDev::BleDev(QWidget *parent) :
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
     ui->btnAccDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
     ui->progressBarAccData->setVisible(false);
-    ui->horizontalLayout_11->setAlignment(Qt::AlignLeft);
+    ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
     initUITexts();
 }
 

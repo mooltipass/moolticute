@@ -757,7 +757,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_11">
+       <layout class="QHBoxLayout" name="horizontalLayout_Fetch">
         <property name="leftMargin">
          <number>30</number>
         </property>
