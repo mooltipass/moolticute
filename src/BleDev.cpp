@@ -23,6 +23,15 @@ BleDev::BleDev(QWidget *parent) :
     ui->label_UploadProgress->hide();
 
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
+    ui->btnAccDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
+    ui->progressBarAccData->setVisible(false);
+    ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
+    ui->progressBarAccData->setMinimum(0);
+    ui->progressBarAccData->setMaximum(0);
+
+#if defined(Q_OS_LINUX)
+    ui->label_AccDataFile->setMaximumWidth(150);
+#endif
     initUITexts();
 }
 
@@ -49,12 +58,13 @@ void BleDev::clearWidgets()
 
 void BleDev::initUITexts()
 {
+    const auto browseText = tr("Browse");
     ui->label_DevTab->setText(tr("BLE Developer Tab"));
     ui->label_BLEDesc->setText(tr("BLE description"));
 
     ui->groupBoxUploadBundle->setTitle(tr("Upload Bundle"));
     ui->label_bundleText->setText(tr("Select Bundle File:"));
-    ui->btnFileBrowser->setText(tr("Browse"));
+    ui->btnFileBrowser->setText(browseText);
 
     ui->groupBoxPlatInfo->setTitle(tr("Platform informations"));
     ui->label_AuxMCUMaj->setText(tr("Aux MCU major:"));
@@ -69,6 +79,11 @@ void BleDev::initUITexts()
     ui->btnReflashAuxMCU->setText(flashText);
     ui->label_FlashMainMCU->setText(tr("Flash Main MCU:"));
     ui->btnFlashMainMCU->setText(flashText);
+
+    ui->groupBoxAccData->setTitle(tr("Acceleration Data"));
+    ui->label_AccDataFile->setText(tr("Acceleration Data File:"));
+    ui->btnAccDataBrowse->setText(browseText);
+    ui->btnFetchAccData->setText(tr("Fetch"));
 }
 
 void BleDev::on_btnFileBrowser_clicked()
@@ -155,4 +170,48 @@ void BleDev::updateProgress(int total, int curr, QString msg)
     ui->progressBarUpload->setMaximum(total);
     ui->progressBarUpload->setValue(curr);
     ui->label_UploadProgress->setText(msg);
+}
+
+void BleDev::on_btnAccDataBrowse_clicked()
+{
+    QSettings s;
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select file to fetch acceleration data"),
+                                            s.value("last_used_path/accdata_dir", QDir::homePath()).toString(),
+                                            "*.bin");
+
+#if defined(Q_OS_LINUX)
+            /**
+             * getSaveFileName is using native dialog
+             * On Linux it is not saving the choosen extension,
+             * so need to add it from code.
+             */
+            const QString BIN_EXT = ".bin";
+            if (!fileName.endsWith(BIN_EXT))
+            {
+                fileName += BIN_EXT;
+            }
+#endif
+
+    ui->lineEditAccData->setText(fileName);
+    s.setValue("last_used_path/accdata_dir", fileName.mid(0, fileName.lastIndexOf('/')));
+}
+
+void BleDev::on_btnFetchAccData_clicked()
+{
+    QString fileName = ui->lineEditAccData->text();
+    if (Common::AccState::STOPPED == accState && !ui->lineEditAccData->text().isEmpty())
+    {
+        ui->progressBarAccData->show();
+        ui->btnFetchAccData->setText(tr("Stop Fetch"));
+        accState = Common::AccState::STARTED;
+        wsClient->sendFetchAccData(fileName);
+    }
+    else
+    {
+        ui->progressBarAccData->hide();
+        ui->btnFetchAccData->setText(tr("Fetch"));
+        accState = Common::AccState::STOPPED;
+        wsClient->sendStopFetchAccData();
+    }
 }

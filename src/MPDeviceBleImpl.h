@@ -29,18 +29,22 @@ public:
 
     void flashMCU(QString type, const MessageHandlerCb &cb);
     void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
+    void fetchAccData(QString filePath);
+    inline void stopFetchAccData() { accState = Common::AccState::STOPPED; }
 
     void sendResetFlipBit();
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
+    void writeAccData(QFile *file);
 
     void dequeueAndRun(AsyncJobs *job);
 
 
     MessageProtocolBLE *bleProt;
     MPDevice *mpDev;
+    Common::AccState accState = Common::AccState::STOPPED;
 
     static constexpr int BUNBLE_DATA_WRITE_SIZE = 256;
     static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;

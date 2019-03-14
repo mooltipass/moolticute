@@ -762,6 +762,15 @@ void WSServerCon::processMessage(const QString &message)
                 sendJsonMessage(oroot);
             }, defaultProgressCb);
         }
+        else if (root["msg"] == "fetch_acc_data")
+        {
+            QJsonObject o = root["data"].toObject();
+            bleImpl->fetchAccData(o["file"].toString());
+        }
+        else if (root["msg"] == "stop_fetch_acc_data")
+        {
+            bleImpl->stopFetchAccData();
+        }
     }
 
 }

@@ -661,6 +661,19 @@ void WSClient::sendUploadBundle(QString bundleFilePath)
                   {"data", o}});
 }
 
+void WSClient::sendFetchAccData(QString fileName)
+{
+    QJsonObject o;
+    o["file"] = fileName;
+    sendJsonData({{ "msg", "fetch_acc_data" },
+                  {"data", o}});
+}
+
+void WSClient::sendStopFetchAccData()
+{
+    sendJsonData({{ "msg", "stop_fetch_acc_data" }});
+}
+
 bool WSClient::isFw12()
 {
     static QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");

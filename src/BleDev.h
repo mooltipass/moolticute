@@ -2,6 +2,7 @@
 #define BLEDEV_H
 
 #include <QWidget>
+#include <Common.h>
 
 class WSClient;
 
@@ -35,12 +36,17 @@ private slots:
 
     void updateProgress(int total, int curr, QString msg);
 
+    void on_btnAccDataBrowse_clicked();
+
+    void on_btnFetchAccData_clicked();
+
 private:
     void initUITexts();
 
 
     Ui::BleDev *ui;
     WSClient *wsClient = nullptr;
+    Common::AccState accState = Common::AccState::STOPPED;
 };
 
 #endif // BLEDEV_H
