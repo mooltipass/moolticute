@@ -351,7 +351,22 @@ void SSHManagement::on_pushButtonImport_clicked()
     if (QFileInfo(fname).suffix().toLower() == "ppk")
     {
         QMessageBox::warning(this, "Moolticute",
-            tr("PuTTY private keys are currently not supported!"));
+            tr("PuTTY private keys are currently not supported!\n"
+            "\n"
+            "Here is workaround:\n"
+            "\n"
+            " * Run PuTTY Key Generator (PuTTYgen);\n"
+            " * From File menu, choose 'Load private key';\n"
+            " * Choose the key you tried to import now;\n"
+            " * From Conversions menu, choose 'Export OpenSSH key (force new file format)';\n"
+            " * Confirm saving the key without a password.\n"
+            "\n"
+            "Then go back to Moolticute and now you will be able to import the file"
+            " you just have saved.\n"
+            "\n"
+            "Just then it is recommended to delete the file"
+            " as it's not protected by a password.\n"
+            ));
         return;
     }
 
