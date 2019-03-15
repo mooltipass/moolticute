@@ -4290,7 +4290,7 @@ void MPDevice::setCredential(QString service, const QString &login,
         return true;
     }));
 
-    QByteArray ldata = pMesProt->toByteArray(service);
+    QByteArray ldata = pMesProt->toByteArray(login);
     ldata.append((char)0);
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_LOGIN,
