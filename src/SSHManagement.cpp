@@ -168,8 +168,17 @@ void SSHManagement::handleProgressErrors(const QJsonObject &rootobj)
                 break;
 
             case Action::ImportKey:
-                msg = tr("Failed to import key into the device!") + "\n\n" +
-                      tr("Make sure it's an OpenSSH private key without a passphrase.");
+                msg = tr("Failed to import key into the device!\n"
+                         "\n"
+                         "Make sure it's an OpenSSH private key without a passphrase.\n"
+                         "\n"
+                         "To import password-protected OpenSSH key you can use 'ssh-add' command"
+                         " if you have configured your setup correctly"
+                         " (mc-agent daemon is running and SSH_AUTH_SOCK is pointing to mc-agent socket).\n"
+                         "\n"
+                         "The other possibility is to copy your password-protected key and reset password on it"
+                         " with 'ssh-keygen -p -f <copy of your rsa key file>'."
+                         );
                 break;
 
             case Action::DeleteKey:
