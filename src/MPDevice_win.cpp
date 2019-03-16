@@ -80,7 +80,7 @@ HANDLE MPDevice_win::openDevice(QString path, bool exlusive /* =false */)
                            nullptr,
                            OPEN_EXISTING,
                            FILE_FLAG_OVERLAPPED,
-                           0);
+                           nullptr);
 
     if (GetLastError() == ERROR_ACCESS_DENIED)
         h = CreateFileA(qToChar(path),
@@ -89,7 +89,7 @@ HANDLE MPDevice_win::openDevice(QString path, bool exlusive /* =false */)
                         nullptr,
                         OPEN_EXISTING,
                         FILE_FLAG_OVERLAPPED,
-                        0);
+                        nullptr);
 
     return h;
 }

@@ -102,12 +102,12 @@ void MPManager::usbDeviceRemoved()
 
 void MPManager::usbDeviceAdded(QString path)
 {
+#if defined(Q_OS_WIN)
     if (!devices.contains(path))
     {
-        MPDevice *device;
+        MPDevice *device = nullptr;
 
         //Create our platform device object
-#if defined(Q_OS_WIN)
         bool isBLE = false;
         if (!MPDevice_win::checkDevice(path, isBLE))
         {
@@ -115,11 +115,6 @@ void MPManager::usbDeviceAdded(QString path)
             return;
         }
         device = new MPDevice_win(this, MPDevice_win::getPlatDef(path, isBLE));
-#elif defined(Q_OS_MAC)
-        //device = new MPDevice_mac(this, path);
-#elif defined(Q_OS_LINUX)
-        //device = new MPDevice_linux(this, path);
-#endif
 
         devices[path] = device;
         emit mpConnected(device);
@@ -128,6 +123,10 @@ void MPManager::usbDeviceAdded(QString path)
     {
         qDebug() << "Device is already added: " << path;
     }
+#else
+    Q_UNUSED(path)
+    return;
+#endif
 }
 
 void MPManager::usbDeviceRemoved(QString path)
