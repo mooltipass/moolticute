@@ -37,8 +37,8 @@ public:
     ~UsbMonitor_win();
 
 signals:
-    void usbDeviceAdded();
-    void usbDeviceRemoved();
+    void usbDeviceAdded(QString path);
+    void usbDeviceRemoved(QString path);
 
 private:
     UsbMonitor_win();

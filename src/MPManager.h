@@ -44,7 +44,7 @@ public:
     bool initialize();
 
     void stop();
-    MPDevice *getDevice(int at);
+    MPDevice* getDevice(int at);
     int getDeviceCount() { return devices.count(); }
 
 signals:
@@ -54,6 +54,8 @@ signals:
 private slots:
     void usbDeviceAdded();
     void usbDeviceRemoved();
+    void usbDeviceAdded(QString path);
+    void usbDeviceRemoved(QString path);
 
 private:
     MPManager();

@@ -39,8 +39,8 @@ bool MPManager::initialize()
     if (!AppDaemon::isEmulationMode())
     {
 #if defined(Q_OS_WIN)
-        connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
-        connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
+        connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceAdded(QString)), this, SLOT(usbDeviceAdded(QString)));
+        connect(UsbMonitor_win::Instance(), SIGNAL(usbDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved(QString)));
 
 #elif defined(Q_OS_MAC)
         connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()));
@@ -100,13 +100,60 @@ void MPManager::usbDeviceRemoved()
     checkUsbDevices();
 }
 
-MPDevice *MPManager::getDevice(int at)
+void MPManager::usbDeviceAdded(QString path)
+{
+    if (!devices.contains(path))
+    {
+        MPDevice *device;
+
+        //Create our platform device object
+#if defined(Q_OS_WIN)
+        bool isBLE = false;
+        if (!MPDevice_win::checkDevice(path, isBLE))
+        {
+            qDebug() << "Not a mooltipass device: " << path;
+            return;
+        }
+        device = new MPDevice_win(this, MPDevice_win::getPlatDef(path, isBLE));
+#elif defined(Q_OS_MAC)
+        //device = new MPDevice_mac(this, path);
+#elif defined(Q_OS_LINUX)
+        //device = new MPDevice_linux(this, path);
+#endif
+
+        devices[path] = device;
+        emit mpConnected(device);
+    }
+    else
+    {
+        qDebug() << "Device is already added: " << path;
+    }
+}
+
+void MPManager::usbDeviceRemoved(QString path)
+{
+    auto it = devices.find(path);
+    if (it != devices.end())
+    {
+        qDebug() << "Disconnecting: " << path;
+        emit mpDisconnected(it.value());
+        delete it.value();
+        devices.remove(path);
+    }
+    else
+    {
+        qDebug() << path << " is not connected.";
+    }
+}
+
+MPDevice* MPManager::getDevice(int at)
 {
     if (at < 0 || at >= devices.count())
+    {
+        qCritical() << "Invalid device index: " << at;
         return nullptr;
-    auto it = devices.begin();
-    while (it != devices.end() && at > 0) { at--; it++; }
-    return it.value();
+    }
+    return devices.values().at(at);
 }
 
 void MPManager::checkUsbDevices()
@@ -131,6 +178,7 @@ void MPManager::checkUsbDevices()
     if (devlist.isEmpty() && !AppDaemon::isEmulationMode())
     {
         //No USB devices found, means all MPs are gone disconnected
+        qDebug() << "Disconnecting devices";
         auto it = devices.begin();
         while (it != devices.end())
         {
@@ -171,6 +219,10 @@ void MPManager::checkUsbDevices()
 
                 devices[def.id] = device;
                 emit mpConnected(device);
+            }
+            else
+            {
+                qDebug() << "Device is already connected: " << def.id;
             }
             detectedDevs.append(def.id);
         }

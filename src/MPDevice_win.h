@@ -77,6 +77,15 @@ public:
 
     //Static function for enumerating devices on platform
     static QList<MPPlatformDef> enumerateDevices();
+    /**
+     * @brief checkDevice
+     * Checking if the device is a mooltipass device
+     * @param path to the device
+     * @param isBLE out param, true if device is a ble
+     * @return true, if the device is mini/ble
+     */
+    static bool checkDevice(QString path, bool &isBLE);
+    static MPPlatformDef getPlatDef(QString path, bool isBLE);
 
 private slots:
     void ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLAPPED *overlapped);
@@ -86,7 +95,7 @@ private:
     virtual void platformWrite(const QByteArray &data);
 
     bool openPath();
-    static HANDLE openDevice(QString path);
+    static HANDLE openDevice(QString path, bool exlusive = false);
 
     //GetLastError() helper
     QString getLastError(DWORD err);
