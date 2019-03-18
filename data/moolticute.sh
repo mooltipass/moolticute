@@ -46,13 +46,13 @@ function install_udev_rule()
 
     tmpfile=$(mktemp /tmp/mc-udev.XXXXXX)
     cat > "$tmpfile" <<- EOF
-# udev rules for allowing console user(s) and libusb access to Mooltipass Mini devices
+# udev rules for allowing console user(s) and hidraw access to Mooltipass Mini devices
 
 ACTION!="add|change", GOTO="mooltipass_end"
 
 # console user
-KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", MODE="0660", SYMLINK+="mooltipass_keyboard", TAG+="uaccess"
-KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="4321", MODE="0660", SYMLINK+="mooltipass_keyboard", TAG+="uaccess"
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", MODE="0660", SYMLINK+="mooltipass_keyboard", TAG+="uaccess", TAG+="udev-acl"
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="4321", MODE="0660", SYMLINK+="mooltipass_keyboard", TAG+="uaccess", TAG+="udev-acl"
 # libusb
 SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", MODE="0660", SYMLINK+="mooltipass_device", TAG+="uaccess"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="4321", MODE="0660", SYMLINK+="mooltipass_device", TAG+="uaccess"

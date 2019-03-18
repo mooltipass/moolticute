@@ -2,7 +2,7 @@ Source: moolticute
 Section: utils
 Priority: optional
 Maintainer: Mooltipass Team <support@themooltipass.com>
-Build-Depends: debhelper (>=9), tar (>=1.27.1), gzip (>=1.6), libqt5websockets5-dev, libusb-1.0-0-dev, qt5-qmake, qttools5-dev-tools, pkg-config
+Build-Depends: debhelper (>=9), tar (>=1.27.1), gzip (>=1.6), libqt5websockets5-dev, libudev-dev, qt5-qmake, qttools5-dev-tools, pkg-config
 Standards-Version: 3.9.7
 Homepage: https://www.themooltipass.com/
 Vcs-Git: https://github.com/mooltipass/moolticute.git
@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/mooltipass/moolticute
 
 Package: moolticute
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqt5gui5, libqt5network5, libqt5websockets5, libqt5widgets5, libqt5dbus5, libusb-1.0-0
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqt5gui5, libqt5network5, libqt5websockets5, libqt5widgets5, libqt5dbus5, libudev
 Description: Mooltipass cross platform daemon/tools
  This project aims to be an easy companion to your Mooltipass device and extend
  the power of the device to more platform/tools. With it you can manage your
@@ -25,6 +25,6 @@ Description: Mooltipass cross platform daemon/tools
  library that is only implemented in Chrome. A Firefox (or any other browser)
  extension could easily be written by using the Moolticute daemon.
  . 
- It is completely cross platform, and runs on Linux (using libusb),
+ It is completely cross platform, and runs on Linux (using hidraw API),
  OS X (native IOKit API), and Windows (native HID API).
 
