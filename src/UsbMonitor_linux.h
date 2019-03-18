@@ -20,9 +20,6 @@
 #define USBMONITOR_LINUX_H
 
 #include <QtCore>
-#include <libusb.h>
-#include <QThread>
-#include <QMap>
 
 #include "MPDevice_linux.h"
 
@@ -37,35 +34,20 @@ public:
     }
     ~UsbMonitor_linux();
 
-    libusb_context *getUsbContext() { return usb_ctx; }
 public slots:
-    void start();
-    void stop();
-
-    void handleEvents();
-    void createSocketMonitor(int fd);
-    void releaseSocketMonitor(int fd);
+    void monitorUSB(int fd);
 signals:
     void usbDeviceAdded();
     void usbDeviceRemoved();
 
 private:
-    void attachCallbacks();
-    void relaseCallbacks();
     UsbMonitor_linux();
 
-    libusb_context *usb_ctx = nullptr;
-    libusb_hotplug_callback_handle cbaddhandle;
-    libusb_hotplug_callback_handle cbdelhandle;
+    QSocketNotifier *sockMonitor = nullptr;
+    struct udev_monitor* mon;
 
-    QMap<intptr_t, QSocketNotifier*> m_fdMonitors;
-
-    friend void libusb_fd_add_cb(int fd, short events, void *user_data);
-    friend void libusb_fd_del_cb(int fd, void *user_data);
-    friend int libusb_device_add_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
-    friend int libusb_device_del_cb(libusb_context *ctx, libusb_device *dev, libusb_hotplug_event event, void *user_data);
+    static QString ADD_ACTION;
+    static QString REMOVE_ACTION;
 };
-
-Q_DECLARE_METATYPE(struct libusb_transfer *)
 
 #endif // USBMONITOR_LINUX_H
