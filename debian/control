@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/mooltipass/moolticute
 
 Package: moolticute
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqt5gui5, libqt5network5, libqt5websockets5, libqt5widgets5, libqt5dbus5, libudev
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqt5gui5, libqt5network5, libqt5websockets5, libqt5widgets5, libqt5dbus5, libudev1
 Description: Mooltipass cross platform daemon/tools
  This project aims to be an easy companion to your Mooltipass device and extend
  the power of the device to more platform/tools. With it you can manage your
