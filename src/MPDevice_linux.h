@@ -19,8 +19,8 @@
 #ifndef MPDEVICE_LINUX_H
 #define MPDEVICE_LINUX_H
 
-#include <libusb.h>
 #include "MPDevice.h"
+#include <QSocketNotifier>
 
 #include <QThread>
 
@@ -29,32 +29,21 @@ class MPPlatformDef
 public:
     QString id; //unique id for all platform
 
-    libusb_context *ctx = nullptr;
-    libusb_device *dev = nullptr;
-
     bool isBLE = false;
-
+    QString path;
 };
 
 inline bool operator==(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return lhs.id == rhs.id; }
 inline bool operator!=(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return !(lhs == rhs); }
 
-class USBTransfer;
-
-class TransferThread : public QThread
-{
-    Q_OBJECT
-    void run() override;
-public:
-    TransferThread(libusb_context *usb_ctx);
-    QAtomicInt keepWoorking;
-private:
-    libusb_context *usb_context;
-};
-
-
 class MPDevice_linux: public MPDevice
 {
+    enum class ExclusiveAccess
+    {
+        RELEASE = 0,
+        GRAB = 1
+    };
+
     Q_OBJECT
 public:
     MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef);
@@ -62,25 +51,27 @@ public:
 
     //Static function for enumerating devices on platform
     static QList<MPPlatformDef> enumerateDevices();
+    static int getDescriptorSize(const char* devpath);
+    static int INVALID_VALUE;
 
-public slots:
+private slots:
+    void readyRead(int fd);
+    void writeNextPacket();
 
+private:
     virtual void platformRead();
     virtual void platformWrite(const QByteArray &data);
 
-private:
-    bool detached_kernel = false;
-    libusb_context *usb_ctx;
-    libusb_device *device;
-    libusb_device_handle *devicefd;
+    QString devPath;
+    int devfd = 0; //device fd
+    QSocketNotifier *sockNotifRead = nullptr;
+    QSocketNotifier *sockNotifWrite = nullptr;
 
-    TransferThread* worker;
+    int grabbed = INVALID_VALUE;
 
-    void usbSendData(unsigned char cmd, const QByteArray &data = QByteArray());
-    void usbRequestReceive();
-
-    friend void _usbSendCallback(struct libusb_transfer *trf);
-    friend void _usbReceiveCallback(struct libusb_transfer *trf);
+    //Bufferize the data sent by sending 64bytes packet at a time
+    QQueue<QByteArray> sendBuffer;
+    bool failToWriteLogged = false;
 };
 
 #endif // MPDEVICE_LINUX_H
