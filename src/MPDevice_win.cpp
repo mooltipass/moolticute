@@ -71,31 +71,32 @@ QString MPDevice_win::getLastError(DWORD err)
     return result;
 }
 
-HANDLE MPDevice_win::openDevice(QString path)
+HANDLE MPDevice_win::openDevice(QString path, bool exlusive /* =false */)
 {
+    DWORD sharedOptRW = exlusive ? 0 : FILE_SHARE_READ | FILE_SHARE_WRITE;
     HANDLE h = CreateFileA(qToChar(path),
                            GENERIC_WRITE | GENERIC_READ,
-                           0, //Open exclusively
-                           NULL,
+                           sharedOptRW,
+                           nullptr,
                            OPEN_EXISTING,
                            FILE_FLAG_OVERLAPPED,
-                           0);
+                           nullptr);
 
     if (GetLastError() == ERROR_ACCESS_DENIED)
         h = CreateFileA(qToChar(path),
                         GENERIC_READ,
-                        0,
-                        NULL,
+                        sharedOptRW & FILE_SHARE_READ,
+                        nullptr,
                         OPEN_EXISTING,
                         FILE_FLAG_OVERLAPPED,
-                        0);
+                        nullptr);
 
     return h;
 }
 
 bool MPDevice_win::openPath()
 {
-    platformDef.devHandle = openDevice(platformDef.path);
+    platformDef.devHandle = openDevice(platformDef.path, true);
 
     if (platformDef.devHandle == INVALID_HANDLE_VALUE)
     {
@@ -210,7 +211,6 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
                                        &dev_data))
     {
         DWORD required_size = 0;
-        HIDD_ATTRIBUTES attrib;
 
         //first call is to get the required_size
         bool ret = SetupDiGetDeviceInterfaceDetailA(dev_info_set,
@@ -232,50 +232,64 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
                                                nullptr,
                                                nullptr);
 
+        ++idx;
         if (!ret)
         {
             free(dev_detail_data);
-            idx++;
             continue;
         }
 
         QString path = QString(dev_detail_data->DevicePath);
         free(dev_detail_data);
 
-        //Get vendorid/productid
-        attrib.Size = sizeof(HIDD_ATTRIBUTES);
-        HANDLE h = openDevice(path);
-        if (h == INVALID_HANDLE_VALUE)
+        bool isBLE = false;
+        if (!checkDevice(path, isBLE))
         {
-            idx++;
             continue;
         }
-
-        HID.HidD_GetAttributes(h, &attrib);
-        CloseHandle(h);
-
-        if ((attrib.VendorID != MOOLTIPASS_VENDORID && attrib.VendorID != MOOLTIPASS_BLE_VENDORID) ||
-            (attrib.ProductID != MOOLTIPASS_PRODUCTID && attrib.ProductID != MOOLTIPASS_BLE_PRODUCTID))
-        {
-            idx++;
-            continue;
-        }
-
         qDebug() << "Found mooltipass: " << path;
 
         //TODO: extract interface number from path string and check it
 
-        MPPlatformDef def;
-        def.path = path;
-        def.id = path; //use path for ID
-        def.isBLE = attrib.VendorID == MOOLTIPASS_BLE_VENDORID;
-        devlist << def;
-        idx++;
+        devlist << getPlatDef(path, isBLE);
     }
 
     SetupDiDestroyDeviceInfoList(dev_info_set);
 
     return devlist;
+}
+
+bool MPDevice_win::checkDevice(QString path, bool &isBLE /* out */)
+{
+    HIDD_ATTRIBUTES attrib;
+    //Get vendorid/productid
+    attrib.Size = sizeof(HIDD_ATTRIBUTES);
+    HANDLE h = openDevice(path);
+    if (h == INVALID_HANDLE_VALUE)
+    {
+        return false;
+    }
+
+    HID.HidD_GetAttributes(h, &attrib);
+    CloseHandle(h);
+
+    if ((attrib.VendorID != MOOLTIPASS_VENDORID && attrib.VendorID != MOOLTIPASS_BLE_VENDORID) ||
+        (attrib.ProductID != MOOLTIPASS_PRODUCTID && attrib.ProductID != MOOLTIPASS_BLE_PRODUCTID))
+    {
+        return false;
+    }
+
+    isBLE = attrib.VendorID == MOOLTIPASS_BLE_VENDORID;
+    return true;
+}
+
+MPPlatformDef MPDevice_win::getPlatDef(QString path, bool isBLE)
+{
+    MPPlatformDef def;
+    def.path = path;
+    def.id = path; //use path for ID
+    def.isBLE = isBLE;
+    return def;
 }
 
 void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLAPPED *overlapped)
