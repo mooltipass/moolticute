@@ -229,6 +229,11 @@ void MPDevice::sendData(MPCmd::Command cmd, MPCommandCb cb)
     sendData(cmd, QByteArray(), CMD_DEFAULT_TIMEOUT, std::move(cb));
 }
 
+void MPDevice::sendData(MPCmd::Command cmd, const QByteArray &data, MPCommandCb cb)
+{
+    sendData(cmd, data, CMD_DEFAULT_TIMEOUT, std::move(cb));
+}
+
 void MPDevice::commandFailed()
 {
     //TODO: fix this to work as it should on all platforms

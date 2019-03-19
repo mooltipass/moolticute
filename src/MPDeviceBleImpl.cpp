@@ -186,6 +186,105 @@ void MPDeviceBleImpl::sendResetFlipBit()
     bleProt->resetFlipBit();
 }
 
+QByteArray MPDeviceBleImpl::getStoreMessage(QString service, QString login, QString desc, QString third, QString password)
+{
+    QByteArray storeMessage;
+    //Add Service index
+    quint16 index = static_cast<quint16>(0);
+    storeMessage.append(bleProt->toLittleEndianFromInt(index));
+    //Add Login index
+    index += (service.size() + 1);
+    if (login.isEmpty())
+    {
+        storeMessage.append(static_cast<char>(0xFF));
+        storeMessage.append(static_cast<char>(0xFF));
+    }
+    else
+    {
+        storeMessage.append(bleProt->toLittleEndianFromInt(index));
+        index += (login.size() + 1);
+    }
+
+    //Add desc index
+    if (desc.isEmpty())
+    {
+        storeMessage.append(static_cast<char>(0xFF));
+        storeMessage.append(static_cast<char>(0xFF));
+    }
+    else
+    {
+        storeMessage.append(bleProt->toLittleEndianFromInt(index));
+        index += (desc.size() + 1);
+    }
+
+    //Add third index
+    if (third.isEmpty())
+    {
+        storeMessage.append(static_cast<char>(0xFF));
+        storeMessage.append(static_cast<char>(0xFF));
+    }
+    else
+    {
+        storeMessage.append(bleProt->toLittleEndianFromInt(index));
+        index += (third.size() + 1);
+    }
+
+    //Add password index
+    if (password.isEmpty())
+    {
+        storeMessage.append(static_cast<char>(0xFF));
+        storeMessage.append(static_cast<char>(0xFF));
+    }
+    else
+    {
+        storeMessage.append(bleProt->toLittleEndianFromInt(index));
+        index += (password.size() + 1);
+    }
+
+    //Add service
+    QByteArray serviceData = bleProt->toByteArray(service);
+    serviceData.append(static_cast<char>(0));
+    serviceData.append(static_cast<char>(0));
+    storeMessage.append(serviceData);
+
+    //Add login
+    if (!login.isEmpty())
+    {
+        QByteArray loginData = bleProt->toByteArray(login);
+        loginData.append(static_cast<char>(0));
+        loginData.append(static_cast<char>(0));
+        storeMessage.append(loginData);
+    }
+
+    //Add desc
+    if (!desc.isEmpty())
+    {
+        QByteArray descData = bleProt->toByteArray(desc);
+        descData.append(static_cast<char>(0));
+        descData.append(static_cast<char>(0));
+        storeMessage.append(descData);
+    }
+
+    //Add third
+    if (!third.isEmpty())
+    {
+        QByteArray thirdData = bleProt->toByteArray(third);
+        thirdData.append(static_cast<char>(0));
+        thirdData.append(static_cast<char>(0));
+        storeMessage.append(thirdData);
+    }
+
+    //Add desc
+    if (!password.isEmpty())
+    {
+        QByteArray passwordData = bleProt->toByteArray(password);
+        passwordData.append(static_cast<char>(0));
+        passwordData.append(static_cast<char>(0));
+        storeMessage.append(passwordData);
+    }
+    return storeMessage;
+}
+
 void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress)
 {
     if (0x01 == bleProt->getFirstPayloadByte(data))

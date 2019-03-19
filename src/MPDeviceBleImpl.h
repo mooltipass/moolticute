@@ -34,6 +34,8 @@ public:
 
     void sendResetFlipBit();
 
+    QByteArray getStoreMessage(QString service, QString login, QString desc, QString third, QString password);
+
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);

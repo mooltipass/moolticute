@@ -119,8 +119,8 @@ QByteArray MessageProtocolBLE::toByteArray(const QString &input)
     for (QChar ch : input)
     {
         quint16 uniChar = ch.unicode();
-        unicodeArray.append(static_cast<char>((0xFF00&uniChar)>>8));
         unicodeArray.append(static_cast<char>((0xFF&uniChar)));
+        unicodeArray.append(static_cast<char>((0xFF00&uniChar)>>8));
     }
     return unicodeArray;
 }
@@ -242,6 +242,8 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::GET_SERIAL            , 0xDA},
         {MPCmd::CMD_DBG_MESSAGE       , 0x8000},
         {MPCmd::GET_PLAT_INFO         , 0x0003},
+        {MPCmd::STORE_CREDENTIAL      , 0x0006},
+        {MPCmd::GET_CREDENTIAL        , 0x0007},
         {MPCmd::CMD_DBG_OPEN_DISP_BUFFER    , 0x8001},
         {MPCmd::CMD_DBG_SEND_TO_DISP_BUFFER , 0x8002},
         {MPCmd::CMD_DBG_CLOSE_DISP_BUFFER   , 0x8003},

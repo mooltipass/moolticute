@@ -130,6 +130,7 @@ public:
     void sendData(MPCmd::Command cmd, const QByteArray &data = QByteArray(), quint32 timeout = CMD_DEFAULT_TIMEOUT, MPCommandCb cb = [](bool, const QByteArray &, bool &){}, bool checkReturn = true);
     void sendData(MPCmd::Command cmd, quint32 timeout, MPCommandCb cb);
     void sendData(MPCmd::Command cmd, MPCommandCb cb);
+    void sendData(MPCmd::Command cmd, const QByteArray &data, MPCommandCb cb);
 
     void updateKeyboardLayout(int lang);
     void updateLockTimeoutEnabled(bool en);

@@ -132,6 +132,14 @@ public:
         return (lowerByte|(upperByte<<8));
     }
 
+    QByteArray toLittleEndianFromInt(quint16 num)
+    {
+        QByteArray littleEndian;
+        littleEndian.append(static_cast<char>(num&0xFF));
+        littleEndian.append(static_cast<char>((num&0xFF00)>>16));
+        return littleEndian;
+    }
+
     QMap<quint16,quint16> m_commandMapping;
 };
 
