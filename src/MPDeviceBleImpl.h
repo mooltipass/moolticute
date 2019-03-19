@@ -2,8 +2,39 @@
 #define MPDEVICEBLEIMPL_H
 
 #include "MPDevice.h"
+#include <QMap>
 
 class MessageProtocolBLE;
+
+class Credential
+{
+public:
+    enum class CredValue
+    {
+        SERVICE,
+        LOGIN,
+        PASSWORD,
+        DESCRIPTION,
+        THIRD
+    };
+
+    Credential(QString service, QString login = "", QString pwd = "", QString desc = "", QString third = "")
+    {
+        m_attributes = { {CredValue::SERVICE, service},
+                         {CredValue::LOGIN, login},
+                         {CredValue::PASSWORD, pwd},
+                         {CredValue::DESCRIPTION, desc},
+                         {CredValue::THIRD, third}
+                       };
+    }
+
+    QMap<CredValue, QString> getAttributes() const { return m_attributes; }
+    void set(CredValue field, QString value) { m_attributes[field] = value; }
+    QString get(CredValue field) const { return m_attributes[field]; }
+
+private:
+    QMap<CredValue, QString> m_attributes;
+};
 
 /**
  * @brief The MPDeviceBleImpl class
@@ -34,7 +65,7 @@ public:
 
     void sendResetFlipBit();
 
-    QByteArray getStoreMessage(QString service, QString login, QString desc, QString third, QString password);
+    QByteArray getStoreMessage(Credential cred);
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
