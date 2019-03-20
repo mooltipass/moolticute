@@ -186,10 +186,30 @@ void MPDeviceBleImpl::sendResetFlipBit()
     bleProt->resetFlipBit();
 }
 
-QByteArray MPDeviceBleImpl::getStoreMessage(Credential cred)
+void MPDeviceBleImpl::storeCredential(const BleCredential &cred)
+{
+    auto *jobs = new AsyncJobs(QString("Store Credential"), this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, getStoreMessage(cred),
+                            [this](const QByteArray &data, bool &)
+                            {
+                                if (bleProt->getFirstPayloadByte(data) == 0x1)
+                                {
+                                    qDebug() << "Credential stored successfully";
+                                }
+                                else
+                                {
+                                    qWarning() << "Credential store failed";
+                                }
+                                return true;
+                            }));
+
+    dequeueAndRun(jobs);
+}
+
+QByteArray MPDeviceBleImpl::getStoreMessage(const BleCredential &cred)
 {
     QByteArray storeMessage;
-    //Add Service index
     quint16 index = static_cast<quint16>(0);
     QByteArray credDatas;
     for (QString attr: cred.getAttributes())
