@@ -51,7 +51,7 @@ sudo udevadm control --reload-rules
 
 ##### Fedora Linux
 ```bash
-sudo dnf install gcc-c++ qt5 qt5-qtwebsockets qt5-qtwebsockets-devel qt5-qttools-devel
+sudo dnf install gcc-c++ qt5 qt5-qtwebsockets qt5-qtwebsockets-devel qt5-qttools-devel systemd-devel
 echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
 sudo udevadm control --reload-rules
 ```
