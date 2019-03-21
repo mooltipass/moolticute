@@ -51,7 +51,7 @@ Common::MPStatus MessageProtocolBLE::getStatus(const QByteArray &data)
 
 quint16 MessageProtocolBLE::getMessageSize(const QByteArray &data)
 {
-    return (static_cast<quint8>(data[PAYLOAD_LEN_LOWER_BYTE])|static_cast<quint8>((data[PAYLOAD_LEN_UPPER_BYTE]<<8)));
+    return (static_cast<quint8>(data[PAYLOAD_LEN_LOWER_BYTE])|static_cast<quint16>((data[PAYLOAD_LEN_UPPER_BYTE]<<8)));
 }
 
 MPCmd::Command MessageProtocolBLE::getCommand(const QByteArray &data)
