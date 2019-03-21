@@ -36,12 +36,16 @@ public:
     void sendResetFlipBit();
 
     void storeCredential(const BleCredential &cred);
-    QByteArray getStoreMessage(const BleCredential &cred);
+    void getCredential(QString service, QString login);
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
     void writeAccData(QFile *file);
+
+    QByteArray createStoreCredMessage(const BleCredential &cred);
+    QByteArray createGetCredMessage(QString service, QString login);
+    QByteArray createCredentialMessage(const CredMap &credMap);
 
     void dequeueAndRun(AsyncJobs *job);
 

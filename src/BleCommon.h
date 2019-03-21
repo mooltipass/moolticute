@@ -4,6 +4,9 @@
 #include <QString>
 #include <QMap>
 
+static constexpr quint16 MSG_FAILED = 0x00;
+static constexpr quint16 MSG_SUCCESS = 0x01;
+
 class BleCredential
 {
 public:
@@ -33,5 +36,7 @@ public:
 private:
     QMap<CredAttr, QString> m_attributes;
 };
+
+using CredMap = QMap<BleCredential::CredAttr, QString>;
 
 #endif // BLECOMMON_H

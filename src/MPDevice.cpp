@@ -22,6 +22,7 @@
 #include "MessageProtocol/MessageProtocolMini.h"
 #include "MessageProtocol/MessageProtocolBLE.h"
 #include "MPDeviceBleImpl.h"
+#include "BleCommon.h"
 
 const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
@@ -145,6 +146,21 @@ void MPDevice::setupMessageProtocol()
             flashMbSizeChanged(0);
         }
     });
+
+    //For testing storeCredential and getCredential
+//    QTimer::singleShot(2000, [this](){
+//        if (isBLE())
+//        {
+//            bleImpl->storeCredential(BleCredential{"test", "user", "desc", "3rd", "pwd"});
+//        }
+//    });
+
+//    QTimer::singleShot(20000, [this](){
+//        if (isBLE())
+//        {
+//            bleImpl->getCredential("test", "user");
+//        }
+//    });
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
