@@ -33,26 +33,26 @@ Packages are build and available here: https://github.com/mooltipass/moolticute/
 
 ##### Linux
  - Requires the qt-dbus module
- - Requires to install [udev rule](https://github.com/bobsaintcool/mooltipass-udev) for it
+ - Requires to install [udev rule](https://github.com/mooltipass/mooltipass-udev) for it
 
 ##### Ubuntu 16.04
 ```bash
-sudo apt install libqt5websockets5-dev qt-sdk qt5-qmake qt5-default
-echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
+sudo apt install libqt5websockets5-dev qt-sdk qt5-qmake qt5-default libudev-dev
+curl https://raw.githubusercontent.com/mooltipass/mooltipass-udev/master/udev/69-mooltipass.rules | sudo tee /etc/udev/rules.d/69-mooltipass.rules
 sudo udevadm control --reload-rules
 ```
 
 ##### Arch Linux
 ```bash
 sudo pacman -S --needed qt5-websockets qt5-base
-echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
+curl https://raw.githubusercontent.com/mooltipass/mooltipass-udev/master/udev/69-mooltipass.rules | sudo tee /etc/udev/rules.d/69-mooltipass.rules
 sudo udevadm control --reload-rules
 ```
 
 ##### Fedora Linux
 ```bash
 sudo dnf install gcc-c++ qt5 qt5-qtwebsockets qt5-qtwebsockets-devel qt5-qttools-devel systemd-devel
-echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="09a0", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/50-mooltipass.rules
+curl https://raw.githubusercontent.com/mooltipass/mooltipass-udev/master/udev/69-mooltipass.rules | sudo tee /etc/udev/rules.d/69-mooltipass.rules
 sudo udevadm control --reload-rules
 ```
 
