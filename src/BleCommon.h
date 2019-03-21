@@ -19,7 +19,7 @@ public:
         PASSWORD
     };
 
-    BleCredential(QString service, QString login = "", QString pwd = "", QString desc = "", QString third = "")
+    BleCredential(QString service, QString login = "", QString desc = "", QString third = "", QString pwd = "")
     {
         m_attributes = { {CredAttr::SERVICE, service},
                          {CredAttr::LOGIN, login},
