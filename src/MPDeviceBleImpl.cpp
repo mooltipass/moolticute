@@ -212,18 +212,10 @@ void MPDeviceBleImpl::getCredential(QString service, QString login)
     auto *jobs = new AsyncJobs(QString("Get Credential"), this);
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
-                            [this](const QByteArray &data, bool &)
+                            [](const QByteArray &data, bool &)
                             {
-                                if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
-                                {
-                                    qDebug() << "Credential got successfully";
-                                    qDebug() << data.toHex();
-                                }
-                                else
-                                {
-                                    qWarning() << "Credential get failed";
-                                    qDebug() << data.toHex();
-                                }
+                                qDebug() << "Credential got successfully";
+                                qDebug() << data.toHex();
                                 return true;
                             }));
 
