@@ -174,60 +174,63 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
     cmd.retries_done = 0;
     cmd.sent_ts = QDateTime::currentMSecsSinceEpoch();
 
-    cmd.timerTimeout = new QTimer(this);
-    connect(cmd.timerTimeout, &QTimer::timeout, [this]()
+    if (!isBLE())
     {
-        auto cmd = pMesProt->getCommand(commandQueue.head().data[0]);
-        commandQueue.head().retry--;
-
-        //Retry is disabled for BLE
-        if (commandQueue.head().retry > 0 && !isBLE())
+        cmd.timerTimeout = new QTimer(this);
+        connect(cmd.timerTimeout, &QTimer::timeout, [this]()
         {
-            qDebug() << "> Retry command: " << pMesProt->printCmd(cmd);
-            commandQueue.head().sent_ts = QDateTime::currentMSecsSinceEpoch();
-            commandQueue.head().timerTimeout->start(); //restart timer
-            commandQueue.head().retries_done++;
-            for (const auto &data : commandQueue.head().data)
-            {
-                platformWrite(data);
-            }
-        }
-        else
-        {
-            //Failed after all retry
-            MPCommand currentCmd = commandQueue.head();
-            delete currentCmd.timerTimeout;
+            auto cmd = pMesProt->getCommand(commandQueue.head().data[0]);
+            commandQueue.head().retry--;
 
-            if (isBLE())
+            //Retry is disabled for BLE
+            if (commandQueue.head().retry > 0)
             {
-                qDebug() << "No response received from the device for: " << pMesProt->printCmd(cmd);
+                qDebug() << "> Retry command: " << pMesProt->printCmd(cmd);
+                commandQueue.head().sent_ts = QDateTime::currentMSecsSinceEpoch();
+                commandQueue.head().timerTimeout->start(); //restart timer
+                commandQueue.head().retries_done++;
+                for (const auto &data : commandQueue.head().data)
+                {
+                    platformWrite(data);
+                }
             }
             else
             {
-                qWarning() << "> Retry command: " << pMesProt->printCmd(cmd) << " has failed too many times. Give up.";
+                //Failed after all retry
+                MPCommand currentCmd = commandQueue.head();
+                delete currentCmd.timerTimeout;
+
+                if (isBLE())
+                {
+                    qDebug() << "No response received from the device for: " << pMesProt->printCmd(cmd);
+                }
+                else
+                {
+                    qWarning() << "> Retry command: " << pMesProt->printCmd(cmd) << " has failed too many times. Give up.";
+                }
+
+                bool done = true;
+                currentCmd.cb(false, QByteArray(3, 0x00), done);
+
+                if (done)
+                {
+                    commandQueue.dequeue();
+                    sendDataDequeue();
+                }
             }
-
-            bool done = true;
-            currentCmd.cb(false, QByteArray(3, 0x00), done);
-
-            if (done)
-            {
-                commandQueue.dequeue();
-                sendDataDequeue();
-            }
-        }
-    });
-    if (timeout == CMD_DEFAULT_TIMEOUT)
-    {
-        timeout = CMD_DEFAULT_TIMEOUT_VAL;
-
-        //If user interaction is required, add additional timeout
-        if (MPCmd::isUserRequired(c))
+        });
+        if (timeout == CMD_DEFAULT_TIMEOUT)
         {
-            timeout += get_userInteractionTimeout() * 1000;
+            timeout = CMD_DEFAULT_TIMEOUT_VAL;
+
+            //If user interaction is required, add additional timeout
+            if (MPCmd::isUserRequired(c))
+            {
+                timeout += static_cast<quint32>(get_userInteractionTimeout()) * 1000;
+            }
         }
+        cmd.timerTimeout->setInterval(static_cast<int>(timeout));
     }
-    cmd.timerTimeout->setInterval(static_cast<int>(timeout));
 
     commandQueue.enqueue(cmd);
 
@@ -293,8 +296,11 @@ void MPDevice::newDataRead(const QByteArray &data)
         dataCommand == MPCmd::MOOLTIPASS_STATUS &&
         (pMesProt->getFirstPayloadByte(data) & MP_UNLOCKING_SCREEN_BITMASK) != 0))
     {
-        /* Stop timeout timer */
-        commandQueue.head().timerTimeout->stop();
+        if (!isBLE())
+        {
+            /* Stop timeout timer */
+            commandQueue.head().timerTimeout->stop();
+        }
 
         /* Bear with me for this complex explanation.
          * In some case, USB commands may take quite a while to get an answer, especially when the user is prompted (or is deliberately trying to delay the answer)
@@ -319,11 +325,18 @@ void MPDevice::newDataRead(const QByteArray &data)
             {
                 timer->stop();
                 timer->deleteLater();
-                for (const auto &data : commandQueue.head().data)
+                if (!isBLE())
                 {
-                    platformWrite(data);
+                    for (const auto &data : commandQueue.head().data)
+                    {
+                        platformWrite(data);
+                    }
+                    commandQueue.head().timerTimeout->start(); //restart timer
                 }
-                commandQueue.head().timerTimeout->start(); //restart timer
+                else
+                {
+                    sendDataDequeue();
+                }
             });
             timer->start(300);
         }
@@ -446,7 +459,23 @@ void MPDevice::sendDataDequeue()
         platformWrite(data);
     }
 
-    currentCmd.timerTimeout->start();
+    if (isBLE())
+    {
+        /**
+          * If checkReturn is false, not required to wait
+          * for the response, so removing the cmd from
+          * commandQueue and finishing currentJob.
+          */
+        if (!currentCmd.checkReturn)
+        {
+            currentJobs->finished(QByteArray{});
+            commandQueue.dequeue();
+        }
+    }
+    else
+    {
+        currentCmd.timerTimeout->start();
+    }
 }
 
 void MPDevice::runAndDequeueJobs()

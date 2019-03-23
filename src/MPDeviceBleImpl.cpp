@@ -77,6 +77,11 @@ QVector<int> MPDeviceBleImpl::calcDebugPlatInfo(const QByteArray &platInfo)
 
 void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
 {
+    /**
+     * Stoping statusTimer to avoid sending
+     * MOOLTIPASS_STATUS message during flash.
+     */
+    mpDev->statusTimer->stop();
     if (type != "aux" && type != "main")
     {
         qCritical() << "Flashing called for an invalid type of " << type;
@@ -86,7 +91,9 @@ void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
     auto *jobs = new AsyncJobs(QString("Flashing %1 MCU").arg(type), this);
     const bool isAuxFlash = type == "aux";
     const quint8 cmd = isAuxFlash ? MPCmd::CMD_DBG_FLASH_AUX_MCU : MPCmd::CMD_DBG_REBOOT_TO_BOOTLOADER;
-    jobs->append(new MPCommandJob(mpDev, cmd, bleProt->getDefaultFuncDone()));
+    auto flashJob = new MPCommandJob(mpDev, cmd, bleProt->getDefaultFuncDone());
+    flashJob->setReturnCheck(false);
+    jobs->append(flashJob);
 
     connect(jobs, &AsyncJobs::failed, [cb, isAuxFlash](AsyncJob *failedJob)
     {
@@ -113,7 +120,12 @@ void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
 
         auto *waitingJob = new AsyncJobs(QString("Waiting job for Main MCU flash"), this);
         qDebug() << "Waiting for device to start after Main MCU flash";
-        waitingJob->append(new TimerJob{5000});
+        const auto flashTimeout = 5000;
+        waitingJob->append(new TimerJob{flashTimeout});
+        /**
+          * Restart statusTimer after Main MCU flash
+          */
+        QTimer::singleShot(flashTimeout, [this]() {mpDev->statusTimer->start();});
         mpDev->jobsQueue.enqueue(waitingJob);
     }
 
