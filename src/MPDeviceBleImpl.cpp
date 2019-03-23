@@ -198,6 +198,11 @@ void MPDeviceBleImpl::sendResetFlipBit()
     bleProt->resetFlipBit();
 }
 
+void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
+{
+    bleProt->flipMessageBit(msg);
+}
+
 void MPDeviceBleImpl::storeCredential(const BleCredential &cred)
 {
     auto *jobs = new AsyncJobs(QString("Store Credential"), this);

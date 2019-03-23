@@ -34,6 +34,7 @@ public:
     inline void stopFetchAccData() { accState = Common::AccState::STOPPED; }
 
     void sendResetFlipBit();
+    void flipMessageBit(QByteArray &msg);
 
     void storeCredential(const BleCredential &cred);
     void getCredential(QString service, QString login);

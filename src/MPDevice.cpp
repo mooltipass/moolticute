@@ -325,17 +325,19 @@ void MPDevice::newDataRead(const QByteArray &data)
             {
                 timer->stop();
                 timer->deleteLater();
-                if (!isBLE())
+                if (isBLE())
+                {
+                    //Need to flip the bit before resend
+                    bleImpl->flipMessageBit(commandQueue.head().data[0]);
+                    sendDataDequeue();
+                }
+                else
                 {
                     for (const auto &data : commandQueue.head().data)
                     {
                         platformWrite(data);
                     }
                     commandQueue.head().timerTimeout->start(); //restart timer
-                }
-                else
-                {
-                    sendDataDequeue();
                 }
             });
             timer->start(300);

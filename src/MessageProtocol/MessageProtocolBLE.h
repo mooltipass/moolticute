@@ -30,6 +30,7 @@ public:
 
     void resetFlipBit();
     inline void setAckFlag(bool on);
+    void flipMessageBit(QByteArray &msg);
 
 private:
     inline void flipBit();
