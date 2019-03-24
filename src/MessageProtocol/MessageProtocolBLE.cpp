@@ -78,7 +78,7 @@ QByteArray MessageProtocolBLE::getFullPayload(const QByteArray &data)
 QByteArray MessageProtocolBLE::getPayloadBytes(const QByteArray &data, int fromPayload, int to)
 {
     int start = getStartingPayloadPosition(data);
-    return data.mid(fromPayload + start, to + start);
+    return data.mid(fromPayload + start, (to - fromPayload) + 1);
 }
 
 quint32 MessageProtocolBLE::getSerialNumber(const QByteArray &data)
@@ -136,8 +136,8 @@ QString MessageProtocolBLE::toQString(const QByteArray &data)
             qCritical() << "Out of bounds";
             break;
         }
-        quint16 unicode = static_cast<quint8>(data[i+1]);
-        unicode |= (data[i]<<8);
+        quint16 unicode = static_cast<quint8>(data[i]);
+        unicode |= (data[i+1]<<8);
         out += QChar(unicode);
     }
     return out;
