@@ -37,7 +37,8 @@ public:
     void flipMessageBit(QByteArray &msg);
 
     void storeCredential(const BleCredential &cred);
-    void getCredential(QString service, QString login);
+    void getCredential(QString service, QString login = "");
+    BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
