@@ -771,6 +771,31 @@ void WSServerCon::processMessage(const QString &message)
         {
             bleImpl->stopFetchAccData();
         }
+        else if (root["msg"] == "get_credential") {
+            QJsonObject o = root["data"].toObject();
+            QString service = o["service"].toString();
+            QString login = o["login"].toString();
+            bleImpl->getCredential(service, login,
+                    [this, root, bleImpl, service, login](bool success, QString errstr, QByteArray data)
+                    {
+                        if (!success)
+                        {
+                            sendFailedJson(root, errstr);
+                            return;
+                        }
+
+                        auto cred = bleImpl->retrieveCredentialFromResponse(data, service, login);
+                        QJsonObject ores;
+                        QJsonObject oroot = root;
+                        ores["service"] = service;
+                        ores["login"] = cred.get(BleCredential::CredAttr::LOGIN);
+                        ores["desc"] = cred.get(BleCredential::CredAttr::DESCRIPTION);
+                        ores["third"] = cred.get(BleCredential::CredAttr::THIRD);
+                        ores["pwd"] = cred.get(BleCredential::CredAttr::PASSWORD);
+                        oroot["data"] = ores;
+                        sendJsonMessage(oroot);
+                    });
+        }
     }
 
 }

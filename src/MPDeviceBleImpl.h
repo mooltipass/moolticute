@@ -37,7 +37,12 @@ public:
     void flipMessageBit(QByteArray &msg);
 
     void storeCredential(const BleCredential &cred);
+    /**
+     * @brief getCredential
+     * Only for testing without the callback
+     */
     void getCredential(QString service, QString login = "");
+    void getCredential(QString service, QString login, const MessageHandlerCbData &cb);
     BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;
 
 private:
