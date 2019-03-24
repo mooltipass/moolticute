@@ -136,7 +136,7 @@ public:
     {
         QByteArray littleEndian;
         littleEndian.append(static_cast<char>(num&0xFF));
-        littleEndian.append(static_cast<char>((num&0xFF00)>>16));
+        littleEndian.append(static_cast<char>((num&0xFF00)>>8));
         return littleEndian;
     }
 
