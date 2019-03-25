@@ -61,7 +61,7 @@ Updater::Updater()
 #if defined Q_OS_WIN
     m_platform = "windows";
 #elif defined Q_OS_MAC
-    m_platform = "osx";
+    m_platform = "macos";
 #elif defined Q_OS_LINUX
     m_platform = "linux";
 #elif defined Q_OS_ANDROID
@@ -122,7 +122,7 @@ QString Updater::moduleName() const
  * If you do not define a platform key, the system will assign the following
  * platform key:
  *    - On iOS: \c ios
- *    - On Mac OSX: \c osx
+ *    - On Mac OSX: \c macos
  *    - On Android: \c android
  *    - On GNU/Linux: \c linux
  *    - On Microsoft Windows: \c windows
@@ -289,7 +289,7 @@ void Updater::setDownloaderEnabled (const bool enabled)
  * Changes the platform key.
  * If the platform key is empty, then the system will use the following keys:
  *    - On iOS: \c ios
- *    - On Mac OSX: \c osx
+ *    - On Mac OSX: \c macos
  *    - On Android: \c android
  *    - On GNU/Linux: \c linux
  *    - On Microsoft Windows: \c windows
@@ -391,15 +391,8 @@ void Updater::onReply (QNetworkReply* reply)
         return;
     }
 
-    /* Get latest GitHub Release */
-    QJsonArray githubReleases = document.array();
-    QJsonObject latestGithubRelese = githubReleases.at(0).toObject();
-    QString tagName = latestGithubRelese.value("tag_name").toString();
-    QString htmlUrl = latestGithubRelese.value("html_url").toString();
-    QString body = latestGithubRelese.value("body").toString();
-
     QString releaseFileSuffix;
-    if (platformKey().compare("osx") == 0)
+    if (platformKey().compare("macos") == 0)
         releaseFileSuffix = ".dmg";
 
     if (platformKey().compare("linux") == 0)
@@ -419,11 +412,46 @@ void Updater::onReply (QNetworkReply* reply)
         return;
     }
 
-    QJsonArray githubReleaseAssets = latestGithubRelese.value("assets").toArray();
+    /* Get latest GitHub Release */
+    QJsonArray githubReleases = document.array();
+    bool isTesting = moduleVersion().endsWith("-testing");
+
+    QJsonObject latestGithubRelease;
+    QJsonArray githubReleaseAssets;
+    for (int i = 0;i < githubReleases.count();i++)
+    {
+        latestGithubRelease = githubReleases.at(i).toObject();
+        if ((latestGithubRelease.value("tag_name").toString().endsWith("-testing") && isTesting) ||
+            (!latestGithubRelease.value("tag_name").toString().endsWith("-testing") && !isTesting))
+        {
+            //Check if an asset is available for this platform, if not continue to search for the latest
+            githubReleaseAssets = latestGithubRelease.value("assets").toArray();
+            bool found = false;
+            for (const auto &jsonValue: qAsConst(githubReleaseAssets))
+            {
+                QJsonObject releaseAsset = jsonValue.toObject();
+                auto r = releaseAsset.value("name").toString();
+                if (r.endsWith(releaseFileSuffix))
+                {
+                    found = true;
+                    break;
+                }
+
+            }
+
+            if (found)
+                break;
+        }
+    }
+    QString tagName = latestGithubRelease.value("tag_name").toString();
+    QString htmlUrl = latestGithubRelease.value("html_url").toString();
+    QString body = latestGithubRelease.value("body").toString();
+
+    githubReleaseAssets = latestGithubRelease.value("assets").toArray();
     bool releaseFound = false;
     QString releaseName;
     QString downloadUrl;
-    for (QJsonValue jsonValue : githubReleaseAssets)
+    for (const auto &jsonValue: qAsConst(githubReleaseAssets))
     {
         QJsonObject releaseAsset = jsonValue.toObject();
         releaseName = releaseAsset.value("name").toString();

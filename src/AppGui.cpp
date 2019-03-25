@@ -691,7 +691,8 @@ void AppGui::restartDaemon()
 
 void AppGui::checkUpdate(bool displayMessage)
 {
-    if (QStringLiteral(APP_VERSION) == "git")
+    if (QStringLiteral(APP_VERSION) == "git" ||
+        QStringLiteral(APP_VERSION) == "deb")
         return;
 
     auto u = QSimpleUpdater::getInstance();

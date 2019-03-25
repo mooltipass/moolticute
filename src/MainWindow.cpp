@@ -188,7 +188,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonHIBP->setStyleSheet(CSS_BLUE_BUTTON);
 
     // Don't show the "check for updates" button when built from git directly.
-    ui->pushButtonCheckUpdate->setVisible(QStringLiteral(APP_VERSION) != "git");
+    // Also deb packages are handled by our PPA, disable check
+    ui->pushButtonCheckUpdate->setVisible(QStringLiteral(APP_VERSION) != "git" &&
+                                          QStringLiteral(APP_VERSION) != "deb");
 
     ui->pushButtonCheckUpdate->setStyleSheet(CSS_BLUE_BUTTON);
 
