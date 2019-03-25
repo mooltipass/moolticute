@@ -211,14 +211,16 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
             }
         }
 
+        bool isMini = dev_vid == MOOLTIPASS_VENDORID && dev_pid == MOOLTIPASS_PRODUCTID;
+        bool isBle = dev_vid == MOOLTIPASS_BLE_VENDORID && dev_pid == MOOLTIPASS_BLE_PRODUCTID;
         if (bus_type == BUS_USB &&
-            dev_vid == MOOLTIPASS_VENDORID &&
-            dev_pid == MOOLTIPASS_PRODUCTID &&
+            (isMini || isBle) &&
             getDescriptorSize(dev_path) == MOOLTIPASS_USBHID_DESC_SIZE)
         {
             MPPlatformDef def;
             def.path = QString::fromUtf8(dev_path);
             def.id = def.path;
+            def.isBLE = isBle;
             devlist << def;
 
             qDebug() << "Found mooltipass: " << def.path;
