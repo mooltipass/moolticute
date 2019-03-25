@@ -237,10 +237,11 @@ void MPDeviceBleImpl::getCredential(QString service, QString login)
                                         return true;
                                     }
                                     qDebug() << "Credential got successfully";
+                                    QByteArray response = bleProt->getFullPayload(data);
     #ifdef DEV_DEBUG
-                                    qDebug() << data.toHex();
+                                    qDebug() << response.toHex();
     #endif
-                                    BleCredential cred = retrieveCredentialFromResponse(bleProt->getFullPayload(data), service, login);
+                                    BleCredential cred = retrieveCredentialFromResponse(response, service, login);
                                     return true;
                                 }));
 
@@ -280,19 +281,17 @@ BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray respons
     for (int attrIndex = 2, i = 0; i < ATTR_NUM; attrIndex+=2, ++i)
     {
         auto index = 0;
-        QString attrVal;
         if (BleCredential::CredAttr::PASSWORD != attr)
         {
             auto indexByte = response.mid(attrIndex, 2);
-            index = (bleProt->toIntFromLittleEndian(static_cast<quint8>(indexByte[0]), static_cast<quint8>(indexByte[1])) * 2) + MSG_ATTR_STARTING_INDEX;
-            attrVal = bleProt->toQString(response.mid(lastIndex, index - lastIndex - 2));
+            index = bleProt->toIntFromLittleEndian(static_cast<quint8>(indexByte[0]), static_cast<quint8>(indexByte[1])) * 2 + MSG_ATTR_STARTING_INDEX;
         }
         else
         {
             //Password is between its index and the end of the message
             index = response.size();
-            attrVal = bleProt->toQString(response.right(index - lastIndex));
         }
+        QString attrVal = bleProt->toQString(response.mid(lastIndex, index - lastIndex - 2));
 
         if (cred.get(attr).isEmpty())
         {

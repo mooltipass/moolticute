@@ -72,7 +72,12 @@ quint8 MessageProtocolBLE::getPayloadByteAt(const QByteArray &data, int at)
 
 QByteArray MessageProtocolBLE::getFullPayload(const QByteArray &data)
 {
-    return data.mid(getStartingPayloadPosition(data));
+    int startingPos = getStartingPayloadPosition(data);
+    if (FIRST_PAYLOAD_BYTE_PACKET == startingPos)
+    {
+        return data.mid(startingPos);
+    }
+    return data.mid(startingPos, getMessageSize(data));
 }
 
 QByteArray MessageProtocolBLE::getPayloadBytes(const QByteArray &data, int fromPayload, int to)
