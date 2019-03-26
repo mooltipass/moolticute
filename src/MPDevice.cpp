@@ -148,6 +148,7 @@ void MPDevice::setupMessageProtocol()
     });
 
     //For testing storeCredential and getCredential
+    //TODO: Only for testing
 //    QTimer::singleShot(2000, [this](){
 //        if (isBLE())
 //        {

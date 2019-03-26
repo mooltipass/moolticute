@@ -41,6 +41,7 @@ public:
      * @brief getCredential
      * Only for testing without the callback
      */
+    //TODO: Only for testing
     void getCredential(QString service, QString login = "");
     void getCredential(QString service, QString login, const MessageHandlerCbData &cb);
     BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;

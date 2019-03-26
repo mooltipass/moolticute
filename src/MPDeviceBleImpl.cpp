@@ -238,9 +238,7 @@ void MPDeviceBleImpl::getCredential(QString service, QString login)
                                     }
                                     qDebug() << "Credential got successfully";
                                     QByteArray response = bleProt->getFullPayload(data);
-    #ifdef DEV_DEBUG
                                     qDebug() << response.toHex();
-    #endif
                                     BleCredential cred = retrieveCredentialFromResponse(response, service, login);
                                     return true;
                                 }));
@@ -314,8 +312,8 @@ QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
 
 QByteArray MPDeviceBleImpl::createGetCredMessage(QString service, QString login)
 {
-    CredMap getMsgMap {{BleCredential::CredAttr::SERVICE, service},
-                       {BleCredential::CredAttr::LOGIN, login}};
+    CredMap getMsgMap{{BleCredential::CredAttr::SERVICE, service},
+                      {BleCredential::CredAttr::LOGIN, login}};
     return createCredentialMessage(getMsgMap);
 }
 
