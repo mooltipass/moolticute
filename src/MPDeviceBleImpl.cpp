@@ -77,6 +77,11 @@ QVector<int> MPDeviceBleImpl::calcDebugPlatInfo(const QByteArray &platInfo)
 
 void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
 {
+    /**
+     * Stoping statusTimer to avoid sending
+     * MOOLTIPASS_STATUS message during flash.
+     */
+    mpDev->statusTimer->stop();
     if (type != "aux" && type != "main")
     {
         qCritical() << "Flashing called for an invalid type of " << type;
@@ -86,7 +91,9 @@ void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
     auto *jobs = new AsyncJobs(QString("Flashing %1 MCU").arg(type), this);
     const bool isAuxFlash = type == "aux";
     const quint8 cmd = isAuxFlash ? MPCmd::CMD_DBG_FLASH_AUX_MCU : MPCmd::CMD_DBG_REBOOT_TO_BOOTLOADER;
-    jobs->append(new MPCommandJob(mpDev, cmd, bleProt->getDefaultFuncDone()));
+    auto flashJob = new MPCommandJob(mpDev, cmd, bleProt->getDefaultFuncDone());
+    flashJob->setReturnCheck(false);
+    jobs->append(flashJob);
 
     connect(jobs, &AsyncJobs::failed, [cb, isAuxFlash](AsyncJob *failedJob)
     {
@@ -113,7 +120,12 @@ void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
 
         auto *waitingJob = new AsyncJobs(QString("Waiting job for Main MCU flash"), this);
         qDebug() << "Waiting for device to start after Main MCU flash";
-        waitingJob->append(new TimerJob{5000});
+        const auto flashTimeout = 5000;
+        waitingJob->append(new TimerJob{flashTimeout});
+        /**
+          * Restart statusTimer after Main MCU flash
+          */
+        QTimer::singleShot(flashTimeout, [this]() {mpDev->statusTimer->start();});
         mpDev->jobsQueue.enqueue(waitingJob);
     }
 
@@ -186,9 +198,153 @@ void MPDeviceBleImpl::sendResetFlipBit()
     bleProt->resetFlipBit();
 }
 
+void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
+{
+    bleProt->flipMessageBit(msg);
+}
+
+void MPDeviceBleImpl::storeCredential(const BleCredential &cred)
+{
+    auto *jobs = new AsyncJobs(QString("Store Credential"), this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, createStoreCredMessage(cred),
+                            [this](const QByteArray &data, bool &)
+                            {
+                                if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
+                                {
+                                    qDebug() << "Credential stored successfully";
+                                }
+                                else
+                                {
+                                    qWarning() << "Credential store failed";
+                                }
+                                return true;
+                            }));
+
+    dequeueAndRun(jobs);
+}
+
+void MPDeviceBleImpl::getCredential(QString service, QString login)
+{
+    auto *jobs = new AsyncJobs(QString("Get Credential"), this);
+
+        jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
+                                [this, service, login](const QByteArray &data, bool &)
+                                {
+                                    if (MSG_FAILED == bleProt->getMessageSize(data))
+                                    {
+                                        qWarning() << "Credential get failed";
+                                        return true;
+                                    }
+                                    qDebug() << "Credential got successfully";
+                                    QByteArray response = bleProt->getFullPayload(data);
+                                    qDebug() << response.toHex();
+                                    BleCredential cred = retrieveCredentialFromResponse(response, service, login);
+                                    return true;
+                                }));
+
+    dequeueAndRun(jobs);
+}
+
+void MPDeviceBleImpl::getCredential(QString service, QString login, const MessageHandlerCbData &cb)
+{
+    auto *jobs = new AsyncJobs(QString("Get Credential"), this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
+                            [this, service, login, cb](const QByteArray &data, bool &)
+                            {
+                                if (MSG_FAILED == bleProt->getMessageSize(data))
+                                {
+                                    qWarning() << "Credential get failed";
+                                    return true;
+                                }
+                                qDebug() << "Credential got successfully";
+#ifdef DEV_DEBUG
+                                qDebug() << data.toHex();
+#endif
+                                cb(true, "", bleProt->getFullPayload(data));
+                                return true;
+                            }));
+
+    dequeueAndRun(jobs);
+}
+
+BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const
+{
+    BleCredential cred{service, login};
+    const int MSG_ATTR_STARTING_INDEX = 8;
+    const int ATTR_NUM = 4;
+    int lastIndex = MSG_ATTR_STARTING_INDEX;
+    BleCredential::CredAttr attr = BleCredential::CredAttr::LOGIN;
+    for (int attrIndex = 2, i = 0; i < ATTR_NUM; attrIndex+=2, ++i)
+    {
+        auto index = 0;
+        if (BleCredential::CredAttr::PASSWORD != attr)
+        {
+            auto indexByte = response.mid(attrIndex, 2);
+            index = bleProt->toIntFromLittleEndian(static_cast<quint8>(indexByte[0]), static_cast<quint8>(indexByte[1])) * 2 + MSG_ATTR_STARTING_INDEX;
+        }
+        else
+        {
+            //Password is between its index and the end of the message
+            index = response.size();
+        }
+        QString attrVal = bleProt->toQString(response.mid(lastIndex, index - lastIndex - 2));
+
+        if (cred.get(attr).isEmpty())
+        {
+            cred.set(attr, attrVal);
+        }
+#ifdef DEV_DEBUG
+        qDebug() << "nextIndex: " << index << " attrName: " << attrVal;
+#endif
+        lastIndex = index;
+        attr = static_cast<BleCredential::CredAttr>(static_cast<int>(attr) + 1);
+    }
+
+    return cred;
+}
+
+QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
+{
+    return createCredentialMessage(cred.getAttributes());
+}
+
+QByteArray MPDeviceBleImpl::createGetCredMessage(QString service, QString login)
+{
+    CredMap getMsgMap{{BleCredential::CredAttr::SERVICE, service},
+                      {BleCredential::CredAttr::LOGIN, login}};
+    return createCredentialMessage(getMsgMap);
+}
+
+QByteArray MPDeviceBleImpl::createCredentialMessage(const CredMap &credMap)
+{
+    QByteArray storeMessage;
+    quint16 index = static_cast<quint16>(0);
+    QByteArray credDatas;
+    for (QString attr: credMap)
+    {
+        if (attr.isEmpty())
+        {
+            storeMessage.append(bleProt->toLittleEndianFromInt(static_cast<quint16>(0xFFFF)));
+        }
+        else
+        {
+            storeMessage.append(bleProt->toLittleEndianFromInt(index));
+            index += (attr.size() + 1);
+            QByteArray data = bleProt->toByteArray(attr);
+            data.append(bleProt->toLittleEndianFromInt(static_cast<quint16>(0x0)));
+            credDatas.append(data);
+        }
+    }
+
+    storeMessage.append(credDatas);
+    return storeMessage;
+}
+
 void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress)
 {
-    if (0x01 == bleProt->getFirstPayloadByte(data))
+    if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
     {
         qDebug() << "Erase done in: " << timer->nsecsElapsed() / 1000000 << " ms";
         delete timer;

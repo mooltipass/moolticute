@@ -51,7 +51,7 @@ Common::MPStatus MessageProtocolBLE::getStatus(const QByteArray &data)
 
 quint16 MessageProtocolBLE::getMessageSize(const QByteArray &data)
 {
-    return (static_cast<quint8>(data[PAYLOAD_LEN_LOWER_BYTE])|static_cast<quint8>((data[PAYLOAD_LEN_UPPER_BYTE]<<8)));
+    return (static_cast<quint8>(data[PAYLOAD_LEN_LOWER_BYTE])|static_cast<quint16>((data[PAYLOAD_LEN_UPPER_BYTE]<<8)));
 }
 
 MPCmd::Command MessageProtocolBLE::getCommand(const QByteArray &data)
@@ -72,13 +72,18 @@ quint8 MessageProtocolBLE::getPayloadByteAt(const QByteArray &data, int at)
 
 QByteArray MessageProtocolBLE::getFullPayload(const QByteArray &data)
 {
-    return data.mid(getStartingPayloadPosition(data));
+    int startingPos = getStartingPayloadPosition(data);
+    if (FIRST_PAYLOAD_BYTE_PACKET == startingPos)
+    {
+        return data.mid(startingPos);
+    }
+    return data.mid(startingPos, getMessageSize(data));
 }
 
 QByteArray MessageProtocolBLE::getPayloadBytes(const QByteArray &data, int fromPayload, int to)
 {
     int start = getStartingPayloadPosition(data);
-    return data.mid(fromPayload + start, to + start);
+    return data.mid(fromPayload + start, (to - fromPayload) + 1);
 }
 
 quint32 MessageProtocolBLE::getSerialNumber(const QByteArray &data)
@@ -119,8 +124,8 @@ QByteArray MessageProtocolBLE::toByteArray(const QString &input)
     for (QChar ch : input)
     {
         quint16 uniChar = ch.unicode();
-        unicodeArray.append(static_cast<char>((0xFF00&uniChar)>>8));
         unicodeArray.append(static_cast<char>((0xFF&uniChar)));
+        unicodeArray.append(static_cast<char>((0xFF00&uniChar)>>8));
     }
     return unicodeArray;
 }
@@ -136,8 +141,8 @@ QString MessageProtocolBLE::toQString(const QByteArray &data)
             qCritical() << "Out of bounds";
             break;
         }
-        quint16 unicode = static_cast<quint8>(data[i+1]);
-        unicode |= (data[i]<<8);
+        quint16 unicode = static_cast<quint8>(data[i]);
+        unicode |= (data[i+1]<<8);
         out += QChar(unicode);
     }
     return out;
@@ -146,6 +151,12 @@ QString MessageProtocolBLE::toQString(const QByteArray &data)
 void MessageProtocolBLE::setAckFlag(bool on)
 {
     m_ackFlag = on ? ACK_FLAG_BIT : 0x00;
+}
+
+void MessageProtocolBLE::flipMessageBit(QByteArray &msg)
+{
+    flipBit();
+    msg[0] = msg[0]^MESSAGE_FLIP_BIT;
 }
 
 void MessageProtocolBLE::resetFlipBit()
@@ -242,6 +253,8 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::GET_SERIAL            , 0xDA},
         {MPCmd::CMD_DBG_MESSAGE       , 0x8000},
         {MPCmd::GET_PLAT_INFO         , 0x0003},
+        {MPCmd::STORE_CREDENTIAL      , 0x0006},
+        {MPCmd::GET_CREDENTIAL        , 0x0007},
         {MPCmd::CMD_DBG_OPEN_DISP_BUFFER    , 0x8001},
         {MPCmd::CMD_DBG_SEND_TO_DISP_BUFFER , 0x8002},
         {MPCmd::CMD_DBG_CLOSE_DISP_BUFFER   , 0x8003},

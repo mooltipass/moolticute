@@ -98,7 +98,8 @@ HEADERS  += \
     src/MessageProtocol/MessageProtocolMini.h \
     src/MessageProtocol/MessageProtocolBLE.h \
     src/MPDeviceBleImpl.h \
-    src/HaveIBeenPwned.h
+    src/HaveIBeenPwned.h \
+    src/BleCommon.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \
