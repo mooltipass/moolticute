@@ -146,658 +146,14 @@ void WSServerCon::processMessage(const QString &message)
     if (checkMemModeEnabled(root))
         return;
 
-    if (root["msg"] == "param_set")
+    if (mpdevice->isBLE())
     {
-        processParametersSet(root["data"].toObject());
-    }
-    else if (root["msg"] == "start_memorymgmt")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        WSServer::Instance()->setMemLockedClient(clientUid);
-
-        //send command to start MMM
-        mpdevice->startMemMgmtMode(o["want_data"].toBool(),
-                defaultProgressCb,
-                [=](bool success, int errCode, QString errMsg)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                QJsonObject oroot = root;
-                oroot["msg"] = "failed_memorymgmt";
-                sendFailedJson(oroot, errMsg, errCode);
-            }
-        });
-    }
-    else if (root["msg"] == "exit_memorymgmt")
-    {
-        //send command to exit MMM
-        mpdevice->exitMemMgmtMode();
-    }
-    else if (root["msg"] == "start_memcheck")
-    {
-        //start integrity check
-        mpdevice->startIntegrityCheck(
-                    [=](bool success, int freeBlocks, int totalBlocks, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            QJsonObject oroot = root;
-            oroot["msg"] = "memcheck";
-
-            if (!success)
-            {
-                sendFailedJson(oroot, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            ores["memcheck_status"] = "done"; //TODO: add return info here about the result of memcheck?
-            ores["free_blocks"] = freeBlocks;
-            ores["total_blocks"] = totalBlocks;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        defaultProgressCb);
-    }
-    else if (root["msg"] == "ask_password" ||
-             root["msg"] == "get_credential")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        mpdevice->getCredential(o["service"].toString(), o["login"].toString(), o["fallback_service"].toString(),
-                reqid,
-                [=](bool success, QString errstr, const QString &service, const QString &login, const QString &pass, const QString &desc)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QSettings s;
-            if (s.value("settings/enable_hibp_check").toBool())
-            {
-                QString formatString = service + ": " + login + ": ";
-                formatString += HIBP_COMPROMISED_FORMAT;
-                hibp->isPasswordPwned(pass, formatString);
-            }
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["service"] = service;
-            ores["login"] = login;
-            ores["password"] = pass;
-            if (mpdevice && mpdevice->isFw12()) //only add description for fw > 1.2
-                ores["description"] = desc;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "set_credential")
-    {
-        QJsonObject o = root["data"].toObject();  
-        QString loginName = o["login"].toString();
-        bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
-        bool isGuiRunning = false;
-        if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveLoginConfirmed"))
-        {
-            root["msg"] = "request_login";
-            QJsonDocument requestLoginDoc(root);
-            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
-            if (isGuiRunning)
-            {
-                return;
-            }
-            qDebug() << "GUI is not running, saving credential with empty login";
-        }
-          
-        QString originalService = o["service"].toString();
-        ParseDomain url(originalService);
-        QSettings s;
-        bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool() && url.isWebsite();
-        bool isManualCredential = o.contains("saveManualCredential");
-        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !isManualCredential && !o.contains("saveDomainConfirmed"))
-        {
-            root["msg"] = "request_domain";
-            o["domain"] = url.getFullDomain();
-            o["subdomain"] = url.getFullSubdomain();
-            root["data"] = o;
-            QJsonDocument requestLoginDoc(root);
-            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
-            if (isGuiRunning)
-            {
-                return;
-            }
-            qDebug() << "GUI is not running, saving credential with subdomain";
-        }
-
-        if (!o.contains("saveDomainConfirmed") && url.isWebsite())
-        {
-            o["service"] = url.getFullDomain();
-        }
-
-        if (isManualCredential)
-        {
-            o["service"] = url.getManuallyEnteredDomainName(originalService);
-        }
-
-        const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
-        emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
-
-        if (s.value("settings/enable_hibp_check").toBool())
-        {
-            QString formatString = o["service"].toString() + ": " + loginName + ": ";
-            formatString += HIBP_COMPROMISED_FORMAT;
-            hibp->isPasswordPwned(o["password"].toString(), formatString);
-        }
-          
-        mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
-                o["password"].toString(), o["description"].toString(), o.contains("description"),
-                [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores = o;
-            QJsonObject oroot = root;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "del_credential")
-    {
-        QJsonObject o = root["data"].toObject();
-        mpdevice->delCredentialAndLeave(o["service"].toString(), o["login"].toString(),
-                defaultProgressCb,
-                [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject oroot = root;
-            oroot["data"] = QJsonObject({{ "success", true }});
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "request_device_uid")
-    {
-        QJsonObject o = root["data"].toObject();
-        const QByteArray key = o.value("key").toString().toUtf8().simplified();
-        mpdevice->getUID(key);
-    }
-
-    else if (root["msg"] == "get_random_numbers")
-    {
-        mpdevice->getRandomNumber([=](bool success, QString errstr, const QByteArray &rndNums)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject oroot = root;
-            QJsonArray arr;
-            for (int i = 0;i < rndNums.size();i++)
-                arr.append((quint8)rndNums.at(i));
-            oroot["data"] = arr;
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "cancel_request")
-    {
-        QJsonObject o = root["data"].toObject();
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        mpdevice->cancelUserRequest(reqid);
-    }
-    else if (root["msg"] == "get_data_node")
-    {
-        QJsonObject o = root["data"].toObject();
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
-                reqid,
-                [=](bool success, QString errstr, const QString &service, const QByteArray &dataNode)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["service"] = service;
-            ores["node_data"] = QString(dataNode.toBase64());
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        defaultProgressCb);
-    }
-    else if (root["msg"] == "set_data_node")
-    {
-        QJsonObject o = root["data"].toObject();
-        QString service = o["service"].toString();
-        QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
-        if (data.isEmpty())
-        {
-            sendFailedJson(root, "node_data is empty");
-            return;
-        }
-
-        int maxSize = MP_MAX_FILE_SIZE;
-        if (service.toLower() == MC_SSH_SERVICE)
-            maxSize = MP_MAX_SSH_SIZE;
-        if (data.size() > maxSize)
-        {
-            sendFailedJson(root, "data is too big to be stored in device");
-            return;
-        }
-
-        mpdevice->setDataNode(service, data,
-                [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            ores["service"] = service;
-            QJsonObject oroot = root;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        defaultProgressCb);
-    }
-    else if (root["msg"] == "delete_data_nodes")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        if (!mpdevice->get_memMgmtMode())
-        {
-            sendFailedJson(root, "Not in memory management mode");
-            return;
-        }
-
-        QJsonArray jarr = o["services"].toArray();
-        QStringList services;
-        for (int i = 0;i < jarr.size();i++)
-            services.append(jarr[i].toString());
-
-        mpdevice->deleteDataNodesAndLeave(services,
-                [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject oroot = root;
-            oroot["data"] = QJsonObject({{ "success", true }});
-            sendJsonMessage(oroot);
-        },
-        defaultProgressCb);
-    }
-    else if (root["msg"] == "credential_exists")
-    {       
-        QJsonObject o = root["data"].toObject();
-
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        mpdevice->serviceExists(false, o["service"].toString(),
-                reqid,
-                [=](bool success, QString errstr, const QString &service, bool exists)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["service"] = service;
-            ores["exists"] = exists;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "data_node_exists")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        mpdevice->serviceExists(true, o["service"].toString(),
-                reqid,
-                [=](bool success, QString errstr, const QString &service, bool exists)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["service"] = service;
-            ores["exists"] = exists;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "set_credentials")
-    {
-        if (!mpdevice->get_memMgmtMode())
-        {
-            sendFailedJson(root, "Not in memory management mode");
-            return;
-        }
-
-        mpdevice->setMMCredentials(
-                    root["data"].toArray(),
-                    false,
-                    defaultProgressCb,
-                    [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = "true";
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "export_database")
-    {
-        QString encryptionMethod  = "none";
-        if (root.contains("data"))
-        {
-            QJsonObject o = root["data"].toObject();
-            encryptionMethod = o.value("encryption").toString();
-        }
-
-        mpdevice->exportDatabase(encryptionMethod,
-                                 [=](bool success, QString errstr, QByteArray fileData)
-        {
-            qDebug() << "send exported DB on WS: success:" << success
-                     << ", fileData size:" << fileData.size()
-                     << ", errstr:" << errstr;
-
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["file_data"] = QString(fileData.toBase64());
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        defaultProgressCb);
-    }
-    else if (root["msg"] == "import_database")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        QByteArray data = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
-        if (data.isEmpty())
-        {
-            sendFailedJson(root, "file_data is empty");
-            return;
-        }
-
-        mpdevice->importDatabase(data, o["no_delete"].toBool(),
-                    [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = "true";
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        defaultProgressCb);
-    }
-    else if (root["msg"] == "import_csv")
-    {
-        mpdevice->importFromCSV(
-                    root["data"].toArray(),
-                    defaultProgressCb,
-                    [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = "true";
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "refresh_files_cache")
-    {
-        mpdevice->updateFilesCache();
-    }
-    else if (root["msg"] == "list_files_cache")
-    {
-        sendFilesCache();
-    }
-    else if (root["msg"] == "reset_card")
-    {
-        mpdevice->resetSmartCard([=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = "true";
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        }
-        );
-    }
-    else if (root["msg"] == "lock_device")
-    {
-        mpdevice->lockDevice([this, root](bool success, QString errstr)
-        {
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = "true";
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
+        processMessageBLE(root, defaultProgressCb);
     }
     else
     {
-        //Only ble related commands
-        MPDeviceBleImpl *bleImpl = mpdevice->ble();
-        if (nullptr == bleImpl)
-        {
-            return;
-        }
-
-        if (root["msg"] == "get_debug_platinfo")
-        {
-            bleImpl->getDebugPlatInfo([this, root, bleImpl](bool success, QString errstr, QByteArray data)
-            {
-                if (!success)
-                {
-                    sendFailedJson(root, errstr);
-                    return;
-                }
-
-                auto platInfo = bleImpl->calcDebugPlatInfo(data);
-                QJsonObject ores;
-                QJsonObject oroot = root;
-                ores["aux_major"] = platInfo[0];
-                ores["aux_minor"] = platInfo[1];
-                ores["main_major"] = platInfo[2];
-                ores["main_minor"] = platInfo[3];
-                ores["success"] = "true";
-                oroot["data"] = ores;
-                sendJsonMessage(oroot);
-            });
-        }
-        else if (root["msg"] == "flash_mcu")
-        {
-            QJsonObject o = root["data"].toObject();
-            bleImpl->flashMCU(o["type"].toString(), [this, root](bool success, QString errstr)
-            {
-                if (!success)
-                {
-                    qCritical() << errstr;
-                    sendFailedJson(root, errstr);
-                    return;
-                }
-            });
-        }
-        else if (root["msg"] == "upload_bundle")
-        {
-            QJsonObject o = root["data"].toObject();
-            bleImpl->uploadBundle(o["file"].toString(), [this, root](bool success, QString errstr)
-            {
-                QJsonObject ores;
-                QJsonObject oroot = root;
-                ores["success"] = success;
-                if (!success)
-                {
-                    qCritical() << errstr;
-                }
-                oroot["data"] = ores;
-                sendJsonMessage(oroot);
-            }, defaultProgressCb);
-        }
-        else if (root["msg"] == "fetch_acc_data")
-        {
-            QJsonObject o = root["data"].toObject();
-            bleImpl->fetchAccData(o["file"].toString());
-        }
-        else if (root["msg"] == "stop_fetch_acc_data")
-        {
-            bleImpl->stopFetchAccData();
-        }
-        else if (root["msg"] == "get_credential") {
-            QJsonObject o = root["data"].toObject();
-            QString service = o["service"].toString();
-            QString login = o["login"].toString();
-            bleImpl->getCredential(service, login,
-                    [this, root, bleImpl, service, login](bool success, QString errstr, QByteArray data)
-                    {
-                        if (!success)
-                        {
-                            sendFailedJson(root, errstr);
-                            return;
-                        }
-
-                        auto cred = bleImpl->retrieveCredentialFromResponse(data, service, login);
-                        QJsonObject ores;
-                        QJsonObject oroot = root;
-                        ores["service"] = service;
-                        ores["login"] = cred.get(BleCredential::CredAttr::LOGIN);
-                        ores["desc"] = cred.get(BleCredential::CredAttr::DESCRIPTION);
-                        ores["third"] = cred.get(BleCredential::CredAttr::THIRD);
-                        ores["pwd"] = cred.get(BleCredential::CredAttr::PASSWORD);
-                        oroot["data"] = ores;
-                        sendJsonMessage(oroot);
-                    });
-        }
+        processMessageMini(root, defaultProgressCb);
     }
-
 }
 
 void WSServerCon::sendFailedJson(QJsonObject obj, QString errstr, int errCode)
@@ -1284,6 +640,722 @@ QString WSServerCon::getRequestId(const QJsonValue &v)
     if (v.isDouble())
         return QString::number(v.toInt());
     return v.toString();
+}
+
+void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb &cbProgress)
+{
+    if (root["msg"] == "param_set")
+    {
+        processParametersSet(root["data"].toObject());
+    }
+    else if (root["msg"] == "start_memorymgmt")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        WSServer::Instance()->setMemLockedClient(clientUid);
+
+        //send command to start MMM
+        mpdevice->startMemMgmtMode(o["want_data"].toBool(),
+                cbProgress,
+                [=](bool success, int errCode, QString errMsg)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                QJsonObject oroot = root;
+                oroot["msg"] = "failed_memorymgmt";
+                sendFailedJson(oroot, errMsg, errCode);
+            }
+        });
+    }
+    else if (root["msg"] == "exit_memorymgmt")
+    {
+        //send command to exit MMM
+        mpdevice->exitMemMgmtMode();
+    }
+    else if (root["msg"] == "start_memcheck")
+    {
+        //start integrity check
+        mpdevice->startIntegrityCheck(
+                    [=](bool success, int freeBlocks, int totalBlocks, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject oroot = root;
+            oroot["msg"] = "memcheck";
+
+            if (!success)
+            {
+                sendFailedJson(oroot, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            ores["memcheck_status"] = "done"; //TODO: add return info here about the result of memcheck?
+            ores["free_blocks"] = freeBlocks;
+            ores["total_blocks"] = totalBlocks;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        cbProgress);
+    }
+    else if (root["msg"] == "ask_password" ||
+             root["msg"] == "get_credential")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->getCredential(o["service"].toString(), o["login"].toString(), o["fallback_service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, const QString &login, const QString &pass, const QString &desc)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QSettings s;
+            if (s.value("settings/enable_hibp_check").toBool())
+            {
+                QString formatString = service + ": " + login + ": ";
+                formatString += HIBP_COMPROMISED_FORMAT;
+                hibp->isPasswordPwned(pass, formatString);
+            }
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["login"] = login;
+            ores["password"] = pass;
+            if (mpdevice && mpdevice->isFw12()) //only add description for fw > 1.2
+                ores["description"] = desc;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "set_credential")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString loginName = o["login"].toString();
+        bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
+        bool isGuiRunning = false;
+        if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveLoginConfirmed"))
+        {
+            root["msg"] = "request_login";
+            QJsonDocument requestLoginDoc(root);
+            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
+            if (isGuiRunning)
+            {
+                return;
+            }
+            qDebug() << "GUI is not running, saving credential with empty login";
+        }
+
+        QString originalService = o["service"].toString();
+        ParseDomain url(originalService);
+        QSettings s;
+        bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool() && url.isWebsite();
+        bool isManualCredential = o.contains("saveManualCredential");
+        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !isManualCredential && !o.contains("saveDomainConfirmed"))
+        {
+            root["msg"] = "request_domain";
+            o["domain"] = url.getFullDomain();
+            o["subdomain"] = url.getFullSubdomain();
+            root["data"] = o;
+            QJsonDocument requestLoginDoc(root);
+            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
+            if (isGuiRunning)
+            {
+                return;
+            }
+            qDebug() << "GUI is not running, saving credential with subdomain";
+        }
+
+        if (!o.contains("saveDomainConfirmed") && url.isWebsite())
+        {
+            o["service"] = url.getFullDomain();
+        }
+
+        if (isManualCredential)
+        {
+            o["service"] = url.getManuallyEnteredDomainName(originalService);
+        }
+
+        const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
+        emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
+
+        if (s.value("settings/enable_hibp_check").toBool())
+        {
+            QString formatString = o["service"].toString() + ": " + loginName + ": ";
+            formatString += HIBP_COMPROMISED_FORMAT;
+            hibp->isPasswordPwned(o["password"].toString(), formatString);
+        }
+
+        mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
+                o["password"].toString(), o["description"].toString(), o.contains("description"),
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores = o;
+            QJsonObject oroot = root;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "del_credential")
+    {
+        QJsonObject o = root["data"].toObject();
+        mpdevice->delCredentialAndLeave(o["service"].toString(), o["login"].toString(),
+                cbProgress,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            oroot["data"] = QJsonObject({{ "success", true }});
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "request_device_uid")
+    {
+        QJsonObject o = root["data"].toObject();
+        const QByteArray key = o.value("key").toString().toUtf8().simplified();
+        mpdevice->getUID(key);
+    }
+
+    else if (root["msg"] == "get_random_numbers")
+    {
+        mpdevice->getRandomNumber([=](bool success, QString errstr, const QByteArray &rndNums)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            QJsonArray arr;
+            for (int i = 0;i < rndNums.size();i++)
+                arr.append(static_cast<quint8>(rndNums.at(i)));
+            oroot["data"] = arr;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "cancel_request")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->cancelUserRequest(reqid);
+    }
+    else if (root["msg"] == "get_data_node")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, const QByteArray &dataNode)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["node_data"] = QString(dataNode.toBase64());
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        cbProgress);
+    }
+    else if (root["msg"] == "set_data_node")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString service = o["service"].toString();
+        QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
+        if (data.isEmpty())
+        {
+            sendFailedJson(root, "node_data is empty");
+            return;
+        }
+
+        int maxSize = MP_MAX_FILE_SIZE;
+        if (service.toLower() == MC_SSH_SERVICE)
+            maxSize = MP_MAX_SSH_SIZE;
+        if (data.size() > maxSize)
+        {
+            sendFailedJson(root, "data is too big to be stored in device");
+            return;
+        }
+
+        mpdevice->setDataNode(service, data,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            ores["service"] = service;
+            QJsonObject oroot = root;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        cbProgress);
+    }
+    else if (root["msg"] == "delete_data_nodes")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        if (!mpdevice->get_memMgmtMode())
+        {
+            sendFailedJson(root, "Not in memory management mode");
+            return;
+        }
+
+        QJsonArray jarr = o["services"].toArray();
+        QStringList services;
+        for (int i = 0;i < jarr.size();i++)
+            services.append(jarr[i].toString());
+
+        mpdevice->deleteDataNodesAndLeave(services,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            oroot["data"] = QJsonObject({{ "success", true }});
+            sendJsonMessage(oroot);
+        },
+        cbProgress);
+    }
+    else if (root["msg"] == "credential_exists")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->serviceExists(false, o["service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, bool exists)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["exists"] = exists;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "data_node_exists")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->serviceExists(true, o["service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, bool exists)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["exists"] = exists;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "set_credentials")
+    {
+        if (!mpdevice->get_memMgmtMode())
+        {
+            sendFailedJson(root, "Not in memory management mode");
+            return;
+        }
+
+        mpdevice->setMMCredentials(
+                    root["data"].toArray(),
+                    false,
+                    cbProgress,
+                    [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "export_database")
+    {
+        QString encryptionMethod  = "none";
+        if (root.contains("data"))
+        {
+            QJsonObject o = root["data"].toObject();
+            encryptionMethod = o.value("encryption").toString();
+        }
+
+        mpdevice->exportDatabase(encryptionMethod,
+                                 [=](bool success, QString errstr, QByteArray fileData)
+        {
+            qDebug() << "send exported DB on WS: success:" << success
+                     << ", fileData size:" << fileData.size()
+                     << ", errstr:" << errstr;
+
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["file_data"] = QString(fileData.toBase64());
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        cbProgress);
+    }
+    else if (root["msg"] == "import_database")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QByteArray data = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
+        if (data.isEmpty())
+        {
+            sendFailedJson(root, "file_data is empty");
+            return;
+        }
+
+        mpdevice->importDatabase(data, o["no_delete"].toBool(),
+                    [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        cbProgress);
+    }
+    else if (root["msg"] == "import_csv")
+    {
+        mpdevice->importFromCSV(
+                    root["data"].toArray(),
+                    cbProgress,
+                    [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "refresh_files_cache")
+    {
+        mpdevice->updateFilesCache();
+    }
+    else if (root["msg"] == "list_files_cache")
+    {
+        sendFilesCache();
+    }
+    else if (root["msg"] == "reset_card")
+    {
+        mpdevice->resetSmartCard([=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        }
+        );
+    }
+    else if (root["msg"] == "lock_device")
+    {
+        mpdevice->lockDevice([this, root](bool success, QString errstr)
+        {
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+}
+
+void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &cbProgress)
+{
+    //Ble related commands
+    MPDeviceBleImpl *bleImpl = mpdevice->ble();
+    if (nullptr == bleImpl)
+    {
+        return;
+    }
+
+    if (root["msg"] == "get_debug_platinfo")
+    {
+        bleImpl->getDebugPlatInfo([this, root, bleImpl](bool success, QString errstr, QByteArray data)
+        {
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            auto platInfo = bleImpl->calcDebugPlatInfo(data);
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["aux_major"] = platInfo[0];
+            ores["aux_minor"] = platInfo[1];
+            ores["main_major"] = platInfo[2];
+            ores["main_minor"] = platInfo[3];
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "flash_mcu")
+    {
+        QJsonObject o = root["data"].toObject();
+        bleImpl->flashMCU(o["type"].toString(), [this, root](bool success, QString errstr)
+        {
+            if (!success)
+            {
+                qCritical() << errstr;
+                sendFailedJson(root, errstr);
+                return;
+            }
+        });
+    }
+    else if (root["msg"] == "upload_bundle")
+    {
+        QJsonObject o = root["data"].toObject();
+        bleImpl->uploadBundle(o["file"].toString(), [this, root](bool success, QString errstr)
+        {
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            if (!success)
+            {
+                qCritical() << errstr;
+            }
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        }, cbProgress);
+    }
+    else if (root["msg"] == "fetch_acc_data")
+    {
+        QJsonObject o = root["data"].toObject();
+        bleImpl->fetchAccData(o["file"].toString());
+    }
+    else if (root["msg"] == "stop_fetch_acc_data")
+    {
+        bleImpl->stopFetchAccData();
+    }
+    else if (root["msg"] == "ask_password" ||
+             root["msg"] == "get_credential") {
+        QJsonObject o = root["data"].toObject();
+        QString service = o["service"].toString();
+        QString login = o["login"].toString();
+        bleImpl->getCredential(service, login,
+                [this, root, bleImpl, service, login](bool success, QString errstr, QByteArray data)
+                {
+                    if (!success)
+                    {
+                        sendFailedJson(root, errstr);
+                        return;
+                    }
+
+                    auto cred = bleImpl->retrieveCredentialFromResponse(data, service, login);
+
+                    QSettings s;
+                    if (s.value("settings/enable_hibp_check").toBool())
+                    {
+                        QString formatString = service + ": " + login + ": ";
+                        formatString += HIBP_COMPROMISED_FORMAT;
+                        hibp->isPasswordPwned(cred.get(BleCredential::CredAttr::PASSWORD), formatString);
+                    }
+                    QJsonObject ores;
+                    QJsonObject oroot = root;
+                    ores["service"] = service;
+                    ores["login"] = cred.get(BleCredential::CredAttr::LOGIN);
+                    ores["desc"] = cred.get(BleCredential::CredAttr::DESCRIPTION);
+                    ores["third"] = cred.get(BleCredential::CredAttr::THIRD);
+                    ores["password"] = cred.get(BleCredential::CredAttr::PASSWORD);
+                    oroot["data"] = ores;
+                    sendJsonMessage(oroot);
+                });
+    }
+    else if (root["msg"] == "set_credential")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString loginName = o["login"].toString();
+        QString originalService = o["service"].toString();
+        ParseDomain url(originalService);
+        QSettings s;
+        bool isManualCredential = o.contains("saveManualCredential");
+        if (isManualCredential)
+        {
+            o["service"] = url.getManuallyEnteredDomainName(originalService);
+        }
+        else
+        {
+            o["service"] = url.getFullDomain();
+        }
+
+        const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
+        bool isGuiRunning;
+        emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
+
+        if (s.value("settings/enable_hibp_check").toBool())
+        {
+            QString formatString = o["service"].toString() + ": " + loginName + ": ";
+            formatString += HIBP_COMPROMISED_FORMAT;
+            hibp->isPasswordPwned(o["password"].toString(), formatString);
+        }
+
+        bleImpl->storeCredential(BleCredential{o["service"].toString(), o["login"].toString(),
+                                               o["description"].toString(), "", o["password"].toString()},
+                                 [=](bool success, QString errstr)
+                                 {
+                                     if (!WSServer::Instance()->checkClientExists(this))
+                                         return;
+
+                                     if (!success)
+                                     {
+                                         sendFailedJson(root, errstr);
+                                         return;
+                                     }
+
+                                     QJsonObject ores = o;
+                                     QJsonObject oroot = root;
+                                     oroot["data"] = ores;
+                                     sendJsonMessage(oroot);
+                                 });
+    }
+    else
+    {
+        qDebug() << root["msg"] << " message have not implemented yet for BLE";
+    }
 }
 
 bool WSServerCon::checkMemModeEnabled(const QJsonObject &root)

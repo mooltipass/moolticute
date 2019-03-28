@@ -96,6 +96,8 @@ private:
     void processParametersSet(const QJsonObject &data);
     void sendFailedJson(QJsonObject obj, QString errstr = QString(), int errCode = -999);
     QString getRequestId(const QJsonValue &v);
+    void processMessageMini(QJsonObject root, const MPDeviceProgressCb &cbProgress);
+    void processMessageBLE(QJsonObject root, const MPDeviceProgressCb &cbProgress);
 };
 
 #endif // WSSERVERCON_H
