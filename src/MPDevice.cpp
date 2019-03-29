@@ -59,15 +59,15 @@ MPDevice::MPDevice(QObject *parent):
 
                 if (prevStatus == Common::UnknownStatus)
                 {
-                    if (!isBLE())
+                    QTimer::singleShot(10, [this]()
                     {
-                        QTimer::singleShot(10, [this]()
+                        /* First start: load parameters */
+                        if (!isBLE())
                         {
-                            /* First start: load parameters */
                             loadParameters();
-                            setCurrentDate();
-                        });
-                    }
+                        }
+                        setCurrentDate();
+                    });
                 }
 
                 if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
