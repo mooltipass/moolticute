@@ -1319,7 +1319,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         }
         else
         {
-            o["service"] = url.getFullDomain();
+            o["service"] = url.getFullSubdomain();
         }
 
         const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
