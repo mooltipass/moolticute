@@ -46,6 +46,8 @@ function install_udev_rule()
 
     tmpfile=$(mktemp /tmp/mc-udev.XXXXXX)
     cat > "$tmpfile" <<- EOF
+## File managed by Appimage, do not change
+#version:2
 # udev rules for allowing console user(s) and hidraw access to Mooltipass Mini devices
 
 ACTION!="add|change", GOTO="mooltipass_end"
@@ -84,6 +86,11 @@ EOF
     rm "$tmpfile"
 }
 
+function check_udev_installed()
+{
+    grep -q "#version:2" $UDEV_RULES_FILE_PATH
+}
+
 SINGLE_EXE=""
 INSTALL=0
 UNINSTALL=0
@@ -120,8 +127,7 @@ case "$1" in
 esac
 
 # Check if UDEV rules are set on normal run
-if (( $# == 0 )) &&\
-    [ ! -s $UDEV_RULES_FILE_PATH ];
+if (( $# == 0 )) && ! check_udev_installed
 then
     install_udev_rule
 fi
@@ -196,7 +202,7 @@ then
     install_udev_rule
 elif (( $CHECK == 1 ));
 then
-    if [ -s $UDEV_RULES_FILE_PATH ]
+    if check_udev_installed
     then
         echo "Moolticute Udev rules are installed."
         exit 0;

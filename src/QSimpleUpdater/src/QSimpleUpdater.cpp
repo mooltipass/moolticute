@@ -190,7 +190,7 @@ QString QSimpleUpdater::getDownloadUrl (const QString& url) const
  * If you do not define a platform key, the system will assign the following
  * platform key:
  *    - On iOS: \c ios
- *    - On Mac OSX: \c osx
+ *    - On Mac OSX: \c macos
  *    - On Android: \c android
  *    - On GNU/Linux: \c linux
  *    - On Microsoft Windows: \c windows
@@ -289,7 +289,7 @@ void QSimpleUpdater::setNotifyOnFinish (const QString& url,
  *
  * If the platform key is empty, then the system will use the following keys:
  *    - On iOS: \c ios
- *    - On Mac OSX: \c osx
+ *    - On Mac OSX: \c macos
  *    - On Android: \c android
  *    - On GNU/Linux: \c linux
  *    - On Microsoft Windows: \c windows
