@@ -39,8 +39,8 @@ public:
     QList<MPPlatformDef> getDeviceList();
 
 signals:
-    void usbDeviceAdded();
-    void usbDeviceRemoved();
+    void usbDeviceAdded(QString path);
+    void usbDeviceRemoved(QString path);
 
 private:
     UsbMonitor_mac();
@@ -48,7 +48,7 @@ private:
 
     IOHIDManagerRef hidmanager;
     IOHIDManagerRef hidmanagerBLE;
-    QHash<IOHIDDeviceRef, MPPlatformDef> deviceHash;
+    QHash<QString, MPPlatformDef> deviceHash;
 
     //Callbacks from IOHIDManager
     friend void _device_matching_callback(void *user_data, IOReturn inResult, void *inSender, IOHIDDeviceRef inIOHIDDeviceRef);

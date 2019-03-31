@@ -87,6 +87,22 @@ QList<MPPlatformDef> MPDevice_mac::enumerateDevices()
     return UsbMonitor_mac::Instance()->getDeviceList();
 }
 
+MPPlatformDef MPDevice_mac::getPlatDef(QString def)
+{
+    auto devices = UsbMonitor_mac::Instance()->getDeviceList();
+    auto it = std::find_if(devices.begin(), devices.end(),
+                 [def](MPPlatformDef plat)
+                {
+                    return plat.id == def;
+                });
+    if (it == devices.end())
+    {
+        qCritical() << "Device not found";
+        return MPPlatformDef{};
+    }
+    return *it;
+}
+
 void MPDevice_mac::platformWrite(const QByteArray &data)
 {
     QtConcurrent::run(usbWriteThreadPool, [=]()
