@@ -51,7 +51,7 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
         grabbed = ioctl(devfd, EVIOCGRAB, ExclusiveAccess::GRAB);
         if (INVALID_VALUE == grabbed)
         {
-            qWarning() << "Exclusive device grab wasn't successful";
+            qWarning() << "Exclusive device grab wasn't successful: " << strerror(errno);
         }
         sockNotifRead = new QSocketNotifier(devfd, QSocketNotifier::Read);
         sockNotifRead->setEnabled(true);
