@@ -47,8 +47,8 @@ bool MPManager::initialize()
         connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()));
 
 #elif defined(Q_OS_LINUX)
-        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded()), this, SLOT(usbDeviceAdded()), Qt::QueuedConnection);
-        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved()), this, SLOT(usbDeviceRemoved()), Qt::QueuedConnection);
+        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded(QString, bool)), this, SLOT(usbDeviceAdded(QString, bool)), Qt::QueuedConnection);
+        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved(QString)), Qt::QueuedConnection);
 #endif
     }
 
@@ -123,6 +123,29 @@ void MPManager::usbDeviceAdded(QString path)
     return;
 #endif
 }
+
+#if defined(Q_OS_LINUX)
+void MPManager::usbDeviceAdded(QString path, bool isBLE)
+{
+    if (!devices.contains(path))
+    {
+        MPDevice *device = nullptr;
+        //Create our platform device object
+        MPPlatformDef def;
+        def.path = path;
+        def.id = path;
+        def.isBLE = isBLE;
+        device = new MPDevice_linux(this, def);
+
+        devices[path] = device;
+        emit mpConnected(device);
+    }
+    else
+    {
+        qDebug() << "Device is already added: " << path;
+    }
+}
+#endif
 
 void MPManager::usbDeviceRemoved(QString path)
 {

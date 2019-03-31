@@ -29,7 +29,8 @@ UsbMonitor_linux::UsbMonitor_linux()
     struct udev* udev = udev_new();
     mon = udev_monitor_new_from_netlink(udev, "udev");
 
-    udev_monitor_filter_add_match_subsystem_devtype(mon, "usb", nullptr);
+    //Filter hidraw devices
+    udev_monitor_filter_add_match_subsystem_devtype(mon, "hidraw", nullptr);
     udev_monitor_enable_receiving(mon);
 
     int fd = udev_monitor_get_fd(mon);
@@ -48,31 +49,40 @@ void UsbMonitor_linux::monitorUSB(int fd)
 {
     Q_UNUSED(fd);
     const auto dev = udev_monitor_receive_device(mon);
+    const char *dev_path = udev_device_get_devnode(dev);
+    bool unrefed = false;
     if (dev)
     {
         QString node(udev_device_get_devnode(dev));
         QString action(udev_device_get_action(dev));
         qDebug() << "Node: " << node;
-        //qDebug() << "Subsystem: " << udev_device_get_subsystem(dev);
-        //qDebug() << "Devtype: " << udev_device_get_devtype(dev);
         qDebug() << "Action: " << action;
-        if (ADD_ACTION == action && node.contains("usb"))
+        if (ADD_ACTION == action && node.contains("hidraw"))
         {
             /**
               * Need to add a delay, because without
               * it the device haven't detected yet
               * during usb enumeration.
               */
-            QTimer::singleShot(100, [this]()
+            bool isBLE;
+            if (MPDevice_linux::checkDevice(dev, isBLE))
             {
-                emit usbDeviceAdded();
-            });
+                QTimer::singleShot(100, [this, dev_path, isBLE]()
+                {
+                    emit usbDeviceAdded(QString::fromUtf8(dev_path), isBLE);
+                });
+            }
+            unrefed = true;
         }
-        else if (REMOVE_ACTION == action)
+        else if (REMOVE_ACTION == action && node.contains("hidraw"))
         {
-            emit usbDeviceRemoved();
+            emit usbDeviceRemoved(QString::fromUtf8(dev_path));
         }
-        udev_device_unref(dev);
+        //If it has not been unrefed in checkDevice
+        if (!unrefed)
+        {
+            udev_device_unref(dev);
+        }
     }
     else
     {

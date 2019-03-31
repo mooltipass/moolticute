@@ -52,6 +52,14 @@ public:
     //Static function for enumerating devices on platform
     static QList<MPPlatformDef> enumerateDevices();
     static int getDescriptorSize(const char* devpath);
+    /**
+     * @brief checkDevice
+     * Checking if the device is a mooltipass device
+     * @param path to the device
+     * @param isBLE out param, true if device is a ble
+     * @return true, if the device is mini/ble
+     */
+    static bool checkDevice(struct udev_device *raw_dev, bool &isBLE);
     static int INVALID_VALUE;
 
 private slots:
