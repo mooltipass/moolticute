@@ -49,7 +49,6 @@ void BleDev::setWsClient(WSClient *c)
 
 void BleDev::clearWidgets()
 {
-    ui->lineEditBundlePath->clear();
     ui->lineEditAuxMCUMaj->clear();
     ui->lineEditAuxMCUMin->clear();
     ui->lineEditMainMCUMaj->clear();
@@ -62,9 +61,14 @@ void BleDev::initUITexts()
     ui->label_DevTab->setText(tr("BLE Developer Tab"));
     ui->label_BLEDesc->setText(tr("BLE description"));
 
-    ui->groupBoxUploadBundle->setTitle(tr("Upload Bundle"));
+    ui->groupBoxUploadBundle->setTitle(tr("Bundle Settings"));
     ui->label_bundleText->setText(tr("Select Bundle File:"));
     ui->btnFileBrowser->setText(browseText);
+    const auto flashText = tr("Flash");
+    ui->label_ReflashAuxMCU->setText(tr("Flash Aux MCU:"));
+    ui->btnReflashAuxMCU->setText(flashText);
+    ui->label_FlashMainMCU->setText(tr("Flash Main MCU:"));
+    ui->btnFlashMainMCU->setText(flashText);
 
     ui->groupBoxPlatInfo->setTitle(tr("Platform informations"));
     ui->label_AuxMCUMaj->setText(tr("Aux MCU major:"));
@@ -72,13 +76,6 @@ void BleDev::initUITexts()
     ui->label_MainMCUMaj->setText(tr("Main MCU major:"));
     ui->label_MainMCUMin->setText(tr("Main MCU minor:"));
     ui->btnPlatInfo->setText(tr("Get Plat Info"));
-
-    const auto flashText = tr("Flash");
-    ui->groupBoxSettings->setTitle(tr("Settings"));
-    ui->label_ReflashAuxMCU->setText(tr("Flash Aux MCU:"));
-    ui->btnReflashAuxMCU->setText(flashText);
-    ui->label_FlashMainMCU->setText(tr("Flash Main MCU:"));
-    ui->btnFlashMainMCU->setText(flashText);
 
     ui->groupBoxAccData->setTitle(tr("Acceleration Data"));
     ui->label_AccDataFile->setText(tr("Acceleration Data File:"));
@@ -99,7 +96,6 @@ void BleDev::on_btnFileBrowser_clicked()
         return;
     }
 
-    ui->lineEditBundlePath->setText(fileName);
     s.setValue("last_used_path/bundle_dir", QFileInfo(fileName).canonicalPath());
 
     QFileInfo file(fileName);
