@@ -77,10 +77,10 @@ void BleDev::initUITexts()
     ui->label_MainMCUMin->setText(tr("Main MCU minor:"));
     ui->btnPlatInfo->setText(tr("Get Plat Info"));
 
-    ui->groupBoxAccData->setTitle(tr("Acceleration Data"));
-    ui->label_AccDataFile->setText(tr("Acceleration Data File:"));
+    ui->groupBoxAccData->setTitle(tr("Data Fetch"));
+    ui->label_AccDataFile->setText(tr("Storage file:"));
     ui->btnAccDataBrowse->setText(browseText);
-    ui->btnFetchAccData->setText(tr("Fetch"));
+    ui->btnFetchAccData->setText(tr("Fetch acceleration"));
 }
 
 void BleDev::on_btnFileBrowser_clicked()
@@ -206,7 +206,7 @@ void BleDev::on_btnFetchAccData_clicked()
     else
     {
         ui->progressBarAccData->hide();
-        ui->btnFetchAccData->setText(tr("Fetch"));
+        ui->btnFetchAccData->setText(tr("Fetch acceleration"));
         accState = Common::AccState::STOPPED;
         wsClient->sendStopFetchAccData();
     }
