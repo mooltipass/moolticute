@@ -201,13 +201,13 @@ void BleDev::on_btnFetchAccData_clicked()
         ui->progressBarAccData->show();
         ui->btnFetchAccData->setText(tr("Stop Fetch"));
         accState = Common::AccState::STARTED;
-        wsClient->sendFetchAccData(fileName);
+        wsClient->sendFetchData(fileName, Common::FetchType::ACCELEROMETER);
     }
     else
     {
         ui->progressBarAccData->hide();
         ui->btnFetchAccData->setText(tr("Fetch acceleration"));
         accState = Common::AccState::STOPPED;
-        wsClient->sendStopFetchAccData();
+        wsClient->sendStopFetchData(Common::FetchType::ACCELEROMETER);
     }
 }

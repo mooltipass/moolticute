@@ -202,6 +202,12 @@ public:
         STOPPED,
         STARTED
     };
+
+    enum class FetchType
+    {
+        ACCELEROMETER,
+        RANDOM_BYTES
+    };
 };
 
 Q_DECLARE_METATYPE(Common::MPStatus)

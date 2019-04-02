@@ -762,14 +762,31 @@ void WSServerCon::processMessage(const QString &message)
                 sendJsonMessage(oroot);
             }, defaultProgressCb);
         }
-        else if (root["msg"] == "fetch_acc_data")
+        else if (root["msg"] == "fetch_data")
         {
             QJsonObject o = root["data"].toObject();
-            bleImpl->fetchAccData(o["file"].toString());
+            auto type = static_cast<Common::FetchType>(o["type"].toInt());
+            if (Common::FetchType::ACCELEROMETER == type)
+            {
+                bleImpl->fetchAccData(o["file"].toString());
+            }
+            else
+            {
+                //TODO: add fetch random bytes
+            }
         }
-        else if (root["msg"] == "stop_fetch_acc_data")
+        else if (root["msg"] == "stop_fetch_data")
         {
-            bleImpl->stopFetchAccData();
+            QJsonObject o = root["data"].toObject();
+            auto type = static_cast<Common::FetchType>(o["type"].toInt());
+            if (Common::FetchType::ACCELEROMETER == type)
+            {
+                bleImpl->stopFetchAccData();
+            }
+            else
+            {
+                //TODO: add stop fetch random bytes
+            }
         }
         else if (root["msg"] == "get_credential") {
             QJsonObject o = root["data"].toObject();

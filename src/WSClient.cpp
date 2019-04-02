@@ -661,17 +661,20 @@ void WSClient::sendUploadBundle(QString bundleFilePath)
                   {"data", o}});
 }
 
-void WSClient::sendFetchAccData(QString fileName)
+void WSClient::sendFetchData(QString fileName, Common::FetchType fetchType)
 {
     QJsonObject o;
+    o["type"] = static_cast<int>(fetchType);
     o["file"] = fileName;
-    sendJsonData({{ "msg", "fetch_acc_data" },
+    sendJsonData({{ "msg", "fetch_data" },
                   {"data", o}});
 }
 
-void WSClient::sendStopFetchAccData()
+void WSClient::sendStopFetchData(Common::FetchType fetchType)
 {
-    sendJsonData({{ "msg", "stop_fetch_acc_data" }});
+    QJsonObject o;
+    o["type"] = static_cast<int>(fetchType);
+    sendJsonData({{ "msg", "stop_fetch_data" }});
 }
 
 bool WSClient::isFw12()
