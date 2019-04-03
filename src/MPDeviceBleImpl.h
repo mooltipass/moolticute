@@ -36,7 +36,13 @@ public:
     void sendResetFlipBit();
     void flipMessageBit(QByteArray &msg);
 
+    /**
+     * @brief storeCredential
+     * Only for testing without the callback
+     */
+    //TODO: Only for testing
     void storeCredential(const BleCredential &cred);
+    void storeCredential(const BleCredential &cred, MessageHandlerCb cb);
     /**
      * @brief getCredential
      * Only for testing without the callback

@@ -53,7 +53,7 @@ public:
     QString getFullDomain() const { return _domain + _tld + (port() != -1 ? ":" + QString::number(port()) : ""); }
 
     // Subdomain with domain and top-level domain ("subdomain.domain.tld")
-    QString getFullSubdomain() const { return _subdomain + "." + getFullDomain(); }
+    QString getFullSubdomain() const { return _subdomain + (_subdomain.isEmpty() ? "":".") + getFullDomain(); }
 
     int port() const { return _url.port(); }
 

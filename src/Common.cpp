@@ -205,11 +205,13 @@ QByteArray Common::dateToBytes(const QDate &dt)
     QByteArray data;
     data.resize(2);
 
-    data[0] = (quint8)(((dt.year() - 2010) << 1) & 0xFE);
+    data[0] = static_cast<char>(((dt.year() - 2010) << 1) & 0xFE);
     if(dt.month() - 1  >= 8)
-        data[0] = (quint8)((quint8)data[0] | 0x01);
-    data[1] = (quint8)((((dt.month() -1) % 8) << 5) & 0xE0);
-    data[1] = (quint8)((quint8)data[1] | dt.day());
+    {
+        data[0] = static_cast<char>((static_cast<quint8>(data[0]) | 0x01));
+    }
+    data[1] = static_cast<char>((((dt.month() -1) % 8) << 5) & 0xE0);
+    data[1] = static_cast<char>(static_cast<quint8>(data[1])|dt.day());
 
     return data;
 }
