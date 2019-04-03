@@ -23,14 +23,14 @@ BleDev::BleDev(QWidget *parent) :
     ui->label_UploadProgress->hide();
 
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
-    ui->btnAccDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
-    ui->progressBarAccData->setVisible(false);
+    ui->btnFetchDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
+    ui->progressBarFetchData->setVisible(false);
     ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
-    ui->progressBarAccData->setMinimum(0);
-    ui->progressBarAccData->setMaximum(0);
+    ui->progressBarFetchData->setMinimum(0);
+    ui->progressBarFetchData->setMaximum(0);
 
 #if defined(Q_OS_LINUX)
-    ui->label_AccDataFile->setMaximumWidth(150);
+    ui->label_FetchDataFile->setMaximumWidth(150);
 #endif
     initUITexts();
 }
@@ -77,16 +77,16 @@ void BleDev::initUITexts()
     ui->label_MainMCUMin->setText(tr("Main MCU minor:"));
     ui->btnPlatInfo->setText(tr("Get Plat Info"));
 
-    ui->groupBoxAccData->setTitle(tr("Data Fetch"));
-    ui->label_AccDataFile->setText(tr("Storage file:"));
-    ui->btnAccDataBrowse->setText(browseText);
+    ui->groupBoxFetchData->setTitle(tr("Data Fetch"));
+    ui->label_FetchDataFile->setText(tr("Storage file:"));
+    ui->btnFetchDataBrowse->setText(browseText);
     ui->btnFetchAccData->setText(FETCH_ACC_DATA_TEXT);
     ui->btnFetchRandomData->setText(FETCH_RANDOM_DATA_TEXT);
 }
 
 void BleDev::fetchData(const Common::FetchType &fetchType)
 {
-    QString fileName = ui->lineEditAccData->text();
+    QString fileName = ui->lineEditFetchData->text();
     if (fileName.isEmpty())
     {
         return;
@@ -94,21 +94,21 @@ void BleDev::fetchData(const Common::FetchType &fetchType)
     bool isAccFetch = Common::FetchType::ACCELEROMETER == fetchType;
     auto& selectedButton = isAccFetch ? ui->btnFetchAccData : ui->btnFetchRandomData;
     auto& inactiveButton = isAccFetch ? ui->btnFetchRandomData : ui->btnFetchAccData;
-    if (Common::FetchState::STOPPED == accState)
+    if (Common::FetchState::STOPPED == fetchState)
     {
-        ui->progressBarAccData->show();
+        ui->progressBarFetchData->show();
         selectedButton->setText(tr("Stop Fetch"));
         inactiveButton->hide();
-        accState = Common::FetchState::STARTED;
+        fetchState = Common::FetchState::STARTED;
         wsClient->sendFetchData(fileName, fetchType);
     }
     else
     {
-        ui->progressBarAccData->hide();
+        ui->progressBarFetchData->hide();
         selectedButton->setText(isAccFetch ? FETCH_ACC_DATA_TEXT : FETCH_RANDOM_DATA_TEXT);
         inactiveButton->show();
-        accState = Common::FetchState::STOPPED;
-        wsClient->sendStopFetchData(fetchType);
+        fetchState = Common::FetchState::STOPPED;
+        wsClient->sendStopFetchData();
     }
 }
 
@@ -197,14 +197,18 @@ void BleDev::updateProgress(int total, int curr, QString msg)
     ui->label_UploadProgress->setText(msg);
 }
 
-void BleDev::on_btnAccDataBrowse_clicked()
+void BleDev::on_btnFetchDataBrowse_clicked()
 {
     QSettings s;
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select file to fetch acceleration data"),
-                                            s.value("last_used_path/accdata_dir", QDir::homePath()).toString(),
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select file to fetch data"),
+                                            s.value("last_used_path/fetchdata_dir", QDir::homePath()).toString(),
                                             "*.bin");
 
+    if (fileName.isEmpty())
+    {
+        return;
+    }
 #if defined(Q_OS_LINUX)
             /**
              * getSaveFileName is using native dialog
@@ -218,8 +222,8 @@ void BleDev::on_btnAccDataBrowse_clicked()
             }
 #endif
 
-    ui->lineEditAccData->setText(fileName);
-    s.setValue("last_used_path/accdata_dir", fileName.mid(0, fileName.lastIndexOf('/')));
+    ui->lineEditFetchData->setText(fileName);
+    s.setValue("last_used_path/fetchdata_dir", fileName.mid(0, fileName.lastIndexOf('/')));
 }
 
 void BleDev::on_btnFetchAccData_clicked()

@@ -36,7 +36,7 @@ private slots:
 
     void updateProgress(int total, int curr, QString msg);
 
-    void on_btnAccDataBrowse_clicked();
+    void on_btnFetchDataBrowse_clicked();
 
     void on_btnFetchAccData_clicked();
 
@@ -48,7 +48,7 @@ private:
 
     Ui::BleDev *ui;
     WSClient *wsClient = nullptr;
-    Common::FetchState accState = Common::FetchState::STOPPED;
+    Common::FetchState fetchState = Common::FetchState::STOPPED;
     const QString FETCH_ACC_DATA_TEXT = tr("Fetch acceleration");
     const QString FETCH_RANDOM_DATA_TEXT = tr("Fetch random data");
 };

@@ -120,7 +120,7 @@ public:
     void sendFlashMCU(QString type);
     void sendUploadBundle(QString bundleFilePath);
     void sendFetchData(QString fileName, Common::FetchType fetchType);
-    void sendStopFetchData(Common::FetchType fetchType);
+    void sendStopFetchData();
 
     bool isFw12();
 

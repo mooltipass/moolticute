@@ -670,10 +670,8 @@ void WSClient::sendFetchData(QString fileName, Common::FetchType fetchType)
                   {"data", o}});
 }
 
-void WSClient::sendStopFetchData(Common::FetchType fetchType)
+void WSClient::sendStopFetchData()
 {
-    QJsonObject o;
-    o["type"] = static_cast<int>(fetchType);
     sendJsonData({{ "msg", "stop_fetch_data" }});
 }
 

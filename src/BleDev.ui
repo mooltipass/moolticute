@@ -584,7 +584,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBoxAccData">
+    <widget class="QGroupBox" name="groupBoxFetchData">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -607,7 +607,7 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_AccDataFile">
+         <widget class="QLabel" name="label_FetchDataFile">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -635,7 +635,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEditAccData">
+         <widget class="QLineEdit" name="lineEditFetchData">
           <property name="minimumSize">
            <size>
             <width>250</width>
@@ -660,7 +660,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btnAccDataBrowse">
+         <widget class="QPushButton" name="btnFetchDataBrowse">
           <property name="minimumSize">
            <size>
             <width>100</width>
@@ -781,7 +781,7 @@
          <number>30</number>
         </property>
         <item>
-         <widget class="QProgressBar" name="progressBarAccData">
+         <widget class="QProgressBar" name="progressBarFetchData">
           <property name="value">
            <number>24</number>
           </property>
