@@ -43,10 +43,10 @@ void _device_matching_callback(void *user_data,
     def.id = QString("%1").arg((quint64)def.hidref);
     def.isBLE = vendorID == MOOLTIPASS_BLE_VENDORID;
 
-    if (!um->deviceHash.contains(def.hidref))
+    if (!um->deviceHash.contains(def.id))
     {
-        um->deviceHash[def.hidref] = def;
-        emit um->usbDeviceAdded();
+        um->deviceHash[def.id] = def;
+        emit um->usbDeviceAdded(def.id);
         qDebug() << "Device added: " << def.id;
     }
 }
@@ -60,11 +60,12 @@ void _device_removal_callback(void *user_data,
     Q_UNUSED(inSender);
     UsbMonitor_mac *um = reinterpret_cast<UsbMonitor_mac *>(user_data);
 
-    if (um->deviceHash.contains(inIOHIDDeviceRef))
+    QString hid_id = QString("%1").arg((quint64)inIOHIDDeviceRef);
+    if (um->deviceHash.contains(hid_id))
     {
-        MPPlatformDef def = um->deviceHash[inIOHIDDeviceRef];
-        um->deviceHash.remove(inIOHIDDeviceRef);
-        emit um->usbDeviceRemoved();
+        MPPlatformDef def = um->deviceHash[hid_id];
+        um->deviceHash.remove(hid_id);
+        emit um->usbDeviceRemoved(hid_id);
         qDebug() << "Device removed: " << def.id;
     }
 }

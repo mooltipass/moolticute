@@ -59,10 +59,13 @@ MPDevice::MPDevice(QObject *parent):
 
                 if (prevStatus == Common::UnknownStatus)
                 {
-                    /* First start: load parameters */
                     QTimer::singleShot(10, [this]()
                     {
-                        loadParameters();
+                        /* First start: load parameters */
+                        if (!isBLE())
+                        {
+                            loadParameters();
+                        }
                         setCurrentDate();
                     });
                 }
@@ -71,7 +74,10 @@ MPDevice::MPDevice(QObject *parent):
                 {
                     QTimer::singleShot(20, [this]()
                     {
-                        getCurrentCardCPZ();
+                        if (!isBLE())
+                        {
+                            getCurrentCardCPZ();
+                        }
                     });
                 }
                 else

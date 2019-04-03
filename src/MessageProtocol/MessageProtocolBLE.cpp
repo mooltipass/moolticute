@@ -46,7 +46,7 @@ QVector<QByteArray> MessageProtocolBLE::createPackets(const QByteArray &data, MP
 Common::MPStatus MessageProtocolBLE::getStatus(const QByteArray &data)
 {
     Q_UNUSED(data);
-    return Common::UnknownStatus;
+    return Common::Unlocked;
 }
 
 quint16 MessageProtocolBLE::getMessageSize(const QByteArray &data)
