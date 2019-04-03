@@ -40,13 +40,17 @@ private slots:
 
     void on_btnFetchAccData_clicked();
 
+    void on_btnFetchRandomData_clicked();
+
 private:
     void initUITexts();
-
+    void fetchData(const Common::FetchType &fetchType);
 
     Ui::BleDev *ui;
     WSClient *wsClient = nullptr;
     Common::AccState accState = Common::AccState::STOPPED;
+    const QString FETCH_ACC_DATA_TEXT = tr("Fetch acceleration");
+    const QString FETCH_RANDOM_DATA_TEXT = tr("Fetch random data");
 };
 
 #endif // BLEDEV_H

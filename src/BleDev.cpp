@@ -80,7 +80,36 @@ void BleDev::initUITexts()
     ui->groupBoxAccData->setTitle(tr("Data Fetch"));
     ui->label_AccDataFile->setText(tr("Storage file:"));
     ui->btnAccDataBrowse->setText(browseText);
-    ui->btnFetchAccData->setText(tr("Fetch acceleration"));
+    ui->btnFetchAccData->setText(FETCH_ACC_DATA_TEXT);
+    ui->btnFetchRandomData->setText(FETCH_RANDOM_DATA_TEXT);
+}
+
+void BleDev::fetchData(const Common::FetchType &fetchType)
+{
+    QString fileName = ui->lineEditAccData->text();
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+    bool isAccFetch = Common::FetchType::ACCELEROMETER == fetchType;
+    auto& selectedButton = isAccFetch ? ui->btnFetchAccData : ui->btnFetchRandomData;
+    auto& inactiveButton = isAccFetch ? ui->btnFetchRandomData : ui->btnFetchAccData;
+    if (Common::AccState::STOPPED == accState)
+    {
+        ui->progressBarAccData->show();
+        selectedButton->setText(tr("Stop Fetch"));
+        inactiveButton->hide();
+        accState = Common::AccState::STARTED;
+        wsClient->sendFetchData(fileName, fetchType);
+    }
+    else
+    {
+        ui->progressBarAccData->hide();
+        selectedButton->setText(isAccFetch ? FETCH_ACC_DATA_TEXT : FETCH_RANDOM_DATA_TEXT);
+        inactiveButton->show();
+        accState = Common::AccState::STOPPED;
+        wsClient->sendStopFetchData(fetchType);
+    }
 }
 
 void BleDev::on_btnFileBrowser_clicked()
@@ -195,19 +224,10 @@ void BleDev::on_btnAccDataBrowse_clicked()
 
 void BleDev::on_btnFetchAccData_clicked()
 {
-    QString fileName = ui->lineEditAccData->text();
-    if (Common::AccState::STOPPED == accState && !ui->lineEditAccData->text().isEmpty())
-    {
-        ui->progressBarAccData->show();
-        ui->btnFetchAccData->setText(tr("Stop Fetch"));
-        accState = Common::AccState::STARTED;
-        wsClient->sendFetchData(fileName, Common::FetchType::ACCELEROMETER);
-    }
-    else
-    {
-        ui->progressBarAccData->hide();
-        ui->btnFetchAccData->setText(tr("Fetch acceleration"));
-        accState = Common::AccState::STOPPED;
-        wsClient->sendStopFetchData(Common::FetchType::ACCELEROMETER);
-    }
+    fetchData(Common::FetchType::ACCELEROMETER);
+}
+
+void BleDev::on_btnFetchRandomData_clicked()
+{
+    fetchData(Common::FetchType::RANDOM_BYTES);
 }
