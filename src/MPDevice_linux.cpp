@@ -51,7 +51,7 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
         grabbed = ioctl(devfd, EVIOCGRAB, ExclusiveAccess::GRAB);
         if (INVALID_VALUE == grabbed)
         {
-            qWarning() << "Exclusive device grab wasn't successful";
+            qWarning() << "Exclusive device grab wasn't successful: " << strerror(errno);
         }
         sockNotifRead = new QSocketNotifier(devfd, QSocketNotifier::Read);
         sockNotifRead->setEnabled(true);
@@ -129,6 +129,53 @@ int MPDevice_linux::getDescriptorSize(const char *devpath)
     return descSize;
 }
 
+bool MPDevice_linux::checkDevice(struct udev_device *raw_dev, bool &isBLE)
+{
+    int bus_type = 0;
+    unsigned short dev_vid = 0;
+    unsigned short dev_pid = 0;
+
+    const char *dev_path = udev_device_get_devnode(raw_dev);
+
+    struct udev_device *hid_dev = udev_device_get_parent_with_subsystem_devtype(raw_dev, "hid", nullptr);
+
+    if (!hid_dev)
+    {
+        udev_device_unref(raw_dev);
+        return false;
+    }
+
+    QString uevent = QString::fromUtf8(udev_device_get_sysattr_value(hid_dev, "uevent"));
+    for (QString keyval: uevent.split('\n'))
+    {
+        QStringList kv = keyval.split('=');
+        if (kv.size() < 2)
+            continue;
+        if (kv.at(0) == "HID_ID")
+        {
+            QStringList idval = kv.at(1).split(':');
+            if (idval.size() < 3)
+                continue;
+            bus_type = idval.at(0).toInt(nullptr, 16);
+            dev_vid = static_cast<quint16>(idval.at(1).toInt(nullptr, 16));
+            dev_pid = static_cast<quint16>(idval.at(2).toInt(nullptr, 16));
+        }
+    }
+
+    bool isMini = dev_vid == MOOLTIPASS_VENDORID && dev_pid == MOOLTIPASS_PRODUCTID;
+    bool isBle = dev_vid == MOOLTIPASS_BLE_VENDORID && dev_pid == MOOLTIPASS_BLE_PRODUCTID;
+    if (bus_type == BUS_USB &&
+        (isMini || isBle) &&
+        getDescriptorSize(dev_path) == MOOLTIPASS_USBHID_DESC_SIZE)
+    {
+        isBLE = isBle;
+        return true;
+    }
+
+    udev_device_unref(raw_dev);
+    return false;
+}
+
 void MPDevice_linux::writeNextPacket()
 {
     if (sendBuffer.isEmpty())
@@ -178,55 +225,20 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
 
     udev_list_entry_foreach(dev, devices)
     {
-        int bus_type = 0;
-        unsigned short dev_vid = 0;
-        unsigned short dev_pid = 0;
-
         const char *sysfs_path = udev_list_entry_get_name(dev);
         struct udev_device *raw_dev = udev_device_new_from_syspath(udev, sysfs_path);
-        const char *dev_path = udev_device_get_devnode(raw_dev);
-
-        struct udev_device *hid_dev = udev_device_get_parent_with_subsystem_devtype(raw_dev, "hid", nullptr);
-
-        if (!hid_dev)
+        bool isBLE;
+        if (checkDevice(raw_dev, isBLE))
         {
-            udev_device_unref(raw_dev);
-            continue;
-        }
-
-        QString uevent = QString::fromUtf8(udev_device_get_sysattr_value(hid_dev, "uevent"));
-        for (QString keyval: uevent.split('\n'))
-        {
-            QStringList kv = keyval.split('=');
-            if (kv.size() < 2)
-                continue;
-            if (kv.at(0) == "HID_ID")
-            {
-                QStringList idval = kv.at(1).split(':');
-                if (idval.size() < 3)
-                    continue;
-                bus_type = idval.at(0).toInt(nullptr, 16);
-                dev_vid = static_cast<quint16>(idval.at(1).toInt(nullptr, 16));
-                dev_pid = static_cast<quint16>(idval.at(2).toInt(nullptr, 16));
-            }
-        }
-
-        bool isMini = dev_vid == MOOLTIPASS_VENDORID && dev_pid == MOOLTIPASS_PRODUCTID;
-        bool isBle = dev_vid == MOOLTIPASS_BLE_VENDORID && dev_pid == MOOLTIPASS_BLE_PRODUCTID;
-        if (bus_type == BUS_USB &&
-            (isMini || isBle) &&
-            getDescriptorSize(dev_path) == MOOLTIPASS_USBHID_DESC_SIZE)
-        {
+            const char *dev_path = udev_device_get_devnode(raw_dev);
             MPPlatformDef def;
             def.path = QString::fromUtf8(dev_path);
             def.id = def.path;
-            def.isBLE = isBle;
+            def.isBLE = isBLE;
             devlist << def;
 
             qDebug() << "Found mooltipass: " << def.path;
         }
-
-        udev_device_unref(raw_dev);
     }
 
     udev_enumerate_unref(enumerate);

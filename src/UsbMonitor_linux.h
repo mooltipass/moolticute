@@ -37,8 +37,8 @@ public:
 public slots:
     void monitorUSB(int fd);
 signals:
-    void usbDeviceAdded();
-    void usbDeviceRemoved();
+    void usbDeviceAdded(QString path, bool isBLE);
+    void usbDeviceRemoved(QString path);
 
 private:
     UsbMonitor_linux();

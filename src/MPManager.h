@@ -55,6 +55,9 @@ private slots:
     void usbDeviceAdded();
     void usbDeviceRemoved();
     void usbDeviceAdded(QString path);
+#if defined(Q_OS_LINUX)
+    void usbDeviceAdded(QString path, bool isBLE);
+#endif
     void usbDeviceRemoved(QString path);
 
 private:
