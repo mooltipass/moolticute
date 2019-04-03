@@ -1272,24 +1272,16 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         }
         else
         {
-            //TODO: add fetch random bytes
+            bleImpl->fetchRandomData(o["file"].toString());
         }
     }
     else if (root["msg"] == "stop_fetch_data")
     {
-        QJsonObject o = root["data"].toObject();
-        auto type = static_cast<Common::FetchType>(o["type"].toInt());
-        if (Common::FetchType::ACCELEROMETER == type)
-        {
-            bleImpl->stopFetchAccData();
-        }
-        else
-        {
-            //TODO: add stop fetch random bytes
-        }
+        bleImpl->stopFetchData();
     }
     else if (root["msg"] == "ask_password" ||
-             root["msg"] == "get_credential") {
+             root["msg"] == "get_credential")
+    {
         QJsonObject o = root["data"].toObject();
         QString service = o["service"].toString();
         QString login = o["login"].toString();

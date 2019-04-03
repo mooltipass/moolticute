@@ -197,7 +197,7 @@ public:
         FAV_14,
     };
 
-    enum class AccState
+    enum class FetchState
     {
         STOPPED,
         STARTED

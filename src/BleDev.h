@@ -48,7 +48,7 @@ private:
 
     Ui::BleDev *ui;
     WSClient *wsClient = nullptr;
-    Common::AccState accState = Common::AccState::STOPPED;
+    Common::FetchState accState = Common::FetchState::STOPPED;
     const QString FETCH_ACC_DATA_TEXT = tr("Fetch acceleration");
     const QString FETCH_RANDOM_DATA_TEXT = tr("Fetch random data");
 };

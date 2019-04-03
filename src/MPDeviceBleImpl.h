@@ -31,7 +31,8 @@ public:
     void flashMCU(QString type, const MessageHandlerCb &cb);
     void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
     void fetchAccData(QString filePath);
-    inline void stopFetchAccData() { accState = Common::AccState::STOPPED; }
+    void fetchRandomData(QString filePath);
+    inline void stopFetchData() { fetchState = Common::FetchState::STOPPED; }
 
     void sendResetFlipBit();
     void flipMessageBit(QByteArray &msg);
@@ -56,6 +57,7 @@ private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
     void writeAccData(QFile *file);
+    void writeRandomData(QFile *file);
 
     QByteArray createStoreCredMessage(const BleCredential &cred);
     QByteArray createGetCredMessage(QString service, QString login);
@@ -66,7 +68,7 @@ private:
 
     MessageProtocolBLE *bleProt;
     MPDevice *mpDev;
-    Common::AccState accState = Common::AccState::STOPPED;
+    Common::FetchState fetchState = Common::FetchState::STOPPED;
 
     static constexpr int BUNBLE_DATA_WRITE_SIZE = 256;
     static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;

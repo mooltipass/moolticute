@@ -94,12 +94,12 @@ void BleDev::fetchData(const Common::FetchType &fetchType)
     bool isAccFetch = Common::FetchType::ACCELEROMETER == fetchType;
     auto& selectedButton = isAccFetch ? ui->btnFetchAccData : ui->btnFetchRandomData;
     auto& inactiveButton = isAccFetch ? ui->btnFetchRandomData : ui->btnFetchAccData;
-    if (Common::AccState::STOPPED == accState)
+    if (Common::FetchState::STOPPED == accState)
     {
         ui->progressBarAccData->show();
         selectedButton->setText(tr("Stop Fetch"));
         inactiveButton->hide();
-        accState = Common::AccState::STARTED;
+        accState = Common::FetchState::STARTED;
         wsClient->sendFetchData(fileName, fetchType);
     }
     else
@@ -107,7 +107,7 @@ void BleDev::fetchData(const Common::FetchType &fetchType)
         ui->progressBarAccData->hide();
         selectedButton->setText(isAccFetch ? FETCH_ACC_DATA_TEXT : FETCH_RANDOM_DATA_TEXT);
         inactiveButton->show();
-        accState = Common::AccState::STOPPED;
+        accState = Common::FetchState::STOPPED;
         wsClient->sendStopFetchData(fetchType);
     }
 }
