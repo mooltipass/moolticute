@@ -30,8 +30,7 @@ public:
 
     void flashMCU(QString type, const MessageHandlerCb &cb);
     void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
-    void fetchAccData(QString filePath);
-    void fetchRandomData(QString filePath);
+    void fetchData(QString filePath, MPCmd::Command cmd);
     inline void stopFetchData() { fetchState = Common::FetchState::STOPPED; }
 
     void sendResetFlipBit();
@@ -56,8 +55,7 @@ public:
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
-    void writeAccData(QFile *file);
-    void writeRandomData(QFile *file);
+    void writeFetchData(QFile *file, MPCmd::Command cmd);
 
     QByteArray createStoreCredMessage(const BleCredential &cred);
     QByteArray createGetCredMessage(QString service, QString login);

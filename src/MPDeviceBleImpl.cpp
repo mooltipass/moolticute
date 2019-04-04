@@ -170,40 +170,20 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb,
     dequeueAndRun(jobs);
 }
 
-void MPDeviceBleImpl::fetchAccData(QString filePath)
+void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
 {
     fetchState = Common::FetchState::STARTED;
-    auto *jobs = new AsyncJobs(QString("Fetch Acc Data"), this);
+    auto *jobs = new AsyncJobs(QString("Fetch Data"), this);
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_GET_ACC_32_SAMPLES,
-                    [this, filePath](const QByteArray &data, bool &) -> bool
+    jobs->append(new MPCommandJob(mpDev, static_cast<quint8>(cmd),
+                    [this, filePath, cmd](const QByteArray &data, bool &) -> bool
                     {
                         QFile *file = new QFile(filePath);
                         if (file->open(QIODevice::WriteOnly))
                         {
                             file->write(bleProt->getFullPayload(data));
                         }
-                        writeAccData(file);
-                        return true;
-                    }));
-
-    dequeueAndRun(jobs);
-}
-
-void MPDeviceBleImpl::fetchRandomData(QString filePath)
-{
-    fetchState = Common::FetchState::STARTED;
-    auto *jobs = new AsyncJobs(QString("Fetch Random Data"), this);
-
-    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_RANDOM_NUMBER,
-                    [this, filePath](const QByteArray &data, bool &) -> bool
-                    {
-                        QFile *file = new QFile(filePath);
-                        if (file->open(QIODevice::WriteOnly))
-                        {
-                            file->write(bleProt->getFullPayload(data));
-                        }
-                        writeRandomData(file);
+                        writeFetchData(file, cmd);
                         return true;
                     }));
 
@@ -463,33 +443,15 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
     jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_REINDEX_BUNDLE, bleProt->getDefaultFuncDone()));
 }
 
-void MPDeviceBleImpl::writeAccData(QFile *file)
+void MPDeviceBleImpl::writeFetchData(QFile *file, MPCmd::Command cmd)
 {
-    mpDev->sendData(MPCmd::CMD_DBG_GET_ACC_32_SAMPLES,
-                    [this, file](bool, const QByteArray &data, bool &) -> bool
+    mpDev->sendData(cmd,
+                    [this, file, cmd](bool, const QByteArray &data, bool &) -> bool
                     {
                         file->write(bleProt->getFullPayload(data));
                         if (Common::FetchState::STARTED == fetchState)
                         {
-                            writeAccData(file);
-                        }
-                        else
-                        {
-                            delete file;
-                        }
-                        return true;
-    });
-}
-
-void MPDeviceBleImpl::writeRandomData(QFile *file)
-{
-    mpDev->sendData(MPCmd::GET_RANDOM_NUMBER,
-                    [this, file](bool, const QByteArray &data, bool &) -> bool
-                    {
-                        file->write(bleProt->getFullPayload(data));
-                        if (Common::FetchState::STARTED == fetchState)
-                        {
-                            writeRandomData(file);
+                            writeFetchData(file, cmd);
                         }
                         else
                         {

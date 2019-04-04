@@ -1266,14 +1266,9 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     {
         QJsonObject o = root["data"].toObject();
         auto type = static_cast<Common::FetchType>(o["type"].toInt());
-        if (Common::FetchType::ACCELEROMETER == type)
-        {
-            bleImpl->fetchAccData(o["file"].toString());
-        }
-        else
-        {
-            bleImpl->fetchRandomData(o["file"].toString());
-        }
+        const auto cmd = Common::FetchType::ACCELEROMETER == type ?
+                    MPCmd::CMD_DBG_GET_ACC_32_SAMPLES : MPCmd::GET_RANDOM_NUMBER;
+        bleImpl->fetchData(o["file"].toString(), cmd);
     }
     else if (root["msg"] == "stop_fetch_data")
     {
