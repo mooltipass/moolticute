@@ -427,7 +427,7 @@ void Updater::onReply (QNetworkReply* reply)
             //Check if an asset is available for this platform, if not continue to search for the latest
             githubReleaseAssets = latestGithubRelease.value("assets").toArray();
             bool found = false;
-            for (const auto &jsonValue: qAsConst(githubReleaseAssets))
+            for (const auto &jsonValue: githubReleaseAssets)
             {
                 QJsonObject releaseAsset = jsonValue.toObject();
                 auto r = releaseAsset.value("name").toString();
@@ -451,7 +451,7 @@ void Updater::onReply (QNetworkReply* reply)
     bool releaseFound = false;
     QString releaseName;
     QString downloadUrl;
-    for (const auto &jsonValue: qAsConst(githubReleaseAssets))
+    for (const auto &jsonValue: githubReleaseAssets)
     {
         QJsonObject releaseAsset = jsonValue.toObject();
         releaseName = releaseAsset.value("name").toString();
