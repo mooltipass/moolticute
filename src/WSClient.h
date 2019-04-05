@@ -119,8 +119,8 @@ public:
     void sendPlatInfoRequest();
     void sendFlashMCU(QString type);
     void sendUploadBundle(QString bundleFilePath);
-    void sendFetchAccData(QString fileName);
-    void sendStopFetchAccData();
+    void sendFetchData(QString fileName, Common::FetchType fetchType);
+    void sendStopFetchData();
 
     bool isFw12();
 
