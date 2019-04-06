@@ -60,7 +60,7 @@ void AutoStartup::enableAutoStartup(bool en)
 
     QString autostartLocation;
     char *xgdConfigHome = getenv("XDG_CONFIG_HOME");
-    if(xgdConfigHome != NULL)
+    if(xgdConfigHome != nullptr)
         autostartLocation = QString(QString(xgdConfigHome) + "/.config/autostart");
     else
         autostartLocation = QString(QDir::homePath() + "/.config/autostart");

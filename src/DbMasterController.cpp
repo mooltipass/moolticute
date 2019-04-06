@@ -16,7 +16,7 @@ void DbMasterController::setMainWindow(MainWindow *window)
 {
     dbExportsRegistryController->setMainWindow(window);
 
-    if (! dbBackupsTrackerController && window && wsClient)
+    if (!dbBackupsTrackerController && window && wsClient)
     {
         dbBackupsTrackerController = new DbBackupsTrackerController(window, wsClient,
                                                                     AppGui::getDataDirPath() + "/dbBackupTracks.ini", this);

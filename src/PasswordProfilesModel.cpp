@@ -441,7 +441,7 @@ void PasswordProfilesModel::removeProfile(const QString &name)
         {
             if (profile->getName() == name && profile->isEditable())
             {
-                int index = it - m_profiles.begin();
+                int index = static_cast<int>(it - m_profiles.begin());
 
                 beginRemoveRows(QModelIndex(), index, index);
                 delete *it;

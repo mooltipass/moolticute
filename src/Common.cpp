@@ -249,10 +249,10 @@ bool Common::isProcessRunning(qint64 pid)
 #else
     /* This code is portable on linux and macos (not tested on *BSD) */
 
-    pid_t p = (pid_t)pid;
+    pid_t p = static_cast<pid_t>(pid);
 
     //Wait for defunct process to end
-    while(waitpid(-1, 0, WNOHANG) > 0)
+    while(waitpid(-1, nullptr, WNOHANG) > 0)
     { /* wait for defunct... */ }
 
     if (kill(p, 0) == 0)

@@ -8,7 +8,7 @@ int SystemNotificationImageUnix::imageHintID = qDBusRegisterMetaType<SystemNotif
 SystemNotificationImageUnix::SystemNotificationImageUnix(const QImage &img)
 {
     QImage image(img.convertToFormat(QImage::Format_ARGB32).rgbSwapped());
-    imageData = QByteArray((char *)image.bits(), image.byteCount());
+    imageData = QByteArray(reinterpret_cast<char*>(image.bits()), image.byteCount());
     width = image.width();
     height = image.height();
     rowstride = image.bytesPerLine();
@@ -20,7 +20,7 @@ SystemNotificationImageUnix::SystemNotificationImageUnix(const QImage &img)
 
 QImage SystemNotificationImageUnix::toQImage() const
 {
-    return QImage((uchar *)imageData.data(), width, height, QImage::Format_ARGB32).rgbSwapped();
+    return QImage(reinterpret_cast<const uchar*>(imageData.data()), width, height, QImage::Format_ARGB32).rgbSwapped();
 }
 
 QDBusArgument &operator<<(QDBusArgument &a, const SystemNotificationImageUnix &i)

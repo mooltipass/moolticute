@@ -97,10 +97,6 @@ void MPManager::usbDeviceRemoved()
 
 void MPManager::usbDeviceAdded(QString path)
 {
-#if defined(Q_OS_LINUX)
-    Q_UNUSED(path);
-    return;
-#endif
     if (!devices.contains(path))
     {
         MPDevice *device = nullptr;
