@@ -266,7 +266,7 @@ void PasswordProfile::init()
     if (poolSize == 0)
         return;
 
-    m_pool.resize(poolSize);
+    m_pool.resize(static_cast<size_t>(poolSize));
 
     //Fill the pool
     auto it = std::begin(m_pool);

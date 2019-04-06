@@ -55,8 +55,8 @@ QJsonObject LoginItem::toJson() const
     QJsonArray addr;
     if (!m_bAddress.isEmpty())
     {
-        addr.append((int)m_bAddress.at(0));
-        addr.append((int)m_bAddress.at(1));
+        addr.append(static_cast<int>(m_bAddress.at(0)));
+        addr.append(static_cast<int>(m_bAddress.at(1)));
     }
 
     QString p;

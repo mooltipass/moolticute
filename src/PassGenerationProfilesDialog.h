@@ -37,7 +37,7 @@ class PassGenerationProfilesDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit PassGenerationProfilesDialog(QWidget *parent = 0);
+    explicit PassGenerationProfilesDialog(QWidget *parent = nullptr);
     ~PassGenerationProfilesDialog();
 
     void setPasswordProfilesModel(PasswordProfilesModel *model);

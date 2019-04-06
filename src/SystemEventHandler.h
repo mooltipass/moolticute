@@ -14,7 +14,7 @@ class SystemEventHandler : public QObject, QAbstractNativeEventFilter
 
 public:
     SystemEventHandler();
-    virtual ~SystemEventHandler();
+    virtual ~SystemEventHandler() override;
 
     void emitEvent(const SystemEvent event);
     static void triggerEvent(const int type, void *instance);

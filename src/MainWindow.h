@@ -39,7 +39,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent = 0);
+    explicit MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent = nullptr);
     ~MainWindow();
 
     void daemonLogAppend(const QByteArray &logdata);

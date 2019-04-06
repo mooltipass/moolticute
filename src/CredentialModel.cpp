@@ -101,8 +101,9 @@ QVariant CredentialModel::headerData(int section, Qt::Orientation orientation, i
 Qt::ItemFlags CredentialModel::flags(const QModelIndex &idx) const
 {
     if (!idx.isValid())
-        return 0;
-
+    {
+        return nullptr;
+    }
     return QAbstractItemModel::flags(idx);
 }
 
@@ -223,15 +224,15 @@ void CredentialModel::load(const QJsonArray &json)
                 continue;
             }
             QByteArray bAddress;
-            bAddress.append((char)a.at(0).toInt());
-            bAddress.append((char)a.at(1).toInt());
+            bAddress.append(static_cast<char>(a.at(0).toInt()));
+            bAddress.append(static_cast<char>(a.at(1).toInt()));
 
             // Update login item address
             pLoginItem->setAddress(bAddress);
 
             // Update login favorite
             int iFavorite = cnode["favorite"].toInt();
-            pLoginItem->setFavorite(iFavorite);
+            pLoginItem->setFavorite(static_cast<qint8>(iFavorite));
         }
     }
 
@@ -294,67 +295,66 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &ro
     bool bChanged = false;
     switch (role)
     {
-    case ItemNameRole:
-    {
-        QString sName = vValue.toString();
-        if (sName != pLoginItem->name())
+        case ItemNameRole:
         {
-            pLoginItem->setName(sName);
-            bChanged = true;
+            QString sName = vValue.toString();
+            if (sName != pLoginItem->name())
+            {
+                pLoginItem->setName(sName);
+                bChanged = true;
+            }
+            break;
         }
-        break;
-    }
-    case PasswordRole:
-    {
-        QString sPassword = vValue.toString();
-        if (sPassword != pLoginItem->password())
+        case PasswordRole:
         {
-            pLoginItem->setPassword(sPassword);
-            bChanged = true;
+            QString sPassword = vValue.toString();
+            if (sPassword != pLoginItem->password())
+            {
+                pLoginItem->setPassword(sPassword);
+                bChanged = true;
+            }
+            break;
         }
-        break;
-    }
-    case DescriptionRole:
-    {
-        QString sDescription = vValue.toString();
-        if (sDescription != pLoginItem->description())
+        case DescriptionRole:
         {
-            pLoginItem->setDescription(sDescription);
-            bChanged = true;
+            QString sDescription = vValue.toString();
+            if (sDescription != pLoginItem->description())
+            {
+                pLoginItem->setDescription(sDescription);
+                bChanged = true;
+            }
+            break;
         }
-        break;
-    }
-    case DateUpdatedRole:
-    {
-        QDate dDate = vValue.toDate();
-        if (dDate != pLoginItem->updatedDate())
+        case DateUpdatedRole:
         {
-            pLoginItem->setUpdatedDate(dDate);
-            bChanged = true;
+            QDate dDate = vValue.toDate();
+            if (dDate != pLoginItem->updatedDate())
+            {
+                pLoginItem->setUpdatedDate(dDate);
+                bChanged = true;
+            }
+            break;
         }
-        break;
-    }
-    case DateAccessedRole:
-    {
-        QDate dDate = vValue.toDate();
-        if (dDate != pLoginItem->accessedDate())
+        case DateAccessedRole:
         {
-            pLoginItem->setAccessedDate(dDate);
-            bChanged = true;
+            QDate dDate = vValue.toDate();
+            if (dDate != pLoginItem->accessedDate())
+            {
+                pLoginItem->setAccessedDate(dDate);
+                bChanged = true;
+            }
+            break;
         }
-        break;
-    }
-    case FavoriteRole:
-    {
-        qint8 iFavorite = (qint8)vValue.toInt();
-        if (iFavorite != pLoginItem->favorite())
+        case FavoriteRole:
         {
-            pLoginItem->setFavorite(iFavorite);
-            bChanged = true;
+            qint8 iFavorite = static_cast<qint8>(vValue.toInt());
+            if (iFavorite != pLoginItem->favorite())
+            {
+                pLoginItem->setFavorite(iFavorite);
+                bChanged = true;
+            }
+            break;
         }
-        break;
-    }
-    default: break;
     }
     if (bChanged)
         emit dataChanged(idx, idx);

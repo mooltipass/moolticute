@@ -38,7 +38,7 @@ class CredentialsManagement : public QWidget
     Q_OBJECT
 
 public:    
-    explicit CredentialsManagement(QWidget *parent = 0);
+    explicit CredentialsManagement(QWidget *parent = nullptr);
     ~CredentialsManagement();
     void setWsClient(WSClient *c);
     void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);

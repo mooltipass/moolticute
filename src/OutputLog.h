@@ -27,7 +27,7 @@ class OutputLog : public QPlainTextEdit
 {
     Q_OBJECT
 public:
-    OutputLog(QWidget *parent = 0);
+    OutputLog(QWidget *parent = nullptr);
     ~OutputLog();
 
     void appendMessage(const QString &out, const QTextCharFormat &format = QTextCharFormat());

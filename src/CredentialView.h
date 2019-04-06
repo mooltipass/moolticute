@@ -17,7 +17,7 @@ class CredentialView : public QTreeView
 
 public:
     explicit CredentialView(QWidget *parent = nullptr);
-    ~CredentialView();
+    ~CredentialView() override;
     void refreshLoginItem(const QModelIndex &srcIndex, bool bIsFavorite=false);
     virtual void setModel(QAbstractItemModel *model) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;

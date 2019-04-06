@@ -164,10 +164,10 @@ QList<FormattedText> AnsiEscapeCodeHandler::parseText(const FormattedText &input
                 const int code = numbers.at(i).toInt();
 
                 if (code >= TextColorStart && code <= TextColorEnd) {
-                    charFormat.setForeground(ansiColor(code - TextColorStart));
+                    charFormat.setForeground(ansiColor(static_cast<uint>(code - TextColorStart)));
                     setFormatScope(charFormat);
                 } else if (code >= BackgroundColorStart && code <= BackgroundColorEnd) {
-                    charFormat.setBackground(ansiColor(code - BackgroundColorStart));
+                    charFormat.setBackground(ansiColor(static_cast<uint>(code - BackgroundColorStart)));
                     setFormatScope(charFormat);
                 } else {
                     switch (code) {
@@ -209,7 +209,7 @@ QList<FormattedText> AnsiEscapeCodeHandler::parseText(const FormattedText &input
                             break;
                         case 5:
                             // 256 color mode with format: 38;5;<i>
-                            uint index = numbers.at(i + 1).toInt();
+                            uint index = numbers.at(i + 1).toUInt();
 
                             QColor color;
                             if (index < 8) {
@@ -224,7 +224,7 @@ QList<FormattedText> AnsiEscapeCodeHandler::parseText(const FormattedText &input
                                 color = QColor((o / 36) * 51, ((o / 6) % 6) * 51, (o % 6) * 51);
                             } else {
                                 // The last 24 colors are a greyscale gradient.
-                                uint grey = (index - 232) * 11;
+                                int grey = (static_cast<int>(index) - 232) * 11;
                                 color = QColor(grey, grey, grey);
                             }
 

@@ -31,7 +31,7 @@ class WindowLog : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit WindowLog(QWidget *parent = 0);
+    explicit WindowLog(QWidget *parent = nullptr);
     ~WindowLog();
 
     void appendData(const QByteArray &logdata);

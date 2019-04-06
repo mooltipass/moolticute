@@ -32,7 +32,7 @@ class SSHManagement : public QWidget
     Q_OBJECT
 
 public:
-    explicit SSHManagement(QWidget *parent = 0);
+    explicit SSHManagement(QWidget *parent = nullptr);
     ~SSHManagement();
 
     void setWsClient(WSClient *c);

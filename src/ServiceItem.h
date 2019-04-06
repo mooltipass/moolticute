@@ -9,7 +9,7 @@ class ServiceItem : public TreeItem
 {
 public:
     ServiceItem(const QString &sServiceName);
-    virtual ~ServiceItem();
+    virtual ~ServiceItem() override;
 
     LoginItem *addLogin(const QString &sLoginName);
     LoginItem *findLoginByName(const QString &sLoginName);

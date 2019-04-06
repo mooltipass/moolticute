@@ -268,7 +268,7 @@ LockedPasswordLineEdit::LockedPasswordLineEdit(QWidget* parent):
     PasswordLineEdit(parent),
     m_locked(false)
 {
-    disconnect(m_showPassword, 0, 0, 0);
+    disconnect(m_showPassword, nullptr, nullptr, nullptr);
 
     connect(m_showPassword, &QAction::triggered, [this]()
     {
@@ -316,21 +316,21 @@ void PasswordOptionsPopup::generatePassword()
     result.resize(length);
 
     // Create a distribution based on the pool size
-    std::uniform_int_distribution<char> distribution(0, pool.size() - 1);
+    std::uniform_int_distribution<char> distribution(0, static_cast<char>(pool.size() - 1));
 
     //Fill the password with random characters
     for (int i = 0; i < length; i++)
-        result[i] = pool.at(distribution(m_random_generator));
+        result[i] = pool.at(static_cast<size_t>(distribution(m_random_generator)));
 
     //Done
     m_passwordLabel->setText(result);
 
-    double entropy = ZxcvbnMatch(result, 0, 0);
+    double entropy = ZxcvbnMatch(result, nullptr, nullptr);
     m_entropy->setText(tr("Entropy: %1 bit").arg(QString::number(entropy, 'f', 2)));
     if (entropy > m_strengthBar->maximum())
         entropy = m_strengthBar->maximum();
 
-    m_strengthBar->setValue(entropy);
+    m_strengthBar->setValue(static_cast<int>(entropy));
 
     QString style = QStringLiteral(PROGRESS_STYLE);
     if (entropy < 35)
@@ -373,7 +373,7 @@ std::vector<char> PasswordOptionsPopup::generateCustomPasswordPool()
         poolSize += kSymbols.size();
     }
 
-    pool.resize(poolSize);
+    pool.resize(static_cast<size_t>(poolSize));
     //Fill the pool
     auto it = std::begin(pool);
     if (m_upperCaseCB->isChecked())

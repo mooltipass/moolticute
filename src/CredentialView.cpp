@@ -155,7 +155,7 @@ void CredentialView::setModel(QAbstractItemModel *model)
 {
     QTreeView::setModel(model);
 
-    setColumnWidth(0, geometry().width()*columnBreakRatio);
+    setColumnWidth(0, static_cast<int>(geometry().width()*columnBreakRatio));
     connect(model, &QAbstractItemModel::layoutAboutToBeChanged
             , this, &CredentialView::onLayoutAboutToBeChanged);
     connect(model, &QAbstractItemModel::layoutChanged, this
@@ -165,7 +165,7 @@ void CredentialView::setModel(QAbstractItemModel *model)
 void CredentialView::resizeEvent(QResizeEvent *event)
 {
     QTreeView::resizeEvent(event);
-    setColumnWidth(0, geometry().width()*columnBreakRatio);
+    setColumnWidth(0, static_cast<int>(geometry().width()*columnBreakRatio));
 }
 
 void CredentialView::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents

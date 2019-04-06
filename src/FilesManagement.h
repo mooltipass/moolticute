@@ -30,7 +30,7 @@ class FilesFilterModel: public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    FilesFilterModel(QObject *parent = 0);
+    FilesFilterModel(QObject *parent = nullptr);
 
     void setFilter(const QString &filter_str);
 
@@ -50,7 +50,7 @@ class FilesManagement : public QWidget
     Q_OBJECT
 
 public:
-    explicit FilesManagement(QWidget *parent = 0);
+    explicit FilesManagement(QWidget *parent = nullptr);
     ~FilesManagement();
 
     void setWsClient(WSClient *c);

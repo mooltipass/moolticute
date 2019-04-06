@@ -93,10 +93,11 @@ QHash<Common::MPStatus, QString> Common::MPStatusString = {
 
 Common::MPStatus Common::statusFromString(const QString &st)
 {
-    for (auto it = MPStatusString.begin();it != MPStatusString.end();it++)
+    const auto it = std::find_if(std::begin(MPStatusString), std::end(MPStatusString),
+                                 [&st](const QString& val){ return val == st;});
+    if (it != std::end(MPStatusString))
     {
-        if (it.value() == st)
-            return it.key();
+        return it.key();
     }
 
     qWarning() << "Unable to find value from enum for status" << st;

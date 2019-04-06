@@ -9,7 +9,7 @@ class RootItem : public TreeItem
 {
 public:
     RootItem();
-    virtual ~RootItem();
+    virtual ~RootItem() override;
 
     ServiceItem *addService(const QString &sServiceName);
     ServiceItem *findServiceByName(const QString &sServiceName);

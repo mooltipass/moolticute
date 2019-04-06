@@ -13,7 +13,7 @@ class LoginItem : public TreeItem
 {
 public:
     LoginItem(const QString &sLoginName);
-    virtual ~LoginItem();
+    virtual ~LoginItem() override;
     const QByteArray &address() const;
     void setAddress(const QByteArray &bAddress);
     qint8 favorite() const;

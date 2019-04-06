@@ -158,7 +158,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
     else if (rootobj["msg"] == "param_changed")
     {
-        udateParameters(rootobj["data"].toObject());
+        updateParameters(rootobj["data"].toObject());
     }
     else if (rootobj["msg"] == "memorymgmt_changed")
     {
@@ -196,7 +196,7 @@ void WSClient::onTextMessageReceived(const QString &message)
             set_mpHwVersion(Common::MP_Classic);
         }
         set_fwVersion(o["hw_version"].toString());
-        set_hwSerial(o["hw_serial"].toInt());
+        set_hwSerial(static_cast<quint32>(o["hw_serial"].toInt()));
         set_hwMemory(o["flash_size"].toInt());
     }
     else if (rootobj["msg"] == "request_domain")
@@ -316,7 +316,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "device_uid")
     {
         QJsonObject o = rootobj["data"].toObject();
-        set_uid((qint64)o["uid"].toDouble());
+        set_uid(static_cast<qint64>(o["uid"].toDouble()));
     }
     else if (rootobj["msg"] == "get_data_node")
     {
@@ -444,7 +444,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
 }
 
-void WSClient::udateParameters(const QJsonObject &data)
+void WSClient::updateParameters(const QJsonObject &data)
 {
     QString param = data["parameter"].toString();
 

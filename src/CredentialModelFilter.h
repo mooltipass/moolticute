@@ -13,7 +13,7 @@ class CredentialModelFilter : public QSortFilterProxyModel
 
 public:
     CredentialModelFilter(QObject *parent = nullptr);
-    ~CredentialModelFilter();
+    ~CredentialModelFilter() override;
     void setFilter(const QString &sFilter);
     bool switchFavFilter();
     TreeItem *getItemByProxyIndex(const QModelIndex &proxyIndex);

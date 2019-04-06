@@ -69,7 +69,7 @@ PassGenerationProfilesDialog::PassGenerationProfilesDialog(QWidget *parent) :
     ui->widgetSpecialSymbols->setLayout(lay);
 
     // Generate buttons for toggling special symbols and place them in 3 rows
-    int countInRow = int(std::ceil(kSymbols.size() / (double)kRows));
+    int countInRow = int(std::ceil(kSymbols.size() / static_cast<double>(kRows)));
     QHBoxLayout *rowLayout = new QHBoxLayout;
     lay->addLayout(rowLayout);
 

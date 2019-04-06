@@ -164,7 +164,7 @@ private slots:
     void onTextMessageReceived(const QString &message);
 
 private:
-    void udateParameters(const QJsonObject &data);
+    void updateParameters(const QJsonObject &data);
 
     QWebSocket *wsocket = nullptr;
 

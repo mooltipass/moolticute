@@ -148,7 +148,7 @@ bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *me
 #ifdef Q_OS_WIN
     if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
     {
-        const auto *msg = (MSG*) message;
+        const auto *msg = static_cast<MSG*>(message);
         if (msg->message == WM_ENDSESSION || msg->message == WM_QUERYENDSESSION)
         {
             if (msg->lParam == static_cast<int>(ENDSESSION_LOGOFF))

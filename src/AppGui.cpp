@@ -53,7 +53,7 @@ AppGui::AppGui(int & argc, char ** argv) :
 
 bool AppGui::initialize()
 {
-    qsrand(time(NULL));
+    qsrand(static_cast<uint>(time(nullptr)));
 
     QCoreApplication::setOrganizationName("mooltipass");
     QCoreApplication::setOrganizationDomain("themooltipass.com");
