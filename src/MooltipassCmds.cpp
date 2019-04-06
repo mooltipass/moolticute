@@ -41,7 +41,7 @@ bool MPCmd::isUserRequired(Command c)
 
 QString MPCmd::toHexString(Command c)
 {
-    return QString("0x%1").arg((quint16)c, 4, 16, QChar('0'));
+    return QString("0x%1").arg(static_cast<quint16>(c), 4, 16, QChar('0'));
 }
 
 QString MPCmd::toHexString(quint16 c)

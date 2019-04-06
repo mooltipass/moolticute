@@ -71,7 +71,7 @@ QList<QVariantMap> FilesCache::load()
 
         QJsonObject jsonRoot = QJsonDocument::fromJson(rawJSon.toLocal8Bit()).object();
 
-        qint8 cacheDbChangeNumber = jsonRoot.value("db_change_number").toInt();
+        qint8 cacheDbChangeNumber = static_cast<qint8>(jsonRoot.value("db_change_number").toInt());
         if (cacheDbChangeNumber != m_dbChangeNumber)
         {
             qDebug() << "dbChangeNumber miss";
@@ -154,15 +154,12 @@ bool FilesCache::setCardCPZ(QByteArray cardCPZ)
 
     m_filePath = dataDir.absoluteFilePath(fileName);
 
-    qint64 m_key = 0;
+    quint64 m_key = 0;
     for (int i = 0;i < std::min(8, cardCPZ.size());i++)
         m_key += (static_cast<unsigned int>(cardCPZ[i]) & 0xFF) << (i * 8);
 
     m_simpleCrypt.setKey(m_key);
     m_simpleCrypt.setIntegrityProtectionMode(SimpleCrypt::ProtectionHash);
 
-    if (m_dbChangeNumberSet)
-        return true;
-    else
-        return false;
+    return m_dbChangeNumberSet;
 }

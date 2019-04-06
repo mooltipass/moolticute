@@ -43,7 +43,7 @@ MPNode::MPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 vir
 int MPNode::getType() const
 {
     if (data.size() > 1)
-        return ((quint8)data[1] >> 6) & 0x03;
+        return (static_cast<quint8>(data[1]) >> 6) & 0x03;
     return -1;
 }
 
@@ -51,7 +51,7 @@ void MPNode::setType(const quint8 type)
 {
     if (data.size() > 1)
     {
-        data[1] = type << 6;
+        data[1] = static_cast<char>(type << 6);
     }
 }
 
@@ -59,7 +59,7 @@ bool MPNode::isValid() const
 {
     return getType() != NodeUnknown &&
            data.size() == MP_NODE_SIZE &&
-           ((quint8)data[1] & 0x20) == 0;
+           (static_cast<quint8>(data[1]) & 0x20) == 0;
 }
 
 bool MPNode::isDataLengthValid() const

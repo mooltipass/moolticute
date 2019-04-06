@@ -157,7 +157,7 @@ public:
     {}
 
     void setReturnCheck(bool enable) { checkReturn = enable; }
-    void setTimeout(int t) { timeout = t; }
+    void setTimeout(uint t) { timeout = t; }
 
 public slots:
     virtual void start(const QByteArray &previous_data);
@@ -179,7 +179,7 @@ private:
 
     //Timeout that will be used for this command
     //and passed to MPDevice::sendData()
-    int timeout = CMD_DEFAULT_TIMEOUT;
+    uint timeout = CMD_DEFAULT_TIMEOUT;
 };
 
 class AsyncJobs: public QObject

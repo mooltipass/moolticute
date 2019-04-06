@@ -32,7 +32,7 @@ private:
     QString m_filePath;
     qint64 m_key = 0;
     bool m_dbChangeNumberSet = false;
-    quint8 m_dbChangeNumber = -1;
+    quint8 m_dbChangeNumber = std::numeric_limits<quint8>::max();
     SimpleCrypt m_simpleCrypt;
     bool m_isFileCacheInSync = true;
 };

@@ -19,7 +19,7 @@
 #include "MPDevice_emul.h"
 #include "MooltipassCmds.h"
 
-#define CLEAN_MEMORY_QBYTEARRAY(d) do {for (int i = 0; i < d.size(); i++){d[i] = qrand() % 256;}} while(0);
+#define CLEAN_MEMORY_QBYTEARRAY(d) do {for (int i = 0; i < d.size(); i++){d[i] = static_cast<char>(qrand() % 256);}} while(0);
 
 
 MPDevice_emul::MPDevice_emul(QObject *parent):
@@ -45,7 +45,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[1] = commandData;
         d[2] = 0x08;
         d.append("v1.0_emul");
-        d[0] = d.size() - 1;
+        d[0] = static_cast<char>(d.size() - 1);
         d.resize(64);
         sendReadSignal(d);
         CLEAN_MEMORY_QBYTEARRAY(d);
@@ -63,7 +63,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
     }
     case MPCmd::SET_MOOLTIPASS_PARM:
     {
-        mooltipassParam[data[2]] = data [3];
+        mooltipassParam[static_cast<unsigned char>(data[2])] = static_cast<unsigned char>(data[3]);
         QByteArray d;
         d[0] = 1;
         d[1] = commandData;
@@ -77,7 +77,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QByteArray d;
         d[0] = 1;
         d[1] = commandData;
-        d[2] = mooltipassParam[data[2]];
+        d[2] = static_cast<char>(mooltipassParam[static_cast<unsigned char>(data[2])]);
         d.resize(64);
         sendReadSignal(d);
         break;
@@ -87,7 +87,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QByteArray d;
         d[0] = 0x01;
         d[1] = commandData;
-        d[2] = 0b101;
+        d[2] = 0x05;
         d.resize(64);
         sendReadSignal(d);
         break;
@@ -109,7 +109,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QByteArray d;
         d[0] = 1;
         d[1] = commandData;
-        d[2] = (quint8)logins.contains(context);
+        d[2] = static_cast<char>(logins.contains(context));
         d.resize(64);
         sendReadSignal(d);
         break;
@@ -123,7 +123,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
             d.append(logins[context]);
         else
             d[2] = 0x0;
-        d[0] = d.length() - 2;
+        d[0] = static_cast<char>(d.length() - 2);
         d.resize(64);
         sendReadSignal(d);
         break;
@@ -137,7 +137,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
             d.append(passwords[context]);
         else
             d[2] = 0x0;
-        d[0] = d.length() - 2;
+        d[0] = static_cast<char>(d.length() - 2);
         d.resize(64);
         sendReadSignal(d);
         break;
@@ -207,7 +207,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
          d[0] = 32;
          d[1] = commandData;
          for (int i = 0; i < 32; i++)
-             d[2 + i] = qrand() % 255;
+             d[2 + i] = static_cast<char>(qrand() % 255);
          d.resize(64);
          sendReadSignal(d);
          break;
@@ -230,7 +230,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[0] = 8;
         d[1] = commandData;
         for (int i = 2; i < 10; i++)
-            d[i] = 0xFF;
+            d[i] = static_cast<char>(0xFF);
 
         d.resize(64);
         sendReadSignal(d);
@@ -239,7 +239,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
     case MPCmd::READ_FLASH_NODE: /* 0xC5 */
     {
         QByteArray d(134, 0x00);
-        d[0] = d.size() - 2;
+        d[0] = static_cast<char>(d.size() - 2);
         d[1] = commandData;
         d.resize(64);
         sendReadSignal(d);

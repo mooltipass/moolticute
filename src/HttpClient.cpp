@@ -37,7 +37,7 @@ int onMessageBeginCb(http_parser *parser)
 int onUrlCb(http_parser *parser, const char *at, size_t length)
 {
     HttpClient *client = reinterpret_cast<HttpClient *>(parser->data);
-    client->m_parseUrl.append(at, length);
+    client->m_parseUrl.append(at, static_cast<int>(length));
 
     return 0;
 }
@@ -64,7 +64,7 @@ int onHeaderFieldCb(http_parser *parser, const char *at, size_t length)
     if (!client->m_hasField)
         client->m_hasField = true;
 
-    client->m_hField.append(at, length);
+    client->m_hField.append(at, static_cast<int>(length));
 
     return 0;
 }
@@ -76,7 +76,7 @@ int onHeaderValueCb(http_parser *parser, const char *at, size_t length)
     if (!client->m_hasValue)
         client->m_hasValue = true;
 
-    client->m_hValue.append(at, length);
+    client->m_hValue.append(at, static_cast<int>(length));
 
     return 0;
 }
@@ -100,7 +100,7 @@ int onBodyCb(http_parser *parser, const char *at, size_t length)
 {
     HttpClient *client = reinterpret_cast<HttpClient *>(parser->data);
 
-    client->m_bodyMessage.append(at, length);
+    client->m_bodyMessage.append(at, static_cast<int>(length));
 
 
     return 0;
@@ -120,11 +120,11 @@ HttpClient::HttpClient(QTcpSocket *socket, QObject *parent) :
     QObject(parent),
     m_socket(socket)
 {
-    m_httpParser = (http_parser*) calloc(1, sizeof(http_parser));
+    m_httpParser = static_cast<http_parser*>(calloc(1, sizeof(http_parser)));
     http_parser_init(m_httpParser, HTTP_REQUEST);
     m_httpParser->data = this;
 
-    m_httpParserSettings = (http_parser_settings*) calloc(1, sizeof(http_parser_settings));
+    m_httpParserSettings = static_cast<http_parser_settings*>(calloc(1, sizeof(http_parser_settings)));
     m_httpParserSettings->on_message_begin = onMessageBeginCb;
     m_httpParserSettings->on_url = onUrlCb;
     m_httpParserSettings->on_status_complete = onStatusCompleteCb;
@@ -190,8 +190,8 @@ void HttpClient::parseRequest()
     while (m_socket->bytesAvailable())
     {
         QByteArray data = m_socket->readAll();
-        int n = http_parser_execute(m_httpParser, m_httpParserSettings, data.constData(), data.size());
-        if (n != data.size())
+        auto n = http_parser_execute(m_httpParser, m_httpParserSettings, data.constData(), static_cast<size_t>(data.size()));
+        if (n != static_cast<size_t>(data.size()))
         {
             // Errro close connection
             CloseConnection();

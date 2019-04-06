@@ -24,7 +24,7 @@
 
 HttpServer::HttpServer(QObject *parent) :
     QObject(parent),
-    m_tcpServer(0)
+    m_tcpServer(nullptr)
 {
 
 }

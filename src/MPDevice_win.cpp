@@ -54,16 +54,16 @@ MPDevice_win::~MPDevice_win()
 
 QString MPDevice_win::getLastError(DWORD err)
 {
-    LPWSTR bufPtr = NULL;
+    LPWSTR bufPtr = nullptr;
     FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                    FORMAT_MESSAGE_FROM_SYSTEM |
                    FORMAT_MESSAGE_IGNORE_INSERTS,
-                   NULL,
+                   nullptr,
                    err,
                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                    (LPWSTR)&bufPtr,
                    0,
-                   NULL);
+                   nullptr);
     const QString result =
             (bufPtr) ? QString::fromUtf16((const ushort*)bufPtr).trimmed() :
                        QString("Unknown Error %1").arg(err);
@@ -139,7 +139,7 @@ bool MPDevice_win::openPath()
 void MPDevice_win::platformWrite(const QByteArray &data)
 {
     QByteArray ba;
-    ba.append((QChar)0x00); //add report id (even if not used). windows requires that
+    ba.append(NULL_CHAR); //add report id (even if not used). windows requires that
     ba.append(data);
 
     //resize array to fit windows requirements (at least outReportLen size)
@@ -150,11 +150,11 @@ void MPDevice_win::platformWrite(const QByteArray &data)
 
     bool ret = WriteFile(platformDef.devHandle,
                          ba.constData(),
-                         ba.size(),
+                         static_cast<DWORD>(ba.size()),
                          nullptr,
                          &writeOverlapped);
 
-    int err = GetLastError();
+    const auto err = GetLastError();
 
     if (!ret &&
         err != ERROR_IO_PENDING &&
@@ -173,11 +173,11 @@ void MPDevice_win::platformRead()
 
     bool ret = ReadFile(platformDef.devHandle,
                         readBuffer.data(),
-                        readBuffer.size(),
+                        static_cast<DWORD>(readBuffer.size()),
                         nullptr,
                         &readOverlapped);
 
-    int err = GetLastError();
+    const auto err = GetLastError();
     if (!ret && err != ERROR_IO_PENDING)
     {
         qWarning() << "Failed to read data from device!";
@@ -193,7 +193,7 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
 
     SP_DEVINFO_DATA devinfo_data;
     SP_DEVICE_INTERFACE_DATA dev_data;
-    SP_DEVICE_INTERFACE_DETAIL_DATA_A *dev_detail_data = NULL;
+    SP_DEVICE_INTERFACE_DETAIL_DATA_A *dev_detail_data = nullptr;
     HDEVINFO dev_info_set = INVALID_HANDLE_VALUE;
     int idx = 0;
 
@@ -207,7 +207,7 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
     while (SetupDiEnumDeviceInterfaces(dev_info_set,
                                        nullptr,
                                        &IClassGuid,
-                                       idx,
+                                       static_cast<DWORD>(idx),
                                        &dev_data))
     {
         DWORD required_size = 0;
@@ -221,7 +221,7 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
                                                     nullptr);
 
         //alloc data
-        dev_detail_data = (SP_DEVICE_INTERFACE_DETAIL_DATA_A*) malloc(required_size);
+        dev_detail_data = static_cast<SP_DEVICE_INTERFACE_DETAIL_DATA_A*>(malloc(required_size));
         dev_detail_data->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA_A);
 
         //Get device info now
@@ -321,7 +321,7 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
             return;
         }
 
-        readBuffer.resize(numberOfBytes);
+        readBuffer.resize(static_cast<int>(numberOfBytes));
         emit platformDataRead(readBuffer.right(readBuffer.length() - 1));
 
         platformRead();

@@ -461,9 +461,9 @@ private:
     //Message Protocol
     IMessageProtocol *pMesProt = nullptr;
     MPDeviceBleImpl *bleImpl = nullptr;
-
 protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
+    const char NULL_CHAR = static_cast<char>(0);
 };
 
 #endif // MPDEVICE_H

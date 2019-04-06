@@ -129,7 +129,7 @@ public:
 
     quint16 toIntFromLittleEndian(quint8 lowerByte, quint8 upperByte)
     {
-        return (lowerByte|(upperByte<<8));
+        return static_cast<quint16>(lowerByte|(upperByte<<8));
     }
 
     QByteArray toLittleEndianFromInt(quint16 num)

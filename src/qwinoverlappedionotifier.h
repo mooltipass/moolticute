@@ -69,7 +69,7 @@ class QWinOverlappedIoNotifier : public QObject
     Q_PRIVATE_SLOT(d_func(), void _q_notified())
     friend class QWinIoCompletionPort;
 public:
-    QWinOverlappedIoNotifier(QObject *parent = 0);
+    QWinOverlappedIoNotifier(QObject *parent = nullptr);
     ~QWinOverlappedIoNotifier();
 
     void setHandle(Qt::HANDLE h);

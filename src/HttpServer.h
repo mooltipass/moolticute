@@ -30,7 +30,7 @@ class HttpServer: QObject
 {
     Q_OBJECT
 public:
-    HttpServer(QObject *parent = 0);
+    HttpServer(QObject *parent = nullptr);
     virtual ~HttpServer();
 
     bool start(quint16 port);

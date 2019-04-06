@@ -113,32 +113,31 @@ static void _messageOutput(QtMsgType type, const QMessageLogContext &context, co
 
     QString s;
     switch (type) {
-    default:
-    case QtDebugMsg:
-    {
-        s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        break;
-    }
-    case QtInfoMsg:
-    {
-        s = QString(COLOR_GREEN "INFO" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        break;
-    }
-    case QtWarningMsg:
-    {
-        s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        break;
-    }
-    case QtCriticalMsg:
-    {
-        s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        break;
-    }
-    case QtFatalMsg:
-    {
-        s = QString(COLOR_RED "FATAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-        break;
-    }
+        case QtDebugMsg:
+        {
+            s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+            break;
+        }
+        case QtInfoMsg:
+        {
+            s = QString(COLOR_GREEN "INFO" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+            break;
+        }
+        case QtWarningMsg:
+        {
+            s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+            break;
+        }
+        case QtCriticalMsg:
+        {
+            s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+            break;
+        }
+        case QtFatalMsg:
+        {
+            s = QString(COLOR_RED "FATAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+            break;
+        }
     }
 
     if (!s.isEmpty())
@@ -192,9 +191,9 @@ void Common::installMessageOutputHandler(QLocalServer *logServer, GuiLogCallback
 QDate Common::bytesToDate(const QByteArray &data)
 {
     //reminder date is uint16_t : yyyy yyym mmmd dddd with year from 2010
-    int y = (((quint8)data[0] >> 1) & 0x7F) + 2010;
-    int m = (((quint8)data[0] & 0x01) << 3) | (((quint8)data[1] >> 5) & 0x07);
-    int d = ((quint8)data[1] & 0x1F);
+    int y = ((static_cast<quint8>(data[0]) >> 1) & 0x7F) + 2010;
+    int m = (static_cast<quint8>(data[0] & 0x01) << 3) | ((static_cast<quint8>(data[1]) >> 5) & 0x07);
+    int d = (static_cast<quint8>(data[1]) & 0x1F);
 
     return QDate(y, m+1, d);
 }
@@ -220,7 +219,9 @@ QJsonArray Common::bytesToJson(const QByteArray &data)
 {
     QJsonArray arr;
     for (int i = 0;i < data.size();i++)
-        arr.append((quint8)data.at(i));
+    {
+        arr.append(static_cast<quint8>(data.at(i)));
+    }
     return arr;
 }
 
@@ -229,7 +230,7 @@ QJsonObject Common::bytesToJsonObjectArray(const QByteArray &data)
     QJsonObject returnObject;
     for (qint32 i = 0; i < data.size(); i++)
     {
-        returnObject[QString::number(i)] = QJsonValue((quint8)data[i]);
+        returnObject[QString::number(i)] = QJsonValue(static_cast<quint8>(data[i]));
     }
     return returnObject;
 }
@@ -239,7 +240,7 @@ bool Common::isProcessRunning(qint64 pid)
 {
     if (pid == 0) return false;
 #if defined(Q_OS_WIN)
-    HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, pid);
+    HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, static_cast<DWORD>(pid));
     if (!process) return false;
     DWORD ret = WaitForSingleObject(process, 0);
     CloseHandle(process);
@@ -276,7 +277,7 @@ QJsonObject Common::readSharedMemory(QSharedMemory &sh)
     }
 
     QJsonParseError jerr;
-    QJsonDocument jdoc = QJsonDocument::fromJson((const char *)sh.constData(), &jerr);
+    QJsonDocument jdoc = QJsonDocument::fromJson(static_cast<const char*>(sh.constData()), &jerr);
 
     if (jerr.error != QJsonParseError::NoError)
     {
@@ -303,7 +304,7 @@ bool Common::writeSharedMemory(QSharedMemory &sh, const QJsonObject &o)
 
     QJsonDocument jdoc(o);
     QByteArray ba = jdoc.toJson(QJsonDocument::Compact);
-    memcpy(sh.data(), ba.constData(), ba.size());
+    memcpy(sh.data(), ba.constData(), static_cast<size_t>(ba.size()));
 
     sh.unlock();
 
@@ -318,7 +319,7 @@ QString Common::createUid(QString prefix)
     if (!commonUidInit)
     {
         commonUidInit = true;
-        qsrand(time(NULL));
+        qsrand(static_cast<uint>(time(nullptr)));
     }
 
     //try to generate a unique id based on
