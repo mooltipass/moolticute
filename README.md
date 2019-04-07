@@ -8,7 +8,7 @@ Moolticute
 This project aims to be an easy companion to your [Mooltipass](http://www.themooltipass.com) device and extend
 the power of the device to more platform/tools.
 With it you can manage your Mooltipass with a cross-platform app, as well as provide a daemon service that
-handle all USB communication with the device.
+handles all USB communication with the device.
 
 This tool is written with a daemon that runs in background, and a user interface app to control you Mooltipass.
 Other clients could also connect and talk to the daemon (it uses a websocket connection and simple JSON messages).
