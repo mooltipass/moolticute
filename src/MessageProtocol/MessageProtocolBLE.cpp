@@ -205,7 +205,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::ADD_CONTEXT           , 0xA9},
         {MPCmd::SET_BOOTLOADER_PWD    , 0xAA},
         {MPCmd::JUMP_TO_BOOTLOADER    , 0xAB},
-        {MPCmd::GET_RANDOM_NUMBER     , 0x0001},
+        {MPCmd::GET_RANDOM_NUMBER     , 0x0008},
         {MPCmd::START_MEMORYMGMT      , 0xAD},
         {MPCmd::IMPORT_MEDIA_START    , 0xAE},
         {MPCmd::IMPORT_MEDIA          , 0xAF},

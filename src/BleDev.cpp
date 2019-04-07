@@ -23,14 +23,14 @@ BleDev::BleDev(QWidget *parent) :
     ui->label_UploadProgress->hide();
 
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
-    ui->btnAccDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
-    ui->progressBarAccData->setVisible(false);
+    ui->btnFetchDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
+    ui->progressBarFetchData->setVisible(false);
     ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
-    ui->progressBarAccData->setMinimum(0);
-    ui->progressBarAccData->setMaximum(0);
+    ui->progressBarFetchData->setMinimum(0);
+    ui->progressBarFetchData->setMaximum(0);
 
 #if defined(Q_OS_LINUX)
-    ui->label_AccDataFile->setMaximumWidth(150);
+    ui->label_FetchDataFile->setMaximumWidth(150);
 #endif
     initUITexts();
 }
@@ -49,7 +49,6 @@ void BleDev::setWsClient(WSClient *c)
 
 void BleDev::clearWidgets()
 {
-    ui->lineEditBundlePath->clear();
     ui->lineEditAuxMCUMaj->clear();
     ui->lineEditAuxMCUMin->clear();
     ui->lineEditMainMCUMaj->clear();
@@ -62,9 +61,14 @@ void BleDev::initUITexts()
     ui->label_DevTab->setText(tr("BLE Developer Tab"));
     ui->label_BLEDesc->setText(tr("BLE description"));
 
-    ui->groupBoxUploadBundle->setTitle(tr("Upload Bundle"));
+    ui->groupBoxUploadBundle->setTitle(tr("Bundle Settings"));
     ui->label_bundleText->setText(tr("Select Bundle File:"));
     ui->btnFileBrowser->setText(browseText);
+    const auto flashText = tr("Flash");
+    ui->label_ReflashAuxMCU->setText(tr("Flash Aux MCU:"));
+    ui->btnReflashAuxMCU->setText(flashText);
+    ui->label_FlashMainMCU->setText(tr("Flash Main MCU:"));
+    ui->btnFlashMainMCU->setText(flashText);
 
     ui->groupBoxPlatInfo->setTitle(tr("Platform informations"));
     ui->label_AuxMCUMaj->setText(tr("Aux MCU major:"));
@@ -73,17 +77,39 @@ void BleDev::initUITexts()
     ui->label_MainMCUMin->setText(tr("Main MCU minor:"));
     ui->btnPlatInfo->setText(tr("Get Plat Info"));
 
-    const auto flashText = tr("Flash");
-    ui->groupBoxSettings->setTitle(tr("Settings"));
-    ui->label_ReflashAuxMCU->setText(tr("Flash Aux MCU:"));
-    ui->btnReflashAuxMCU->setText(flashText);
-    ui->label_FlashMainMCU->setText(tr("Flash Main MCU:"));
-    ui->btnFlashMainMCU->setText(flashText);
+    ui->groupBoxFetchData->setTitle(tr("Data Fetch"));
+    ui->label_FetchDataFile->setText(tr("Storage file:"));
+    ui->btnFetchDataBrowse->setText(browseText);
+    ui->btnFetchAccData->setText(FETCH_ACC_DATA_TEXT);
+    ui->btnFetchRandomData->setText(FETCH_RANDOM_DATA_TEXT);
+}
 
-    ui->groupBoxAccData->setTitle(tr("Acceleration Data"));
-    ui->label_AccDataFile->setText(tr("Acceleration Data File:"));
-    ui->btnAccDataBrowse->setText(browseText);
-    ui->btnFetchAccData->setText(tr("Fetch"));
+void BleDev::fetchData(const Common::FetchType &fetchType)
+{
+    QString fileName = ui->lineEditFetchData->text();
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+    bool isAccFetch = Common::FetchType::ACCELEROMETER == fetchType;
+    auto& selectedButton = isAccFetch ? ui->btnFetchAccData : ui->btnFetchRandomData;
+    auto& inactiveButton = isAccFetch ? ui->btnFetchRandomData : ui->btnFetchAccData;
+    if (Common::FetchState::STOPPED == fetchState)
+    {
+        ui->progressBarFetchData->show();
+        selectedButton->setText(tr("Stop Fetch"));
+        inactiveButton->hide();
+        fetchState = Common::FetchState::STARTED;
+        wsClient->sendFetchData(fileName, fetchType);
+    }
+    else
+    {
+        ui->progressBarFetchData->hide();
+        selectedButton->setText(isAccFetch ? FETCH_ACC_DATA_TEXT : FETCH_RANDOM_DATA_TEXT);
+        inactiveButton->show();
+        fetchState = Common::FetchState::STOPPED;
+        wsClient->sendStopFetchData();
+    }
 }
 
 void BleDev::on_btnFileBrowser_clicked()
@@ -99,7 +125,6 @@ void BleDev::on_btnFileBrowser_clicked()
         return;
     }
 
-    ui->lineEditBundlePath->setText(fileName);
     s.setValue("last_used_path/bundle_dir", QFileInfo(fileName).canonicalPath());
 
     QFileInfo file(fileName);
@@ -172,14 +197,18 @@ void BleDev::updateProgress(int total, int curr, QString msg)
     ui->label_UploadProgress->setText(msg);
 }
 
-void BleDev::on_btnAccDataBrowse_clicked()
+void BleDev::on_btnFetchDataBrowse_clicked()
 {
     QSettings s;
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select file to fetch acceleration data"),
-                                            s.value("last_used_path/accdata_dir", QDir::homePath()).toString(),
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select file to fetch data"),
+                                            s.value("last_used_path/fetchdata_dir", QDir::homePath()).toString(),
                                             "*.bin");
 
+    if (fileName.isEmpty())
+    {
+        return;
+    }
 #if defined(Q_OS_LINUX)
             /**
              * getSaveFileName is using native dialog
@@ -193,25 +222,16 @@ void BleDev::on_btnAccDataBrowse_clicked()
             }
 #endif
 
-    ui->lineEditAccData->setText(fileName);
-    s.setValue("last_used_path/accdata_dir", fileName.mid(0, fileName.lastIndexOf('/')));
+    ui->lineEditFetchData->setText(fileName);
+    s.setValue("last_used_path/fetchdata_dir", fileName.mid(0, fileName.lastIndexOf('/')));
 }
 
 void BleDev::on_btnFetchAccData_clicked()
 {
-    QString fileName = ui->lineEditAccData->text();
-    if (Common::AccState::STOPPED == accState && !ui->lineEditAccData->text().isEmpty())
-    {
-        ui->progressBarAccData->show();
-        ui->btnFetchAccData->setText(tr("Stop Fetch"));
-        accState = Common::AccState::STARTED;
-        wsClient->sendFetchAccData(fileName);
-    }
-    else
-    {
-        ui->progressBarAccData->hide();
-        ui->btnFetchAccData->setText(tr("Fetch"));
-        accState = Common::AccState::STOPPED;
-        wsClient->sendStopFetchAccData();
-    }
+    fetchData(Common::FetchType::ACCELEROMETER);
+}
+
+void BleDev::on_btnFetchRandomData_clicked()
+{
+    fetchData(Common::FetchType::RANDOM_BYTES);
 }

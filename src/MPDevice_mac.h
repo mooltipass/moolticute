@@ -44,6 +44,7 @@ public:
 
     //Static function for enumerating devices on platform
     static QList<MPPlatformDef> enumerateDevices();
+    static MPPlatformDef getPlatDef(QString def);
 
 private:
     virtual void platformRead();

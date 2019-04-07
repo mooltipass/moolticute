@@ -197,10 +197,16 @@ public:
         FAV_14,
     };
 
-    enum class AccState
+    enum class FetchState
     {
         STOPPED,
         STARTED
+    };
+
+    enum class FetchType
+    {
+        ACCELEROMETER,
+        RANDOM_BYTES
     };
 };
 

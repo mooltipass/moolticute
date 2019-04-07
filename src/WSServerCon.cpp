@@ -1262,17 +1262,21 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             sendJsonMessage(oroot);
         }, cbProgress);
     }
-    else if (root["msg"] == "fetch_acc_data")
+    else if (root["msg"] == "fetch_data")
     {
         QJsonObject o = root["data"].toObject();
-        bleImpl->fetchAccData(o["file"].toString());
+        auto type = static_cast<Common::FetchType>(o["type"].toInt());
+        const auto cmd = Common::FetchType::ACCELEROMETER == type ?
+                    MPCmd::CMD_DBG_GET_ACC_32_SAMPLES : MPCmd::GET_RANDOM_NUMBER;
+        bleImpl->fetchData(o["file"].toString(), cmd);
     }
-    else if (root["msg"] == "stop_fetch_acc_data")
+    else if (root["msg"] == "stop_fetch_data")
     {
-        bleImpl->stopFetchAccData();
+        bleImpl->stopFetchData();
     }
     else if (root["msg"] == "ask_password" ||
-             root["msg"] == "get_credential") {
+             root["msg"] == "get_credential")
+    {
         QJsonObject o = root["data"].toObject();
         QString service = o["service"].toString();
         QString login = o["login"].toString();
