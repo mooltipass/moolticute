@@ -148,29 +148,6 @@ void MPManager::usbDeviceAdded(QString path, bool isBLE)
 }
 #endif
 
-#if defined(Q_OS_LINUX)
-void MPManager::usbDeviceAdded(QString path, bool isBLE)
-{
-    if (!devices.contains(path))
-    {
-        MPDevice *device = nullptr;
-        //Create our platform device object
-        MPPlatformDef def;
-        def.path = path;
-        def.id = path;
-        def.isBLE = isBLE;
-        device = new MPDevice_linux(this, def);
-
-        devices[path] = device;
-        emit mpConnected(device);
-    }
-    else
-    {
-        qDebug() << "Device is already added: " << path;
-    }
-}
-#endif
-
 void MPManager::usbDeviceRemoved(QString path)
 {
     auto it = devices.find(path);
