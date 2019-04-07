@@ -59,13 +59,13 @@ LSSharedFileListItemRef FindLoginItemForCurrentBundle(CFArrayRef currentLoginIte
 {
     CFURLRef mainBundleURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 
-    for (int i = 0, end = CFArrayGetCount(currentLoginItems);i < end;++i)
+    for (int i = 0, end = static_cast<int>(CFArrayGetCount(currentLoginItems)); i < end; ++i)
     {
         LSSharedFileListItemRef item = (LSSharedFileListItemRef)CFArrayGetValueAtIndex(currentLoginItems, i);
 
         UInt32 resolutionFlags = kLSSharedFileListNoUserInteraction | kLSSharedFileListDoNotMountVolumes;
-        CFURLRef url = NULL;
-        OSStatus err = LSSharedFileListItemResolve(item, resolutionFlags, &url, NULL);
+        CFURLRef url = nullptr;
+        OSStatus err = LSSharedFileListItemResolve(item, resolutionFlags, &url, nullptr);
 
         if (err == noErr)
         {
@@ -81,12 +81,12 @@ LSSharedFileListItemRef FindLoginItemForCurrentBundle(CFArrayRef currentLoginIte
     }
 
     CFRelease(mainBundleURL);
-    return NULL;
+    return nullptr;
 }
 
 void setAutoStartup(bool en)
 {
-    LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
+    LSSharedFileListRef loginItems = LSSharedFileListCreate(nullptr, kLSSharedFileListSessionLoginItems, nullptr);
 
     if (!loginItems)
     {
@@ -98,13 +98,13 @@ void setAutoStartup(bool en)
     CFArrayRef currentLoginItems = LSSharedFileListCopySnapshot(loginItems, &seed);
     LSSharedFileListItemRef existingItem = FindLoginItemForCurrentBundle(currentLoginItems);
 
-    if (en && (existingItem == NULL))
+    if (en && (existingItem == nullptr))
     {
         CFURLRef mainBundleURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-        LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemBeforeFirst, NULL, NULL, mainBundleURL, NULL, NULL);
+        LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemBeforeFirst, nullptr, nullptr, mainBundleURL, nullptr, nullptr);
         CFRelease(mainBundleURL);
     }
-    else if (!en && (existingItem != NULL))
+    else if (!en && (existingItem != nullptr))
     {
         LSSharedFileListItemRemove(loginItems, existingItem);
     }

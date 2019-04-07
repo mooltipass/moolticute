@@ -34,7 +34,7 @@ void _read_report_callback(void *context,
     Q_UNUSED(report_id);
 
     MPDevice_mac *dev = reinterpret_cast<MPDevice_mac *>(context);
-    QByteArray data((const char *)report, report_length);
+    QByteArray data(reinterpret_cast<const char *>(report), static_cast<int>(report_length));
     emit dev->platformDataRead(data);
 }
 
@@ -65,13 +65,13 @@ MPDevice_mac::MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef):
     //Get max input report length
     CFTypeRef ref = IOHIDDeviceGetProperty(hidref, CFSTR(kIOHIDMaxInputReportSizeKey));
     if (ref && CFGetTypeID(ref) == CFNumberGetTypeID())
-        CFNumberGetValue((CFNumberRef)ref, kCFNumberSInt32Type, &maxInReportLen);
+        CFNumberGetValue(static_cast<CFNumberRef>(ref), kCFNumberSInt32Type, &maxInReportLen);
 
     readBuf.resize(maxInReportLen);
 
     //Attach a callback that will be triggered when data comes in
     IOHIDDeviceRegisterInputReportCallback(hidref,
-                                           (uint8_t *)readBuf.data(),
+                                           reinterpret_cast<uint8_t *>(readBuf.data()),
                                            readBuf.size(),
                                            &_read_report_callback,
                                            this);
@@ -110,7 +110,7 @@ void MPDevice_mac::platformWrite(const QByteArray &data)
         IOReturn res = IOHIDDeviceSetReport(hidref,
                                             kIOHIDReportTypeOutput,
                                             0,
-                                            (const uint8_t *)data.constData(),
+                                            reinterpret_cast<const uint8_t *>(data.constData()),
                                             data.size());
         if (res != kIOReturnSuccess)
             qWarning() << "Failed to write data to device";

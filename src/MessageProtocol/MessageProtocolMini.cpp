@@ -78,7 +78,7 @@ QVector<QByteArray> MessageProtocolMini::createWriteNodePackets(const QByteArray
 
         QByteArray packetToSend = QByteArray();
         packetToSend.append(address);
-        packetToSend.append(i);
+        packetToSend.append(static_cast<char>(i));
         packetToSend.append(data.mid(i*59, payload_size-3));
         createdPackets.append(packetToSend);
     }

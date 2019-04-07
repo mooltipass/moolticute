@@ -28,7 +28,7 @@ void _device_matching_callback(void *user_data,
     UsbMonitor_mac *um = reinterpret_cast<UsbMonitor_mac *>(user_data);
 
     int vendorID = 0;
-    CFNumberRef vendorNumRef = (CFNumberRef)IOHIDDeviceGetProperty(inIOHIDDeviceRef, CFSTR(kIOHIDVendorIDKey)) ;
+    CFNumberRef vendorNumRef = static_cast<CFNumberRef>(IOHIDDeviceGetProperty(inIOHIDDeviceRef, CFSTR(kIOHIDVendorIDKey))) ;
     if (vendorNumRef)
     {
         CFNumberGetValue(vendorNumRef, kCFNumberSInt32Type, &vendorID);
@@ -40,7 +40,7 @@ void _device_matching_callback(void *user_data,
 
     MPPlatformDef def;
     def.hidref = inIOHIDDeviceRef;
-    def.id = QString("%1").arg((quint64)def.hidref);
+    def.id = QString("%1").arg(reinterpret_cast<quint64>(def.hidref));
     def.isBLE = vendorID == MOOLTIPASS_BLE_VENDORID;
 
     if (!um->deviceHash.contains(def.id))
@@ -60,7 +60,7 @@ void _device_removal_callback(void *user_data,
     Q_UNUSED(inSender);
     UsbMonitor_mac *um = reinterpret_cast<UsbMonitor_mac *>(user_data);
 
-    QString hid_id = QString("%1").arg((quint64)inIOHIDDeviceRef);
+    QString hid_id = QString("%1").arg(reinterpret_cast<quint64>(inIOHIDDeviceRef));
     if (um->deviceHash.contains(hid_id))
     {
         MPPlatformDef def = um->deviceHash[hid_id];
