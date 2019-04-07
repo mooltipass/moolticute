@@ -87,7 +87,7 @@ void MacNotify::showNotification(const QString &title, const QString &text)
 {
     NSUserNotification *userNotification = [[NSUserNotification alloc] init];
     userNotification.title = title.toNSString();
-    userNotification.subtitle = text.toNSString();
+    userNotification.informativeText = text.toNSString();
     userNotification.soundName = NSUserNotificationDefaultSoundName;
 
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
@@ -97,7 +97,7 @@ void MacNotify::showButtonNotification(const QString &title, const QString &text
 {
     NSUserNotification *userNotification = [[NSUserNotification alloc] init];
     userNotification.title = title.toNSString();
-    userNotification.subtitle = text.toNSString();
+    userNotification.informativeText = text.toNSString();
     userNotification.soundName = NSUserNotificationDefaultSoundName;
     userNotification.hasActionButton = true;
     userNotification.actionButtonTitle = QString(tr("Choose")).toNSString();
@@ -120,7 +120,7 @@ void MacNotify::showTextBoxNotification(const QString &title, const QString &tex
 {
     NSUserNotification *userNotification = [[NSUserNotification alloc] init];
     userNotification.title = title.toNSString();
-    userNotification.subtitle = text.toNSString();
+    userNotification.informativeText = text.toNSString();
     userNotification.soundName = NSUserNotificationDefaultSoundName;
     userNotification.hasReplyButton = true;
     userNotification.responsePlaceholder = QString(tr("Type your reply here")).toNSString();
