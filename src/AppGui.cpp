@@ -692,7 +692,7 @@ void AppGui::restartDaemon()
 void AppGui::checkUpdate(bool displayMessage)
 {
     if (QStringLiteral(APP_VERSION) == "git" ||
-        QStringLiteral(APP_VERSION) == "deb")
+        QStringLiteral(APP_TYPE) == "deb")
         return;
 
     auto u = QSimpleUpdater::getInstance();
@@ -701,9 +701,7 @@ void AppGui::checkUpdate(bool displayMessage)
     u->setDownloaderEnabled(GITHUB_UPDATE_URL, true);
     u->setNotifyOnFinish(GITHUB_UPDATE_URL, displayMessage);
     u->setDisplayDialog(GITHUB_UPDATE_URL, false);
-
-    if (QStringLiteral(APP_TYPE) == "appimage")
-        u->setPlatformKey(GITHUB_UPDATE_URL, "appimage");
+    u->setPlatformKey(GITHUB_UPDATE_URL, APP_TYPE);
 
     u->checkForUpdates(GITHUB_UPDATE_URL);
 
