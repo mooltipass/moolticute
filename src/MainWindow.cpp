@@ -190,7 +190,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     // Don't show the "check for updates" button when built from git directly.
     // Also deb packages are handled by our PPA, disable check
     ui->pushButtonCheckUpdate->setVisible(QStringLiteral(APP_VERSION) != "git" &&
-                                          QStringLiteral(APP_VERSION) != "deb");
+                                          QStringLiteral(APP_TYPE) != "deb");
 
     ui->pushButtonCheckUpdate->setStyleSheet(CSS_BLUE_BUTTON);
 
