@@ -395,9 +395,6 @@ void Updater::onReply (QNetworkReply* reply)
     if (platformKey().compare("macos") == 0)
         releaseFileSuffix = ".dmg";
 
-    if (platformKey().compare("linux") == 0)
-        releaseFileSuffix = ".deb";
-
     if (platformKey().compare("appimage") == 0)
         releaseFileSuffix = ".AppImage";
 
