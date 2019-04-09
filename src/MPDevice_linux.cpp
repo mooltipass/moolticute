@@ -52,6 +52,12 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
         if (INVALID_VALUE == grabbed)
         {
             qWarning() << "Exclusive device grab wasn't successful: " << strerror(errno);
+            //Need a delay for setting MPDevice to WSServer
+            QTimer::singleShot(100,
+                [this]()
+                {
+                    sendNotification(tr("Exclusive Grab Failure"), tr("Moolticute couldn't open the USB port exclusively"));
+                });
         }
         sockNotifRead = new QSocketNotifier(devfd, QSocketNotifier::Read);
         sockNotifRead->setEnabled(true);

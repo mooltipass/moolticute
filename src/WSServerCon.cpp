@@ -215,7 +215,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, &MPDevice::filesCacheChanged, this, &WSServerCon::sendFilesCache);
 
     connect(mpdevice, &MPDevice::dbChangeNumbersChanged, this, &WSServerCon::sendCardDbMetadata);
-
+    connect(mpdevice, &MPDevice::sendNotification, this, &WSServerCon::sendNotification);
 }
 
 void WSServerCon::statusChanged()
@@ -581,6 +581,13 @@ void WSServerCon::sendHibpNotification(QString message)
     {
         qDebug() << "Cannot send pwned notification to GUI: " << message;
     }
+}
+
+void WSServerCon::sendNotification(QString title, QString message)
+{
+    sendJsonMessage({{ "msg", "send_notification" },
+                     { "data", QJsonObject{ {"title", title}, {"message", message} } }
+                    });
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)

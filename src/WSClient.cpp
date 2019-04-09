@@ -442,6 +442,11 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         SystemNotification::instance().createNotification(tr("Password Compromised"), o["message"].toString());
     }
+    else if (rootobj["msg"] == "send_notification")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        SystemNotification::instance().createNotification(o["title"].toString(), o["message"].toString());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
