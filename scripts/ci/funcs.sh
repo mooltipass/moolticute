@@ -32,6 +32,9 @@ function make_version()
         echo "#define APP_RELEASE_TESTING 1" >> $1/src/version.h
     fi
     echo "#endif" >> $1/src/version.h
+
+    echo "version.h created"
+    cat $1/src/version.h
 }
 
 function wget_retry()
