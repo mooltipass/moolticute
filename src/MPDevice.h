@@ -275,7 +275,7 @@ signals:
     void platformFailed();
     void filesCacheChanged();
     void dbChangeNumbersChanged(const int credentialsDbChangeNumber, const int dataDbChangeNumber);
-    void sendNotification(QString title, QString message);
+    void sendExclGrabFailedNotification();
 
 private slots:
     void newDataRead(const QByteArray &data);

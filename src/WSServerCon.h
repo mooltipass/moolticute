@@ -80,7 +80,7 @@ private slots:
     void sendCardDbMetadata();
 
     void sendHibpNotification(QString message);
-    void sendNotification(QString title, QString message);
+    void sendExclGrabFailedNotification();
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
 

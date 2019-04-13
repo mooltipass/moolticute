@@ -56,7 +56,7 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
             QTimer::singleShot(100,
                 [this]()
                 {
-                    sendNotification(tr("Exclusive Grab Failure"), tr("Moolticute couldn't open the USB port exclusively"));
+                    sendExclGrabFailedNotification();
                 });
         }
         sockNotifRead = new QSocketNotifier(devfd, QSocketNotifier::Read);
