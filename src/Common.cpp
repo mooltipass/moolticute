@@ -193,7 +193,7 @@ QDate Common::bytesToDate(const QByteArray &data)
 {
     //reminder date is uint16_t : yyyy yyym mmmd dddd with year from 2010
     int y = ((static_cast<quint8>(data[0]) >> 1) & 0x7F) + 2010;
-    int m = (static_cast<quint8>(data[0] & 0x01) << 3) | ((static_cast<quint8>(data[1]) >> 5) & 0x07);
+    int m = ((static_cast<quint8>(data[0]) & 0x01) << 3) | ((static_cast<quint8>(data[1]) >> 5) & 0x07);
     int d = (static_cast<quint8>(data[1]) & 0x1F);
 
     return QDate(y, m+1, d);

@@ -1398,7 +1398,7 @@ quint16 MPDevice::getNumberOfPages(void)
 
 quint16 MPDevice::getFlashPageFromAddress(const QByteArray &address)
 {
-    return (static_cast<quint16>(address[1] << 5) & 0x1FE0) | (static_cast<quint16>(address[0] >> 3) & 0x001F);
+    return ((static_cast<quint16>(address[1]) << 5) & 0x1FE0) | ((static_cast<quint16>(address[0]) >> 3) & 0x001F);
 }
 
 QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
@@ -1593,7 +1593,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
                         currentFirstCharVal = 'z';
                     if (currentFirstCharVal < 'a')
                         currentFirstCharVal = 'a';
-                    progressCurrent = static_cast<int>((static_cast<double>(currentFirstCharVal - 'a')) / static_cast<double>(('z' - 'a')) * 100);
+                    progressCurrent = (currentFirstCharVal - 'a') / (static_cast<double>('z' - 'a') * 100);
                     progressCurrent += MOOLTIPASS_FAV_MAX;
                 }
 
@@ -4887,42 +4887,42 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
 {
     if (virtualStartNode != 0)
     {
-        qDebug() << "Setting start node to " << freeAddresses[static_cast<int>(virtualStartNode)].toHex();
-        startNode = freeAddresses[static_cast<int>(virtualStartNode)];
+        qDebug() << "Setting start node to " << freeAddresses[virtualStartNode].toHex();
+        startNode = freeAddresses[virtualStartNode];
     }
     if (virtualDataStartNode != 0)
     {
-        qDebug() << "Setting data start node to " << freeAddresses[static_cast<int>(virtualDataStartNode)].toHex();
-        startDataNode = freeAddresses[static_cast<int>(virtualDataStartNode)];
+        qDebug() << "Setting data start node to " << freeAddresses[virtualDataStartNode].toHex();
+        startDataNode = freeAddresses[virtualDataStartNode];
     }
     qDebug() << "Replacing virtual addresses for login nodes...";
     for (auto &i: loginNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[static_cast<int>(i->getVirtualAddress())]);
-        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[static_cast<int>(i->getNextParentVirtualAddress())]);
-        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[static_cast<int>(i->getPreviousParentVirtualAddress())]);
-        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[static_cast<int>(i->getStartChildVirtualAddress())]);
+        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
+        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPreviousParentVirtualAddress()]);
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getStartChildVirtualAddress()]);
     }
     qDebug() << "Replacing virtual addresses for child nodes...";
     for (auto &i: loginChildNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[static_cast<int>(i->getVirtualAddress())]);
-        if (i->getNextChildAddress().isNull()) i->setNextChildAddress(freeAddresses[static_cast<int>(i->getNextChildVirtualAddress())]);
-        if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(freeAddresses[static_cast<int>(i->getPreviousChildVirtualAddress())]);
+        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
+        if (i->getNextChildAddress().isNull()) i->setNextChildAddress(freeAddresses[i->getNextChildVirtualAddress()]);
+        if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(freeAddresses[i->getPreviousChildVirtualAddress()]);
     }
     qDebug() << "Replacing virtual addresses for data nodes...";
     for (auto &i: dataNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[static_cast<int>(i->getVirtualAddress())]);
-        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[static_cast<int>(i->getNextParentVirtualAddress())]);
-        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[static_cast<int>(i->getPreviousParentVirtualAddress())]);
-        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[static_cast<int>(i->getStartChildVirtualAddress())]);
+        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
+        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPreviousParentVirtualAddress()]);
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getStartChildVirtualAddress()]);
     }
     qDebug() << "Replacing virtual addresses for data child nodes...";
     for (auto &i: dataChildNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[static_cast<int>(i->getVirtualAddress())]);
-        if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(freeAddresses[static_cast<int>(i->getNextChildVirtualAddress())]);
+        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
+        if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(freeAddresses[i->getNextChildVirtualAddress()]);
     }
 }
 
