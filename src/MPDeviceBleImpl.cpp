@@ -143,7 +143,7 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb,
                         QVariantMap progress = {
                             {"total", 0},
                             {"current", 0},
-                            {"msg", tr("Erasing device data...") }
+                            {"msg", "Erasing device data..." }
                         };
                         cbProgress(progress);
                         return true;
@@ -413,7 +413,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
                                       QVariantMap progress = QVariantMap {
                                           {"total", fileSize},
                                           {"current", curAddress},
-                                          {"msg", tr("Writing bundle data to device...") }
+                                          {"msg", "Writing bundle data to device..." }
                                       };
                                       cbProgress(progress);
 #ifdef DEV_DEBUG

@@ -11,16 +11,17 @@ class HaveIBeenPwned : public QObject
 public:
     explicit HaveIBeenPwned(QObject *parent = nullptr);
 
-    void isPasswordPwned(const QString &pwd, const QString &formatString);
+    void isPasswordPwned(const QString &pwd, const QString &credInfo);
 
 signals:
     /**
      * @brief sendPwnedNum
-     * @param message
+     * @param credInfo "service: login"
+     * @param pwnedNum
      * Sending signal how many times the given password
      * has been compromised
      */
-    void sendPwnedMessage(QString message);
+    void sendPwnedMessage(QString credInfo, QString pwnedNum);
 
     /**
      * @brief safePassword
@@ -36,7 +37,7 @@ private:
     QNetworkRequest req;
 
     QString hash;
-    QString formatString;
+    QString credInfo;
 
     const QString HIBP_API = "https://api.pwnedpasswords.com/range/";
     const QString HASH_SEPARATOR = "\r\n";

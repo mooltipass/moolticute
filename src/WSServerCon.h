@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  **  Copyright (c) Raoul Hecky. All Rights Reserved.
  **
  **  Calaos is free software; you can redistribute it and/or modify
@@ -79,7 +79,7 @@ private slots:
 
     void sendCardDbMetadata();
 
-    void sendHibpNotification(QString message);
+    void sendHibpNotification(QString credInfo, QString pwnedNum);
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
 
@@ -91,11 +91,10 @@ private:
 
     HaveIBeenPwned *hibp = nullptr;
 
-    QString HIBP_COMPROMISED_FORMAT = tr("this password has been compromised %1 times.");
-
     void processParametersSet(const QJsonObject &data);
     void sendFailedJson(QJsonObject obj, QString errstr = QString(), int errCode = -999);
     QString getRequestId(const QJsonValue &v);
+    void checkHaveIBeenPwned(const QString &service, const QString &login, const QString &password);
     void processMessageMini(QJsonObject root, const MPDeviceProgressCb &cbProgress);
     void processMessageBLE(QJsonObject root, const MPDeviceProgressCb &cbProgress);
 };

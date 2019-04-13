@@ -13,16 +13,16 @@ HaveIBeenPwned::HaveIBeenPwned(QObject *parent) :
 /**
  * @brief HaveIBeenPwned::isPasswordPwned
  * @param pwd Given password to check
- * @param formatString Formatting the response
+ * @param credInfo "service: login"
  * Calculating the SHA1 hash of the password
  * and sending the first five char to HIBP v2 API.
  */
-void HaveIBeenPwned::isPasswordPwned(const QString &pwd, const QString &formatString)
+void HaveIBeenPwned::isPasswordPwned(const QString &pwd, const QString &credInfo)
 {
     QCryptographicHash sha1Hasher(QCryptographicHash::Sha1);
     sha1Hasher.addData(pwd.toUtf8());
     hash = sha1Hasher.result().toHex().toUpper();
-    this->formatString = formatString;
+    this->credInfo = credInfo;
     req.setUrl(QUrl(HIBP_API + hash.left(HIBP_REQUEST_SHA_LENGTH)));
     hash = hash.mid(HIBP_REQUEST_SHA_LENGTH);
     networkManager->get(req);
@@ -52,7 +52,7 @@ void HaveIBeenPwned::processReply(QNetworkReply *reply)
         QString fromPwned = answer.mid(answer.indexOf(hash));
         QString pwned = fromPwned.left(fromPwned.indexOf(HASH_SEPARATOR));
         QString pwnedNum = pwned.mid(pwned.indexOf(':') + 1);
-        emit sendPwnedMessage(formatString.arg(pwnedNum));
+        emit sendPwnedMessage(credInfo, pwnedNum);
     }
     else
     {
