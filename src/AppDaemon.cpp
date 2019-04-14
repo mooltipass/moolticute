@@ -121,7 +121,7 @@ bool AppDaemon::initialize()
     if (parser.isSet(debugHttpServer))
     {
         httpServer = new HttpServer(this);
-        if (!httpServer->start(static_cast<quint16>(parser.value(debugHttpServer).toInt())))
+        if (!httpServer->start(parser.value(debugHttpServer).toUShort()))
         {
             qCritical() << "Fatal error: Failed to create HTTP server.";
             return false;

@@ -71,7 +71,7 @@ QList<QVariantMap> FilesCache::load()
 
         QJsonObject jsonRoot = QJsonDocument::fromJson(rawJSon.toLocal8Bit()).object();
 
-        qint8 cacheDbChangeNumber = static_cast<qint8>(jsonRoot.value("db_change_number").toInt());
+        qint8 cacheDbChangeNumber = jsonRoot.value("db_change_number").toInt();
         if (cacheDbChangeNumber != m_dbChangeNumber)
         {
             qDebug() << "dbChangeNumber miss";

@@ -321,7 +321,7 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
             return;
         }
 
-        readBuffer.resize(static_cast<int>(numberOfBytes));
+        readBuffer.resize(numberOfBytes);
         emit platformDataRead(readBuffer.right(readBuffer.length() - 1));
 
         platformRead();

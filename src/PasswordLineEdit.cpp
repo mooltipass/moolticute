@@ -316,11 +316,11 @@ void PasswordOptionsPopup::generatePassword()
     result.resize(length);
 
     // Create a distribution based on the pool size
-    std::uniform_int_distribution<char> distribution(0, static_cast<char>(pool.size() - 1));
+    std::uniform_int_distribution<char> distribution(0, pool.size() - 1);
 
     //Fill the password with random characters
     for (int i = 0; i < length; i++)
-        result[i] = pool.at(static_cast<size_t>(distribution(m_random_generator)));
+        result[i] = pool.at(distribution(m_random_generator));
 
     //Done
     m_passwordLabel->setText(result);
@@ -330,7 +330,7 @@ void PasswordOptionsPopup::generatePassword()
     if (entropy > m_strengthBar->maximum())
         entropy = m_strengthBar->maximum();
 
-    m_strengthBar->setValue(static_cast<int>(entropy));
+    m_strengthBar->setValue(entropy);
 
     QString style = QStringLiteral(PROGRESS_STYLE);
     if (entropy < 35)
@@ -373,7 +373,7 @@ std::vector<char> PasswordOptionsPopup::generateCustomPasswordPool()
         poolSize += kSymbols.size();
     }
 
-    pool.resize(static_cast<size_t>(poolSize));
+    pool.resize(poolSize);
     //Fill the pool
     auto it = std::begin(pool);
     if (m_upperCaseCB->isChecked())

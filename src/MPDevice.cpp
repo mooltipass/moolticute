@@ -1388,11 +1388,11 @@ quint16 MPDevice::getNumberOfPages(void)
 {
     if(get_flashMbSize() >= 16)
     {
-        return static_cast<quint16>(256*get_flashMbSize());
+        return 256*get_flashMbSize();
     }
     else
     {
-        return static_cast<quint16>(512*get_flashMbSize());
+        return 512*get_flashMbSize();
     }
 }
 
@@ -3560,8 +3560,8 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             qDebug() << "Cred DB: " << get_credentialsDbChangeNumber() << " clone: " << credentialsDbChangeNumberClone;
             qDebug() << "Data cred DB: " << get_dataDbChangeNumber() << " clone: " << dataDbChangeNumberClone;
             QByteArray updateChangeNumbersPacket = QByteArray();
-            updateChangeNumbersPacket.append(static_cast<char>(get_credentialsDbChangeNumber()));
-            updateChangeNumbersPacket.append(static_cast<char>(get_dataDbChangeNumber()));
+            updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
+            updateChangeNumbersPacket.append(get_dataDbChangeNumber());
             jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
         }
     }
@@ -3676,7 +3676,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, static_cast<char>(0xFF)), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, MAX_CHAR), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3689,7 +3689,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, static_cast<char>(0xFF)), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, MAX_CHAR), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3703,7 +3703,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
                 qDebug() << "Generating favorite" << i << "update packet";
                 diagSavePacketsGenerated = true;
                 QByteArray updateFavPacket = QByteArray();
-                updateFavPacket.append(static_cast<char>(i));
+                updateFavPacket.append(i);
                 updateFavPacket.append(favoritesAddrs[i]);
                 jobs->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, updateFavPacket, pMesProt->getDefaultFuncDone()));
             }
@@ -3727,7 +3727,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted data service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, static_cast<char>(0xFF)), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, MAX_CHAR), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3740,7 +3740,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted data child node";
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, static_cast<char>(0xFF)), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, MAX_CHAR), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3874,7 +3874,7 @@ void MPDevice::getUID(const QByteArray & key)
         data_to_send.clear();
         data_to_send.resize(16);
         for(int i = 0; i < 16; i++) {
-            data_to_send[i] = static_cast<char>(key.mid(2*i, 2).toUInt(&ok, 16));
+            data_to_send[i] = key.mid(2*i, 2).toUInt(&ok, 16);
             if(!ok)
                 return false;
         }
@@ -3892,7 +3892,7 @@ void MPDevice::getUID(const QByteArray & key)
 
         bool ok;
         quint64 uid = pMesProt->getFullPayload(data).toHex().toULongLong(&ok, 16);
-        set_uid(ok ? static_cast<qint64>(uid) : - 1);
+        set_uid(ok ? uid : - 1);
         return ok;
     }));
 
@@ -4607,7 +4607,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
         quint32 sz = qFromBigEndian<quint32>(ndata.data());
         qDebug() << "Data size: " << sz;
 
-        cb(true, QString(), m["service"].toString(), ndata.mid(4, static_cast<int>(sz)));
+        cb(true, QString(), m["service"].toString(), ndata.mid(4, sz));
     });
 
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
@@ -4852,8 +4852,8 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
                 dataDbChangeNumberClone = get_dataDbChangeNumber();
                 filesCache.setDbChangeNumber(get_dataDbChangeNumber());
                 QByteArray updateChangeNumbersPacket = QByteArray();
-                updateChangeNumbersPacket.append(static_cast<char>(get_credentialsDbChangeNumber()));
-                updateChangeNumbersPacket.append(static_cast<char>(get_dataDbChangeNumber()));
+                updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
+                updateChangeNumbersPacket.append(get_dataDbChangeNumber());
                 saveJobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
                 emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
             }
@@ -5347,18 +5347,18 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     {
         qInfo() << "Dealing with Moolticute export file";
         isMooltiAppImportFile = false;
-        importedCredentialsDbChangeNumber = static_cast<quint8>(dataArray[11].toInt());
+        importedCredentialsDbChangeNumber = dataArray[11].toInt();
         qDebug() << "Imported cred change number: " << importedCredentialsDbChangeNumber;
-        importedDataDbChangeNumber = static_cast<quint8>(dataArray[12].toInt());
+        importedDataDbChangeNumber = dataArray[12].toInt();
         qDebug() << "Imported data change number: " << importedDataDbChangeNumber;
-        importedDbMiniSerialNumber = static_cast<quint8>(dataArray[13].toInt());
+        importedDbMiniSerialNumber = dataArray[13].toInt();
         qDebug() << "Imported mini serial number: " << importedDbMiniSerialNumber;
     }
 
     /* Read CTR */
     importedCtrValue = QByteArray();
     auto qjobject = dataArray[0].toObject();
-    for (qint32 i = 0; i < qjobject.size(); i++) {importedCtrValue.append(static_cast<char>(qjobject[QString::number(i)].toInt()));}
+    for (qint32 i = 0; i < qjobject.size(); i++) {importedCtrValue.append(qjobject[QString::number(i)].toInt());}
     qDebug() << "Imported CTR: " << importedCtrValue.toHex();
 
     /* Read CPZ CTR values */
@@ -5367,7 +5367,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     {
         qjobject = qjarray[i].toObject();
         QByteArray qbarray = QByteArray();
-        for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(static_cast<char>(qjobject[QString::number(j)].toInt()));}
+        for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(qjobject[QString::number(j)].toInt());}
         qDebug() << "Imported CPZ/CTR value : " << qbarray.toHex();
         importedCpzCtrValue.append(qbarray);
     }
@@ -5393,13 +5393,13 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     /* Read Starting Parent */
     importedStartNode = QByteArray();
     qjarray = dataArray[2].toArray();
-    for (qint32 i = 0; i < qjarray.size(); i++) {importedStartNode.append(static_cast<char>(qjarray[i].toInt()));}
+    for (qint32 i = 0; i < qjarray.size(); i++) {importedStartNode.append(qjarray[i].toInt());}
     qDebug() << "Imported start node: " << importedStartNode.toHex();
 
     /* Read Data Starting Parent */
     importedStartDataNode = QByteArray();
     qjarray = dataArray[3].toArray();
-    for (qint32 i = 0; i < qjarray.size(); i++) {importedStartDataNode.append(static_cast<char>(qjarray[i].toInt()));}
+    for (qint32 i = 0; i < qjarray.size(); i++) {importedStartDataNode.append(qjarray[i].toInt());}
     qDebug() << "Imported data start node: " << importedStartDataNode.toHex();
 
     /* Read favorites */
@@ -5408,7 +5408,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     {
         qjobject = qjarray[i].toObject();
         QByteArray qbarray = QByteArray();
-        for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(static_cast<char>(qjobject[QString::number(j)].toInt()));}
+        for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(qjobject[QString::number(j)].toInt());}
         qDebug() << "Imported favorite " << i << " : " << qbarray.toHex();
         importedFavoritesAddrs.append(qbarray);
     }
@@ -5422,12 +5422,12 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         /* Fetch address */
         QJsonArray serviceAddrArr = qjobject["address"].toArray();
         QByteArray serviceAddr = QByteArray();
-        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(static_cast<char>(serviceAddrArr[j].toInt()));}
+        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
 
         /* Fetch core data */
         QJsonObject dataObj = qjobject["data"].toObject();
         QByteArray dataCore = QByteArray();
-        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(static_cast<char>(dataObj[QString::number(j)].toInt()));}
+        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
         /* Recreate node and add it to the list of imported nodes */
         MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
@@ -5444,12 +5444,12 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         /* Fetch address */
         QJsonArray serviceAddrArr = qjobject["address"].toArray();
         QByteArray serviceAddr = QByteArray();
-        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(static_cast<char>(serviceAddrArr[j].toInt()));}
+        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
 
         /* Fetch core data */
         QJsonObject dataObj = qjobject["data"].toObject();
         QByteArray dataCore = QByteArray();
-        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(static_cast<char>(dataObj[QString::number(j)].toInt()));}
+        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
         /* Recreate node and add it to the list of imported nodes */
         MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
@@ -5468,12 +5468,12 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             /* Fetch address */
             QJsonArray serviceAddrArr = qjobject["address"].toArray();
             QByteArray serviceAddr = QByteArray();
-            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(static_cast<char>(serviceAddrArr[j].toInt()));}
+            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
 
             /* Fetch core data */
             QJsonObject dataObj = qjobject["data"].toObject();
             QByteArray dataCore = QByteArray();
-            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(static_cast<char>(dataObj[QString::number(j)].toInt()));}
+            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
             /* Recreate node and add it to the list of imported nodes */
             MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
@@ -5490,12 +5490,12 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             /* Fetch address */
             QJsonArray serviceAddrArr = qjobject["address"].toArray();
             QByteArray serviceAddr = QByteArray();
-            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(static_cast<char>(serviceAddrArr[j].toInt()));}
+            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
 
             /* Fetch core data */
             QJsonObject dataObj = qjobject["data"].toObject();
             QByteArray dataCore = QByteArray();
-            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(static_cast<char>(dataObj[QString::number(j)].toInt()));}
+            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
             /* Recreate node and add it to the list of imported nodes */
             MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
@@ -6752,7 +6752,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             QString password = qjobject["password"].toString();
             QString description = qjobject["description"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
-            for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(static_cast<char>(addrArray[j].toInt())); }
+            for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
 
             /* Find node in our list */
@@ -6994,8 +6994,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
         credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
         QByteArray updateChangeNumbersPacket = QByteArray();
-        updateChangeNumbersPacket.append(static_cast<char>(get_credentialsDbChangeNumber()));
-        updateChangeNumbersPacket.append(static_cast<char>(get_dataDbChangeNumber()));
+        updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
+        updateChangeNumbersPacket.append(get_dataDbChangeNumber());
         jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
     }
 

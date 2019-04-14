@@ -266,7 +266,7 @@ void PasswordProfile::init()
     if (poolSize == 0)
         return;
 
-    m_pool.resize(static_cast<size_t>(poolSize));
+    m_pool.resize(poolSize);
 
     //Fill the pool
     auto it = std::begin(m_pool);
@@ -441,7 +441,7 @@ void PasswordProfilesModel::removeProfile(const QString &name)
         {
             if (profile->getName() == name && profile->isEditable())
             {
-                int index = static_cast<int>(it - m_profiles.begin());
+                int index = it - m_profiles.begin();
 
                 beginRemoveRows(QModelIndex(), index, index);
                 delete *it;

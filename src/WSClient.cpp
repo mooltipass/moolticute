@@ -196,7 +196,7 @@ void WSClient::onTextMessageReceived(const QString &message)
             set_mpHwVersion(Common::MP_Classic);
         }
         set_fwVersion(o["hw_version"].toString());
-        set_hwSerial(static_cast<quint32>(o["hw_serial"].toInt()));
+        set_hwSerial(o["hw_serial"].toInt());
         set_hwMemory(o["flash_size"].toInt());
     }
     else if (rootobj["msg"] == "request_domain")

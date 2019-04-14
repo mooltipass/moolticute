@@ -464,6 +464,7 @@ private:
 protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
     const char NULL_CHAR = static_cast<char>(0);
+    const char MAX_CHAR = static_cast<char>(0xFF);
 };
 
 #endif // MPDEVICE_H

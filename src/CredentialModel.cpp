@@ -232,7 +232,7 @@ void CredentialModel::load(const QJsonArray &json)
 
             // Update login favorite
             int iFavorite = cnode["favorite"].toInt();
-            pLoginItem->setFavorite(static_cast<qint8>(iFavorite));
+            pLoginItem->setFavorite(iFavorite);
         }
     }
 

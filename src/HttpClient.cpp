@@ -37,7 +37,7 @@ int onMessageBeginCb(http_parser *parser)
 int onUrlCb(http_parser *parser, const char *at, size_t length)
 {
     HttpClient *client = reinterpret_cast<HttpClient *>(parser->data);
-    client->m_parseUrl.append(at, static_cast<int>(length));
+    client->m_parseUrl.append(at, length);
 
     return 0;
 }
@@ -64,7 +64,7 @@ int onHeaderFieldCb(http_parser *parser, const char *at, size_t length)
     if (!client->m_hasField)
         client->m_hasField = true;
 
-    client->m_hField.append(at, static_cast<int>(length));
+    client->m_hField.append(at, length);
 
     return 0;
 }
@@ -76,7 +76,7 @@ int onHeaderValueCb(http_parser *parser, const char *at, size_t length)
     if (!client->m_hasValue)
         client->m_hasValue = true;
 
-    client->m_hValue.append(at, static_cast<int>(length));
+    client->m_hValue.append(at, length);
 
     return 0;
 }
@@ -190,8 +190,8 @@ void HttpClient::parseRequest()
     while (m_socket->bytesAvailable())
     {
         QByteArray data = m_socket->readAll();
-        auto n = http_parser_execute(m_httpParser, m_httpParserSettings, data.constData(), static_cast<size_t>(data.size()));
-        if (n != static_cast<size_t>(data.size()))
+        int n = http_parser_execute(m_httpParser, m_httpParserSettings, data.constData(), data.size());
+        if (n != data.size())
         {
             // Errro close connection
             CloseConnection();

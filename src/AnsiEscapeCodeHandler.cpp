@@ -63,6 +63,11 @@ static QColor ansiColor(uint code)
     return QColor(red, green, blue);
 }
 
+static QColor ansiColor(int code)
+{
+    return ansiColor(static_cast<uint>(code));
+}
+
 QList<FormattedText> AnsiEscapeCodeHandler::parseText(const FormattedText &input)
 {
     enum AnsiEscapeCodes {
@@ -164,10 +169,10 @@ QList<FormattedText> AnsiEscapeCodeHandler::parseText(const FormattedText &input
                 const int code = numbers.at(i).toInt();
 
                 if (code >= TextColorStart && code <= TextColorEnd) {
-                    charFormat.setForeground(ansiColor(static_cast<uint>(code - TextColorStart)));
+                    charFormat.setForeground(ansiColor(code - TextColorStart));
                     setFormatScope(charFormat);
                 } else if (code >= BackgroundColorStart && code <= BackgroundColorEnd) {
-                    charFormat.setBackground(ansiColor(static_cast<uint>(code - BackgroundColorStart)));
+                    charFormat.setBackground(ansiColor(code - BackgroundColorStart));
                     setFormatScope(charFormat);
                 } else {
                     switch (code) {
@@ -209,7 +214,7 @@ QList<FormattedText> AnsiEscapeCodeHandler::parseText(const FormattedText &input
                             break;
                         case 5:
                             // 256 color mode with format: 38;5;<i>
-                            uint index = numbers.at(i + 1).toUInt();
+                            int index = numbers.at(i + 1).toInt();
 
                             QColor color;
                             if (index < 8) {
@@ -220,11 +225,11 @@ QList<FormattedText> AnsiEscapeCodeHandler::parseText(const FormattedText &input
                                 color = ansiColor(index - 8).lighter(150);
                             } else if (index < 232) {
                                 // The next 216 colors are a 6x6x6 RGB cube.
-                                uint o = index - 16;
+                                int o = index - 16;
                                 color = QColor((o / 36) * 51, ((o / 6) % 6) * 51, (o % 6) * 51);
                             } else {
                                 // The last 24 colors are a greyscale gradient.
-                                int grey = (static_cast<int>(index) - 232) * 11;
+                                int grey = (index - 232) * 11;
                                 color = QColor(grey, grey, grey);
                             }
 

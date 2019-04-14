@@ -222,7 +222,7 @@ protected:
                     SetEvent(hQueueDrainedEvent);
                     continue;
                 }
-                qErrnoWarning(static_cast<int>(errorCode), "GetQueuedCompletionStatus failed.");
+                qErrnoWarning(errorCode, "GetQueuedCompletionStatus failed.");
                 return;
             }
 

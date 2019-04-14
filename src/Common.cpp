@@ -114,31 +114,31 @@ static void _messageOutput(QtMsgType type, const QMessageLogContext &context, co
 
     QString s;
     switch (type) {
-        case QtDebugMsg:
-        {
-            s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-            break;
-        }
-        case QtInfoMsg:
-        {
-            s = QString(COLOR_GREEN "INFO" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-            break;
-        }
-        case QtWarningMsg:
-        {
-            s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-            break;
-        }
-        case QtCriticalMsg:
-        {
-            s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-            break;
-        }
-        case QtFatalMsg:
-        {
-            s = QString(COLOR_RED "FATAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
-            break;
-        }
+    case QtDebugMsg:
+    {
+        s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        break;
+    }
+    case QtInfoMsg:
+    {
+        s = QString(COLOR_GREEN "INFO" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        break;
+    }
+    case QtWarningMsg:
+    {
+        s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        break;
+    }
+    case QtCriticalMsg:
+    {
+        s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        break;
+    }
+    case QtFatalMsg:
+    {
+        s = QString(COLOR_RED "FATAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        break;
+    }
     }
 
     if (!s.isEmpty())
@@ -241,7 +241,7 @@ bool Common::isProcessRunning(qint64 pid)
 {
     if (pid == 0) return false;
 #if defined(Q_OS_WIN)
-    HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, static_cast<DWORD>(pid));
+    HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, pid);
     if (!process) return false;
     DWORD ret = WaitForSingleObject(process, 0);
     CloseHandle(process);
@@ -305,7 +305,7 @@ bool Common::writeSharedMemory(QSharedMemory &sh, const QJsonObject &o)
 
     QJsonDocument jdoc(o);
     QByteArray ba = jdoc.toJson(QJsonDocument::Compact);
-    memcpy(sh.data(), ba.constData(), static_cast<size_t>(ba.size()));
+    memcpy(sh.data(), ba.constData(), ba.size());
 
     sh.unlock();
 
@@ -320,7 +320,7 @@ QString Common::createUid(QString prefix)
     if (!commonUidInit)
     {
         commonUidInit = true;
-        qsrand(static_cast<uint>(time(nullptr)));
+        qsrand(time(nullptr));
     }
 
     //try to generate a unique id based on

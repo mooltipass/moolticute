@@ -51,7 +51,7 @@ void MPNode::setType(const quint8 type)
 {
     if (data.size() > 1)
     {
-        data[1] = static_cast<char>(type << 6);
+        data[1] = type << 6;
     }
 }
 
