@@ -161,6 +161,12 @@ public:
     static std::vector<qint64> getRngSeed();
     static void updateSeed(std::vector<qint64> &newInts);
 
+    template <typename Enumeration>
+    static typename std::underlying_type<Enumeration>::type getEnumValue(Enumeration const value)
+    {
+        return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+    }
+
     typedef enum
     {
         MP_Classic = 0,

@@ -336,18 +336,19 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 #endif
 
     using LF = Common::LockUnlockModeFeatureFlags;
+    auto value = [](LF val) {return Common::getEnumValue(val);};
 
-    ui->lockUnlockModeComboBox->addItem(tr("Disabled")          , static_cast<uint>(LF::Disabled));
-    ui->lockUnlockModeComboBox->addItem(tr("Password Only")     , static_cast<uint>(LF::Password));
-    ui->lockUnlockModeComboBox->addItem(tr("Login + Password")  , static_cast<uint>(LF::Password)|static_cast<uint>(LF::Login));
-    ui->lockUnlockModeComboBox->addItem(tr("Enter + Password")  , static_cast<uint>(LF::Password)|static_cast<uint>(LF::SendEnter));
-    ui->lockUnlockModeComboBox->addItem(tr("Password / Win + L")  , static_cast<uint>(LF::Password)|static_cast<uint>(LF::SendWin_L));
-    ui->lockUnlockModeComboBox->addItem(tr("Login + Pass / Win + L"), static_cast<uint>(LF::Password)|
-                                        static_cast<uint>(LF::Login)|static_cast<uint>(LF::SendWin_L));
-    ui->lockUnlockModeComboBox->addItem(tr("Enter + Pass / Win + L"), static_cast<uint>(LF::Password)|
-                                        static_cast<uint>(LF::SendEnter)|static_cast<uint>(LF::SendWin_L));
-    ui->lockUnlockModeComboBox->addItem(tr("Ctrl + Alt + Del / Win + L"), static_cast<uint>(LF::SendCtrl_Alt_Del)|
-                                        static_cast<uint>(LF::Password)|static_cast<uint>(LF::SendWin_L));
+    ui->lockUnlockModeComboBox->addItem(tr("Disabled")          , value(LF::Disabled));
+    ui->lockUnlockModeComboBox->addItem(tr("Password Only")     , value(LF::Password));
+    ui->lockUnlockModeComboBox->addItem(tr("Login + Password")  , value(LF::Password)|value(LF::Login));
+    ui->lockUnlockModeComboBox->addItem(tr("Enter + Password")  , value(LF::Password)|value(LF::SendEnter));
+    ui->lockUnlockModeComboBox->addItem(tr("Password / Win + L")  , value(LF::Password)|value(LF::SendWin_L));
+    ui->lockUnlockModeComboBox->addItem(tr("Login + Pass / Win + L"), value(LF::Password)|
+                                        value(LF::Login)|value(LF::SendWin_L));
+    ui->lockUnlockModeComboBox->addItem(tr("Enter + Pass / Win + L"), value(LF::Password)|
+                                        value(LF::SendEnter)|value(LF::SendWin_L));
+    ui->lockUnlockModeComboBox->addItem(tr("Ctrl + Alt + Del / Win + L"), value(LF::SendCtrl_Alt_Del)|
+                                        value(LF::Password)|value(LF::SendWin_L));
     ui->lockUnlockModeComboBox->setCurrentIndex(0);
 
     ui->comboBoxSystrayIcon->blockSignals(true);
