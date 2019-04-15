@@ -48,11 +48,6 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
     }
     else
     {
-        grabbed = ioctl(devfd, EVIOCGRAB, ExclusiveAccess::GRAB);
-        if (INVALID_VALUE == grabbed)
-        {
-            qWarning() << "Exclusive device grab wasn't successful: " << strerror(errno);
-        }
         sockNotifRead = new QSocketNotifier(devfd, QSocketNotifier::Read);
         sockNotifRead->setEnabled(true);
         connect(sockNotifRead, &QSocketNotifier::activated, this, &MPDevice_linux::readyRead);
@@ -64,11 +59,6 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
 
 MPDevice_linux::~MPDevice_linux()
 {
-    if (INVALID_VALUE != grabbed)
-    {
-        ioctl(devfd, EVIOCGRAB, ExclusiveAccess::RELEASE);
-    }
-
     delete sockNotifRead;
     delete sockNotifWrite;
 
