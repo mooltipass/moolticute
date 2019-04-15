@@ -440,7 +440,9 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "send_hibp")
     {
         QJsonObject o = rootobj["data"].toObject();
-        SystemNotification::instance().createNotification(tr("Password Compromised"), o["message"].toString());
+        QString message = o["credinfo"].toString() + HIBP_COMPROMISED_FORMAT;
+        QString pwnedNum = o["pwnednum"].toString();
+        SystemNotification::instance().createNotification(tr("Password Compromised"), message.arg(pwnedNum));
     }
 }
 

@@ -567,11 +567,12 @@ void WSServerCon::sendCardDbMetadata()
     }
 }
 
-void WSServerCon::sendHibpNotification(QString message)
+void WSServerCon::sendHibpNotification(QString credInfo, QString pwnedNum)
 {
     QJsonObject oroot = { {"msg", "send_hibp"} };
     QJsonObject data;
-    data.insert("message", message);
+    data.insert("credinfo", credInfo);
+    data.insert("pwnednum", pwnedNum);
     oroot["data"] = data;
 
     bool isGuiRunning;
@@ -579,7 +580,7 @@ void WSServerCon::sendHibpNotification(QString message)
 
     if (!isGuiRunning)
     {
-        qDebug() << "Cannot send pwned notification to GUI: " << message;
+        qDebug() << "Cannot send pwned notification to GUI: " << credInfo << ": " << pwnedNum;
     }
 }
 
@@ -640,6 +641,16 @@ QString WSServerCon::getRequestId(const QJsonValue &v)
     if (v.isDouble())
         return QString::number(v.toInt());
     return v.toString();
+}
+
+void WSServerCon::checkHaveIBeenPwned(const QString &service, const QString &login, const QString &password)
+{
+    QSettings s;
+    if (s.value("settings/enable_hibp_check").toBool())
+    {
+        QString credInfo = service + ": " + login + ": ";
+        hibp->isPasswordPwned(password, credInfo);
+    }
 }
 
 void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb &cbProgress)
@@ -724,13 +735,7 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
                 return;
             }
 
-            QSettings s;
-            if (s.value("settings/enable_hibp_check").toBool())
-            {
-                QString formatString = service + ": " + login + ": ";
-                formatString += HIBP_COMPROMISED_FORMAT;
-                hibp->isPasswordPwned(pass, formatString);
-            }
+            checkHaveIBeenPwned(service, login, pass);
             QJsonObject ores;
             QJsonObject oroot = root;
             ores["service"] = service;
@@ -793,12 +798,7 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
         const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
         emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
 
-        if (s.value("settings/enable_hibp_check").toBool())
-        {
-            QString formatString = o["service"].toString() + ": " + loginName + ": ";
-            formatString += HIBP_COMPROMISED_FORMAT;
-            hibp->isPasswordPwned(o["password"].toString(), formatString);
-        }
+        checkHaveIBeenPwned(o["service"].toString(), loginName, o["password"].toString());
 
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
@@ -1291,13 +1291,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
 
                     auto cred = bleImpl->retrieveCredentialFromResponse(data, service, login);
 
-                    QSettings s;
-                    if (s.value("settings/enable_hibp_check").toBool())
-                    {
-                        QString formatString = service + ": " + login + ": ";
-                        formatString += HIBP_COMPROMISED_FORMAT;
-                        hibp->isPasswordPwned(cred.get(BleCredential::CredAttr::PASSWORD), formatString);
-                    }
+                    checkHaveIBeenPwned(service, cred.get(BleCredential::CredAttr::LOGIN), cred.get(BleCredential::CredAttr::PASSWORD));
                     QJsonObject ores;
                     QJsonObject oroot = root;
                     ores["service"] = service;
@@ -1330,12 +1324,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         bool isGuiRunning;
         emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
 
-        if (s.value("settings/enable_hibp_check").toBool())
-        {
-            QString formatString = o["service"].toString() + ": " + loginName + ": ";
-            formatString += HIBP_COMPROMISED_FORMAT;
-            hibp->isPasswordPwned(o["password"].toString(), formatString);
-        }
+        checkHaveIBeenPwned(o["service"].toString(), loginName, o["password"].toString());
 
         bleImpl->storeCredential(BleCredential{o["service"].toString(), o["login"].toString(),
                                                o["description"].toString(), "", o["password"].toString()},

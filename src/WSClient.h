@@ -172,6 +172,7 @@ private:
     QJsonArray filesCache;
 
     QTimer *randomNumTimer = nullptr;
+    QString HIBP_COMPROMISED_FORMAT = tr("this password has been compromised %1 times.");
 };
 
 #endif // WSCLIENT_H
