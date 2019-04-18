@@ -38,12 +38,6 @@ inline bool operator!=(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { ret
 
 class MPDevice_linux: public MPDevice
 {
-    enum class ExclusiveAccess
-    {
-        RELEASE = 0,
-        GRAB = 1
-    };
-
     Q_OBJECT
 public:
     MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef);
@@ -74,8 +68,6 @@ private:
     int devfd = 0; //device fd
     QSocketNotifier *sockNotifRead = nullptr;
     QSocketNotifier *sockNotifWrite = nullptr;
-
-    int grabbed = INVALID_VALUE;
 
     //Bufferize the data sent by sending 64bytes packet at a time
     QQueue<QByteArray> sendBuffer;
