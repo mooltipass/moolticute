@@ -1287,6 +1287,54 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     }
 }
 
+void MPDevice::memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds)
+{
+    Q_UNUSED(getData);
+    Q_UNUSED(getDataChilds);
+    if (getCreds)
+    {
+        /* Get parent node start address */
+        jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
+                                      [this, jobs, fullScan, cbProgress](const QByteArray &data, bool &) -> bool
+        {
+            if (pMesProt->getMessageSize(data) == 1)
+            {
+                /* Received one byte as answer: command fail */
+                jobs->setCurrentJobError("Mooltipass refused to send us starting parent");
+                qCritical() << "Get start node addr: couldn't get answer";
+                return false;
+            }
+            else
+            {
+                startNode = pMesProt->getPayloadBytes(data, 0, 1);
+                startNodeClone = pMesProt->getPayloadBytes(data, 0, 1);
+                qDebug() << "Start node addr:" << startNode.toHex();
+
+                //if parent address is not null, load nodes
+                if (startNode != MPNode::EmptyAddress)
+                {
+                    qInfo() << "Loading parent nodes...";
+                    if (!fullScan)
+                    {
+                        /* Traverse the flash by following the linked list */
+                        loadLoginNode(jobs, startNode, cbProgress);
+                    }
+                    else
+                    {
+                        /* Full scan will be triggered once the answer from get data start node is received */
+                    }
+                }
+                else
+                {
+                    qInfo() << "No parent nodes to load.";
+                }
+
+                return true;
+            }
+        }));
+    }
+}
+
 void MPDevice::startMemMgmtMode(bool wantData,
                                 const MPDeviceProgressCb &cbProgress,
                                 const std::function<void(bool success, int errCode, QString errMsg)> &cb)
@@ -1308,7 +1356,14 @@ void MPDevice::startMemMgmtMode(bool wantData,
     jobs->append(startMmmJob);
 
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
+    if (isBLE())
+    {
+        memMgmtModeReadFlashBLE(jobs, false, cbProgress, !wantData, wantData, true);
+    }
+    else
+    {
+        memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
+    }
 
     connect(jobs, &AsyncJobs::finished, [this, cb, wantData](const QByteArray &data)
     {

@@ -57,6 +57,17 @@ void MPNode::setType(const quint8 type)
 
 bool MPNode::isValid() const
 {
+    if (NodeUnknown == getType())
+    {
+        return false;
+    }
+
+    if (isBLE())
+    {
+        qDebug() << "Type: " << getType() << ", size: " << data.size();
+        return (data.size() == 264 || data.size() == 528);
+    }
+
     return getType() != NodeUnknown &&
            data.size() == MP_NODE_SIZE &&
            ((quint8)data[1] & 0x20) == 0;
@@ -64,6 +75,10 @@ bool MPNode::isValid() const
 
 bool MPNode::isDataLengthValid() const
 {
+    if (isBLE())
+    {
+        return data.size() == 264 || data.size() == 528;
+    }
     return data.size() == MP_NODE_SIZE;
 }
 
@@ -111,6 +126,11 @@ void MPNode::setNotDeletedTagged()
 bool MPNode::getNotDeletedTagged() const
 {
     return notDeletedTagged;
+}
+
+bool MPNode::isBLE() const
+{
+    return "BLE" == pMesProt->getDeviceName();
 }
 
 void MPNode::setMergeTagged()
@@ -232,6 +252,10 @@ void MPNode::setStartChildAddress(const QByteArray &d, const quint32 virt_addr)
 QString MPNode::getService() const
 {
     if (!isValid()) return QString();
+    if (isBLE())
+    {
+        return pMesProt->toQString(data.mid(8, 252));
+    }
     return pMesProt->toQString(data.mid(8, MP_NODE_SIZE - 8 - 3));
 }
 
@@ -250,6 +274,10 @@ void MPNode::setService(const QString &service)
 QByteArray MPNode::getStartDataCtr() const
 {
     if (!isValid()) return QByteArray();
+    if (isBLE())
+    {
+        return data.mid(261, 3);
+    }
     return data.mid(129, 3);
 }
 
@@ -332,12 +360,20 @@ void MPNode::setNextChildDataAddress(const QByteArray &d, const quint32 virt_add
 QByteArray MPNode::getCTR() const
 {
     if (!isValid()) return QByteArray();
+    if (isBLE())
+    {
+        return data.mid(395, 3);
+    }
     return data.mid(34, 3);
 }
 
 QString MPNode::getDescription() const
 {
     if (!isValid()) return QString();
+    if (isBLE())
+    {
+        return pMesProt->toQString(data.mid(140, 48));
+    }
     return pMesProt->toQString(data.mid(6, 24));
 }
 
@@ -356,6 +392,10 @@ void MPNode::setDescription(const QString &newDescription)
 QString MPNode::getLogin() const
 {
     if (!isValid()) return QString();
+    if (isBLE())
+    {
+        return pMesProt->toQString(data.mid(12, 128));
+    }
     return pMesProt->toQString(data.mid(37, 63));
 }
 
@@ -374,18 +414,30 @@ void MPNode::setLogin(const QString &newLogin)
 QByteArray MPNode::getPasswordEnc() const
 {
     if (!isValid()) return QByteArray();
+    if (isBLE())
+    {
+        return data.mid(266, 128);
+    }
     return data.mid(100, 32);
 }
 
 QDate MPNode::getDateCreated() const
 {
     if (!isValid()) return QDate();
+    if (isBLE())
+    {
+        return Common::bytesToDate(data.mid(8, 2));
+    }
     return Common::bytesToDate(data.mid(30, 2));
 }
 
 QDate MPNode::getDateLastUsed() const
 {
     if (!isValid()) return QDate();
+    if (isBLE())
+    {
+        return Common::bytesToDate(data.mid(10, 2));
+    }
     return Common::bytesToDate(data.mid(32, 2));
 }
 

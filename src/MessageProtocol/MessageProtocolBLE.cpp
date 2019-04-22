@@ -143,6 +143,10 @@ QString MessageProtocolBLE::toQString(const QByteArray &data)
         }
         quint16 unicode = static_cast<quint8>(data[i]);
         unicode |= (data[i+1]<<8);
+        if (0 == unicode)
+        {
+            return out;
+        }
         out += QChar(unicode);
     }
     return out;

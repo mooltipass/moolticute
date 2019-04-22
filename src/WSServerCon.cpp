@@ -1345,6 +1345,33 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
                                      sendJsonMessage(oroot);
                                  });
     }
+    else if (root["msg"] == "start_memorymgmt")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        WSServer::Instance()->setMemLockedClient(clientUid);
+
+        //send command to start MMM
+        mpdevice->startMemMgmtMode(o["want_data"].toBool(),
+                cbProgress,
+                [=](bool success, int errCode, QString errMsg)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                QJsonObject oroot = root;
+                oroot["msg"] = "failed_memorymgmt";
+                sendFailedJson(oroot, errMsg, errCode);
+            }
+        });
+    }
+    else if (root["msg"] == "exit_memorymgmt")
+    {
+        //send command to exit MMM
+        mpdevice->exitMemMgmtMode();
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

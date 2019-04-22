@@ -128,6 +128,8 @@ public:
     void setNotDeletedTagged();
     bool getNotDeletedTagged() const;
 
+    bool isBLE() const;
+
     static QByteArray EmptyAddress;
 
     QJsonObject toJson() const;
