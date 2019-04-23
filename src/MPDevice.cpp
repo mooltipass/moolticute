@@ -33,7 +33,7 @@ MPDevice::MPDevice(QObject *parent):
     set_memMgmtMode(false); //by default device is not in MMM
 
     statusTimer = new QTimer(this);
-    statusTimer->start(5000);
+    statusTimer->start(500);
     connect(statusTimer, &QTimer::timeout, [this]()
     {
         //Do not interfer with any other operation by sending a MOOLTIPASS_STATUS command

@@ -21,6 +21,7 @@
 
 #include "Common.h"
 #include "IMessageProtocol.h"
+#include "MPNodeImpl.h"
 
 class MPNode: public QObject
 {
@@ -37,6 +38,7 @@ public:
         NodeChildData = 3,
     };
 
+    void createNodeImpl();
     //Fill node container with data
     void appendData(const QByteArray &d);
     bool isDataLengthValid() const;
@@ -155,6 +157,7 @@ private:
 
     IMessageProtocol *pMesProt = nullptr;
     const bool isBLE = false;
+    std::unique_ptr<MPNodeImpl> pNodeImpl = nullptr;
 };
 
 #endif // MPNODE_H

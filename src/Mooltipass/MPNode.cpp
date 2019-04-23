@@ -18,6 +18,8 @@
  ******************************************************************************/
 #include "MPNode.h"
 #include "MooltipassCmds.h"
+#include "MPNodeMiniImpl.h"
+#include "MPNodeBLEImpl.h"
 
 #include "MPDevice.h"
 
@@ -31,6 +33,7 @@ MPNode::MPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddre
     pMesProt(getMesProt(parent)),
     isBLE{"BLE" == pMesProt->getDeviceName()}
 {
+    createNodeImpl();
 }
 
 MPNode::MPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr):
@@ -40,13 +43,28 @@ MPNode::MPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 vir
     pMesProt(getMesProt(parent)),
     isBLE{"BLE" == pMesProt->getDeviceName()}
 {
+    createNodeImpl();
+}
+
+void MPNode::createNodeImpl()
+{
+    if (isBLE)
+    {
+        pNodeImpl = std::unique_ptr<MPNodeBLEImpl>(new MPNodeBLEImpl{});
+        qDebug() << "Node is BLE";
+    }
+    else
+    {
+        pNodeImpl = std::unique_ptr<MPNodeMiniImpl>(new MPNodeMiniImpl{});
+        qDebug() << "Node is Mini";
+    }
 }
 
 int MPNode::getType() const
 {
     if (data.size() > 1)
         return ((quint8)data[1] >> 6) & 0x03;
-    return -1;
+    return NodeUnknown;
 }
 
 void MPNode::setType(const quint8 type)
@@ -64,15 +82,7 @@ bool MPNode::isValid() const
         return false;
     }
 
-    if (isBLE)
-    {
-        qDebug() << "Type: " << getType() << ", size: " << data.size();
-        return (data.size() == 264 || data.size() == 528);
-    }
-
-    return getType() != NodeUnknown &&
-           data.size() == MP_NODE_SIZE &&
-           ((quint8)data[1] & 0x20) == 0;
+    return pNodeImpl->isValid(data);
 }
 
 bool MPNode::isDataLengthValid() const
