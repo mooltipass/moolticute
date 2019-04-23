@@ -20,7 +20,7 @@
 #define MPNODE_H
 
 #include "Common.h"
-#include "MessageProtocol/IMessageProtocol.h"
+#include "IMessageProtocol.h"
 
 class MPNode: public QObject
 {
@@ -128,8 +128,6 @@ public:
     void setNotDeletedTagged();
     bool getNotDeletedTagged() const;
 
-    bool isBLE() const;
-
     static QByteArray EmptyAddress;
 
     QJsonObject toJson() const;
@@ -156,6 +154,7 @@ private:
     QList<MPNode *> childDataNodes;
 
     IMessageProtocol *pMesProt = nullptr;
+    const bool isBLE = false;
 };
 
 #endif // MPNODE_H

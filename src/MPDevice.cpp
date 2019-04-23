@@ -19,8 +19,8 @@
 #include "MPDevice.h"
 #include <functional>
 #include "ParseDomain.h"
-#include "MessageProtocol/MessageProtocolMini.h"
-#include "MessageProtocol/MessageProtocolBLE.h"
+#include "MessageProtocolMini.h"
+#include "MessageProtocolBLE.h"
 #include "MPDeviceBleImpl.h"
 #include "BleCommon.h"
 
@@ -33,7 +33,7 @@ MPDevice::MPDevice(QObject *parent):
     set_memMgmtMode(false); //by default device is not in MMM
 
     statusTimer = new QTimer(this);
-    statusTimer->start(500);
+    statusTimer->start(5000);
     connect(statusTimer, &QTimer::timeout, [this]()
     {
         //Do not interfer with any other operation by sending a MOOLTIPASS_STATUS command
