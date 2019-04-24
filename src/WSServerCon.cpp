@@ -146,7 +146,28 @@ void WSServerCon::processMessage(const QString &message)
     if (checkMemModeEnabled(root))
         return;
 
-    if (mpdevice->isBLE())
+    if (root["msg"] == "get_random_numbers")
+    {
+        mpdevice->getRandomNumber([=](bool success, QString errstr, const QByteArray &rndNums)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            QJsonArray arr;
+            for (int i = 0;i < rndNums.size();i++)
+                arr.append(static_cast<quint8>(rndNums.at(i)));
+            oroot["data"] = arr;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
     }
@@ -845,28 +866,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
         QJsonObject o = root["data"].toObject();
         const QByteArray key = o.value("key").toString().toUtf8().simplified();
         mpdevice->getUID(key);
-    }
-
-    else if (root["msg"] == "get_random_numbers")
-    {
-        mpdevice->getRandomNumber([=](bool success, QString errstr, const QByteArray &rndNums)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject oroot = root;
-            QJsonArray arr;
-            for (int i = 0;i < rndNums.size();i++)
-                arr.append(static_cast<quint8>(rndNums.at(i)));
-            oroot["data"] = arr;
-            sendJsonMessage(oroot);
-        });
     }
     else if (root["msg"] == "cancel_request")
     {
