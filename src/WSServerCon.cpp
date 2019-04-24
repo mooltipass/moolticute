@@ -161,8 +161,10 @@ void WSServerCon::processMessage(const QString &message)
 
             QJsonObject oroot = root;
             QJsonArray arr;
-            for (int i = 0;i < rndNums.size();i++)
-                arr.append(static_cast<quint8>(rndNums.at(i)));
+            for (auto num : rndNums)
+            {
+                arr.append(static_cast<quint8>(num));
+            }
             oroot["data"] = arr;
             sendJsonMessage(oroot);
         });
