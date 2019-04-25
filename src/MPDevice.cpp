@@ -1306,8 +1306,8 @@ void MPDevice::memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPD
             }
             else
             {
-                startNode = pMesProt->getPayloadBytes(data, 0, 1);
-                startNodeClone = pMesProt->getPayloadBytes(data, 0, 1);
+                startNode = pMesProt->getPayloadBytes(data, 0, 2);
+                startNodeClone = pMesProt->getPayloadBytes(data, 0, 2);
                 qDebug() << "Start node addr:" << startNode.toHex();
 
                 //if parent address is not null, load nodes
