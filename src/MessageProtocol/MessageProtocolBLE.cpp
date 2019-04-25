@@ -83,7 +83,7 @@ QByteArray MessageProtocolBLE::getFullPayload(const QByteArray &data)
 QByteArray MessageProtocolBLE::getPayloadBytes(const QByteArray &data, int fromPayload, int to)
 {
     int start = getStartingPayloadPosition(data);
-    return data.mid(fromPayload + start, (to - fromPayload) + 1);
+    return data.mid(fromPayload + start, to - fromPayload);
 }
 
 quint32 MessageProtocolBLE::getSerialNumber(const QByteArray &data)
