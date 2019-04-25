@@ -4251,13 +4251,13 @@ void MPDevice::getRandomNumber(std::function<void(bool success, QString errstr, 
     cmd->setTimeout(5000);
     jobs->append(cmd);
 
-    connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [cb, this](const QByteArray &data)
     {
         //data is last result
         //all jobs finished success
 
         qInfo() << "Random numbers generated ok";
-        cb(true, QString(), data.mid(0, 32));
+        cb(true, QString(), pMesProt->getPayloadBytes(data, 0, 32));
     });
 
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
