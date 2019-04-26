@@ -38,7 +38,7 @@ public:
         NodeChildData = 3,
     };
 
-    void createNodeImpl();
+    void createNodeImpl(const QByteArray &d);
     //Fill node container with data
     void appendData(const QByteArray &d);
     bool isDataLengthValid() const;
@@ -137,7 +137,6 @@ public:
 private:
     IMessageProtocol* getMesProt(QObject *parent);
 
-    QByteArray data;
     QByteArray address;
     bool mergeTagged = false;
     bool pointedToCheck = false;
