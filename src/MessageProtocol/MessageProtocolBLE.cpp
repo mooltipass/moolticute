@@ -1,4 +1,5 @@
 #include "MessageProtocolBLE.h"
+#include "MPNodeBLE.h"
 
 MessageProtocolBLE::MessageProtocolBLE()
 {
@@ -161,6 +162,16 @@ void MessageProtocolBLE::flipMessageBit(QByteArray &msg)
 {
     flipBit();
     msg[0] = msg[0]^MESSAGE_FLIP_BIT;
+}
+
+MPNode* MessageProtocolBLE::createMPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeBLE(d, parent, nodeAddress, virt_addr);
+}
+
+MPNode* MessageProtocolBLE::createMPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeBLE(parent, nodeAddress, virt_addr);
 }
 
 void MessageProtocolBLE::resetFlipBit()

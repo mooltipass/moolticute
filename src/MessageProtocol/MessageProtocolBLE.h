@@ -32,6 +32,9 @@ public:
     inline void setAckFlag(bool on);
     void flipMessageBit(QByteArray &msg);
 
+    virtual MPNode* createMPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
+    virtual MPNode* createMPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
+
 private:
     inline void flipBit();
     virtual void fillCommandMapping() override;

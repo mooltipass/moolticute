@@ -1,4 +1,5 @@
 #include "MessageProtocolMini.h"
+#include "MPNodeMini.h"
 
 MessageProtocolMini::MessageProtocolMini()
 {
@@ -106,6 +107,17 @@ QByteArray MessageProtocolMini::toByteArray(const QString &input)
 QString MessageProtocolMini::toQString(const QByteArray &data)
 {
     return QString::fromUtf8(data);
+}
+
+
+MPNode* MessageProtocolMini::createMPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeMini(d, parent, nodeAddress, virt_addr);
+}
+
+MPNode* MessageProtocolMini::createMPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeMini(parent, nodeAddress, virt_addr);
 }
 
 void MessageProtocolMini::fillCommandMapping()

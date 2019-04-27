@@ -1508,8 +1508,8 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }
 
     /* Create pointers to the nodes we are going to fill */
-    MPNode *pnodeClone = new MPNode(this, address);
-    MPNode *pnode = new MPNode(this, address);
+    MPNode *pnodeClone = pMesProt->createMPNode(this, address);
+    MPNode *pnode = pMesProt->createMPNode(this, address);
 
     /* Send read node command, expecting 3 packets or 1 depending on if we're allowed to read a block*/
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
@@ -1609,9 +1609,9 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
     /* Create new parent node, append to list */
-    MPNode *pnode = new MPNode(this, address);
+    MPNode *pnode = pMesProt->createMPNode(this, address);
     loginNodes.append(pnode);
-    MPNode *pnodeClone = new MPNode(this, address);
+    MPNode *pnodeClone = pMesProt->createMPNode(this, address);
     loginNodesClone.append(pnodeClone);
 
     /* Send read node command, expecting 3 packets */
@@ -1690,10 +1690,10 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     qDebug() << "Loading cred child node at address:" << address.toHex();
 
     /* Create empty child node and add it to the list */
-    MPNode *cnode = new MPNode(this, address);
+    MPNode *cnode = pMesProt->createMPNode(this, address);
     loginChildNodes.append(cnode);
     parent->appendChild(cnode);
-    MPNode *cnodeClone = new MPNode(this, address);
+    MPNode *cnodeClone = pMesProt->createMPNode(this, address);
     loginChildNodesClone.append(cnodeClone);
     parentClone->appendChild(cnodeClone);
 
@@ -1740,9 +1740,9 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
 
 void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, const MPDeviceProgressCb &cbProgress)
 {
-    MPNode *pnode = new MPNode(this, address);
+    MPNode *pnode = pMesProt->createMPNode(this, address);
     dataNodes.append(pnode);
-    MPNode *pnodeClone = new MPNode(this, address);
+    MPNode *pnodeClone = pMesProt->createMPNode(this, address);
     dataNodesClone.append(pnodeClone);
 
     qDebug() << "Loading data parent node at address: " << address.toHex();
@@ -1808,10 +1808,10 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
 
 void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress, quint32 nbBytesFetched)
 {
-    MPNode *cnode = new MPNode(this, address);
+    MPNode *cnode = pMesProt->createMPNode(this, address);
     parent->appendChildData(cnode);
     dataChildNodes.append(cnode);
-    MPNode *cnodeClone = new MPNode(this, address);
+    MPNode *cnodeClone = pMesProt->createMPNode(this, address);
     parentClone->appendChildData(cnodeClone);
     dataChildNodesClone.append(cnodeClone);
 
@@ -2879,7 +2879,7 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     newAddressesNeededCounter += 1;
 
     /* Create new node with null address and virtual address set to our counter value */
-    newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+    newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
     newNodePt->setType(MPNode::NodeParent);
     newNodePt->setService(service);
 
@@ -5122,7 +5122,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting first child node and adding it again";
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
-    temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
+    temp_node = pMesProt->createMPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
     removeChildFromDB(loginNodes[0], temp_node_pt, true, true);
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
@@ -5132,7 +5132,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting middle child node and adding it again";
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
-    temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
+    temp_node = pMesProt->createMPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
     removeChildFromDB(loginNodes[0], temp_node_pt, true, true);
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
@@ -5143,7 +5143,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[0]->getStartChildAddress(), loginNodes[0]->getStartChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, temp_node_pt->getNextChildAddress(), temp_node_pt->getNextChildVirtualAddress());
-    temp_node = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
+    temp_node = pMesProt->createMPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
     removeChildFromDB(loginNodes[0], temp_node_pt, true, true);
     addChildToDB(loginNodes[0], temp_node);
     loginChildNodes.append(temp_node);
@@ -5152,8 +5152,8 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
 
     qInfo() << "testCodeAgainstCleanDBChanges: Deleting parent node with single child node and adding it again";
     temp_node_pt = findNodeWithAddressInList(loginChildNodes, loginNodes[1]->getStartChildAddress(), loginNodes[1]->getStartChildVirtualAddress());
-    temp_cnode = new MPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
-    temp_node = new MPNode(loginNodes[1]->getNodeData(), this, loginNodes[1]->getAddress(), loginNodes[1]->getVirtualAddress());
+    temp_cnode = pMesProt->createMPNode(temp_node_pt->getNodeData(), this, temp_node_pt->getAddress(), temp_node_pt->getVirtualAddress());
+    temp_node = pMesProt->createMPNode(loginNodes[1]->getNodeData(), this, loginNodes[1]->getAddress(), loginNodes[1]->getVirtualAddress());
     temp_node->setStartChildAddress(MPNode::EmptyAddress, 0);
     removeChildFromDB(loginNodes[1], temp_node_pt, true, true);
     loginNodes.append(temp_node);
@@ -5483,7 +5483,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
         /* Recreate node and add it to the list of imported nodes */
-        MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+        MPNode* importedNode = pMesProt->createMPNode(dataCore, this, serviceAddr, 0);
         importedLoginNodes.append(importedNode);
         //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
     }
@@ -5505,7 +5505,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
         /* Recreate node and add it to the list of imported nodes */
-        MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+        MPNode* importedNode = pMesProt->createMPNode(dataCore, this, serviceAddr, 0);
         importedLoginChildNodes.append(importedNode);
         //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
     }
@@ -5529,7 +5529,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
             /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+            MPNode* importedNode = pMesProt->createMPNode(dataCore, this, serviceAddr, 0);
             importedDataNodes.append(importedNode);
             //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
         }
@@ -5551,7 +5551,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
             /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = new MPNode(dataCore, this, serviceAddr, 0);
+            MPNode* importedNode = pMesProt->createMPNode(dataCore, this, serviceAddr, 0);
             importedDataChildNodes.append(importedNode);
             //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
         }
@@ -5761,7 +5761,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                             newAddressesNeededCounter += 1;
 
                             /* Create new node with null address and virtual address set to our counter value */
-                            MPNode* newChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                            MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
                             newChildNodePt->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
                             newChildNodePt->setMergeTagged();
 
@@ -5794,7 +5794,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                newAddressesNeededCounter += 1;
 
                /* Create new node with null address and virtual address set to our counter value */
-               MPNode* newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+               MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
                newNodePt->setLoginNodeData(importedLoginNodes[i]->getNodeFlags(), importedLoginNodes[i]->getLoginNodeData());
                newNodePt->setMergeTagged();
 
@@ -5829,7 +5829,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                    newAddressesNeededCounter += 1;
 
                    /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                   MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
                    newChildNodePt->setLoginChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getLoginChildNodeData());
                    newChildNodePt->setMergeTagged();
 
@@ -5969,7 +5969,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                                 newAddressesNeededCounter += 1;
 
                                 /* Create new node with null address and virtual address set to our counter value */
-                                MPNode* newDataChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                                MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
                                 newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
                                 newDataChildNodePt->setMergeTagged();
 
@@ -6014,7 +6014,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                    newAddressesNeededCounter += 1;
 
                    /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                   MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
                    newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
                    newNodePt->setMergeTagged();
 
@@ -6051,7 +6051,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                        newAddressesNeededCounter += 1;
 
                        /* Create new node with null address and virtual address set to our counter value */
-                       MPNode* newDataChildNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                       MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
                        newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
                        newDataChildNodePt->setMergeTagged();
 
@@ -6851,7 +6851,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 newAddressesNeededCounter += 1;
 
                 /* Create new node with null address and virtual address set to our counter value */
-                MPNode* newNodePt = new MPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
                 newNodePt->setType(MPNode::NodeChild);
                 loginChildNodes.append(newNodePt);
                 newNodePt->setNotDeletedTagged();
@@ -6952,7 +6952,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     }
 
                     /* Create new node, remove the old one and add it */
-                    MPNode* newNode = new MPNode(nodePtr->getNodeData(), this, nodePtr->getAddress(), nodePtr->getVirtualAddress());
+                    MPNode* newNode = pMesProt->createMPNode(nodePtr->getNodeData(), this, nodePtr->getAddress(), nodePtr->getVirtualAddress());
                     newNode->setLogin(login);
                     newNode->setNotDeletedTagged();
                     loginChildNodes.append(newNode);

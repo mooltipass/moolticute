@@ -76,9 +76,8 @@ SOURCES += src/main_daemon.cpp \
     src/MessageProtocol/MessageProtocolBLE.cpp \
     src/MPDeviceBleImpl.cpp \
     src/HaveIBeenPwned.cpp \
-    src/Mooltipass/MPNodeImpl.cpp \
-    src/Mooltipass/MPNodeMiniImpl.cpp \
-    src/Mooltipass/MPNodeBLEImpl.cpp
+    src/Mooltipass/MPNodeMini.cpp \
+    src/Mooltipass/MPNodeBLE.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -105,9 +104,8 @@ HEADERS  += \
     src/MPDeviceBleImpl.h \
     src/HaveIBeenPwned.h \
     src/BleCommon.h \
-    src/Mooltipass/MPNodeImpl.h \
-    src/Mooltipass/MPNodeMiniImpl.h \
-    src/Mooltipass/MPNodeBLEImpl.h
+    src/Mooltipass/MPNodeMini.h \
+    src/Mooltipass/MPNodeBLE.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \
