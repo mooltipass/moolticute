@@ -46,8 +46,7 @@ QVector<QByteArray> MessageProtocolBLE::createPackets(const QByteArray &data, MP
 
 Common::MPStatus MessageProtocolBLE::getStatus(const QByteArray &data)
 {
-    Q_UNUSED(data);
-    return Common::Unlocked;
+    return Common::MPStatus(getFirstPayloadByte(data));
 }
 
 quint16 MessageProtocolBLE::getMessageSize(const QByteArray &data)
@@ -233,7 +232,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::SET_CARD_LOGIN        , 0xB6},
         {MPCmd::SET_CARD_PASS         , 0xB7},
         {MPCmd::ADD_UNKNOWN_CARD      , 0xB8},
-        {MPCmd::MOOLTIPASS_STATUS     , 0x0001},
+        {MPCmd::MOOLTIPASS_STATUS     , 0x0011},
         {MPCmd::FUNCTIONAL_TEST_RES   , 0xBA},
         {MPCmd::SET_DATE              , 0x0004},
         {MPCmd::SET_UID               , 0xBC},

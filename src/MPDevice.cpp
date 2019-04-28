@@ -93,7 +93,10 @@ MPDevice::MPDevice(QObject *parent):
                         if (isFw12())
                         {
                             qInfo() << "Firmware above v1.2, requesting change numbers";
-                            getChangeNumbers();
+                            if (!isBLE())
+                            {
+                                getChangeNumbers();
+                            }
                         }
                         else
                             qInfo() << "Firmware below v1.2, do not request change numbers";
