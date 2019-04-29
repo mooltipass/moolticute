@@ -109,6 +109,10 @@ QString MessageProtocolMini::toQString(const QByteArray &data)
     return QString::fromUtf8(data);
 }
 
+QByteArray MessageProtocolMini::convertDate(const QDateTime& dateTime)
+{
+    return Common::dateToBytes(dateTime.date());
+}
 
 MPNode* MessageProtocolMini::createMPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
 {

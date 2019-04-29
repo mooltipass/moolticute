@@ -3889,14 +3889,12 @@ void MPDevice::setCurrentDate()
     AsyncJobs *jobs = new AsyncJobs("Send date to device", this);
 
     jobs->append(new MPCommandJob(this, MPCmd::SET_DATE,
-                                  [](const QByteArray &, QByteArray &data_to_send) -> bool
+                                  [this](const QByteArray &, QByteArray &data_to_send) -> bool
     {
         data_to_send.clear();
-        data_to_send.append(Common::dateToBytes(QDate::currentDate()));
+        data_to_send.append(pMesProt->convertDate(QDateTime::currentDateTime()));
 
-        qDebug() << "Sending current date: " <<
-                    QString("0x%1").arg((quint8)data_to_send[0], 2, 16, QChar('0')) <<
-                    QString("0x%1").arg((quint8)data_to_send[1], 2, 16, QChar('0'));
+        qDebug() << "Sending current date: " << data_to_send.toHex();
 
         return true;
     },

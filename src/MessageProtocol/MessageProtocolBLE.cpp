@@ -163,6 +163,20 @@ void MessageProtocolBLE::flipMessageBit(QByteArray &msg)
     msg[0] = msg[0]^MESSAGE_FLIP_BIT;
 }
 
+QByteArray MessageProtocolBLE::convertDate(const QDateTime &dateTime)
+{
+    QByteArray data;
+    QDate date = dateTime.date();
+    data.append(toLittleEndianFromInt(date.year()));
+    data.append(toLittleEndianFromInt(date.month()));
+    data.append(toLittleEndianFromInt(date.day()));
+    QTime time = dateTime.time();
+    data.append(toLittleEndianFromInt(time.hour()));
+    data.append(toLittleEndianFromInt(time.minute()));
+    data.append(toLittleEndianFromInt(time.second()));
+    return data;
+}
+
 MPNode* MessageProtocolBLE::createMPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
 {
     return new MPNodeBLE(d, parent, nodeAddress, virt_addr);

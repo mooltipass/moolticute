@@ -28,6 +28,8 @@ public:
     virtual QByteArray toByteArray(const QString &input) override;
     virtual QString toQString(const QByteArray &data) override;
 
+    QByteArray convertDate(const QDateTime& dateTime) override;
+
     virtual MPNode* createMPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
     virtual MPNode* createMPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
 
