@@ -1294,10 +1294,8 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
 }
 
 //TODO: Remove if favorites, cpz_ctr, ctrvalue and getData implemented for BLE too
-void MPDevice::memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds)
+void MPDevice::memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds)
 {
-    Q_UNUSED(getData);
-    Q_UNUSED(getDataChilds);
     if (getCreds)
     {
         /* Get parent node start address */
@@ -1365,7 +1363,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
     /* Load flash contents the usual way */
     if (isBLE())
     {
-        memMgmtModeReadFlashBLE(jobs, false, cbProgress, !wantData, wantData, true);
+        memMgmtModeReadFlashBLE(jobs, false, cbProgress, !wantData);
     }
     else
     {

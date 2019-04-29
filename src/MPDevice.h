@@ -316,7 +316,7 @@ private:
      * implemented for BLE, after the other cmds
      * created it can use memMgmtModeReadFlash too.
      */
-    void memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds);
+    void memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
