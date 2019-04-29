@@ -169,6 +169,33 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "start_memorymgmt")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        WSServer::Instance()->setMemLockedClient(clientUid);
+
+        //send command to start MMM
+        mpdevice->startMemMgmtMode(o["want_data"].toBool(),
+                defaultProgressCb,
+                [=](bool success, int errCode, QString errMsg)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                QJsonObject oroot = root;
+                oroot["msg"] = "failed_memorymgmt";
+                sendFailedJson(oroot, errMsg, errCode);
+            }
+        });
+    }
+    else if (root["msg"] == "exit_memorymgmt")
+    {
+        //send command to exit MMM
+        mpdevice->exitMemMgmtMode();
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -681,33 +708,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
     if (root["msg"] == "param_set")
     {
         processParametersSet(root["data"].toObject());
-    }
-    else if (root["msg"] == "start_memorymgmt")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        WSServer::Instance()->setMemLockedClient(clientUid);
-
-        //send command to start MMM
-        mpdevice->startMemMgmtMode(o["want_data"].toBool(),
-                cbProgress,
-                [=](bool success, int errCode, QString errMsg)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                QJsonObject oroot = root;
-                oroot["msg"] = "failed_memorymgmt";
-                sendFailedJson(oroot, errMsg, errCode);
-            }
-        });
-    }
-    else if (root["msg"] == "exit_memorymgmt")
-    {
-        //send command to exit MMM
-        mpdevice->exitMemMgmtMode();
     }
     else if (root["msg"] == "start_memcheck")
     {
@@ -1345,33 +1345,6 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
                                      oroot["data"] = ores;
                                      sendJsonMessage(oroot);
                                  });
-    }
-    else if (root["msg"] == "start_memorymgmt")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        WSServer::Instance()->setMemLockedClient(clientUid);
-
-        //send command to start MMM
-        mpdevice->startMemMgmtMode(o["want_data"].toBool(),
-                cbProgress,
-                [=](bool success, int errCode, QString errMsg)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                QJsonObject oroot = root;
-                oroot["msg"] = "failed_memorymgmt";
-                sendFailedJson(oroot, errMsg, errCode);
-            }
-        });
-    }
-    else if (root["msg"] == "exit_memorymgmt")
-    {
-        //send command to exit MMM
-        mpdevice->exitMemMgmtMode();
     }
     else
     {

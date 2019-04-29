@@ -47,13 +47,13 @@ void MPNodeBLE::setService(const QString &service)
 QByteArray MPNodeBLE::getStartDataCtr() const
 {
     if (!isValid()) return QByteArray();
-    return data.mid(CTR_DATA_ADDR_START, ADDRESS_LENGTH);
+    return data.mid(CTR_DATA_ADDR_START, CTR_LENGTH);
 }
 
 QByteArray MPNodeBLE::getCTR() const
 {
     if (!isValid()) return QByteArray();
-    return data.mid(CTR_ADDR_START, ADDRESS_LENGTH);
+    return data.mid(CTR_ADDR_START, CTR_LENGTH);
 }
 
 QString MPNodeBLE::getDescription() const

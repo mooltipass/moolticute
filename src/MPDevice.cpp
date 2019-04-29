@@ -62,6 +62,7 @@ MPDevice::MPDevice(QObject *parent):
                     QTimer::singleShot(10, [this]()
                     {
                         /* First start: load parameters */
+                        //TODO: LoadParameters has not been implemented for BLE yet
                         if (!isBLE())
                         {
                             loadParameters();
@@ -74,6 +75,7 @@ MPDevice::MPDevice(QObject *parent):
                 {
                     QTimer::singleShot(20, [this]()
                     {
+                        //TODO: GetCurrentCardCPZ has not been implemented for BLE yet
                         if (!isBLE())
                         {
                             getCurrentCardCPZ();
@@ -93,6 +95,7 @@ MPDevice::MPDevice(QObject *parent):
                         if (isFw12())
                         {
                             qInfo() << "Firmware above v1.2, requesting change numbers";
+                            //TODO: GetUserChangeNumber has not been implemented for BLE yet
                             if (!isBLE())
                             {
                                 getChangeNumbers();
@@ -1290,6 +1293,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     }
 }
 
+//TODO: Remove if favorites, cpz_ctr, ctrvalue and getData implemented for BLE too
 void MPDevice::memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds)
 {
     Q_UNUSED(getData);

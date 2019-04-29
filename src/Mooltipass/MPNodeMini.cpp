@@ -4,13 +4,11 @@
 MPNodeMini::MPNodeMini(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
     : MPNode(d, parent, nodeAddress, virt_addr)
 {
-
 }
 
 MPNodeMini::MPNodeMini(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
     : MPNode(parent, nodeAddress, virt_addr)
 {
-
 }
 
 bool MPNodeMini::isDataLengthValid() const
@@ -32,7 +30,7 @@ bool MPNodeMini::isValid() const
 QString MPNodeMini::getService() const
 {
     if (!isValid()) return QString();
-    return pMesProt->toQString(data.mid(8, MP_NODE_SIZE - 8 - 3));
+    return pMesProt->toQString(data.mid(SERVICE_ADDR_START, MP_NODE_SIZE - 8 - 3));
 }
 
 void MPNodeMini::setService(const QString &service)
@@ -50,13 +48,13 @@ void MPNodeMini::setService(const QString &service)
 QByteArray MPNodeMini::getStartDataCtr() const
 {
     if (!isValid()) return QByteArray();
-    return data.mid(CTR_DATA_ADDR_START, ADDRESS_LENGTH);
+    return data.mid(CTR_DATA_ADDR_START, CTR_LENGTH);
 }
 
 QByteArray MPNodeMini::getCTR() const
 {
     if (!isValid()) return QByteArray();
-    return data.mid(CTR_ADDR_START, ADDRESS_LENGTH);
+    return data.mid(CTR_ADDR_START, CTR_LENGTH);
 }
 
 QString MPNodeMini::getDescription() const

@@ -435,5 +435,6 @@ IMessageProtocol *MPNode::getMesProt(QObject *parent)
     {
         return test->getMesProt();
     }
+    qFatal("Parent is not an MPDevice");
     return nullptr;
 }

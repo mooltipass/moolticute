@@ -159,7 +159,7 @@ protected:
     const bool isBLE = false;
 
     static constexpr int ADDRESS_LENGTH = 2;
-    static constexpr int CTR_DATA_LENGTH = 2;
+    static constexpr int CTR_LENGTH = 3;
     static constexpr int NODE_FLAG_ADDR_START = 0;
 
     static constexpr int PREVIOUS_PARENT_ADDR_START = 2;

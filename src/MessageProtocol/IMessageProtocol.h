@@ -141,8 +141,20 @@ public:
         return littleEndian;
     }
 
+    /**
+     * @brief convertDate
+     * @param dateTime: current dateTime
+     * @return dateTime converted to QByteArray
+     * for the given device
+     */
     virtual QByteArray convertDate(const QDateTime& dateTime) = 0;
 
+    /**
+     * @brief createMPNode
+     * @return MPNodeBLE or MPNodeMini
+     * Factory method for MPNode return a new
+     * MPNode for the corresponding device
+     */
     virtual MPNode* createMPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
     virtual MPNode* createMPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
 
