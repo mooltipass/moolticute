@@ -11,6 +11,16 @@ MPNodeMini::MPNodeMini(QObject *parent, const QByteArray &nodeAddress, const qui
 {
 }
 
+MPNodeMini::MPNodeMini(QByteArray &&d, QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+    : MPNode(qMove(d), parent, qMove(nodeAddress), virt_addr)
+{
+}
+
+MPNodeMini::MPNodeMini(QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+    : MPNode(parent, qMove(nodeAddress), virt_addr)
+{
+}
+
 bool MPNodeMini::isDataLengthValid() const
 {
     return data.size() == MP_NODE_SIZE;

@@ -9,6 +9,8 @@ class MPNodeBLE : public MPNode
 public:
     MPNodeBLE(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
     MPNodeBLE(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
+    MPNodeBLE(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
+    MPNodeBLE(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
 
     bool isDataLengthValid() const override;
     bool isValid() const override;

@@ -112,7 +112,7 @@ AsyncFuncDone MessageProtocolBLE::getDefaultFuncDone()
     };
 }
 
-QString MessageProtocolBLE::getDeviceName()
+QString MessageProtocolBLE::getDeviceName() const
 {
     return "BLE";
 }
@@ -185,6 +185,16 @@ MPNode* MessageProtocolBLE::createMPNode(const QByteArray &d, QObject *parent, c
 MPNode* MessageProtocolBLE::createMPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
 {
     return new MPNodeBLE(parent, nodeAddress, virt_addr);
+}
+
+MPNode* MessageProtocolBLE::createMPNode(QByteArray &&d, QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeBLE(qMove(d), parent, qMove(nodeAddress), virt_addr);
+}
+
+MPNode* MessageProtocolBLE::createMPNode(QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeBLE(parent, qMove(nodeAddress), virt_addr);
 }
 
 void MessageProtocolBLE::resetFlipBit()

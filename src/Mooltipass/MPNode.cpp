@@ -29,7 +29,7 @@ MPNode::MPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddre
     address(nodeAddress),
     virtualAddress(virt_addr),
     pMesProt(getMesProt(parent)),
-    isBLE{"BLE" == pMesProt->getDeviceName()}
+    isBLE{pMesProt->isBLE()}
 {
 }
 
@@ -38,7 +38,26 @@ MPNode::MPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 vir
     address(nodeAddress),
     virtualAddress(virt_addr),
     pMesProt(getMesProt(parent)),
-    isBLE{"BLE" == pMesProt->getDeviceName()}
+    isBLE{pMesProt->isBLE()}
+{
+}
+
+MPNode::MPNode(QByteArray &&d, QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr):
+    QObject(parent),
+    data(qMove(d)),
+    address(qMove(nodeAddress)),
+    virtualAddress(virt_addr),
+    pMesProt(getMesProt(parent)),
+    isBLE{pMesProt->isBLE()}
+{
+}
+
+MPNode::MPNode(QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr):
+    QObject(parent),
+    address(qMove(nodeAddress)),
+    virtualAddress(virt_addr),
+    pMesProt(getMesProt(parent)),
+    isBLE{pMesProt->isBLE()}
 {
 }
 

@@ -94,7 +94,7 @@ AsyncFuncDone MessageProtocolMini::getDefaultFuncDone()
     };
 }
 
-QString MessageProtocolMini::getDeviceName()
+QString MessageProtocolMini::getDeviceName() const
 {
     return "Mini";
 }
@@ -122,6 +122,16 @@ MPNode* MessageProtocolMini::createMPNode(const QByteArray &d, QObject *parent, 
 MPNode* MessageProtocolMini::createMPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
 {
     return new MPNodeMini(parent, nodeAddress, virt_addr);
+}
+
+MPNode* MessageProtocolMini::createMPNode(QByteArray &&d, QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeMini(qMove(d), parent, qMove(nodeAddress), virt_addr);
+}
+
+MPNode* MessageProtocolMini::createMPNode(QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeMini(parent, qMove(nodeAddress), virt_addr);
 }
 
 void MessageProtocolMini::fillCommandMapping()

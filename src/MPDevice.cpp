@@ -1296,6 +1296,9 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
 //TODO: Remove if favorites, cpz_ctr, ctrvalue and getData implemented for BLE too
 void MPDevice::memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds)
 {
+    /* For when the MMM is left */
+    cleanMMMVars();
+
     if (getCreds)
     {
         /* Get parent node start address */
@@ -5486,7 +5489,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
         /* Recreate node and add it to the list of imported nodes */
-        MPNode* importedNode = pMesProt->createMPNode(dataCore, this, serviceAddr, 0);
+        MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
         importedLoginNodes.append(importedNode);
         //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
     }
@@ -5508,7 +5511,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
         /* Recreate node and add it to the list of imported nodes */
-        MPNode* importedNode = pMesProt->createMPNode(dataCore, this, serviceAddr, 0);
+        MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
         importedLoginChildNodes.append(importedNode);
         //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
     }
@@ -5532,7 +5535,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
             /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = pMesProt->createMPNode(dataCore, this, serviceAddr, 0);
+            MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
             importedDataNodes.append(importedNode);
             //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
         }
@@ -5554,7 +5557,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
 
             /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = pMesProt->createMPNode(dataCore, this, serviceAddr, 0);
+            MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
             importedDataChildNodes.append(importedNode);
             //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
         }

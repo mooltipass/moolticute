@@ -9,6 +9,9 @@ class MPNodeMini : public MPNode
 public:
     MPNodeMini(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
     MPNodeMini(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
+    MPNodeMini(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
+    MPNodeMini(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
+
 
     bool isDataLengthValid() const override;
     bool isValid() const override;

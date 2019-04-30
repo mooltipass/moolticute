@@ -11,6 +11,16 @@ MPNodeBLE::MPNodeBLE(QObject *parent, const QByteArray &nodeAddress, const quint
 {
 }
 
+MPNodeBLE::MPNodeBLE(QByteArray &&d, QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+    : MPNode(qMove(d), parent, qMove(nodeAddress), virt_addr)
+{
+}
+
+MPNodeBLE::MPNodeBLE(QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+    : MPNode(parent, qMove(nodeAddress), virt_addr)
+{
+}
+
 bool MPNodeBLE::isDataLengthValid() const
 {
     return isValid();
