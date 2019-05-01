@@ -93,6 +93,13 @@ quint32 MessageProtocolBLE::getSerialNumber(const QByteArray &data)
     return 0;
 }
 
+bool MessageProtocolBLE::getChangeNumber(const QByteArray &data, quint32 &credDbNum, quint32 &dataDbNum)
+{
+    credDbNum = convertToQuint32(getPayloadBytes(data, 0, 4));
+    dataDbNum = convertToQuint32(getPayloadBytes(data, 4, 8));
+    return true;
+}
+
 QVector<QByteArray> MessageProtocolBLE::createWriteNodePackets(const QByteArray &data, const QByteArray &address)
 {
     Q_UNUSED(data);
@@ -161,6 +168,24 @@ void MessageProtocolBLE::flipMessageBit(QByteArray &msg)
 {
     flipBit();
     msg[0] = msg[0]^MESSAGE_FLIP_BIT;
+}
+
+quint32 MessageProtocolBLE::convertToQuint32(const QByteArray &data)
+{
+    QVector<quint8> l(4, 0);
+    std::transform(std::begin(data), std::end(data), std::begin(l),
+                   [](char c) {return static_cast<quint8>(c);});
+    return convertToQuint32(l[0], l[1], l[2], l[3]);
+}
+
+quint32 MessageProtocolBLE::convertToQuint32(quint8 firstByte, quint8 secondByte, quint8 thirdByte, quint8 fourthByte)
+{
+    quint32 res = 0;
+    res |= firstByte;
+    res |= (secondByte<<8);
+    res |= (thirdByte<<16);
+    res |= (fourthByte<<24);
+    return res;
 }
 
 QByteArray MessageProtocolBLE::convertDate(const QDateTime &dateTime)
@@ -285,7 +310,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::END_MEMORYMGMT        , 0x0101},
         {MPCmd::SET_USER_CHANGE_NB    , 0xD4},
         {MPCmd::GET_DESCRIPTION       , 0xD5},
-        {MPCmd::GET_USER_CHANGE_NB    , 0xD6},
+        {MPCmd::GET_USER_CHANGE_NB    , 0x000A},
         {MPCmd::SET_DESCRIPTION       , 0xD8},
         {MPCmd::LOCK_DEVICE           , 0xD9},
         {MPCmd::GET_SERIAL            , 0xDA},

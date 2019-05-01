@@ -98,8 +98,8 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(int, lockUnlockMode, 0)
 
     QT_WRITABLE_PROPERTY(quint32, serialNumber, 0)              // serial number if firmware is above 1.2
-    QT_WRITABLE_PROPERTY(quint8, credentialsDbChangeNumber, 0)  // credentials db change number
-    QT_WRITABLE_PROPERTY(quint8, dataDbChangeNumber, 0)         // data db change number
+    QT_WRITABLE_PROPERTY(quint32, credentialsDbChangeNumber, 0)  // credentials db change number
+    QT_WRITABLE_PROPERTY(quint32, dataDbChangeNumber, 0)         // data db change number
     QT_WRITABLE_PROPERTY(QByteArray, cardCPZ, QByteArray())     // Card CPZ
 
     QT_WRITABLE_PROPERTY(qint64, uid, -1)
@@ -413,8 +413,8 @@ private:
     QByteArray unknownCardAddPayload;
 
     // Clones of these values, used when modifying them in MMM
-    quint8 credentialsDbChangeNumberClone;
-    quint8 dataDbChangeNumberClone;
+    quint32 credentialsDbChangeNumberClone;
+    quint32 dataDbChangeNumberClone;
     QByteArray ctrValueClone;
     QByteArray startNodeClone;
     QByteArray startDataNodeClone;

@@ -92,14 +92,10 @@ MPDevice::MPDevice(QObject *parent):
                     /* If v1.2 firmware, query user change number */
                     QTimer::singleShot(50, [this]()
                     {
-                        if (isFw12())
+                        if (isFw12() || isBLE())
                         {
                             qInfo() << "Firmware above v1.2, requesting change numbers";
-                            //TODO: GetUserChangeNumber has not been implemented for BLE yet
-                            if (!isBLE())
-                            {
-                                getChangeNumbers();
-                            }
+                            getChangeNumbers();
                         }
                         else
                             qInfo() << "Firmware below v1.2, do not request change numbers";
@@ -4019,29 +4015,27 @@ void MPDevice::getChangeNumbers()
                                   MPCmd::GET_USER_CHANGE_NB,
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        if (pMesProt->getFirstPayloadByte(data) == 0)
+        quint32 credDbChangeNum = 0;
+        quint32 dataDbChangeNum = 0;
+        if (!pMesProt->getChangeNumber(data, credDbChangeNum, dataDbChangeNum))
         {
             qWarning() << "Couldn't request change numbers";
             return false;
         }
-        else
+
+        set_credentialsDbChangeNumber(credDbChangeNum);
+        credentialsDbChangeNumberClone = credDbChangeNum;
+        set_dataDbChangeNumber(dataDbChangeNum);
+        dataDbChangeNumberClone = dataDbChangeNum;
+        if (filesCache.setDbChangeNumber(dataDbChangeNum))
         {
-            const auto credDbChangeNum = pMesProt->getPayloadByteAt(data, 1);
-            set_credentialsDbChangeNumber(credDbChangeNum);
-            credentialsDbChangeNumberClone = credDbChangeNum;
-            const auto dataDbChangeNum = pMesProt->getPayloadByteAt(data, 2);
-            set_dataDbChangeNumber(dataDbChangeNum);
-            dataDbChangeNumberClone = dataDbChangeNum;
-            if (filesCache.setDbChangeNumber(dataDbChangeNum))
-            {
-                qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
-                emit filesCacheChanged();
-            }
-            emit dbChangeNumbersChanged(credentialsDbChangeNumberClone, dataDbChangeNumberClone);
-            qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
-            qDebug() << "Data change number:" << get_dataDbChangeNumber();
-            return true;
+            qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
+            emit filesCacheChanged();
         }
+        emit dbChangeNumbersChanged(credentialsDbChangeNumberClone, dataDbChangeNumberClone);
+        qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
+        qDebug() << "Data change number:" << get_dataDbChangeNumber();
+        return true;
     }));
 
     connect(v12jobs, &AsyncJobs::finished, [](const QByteArray &)

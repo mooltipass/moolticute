@@ -66,6 +66,19 @@ quint32 MessageProtocolMini::getSerialNumber(const QByteArray &data)
             static_cast<quint32>(static_cast<quint8>(data[MP_PAYLOAD_FIELD_INDEX+0]) << 24);
 }
 
+bool MessageProtocolMini::getChangeNumber(const QByteArray &data, quint32 &credDbNum, quint32 &dataDbNum)
+{
+    if (getFirstPayloadByte(data) == 0)
+    {
+        return false;
+    }
+
+    credDbNum = getPayloadByteAt(data, 1);
+    dataDbNum = getPayloadByteAt(data, 2);
+
+    return true;
+}
+
 QVector<QByteArray> MessageProtocolMini::createWriteNodePackets(const QByteArray &data, const QByteArray &address)
 {
     QVector<QByteArray> createdPackets;

@@ -20,6 +20,8 @@ public:
     virtual QByteArray getPayloadBytes(const QByteArray &data, int fromPayload, int to) override;
 
     virtual quint32 getSerialNumber(const QByteArray &data) override;
+    virtual bool getChangeNumber(const QByteArray &data, quint32& credDbNum, quint32& dataDbNum) override;
+
     virtual QVector<QByteArray> createWriteNodePackets(const QByteArray& data, const QByteArray& address) override;
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() override;

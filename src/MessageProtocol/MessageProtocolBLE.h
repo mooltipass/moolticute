@@ -20,6 +20,8 @@ public:
     virtual QByteArray getPayloadBytes(const QByteArray &data, int fromPayload, int to) override;
 
     virtual quint32 getSerialNumber(const QByteArray &data) override;
+    virtual bool getChangeNumber(const QByteArray &data, quint32& credDbNum, quint32& dataDbNum) override;
+
     virtual QVector<QByteArray> createWriteNodePackets(const QByteArray& data, const QByteArray& address) override;
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() override;
@@ -31,6 +33,9 @@ public:
     void resetFlipBit();
     inline void setAckFlag(bool on);
     void flipMessageBit(QByteArray &msg);
+
+    quint32 convertToQuint32(const QByteArray& data);
+    quint32 convertToQuint32(quint8 firstByte, quint8 secondByte, quint8 thirdByte, quint8 fourthByte);
 
     QByteArray convertDate(const QDateTime& dateTime) override;
 
