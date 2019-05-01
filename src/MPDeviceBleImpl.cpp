@@ -1,6 +1,6 @@
 #include "MPDeviceBleImpl.h"
 #include "AsyncJobs.h"
-#include "MessageProtocol/MessageProtocolBLE.h"
+#include "MessageProtocolBLE.h"
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),

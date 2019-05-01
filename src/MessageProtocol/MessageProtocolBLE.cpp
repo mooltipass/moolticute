@@ -1,4 +1,5 @@
 #include "MessageProtocolBLE.h"
+#include "MPNodeBLE.h"
 
 MessageProtocolBLE::MessageProtocolBLE()
 {
@@ -45,8 +46,7 @@ QVector<QByteArray> MessageProtocolBLE::createPackets(const QByteArray &data, MP
 
 Common::MPStatus MessageProtocolBLE::getStatus(const QByteArray &data)
 {
-    Q_UNUSED(data);
-    return Common::Unlocked;
+    return Common::MPStatus(getFirstPayloadByte(data));
 }
 
 quint16 MessageProtocolBLE::getMessageSize(const QByteArray &data)
@@ -112,7 +112,7 @@ AsyncFuncDone MessageProtocolBLE::getDefaultFuncDone()
     };
 }
 
-QString MessageProtocolBLE::getDeviceName()
+QString MessageProtocolBLE::getDeviceName() const
 {
     return "BLE";
 }
@@ -143,6 +143,10 @@ QString MessageProtocolBLE::toQString(const QByteArray &data)
         }
         quint16 unicode = static_cast<quint8>(data[i]);
         unicode |= (data[i+1]<<8);
+        if (0 == unicode)
+        {
+            return out;
+        }
         out += QChar(unicode);
     }
     return out;
@@ -157,6 +161,40 @@ void MessageProtocolBLE::flipMessageBit(QByteArray &msg)
 {
     flipBit();
     msg[0] = msg[0]^MESSAGE_FLIP_BIT;
+}
+
+QByteArray MessageProtocolBLE::convertDate(const QDateTime &dateTime)
+{
+    QByteArray data;
+    QDate date = dateTime.date();
+    data.append(toLittleEndianFromInt(date.year()));
+    data.append(toLittleEndianFromInt(date.month()));
+    data.append(toLittleEndianFromInt(date.day()));
+    QTime time = dateTime.time();
+    data.append(toLittleEndianFromInt(time.hour()));
+    data.append(toLittleEndianFromInt(time.minute()));
+    data.append(toLittleEndianFromInt(time.second()));
+    return data;
+}
+
+MPNode* MessageProtocolBLE::createMPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeBLE(d, parent, nodeAddress, virt_addr);
+}
+
+MPNode* MessageProtocolBLE::createMPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeBLE(parent, nodeAddress, virt_addr);
+}
+
+MPNode* MessageProtocolBLE::createMPNode(QByteArray &&d, QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeBLE(qMove(d), parent, qMove(nodeAddress), virt_addr);
+}
+
+MPNode* MessageProtocolBLE::createMPNode(QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeBLE(parent, qMove(nodeAddress), virt_addr);
 }
 
 void MessageProtocolBLE::resetFlipBit()
@@ -206,7 +244,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::SET_BOOTLOADER_PWD    , 0xAA},
         {MPCmd::JUMP_TO_BOOTLOADER    , 0xAB},
         {MPCmd::GET_RANDOM_NUMBER     , 0x0008},
-        {MPCmd::START_MEMORYMGMT      , 0xAD},
+        {MPCmd::START_MEMORYMGMT      , 0x0009},
         {MPCmd::IMPORT_MEDIA_START    , 0xAE},
         {MPCmd::IMPORT_MEDIA          , 0xAF},
         {MPCmd::IMPORT_MEDIA_END      , 0xB0},
@@ -218,7 +256,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::SET_CARD_LOGIN        , 0xB6},
         {MPCmd::SET_CARD_PASS         , 0xB7},
         {MPCmd::ADD_UNKNOWN_CARD      , 0xB8},
-        {MPCmd::MOOLTIPASS_STATUS     , 0x0001},
+        {MPCmd::MOOLTIPASS_STATUS     , 0x0011},
         {MPCmd::FUNCTIONAL_TEST_RES   , 0xBA},
         {MPCmd::SET_DATE              , 0x0004},
         {MPCmd::SET_UID               , 0xBC},
@@ -230,11 +268,11 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::GET_CUR_CARD_CPZ      , 0xC2},
         {MPCmd::CANCEL_USER_REQUEST   , 0xC3},
         {MPCmd::PLEASE_RETRY          , 0x0002},
-        {MPCmd::READ_FLASH_NODE       , 0xC5},
+        {MPCmd::READ_FLASH_NODE       , 0x0102},
         {MPCmd::WRITE_FLASH_NODE      , 0xC6},
         {MPCmd::GET_FAVORITE          , 0xC7},
         {MPCmd::SET_FAVORITE          , 0xC8},
-        {MPCmd::GET_STARTING_PARENT   , 0xC9},
+        {MPCmd::GET_STARTING_PARENT   , 0x0100},
         {MPCmd::SET_STARTING_PARENT   , 0xCA},
         {MPCmd::GET_CTRVALUE          , 0xCB},
         {MPCmd::SET_CTRVALUE          , 0xCC},
@@ -244,7 +282,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::GET_30_FREE_SLOTS     , 0xD0},
         {MPCmd::GET_DN_START_PARENT   , 0xD1},
         {MPCmd::SET_DN_START_PARENT   , 0xD2},
-        {MPCmd::END_MEMORYMGMT        , 0x0001},
+        {MPCmd::END_MEMORYMGMT        , 0x0101},
         {MPCmd::SET_USER_CHANGE_NB    , 0xD4},
         {MPCmd::GET_DESCRIPTION       , 0xD5},
         {MPCmd::GET_USER_CHANGE_NB    , 0xD6},

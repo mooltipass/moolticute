@@ -1,4 +1,5 @@
 #include "MessageProtocolMini.h"
+#include "MPNodeMini.h"
 
 MessageProtocolMini::MessageProtocolMini()
 {
@@ -93,7 +94,7 @@ AsyncFuncDone MessageProtocolMini::getDefaultFuncDone()
     };
 }
 
-QString MessageProtocolMini::getDeviceName()
+QString MessageProtocolMini::getDeviceName() const
 {
     return "Mini";
 }
@@ -106,6 +107,31 @@ QByteArray MessageProtocolMini::toByteArray(const QString &input)
 QString MessageProtocolMini::toQString(const QByteArray &data)
 {
     return QString::fromUtf8(data);
+}
+
+QByteArray MessageProtocolMini::convertDate(const QDateTime& dateTime)
+{
+    return Common::dateToBytes(dateTime.date());
+}
+
+MPNode* MessageProtocolMini::createMPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeMini(d, parent, nodeAddress, virt_addr);
+}
+
+MPNode* MessageProtocolMini::createMPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeMini(parent, nodeAddress, virt_addr);
+}
+
+MPNode* MessageProtocolMini::createMPNode(QByteArray &&d, QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeMini(qMove(d), parent, qMove(nodeAddress), virt_addr);
+}
+
+MPNode* MessageProtocolMini::createMPNode(QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
+{
+    return new MPNodeMini(parent, qMove(nodeAddress), virt_addr);
 }
 
 void MessageProtocolMini::fillCommandMapping()

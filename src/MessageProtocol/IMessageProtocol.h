@@ -7,6 +7,7 @@
 
 #include <QByteArray>
 
+class MPNode;
 class IMessageProtocol
 {
 public:
@@ -75,7 +76,16 @@ public:
      * @brief getDeviceName
      * @return the used device name (BLE or Mini)
      */
-    virtual QString getDeviceName() = 0;
+    virtual QString getDeviceName() const = 0;
+
+    /**
+     * @brief isBLE
+     * @return true if the current device is a BLE
+     */
+    bool isBLE() const
+    {
+        return "BLE" == getDeviceName();
+    }
 
     /**
      * @brief fillCommandMapping
@@ -139,6 +149,25 @@ public:
         littleEndian.append(static_cast<char>((num&0xFF00)>>8));
         return littleEndian;
     }
+
+    /**
+     * @brief convertDate
+     * @param dateTime: current dateTime
+     * @return dateTime converted to QByteArray
+     * for the given device
+     */
+    virtual QByteArray convertDate(const QDateTime& dateTime) = 0;
+
+    /**
+     * @brief createMPNode
+     * @return MPNodeBLE or MPNodeMini
+     * Factory method for MPNode return a new
+     * MPNode for the corresponding device
+     */
+    virtual MPNode* createMPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
+    virtual MPNode* createMPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
+    virtual MPNode* createMPNode(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
+    virtual MPNode* createMPNode(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
 
     QMap<quint16,quint16> m_commandMapping;
 };

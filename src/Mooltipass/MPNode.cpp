@@ -25,26 +25,54 @@ QByteArray MPNode::EmptyAddress = QByteArray(2, 0);
 
 MPNode::MPNode(const QByteArray &d, QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr):
     QObject(parent),
-    data(std::move(d)),
-    address(std::move(nodeAddress)),
+    data(d),
+    address(nodeAddress),
     virtualAddress(virt_addr),
-    pMesProt(getMesProt(parent))
+    pMesProt(getMesProt(parent)),
+    isBLE{pMesProt->isBLE()}
 {
 }
 
 MPNode::MPNode(QObject *parent, const QByteArray &nodeAddress, const quint32 virt_addr):
     QObject(parent),
-    address(std::move(nodeAddress)),
+    address(nodeAddress),
     virtualAddress(virt_addr),
-    pMesProt(getMesProt(parent))
+    pMesProt(getMesProt(parent)),
+    isBLE{pMesProt->isBLE()}
 {
+}
+
+MPNode::MPNode(QByteArray &&d, QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr):
+    QObject(parent),
+    data(qMove(d)),
+    address(qMove(nodeAddress)),
+    virtualAddress(virt_addr),
+    pMesProt(getMesProt(parent)),
+    isBLE{pMesProt->isBLE()}
+{
+}
+
+MPNode::MPNode(QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr):
+    QObject(parent),
+    address(qMove(nodeAddress)),
+    virtualAddress(virt_addr),
+    pMesProt(getMesProt(parent)),
+    isBLE{pMesProt->isBLE()}
+{
+}
+
+void MPNode::appendData(const QByteArray &d)
+{
+    data.append(d);
 }
 
 int MPNode::getType() const
 {
     if (data.size() > 1)
-        return ((quint8)data[1] >> 6) & 0x03;
-    return -1;
+    {
+        return (static_cast<quint8>(data[1]) >> 6) & 0x03;
+    }
+    return NodeUnknown;
 }
 
 void MPNode::setType(const quint8 type)
@@ -53,23 +81,6 @@ void MPNode::setType(const quint8 type)
     {
         data[1] = type << 6;
     }
-}
-
-bool MPNode::isValid() const
-{
-    return getType() != NodeUnknown &&
-           data.size() == MP_NODE_SIZE &&
-           ((quint8)data[1] & 0x20) == 0;
-}
-
-bool MPNode::isDataLengthValid() const
-{
-    return data.size() == MP_NODE_SIZE;
-}
-
-void MPNode::appendData(const QByteArray &d)
-{
-    data.append(d);
 }
 
 QByteArray MPNode::getAddress() const
@@ -152,7 +163,7 @@ QByteArray MPNode::getPreviousParentAddress() const
 {
     if (!isValid()) return QByteArray();
     if (prevVirtualAddressSet) return QByteArray();
-    return data.mid(2, 2);
+    return data.mid(PREVIOUS_PARENT_ADDR_START, ADDRESS_LENGTH);
 }
 
 quint32 MPNode::getPreviousParentVirtualAddress() const
@@ -170,8 +181,8 @@ void MPNode::setPreviousParentAddress(const QByteArray &d, const quint32 virt_ad
     else
     {
         prevVirtualAddressSet = false;
-        data[2] = d[0];
-        data[3] = d[1];
+        data[PREVIOUS_PARENT_ADDR_START] = d[0];
+        data[PREVIOUS_PARENT_ADDR_START+1] = d[1];
     }
 }
 
@@ -179,7 +190,7 @@ QByteArray MPNode::getNextParentAddress() const
 {
     if (!isValid()) return QByteArray();
     if (nextVirtualAddressSet) return QByteArray();
-    return data.mid(4, 2);
+    return data.mid(NEXT_PARENT_ADDR_START, ADDRESS_LENGTH);
 }
 
 quint32 MPNode::getNextParentVirtualAddress() const
@@ -197,8 +208,8 @@ void MPNode::setNextParentAddress(const QByteArray &d, const quint32 virt_addr)
     else
     {
         nextVirtualAddressSet = false;
-        data[4] = d[0];
-        data[5] = d[1];
+        data[NEXT_PARENT_ADDR_START] = d[0];
+        data[NEXT_PARENT_ADDR_START+1] = d[1];
     }
 }
 
@@ -206,7 +217,7 @@ QByteArray MPNode::getStartChildAddress() const
 {
     if (!isValid()) return QByteArray();
     if (firstChildVirtualAddressSet) return QByteArray();
-    return data.mid(6, 2);
+    return data.mid(START_CHILD_ADDR_START, ADDRESS_LENGTH);
 }
 
 quint32 MPNode::getStartChildVirtualAddress() const
@@ -224,40 +235,16 @@ void MPNode::setStartChildAddress(const QByteArray &d, const quint32 virt_addr)
     else
     {
         firstChildVirtualAddressSet = false;
-        data[6] = d[0];
-        data[7] = d[1];
+        data[START_CHILD_ADDR_START] = d[0];
+        data[START_CHILD_ADDR_START+1] = d[1];
     }
-}
-
-QString MPNode::getService() const
-{
-    if (!isValid()) return QString();
-    return pMesProt->toQString(data.mid(8, MP_NODE_SIZE - 8 - 3));
-}
-
-void MPNode::setService(const QString &service)
-{
-    if (isValid())
-    {
-        QByteArray serviceArray = pMesProt->toByteArray(service);
-        serviceArray.append('\0');
-        serviceArray.resize(MP_MAX_PAYLOAD_LENGTH);
-        serviceArray[serviceArray.size()-1] = '\0';
-        data.replace(8, MP_MAX_PAYLOAD_LENGTH, serviceArray);
-    }
-}
-
-QByteArray MPNode::getStartDataCtr() const
-{
-    if (!isValid()) return QByteArray();
-    return data.mid(129, 3);
 }
 
 QByteArray MPNode::getNextChildAddress() const
 {
     if (!isValid()) return QByteArray();
     if (nextVirtualAddressSet) return QByteArray();
-    return data.mid(4, 2);
+    return data.mid(NEXT_PARENT_ADDR_START, ADDRESS_LENGTH);
 }
 
 quint32 MPNode::getNextChildVirtualAddress(void) const
@@ -275,8 +262,8 @@ void MPNode::setNextChildAddress(const QByteArray &d, const quint32 virt_addr)
     else
     {
         nextVirtualAddressSet = false;
-        data[4] = d[0];
-        data[5] = d[1];
+        data[NEXT_PARENT_ADDR_START] = d[0];
+        data[NEXT_PARENT_ADDR_START+1] = d[1];
     }
 }
 
@@ -289,7 +276,7 @@ QByteArray MPNode::getPreviousChildAddress() const
 {
     if (!isValid()) return QByteArray();
     if (prevVirtualAddressSet) return QByteArray();
-    return data.mid(2, 2);
+    return data.mid(PREVIOUS_PARENT_ADDR_START, ADDRESS_LENGTH);
 }
 
 void MPNode::setPreviousChildAddress(const QByteArray &d, const quint32 virt_addr)
@@ -302,8 +289,8 @@ void MPNode::setPreviousChildAddress(const QByteArray &d, const quint32 virt_add
     else
     {
         prevVirtualAddressSet = false;
-        data[2] = d[0];
-        data[3] = d[1];
+        data[PREVIOUS_PARENT_ADDR_START] = d[0];
+        data[PREVIOUS_PARENT_ADDR_START+1] = d[1];
     }
 }
 
@@ -311,7 +298,7 @@ QByteArray MPNode::getNextChildDataAddress() const
 {
     if (!isValid()) return QByteArray();
     if (nextVirtualAddressSet) return QByteArray();
-    return data.mid(2, 2);
+    return data.mid(NEXT_DATA_ADDR_START, ADDRESS_LENGTH);
 }
 
 void MPNode::setNextChildDataAddress(const QByteArray &d, const quint32 virt_addr)
@@ -324,75 +311,15 @@ void MPNode::setNextChildDataAddress(const QByteArray &d, const quint32 virt_add
     else
     {
         nextVirtualAddressSet = false;
-        data[2] = d[0];
-        data[3] = d[1];
+        data[NEXT_DATA_ADDR_START] = d[0];
+        data[NEXT_DATA_ADDR_START+1] = d[1];
     }
-}
-
-QByteArray MPNode::getCTR() const
-{
-    if (!isValid()) return QByteArray();
-    return data.mid(34, 3);
-}
-
-QString MPNode::getDescription() const
-{
-    if (!isValid()) return QString();
-    return pMesProt->toQString(data.mid(6, 24));
-}
-
-void MPNode::setDescription(const QString &newDescription)
-{
-    if (isValid())
-    {
-        QByteArray desc = pMesProt->toByteArray(newDescription);
-        desc.append('\0');
-        desc.resize(MP_MAX_DESC_LENGTH);
-        desc[desc.size()-1] = '\0';
-        data.replace(6, MP_MAX_DESC_LENGTH, desc);
-    }
-}
-
-QString MPNode::getLogin() const
-{
-    if (!isValid()) return QString();
-    return pMesProt->toQString(data.mid(37, 63));
-}
-
-void MPNode::setLogin(const QString &newLogin)
-{
-    if (isValid())
-    {
-        QByteArray login = pMesProt->toByteArray(newLogin);
-        login.append('\0');
-        login.resize(MP_MAX_PAYLOAD_LENGTH);
-        login[login.size()-1] = '\0';
-        data.replace(37, MP_MAX_PAYLOAD_LENGTH, login);
-    }
-}
-
-QByteArray MPNode::getPasswordEnc() const
-{
-    if (!isValid()) return QByteArray();
-    return data.mid(100, 32);
-}
-
-QDate MPNode::getDateCreated() const
-{
-    if (!isValid()) return QDate();
-    return Common::bytesToDate(data.mid(30, 2));
-}
-
-QDate MPNode::getDateLastUsed() const
-{
-    if (!isValid()) return QDate();
-    return Common::bytesToDate(data.mid(32, 2));
 }
 
 QByteArray MPNode::getNextDataAddress() const
 {
     if (!isValid()) return QByteArray();
-    return data.mid(2, 2);
+    return data.mid(NEXT_DATA_ADDR_START, ADDRESS_LENGTH);
 }
 
 QByteArray MPNode::getNodeData() const
@@ -403,14 +330,14 @@ QByteArray MPNode::getNodeData() const
 
 QByteArray MPNode::getNodeFlags() const
 {
-    return data.mid(0, 2);
+    return data.mid(NODE_FLAG_ADDR_START, ADDRESS_LENGTH);
 }
 
 QByteArray MPNode::getLoginNodeData() const
 {
     // return core data, excluding linked lists and flags
     if (!isValid()) return QByteArray();
-    return data.mid(8);
+    return data.mid(DATA_ADDR_START);
 }
 
 void MPNode::setLoginNodeData(const QByteArray &flags, const QByteArray &d)
@@ -418,8 +345,8 @@ void MPNode::setLoginNodeData(const QByteArray &flags, const QByteArray &d)
     // overwrite core data, excluding linked lists
     if (isValid())
     {
-        data.replace(8, MP_NODE_SIZE-8, d);
-        data.replace(0, 2, flags);
+        data.replace(DATA_ADDR_START, MP_NODE_SIZE-8, d);
+        data.replace(0, ADDRESS_LENGTH, flags);
     }
 }
 
@@ -427,7 +354,7 @@ QByteArray MPNode::getLoginChildNodeData() const
 {
     // return core data, excluding linked lists and flags
     if (!isValid()) return QByteArray();
-    return data.mid(6);
+    return data.mid(LOGIN_CHILD_NODE_DATA_ADDR_START);
 }
 
 void MPNode::setLoginChildNodeData(const QByteArray &flags, const QByteArray &d)
@@ -435,15 +362,15 @@ void MPNode::setLoginChildNodeData(const QByteArray &flags, const QByteArray &d)
     // overwrite core data, excluding linked lists
     if (isValid())
     {
-        data.replace(6, MP_NODE_SIZE-6, d);
-        data.replace(0, 2, flags);
+        data.replace(LOGIN_CHILD_NODE_DATA_ADDR_START, MP_NODE_SIZE-8, d);
+        data.replace(0, ADDRESS_LENGTH, flags);
     }
 }
 
 QByteArray MPNode::getDataNodeData() const
 {
     if (!isValid()) return QByteArray();
-    return data.mid(8);
+    return data.mid(DATA_ADDR_START);
 }
 
 void MPNode::setDataNodeData(const QByteArray &flags, const QByteArray &d)
@@ -451,15 +378,15 @@ void MPNode::setDataNodeData(const QByteArray &flags, const QByteArray &d)
     // overwrite core data, excluding linked lists
     if (isValid())
     {
-        data.replace(8, MP_NODE_SIZE-8, d);
-        data.replace(0, 2, flags);
+        data.replace(DATA_ADDR_START, MP_NODE_SIZE-8, d);
+        data.replace(0, ADDRESS_LENGTH, flags);
     }
 }
 
 QByteArray MPNode::getDataChildNodeData() const
 {
     if (!isValid()) return QByteArray();
-    return data.mid(4);
+    return data.mid(DATA_CHILD_DATA_ADDR_START);
 }
 
 void MPNode::setDataChildNodeData(const QByteArray &flags, const QByteArray &d)
@@ -467,8 +394,8 @@ void MPNode::setDataChildNodeData(const QByteArray &flags, const QByteArray &d)
     // overwrite core data, excluding linked lists
     if (isValid())
     {
-        data.replace(4, MP_NODE_SIZE-4, d);
-        data.replace(0, 2, flags);
+        data.replace(DATA_CHILD_DATA_ADDR_START, MP_NODE_SIZE-4, d);
+        data.replace(0, ADDRESS_LENGTH, flags);
     }
 }
 
@@ -527,5 +454,6 @@ IMessageProtocol *MPNode::getMesProt(QObject *parent)
     {
         return test->getMesProt();
     }
+    qFatal("Parent is not an MPDevice");
     return nullptr;
 }
