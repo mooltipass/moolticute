@@ -105,6 +105,11 @@ bool MessageProtocolBLE::getChangeNumber(const QByteArray &data, quint32 &credDb
     return true;
 }
 
+bool MessageProtocolBLE::isCPZInvalid(const QByteArray &data)
+{
+    return getMessageSize(data) == 1;
+}
+
 QVector<QByteArray> MessageProtocolBLE::createWriteNodePackets(const QByteArray &data, const QByteArray &address)
 {
     Q_UNUSED(data);
@@ -295,7 +300,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::ADD_DATA_SERVICE      , 0xBF},
         {MPCmd::WRITE_32B_IN_DN       , 0xC0},
         {MPCmd::READ_32B_IN_DN        , 0xC1},
-        {MPCmd::GET_CUR_CARD_CPZ      , 0xC2},
+        {MPCmd::GET_CUR_CARD_CPZ      , 0x000B},
         {MPCmd::CANCEL_USER_REQUEST   , 0xC3},
         {MPCmd::PLEASE_RETRY          , 0x0002},
         {MPCmd::READ_FLASH_NODE       , 0x0102},

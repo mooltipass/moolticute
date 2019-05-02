@@ -79,6 +79,11 @@ bool MessageProtocolMini::getChangeNumber(const QByteArray &data, quint32 &credD
     return true;
 }
 
+bool MessageProtocolMini::isCPZInvalid(const QByteArray &data)
+{
+    return getFirstPayloadByte(data) == 0;
+}
+
 QVector<QByteArray> MessageProtocolMini::createWriteNodePackets(const QByteArray &data, const QByteArray &address)
 {
     QVector<QByteArray> createdPackets;

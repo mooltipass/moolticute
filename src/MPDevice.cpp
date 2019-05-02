@@ -75,11 +75,7 @@ MPDevice::MPDevice(QObject *parent):
                 {
                     QTimer::singleShot(20, [this]()
                     {
-                        //TODO: GetCurrentCardCPZ has not been implemented for BLE yet
-                        if (!isBLE())
-                        {
-                            getCurrentCardCPZ();
-                        }
+                        getCurrentCardCPZ();
                     });
                 }
                 else
@@ -3971,7 +3967,7 @@ void MPDevice::getCurrentCardCPZ()
                                   MPCmd::GET_CUR_CARD_CPZ,
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        if (pMesProt->getFirstPayloadByte(data) == 0)
+        if (pMesProt->isCPZInvalid(data))
         {
             qWarning() << "Couldn't request card CPZ";
             return false;
