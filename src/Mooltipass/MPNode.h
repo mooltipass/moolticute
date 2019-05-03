@@ -20,13 +20,15 @@
 #define MPNODE_H
 
 #include "Common.h"
-#include "MessageProtocol/IMessageProtocol.h"
+#include "IMessageProtocol.h"
 
 class MPNode: public QObject
 {
 public:
     MPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
     MPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
+    MPNode(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
+    MPNode(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
 
     enum
     {
@@ -39,16 +41,17 @@ public:
 
     //Fill node container with data
     void appendData(const QByteArray &d);
-    bool isDataLengthValid() const;
-    bool isValid() const;
+    virtual bool isDataLengthValid() const = 0;
+    virtual bool isValid() const = 0;
+    int getType() const;
+    void setType(const quint8 type);
 
     /* accessors for node properties */
     void setAddress(const QByteArray &d, const quint32 virt_addr = 0);
     quint32 getVirtualAddress(void) const;
     void setVirtualAddress(quint32 addr);
-    void setType(const quint8 type);
+
     QByteArray getAddress() const;
-    int getType() const;
 
     // NodeParent / NodeParentData properties
     void setPreviousParentAddress(const QByteArray &d, const quint32 virt_addr = 0);
@@ -60,10 +63,6 @@ public:
     void setStartChildAddress(const QByteArray &d, const quint32 virt_addr = 0);
     quint32 getStartChildVirtualAddress() const;
     QByteArray getStartChildAddress() const;
-    void setService(const QString &service);
-    QString getService() const;
-
-    QByteArray getStartDataCtr() const;
 
     QList<MPNode *> &getChildNodes() { return childNodes; }
     void appendChild(MPNode *node) { node->setParent(this); childNodes.append(node); }
@@ -80,18 +79,23 @@ public:
     void setPreviousChildAddress(const QByteArray &d, const quint32 virt_addr = 0);
     quint32 getPreviousChildVirtualAddress(void) const;
     QByteArray getPreviousChildAddress() const;
-    QByteArray getCTR() const;
-    QString getDescription() const;
-    void setDescription(const QString &newDescription);
-    QString getLogin() const;
-    void setLogin(const QString &newLogin);
-    QByteArray getPasswordEnc() const;
-    QDate getDateCreated() const;
-    QDate getDateLastUsed() const;
-    void setFavoriteProperty(const qint8 favId);
-    qint8 getFavoriteProperty() const;
-    quint32 getEncDataSize() const;
-    void setEncDataSize(const quint32 encSize);
+
+    virtual QString getService() const = 0;
+    virtual void setService(const QString &service) = 0;
+    virtual QByteArray getStartDataCtr() const = 0;
+    virtual QByteArray getCTR() const = 0;
+    virtual QString getDescription() const = 0;
+    virtual void setDescription(const QString &newDescription) = 0;
+    virtual QString getLogin() const = 0;
+    virtual void setLogin(const QString &newLogin) = 0;
+    virtual QByteArray getPasswordEnc() const = 0;
+    virtual QDate getDateCreated() const = 0;
+    virtual QDate getDateLastUsed() const = 0;
+
+    virtual void setFavoriteProperty(const qint8 favId);
+    virtual qint8 getFavoriteProperty() const;
+    virtual quint32 getEncDataSize() const;
+    virtual void setEncDataSize(const quint32 encSize);
 
     //Data node address
     //Address in data node is not at the same position as cred nodes
@@ -132,7 +136,7 @@ public:
 
     QJsonObject toJson() const;
 
-private:
+protected:
     IMessageProtocol* getMesProt(QObject *parent);
 
     QByteArray data;
@@ -154,6 +158,22 @@ private:
     QList<MPNode *> childDataNodes;
 
     IMessageProtocol *pMesProt = nullptr;
+    const bool isBLE = false;
+
+    static constexpr int ADDRESS_LENGTH = 2;
+    static constexpr int CTR_LENGTH = 3;
+    static constexpr int NODE_FLAG_ADDR_START = 0;
+
+    static constexpr int PREVIOUS_PARENT_ADDR_START = 2;
+    static constexpr int NEXT_PARENT_ADDR_START = 4;
+    static constexpr int START_CHILD_ADDR_START = 6;
+
+    static constexpr int NEXT_DATA_ADDR_START = 2;
+    static constexpr int DATA_CHILD_DATA_ADDR_START = 4;
+    static constexpr int LOGIN_CHILD_NODE_DATA_ADDR_START = 6;
+    static constexpr int DATA_ADDR_START = 8;
+
+    static constexpr int SERVICE_ADDR_START = 8;
 };
 
 #endif // MPNODE_H

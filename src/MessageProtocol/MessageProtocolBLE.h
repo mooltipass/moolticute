@@ -23,7 +23,7 @@ public:
     virtual QVector<QByteArray> createWriteNodePackets(const QByteArray& data, const QByteArray& address) override;
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() override;
-    virtual QString getDeviceName() override;
+    virtual QString getDeviceName() const override;
 
     virtual QByteArray toByteArray(const QString &input) override;
     virtual QString toQString(const QByteArray &data) override;
@@ -31,6 +31,13 @@ public:
     void resetFlipBit();
     inline void setAckFlag(bool on);
     void flipMessageBit(QByteArray &msg);
+
+    QByteArray convertDate(const QDateTime& dateTime) override;
+
+    MPNode* createMPNode(const QByteArray &d, QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
+    MPNode* createMPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
+    MPNode* createMPNode(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
+    MPNode* createMPNode(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
 
 private:
     inline void flipBit();

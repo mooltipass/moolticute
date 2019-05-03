@@ -11,6 +11,8 @@ CONFIG -= app_bundle
 
 CONFIG += c++11
 
+INCLUDEPATH += $$PWD/src $$PWD/src/MessageProtocol $$PWD/src/Mooltipass
+
 win32 {
     LIBS += -lsetupapi -luser32
 } else:linux {
@@ -60,7 +62,7 @@ SOURCES += src/main_daemon.cpp \
     src/WSServer.cpp \
     src/AppDaemon.cpp \
     src/AsyncJobs.cpp \
-    src/MPNode.cpp \
+    src/Mooltipass/MPNode.cpp \
     src/WSServerCon.cpp \
     src/MPDevice_emul.cpp \
     src/http-parser/http_parser.c \
@@ -73,7 +75,9 @@ SOURCES += src/main_daemon.cpp \
     src/MessageProtocol/MessageProtocolMini.cpp \
     src/MessageProtocol/MessageProtocolBLE.cpp \
     src/MPDeviceBleImpl.cpp \
-    src/HaveIBeenPwned.cpp
+    src/HaveIBeenPwned.cpp \
+    src/Mooltipass/MPNodeMini.cpp \
+    src/Mooltipass/MPNodeBLE.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -84,7 +88,7 @@ HEADERS  += \
     src/WSServer.h \
     src/AppDaemon.h \
     src/AsyncJobs.h \
-    src/MPNode.h \
+    src/Mooltipass/MPNode.h \
     src/version.h \
     src/WSServerCon.h \
     src/MPDevice_emul.h \
@@ -99,7 +103,9 @@ HEADERS  += \
     src/MessageProtocol/MessageProtocolBLE.h \
     src/MPDeviceBleImpl.h \
     src/HaveIBeenPwned.h \
-    src/BleCommon.h
+    src/BleCommon.h \
+    src/Mooltipass/MPNodeMini.h \
+    src/Mooltipass/MPNodeBLE.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \

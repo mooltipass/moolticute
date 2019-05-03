@@ -20,7 +20,7 @@
 #define MPDEVICE_EMUL_H
 #include <QHash>
 #include "MPDevice.h"
-#include "MessageProtocol/MessageProtocolMini.h"
+#include "MessageProtocolMini.h"
 
 class MPDevice_emul : public MPDevice
 {
