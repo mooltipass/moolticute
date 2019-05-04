@@ -196,6 +196,36 @@ void WSServerCon::processMessage(const QString &message)
         //send command to exit MMM
         mpdevice->exitMemMgmtMode();
     }
+    else if (root["msg"] == "set_credentials")
+    {
+        if (!mpdevice->get_memMgmtMode())
+        {
+            sendFailedJson(root, "Not in memory management mode");
+            return;
+        }
+
+        mpdevice->setMMCredentials(
+                    root["data"].toArray(),
+                    false,
+                    defaultProgressCb,
+                    [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -1034,36 +1064,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
             QJsonObject oroot = root;
             ores["service"] = service;
             ores["exists"] = exists;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "set_credentials")
-    {
-        if (!mpdevice->get_memMgmtMode())
-        {
-            sendFailedJson(root, "Not in memory management mode");
-            return;
-        }
-
-        mpdevice->setMMCredentials(
-                    root["data"].toArray(),
-                    false,
-                    cbProgress,
-                    [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = "true";
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });

@@ -7038,7 +7038,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     }
 
     /* Increment db change numbers */
-    if (isFw12())
+    if (isFw12() /*|| isBLE()*/)
     {
         set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
         credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
