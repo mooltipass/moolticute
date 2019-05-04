@@ -28,12 +28,14 @@ bool MPNodeBLE::isDataLengthValid() const
 
 bool MPNodeBLE::isValid() const
 {
-    if (NodeUnknown == getType())
+    const auto type = getType();
+    if (NodeUnknown == type)
     {
         return false;
     }
 
-    return (data.size() == PARENT_NODE_LENGTH || data.size() == CHILD_NODE_LENGTH);
+    return (data.size() == PARENT_NODE_LENGTH && NodeParent == type) ||
+           (data.size() == CHILD_NODE_LENGTH && NodeChild == type);
 }
 
 QString MPNodeBLE::getService() const
