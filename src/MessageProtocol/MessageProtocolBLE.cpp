@@ -122,10 +122,9 @@ QVector<QByteArray> MessageProtocolBLE::createWriteNodePackets(const QByteArray 
 
 AsyncFuncDone MessageProtocolBLE::getDefaultFuncDone()
 {
-    return [](const QByteArray &data, bool &) -> bool
+    return [this](const QByteArray &data, bool &) -> bool
     {
-        Q_UNUSED(data);
-        return true;
+        return getFirstPayloadByte(data) == 0x01;
     };
 }
 
