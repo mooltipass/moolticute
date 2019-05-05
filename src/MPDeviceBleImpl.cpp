@@ -26,7 +26,7 @@ void MPDeviceBleImpl::getPlatInfo()
 {
     auto *jobs = new AsyncJobs("Get PlatInfo", mpDev);
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_PLAT_INFO, bleProt->getDefaultFuncDone()));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_PLAT_INFO, bleProt->getDefaultSizeCheckFuncDone()));
 
     connect(jobs, &AsyncJobs::finished, [this](const QByteArray &data)
     {
@@ -53,7 +53,7 @@ void MPDeviceBleImpl::getDebugPlatInfo(const MessageHandlerCbData &cb)
 {
     auto *jobs = new AsyncJobs("Get Debug PlatInfo", mpDev);
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_GET_PLAT_INFO, bleProt->getDefaultFuncDone()));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_GET_PLAT_INFO, bleProt->getDefaultSizeCheckFuncDone()));
 
     connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &data)
     {

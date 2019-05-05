@@ -26,6 +26,7 @@ public:
     virtual QVector<QByteArray> createWriteNodePackets(const QByteArray& data, const QByteArray& address) override;
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() override;
+    AsyncFuncDone getDefaultSizeCheckFuncDone();
     virtual QString getDeviceName() const override;
 
     virtual QByteArray toByteArray(const QString &input) override;

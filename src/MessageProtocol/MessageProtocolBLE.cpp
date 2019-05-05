@@ -128,6 +128,14 @@ AsyncFuncDone MessageProtocolBLE::getDefaultFuncDone()
     };
 }
 
+AsyncFuncDone MessageProtocolBLE::getDefaultSizeCheckFuncDone()
+{
+    return [this](const QByteArray &data, bool &) -> bool
+    {
+        return getMessageSize(data) != 0;
+    };
+}
+
 QString MessageProtocolBLE::getDeviceName() const
 {
     return "BLE";
