@@ -269,9 +269,18 @@ void MPDeviceBleImpl::getCredential(QString service, QString login)
     dequeueAndRun(jobs);
 }
 
-void MPDeviceBleImpl::getCredential(QString service, QString login, const MessageHandlerCbData &cb)
+void MPDeviceBleImpl::getCredential(const QString& service, const QString& login, const QString& reqid, const MessageHandlerCbData &cb)
 {
-    auto *jobs = new AsyncJobs(QString("Get Credential"), this);
+    AsyncJobs *jobs;
+    const QString getCred = "Get Credential";
+    if (reqid.isEmpty())
+    {
+        jobs = new AsyncJobs(getCred, this);
+    }
+    else
+    {
+        jobs = new AsyncJobs(getCred, reqid, this);
+    }
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
                             [this, service, login, cb](const QByteArray &data, bool &)

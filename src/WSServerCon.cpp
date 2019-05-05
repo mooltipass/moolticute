@@ -226,6 +226,15 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "cancel_request")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->cancelUserRequest(reqid);
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -899,15 +908,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
         const QByteArray key = o.value("key").toString().toUtf8().simplified();
         mpdevice->getUID(key);
     }
-    else if (root["msg"] == "cancel_request")
-    {
-        QJsonObject o = root["data"].toObject();
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        mpdevice->cancelUserRequest(reqid);
-    }
     else if (root["msg"] == "get_data_node")
     {
         QJsonObject o = root["data"].toObject();
@@ -1281,7 +1281,12 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         QJsonObject o = root["data"].toObject();
         QString service = o["service"].toString();
         QString login = o["login"].toString();
-        bleImpl->getCredential(service, login,
+        QString reqid;
+        if (o.contains("request_id"))
+        {
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+        }
+        bleImpl->getCredential(service, login, reqid,
                 [this, root, bleImpl, service, login](bool success, QString errstr, QByteArray data)
                 {
                     if (!success)

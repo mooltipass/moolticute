@@ -49,7 +49,7 @@ public:
      */
     //TODO: Only for testing
     void getCredential(QString service, QString login = "");
-    void getCredential(QString service, QString login, const MessageHandlerCbData &cb);
+    void getCredential(const QString& service, const QString& login, const QString& reqid, const MessageHandlerCbData &cb);
     BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;
 
 private:

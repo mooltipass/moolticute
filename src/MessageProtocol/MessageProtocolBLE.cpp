@@ -308,7 +308,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::WRITE_32B_IN_DN       , 0xC0},
         {MPCmd::READ_32B_IN_DN        , 0xC1},
         {MPCmd::GET_CUR_CARD_CPZ      , 0x000B},
-        {MPCmd::CANCEL_USER_REQUEST   , 0xC3},
+        {MPCmd::CANCEL_USER_REQUEST   , 0x0005},
         {MPCmd::PLEASE_RETRY          , 0x0002},
         {MPCmd::READ_FLASH_NODE       , 0x0102},
         {MPCmd::WRITE_FLASH_NODE      , 0xC6},

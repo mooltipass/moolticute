@@ -353,6 +353,9 @@ void MPDevice::newDataRead(const QByteArray &data)
     {
         qWarning() << "Wrong answer received: " << pMesProt->printCmd(dataCommand)
                    << " for command: " << pMesProt->printCmd(currentCommand);
+#ifdef DEV_DEBUG
+        qWarning() << "Full response: " << data.toHex();
+#endif
         return;
     }
 
@@ -4069,7 +4072,7 @@ void MPDevice::cancelUserRequest(const QString &reqid)
     // As the request may block the sending queue, we directly send the command
     // and bypass the queue.
 
-    if (!isFw12())
+    if (!isFw12() && !isBLE())
     {
         qDebug() << "cancelUserRequest not supported for fw < 1.2";
         return;
@@ -4081,11 +4084,14 @@ void MPDevice::cancelUserRequest(const QString &reqid)
     {
         qInfo() << "request_id match current one. Cancel current request";
 
+        const auto cancelRequestCmd = MPCmd::CANCEL_USER_REQUEST;
         QByteArray ba;
-        ba.append(static_cast<char>(0));
-        ba.append(static_cast<char>(pMesProt->getDeviceMappedCommandId(MPCmd::CANCEL_USER_REQUEST)));
+        ba.append(pMesProt->createPackets(QByteArray{}, cancelRequestCmd)[0]);
 
-        qDebug() << "Platform send command: " << QString("0x%1").arg(static_cast<quint8>(ba[1]), 2, 16, QChar('0'));
+        qDebug() << "Platform send command: " << pMesProt->printCmd(cancelRequestCmd);
+#ifdef DEV_DEBUG
+        qDebug() << "Message:" << ba.toHex();
+#endif
         platformWrite(ba);
         return;
     }
