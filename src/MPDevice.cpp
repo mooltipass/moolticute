@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  **  Copyright (c) Raoul Hecky. All Rights Reserved.
  **
  **  Moolticute is free software; you can redistribute it and/or modify
@@ -62,11 +62,7 @@ MPDevice::MPDevice(QObject *parent):
                     QTimer::singleShot(10, [this]()
                     {
                         /* First start: load parameters */
-                        //TODO: LoadParameters has not been implemented for BLE yet
-                        if (!isBLE())
-                        {
-                            loadParameters();
-                        }
+                        loadParameters();
                         setCurrentDate();
                     });
                 }
@@ -596,274 +592,289 @@ void MPDevice::loadParameters()
                           "Loading device parameters",
                           this);
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::VERSION,
-                                  [this](const QByteArray &data, bool &) -> bool
+    if (isBLE())
     {
-        const auto flashSize = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received MP version FLASH size: " << flashSize << "Mb";
-        QString hw = QString(pMesProt->getPayloadBytes(data, 1, pMesProt->getMessageSize(data) - 2));
-        qDebug() << "received MP version hw: " << hw;
-        set_flashMbSize(flashSize);
-        set_hwVersion(hw);
-
-        QRegularExpressionMatchIterator i = regVersion.globalMatch(hw);
-        if (i.hasNext())
+        //TODO: Implement settings for BLE
+        jobs->append(new MPCommandJob(this,
+                       MPCmd::GET_DEVICE_SETTINGS,
+                       [this] (const QByteArray &data, bool &)
+                        {
+                            qDebug() << "Full device settings payload: " << pMesProt->getFullPayload(data).toHex();
+                            return true;
+                        }
+        ));
+    }
+    else
+    {
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::VERSION,
+                                      [this](const QByteArray &data, bool &) -> bool
         {
-            QRegularExpressionMatch match = i.next();
-            int v = match.captured(1).toInt() * 10 +
-                    match.captured(2).toInt();
-            isFw12Flag = v >= 12;
-            if (match.captured(3) == "_mini")
+            const auto flashSize = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received MP version FLASH size: " << flashSize << "Mb";
+            QString hw = QString(pMesProt->getPayloadBytes(data, 1, pMesProt->getMessageSize(data) - 2));
+            qDebug() << "received MP version hw: " << hw;
+            set_flashMbSize(flashSize);
+            set_hwVersion(hw);
+
+            QRegularExpressionMatchIterator i = regVersion.globalMatch(hw);
+            if (i.hasNext())
             {
-                deviceType = DeviceType::MINI;
+                QRegularExpressionMatch match = i.next();
+                int v = match.captured(1).toInt() * 10 +
+                        match.captured(2).toInt();
+                isFw12Flag = v >= 12;
+                if (match.captured(3) == "_mini")
+                {
+                    deviceType = DeviceType::MINI;
+                }
             }
-        }
 
-        return true;
-    }));
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::KEYBOARD_LAYOUT_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto language = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received language: " << language;
-        set_keyboardLayout(language);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::KEYBOARD_LAYOUT_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto language = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received language: " << language;
+            set_keyboardLayout(language);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::LOCK_TIMEOUT_ENABLE_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto lockTimeoutEnabled = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received lock timeout enable: " << lockTimeoutEnabled;
-        set_lockTimeoutEnabled(lockTimeoutEnabled != 0);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::LOCK_TIMEOUT_ENABLE_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto lockTimeoutEnabled = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received lock timeout enable: " << lockTimeoutEnabled;
+            set_lockTimeoutEnabled(lockTimeoutEnabled != 0);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::LOCK_TIMEOUT_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto lockTimeout = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received lock timeout: " << lockTimeout;
-        set_lockTimeout(lockTimeout);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::LOCK_TIMEOUT_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto lockTimeout = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received lock timeout: " << lockTimeout;
+            set_lockTimeout(lockTimeout);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::SCREENSAVER_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto screensaver = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received screensaver: " << screensaver;
-        set_screensaver(screensaver != 0);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::SCREENSAVER_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto screensaver = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received screensaver: " << screensaver;
+            set_screensaver(screensaver != 0);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::USER_REQ_CANCEL_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto userRequestCancel = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received userRequestCancel: " << userRequestCancel;
-        set_userRequestCancel(userRequestCancel != 0);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::USER_REQ_CANCEL_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto userRequestCancel = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received userRequestCancel: " << userRequestCancel;
+            set_userRequestCancel(userRequestCancel != 0);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::USER_INTER_TIMEOUT_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto userInteractionTimeout = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received userInteractionTimeout: " << userInteractionTimeout;
-        set_userInteractionTimeout(userInteractionTimeout);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::USER_INTER_TIMEOUT_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto userInteractionTimeout = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received userInteractionTimeout: " << userInteractionTimeout;
+            set_userInteractionTimeout(userInteractionTimeout);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::FLASH_SCREEN_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto flashScreen = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received flashScreen: " << flashScreen;
-        set_flashScreen(flashScreen != 0);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::FLASH_SCREEN_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto flashScreen = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received flashScreen: " << flashScreen;
+            set_flashScreen(flashScreen != 0);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::OFFLINE_MODE_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto offlineMode = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received offlineMode: " << offlineMode;
-        set_offlineMode(offlineMode != 0);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::OFFLINE_MODE_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto offlineMode = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received offlineMode: " << offlineMode;
+            set_offlineMode(offlineMode != 0);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::TUTORIAL_BOOL_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto tutorialEnabled = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received tutorialEnabled: " << tutorialEnabled;
-        set_tutorialEnabled(tutorialEnabled != 0);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::TUTORIAL_BOOL_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto tutorialEnabled = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received tutorialEnabled: " << tutorialEnabled;
+            set_tutorialEnabled(tutorialEnabled != 0);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto screenBrightness = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received screenBrightness: " << screenBrightness;
-        set_screenBrightness(screenBrightness);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto screenBrightness = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received screenBrightness: " << screenBrightness;
+            set_screenBrightness(screenBrightness);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto knockEnabled = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received set_knockEnabled: " << knockEnabled;
-        set_knockEnabled(knockEnabled != 0);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto knockEnabled = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received set_knockEnabled: " << knockEnabled;
+            set_knockEnabled(knockEnabled != 0);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::MINI_KNOCK_THRES_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto knockEnabled = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received knock threshold: " << knockEnabled;
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::MINI_KNOCK_THRES_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto knockEnabled = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received knock threshold: " << knockEnabled;
 
-        // The conversion of the real-device 'knock threshold' property
-        // to our made-up 'knock sensitivity' property:
-        int v;
-        quint8 s = knockEnabled;
-        if      (s >= KNOCKING_VERY_LOW) v = 0;
-        else if (s >= KNOCKING_LOW)      v = 1;
-        else if (s >= KNOCKING_MEDIUM)   v = 2;
-        else v = 3;
-        set_knockSensitivity(v);
-        return true;
-    }));
+            // The conversion of the real-device 'knock threshold' property
+            // to our made-up 'knock sensitivity' property:
+            int v;
+            quint8 s = knockEnabled;
+            if      (s >= KNOCKING_VERY_LOW) v = 0;
+            else if (s >= KNOCKING_LOW)      v = 1;
+            else if (s >= KNOCKING_MEDIUM)   v = 2;
+            else v = 3;
+            set_knockSensitivity(v);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::RANDOM_INIT_PIN_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto randomStartingPin = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received randomStartingPin: " << randomStartingPin;
-        set_randomStartingPin(randomStartingPin != 0);
-        return true;
-    }));
-
-
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::HASH_DISPLAY_FEATURE_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto hashDisplay = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received hashDisplay: " << hashDisplay;
-        set_hashDisplay(hashDisplay != 0);
-        return true;
-    }));
-
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::LOCK_UNLOCK_FEATURE_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto lockUnlockMode = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received lockUnlockMode: " << lockUnlockMode;
-        set_lockUnlockMode(lockUnlockMode);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::RANDOM_INIT_PIN_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto randomStartingPin = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received randomStartingPin: " << randomStartingPin;
+            set_randomStartingPin(randomStartingPin != 0);
+            return true;
+        }));
 
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto keyAfterLoginSend = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received key after login send enabled: " << keyAfterLoginSend;
-        set_keyAfterLoginSendEnable(keyAfterLoginSend != 0);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::HASH_DISPLAY_FEATURE_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto hashDisplay = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received hashDisplay: " << hashDisplay;
+            set_hashDisplay(hashDisplay != 0);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto keyAfterLoginSend = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received key after login send " << keyAfterLoginSend;
-        set_keyAfterLoginSend(keyAfterLoginSend);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::LOCK_UNLOCK_FEATURE_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto lockUnlockMode = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received lockUnlockMode: " << lockUnlockMode;
+            set_lockUnlockMode(lockUnlockMode);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto keyAfterPassSend = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received key after pass send enabled: " << keyAfterPassSend;
-        set_keyAfterPassSendEnable(keyAfterPassSend != 0);
-        return true;
-    }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto keyAfterPassSend = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received key after pass send " << keyAfterPassSend;
-        set_keyAfterPassSend(keyAfterPassSend);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto keyAfterLoginSend = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received key after login send enabled: " << keyAfterLoginSend;
+            set_keyAfterLoginSendEnable(keyAfterLoginSend != 0);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto delayAfterKeyEntry = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received delay after key entry enabled: " << delayAfterKeyEntry;
-        set_delayAfterKeyEntryEnable(delayAfterKeyEntry != 0);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::KEY_AFTER_LOGIN_SEND_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto keyAfterLoginSend = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received key after login send " << keyAfterLoginSend;
+            set_keyAfterLoginSend(keyAfterLoginSend);
+            return true;
+        }));
 
-    jobs->append(new MPCommandJob(this,
-                                  MPCmd::GET_MOOLTIPASS_PARM,
-                                  QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM),
-                                  [this](const QByteArray &data, bool &) -> bool
-    {
-        const auto delayAfterKeyEntry = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received delay after key entry " << delayAfterKeyEntry;
-        set_delayAfterKeyEntry(delayAfterKeyEntry);
-        return true;
-    }));
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto keyAfterPassSend = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received key after pass send enabled: " << keyAfterPassSend;
+            set_keyAfterPassSendEnable(keyAfterPassSend != 0);
+            return true;
+        }));
+
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::KEY_AFTER_PASS_SEND_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto keyAfterPassSend = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received key after pass send " << keyAfterPassSend;
+            set_keyAfterPassSend(keyAfterPassSend);
+            return true;
+        }));
+
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto delayAfterKeyEntry = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received delay after key entry enabled: " << delayAfterKeyEntry;
+            set_delayAfterKeyEntryEnable(delayAfterKeyEntry != 0);
+            return true;
+        }));
+
+        jobs->append(new MPCommandJob(this,
+                                      MPCmd::GET_MOOLTIPASS_PARM,
+                                      QByteArray(1, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM),
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto delayAfterKeyEntry = pMesProt->getFirstPayloadByte(data);
+            qDebug() << "received delay after key entry " << delayAfterKeyEntry;
+            set_delayAfterKeyEntry(delayAfterKeyEntry);
+            return true;
+        }));
+    }
 
     connect(jobs, &AsyncJobs::finished, [this](const QByteArray &data)
     {
