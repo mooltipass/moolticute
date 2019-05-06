@@ -362,7 +362,7 @@ void MPNode::setLoginChildNodeData(const QByteArray &flags, const QByteArray &d)
     // overwrite core data, excluding linked lists
     if (isValid())
     {
-        data.replace(LOGIN_CHILD_NODE_DATA_ADDR_START, MP_NODE_SIZE-8, d);
+        data.replace(LOGIN_CHILD_NODE_DATA_ADDR_START, MP_NODE_SIZE-6, d);
         data.replace(0, ADDRESS_LENGTH, flags);
     }
 }
