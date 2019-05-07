@@ -340,8 +340,6 @@ void MPDevice::newDataRead(const QByteArray &data)
                 timer->deleteLater();
                 if (isBLE())
                 {
-                    //Need to flip the bit before resend
-                    bleImpl->flipMessageBit(commandQueue.head().data[0]);
                     sendDataDequeue();
                 }
                 else
@@ -455,6 +453,10 @@ void MPDevice::sendDataDequeue()
     int i = 0;
     qDebug() << "Platform send command: " << pMesProt->printCmd(currentCmd.data[0]);
 #endif
+    if (isBLE())
+    {
+        bleImpl->flipMessageBit(currentCmd.data[0]);
+    }
     // send data with platform code
     for (const auto &data : currentCmd.data)
     {
@@ -4085,6 +4087,10 @@ void MPDevice::cancelUserRequest(const QString &reqid)
         ba.append(static_cast<char>(pMesProt->getDeviceMappedCommandId(MPCmd::CANCEL_USER_REQUEST)));
 
         qDebug() << "Platform send command: " << QString("0x%1").arg(static_cast<quint8>(ba[1]), 2, 16, QChar('0'));
+        if (isBLE())
+        {
+            bleImpl->flipMessageBit(ba);
+        }
         platformWrite(ba);
         return;
     }

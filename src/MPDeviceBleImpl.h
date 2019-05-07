@@ -33,9 +33,6 @@ public:
     void fetchData(QString filePath, MPCmd::Command cmd);
     inline void stopFetchData() { fetchState = Common::FetchState::STOPPED; }
 
-    void sendResetFlipBit();
-    void flipMessageBit(QByteArray &msg);
-
     /**
      * @brief storeCredential
      * Only for testing without the callback
@@ -52,6 +49,9 @@ public:
     void getCredential(QString service, QString login, const MessageHandlerCbData &cb);
     BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;
 
+    void sendResetFlipBit();
+    void flipMessageBit(QByteArray &msg);
+
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
@@ -63,11 +63,17 @@ private:
 
     void dequeueAndRun(AsyncJobs *job);
 
+    inline void flipBit();
+    void resetFlipBit();
 
     MessageProtocolBLE *bleProt;
     MPDevice *mpDev;
     Common::FetchState fetchState = Common::FetchState::STOPPED;
 
+    quint8 m_flipBit = 0x00;
+
+    static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
+    static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;
     static constexpr int BUNBLE_DATA_WRITE_SIZE = 256;
     static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;
 };
