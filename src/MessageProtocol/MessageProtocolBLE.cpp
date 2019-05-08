@@ -31,7 +31,7 @@ QVector<QByteArray> MessageProtocolBLE::createPackets(const QByteArray &data, MP
     {
         QByteArray packet;
         int payloadLength = remainingBytes < HID_PACKET_DATA_PAYLOAD ? remainingBytes : HID_PACKET_DATA_PAYLOAD;
-        packet.append(static_cast<char>(m_flipBit|m_ackFlag|payloadLength));
+        packet.append(static_cast<char>(m_ackFlag|payloadLength));
         packet.append(static_cast<char>((curPacketId << 4)|packetNum));
         packet.append(messagePayload.mid(curByteIndex, payloadLength));
 
@@ -40,7 +40,6 @@ QVector<QByteArray> MessageProtocolBLE::createPackets(const QByteArray &data, MP
         ++curPacketId;
         packets.append(packet);
     }
-    flipBit();
     return packets;
 }
 
@@ -157,12 +156,6 @@ void MessageProtocolBLE::setAckFlag(bool on)
     m_ackFlag = on ? ACK_FLAG_BIT : 0x00;
 }
 
-void MessageProtocolBLE::flipMessageBit(QByteArray &msg)
-{
-    flipBit();
-    msg[0] = msg[0]^MESSAGE_FLIP_BIT;
-}
-
 QByteArray MessageProtocolBLE::convertDate(const QDateTime &dateTime)
 {
     QByteArray data;
@@ -195,16 +188,6 @@ MPNode* MessageProtocolBLE::createMPNode(QByteArray &&d, QObject *parent, QByteA
 MPNode* MessageProtocolBLE::createMPNode(QObject *parent, QByteArray &&nodeAddress, const quint32 virt_addr)
 {
     return new MPNodeBLE(parent, qMove(nodeAddress), virt_addr);
-}
-
-void MessageProtocolBLE::resetFlipBit()
-{
-    m_flipBit = 0x00;
-}
-
-void MessageProtocolBLE::flipBit()
-{
-    m_flipBit = m_flipBit ? 0x00 : MESSAGE_FLIP_BIT;
 }
 
 void MessageProtocolBLE::fillCommandMapping()

@@ -28,9 +28,7 @@ public:
     virtual QByteArray toByteArray(const QString &input) override;
     virtual QString toQString(const QByteArray &data) override;
 
-    void resetFlipBit();
     inline void setAckFlag(bool on);
-    void flipMessageBit(QByteArray &msg);
 
     QByteArray convertDate(const QDateTime& dateTime) override;
 
@@ -40,14 +38,11 @@ public:
     MPNode* createMPNode(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
 
 private:
-    inline void flipBit();
     virtual void fillCommandMapping() override;
     int getStartingPayloadPosition(const QByteArray &data) const;
 
     quint8 m_ackFlag = 0x00;
-    quint8 m_flipBit = 0x00;
 
-    static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 ACK_FLAG_BIT = 0x40;
     static constexpr int HID_PACKET_DATA_PAYLOAD = 62;
     static constexpr quint8 CMD_LOWER_BYTE = 2;
