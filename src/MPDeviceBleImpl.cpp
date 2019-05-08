@@ -190,19 +190,6 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
     dequeueAndRun(jobs);
 }
 
-void MPDeviceBleImpl::sendResetFlipBit()
-{
-    QByteArray clearFlip;
-    clearFlip.fill(static_cast<char>(0xFF), 2);
-    mpDev->platformWrite(clearFlip);
-    bleProt->resetFlipBit();
-}
-
-void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
-{
-    bleProt->flipMessageBit(msg);
-}
-
 void MPDeviceBleImpl::storeCredential(const BleCredential &cred)
 {
     auto *jobs = new AsyncJobs(QString("Store Credential"), this);
@@ -335,6 +322,30 @@ BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray respons
     }
 
     return cred;
+}
+
+void MPDeviceBleImpl::flipBit()
+{
+    m_flipBit = m_flipBit ? 0x00 : MESSAGE_FLIP_BIT;
+}
+
+void MPDeviceBleImpl::resetFlipBit()
+{
+    m_flipBit = 0x00;
+}
+
+void MPDeviceBleImpl::sendResetFlipBit()
+{
+    QByteArray clearFlip;
+    clearFlip.fill(static_cast<char>(0xFF), 2);
+    mpDev->platformWrite(clearFlip);
+    resetFlipBit();
+}
+
+void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
+{
+    msg[0] = static_cast<char>((msg[0]&MESSAGE_ACK_AND_PAYLOAD_LENGTH)|m_flipBit);
+    flipBit();
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
