@@ -275,7 +275,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::IMPORT_MEDIA_END      , 0xB0},
         {MPCmd::SET_MOOLTIPASS_PARM   , 0xB1},
         {MPCmd::GET_MOOLTIPASS_PARM   , 0xB2},
-        {MPCmd::RESET_CARD            , 0xB3},
+        {MPCmd::RESET_CARD            , 0x000E},
         {MPCmd::READ_CARD_LOGIN       , 0xB4},
         {MPCmd::READ_CARD_PASS        , 0xB5},
         {MPCmd::SET_CARD_LOGIN        , 0xB6},

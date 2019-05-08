@@ -235,6 +235,27 @@ void WSServerCon::processMessage(const QString &message)
 
         mpdevice->cancelUserRequest(reqid);
     }
+    else if (root["msg"] == "reset_card")
+    {
+        mpdevice->resetSmartCard([=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        }
+        );
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -1162,27 +1183,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
     else if (root["msg"] == "list_files_cache")
     {
         sendFilesCache();
-    }
-    else if (root["msg"] == "reset_card")
-    {
-        mpdevice->resetSmartCard([=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = "true";
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        }
-        );
     }
     else if (root["msg"] == "lock_device")
     {
