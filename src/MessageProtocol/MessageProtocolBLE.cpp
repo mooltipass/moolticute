@@ -94,7 +94,7 @@ quint32 MessageProtocolBLE::getSerialNumber(const QByteArray &data)
 
 bool MessageProtocolBLE::getChangeNumber(const QByteArray &data, quint32 &credDbNum, quint32 &dataDbNum)
 {
-    if (getFirstPayloadByte(data) == 0)
+    if (getMessageSize(data) == 1)
     {
         return false;
     }
