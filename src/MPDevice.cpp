@@ -455,7 +455,7 @@ void MPDevice::sendDataDequeue()
 #endif
     if (isBLE())
     {
-        bleImpl->flipMessageBit(currentCmd.data[0]);
+        bleImpl->flipMessageBit(currentCmd.data);
     }
     // send data with platform code
     for (const auto &data : currentCmd.data)

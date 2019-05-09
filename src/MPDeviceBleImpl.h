@@ -50,6 +50,8 @@ public:
     BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;
 
     void sendResetFlipBit();
+    void setCurrentFlipBit(QByteArray &msg);
+    void flipMessageBit(QVector<QByteArray> &msg);
     void flipMessageBit(QByteArray &msg);
 
 private:

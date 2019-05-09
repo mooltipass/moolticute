@@ -333,9 +333,23 @@ void MPDeviceBleImpl::sendResetFlipBit()
     resetFlipBit();
 }
 
-void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
+void MPDeviceBleImpl::setCurrentFlipBit(QByteArray &msg)
 {
     msg[0] = static_cast<char>((msg[0]&MESSAGE_ACK_AND_PAYLOAD_LENGTH)|m_flipBit);
+}
+
+void MPDeviceBleImpl::flipMessageBit(QVector<QByteArray>& msgVec)
+{
+    for (auto& msg : msgVec)
+    {
+        setCurrentFlipBit(msg);
+    }
+    flipBit();
+}
+
+void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
+{
+    setCurrentFlipBit(msg);
     flipBit();
 }
 
