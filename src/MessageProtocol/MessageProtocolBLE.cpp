@@ -312,7 +312,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::GET_DESCRIPTION       , 0xD5},
         {MPCmd::GET_USER_CHANGE_NB    , 0x000A},
         {MPCmd::SET_DESCRIPTION       , 0xD8},
-        {MPCmd::LOCK_DEVICE           , 0xD9},
+        {MPCmd::LOCK_DEVICE           , 0x0010},
         {MPCmd::GET_SERIAL            , 0xDA},
         {MPCmd::CMD_DBG_MESSAGE       , 0x8000},
         {MPCmd::GET_PLAT_INFO         , 0x0003},

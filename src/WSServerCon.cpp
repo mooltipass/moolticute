@@ -256,6 +256,23 @@ void WSServerCon::processMessage(const QString &message)
         }
         );
     }
+    else if (root["msg"] == "lock_device")
+    {
+        mpdevice->lockDevice([this, root](bool success, QString errstr)
+        {
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -1183,23 +1200,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
     else if (root["msg"] == "list_files_cache")
     {
         sendFilesCache();
-    }
-    else if (root["msg"] == "lock_device")
-    {
-        mpdevice->lockDevice([this, root](bool success, QString errstr)
-        {
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = "true";
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
     }
 }
 
