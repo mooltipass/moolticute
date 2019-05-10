@@ -7440,6 +7440,31 @@ void MPDevice::lockDevice(const MessageHandlerCb &cb)
     runAndDequeueJobs();
 }
 
+void MPDevice::getAvailableUsers(const MessageHandlerCb &cb)
+{
+    auto *jobs = new AsyncJobs("Get Available User", this);
+
+    jobs->append(new MPCommandJob(this, MPCmd::GET_AVAILABLE_USERS,
+                      [this, cb](const QByteArray& data, bool &)
+                        {
+                            const auto availableUsers = pMesProt->getFirstPayloadByte(data);
+                            qDebug() << "Available users: " << availableUsers;
+                            cb(true, QString::number(availableUsers));
+                            return true;
+                        }
+                      ));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Failed to get available users!";
+        cb(false, "");
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
 MPDeviceBleImpl *MPDevice::ble() const
 {
     return bleImpl;

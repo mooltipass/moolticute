@@ -230,6 +230,7 @@ void MessageProtocolMini::fillCommandMapping()
         {MPCmd::SET_USER_CHANGE_NB    , 0xD4},
         {MPCmd::GET_DESCRIPTION       , 0xD5},
         {MPCmd::GET_USER_CHANGE_NB    , 0xD6},
+        {MPCmd::GET_AVAILABLE_USERS   , 0xD7},
         {MPCmd::SET_DESCRIPTION       , 0xD8},
         {MPCmd::LOCK_DEVICE           , 0xD9},
         {MPCmd::GET_SERIAL            , 0xDA},

@@ -130,6 +130,7 @@ public:
             STORE_CREDENTIAL    ,
             GET_CREDENTIAL      ,
             GET_DEVICE_SETTINGS ,
+            GET_AVAILABLE_USERS ,
             CMD_DBG_MESSAGE     ,
             CMD_DBG_OPEN_DISP_BUFFER    ,
             CMD_DBG_SEND_TO_DISP_BUFFER ,

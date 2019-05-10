@@ -241,6 +241,8 @@ public:
     // Lock the devide.
     void lockDevice(const MessageHandlerCb &cb);
 
+    void getAvailableUsers(const MessageHandlerCb &cb);
+
     // Returns bleImpl
     MPDeviceBleImpl* ble() const;
 

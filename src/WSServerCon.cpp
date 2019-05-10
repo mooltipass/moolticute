@@ -273,6 +273,24 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "get_available_users")
+    {
+        mpdevice->getAvailableUsers([this, root](bool success, QString result)
+        {
+            if (!success)
+            {
+                sendFailedJson(root, result);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            ores["num"] = result;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
