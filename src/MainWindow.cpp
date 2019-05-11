@@ -203,10 +203,17 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonImportCSV->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonExportCSV->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonGetAvailableUsers->setStyleSheet(CSS_BLUE_BUTTON);
-    connect(wsClient, &WSClient::displayAvailableUsers, [this](const QString& num)
-    {
-        this->ui->lineEdit_AvailableUsers->setText(num);
-    });
+    connect(wsClient, &WSClient::displayAvailableUsers,
+            [this](const QString& num)
+            {
+                this->ui->lineEdit_AvailableUsers->setText(num);
+            });
+    connect(wsClient, &WSClient::connectedChanged, this,
+            [this]()
+            {
+                this->ui->lineEdit_AvailableUsers->setText("");
+            });
+
 
     // temporary hide 'CSV Export' until it will be implemented
     ui->label_ExportCSV->hide();
