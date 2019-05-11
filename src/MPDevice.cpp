@@ -86,11 +86,13 @@ MPDevice::MPDevice(QObject *parent):
                     {
                         if (isFw12() || isBLE())
                         {
-                            qInfo() << "Firmware above v1.2, requesting change numbers";
+                            qInfo() << "Requesting change numbers";
                             getChangeNumbers();
                         }
                         else
+                        {
                             qInfo() << "Firmware below v1.2, do not request change numbers";
+                        }
                     });
                 }
             }
@@ -7064,6 +7066,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     }
 
     /* Increment db change numbers */
+    /**
+     * TODO: Uncomment and adjust, when SET_USER_CHANGE_NB
+     *       is implemented for BLE
+     */
     if (isFw12() /*|| isBLE()*/)
     {
         set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
