@@ -1307,6 +1307,9 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         bleImpl->getCredential(service, login, reqid,
                 [this, root, bleImpl, service, login](bool success, QString errstr, QByteArray data)
                 {
+                    if (!WSServer::Instance()->checkClientExists(this))
+                        return;
+
                     if (!success)
                     {
                         sendFailedJson(root, errstr);

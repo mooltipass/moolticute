@@ -275,6 +275,7 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
                                 if (MSG_FAILED == bleProt->getMessageSize(data))
                                 {
                                     qWarning() << "Credential get failed";
+                                    cb(false, "Get credential failed", QByteArray{});
                                     return true;
                                 }
                                 qDebug() << "Credential got successfully";
@@ -284,6 +285,12 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
                                 cb(true, "", bleProt->getFullPayload(data));
                                 return true;
                             }));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed getting credential: " << failedJob->getErrorStr();
+        cb(false, failedJob->getErrorStr(), QByteArray{});
+    });
 
     dequeueAndRun(jobs);
 }
