@@ -182,10 +182,16 @@ void MessageProtocolBLE::setAckFlag(bool on)
 
 quint32 MessageProtocolBLE::convertToQuint32(const QByteArray &data)
 {
-    QVector<quint8> l(4, 0);
-    std::transform(std::begin(data), std::end(data), std::begin(l),
-                   [](char c) {return static_cast<quint8>(c);});
-    return convertToQuint32(l[0], l[1], l[2], l[3]);
+    if (data.isEmpty())
+    {
+        return 0;
+    }
+
+    const auto size = data.size();
+    return convertToQuint32(static_cast<quint8>(data[0]),
+                            size > 1 ? static_cast<quint8>(data[1]) : 0,
+                            size > 2 ? static_cast<quint8>(data[2]) : 0,
+                            size > 3 ? static_cast<quint8>(data[3]) : 0);
 }
 
 quint32 MessageProtocolBLE::convertToQuint32(quint8 firstByte, quint8 secondByte, quint8 thirdByte, quint8 fourthByte)
