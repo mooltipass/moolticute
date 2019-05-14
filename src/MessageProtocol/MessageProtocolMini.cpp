@@ -66,6 +66,24 @@ quint32 MessageProtocolMini::getSerialNumber(const QByteArray &data)
             static_cast<quint32>(static_cast<quint8>(data[MP_PAYLOAD_FIELD_INDEX+0]) << 24);
 }
 
+bool MessageProtocolMini::getChangeNumber(const QByteArray &data, quint32 &credDbNum, quint32 &dataDbNum)
+{
+    if (getFirstPayloadByte(data) == 0)
+    {
+        return false;
+    }
+
+    credDbNum = getPayloadByteAt(data, 1);
+    dataDbNum = getPayloadByteAt(data, 2);
+
+    return true;
+}
+
+bool MessageProtocolMini::isCPZInvalid(const QByteArray &data)
+{
+    return getFirstPayloadByte(data) == 0;
+}
+
 QVector<QByteArray> MessageProtocolMini::createWriteNodePackets(const QByteArray &data, const QByteArray &address)
 {
     QVector<QByteArray> createdPackets;
@@ -212,6 +230,7 @@ void MessageProtocolMini::fillCommandMapping()
         {MPCmd::SET_USER_CHANGE_NB    , 0xD4},
         {MPCmd::GET_DESCRIPTION       , 0xD5},
         {MPCmd::GET_USER_CHANGE_NB    , 0xD6},
+        {MPCmd::GET_AVAILABLE_USERS   , 0xD7},
         {MPCmd::SET_DESCRIPTION       , 0xD8},
         {MPCmd::LOCK_DEVICE           , 0xD9},
         {MPCmd::GET_SERIAL            , 0xDA},

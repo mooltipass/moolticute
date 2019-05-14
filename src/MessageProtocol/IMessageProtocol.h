@@ -58,7 +58,10 @@ public:
 
 
     //Command related functions
-    virtual quint32 getSerialNumber(const QByteArray &) = 0;
+    virtual quint32 getSerialNumber(const QByteArray &data) = 0;
+    virtual bool getChangeNumber(const QByteArray &data, quint32& credDbNum, quint32& dataDbNum) = 0;
+    virtual bool isCPZInvalid(const QByteArray &data) = 0;
+
     /*!
      * \brief createWriteNodePackets
      * \param data

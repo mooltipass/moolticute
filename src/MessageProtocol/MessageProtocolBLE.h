@@ -20,15 +20,22 @@ public:
     virtual QByteArray getPayloadBytes(const QByteArray &data, int fromPayload, int to) override;
 
     virtual quint32 getSerialNumber(const QByteArray &data) override;
+    virtual bool getChangeNumber(const QByteArray &data, quint32& credDbNum, quint32& dataDbNum) override;
+    virtual bool isCPZInvalid(const QByteArray &data) override;
+
     virtual QVector<QByteArray> createWriteNodePackets(const QByteArray& data, const QByteArray& address) override;
     //This default func only checks if return value from device is ok or not
     virtual AsyncFuncDone getDefaultFuncDone() override;
+    AsyncFuncDone getDefaultSizeCheckFuncDone();
     virtual QString getDeviceName() const override;
 
     virtual QByteArray toByteArray(const QString &input) override;
     virtual QString toQString(const QByteArray &data) override;
 
     inline void setAckFlag(bool on);
+
+    quint32 convertToQuint32(const QByteArray& data);
+    quint32 convertToQuint32(quint8 firstByte, quint8 secondByte, quint8 thirdByte, quint8 fourthByte);
 
     QByteArray convertDate(const QDateTime& dateTime) override;
 

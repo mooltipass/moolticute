@@ -31,7 +31,7 @@ bool FilesCache::save(QList<QVariantMap> files)
         return false;
 
     QJsonObject json;
-    json.insert("db_change_number", m_dbChangeNumber);
+    json.insert("db_change_number", static_cast<int>(m_dbChangeNumber));
 
     QJsonArray filesJson;
     for (QVariantMap file : files)
@@ -71,7 +71,7 @@ QList<QVariantMap> FilesCache::load()
 
         QJsonObject jsonRoot = QJsonDocument::fromJson(rawJSon.toLocal8Bit()).object();
 
-        qint8 cacheDbChangeNumber = jsonRoot.value("db_change_number").toInt();
+        quint32 cacheDbChangeNumber = jsonRoot.value("db_change_number").toInt();
         if (cacheDbChangeNumber != m_dbChangeNumber)
         {
             qDebug() << "dbChangeNumber miss";
@@ -107,7 +107,7 @@ void FilesCache::resetState()
     m_isFileCacheInSync = true;
 }
 
-bool FilesCache::setDbChangeNumber(quint8 changeNumber)
+bool FilesCache::setDbChangeNumber(quint32 changeNumber)
 {
     if (m_dbChangeNumberSet && m_dbChangeNumber != changeNumber && !m_cardCPZ.isEmpty())
     {

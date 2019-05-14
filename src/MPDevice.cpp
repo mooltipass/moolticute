@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  **  Copyright (c) Raoul Hecky. All Rights Reserved.
  **
  **  Moolticute is free software; you can redistribute it and/or modify
@@ -62,11 +62,7 @@ MPDevice::MPDevice(QObject *parent):
                     QTimer::singleShot(10, [this]()
                     {
                         /* First start: load parameters */
-                        //TODO: LoadParameters has not been implemented for BLE yet
-                        if (!isBLE())
-                        {
-                            loadParameters();
-                        }
+                        loadParameters();
                         setCurrentDate();
                     });
                 }
@@ -75,11 +71,7 @@ MPDevice::MPDevice(QObject *parent):
                 {
                     QTimer::singleShot(20, [this]()
                     {
-                        //TODO: GetCurrentCardCPZ has not been implemented for BLE yet
-                        if (!isBLE())
-                        {
-                            getCurrentCardCPZ();
-                        }
+                        getCurrentCardCPZ();
                     });
                 }
                 else
@@ -92,17 +84,15 @@ MPDevice::MPDevice(QObject *parent):
                     /* If v1.2 firmware, query user change number */
                     QTimer::singleShot(50, [this]()
                     {
-                        if (isFw12())
+                        if (isFw12() || isBLE())
                         {
-                            qInfo() << "Firmware above v1.2, requesting change numbers";
-                            //TODO: GetUserChangeNumber has not been implemented for BLE yet
-                            if (!isBLE())
-                            {
-                                getChangeNumbers();
-                            }
+                            qInfo() << "Requesting change numbers";
+                            getChangeNumbers();
                         }
                         else
+                        {
                             qInfo() << "Firmware below v1.2, do not request change numbers";
+                        }
                     });
                 }
             }
@@ -363,6 +353,9 @@ void MPDevice::newDataRead(const QByteArray &data)
     {
         qWarning() << "Wrong answer received: " << pMesProt->printCmd(dataCommand)
                    << " for command: " << pMesProt->printCmd(currentCommand);
+#ifdef DEV_DEBUG
+        qWarning() << "Full response: " << data.toHex();
+#endif
         return;
     }
 
@@ -605,6 +598,23 @@ void MPDevice::loadParameters()
     AsyncJobs *jobs = new AsyncJobs(
                           "Loading device parameters",
                           this);
+
+    if (isBLE())
+    {
+        //TODO: Implement settings for BLE
+        jobs->append(new MPCommandJob(this,
+                       MPCmd::GET_DEVICE_SETTINGS,
+                       [this] (const QByteArray &data, bool &)
+                        {
+                            qDebug() << "Full device settings payload: " << pMesProt->getFullPayload(data).toHex();
+                            qWarning() << "Load Parameters processing haven't been implemented for BLE yet.";
+                            return true;
+                        }
+        ));
+        jobsQueue.enqueue(jobs);
+        runAndDequeueJobs();
+        return;
+    }
 
     jobs->append(new MPCommandJob(this,
                                   MPCmd::VERSION,
@@ -3977,7 +3987,7 @@ void MPDevice::getCurrentCardCPZ()
                                   MPCmd::GET_CUR_CARD_CPZ,
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        if (pMesProt->getFirstPayloadByte(data) == 0)
+        if (pMesProt->isCPZInvalid(data))
         {
             qWarning() << "Couldn't request card CPZ";
             return false;
@@ -4021,29 +4031,27 @@ void MPDevice::getChangeNumbers()
                                   MPCmd::GET_USER_CHANGE_NB,
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        if (pMesProt->getFirstPayloadByte(data) == 0)
+        quint32 credDbChangeNum = 0;
+        quint32 dataDbChangeNum = 0;
+        if (!pMesProt->getChangeNumber(data, credDbChangeNum, dataDbChangeNum))
         {
             qWarning() << "Couldn't request change numbers";
             return false;
         }
-        else
+
+        set_credentialsDbChangeNumber(credDbChangeNum);
+        credentialsDbChangeNumberClone = credDbChangeNum;
+        set_dataDbChangeNumber(dataDbChangeNum);
+        dataDbChangeNumberClone = dataDbChangeNum;
+        if (filesCache.setDbChangeNumber(dataDbChangeNum))
         {
-            const auto credDbChangeNum = pMesProt->getPayloadByteAt(data, 1);
-            set_credentialsDbChangeNumber(credDbChangeNum);
-            credentialsDbChangeNumberClone = credDbChangeNum;
-            const auto dataDbChangeNum = pMesProt->getPayloadByteAt(data, 2);
-            set_dataDbChangeNumber(dataDbChangeNum);
-            dataDbChangeNumberClone = dataDbChangeNum;
-            if (filesCache.setDbChangeNumber(dataDbChangeNum))
-            {
-                qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
-                emit filesCacheChanged();
-            }
-            emit dbChangeNumbersChanged(credentialsDbChangeNumberClone, dataDbChangeNumberClone);
-            qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
-            qDebug() << "Data change number:" << get_dataDbChangeNumber();
-            return true;
+            qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
+            emit filesCacheChanged();
         }
+        emit dbChangeNumbersChanged(credentialsDbChangeNumberClone, dataDbChangeNumberClone);
+        qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
+        qDebug() << "Data change number:" << get_dataDbChangeNumber();
+        return true;
     }));
 
     connect(v12jobs, &AsyncJobs::finished, [](const QByteArray &)
@@ -4070,7 +4078,7 @@ void MPDevice::cancelUserRequest(const QString &reqid)
     // As the request may block the sending queue, we directly send the command
     // and bypass the queue.
 
-    if (!isFw12())
+    if (!isFw12() && !isBLE())
     {
         qDebug() << "cancelUserRequest not supported for fw < 1.2";
         return;
@@ -4082,10 +4090,14 @@ void MPDevice::cancelUserRequest(const QString &reqid)
     {
         qInfo() << "request_id match current one. Cancel current request";
 
+        const auto cancelRequestCmd = MPCmd::CANCEL_USER_REQUEST;
         QByteArray ba;
-        ba.append(static_cast<char>(0));
-        ba.append(static_cast<char>(pMesProt->getDeviceMappedCommandId(MPCmd::CANCEL_USER_REQUEST)));
+        ba.append(pMesProt->createPackets(QByteArray{}, cancelRequestCmd)[0]);
 
+        qDebug() << "Platform send command: " << pMesProt->printCmd(cancelRequestCmd);
+#ifdef DEV_DEBUG
+        qDebug() << "Message:" << ba.toHex();
+#endif
         qDebug() << "Platform send command: " << QString("0x%1").arg(static_cast<quint8>(ba[1]), 2, 16, QChar('0'));
         if (isBLE())
         {
@@ -7054,7 +7066,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     }
 
     /* Increment db change numbers */
-    if (isFw12())
+    /**
+     * TODO: Uncomment and adjust, when SET_USER_CHANGE_NB
+     *       is implemented for BLE
+     */
+    if (isFw12() /*|| isBLE()*/)
     {
         set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
         credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
@@ -7426,6 +7442,31 @@ void MPDevice::lockDevice(const MessageHandlerCb &cb)
         Q_UNUSED(failedJob);
         qCritical() << "Failed to lock device!";
         cb(false, {});
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+void MPDevice::getAvailableUsers(const MessageHandlerCb &cb)
+{
+    auto *jobs = new AsyncJobs("Get Available User", this);
+
+    jobs->append(new MPCommandJob(this, MPCmd::GET_AVAILABLE_USERS,
+                      [this, cb](const QByteArray& data, bool &)
+                        {
+                            const auto availableUsers = pMesProt->getFirstPayloadByte(data);
+                            qDebug() << "Available users: " << availableUsers;
+                            cb(true, QString::number(availableUsers));
+                            return true;
+                        }
+                      ));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Failed to get available users!";
+        cb(false, "");
     });
 
     jobsQueue.enqueue(jobs);

@@ -444,6 +444,11 @@ void WSClient::onTextMessageReceived(const QString &message)
         QString pwnedNum = o["pwnednum"].toString();
         SystemNotification::instance().createNotification(tr("Password Compromised"), message.arg(pwnedNum));
     }
+    else if(rootobj["msg"] == "get_available_users")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit displayAvailableUsers(o["num"].toString());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -578,6 +583,11 @@ void WSClient::deleteDataFilesAndLeave(const QStringList &services)
 void WSClient::requestResetCard()
 {
     sendJsonData({{ "msg", "reset_card" }});
+}
+
+void WSClient::requestAvailableUserNumber()
+{
+    sendJsonData({{ "msg", "get_available_users" }});
 }
 
 void WSClient::serviceExists(bool isDatanode, const QString &service)

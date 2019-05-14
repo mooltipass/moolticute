@@ -104,6 +104,7 @@ public:
     void deleteDataFilesAndLeave(const QStringList &services);
 
     void requestResetCard();
+    void requestAvailableUserNumber();
 
     void serviceExists(bool isDatanode, const QString &service);
 
@@ -149,6 +150,7 @@ signals:
     void displayStatusWarning();
     void displayDebugPlatInfo(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
     void displayUploadBundleResult(bool success);
+    void displayAvailableUsers(const QString& num);
     void deleteDataNodesFinished();
 
 public slots:

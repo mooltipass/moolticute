@@ -26,7 +26,7 @@ void MPDeviceBleImpl::getPlatInfo()
 {
     auto *jobs = new AsyncJobs("Get PlatInfo", mpDev);
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_PLAT_INFO, bleProt->getDefaultFuncDone()));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_PLAT_INFO, bleProt->getDefaultSizeCheckFuncDone()));
 
     connect(jobs, &AsyncJobs::finished, [this](const QByteArray &data)
     {
@@ -53,7 +53,7 @@ void MPDeviceBleImpl::getDebugPlatInfo(const MessageHandlerCbData &cb)
 {
     auto *jobs = new AsyncJobs("Get Debug PlatInfo", mpDev);
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_GET_PLAT_INFO, bleProt->getDefaultFuncDone()));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_GET_PLAT_INFO, bleProt->getDefaultSizeCheckFuncDone()));
 
     connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &data)
     {
@@ -256,9 +256,18 @@ void MPDeviceBleImpl::getCredential(QString service, QString login)
     dequeueAndRun(jobs);
 }
 
-void MPDeviceBleImpl::getCredential(QString service, QString login, const MessageHandlerCbData &cb)
+void MPDeviceBleImpl::getCredential(const QString& service, const QString& login, const QString& reqid, const MessageHandlerCbData &cb)
 {
-    auto *jobs = new AsyncJobs(QString("Get Credential"), this);
+    AsyncJobs *jobs;
+    const QString getCred = "Get Credential";
+    if (reqid.isEmpty())
+    {
+        jobs = new AsyncJobs(getCred, this);
+    }
+    else
+    {
+        jobs = new AsyncJobs(getCred, reqid, this);
+    }
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
                             [this, service, login, cb](const QByteArray &data, bool &)
@@ -266,6 +275,7 @@ void MPDeviceBleImpl::getCredential(QString service, QString login, const Messag
                                 if (MSG_FAILED == bleProt->getMessageSize(data))
                                 {
                                     qWarning() << "Credential get failed";
+                                    cb(false, "Get credential failed", QByteArray{});
                                     return true;
                                 }
                                 qDebug() << "Credential got successfully";
@@ -275,6 +285,12 @@ void MPDeviceBleImpl::getCredential(QString service, QString login, const Messag
                                 cb(true, "", bleProt->getFullPayload(data));
                                 return true;
                             }));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed getting credential: " << failedJob->getErrorStr();
+        cb(false, failedJob->getErrorStr(), QByteArray{});
+    });
 
     dequeueAndRun(jobs);
 }

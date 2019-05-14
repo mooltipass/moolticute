@@ -92,6 +92,23 @@ quint32 MessageProtocolBLE::getSerialNumber(const QByteArray &data)
     return 0;
 }
 
+bool MessageProtocolBLE::getChangeNumber(const QByteArray &data, quint32 &credDbNum, quint32 &dataDbNum)
+{
+    if (getMessageSize(data) == 1)
+    {
+        return false;
+    }
+
+    credDbNum = convertToQuint32(getPayloadBytes(data, 0, 4));
+    dataDbNum = convertToQuint32(getPayloadBytes(data, 4, 8));
+    return true;
+}
+
+bool MessageProtocolBLE::isCPZInvalid(const QByteArray &data)
+{
+    return getMessageSize(data) == 1;
+}
+
 QVector<QByteArray> MessageProtocolBLE::createWriteNodePackets(const QByteArray &data, const QByteArray &address)
 {
     Q_UNUSED(data);
@@ -104,10 +121,17 @@ QVector<QByteArray> MessageProtocolBLE::createWriteNodePackets(const QByteArray 
 
 AsyncFuncDone MessageProtocolBLE::getDefaultFuncDone()
 {
-    return [](const QByteArray &data, bool &) -> bool
+    return [this](const QByteArray &data, bool &) -> bool
     {
-        Q_UNUSED(data);
-        return true;
+        return getFirstPayloadByte(data) == 0x01;
+    };
+}
+
+AsyncFuncDone MessageProtocolBLE::getDefaultSizeCheckFuncDone()
+{
+    return [this](const QByteArray &data, bool &) -> bool
+    {
+        return getMessageSize(data) != 0;
     };
 }
 
@@ -154,6 +178,30 @@ QString MessageProtocolBLE::toQString(const QByteArray &data)
 void MessageProtocolBLE::setAckFlag(bool on)
 {
     m_ackFlag = on ? ACK_FLAG_BIT : 0x00;
+}
+
+quint32 MessageProtocolBLE::convertToQuint32(const QByteArray &data)
+{
+    if (data.isEmpty())
+    {
+        return 0;
+    }
+
+    const auto size = data.size();
+    return convertToQuint32(static_cast<quint8>(data[0]),
+                            size > 1 ? static_cast<quint8>(data[1]) : 0,
+                            size > 2 ? static_cast<quint8>(data[2]) : 0,
+                            size > 3 ? static_cast<quint8>(data[3]) : 0);
+}
+
+quint32 MessageProtocolBLE::convertToQuint32(quint8 firstByte, quint8 secondByte, quint8 thirdByte, quint8 fourthByte)
+{
+    quint32 res = 0;
+    res |= firstByte;
+    res |= (secondByte<<8);
+    res |= (thirdByte<<16);
+    res |= (fourthByte<<24);
+    return res;
 }
 
 QByteArray MessageProtocolBLE::convertDate(const QDateTime &dateTime)
@@ -233,7 +281,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::IMPORT_MEDIA_END      , 0xB0},
         {MPCmd::SET_MOOLTIPASS_PARM   , 0xB1},
         {MPCmd::GET_MOOLTIPASS_PARM   , 0xB2},
-        {MPCmd::RESET_CARD            , 0xB3},
+        {MPCmd::RESET_CARD            , 0x000E},
         {MPCmd::READ_CARD_LOGIN       , 0xB4},
         {MPCmd::READ_CARD_PASS        , 0xB5},
         {MPCmd::SET_CARD_LOGIN        , 0xB6},
@@ -248,8 +296,8 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::ADD_DATA_SERVICE      , 0xBF},
         {MPCmd::WRITE_32B_IN_DN       , 0xC0},
         {MPCmd::READ_32B_IN_DN        , 0xC1},
-        {MPCmd::GET_CUR_CARD_CPZ      , 0xC2},
-        {MPCmd::CANCEL_USER_REQUEST   , 0xC3},
+        {MPCmd::GET_CUR_CARD_CPZ      , 0x000B},
+        {MPCmd::CANCEL_USER_REQUEST   , 0x0005},
         {MPCmd::PLEASE_RETRY          , 0x0002},
         {MPCmd::READ_FLASH_NODE       , 0x0102},
         {MPCmd::WRITE_FLASH_NODE      , 0xC6},
@@ -268,14 +316,16 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::END_MEMORYMGMT        , 0x0101},
         {MPCmd::SET_USER_CHANGE_NB    , 0xD4},
         {MPCmd::GET_DESCRIPTION       , 0xD5},
-        {MPCmd::GET_USER_CHANGE_NB    , 0xD6},
+        {MPCmd::GET_USER_CHANGE_NB    , 0x000A},
         {MPCmd::SET_DESCRIPTION       , 0xD8},
-        {MPCmd::LOCK_DEVICE           , 0xD9},
+        {MPCmd::LOCK_DEVICE           , 0x0010},
         {MPCmd::GET_SERIAL            , 0xDA},
         {MPCmd::CMD_DBG_MESSAGE       , 0x8000},
         {MPCmd::GET_PLAT_INFO         , 0x0003},
         {MPCmd::STORE_CREDENTIAL      , 0x0006},
         {MPCmd::GET_CREDENTIAL        , 0x0007},
+        {MPCmd::GET_DEVICE_SETTINGS   , 0x000C},
+        {MPCmd::GET_AVAILABLE_USERS   , 0x000F},
         {MPCmd::CMD_DBG_OPEN_DISP_BUFFER    , 0x8001},
         {MPCmd::CMD_DBG_SEND_TO_DISP_BUFFER , 0x8002},
         {MPCmd::CMD_DBG_CLOSE_DISP_BUFFER   , 0x8003},
