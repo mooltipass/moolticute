@@ -39,9 +39,26 @@ MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
     setupMessageProtocol();
 
     if (!openPath())
+    {
         qWarning() << "Error opening device";
+        QTimer::singleShot(50, [this]()
+        {
+            if (openPath())
+            {
+                platformRead();
+                sendInitMessages();
+            }
+            else
+            {
+                qCritical() << "Device open failed after retry.";
+            }
+        });
+    }
     else
+    {
         platformRead();
+        sendInitMessages();
+    }
 }
 
 MPDevice_win::~MPDevice_win()
