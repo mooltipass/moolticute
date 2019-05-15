@@ -33,7 +33,6 @@ MPDevice::MPDevice(QObject *parent):
     set_memMgmtMode(false); //by default device is not in MMM
 
     statusTimer = new QTimer(this);
-    statusTimer->start(500);
     connect(statusTimer, &QTimer::timeout, [this]()
     {
         //Do not interfer with any other operation by sending a MOOLTIPASS_STATUS command
@@ -126,6 +125,30 @@ void MPDevice::setupMessageProtocol()
         qDebug() << "Mooltipass Mini is connected";
     }
 
+#ifndef Q_OS_WIN
+    sendInitMessages();
+#endif
+
+    //For testing storeCredential and getCredential
+    //TODO: Only for testing
+//    QTimer::singleShot(2000, [this](){
+//        if (isBLE())
+//        {
+//            bleImpl->storeCredential(BleCredential{"test", "user", "desc", "3rd", "pwd"});
+//        }
+//    });
+
+//    QTimer::singleShot(20000, [this](){
+//        if (isBLE())
+//        {
+//            bleImpl->getCredential("test", "user");
+//        }
+    //    });
+}
+
+void MPDevice::sendInitMessages()
+{
+    statusTimer->start(500);
     QTimer::singleShot(100, [this]() {
         if (isBLE())
         {
@@ -148,22 +171,6 @@ void MPDevice::setupMessageProtocol()
             flashMbSizeChanged(0);
         }
     });
-
-    //For testing storeCredential and getCredential
-    //TODO: Only for testing
-//    QTimer::singleShot(2000, [this](){
-//        if (isBLE())
-//        {
-//            bleImpl->storeCredential(BleCredential{"test", "user", "desc", "3rd", "pwd"});
-//        }
-//    });
-
-//    QTimer::singleShot(20000, [this](){
-//        if (isBLE())
-//        {
-//            bleImpl->getCredential("test", "user");
-//        }
-//    });
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
