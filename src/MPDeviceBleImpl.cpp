@@ -215,21 +215,35 @@ void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerC
 {
     auto *jobs = new AsyncJobs(QString("Store Credential"), this);
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, createStoreCredMessage(cred),
-                            [this, cb](const QByteArray &data, bool &)
+    jobs->append(new MPCommandJob(mpDev, MPCmd::CHECK_CREDENTIAL, createCheckCredMessage(cred),
+                        [this, cb, jobs, cred] (const QByteArray &data, bool &)
+                        {
+                            if (MSG_SUCCESS != bleProt->getFirstPayloadByte(data))
                             {
-                                if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
-                                {
-                                    qDebug() << "Credential stored successfully";
-                                    cb(true, "");
-                                }
-                                else
-                                {
-                                    qWarning() << "Credential store failed";
-                                    cb(false, "Credential store failed");
-                                }
-                                return true;
-                            }));
+                                jobs->prepend(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, createStoreCredMessage(cred),
+                                   [this, cb](const QByteArray &data, bool &)
+                                   {
+                                       if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
+                                       {
+                                           qDebug() << "Credential stored successfully";
+                                           cb(true, "");
+                                       }
+                                       else
+                                       {
+                                           qWarning() << "Credential store failed";
+                                           cb(false, "Credential store failed");
+                                       }
+                                       return true;
+                                   }));
+                            }
+                            else
+                            {
+                                qWarning() << "Credential is already exists";
+                                cb(false, "Credential is already exists");
+                            }
+                            return true;
+                        }
+               ));
 
     dequeueAndRun(jobs);
 }
@@ -379,6 +393,14 @@ QByteArray MPDeviceBleImpl::createGetCredMessage(QString service, QString login)
     CredMap getMsgMap{{BleCredential::CredAttr::SERVICE, service},
                       {BleCredential::CredAttr::LOGIN, login}};
     return createCredentialMessage(getMsgMap);
+}
+
+QByteArray MPDeviceBleImpl::createCheckCredMessage(const BleCredential &cred)
+{
+    auto checkCred = cred.getAttributes();
+    checkCred.remove(BleCredential::CredAttr::DESCRIPTION);
+    checkCred.remove(BleCredential::CredAttr::THIRD);
+    return createCredentialMessage(checkCred);
 }
 
 QByteArray MPDeviceBleImpl::createCredentialMessage(const CredMap &credMap)

@@ -61,6 +61,7 @@ private:
 
     QByteArray createStoreCredMessage(const BleCredential &cred);
     QByteArray createGetCredMessage(QString service, QString login);
+    QByteArray createCheckCredMessage(const BleCredential &cred);
     QByteArray createCredentialMessage(const CredMap &credMap);
 
     void dequeueAndRun(AsyncJobs *job);
