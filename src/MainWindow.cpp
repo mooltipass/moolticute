@@ -374,6 +374,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         ui->widgetParamMini->setVisible(wsClient->isMPMini());
         ui->labelAbouHwSerial->setVisible(wsClient->isMPMini() || wsClient->isMPBLE());
         displayMCUVersion(wsClient->isMPBLE());
+        if (!wsClient->isFw12() && !wsClient->isMPBLE())
+        {
+            ui->groupBox_Information->hide();
+        }
     });
 
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updateSerialInfos);
