@@ -132,6 +132,8 @@ public:
             GET_DEVICE_SETTINGS ,
             GET_AVAILABLE_USERS ,
             CHECK_CREDENTIAL    ,
+            GET_USER_CATEGORIES ,
+            SET_USER_CATEGORIES ,
             CMD_DBG_MESSAGE     ,
             CMD_DBG_OPEN_DISP_BUFFER    ,
             CMD_DBG_SEND_TO_DISP_BUFFER ,

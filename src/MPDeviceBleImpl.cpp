@@ -383,6 +383,46 @@ void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
     flipBit();
 }
 
+void MPDeviceBleImpl::getUserCategories(const MessageHandlerCbData &cb)
+{
+    AsyncJobs *jobs = new AsyncJobs("Get User Categories", this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_USER_CATEGORIES,
+                            [this, cb](const QByteArray &data, bool &)
+                            {
+                                if (0x01 == bleProt->getMessageSize(data))
+                                {
+                                    qWarning() << "Get user categories failed";
+                                    cb(false, "Get user categories failed", QByteArray{});
+                                    return true;
+                                }
+                                qDebug() << "User categories got successfully";
+
+                                cb(true, "", bleProt->getFullPayload(data));
+                                return true;
+                            }));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed getting user categories: " << failedJob->getErrorStr();
+        cb(false, failedJob->getErrorStr(), QByteArray{});
+    });
+
+    dequeueAndRun(jobs);
+}
+
+void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categories)
+{
+    for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
+    {
+        QString catName = "category_" + QString::number(i+1);
+        QString category = bleProt->toQString(data.mid(i*USER_CATEGORY_LENGTH, (i+1)*USER_CATEGORY_LENGTH));
+        bool defaultCat = std::all_of(std::begin(category), std::end(category),
+                                   [](const QChar& c) { return c == QChar{0xFFFF};});
+        categories[catName] = defaultCat ? "" : category;
+    }
+}
+
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
 {
     return createCredentialMessage(cred.getAttributes());

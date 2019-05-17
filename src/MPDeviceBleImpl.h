@@ -54,6 +54,9 @@ public:
     void flipMessageBit(QVector<QByteArray> &msg);
     void flipMessageBit(QByteArray &msg);
 
+    void getUserCategories(const MessageHandlerCbData &cb);
+    void fillGetCategory(const QByteArray& data, QJsonObject &categories);
+
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
@@ -79,6 +82,8 @@ private:
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;
     static constexpr int BUNBLE_DATA_WRITE_SIZE = 256;
     static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;
+    static constexpr int USER_CATEGORY_COUNT = 4;
+    static constexpr int USER_CATEGORY_LENGTH = 66;
 };
 
 #endif // MPDEVICEBLEIMPL_H
