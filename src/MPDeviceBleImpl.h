@@ -33,19 +33,7 @@ public:
     void fetchData(QString filePath, MPCmd::Command cmd);
     inline void stopFetchData() { fetchState = Common::FetchState::STOPPED; }
 
-    /**
-     * @brief storeCredential
-     * Only for testing without the callback
-     */
-    //TODO: Only for testing
-    void storeCredential(const BleCredential &cred);
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb);
-    /**
-     * @brief getCredential
-     * Only for testing without the callback
-     */
-    //TODO: Only for testing
-    void getCredential(QString service, QString login = "");
     void getCredential(const QString& service, const QString& login, const QString& reqid, const MessageHandlerCbData &cb);
     BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;
 

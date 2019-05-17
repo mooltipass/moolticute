@@ -190,27 +190,6 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
     dequeueAndRun(jobs);
 }
 
-void MPDeviceBleImpl::storeCredential(const BleCredential &cred)
-{
-    auto *jobs = new AsyncJobs(QString("Store Credential"), this);
-
-    jobs->append(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, createStoreCredMessage(cred),
-                            [this](const QByteArray &data, bool &)
-                            {
-                                if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
-                                {
-                                    qDebug() << "Credential stored successfully";
-                                }
-                                else
-                                {
-                                    qWarning() << "Credential store failed";
-                                }
-                                return true;
-                            }));
-
-    dequeueAndRun(jobs);
-}
-
 void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerCb cb)
 {
     auto *jobs = new AsyncJobs(QString("Store Credential"), this);
@@ -244,28 +223,6 @@ void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerC
                             return true;
                         }
                ));
-
-    dequeueAndRun(jobs);
-}
-
-void MPDeviceBleImpl::getCredential(QString service, QString login)
-{
-    auto *jobs = new AsyncJobs(QString("Get Credential"), this);
-
-        jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
-                                [this, service, login](const QByteArray &data, bool &)
-                                {
-                                    if (MSG_FAILED == bleProt->getMessageSize(data))
-                                    {
-                                        qWarning() << "Credential get failed";
-                                        return true;
-                                    }
-                                    qDebug() << "Credential got successfully";
-                                    QByteArray response = bleProt->getFullPayload(data);
-                                    qDebug() << response.toHex();
-                                    BleCredential cred = retrieveCredentialFromResponse(response, service, login);
-                                    return true;
-                                }));
 
     dequeueAndRun(jobs);
 }
