@@ -43,7 +43,9 @@ public:
     void flipMessageBit(QByteArray &msg);
 
     void getUserCategories(const MessageHandlerCbData &cb);
+    void setUserCategories(const QJsonObject &categories, const MessageHandlerCbData &cb);
     void fillGetCategory(const QByteArray& data, QJsonObject &categories);
+    QByteArray createUserCategoriesMsg(const QJsonObject &categories);
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);

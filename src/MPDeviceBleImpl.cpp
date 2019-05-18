@@ -368,6 +368,34 @@ void MPDeviceBleImpl::getUserCategories(const MessageHandlerCbData &cb)
     dequeueAndRun(jobs);
 }
 
+void MPDeviceBleImpl::setUserCategories(const QJsonObject &categories, const MessageHandlerCbData &cb)
+{
+    AsyncJobs *jobs = new AsyncJobs("Set User Categories", this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::SET_USER_CATEGORIES,
+                                  createUserCategoriesMsg(categories),
+                            [this, cb](const QByteArray &data, bool &)
+                            {
+                                if (MSG_FAILED == bleProt->getFirstPayloadByte(data))
+                                {
+                                    qWarning() << "Set user categories failed";
+                                    cb(false, "Set user categories failed", QByteArray{});
+                                    return true;
+                                }
+                                qDebug() << "User categories set successfully";
+                                cb(true, "", QByteArray{});
+                                return true;
+                            }));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed setting user categories: " << failedJob->getErrorStr();
+        cb(false, failedJob->getErrorStr(), QByteArray{});
+    });
+
+    dequeueAndRun(jobs);
+}
+
 void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categories)
 {
     for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
@@ -378,6 +406,18 @@ void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categ
                                    [](const QChar& c) { return c == QChar{0xFFFF};});
         categories[catName] = defaultCat ? "" : category;
     }
+}
+
+QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categories)
+{
+    QByteArray data;
+    for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
+    {
+        QByteArray categoryArr = bleProt->toByteArray(categories["category_" + QString::number(i+1)].toString());
+        categoryArr.append(USER_CATEGORY_LENGTH - categoryArr.size(), static_cast<char>(0x00));
+        data.append(categoryArr);
+    }
+    return data;
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)

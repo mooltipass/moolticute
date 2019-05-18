@@ -1393,6 +1393,27 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
                      sendJsonMessage(oroot);
                  });
     }
+    else if (root["msg"] == "set_user_categories")
+    {
+         QJsonObject o = root["data"].toObject();
+         bleImpl->setUserCategories(o, [this, root](bool success, QString errstr, QByteArray)
+                 {
+                     if (!WSServer::Instance()->checkClientExists(this))
+                         return;
+
+                     if (!success)
+                     {
+                         sendFailedJson(root, errstr);
+                         return;
+                     }
+
+                     QJsonObject ores;
+                     QJsonObject oroot = root;
+                     ores["success"] = "true";
+                     oroot["data"] = ores;
+                     sendJsonMessage(oroot);
+                 });
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";
