@@ -196,6 +196,15 @@ void CredentialsManagement::setWsClient(WSClient *c)
                     ui->lineEditCategory4->setText(cat4);
                 }
     );
+    connect(wsClient, &WSClient::statusChanged, this,
+             [this](Common::MPStatus status)
+                {
+                    if (Common::MPStatus::Unlocked == status)
+                    {
+                        wsClient->sendGetUserCategories();
+                    }
+                }
+    );
 }
 
 void CredentialsManagement::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)

@@ -457,6 +457,16 @@ void WSClient::onTextMessageReceived(const QString &message)
                                    o["category_3"].toString(),
                                    o["category_4"].toString());
     }
+    else if(rootobj["msg"] == "set_user_categories")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        if (!success)
+        {
+            SystemNotification::instance().createNotification(tr("Error"), tr("Set user category failed."));
+            sendGetUserCategories();
+        }
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
