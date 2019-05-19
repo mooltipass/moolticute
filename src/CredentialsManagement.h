@@ -115,6 +115,7 @@ private:
     QJsonArray m_loadedModelSerialiation;
     bool m_selectionCanceled;
     bool m_isClean = true;
+    bool m_isSetCategoryClean = true;
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 

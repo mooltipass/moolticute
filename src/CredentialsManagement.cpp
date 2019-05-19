@@ -186,6 +186,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
     });
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
     connect(wsClient, &WSClient::mpHwVersionChanged, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::displayUserCategories, this,
              [this](const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4)
                 {
@@ -933,7 +934,7 @@ void CredentialsManagement::credentialDataChanged()
 
 void CredentialsManagement::checkDeviceType()
 {
-    if (wsClient->isMPBLE() /*&& checkAdvancedMode*/)
+    if (wsClient->isMPBLE() && !wsClient->get_memMgmtMode() /*&& checkAdvancedMode*/)
     {
         ui->label_UserCategories->show();
         ui->widget_UserCategories->show();
@@ -974,10 +975,15 @@ void CredentialsManagement::on_pushButtonSaveCategories_clicked()
                                     ui->lineEditCategory3->text(),
                                     ui->lineEditCategory4->text());
     ui->pushButtonSaveCategories->hide();
+    m_isSetCategoryClean = true;
 }
 
 void CredentialsManagement::onCategoryEdited(const QString &edited)
 {
     Q_UNUSED(edited);
-    ui->pushButtonSaveCategories->show();
+    if (m_isSetCategoryClean)
+    {
+        ui->pushButtonSaveCategories->show();
+        m_isSetCategoryClean = false;
+    }
 }
