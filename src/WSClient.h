@@ -123,6 +123,7 @@ public:
     void sendFetchData(QString fileName, Common::FetchType fetchType);
     void sendStopFetchData();
     void sendGetUserCategories();
+    void sendSetUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
 
     bool isFw12();
 

@@ -84,6 +84,9 @@ private slots:
 
     void on_toolButtonEditService_clicked();
 
+    void on_pushButtonSaveCategories_clicked();
+    void onCategoryEdited(const QString& edited);
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);

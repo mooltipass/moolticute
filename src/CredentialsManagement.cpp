@@ -80,6 +80,13 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->lineEditCategory2->setMaxLength(maxCategoryLength);
     ui->lineEditCategory3->setMaxLength(maxCategoryLength);
     ui->lineEditCategory4->setMaxLength(maxCategoryLength);
+    ui->pushButtonSaveCategories->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonSaveCategories->setText(tr("Save"));
+    ui->pushButtonSaveCategories->hide();
+    connect(ui->lineEditCategory1, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
+    connect(ui->lineEditCategory2, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
+    connect(ui->lineEditCategory3, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
+    connect(ui->lineEditCategory4, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
 
     QAction *action = m_favMenu.addAction(tr("Not a favorite"));
     connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
@@ -958,4 +965,19 @@ void CredentialsManagement::on_toolButtonEditService_clicked()
     ui->credDisplayServiceInput->setReadOnly(false);
     ui->credDisplayServiceInput->setFrame(true);
     ui->credDisplayServiceInput->setFocus();
+}
+
+void CredentialsManagement::on_pushButtonSaveCategories_clicked()
+{
+    wsClient->sendSetUserCategories(ui->lineEditCategory1->text(),
+                                    ui->lineEditCategory2->text(),
+                                    ui->lineEditCategory3->text(),
+                                    ui->lineEditCategory4->text());
+    ui->pushButtonSaveCategories->hide();
+}
+
+void CredentialsManagement::onCategoryEdited(const QString &edited)
+{
+    Q_UNUSED(edited);
+    ui->pushButtonSaveCategories->show();
 }

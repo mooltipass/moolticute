@@ -700,6 +700,17 @@ void WSClient::sendGetUserCategories()
     sendJsonData({{ "msg", "get_user_categories" }});
 }
 
+void WSClient::sendSetUserCategories(const QString &cat1, const QString &cat2, const QString &cat3, const QString &cat4)
+{
+    QJsonObject o;
+    o["category_1"] = cat1;
+    o["category_2"] = cat2;
+    o["category_3"] = cat3;
+    o["category_4"] = cat4;
+    sendJsonData({{ "msg", "set_user_categories" },
+                  {"data", o}});
+}
+
 bool WSClient::isFw12()
 {
     static QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
