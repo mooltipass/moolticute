@@ -70,6 +70,17 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->toolButtonEditService->setIcon(AppGui::qtAwesome()->icon(fa::edit));
     ui->toolButtonEditService->setToolTip(tr("Edit Service Name"));
 
+    ui->label_UserCategories->setText(tr("Set user categories"));
+    ui->labelCategory1->setText(tr("Category 1:"));
+    ui->labelCategory2->setText(tr("Category 2:"));
+    ui->labelCategory3->setText(tr("Category 3:"));
+    ui->labelCategory4->setText(tr("Category 4:"));
+    const int maxCategoryLength = 32;
+    ui->lineEditCategory1->setMaxLength(maxCategoryLength);
+    ui->lineEditCategory2->setMaxLength(maxCategoryLength);
+    ui->lineEditCategory3->setMaxLength(maxCategoryLength);
+    ui->lineEditCategory4->setMaxLength(maxCategoryLength);
+
     QAction *action = m_favMenu.addAction(tr("Not a favorite"));
     connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
 
@@ -167,6 +178,16 @@ void CredentialsManagement::setWsClient(WSClient *c)
         ui->lineEditFilterCred->clear();
     });
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
+    connect(wsClient, &WSClient::mpHwVersionChanged, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::displayUserCategories, this,
+             [this](const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4)
+                {
+                    ui->lineEditCategory1->setText(cat1);
+                    ui->lineEditCategory2->setText(cat2);
+                    ui->lineEditCategory3->setText(cat3);
+                    ui->lineEditCategory4->setText(cat4);
+                }
+    );
 }
 
 void CredentialsManagement::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
@@ -901,6 +922,21 @@ void CredentialsManagement::credentialDataChanged()
     disconnect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::credentialDataChanged);
     disconnect(m_pCredModel, &CredentialModel::rowsInserted, this, &CredentialsManagement::credentialDataChanged);
     disconnect(m_pCredModel, &CredentialModel::rowsRemoved, this, &CredentialsManagement::credentialDataChanged);
+}
+
+void CredentialsManagement::checkDeviceType()
+{
+    if (wsClient->isMPBLE() /*&& checkAdvancedMode*/)
+    {
+        ui->label_UserCategories->show();
+        ui->widget_UserCategories->show();
+        wsClient->sendGetUserCategories();
+    }
+    else
+    {
+        ui->label_UserCategories->hide();
+        ui->widget_UserCategories->hide();
+    }
 }
 
 void CredentialsManagement::changeEvent(QEvent *event)

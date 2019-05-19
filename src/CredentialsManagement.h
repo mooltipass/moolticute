@@ -78,6 +78,7 @@ private slots:
     void onSelectLoginTimerTimeOut();
     void updateFavMenu();
     void credentialDataChanged();
+    void checkDeviceType();
 
     void on_toolButtonFavFilter_clicked();
 

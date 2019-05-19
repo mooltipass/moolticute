@@ -449,6 +449,14 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit displayAvailableUsers(o["num"].toString());
     }
+    else if(rootobj["msg"] == "get_user_categories")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit displayUserCategories(o["category_1"].toString(),
+                                   o["category_2"].toString(),
+                                   o["category_3"].toString(),
+                                   o["category_4"].toString());
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -685,6 +693,11 @@ void WSClient::sendFetchData(QString fileName, Common::FetchType fetchType)
 void WSClient::sendStopFetchData()
 {
     sendJsonData({{ "msg", "stop_fetch_data" }});
+}
+
+void WSClient::sendGetUserCategories()
+{
+    sendJsonData({{ "msg", "get_user_categories" }});
 }
 
 bool WSClient::isFw12()
