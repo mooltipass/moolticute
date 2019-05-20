@@ -603,6 +603,7 @@ void MPDevice::loadParameters()
                         }
         ));
         jobsQueue.enqueue(jobs);
+        bleImpl->readUserSettings();
         runAndDequeueJobs();
         return;
     }

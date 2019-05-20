@@ -132,6 +132,7 @@ public:
             GET_DEVICE_SETTINGS ,
             GET_AVAILABLE_USERS ,
             CHECK_CREDENTIAL    ,
+            GET_USER_SETTINGS   ,
             GET_USER_CATEGORIES ,
             SET_USER_CATEGORIES ,
             CMD_DBG_MESSAGE     ,

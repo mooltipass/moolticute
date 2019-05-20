@@ -17,6 +17,22 @@ class MPDeviceBleImpl: public QObject
 
     QT_WRITABLE_PROPERTY(QString, mainMCUVersion, QString())
     QT_WRITABLE_PROPERTY(QString, auxMCUVersion, QString())
+    QT_WRITABLE_PROPERTY(bool, loginPrompt, false)
+    QT_WRITABLE_PROPERTY(bool, PINforMMM, false)
+    QT_WRITABLE_PROPERTY(bool, storagePrompt, false)
+    QT_WRITABLE_PROPERTY(bool, advancedMenu, false)
+    QT_WRITABLE_PROPERTY(bool, bluetoothEnabled, false)
+    QT_WRITABLE_PROPERTY(bool, credentialDisplayPrompt, false)
+
+    enum UserSettingsMask : quint8
+    {
+        LOGIN_PROMPT      = 0x01,
+        PIN_FROM_MMM      = 0x02,
+        STORAGE_PROMPT    = 0x04,
+        ADVANCED_MENU     = 0x08,
+        BLUETOOTH_ENABLED = 0x10,
+        CREDENTIAL_PROMPT = 0x20
+    };
 
 public:
     MPDeviceBleImpl(MessageProtocolBLE *mesProt, MPDevice *dev);
@@ -46,6 +62,8 @@ public:
     void setUserCategories(const QJsonObject &categories, const MessageHandlerCbData &cb);
     void fillGetCategory(const QByteArray& data, QJsonObject &categories);
     QByteArray createUserCategoriesMsg(const QJsonObject &categories);
+
+    void readUserSettings();
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
