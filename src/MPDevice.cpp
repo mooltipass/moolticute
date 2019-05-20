@@ -48,6 +48,11 @@ MPDevice::MPDevice(QObject *parent):
             Common::MPStatus s = pMesProt->getStatus(data);
             Common::MPStatus prevStatus = get_status();
 
+            if (isBLE())
+            {
+                bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
+            }
+
             /* Trigger on status change */
             if (s != prevStatus)
             {
@@ -603,7 +608,6 @@ void MPDevice::loadParameters()
                         }
         ));
         jobsQueue.enqueue(jobs);
-        bleImpl->readUserSettings();
         runAndDequeueJobs();
         return;
     }

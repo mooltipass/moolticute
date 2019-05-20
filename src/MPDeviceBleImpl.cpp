@@ -420,29 +420,19 @@ QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categorie
     return data;
 }
 
-void MPDeviceBleImpl::readUserSettings()
+void MPDeviceBleImpl::readUserSettings(const QByteArray& settings)
 {
-    AsyncJobs *jobs = new AsyncJobs("Get User Settings", this);
-
-    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_USER_SETTINGS,
-                            [this](const QByteArray &data, bool &)
-                            {
-                                if (MSG_FAILED == bleProt->getMessageSize(data))
-                                {
-                                    qWarning() << "Get user settings failed";
-                                    return true;
-                                }
-                                quint8 d = bleProt->getFullPayload(data)[0];
-                                set_loginPrompt(d&LOGIN_PROMPT);
-                                set_PINforMMM(d&PIN_FROM_MMM);
-                                set_storagePrompt(d&STORAGE_PROMPT);
-                                set_advancedMenu(d&ADVANCED_MENU);
-                                set_bluetoothEnabled(d&BLUETOOTH_ENABLED);
-                                set_credentialDisplayPrompt(d&CREDENTIAL_PROMPT);
-                                qDebug() << "Got user settings successfully";
-                                return true;
-                            }));
-    dequeueAndRun(jobs);
+    quint8 d = settings[0];
+    if (d != m_currentUserSettings)
+    {
+        set_loginPrompt(d&LOGIN_PROMPT);
+        set_PINforMMM(d&PIN_FROM_MMM);
+        set_storagePrompt(d&STORAGE_PROMPT);
+        set_advancedMenu(d&ADVANCED_MENU);
+        set_bluetoothEnabled(d&BLUETOOTH_ENABLED);
+        set_credentialDisplayPrompt(d&CREDENTIAL_PROMPT);
+        m_currentUserSettings = d;
+    }
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)

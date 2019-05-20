@@ -63,7 +63,7 @@ public:
     void fillGetCategory(const QByteArray& data, QJsonObject &categories);
     QByteArray createUserCategoriesMsg(const QJsonObject &categories);
 
-    void readUserSettings();
+    void readUserSettings(const QByteArray& settings);
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
@@ -85,6 +85,7 @@ private:
     Common::FetchState fetchState = Common::FetchState::STOPPED;
 
     quint8 m_flipBit = 0x00;
+    quint8 m_currentUserSettings = 0x00;
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;
