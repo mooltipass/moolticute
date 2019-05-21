@@ -432,7 +432,20 @@ void MPDeviceBleImpl::readUserSettings(const QByteArray& settings)
         set_bluetoothEnabled(d&BLUETOOTH_ENABLED);
         set_credentialDisplayPrompt(d&CREDENTIAL_PROMPT);
         m_currentUserSettings = d;
+        sendUserSettings();
     }
+}
+
+void MPDeviceBleImpl::sendUserSettings()
+{
+    QJsonObject settingJson;
+    settingJson["login_prompt"] = get_loginPrompt();
+    settingJson["pin_for_mmm"] = get_PINforMMM();
+    settingJson["storage_prompt"] = get_storagePrompt();
+    settingJson["advanced_menu"] = get_advancedMenu();
+    settingJson["blutooth_enabled"] = get_bluetoothEnabled();
+    settingJson["credential_prompt"] = get_credentialDisplayPrompt();
+    emit userSettingsChanged(settingJson);
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)

@@ -64,6 +64,10 @@ public:
     QByteArray createUserCategoriesMsg(const QJsonObject &categories);
 
     void readUserSettings(const QByteArray& settings);
+    void sendUserSettings();
+
+signals:
+    void userSettingsChanged(QJsonObject settings);
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);

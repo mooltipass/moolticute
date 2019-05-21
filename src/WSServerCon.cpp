@@ -361,6 +361,10 @@ void WSServerCon::resetDevice(MPDevice *dev)
 
     connect(mpdevice, &MPDevice::dbChangeNumbersChanged, this, &WSServerCon::sendCardDbMetadata);
 
+    if (nullptr != mpdevice->ble())
+    {
+        connect(mpdevice->ble(), &MPDeviceBleImpl::userSettingsChanged, this, &WSServerCon::sendUserSettings);
+    }
 }
 
 void WSServerCon::statusChanged()
@@ -727,6 +731,13 @@ void WSServerCon::sendHibpNotification(QString credInfo, QString pwnedNum)
     {
         qDebug() << "Cannot send pwned notification to GUI: " << credInfo << ": " << pwnedNum;
     }
+}
+
+void WSServerCon::sendUserSettings(QJsonObject settings)
+{
+    QJsonObject oroot = { {"msg", "send_user_settings"} };
+    oroot["data"] = settings;
+    sendJsonMessage(oroot);
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)
@@ -1413,6 +1424,10 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
                      oroot["data"] = ores;
                      sendJsonMessage(oroot);
                  });
+    }
+    else if (root["msg"] == "get_user_settings")
+    {
+         bleImpl->sendUserSettings();
     }
     else
     {
