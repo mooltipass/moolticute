@@ -130,6 +130,7 @@ private slots:
     void on_pushButtonHIBP_clicked();
 
     void on_pushButtonGetAvailableUsers_clicked();
+    void onDeviceDisconnected();
 
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");

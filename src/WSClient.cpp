@@ -150,6 +150,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         set_memMgmtMode(false);
         set_connected(false);
+        emit deviceDisconnected();
     }
     else if (rootobj["msg"] == "status_changed")
     {
@@ -467,6 +468,11 @@ void WSClient::onTextMessageReceived(const QString &message)
             sendGetUserCategories();
         }
     }
+    else if(rootobj["msg"] == "send_user_settings")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit updateUserSettingsOnUI(o);
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -719,6 +725,11 @@ void WSClient::sendSetUserCategories(const QString &cat1, const QString &cat2, c
     o["category_4"] = cat4;
     sendJsonData({{ "msg", "set_user_categories" },
                   {"data", o}});
+}
+
+void WSClient::sendUserSettingsRequest()
+{
+    sendJsonData({{ "msg", "get_user_settings" }});
 }
 
 bool WSClient::isFw12()

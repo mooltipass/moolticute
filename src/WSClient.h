@@ -124,6 +124,7 @@ public:
     void sendStopFetchData();
     void sendGetUserCategories();
     void sendSetUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
+    void sendUserSettingsRequest();
 
     bool isFw12();
 
@@ -154,6 +155,8 @@ signals:
     void displayUploadBundleResult(bool success);
     void displayAvailableUsers(const QString& num);
     void displayUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
+    void updateUserSettingsOnUI(const QJsonObject& userSettings);
+    void deviceDisconnected();
     void deleteDataNodesFinished();
 
 public slots:

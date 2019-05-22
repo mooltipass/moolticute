@@ -160,6 +160,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
+    connect(wsClient, &WSClient::deviceDisconnected, this, &MainWindow::onDeviceDisconnected);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
     connect(ui->widgetCredentials, &CredentialsManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
@@ -368,6 +369,24 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     }
     ui->comboBoxSystrayIcon->blockSignals(false);
 
+    ui->cbLoginPrompt->setDisabled(true);
+    ui->cbPinForMMM->setDisabled(true);
+    ui->cbStoragePrompt->setDisabled(true);
+    ui->cbAdvancedMenu->setDisabled(true);
+    ui->cbBluetoothEnabled->setDisabled(true);
+    ui->cbCredentialPrompt->setDisabled(true);
+
+    connect(wsClient, &WSClient::updateUserSettingsOnUI,
+            [this](const QJsonObject& settings)
+            {
+                ui->cbLoginPrompt->setChecked(settings["login_prompt"].toBool());
+                ui->cbPinForMMM->setChecked(settings["pin_for_mmm"].toBool());
+                ui->cbStoragePrompt->setChecked(settings["storage_prompt"].toBool());
+                ui->cbAdvancedMenu->setChecked(settings["advanced_menu"].toBool());
+                ui->cbBluetoothEnabled->setChecked(settings["bluetooth_enabled"].toBool());
+                ui->cbCredentialPrompt->setChecked(settings["credential_prompt"].toBool());
+            });
+
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
     {
@@ -377,6 +396,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         if (!wsClient->isFw12() && !wsClient->isMPBLE())
         {
             ui->groupBox_Information->hide();
+        }
+        if (wsClient->isMPBLE())
+        {
+            wsClient->sendUserSettingsRequest();
+            ui->groupBox_UserSettings->show();
         }
     });
 
@@ -1835,4 +1859,9 @@ void MainWindow::on_pushButtonHIBP_clicked()
 void MainWindow::on_pushButtonGetAvailableUsers_clicked()
 {
     wsClient->requestAvailableUserNumber();
+}
+
+void MainWindow::onDeviceDisconnected()
+{
+    ui->groupBox_UserSettings->hide();
 }
