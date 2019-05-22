@@ -426,7 +426,7 @@ void MPDeviceBleImpl::readUserSettings(const QByteArray& settings)
     if (d != m_currentUserSettings)
     {
         set_loginPrompt(d&LOGIN_PROMPT);
-        set_PINforMMM(d&PIN_FROM_MMM);
+        set_PINforMMM(d&PIN_FOR_MMM);
         set_storagePrompt(d&STORAGE_PROMPT);
         set_advancedMenu(d&ADVANCED_MENU);
         set_bluetoothEnabled(d&BLUETOOTH_ENABLED);
@@ -443,7 +443,7 @@ void MPDeviceBleImpl::sendUserSettings()
     settingJson["pin_for_mmm"] = get_PINforMMM();
     settingJson["storage_prompt"] = get_storagePrompt();
     settingJson["advanced_menu"] = get_advancedMenu();
-    settingJson["blutooth_enabled"] = get_bluetoothEnabled();
+    settingJson["bluetooth_enabled"] = get_bluetoothEnabled();
     settingJson["credential_prompt"] = get_credentialDisplayPrompt();
     emit userSettingsChanged(settingJson);
 }

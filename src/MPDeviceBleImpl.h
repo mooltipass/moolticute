@@ -27,7 +27,7 @@ class MPDeviceBleImpl: public QObject
     enum UserSettingsMask : quint8
     {
         LOGIN_PROMPT      = 0x01,
-        PIN_FROM_MMM      = 0x02,
+        PIN_FOR_MMM       = 0x02,
         STORAGE_PROMPT    = 0x04,
         ADVANCED_MENU     = 0x08,
         BLUETOOTH_ENABLED = 0x10,
