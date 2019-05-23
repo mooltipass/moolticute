@@ -347,7 +347,7 @@ void MPDeviceBleImpl::getUserCategories(const MessageHandlerCbData &cb)
     jobs->append(new MPCommandJob(mpDev, MPCmd::GET_USER_CATEGORIES,
                             [this, cb](const QByteArray &data, bool &)
                             {
-                                if (0x01 == bleProt->getMessageSize(data))
+                                if (MSG_SUCCESS == bleProt->getMessageSize(data))
                                 {
                                     qWarning() << "Get user categories failed";
                                     cb(false, "Get user categories failed", QByteArray{});
