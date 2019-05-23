@@ -54,6 +54,7 @@ public:
     void flipMessageBit(QVector<QByteArray> &msg);
     void flipMessageBit(QByteArray &msg);
 
+    bool isAfterAuxFlash();
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
@@ -78,6 +79,7 @@ private:
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;
     static constexpr int BUNBLE_DATA_WRITE_SIZE = 256;
     static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;
+    const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
 };
 
 #endif // MPDEVICEBLEIMPL_H
