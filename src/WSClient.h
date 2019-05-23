@@ -70,6 +70,7 @@ class WSClient: public QObject
 
     QT_WRITABLE_PROPERTY(QString, mainMCUVersion, QString())
     QT_WRITABLE_PROPERTY(QString, auxMCUVersion, QString())
+    QT_WRITABLE_PROPERTY(bool, advancedMenu, false)
 
 public:
     explicit WSClient(QObject *parent = nullptr);
@@ -156,6 +157,7 @@ signals:
     void displayAvailableUsers(const QString& num);
     void displayUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
     void updateUserSettingsOnUI(const QJsonObject& userSettings);
+    void deviceConnacted();
     void deviceDisconnected();
     void deleteDataNodesFinished();
 

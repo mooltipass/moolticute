@@ -160,6 +160,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
+    connect(wsClient, &WSClient::deviceConnacted, this, &MainWindow::onDeviceConnected);
     connect(wsClient, &WSClient::deviceDisconnected, this, &MainWindow::onDeviceDisconnected);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
@@ -382,7 +383,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->cbLoginPrompt->setChecked(settings["login_prompt"].toBool());
                 ui->cbPinForMMM->setChecked(settings["pin_for_mmm"].toBool());
                 ui->cbStoragePrompt->setChecked(settings["storage_prompt"].toBool());
-                ui->cbAdvancedMenu->setChecked(settings["advanced_menu"].toBool());
+                bool advancedMenu = settings["advanced_menu"].toBool();
+                ui->cbAdvancedMenu->setChecked(advancedMenu);
+                wsClient->set_advancedMenu(advancedMenu);
                 ui->cbBluetoothEnabled->setChecked(settings["bluetooth_enabled"].toBool());
                 ui->cbCredentialPrompt->setChecked(settings["credential_prompt"].toBool());
             });
@@ -397,11 +400,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         {
             ui->groupBox_Information->hide();
         }
-        if (wsClient->isMPBLE())
-        {
-            wsClient->sendUserSettingsRequest();
-            ui->groupBox_UserSettings->show();
-        }
+        onDeviceConnected();
     });
 
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updateSerialInfos);
@@ -1859,6 +1858,19 @@ void MainWindow::on_pushButtonHIBP_clicked()
 void MainWindow::on_pushButtonGetAvailableUsers_clicked()
 {
     wsClient->requestAvailableUserNumber();
+}
+
+void MainWindow::onDeviceConnected()
+{
+    if (wsClient->isMPBLE())
+    {
+        wsClient->sendUserSettingsRequest();
+        ui->groupBox_UserSettings->show();
+    }
+    else
+    {
+        ui->groupBox_UserSettings->hide();
+    }
 }
 
 void MainWindow::onDeviceDisconnected()

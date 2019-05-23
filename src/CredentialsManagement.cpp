@@ -187,6 +187,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
     connect(wsClient, &WSClient::mpHwVersionChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::displayUserCategories, this,
              [this](const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4)
                 {
@@ -943,7 +944,7 @@ void CredentialsManagement::credentialDataChanged()
 
 void CredentialsManagement::checkDeviceType()
 {
-    if (wsClient->isMPBLE() && !wsClient->get_memMgmtMode() /*&& checkAdvancedMode*/)
+    if (wsClient->isMPBLE() && !wsClient->get_memMgmtMode() && wsClient->get_advancedMenu())
     {
         ui->label_UserCategories->show();
         ui->widget_UserCategories->show();

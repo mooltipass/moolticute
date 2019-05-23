@@ -130,6 +130,8 @@ private slots:
     void on_pushButtonHIBP_clicked();
 
     void on_pushButtonGetAvailableUsers_clicked();
+
+    void onDeviceConnected();
     void onDeviceDisconnected();
 
 private:
