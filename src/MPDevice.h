@@ -200,6 +200,7 @@ public:
 
     //Send a cancel request to device
     void cancelUserRequest(const QString &reqid);
+    void writeCancelRequest();
 
     //Request for a raw data node from the device
     void getDataNode(QString service, const QString &fallback_service, const QString &reqid,

@@ -94,6 +94,11 @@ void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
     auto flashJob = new MPCommandJob(mpDev, cmd, bleProt->getDefaultFuncDone());
     flashJob->setReturnCheck(false);
     jobs->append(flashJob);
+    if (isAuxFlash)
+    {
+        QSettings s;
+        s.setValue(AFTER_AUX_FLASH_SETTING, true);
+    }
 
     connect(jobs, &AsyncJobs::failed, [cb, isAuxFlash](AsyncJob *failedJob)
     {
@@ -367,6 +372,17 @@ void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
 {
     setCurrentFlipBit(msg);
     flipBit();
+}
+
+bool MPDeviceBleImpl::isAfterAuxFlash()
+{
+    QSettings s;
+    if (s.value(AFTER_AUX_FLASH_SETTING, false).toBool())
+    {
+        s.setValue(AFTER_AUX_FLASH_SETTING, false);
+        return true;
+    }
+    return false;
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
