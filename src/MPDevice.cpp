@@ -145,6 +145,11 @@ void MPDevice::sendInitMessages()
             qDebug() << "Resetting flip bit for BLE";
 #endif
             bleImpl->sendResetFlipBit();
+            if (bleImpl->isAfterAuxFlash())
+            {
+                qDebug() << "Fixing communication with device after Aux Flash";
+                writeCancelRequest();
+            }
             bleImpl->getPlatInfo();
         }
 
@@ -4086,20 +4091,7 @@ void MPDevice::cancelUserRequest(const QString &reqid)
     {
         qInfo() << "request_id match current one. Cancel current request";
 
-        const auto cancelRequestCmd = MPCmd::CANCEL_USER_REQUEST;
-        QByteArray ba;
-        ba.append(pMesProt->createPackets(QByteArray{}, cancelRequestCmd)[0]);
-
-        qDebug() << "Platform send command: " << pMesProt->printCmd(cancelRequestCmd);
-#ifdef DEV_DEBUG
-        qDebug() << "Message:" << ba.toHex();
-#endif
-        qDebug() << "Platform send command: " << QString("0x%1").arg(static_cast<quint8>(ba[1]), 2, 16, QChar('0'));
-        if (isBLE())
-        {
-            bleImpl->flipMessageBit(ba);
-        }
-        platformWrite(ba);
+        writeCancelRequest();
         return;
     }
 
@@ -4115,6 +4107,24 @@ void MPDevice::cancelUserRequest(const QString &reqid)
     }
 
     qWarning() << "No request found for reqid: " << reqid;
+}
+
+void MPDevice::writeCancelRequest()
+{
+    const auto cancelRequestCmd = MPCmd::CANCEL_USER_REQUEST;
+    QByteArray ba;
+    ba.append(pMesProt->createPackets(QByteArray{}, cancelRequestCmd)[0]);
+
+    qDebug() << "Platform send command: " << pMesProt->printCmd(cancelRequestCmd);
+#ifdef DEV_DEBUG
+    qDebug() << "Message:" << ba.toHex();
+#endif
+    qDebug() << "Platform send command: " << QString("0x%1").arg(static_cast<quint8>(ba[1]), 2, 16, QChar('0'));
+    if (isBLE())
+    {
+        bleImpl->flipMessageBit(ba);
+    }
+    platformWrite(ba);
 }
 
 void MPDevice::getCredential(QString service, const QString &login, const QString &fallback_service, const QString &reqid,

@@ -58,6 +58,8 @@ public:
     void flipMessageBit(QVector<QByteArray> &msg);
     void flipMessageBit(QByteArray &msg);
 
+	bool isAfterAuxFlash();
+
     void getUserCategories(const MessageHandlerCbData &cb);
     void setUserCategories(const QJsonObject &categories, const MessageHandlerCbData &cb);
     void fillGetCategory(const QByteArray& data, QJsonObject &categories);
@@ -96,7 +98,8 @@ private:
     static constexpr int BUNBLE_DATA_WRITE_SIZE = 256;
     static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;
     static constexpr int USER_CATEGORY_COUNT = 4;
-    static constexpr int USER_CATEGORY_LENGTH = 66;
+	static constexpr int USER_CATEGORY_LENGTH = 66;
+    const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
 };
 
 #endif // MPDEVICEBLEIMPL_H
