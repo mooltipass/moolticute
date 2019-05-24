@@ -210,6 +210,15 @@ public:
     };
 };
 
+enum class DeviceType
+{
+    MOOLTIPASS = 0,
+    MINI = 1,
+    BLE = 2
+};
+
+const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
+
 Q_DECLARE_METATYPE(Common::MPStatus)
 Q_DECLARE_METATYPE(Common::MPHwVersion)
 

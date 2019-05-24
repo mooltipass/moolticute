@@ -1,6 +1,7 @@
 #include "MPDeviceBleImpl.h"
 #include "AsyncJobs.h"
 #include "MessageProtocolBLE.h"
+#include "MPSettings.h"
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),
@@ -41,9 +42,9 @@ void MPDeviceBleImpl::getPlatInfo()
         const auto serialUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[10]), static_cast<quint8>(response[11]));
         quint32 serialNum = serialLower;
         serialNum |= static_cast<quint32>((serialUpper<<16));
-        mpDev->set_serialNumber(serialNum);
+        mpDev->settings()->set_serialNumber(serialNum);
         const auto memorySize = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[12]), static_cast<quint8>(response[13]));
-        mpDev->set_flashMbSize(memorySize);
+        mpDev->settings()->set_flashMbSize(memorySize);
     });
 
     dequeueAndRun(jobs);
