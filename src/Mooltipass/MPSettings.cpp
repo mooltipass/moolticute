@@ -8,7 +8,7 @@ MPSettings::MPSettings(MPDevice *parent, IMessageProtocol *mesProt)
       mpDevice(parent),
       pMesProt(mesProt)
 {
-
+    fillParameterMapping();
 }
 
 MPSettings::~MPSettings()
@@ -18,7 +18,7 @@ MPSettings::~MPSettings()
 
 void MPSettings::loadParameters()
 {
-    readingParams = true;
+    m_readingParams = true;
     AsyncJobs *jobs = new AsyncJobs(
                           "Loading device parameters",
                           this);
@@ -49,7 +49,7 @@ void MPSettings::loadParameters()
         QString hw = QString(pMesProt->getPayloadBytes(data, 1, pMesProt->getMessageSize(data) - 2));
         qDebug() << "received MP version hw: " << hw;
         set_flashMbSize(flashSize);
-        set_hwVersion(hw);
+        mpDevice->set_hwVersion(hw);
 
         QRegularExpressionMatchIterator i = regVersion.globalMatch(hw);
         if (i.hasNext())
@@ -328,7 +328,7 @@ void MPSettings::loadParameters()
                                           [this](const QByteArray &data, bool &) -> bool
             {
                 const auto serialNumber = pMesProt->getSerialNumber(data);
-                set_serialNumber(serialNumber);
+                mpDevice->set_serialNumber(serialNumber);
                 qDebug() << "Mooltipass Mini serial number:" << serialNumber;
                 return true;
             }));
@@ -338,7 +338,7 @@ void MPSettings::loadParameters()
                 Q_UNUSED(data);
                 //data is last result
                 //all jobs finished success
-                readingParams = false;
+                m_readingParams = false;
                 qInfo() << "Finished loading Mini serial number";
             });
 
@@ -346,7 +346,7 @@ void MPSettings::loadParameters()
             {
                 Q_UNUSED(failedJob);
                 qCritical() << "Loading Mini serial number failed";
-                readingParams = false;
+                m_readingParams = false;
                 loadParameters(); // memory: does it get "piled on?"
             });
             mpDevice->jobsQueue.enqueue(v12jobs);
@@ -358,7 +358,7 @@ void MPSettings::loadParameters()
     {
         Q_UNUSED(failedJob);
         qCritical() << "Loading option failed";
-        readingParams = false;
+        m_readingParams = false;
         loadParameters(); // memory: does it get "piled on?"
     });
 
@@ -366,128 +366,52 @@ void MPSettings::loadParameters()
     mpDevice->runAndDequeueJobs();
 }
 
-void MPSettings::updateKeyboardLayout(int lang)
+MPParams::Param MPSettings::getParamId(const QString &paramName)
 {
-    updateParam(MPParams::KEYBOARD_LAYOUT_PARAM, lang);
+    return m_paramMap.key(paramName);
 }
 
-void MPSettings::updateLockTimeoutEnabled(bool en)
+QString MPSettings::getParamName(MPParams::Param param)
 {
-    updateParam(MPParams::LOCK_TIMEOUT_ENABLE_PARAM, en);
+    return m_paramMap[param];
 }
 
-void MPSettings::updateLockTimeout(int timeout)
+void MPSettings::sendEveryParameter()
 {
-    if (timeout < 0) timeout = 0;
-    if (timeout > 0xFF) timeout = 0xFF;
-    updateParam(MPParams::LOCK_TIMEOUT_PARAM, timeout);
-}
-
-void MPSettings::updateScreensaver(bool en)
-{
-    updateParam(MPParams::SCREENSAVER_PARAM, en);
-}
-
-void MPSettings::updateUserRequestCancel(bool en)
-{
-    updateParam(MPParams::USER_REQ_CANCEL_PARAM, en);
-}
-
-void MPSettings::updateUserInteractionTimeout(int timeout)
-{
-    if (timeout < 0) timeout = 0;
-    if (timeout > 0xFF) timeout = 0xFF;
-    updateParam(MPParams::USER_INTER_TIMEOUT_PARAM, timeout);
-}
-
-void MPSettings::updateFlashScreen(bool en)
-{
-    updateParam(MPParams::FLASH_SCREEN_PARAM, en);
-}
-
-void MPSettings::updateOfflineMode(bool en)
-{
-    updateParam(MPParams::OFFLINE_MODE_PARAM, en);
-}
-
-void MPSettings::updateTutorialEnabled(bool en)
-{
-    updateParam(MPParams::TUTORIAL_BOOL_PARAM, en);
-}
-
-void MPSettings::updateScreenBrightness(int bval) //In percent
-{
-    updateParam(MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM, bval);
-}
-
-void MPSettings::updateKnockEnabled(bool en)
-{
-    updateParam(MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM, en);
-}
-
-void MPSettings::updateKeyAfterLoginSendEnable(bool en)
-{
-    updateParam(MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM, en);
-}
-
-void MPSettings::updateKeyAfterLoginSend(int value)
-{
-    updateParam(MPParams::KEY_AFTER_LOGIN_SEND_PARAM, value);
-}
-
-void MPSettings::updateKeyAfterPassSendEnable(bool en)
-{
-     updateParam(MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM, en);
-}
-
-void MPSettings::updateKeyAfterPassSend(int value)
-{
-    updateParam(MPParams::KEY_AFTER_PASS_SEND_PARAM, value);
-}
-
-void MPSettings::updateDelayAfterKeyEntryEnable(bool en)
-{
-    updateParam(MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, en);
-}
-
-void MPSettings::updateDelayAfterKeyEntry(int val)
-{
-    updateParam(MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, val);
-}
-
-void MPSettings::updateKnockSensitivity(int s) // 0-very low, 1-low, 2-medium, 3-high
-{
-    quint8 v;
-    switch(s)
+    for (int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); ++i)
     {
-    case 0: v = KNOCKING_VERY_LOW; break;
-    case 1: v = KNOCKING_LOW; break;
-    case 2: v = KNOCKING_MEDIUM; break;
-    case 3: v = KNOCKING_HIGH; break;
-    default:
-        v = KNOCKING_MEDIUM;
+        const auto slotName = metaObject()->property(i).notifySignal().name();
+        QVariant value = metaObject()->property(i).read(this);
+        if (value.type() == QVariant::Bool)
+        {
+            emit QMetaObject::invokeMethod(this, slotName, Q_ARG(bool, value.toBool()));
+        }
+        else
+        {
+            emit QMetaObject::invokeMethod(this, slotName, Q_ARG(int, value.toInt()));
+        }
     }
-
-    updateParam(MPParams::MINI_KNOCK_THRES_PARAM, v);
-}
-
-void MPSettings::updateRandomStartingPin(bool en)
-{
-    updateParam(MPParams::RANDOM_INIT_PIN_PARAM, en);
-}
-
-void MPSettings::updateHashDisplay(bool en)
-{
-    updateParam(MPParams::HASH_DISPLAY_FEATURE_PARAM, en);
-}
-
-void MPSettings::updateLockUnlockMode(int val)
-{
-    updateParam(MPParams::LOCK_UNLOCK_FEATURE_PARAM, val);
 }
 
 void MPSettings::updateParam(MPParams::Param param, int val)
 {
+    if (MPParams::MINI_KNOCK_THRES_PARAM == param)
+    {
+        switch(val)
+        {
+        case 0: val = KNOCKING_VERY_LOW; break;
+        case 1: val = KNOCKING_LOW; break;
+        case 2: val = KNOCKING_MEDIUM; break;
+        case 3: val = KNOCKING_HIGH; break;
+        default:
+            val = KNOCKING_MEDIUM;
+        }
+    }
+    else if (MPParams::USER_INTER_TIMEOUT_PARAM == param || MPParams::LOCK_TIMEOUT_PARAM == param)
+    {
+        if (val < 0) val = 0;
+        if (val > 0xFF) val = 0xFF;
+    }
     QMetaEnum m = QMetaEnum::fromType<MPParams::Param>();
     QString logInf = QStringLiteral("Updating %1 param: %2").arg(m.valueToKey(param)).arg(val);
 
@@ -512,7 +436,34 @@ void MPSettings::updateParam(MPParams::Param param, int val)
     mpDevice->runAndDequeueJobs();
 }
 
+void MPSettings::fillParameterMapping()
+{
+    m_paramMap = {
+        {MPParams::KEYBOARD_LAYOUT_PARAM, "keyboard_layout"},
+        {MPParams::LOCK_TIMEOUT_ENABLE_PARAM, "lock_timeout_enabled"},
+        {MPParams::LOCK_TIMEOUT_PARAM, "lock_timeout"},
+        {MPParams::SCREENSAVER_PARAM, "screensaver"},
+        {MPParams::USER_REQ_CANCEL_PARAM, "user_request_cancel"},
+        {MPParams::USER_INTER_TIMEOUT_PARAM, "user_interaction_timeout"},
+        {MPParams::FLASH_SCREEN_PARAM, "flash_screen"},
+        {MPParams::OFFLINE_MODE_PARAM, "offline_mode"},
+        {MPParams::TUTORIAL_BOOL_PARAM, "tutorial_enabled"},
+        {MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM, "screen_brightness"},
+        {MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM, "knock_enabled"},
+        {MPParams::MINI_KNOCK_THRES_PARAM, "knock_sensitivity"},
+        {MPParams::RANDOM_INIT_PIN_PARAM, "random_starting_pin"},
+        {MPParams::HASH_DISPLAY_FEATURE_PARAM, "hash_display"},
+        {MPParams::LOCK_UNLOCK_FEATURE_PARAM, "lock_unlock_mode"},
+        {MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM, "key_after_login_enabled"},
+        {MPParams::KEY_AFTER_LOGIN_SEND_PARAM, "key_after_login"},
+        {MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM, "key_after_pass_enabled"},
+        {MPParams::KEY_AFTER_PASS_SEND_PARAM, "key_after_pass"},
+        {MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, "delay_after_key_enabled"},
+        {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, "delay_after_key"}
+    };
+}
+
 void MPSettings::updateParam(MPParams::Param param, bool en)
 {
-    updateParam(param, (int)en);
+    updateParam(param, static_cast<int>(en));
 }

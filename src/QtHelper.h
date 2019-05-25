@@ -43,5 +43,27 @@
         void name##Changed (type name); \
     private:
 
+#define QT_SETTINGS_PROPERTY(type, name, def, prop) \
+    protected: \
+        Q_PROPERTY (type name READ get_##name WRITE set_##name NOTIFY name##Changed) \
+    private: \
+        type m_##name = def; \
+    public: \
+        type get_##name () const { return m_##name; } \
+    public Q_SLOTS: \
+        void set_##name (type name) { \
+            if (m_##name != name) { \
+                m_##name = name; \
+                emit name##Changed (m_##name, prop); \
+            } \
+        } \
+        void force_##name (type name) { \
+            m_##name = name; \
+            emit name##Changed (m_##name, prop); \
+        } \
+    Q_SIGNALS: \
+        void name##Changed (type name, int p = prop); \
+    private:
+
 #endif // QTHELPER
 

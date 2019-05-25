@@ -13,36 +13,33 @@ class MPSettings : public QObject
 {
     Q_OBJECT
 
-    QT_WRITABLE_PROPERTY(int, keyboardLayout, 0)
-    QT_WRITABLE_PROPERTY(bool, lockTimeoutEnabled, false)
-    QT_WRITABLE_PROPERTY(int, lockTimeout, 0)
-    QT_WRITABLE_PROPERTY(bool, screensaver, false)
-    QT_WRITABLE_PROPERTY(bool, userRequestCancel, false)
-    QT_WRITABLE_PROPERTY(int, userInteractionTimeout, 0)
-    QT_WRITABLE_PROPERTY(bool, flashScreen, false)
-    QT_WRITABLE_PROPERTY(bool, offlineMode, false)
-    QT_WRITABLE_PROPERTY(bool, tutorialEnabled, false)
-    QT_WRITABLE_PROPERTY(int, flashMbSize, 0)
-    QT_WRITABLE_PROPERTY(QString, hwVersion, QString())
+    QT_SETTINGS_PROPERTY(int, keyboardLayout, 0, MPParams::KEYBOARD_LAYOUT_PARAM)
+    QT_SETTINGS_PROPERTY(bool, lockTimeoutEnabled, false, MPParams::LOCK_TIMEOUT_ENABLE_PARAM)
+    QT_SETTINGS_PROPERTY(int, lockTimeout, 0, MPParams::LOCK_TIMEOUT_PARAM)
+    QT_SETTINGS_PROPERTY(bool, screensaver, false, MPParams::SCREENSAVER_PARAM)
+    QT_SETTINGS_PROPERTY(bool, userRequestCancel, false, MPParams::USER_REQ_CANCEL_PARAM)
+    QT_SETTINGS_PROPERTY(int, userInteractionTimeout, 0, MPParams::USER_INTER_TIMEOUT_PARAM)
+    QT_SETTINGS_PROPERTY(bool, flashScreen, false, MPParams::FLASH_SCREEN_PARAM)
+    QT_SETTINGS_PROPERTY(bool, offlineMode, false, MPParams::OFFLINE_MODE_PARAM)
+    QT_SETTINGS_PROPERTY(bool, tutorialEnabled, false, MPParams::TUTORIAL_BOOL_PARAM)
+    QT_SETTINGS_PROPERTY(int, flashMbSize, 0, MPParams::FLASH_SCREEN_PARAM)
 
-    QT_WRITABLE_PROPERTY(bool, keyAfterLoginSendEnable, false)
-    QT_WRITABLE_PROPERTY(int, keyAfterLoginSend, 0)
-    QT_WRITABLE_PROPERTY(bool, keyAfterPassSendEnable, false)
-    QT_WRITABLE_PROPERTY(int, keyAfterPassSend, 0)
-    QT_WRITABLE_PROPERTY(bool, delayAfterKeyEntryEnable, false)
-    QT_WRITABLE_PROPERTY(int, delayAfterKeyEntry, 0)
+    QT_SETTINGS_PROPERTY(bool, keyAfterLoginSendEnable, false, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM)
+    QT_SETTINGS_PROPERTY(int, keyAfterLoginSend, 0, MPParams::KEY_AFTER_LOGIN_SEND_PARAM)
+    QT_SETTINGS_PROPERTY(bool, keyAfterPassSendEnable, false, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM)
+    QT_SETTINGS_PROPERTY(int, keyAfterPassSend, 0, MPParams::KEY_AFTER_PASS_SEND_PARAM)
+    QT_SETTINGS_PROPERTY(bool, delayAfterKeyEntryEnable, false, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM)
+    QT_SETTINGS_PROPERTY(int, delayAfterKeyEntry, 0, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM)
 
 
 
     //MP Mini only
-    QT_WRITABLE_PROPERTY(int, screenBrightness, 0) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
-    QT_WRITABLE_PROPERTY(bool, knockEnabled, false)
-    QT_WRITABLE_PROPERTY(int, knockSensitivity, 0) // 0-very low, 1-low, 2-medium, 3-high
-    QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
-    QT_WRITABLE_PROPERTY(bool, hashDisplay, false)
-    QT_WRITABLE_PROPERTY(int, lockUnlockMode, 0)
-
-    QT_WRITABLE_PROPERTY(quint32, serialNumber, 0)              // serial number if firmware is above 1.2
+    QT_SETTINGS_PROPERTY(int, screenBrightness, 0, MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
+    QT_SETTINGS_PROPERTY(bool, knockEnabled, false, MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM)
+    QT_SETTINGS_PROPERTY(int, knockSensitivity, 0, MPParams::MINI_KNOCK_THRES_PARAM) // 0-very low, 1-low, 2-medium, 3-high
+    QT_SETTINGS_PROPERTY(bool, randomStartingPin, false, MPParams::RANDOM_INIT_PIN_PARAM)
+    QT_SETTINGS_PROPERTY(bool, hashDisplay, false, MPParams::HASH_DISPLAY_FEATURE_PARAM)
+    QT_SETTINGS_PROPERTY(int, lockUnlockMode, 0, MPParams::LOCK_UNLOCK_FEATURE_PARAM)
 
 public:
     MPSettings(MPDevice *parent, IMessageProtocol *mesProt);
@@ -58,42 +55,23 @@ public:
 
     //reload parameters from MP
     void loadParameters();
+    MPParams::Param getParamId(const QString& paramName);
+    QString getParamName(MPParams::Param param);
+    void sendEveryParameter();
 
-    void updateKeyboardLayout(int lang);
-    void updateLockTimeoutEnabled(bool en);
-    void updateLockTimeout(int timeout);
-    void updateScreensaver(bool en);
-    void updateUserRequestCancel(bool en);
-    void updateUserInteractionTimeout(int timeout);
-    void updateFlashScreen(bool en);
-    void updateOfflineMode(bool en);
-    void updateTutorialEnabled(bool en);
-    void updateKeyAfterLoginSendEnable(bool en);
-    void updateKeyAfterLoginSend(int value);
-    void updateKeyAfterPassSendEnable(bool en);
-    void updateKeyAfterPassSend(int value);
-    void updateDelayAfterKeyEntryEnable(bool en);
-    void updateDelayAfterKeyEntry(int val);
-
-
-    //MP Mini only
-    void updateScreenBrightness(int bval); //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
-    void updateKnockEnabled(bool en);
-    void updateKnockSensitivity(int s); // 0-very low, 1-low, 2-medium, 3-high
-    void updateRandomStartingPin(bool);
-    void updateHashDisplay(bool);
-    void updateLockUnlockMode(int);
-
-private:
     void updateParam(MPParams::Param param, bool en);
     void updateParam(MPParams::Param param, int val);
+
+private:
+    void fillParameterMapping();
 
 
     MPDevice* mpDevice = nullptr;
     IMessageProtocol* pMesProt = nullptr;
+    QMap<MPParams::Param, QString> m_paramMap;
 
     //flag set when loading all parameters
-    bool readingParams = false;
+    bool m_readingParams = false;
 };
 
 #endif // MPSETTINGS_H

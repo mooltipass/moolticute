@@ -162,7 +162,7 @@ void MPDevice::sendInitMessages()
           */
         if (isBLE())
         {
-            pSettings->flashMbSizeChanged(0);
+            pSettings->flashMbSizeChanged(MPParams::FLASH_SCREEN_PARAM, 0);
         }
     });
 }
@@ -4788,7 +4788,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     exportTopArray.append(QJsonValue((quint8)get_dataDbChangeNumber()));
 
     /* Mooltipass serial */
-    exportTopArray.append(QJsonValue((qint64)pSettings->get_serialNumber()));
+    exportTopArray.append(QJsonValue((qint64)get_serialNumber()));
 
     /* Generate file payload */
     QJsonDocument payloadDoc(exportTopArray);

@@ -330,32 +330,32 @@ void WSServerCon::resetDevice(MPDevice *dev)
     connect(mpdevice, &MPDevice::statusChanged, this, &WSServerCon::statusChanged);
 
     MPSettings *settings = mpdevice->settings();
-    connect(settings, SIGNAL(keyboardLayoutChanged(int)), this, SLOT(sendKeyboardLayout()));
-    connect(settings, SIGNAL(lockTimeoutEnabledChanged(bool)), this, SLOT(sendLockTimeoutEnabled()));
-    connect(settings, SIGNAL(lockTimeoutChanged(int)), this, SLOT(sendLockTimeout()));
-    connect(settings, SIGNAL(screensaverChanged(bool)), this, SLOT(sendScreensaver()));
-    connect(settings, SIGNAL(userRequestCancelChanged(bool)), this, SLOT(sendUserRequestCancel()));
-    connect(settings, SIGNAL(userInteractionTimeoutChanged(int)), this, SLOT(sendUserInteractionTimeout()));
-    connect(settings, SIGNAL(flashScreenChanged(bool)), this, SLOT(sendFlashScreen()));
-    connect(settings, SIGNAL(offlineModeChanged(bool)), this, SLOT(sendOfflineMode()));
-    connect(settings, SIGNAL(tutorialEnabledChanged(bool)), this, SLOT(sendTutorialEnabled()));
-    connect(settings, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
+    connect(settings, SIGNAL(keyboardLayoutChanged(int, int)), this, SLOT(sendParams(int, int)));
+    connect(settings, SIGNAL(lockTimeoutEnabledChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(lockTimeoutChanged(int, int)), this, SLOT(sendParams(int, int)));
+    connect(settings, SIGNAL(screensaverChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(userRequestCancelChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(userInteractionTimeoutChanged(int, int)), this, SLOT(sendParams(int, int)));
+    connect(settings, SIGNAL(flashScreenChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(offlineModeChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(tutorialEnabledChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
     connect(settings, SIGNAL(flashMbSizeChanged(int)), this, SLOT(sendVersion()));
-    connect(settings, SIGNAL(hwVersionChanged(QString)), this, SLOT(sendVersion()));
-    connect(settings, SIGNAL(serialNumberChanged(quint32)), this, SLOT(sendVersion()));
-    connect(settings, SIGNAL(screenBrightnessChanged(int)), this, SLOT(sendScreenBrightness()));
-    connect(settings, SIGNAL(knockEnabledChanged(bool)), this, SLOT(sendKnockEnabled()));
-    connect(settings, SIGNAL(knockSensitivityChanged(int)), this, SLOT(sendKnockSensitivity()));
-    connect(settings, SIGNAL(randomStartingPinChanged(bool)), this, SLOT(sendRandomStartingPin()));
-    connect(settings, SIGNAL(hashDisplayChanged(bool)), this, SLOT(sendHashDisplayEnabled()));
-    connect(settings, SIGNAL(lockUnlockModeChanged(int)), this, SLOT(sendLockUnlockMode()));
+    connect(mpdevice, SIGNAL(hwVersionChanged(QString)), this, SLOT(sendVersion()));
+    connect(mpdevice, SIGNAL(serialNumberChanged(quint32)), this, SLOT(sendVersion()));
+    connect(settings, SIGNAL(screenBrightnessChanged(int, int)), this, SLOT(sendParams(int, int)));
+    connect(settings, SIGNAL(knockEnabledChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(knockSensitivityChanged(int, int)), this, SLOT(sendParams(int, int)));
+    connect(settings, SIGNAL(randomStartingPinChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(hashDisplayChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(lockUnlockModeChanged(int, int)), this, SLOT(sendParams(int, int)));
 
-    connect(settings, SIGNAL(keyAfterLoginSendEnableChanged(bool)), this, SLOT(sendKeyAfterLoginSendEnable()));
-    connect(settings, SIGNAL(keyAfterLoginSendChanged(int)), this, SLOT(sendKeyAfterLoginSend()));
-    connect(settings, SIGNAL(keyAfterPassSendEnableChanged(bool)), this, SLOT(sendKeyAfterPassSendEnable()));
-    connect(settings, SIGNAL(keyAfterPassSendChanged(int)), this, SLOT(sendKeyAfterPassSend()));
-    connect(settings, SIGNAL(delayAfterKeyEntryEnableChanged(bool)), this, SLOT(sendDelayAfterKeyEntryEnable()));
-    connect(settings, SIGNAL(delayAfterKeyEntryChanged(int)), this, SLOT(sendDelayAfterKeyEntry()));
+    connect(settings, SIGNAL(keyAfterLoginSendEnableChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(keyAfterLoginSendChanged(int, int)), this, SLOT(sendParams(int, int)));
+    connect(settings, SIGNAL(keyAfterPassSendEnableChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(keyAfterPassSendChanged(int, int)), this, SLOT(sendParams(int, int)));
+    connect(settings, SIGNAL(delayAfterKeyEntryEnableChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    connect(settings, SIGNAL(delayAfterKeyEntryChanged(int, int)), this, SLOT(sendParams(int, int)));
 
     connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
 
@@ -378,6 +378,26 @@ void WSServerCon::statusChanged()
                      { "data", Common::MPStatusString[mpdevice->get_status()] }});
 }
 
+void WSServerCon::sendParams(int value, int param)
+{
+    MPSettings *settings = mpdevice->settings();
+    if (!settings)
+        return;
+    QJsonObject data = {{ "parameter", settings->getParamName(MPParams::Param(param)) },
+                        { "value", value }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
+void WSServerCon::sendParams(bool value, int param)
+{
+    MPSettings *settings = mpdevice->settings();
+    if (!settings)
+        return;
+    QJsonObject data = {{ "parameter", settings->getParamName(MPParams::Param(param)) },
+                        { "value", value }};
+    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
+}
+
 void WSServerCon::sendInitialStatus()
 {
     //Sends initial status to any new connected client
@@ -390,242 +410,11 @@ void WSServerCon::sendInitialStatus()
         sendJsonMessage({{ "msg", "mp_connected" }});
         sendJsonMessage({{ "msg", "status_changed" },
                          { "data", Common::MPStatusString[mpdevice->get_status()] }});
-        sendKeyboardLayout();
-        sendLockTimeoutEnabled();
-        sendLockTimeout();
-        sendScreensaver();
-        sendUserRequestCancel();
-        sendUserInteractionTimeout();
-        sendFlashScreen();
-        sendOfflineMode();
-        sendTutorialEnabled();
-        sendMemMgmtMode();
+        mpdevice->settings()->sendEveryParameter();
         sendVersion();
-        sendScreenBrightness();
-        sendKnockEnabled();
-        sendKnockSensitivity();
-        sendRandomStartingPin();
-        sendHashDisplayEnabled();
-        sendLockUnlockMode();
-        sendKeyAfterLoginSendEnable();
-        sendKeyAfterLoginSend();
-        sendKeyAfterPassSendEnable();
-        sendKeyAfterPassSend();
-        sendDelayAfterKeyEntryEnable();
-        sendDelayAfterKeyEntry();
+        sendMemMgmtMode();
         sendCardDbMetadata();
     }
-}
-
-void WSServerCon::sendKeyboardLayout()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "keyboard_layout" },
-                        { "value", settings->get_keyboardLayout() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendLockTimeoutEnabled()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "lock_timeout_enabled" },
-                        { "value", settings->get_lockTimeoutEnabled() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendLockTimeout()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "lock_timeout" },
-                        { "value", settings->get_lockTimeout() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendScreensaver()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "screensaver" },
-                        { "value", settings->get_screensaver() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendUserRequestCancel()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "user_request_cancel" },
-                        { "value", settings->get_userRequestCancel() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendUserInteractionTimeout()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "user_interaction_timeout" },
-                        { "value", settings->get_userInteractionTimeout() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendFlashScreen()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "flash_screen" },
-                        { "value", settings->get_flashScreen() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendOfflineMode()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "offline_mode" },
-                        { "value", settings->get_offlineMode() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendTutorialEnabled()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "tutorial_enabled" },
-                        { "value", settings->get_tutorialEnabled() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendScreenBrightness()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "screen_brightness" },
-                        { "value", settings->get_screenBrightness() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendKnockEnabled()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "knock_enabled" },
-                        { "value", settings->get_knockEnabled() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendKnockSensitivity()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "knock_sensitivity" },
-                        { "value", settings->get_knockSensitivity() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-
-void WSServerCon::sendRandomStartingPin()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "random_starting_pin" },
-                        { "value", settings->get_randomStartingPin() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendHashDisplayEnabled()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "hash_display" },
-                        { "value", settings->get_hashDisplay() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendLockUnlockMode()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "lock_unlock_mode" },
-                        { "value", settings->get_lockUnlockMode() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendKeyAfterLoginSendEnable()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "key_after_login_enabled" },
-                        { "value", settings->get_keyAfterLoginSendEnable() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendKeyAfterLoginSend()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "key_after_login" },
-                        { "value", settings->get_keyAfterLoginSend() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendKeyAfterPassSendEnable()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "key_after_pass_enabled" },
-                        { "value", settings->get_keyAfterPassSendEnable() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendKeyAfterPassSend()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "key_after_pass" },
-                        { "value", settings->get_keyAfterPassSend() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendDelayAfterKeyEntryEnable()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "delay_after_key_enabled" },
-                        { "value", settings->get_delayAfterKeyEntryEnable() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
-}
-
-void WSServerCon::sendDelayAfterKeyEntry()
-{
-    MPSettings *settings = mpdevice->settings();
-    if (!settings)
-        return;
-    QJsonObject data = {{ "parameter", "delay_after_key" },
-                        { "value", settings->get_delayAfterKeyEntry() }};
-    sendJsonMessage({{ "msg", "param_changed" }, { "data", data }});
 }
 
 void WSServerCon::sendMemMgmtMode()
@@ -660,9 +449,9 @@ void WSServerCon::sendVersion()
     MPSettings *settings = mpdevice->settings();
     if (!settings)
         return;
-    QJsonObject data = {{ "hw_version", settings->get_hwVersion() },
+    QJsonObject data = {{ "hw_version", mpdevice->get_hwVersion() },
                         { "flash_size", settings->get_flashMbSize() }};
-    data["hw_serial"] = static_cast<qint64>(settings->get_serialNumber());
+    data["hw_serial"] = static_cast<qint64>(mpdevice->get_serialNumber());
     if (mpdevice->isBLE())
     {
         data["hw_version"] = "ble";
@@ -769,48 +558,21 @@ void WSServerCon::processParametersSet(const QJsonObject &data)
     MPSettings *settings = mpdevice->settings();
     if (!settings)
         return;
-    if (data.contains("keyboard_layout"))
-        settings->updateKeyboardLayout(data["keyboard_layout"].toInt());
-    if (data.contains("lock_timeout_enabled"))
-        settings->updateLockTimeoutEnabled(data["lock_timeout_enabled"].toBool());
-    if (data.contains("lock_timeout"))
-        settings->updateLockTimeout(data["lock_timeout"].toInt());
-    if (data.contains("screensaver"))
-        settings->updateScreensaver(data["screensaver"].toBool());
-    if (data.contains("user_request_cancel"))
-        settings->updateUserRequestCancel(data["user_request_cancel"].toBool());
-    if (data.contains("user_interaction_timeout"))
-        settings->updateUserInteractionTimeout(data["user_interaction_timeout"].toInt());
-    if (data.contains("flash_screen"))
-        settings->updateFlashScreen(data["flash_screen"].toBool());
-    if (data.contains("offline_mode"))
-        settings->updateOfflineMode(data["offline_mode"].toBool());
-    if (data.contains("tutorial_enabled"))
-        settings->updateTutorialEnabled(data["tutorial_enabled"].toBool());
-    if (data.contains("screen_brightness"))
-        settings->updateScreenBrightness(data["screen_brightness"].toInt());
-    if (data.contains("knock_enabled"))
-        settings->updateKnockEnabled(data["knock_enabled"].toBool());
-    if (data.contains("knock_sensitivity"))
-        settings->updateKnockSensitivity(data["knock_sensitivity"].toInt());
-    if (data.contains("random_starting_pin"))
-        settings->updateRandomStartingPin(data["random_starting_pin"].toBool());
-    if (data.contains("hash_display"))
-        settings->updateHashDisplay(data["hash_display"].toBool());
-    if (data.contains("lock_unlock_mode"))
-        settings->updateLockUnlockMode(data["lock_unlock_mode"].toInt());
-    if (data.contains("key_after_login_enabled"))
-         settings->updateKeyAfterLoginSendEnable(data["key_after_login_enabled"].toBool());
-    if (data.contains("key_after_login"))
-         settings->updateKeyAfterLoginSend(data["key_after_login"].toInt());
-    if (data.contains("key_after_pass_enabled"))
-         settings->updateKeyAfterPassSendEnable(data["key_after_pass_enabled"].toBool());
-    if (data.contains("key_after_pass"))
-         settings->updateKeyAfterPassSend(data["key_after_pass"].toInt());
-    if (data.contains("delay_after_key_enabled"))
-         settings->updateDelayAfterKeyEntryEnable( data["delay_after_key_enabled"].toBool());
-    if (data.contains("delay_after_key"))
-         settings->updateDelayAfterKeyEntry(data["delay_after_key"].toInt());
+
+    for (auto it = data.begin(); it != data.end(); ++it)
+    {
+        const auto paramId = settings->getParamId(it.key());
+        const auto value = it.value();
+        if (value.isBool())
+        {
+            settings->updateParam(paramId, value.toBool());
+        }
+        else
+        {
+            settings->updateParam(paramId, value.toInt());
+        }
+
+    }
 
     //reload parameters from device after changed all params, this will trigger
     //websocket update of clients too
