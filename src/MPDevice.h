@@ -92,6 +92,7 @@ public:
     void sendData(MPCmd::Command cmd, quint32 timeout, MPCommandCb cb);
     void sendData(MPCmd::Command cmd, MPCommandCb cb);
     void sendData(MPCmd::Command cmd, const QByteArray &data, MPCommandCb cb);
+    void enqueueAndRunJob(AsyncJobs* jobs);
 
     void getUID(const QByteArray & key);
 

@@ -36,8 +36,7 @@ void MPSettings::loadParameters()
                             return true;
                         }
         ));
-        mpDevice->jobsQueue.enqueue(jobs);
-        mpDevice->runAndDequeueJobs();
+        mpDevice->enqueueAndRunJob(jobs);
         return;
     }
 
@@ -350,8 +349,7 @@ void MPSettings::loadParameters()
                 m_readingParams = false;
                 loadParameters(); // memory: does it get "piled on?"
             });
-            mpDevice->jobsQueue.enqueue(v12jobs);
-            mpDevice->runAndDequeueJobs();
+            mpDevice->enqueueAndRunJob(v12jobs);
         }
     });
 
@@ -363,8 +361,7 @@ void MPSettings::loadParameters()
         loadParameters(); // memory: does it get "piled on?"
     });
 
-    mpDevice->jobsQueue.enqueue(jobs);
-    mpDevice->runAndDequeueJobs();
+    mpDevice->enqueueAndRunJob(jobs);
 }
 
 MPParams::Param MPSettings::getParamId(const QString &paramName)
@@ -440,8 +437,7 @@ void MPSettings::updateParam(MPParams::Param param, int val)
         qWarning() << "Failed to change " << param;
     });
 
-    mpDevice->jobsQueue.enqueue(jobs);
-    mpDevice->runAndDequeueJobs();
+    mpDevice->enqueueAndRunJob(jobs);
 }
 
 void MPSettings::fillParameterMapping()

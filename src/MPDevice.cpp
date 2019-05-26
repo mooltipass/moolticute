@@ -257,6 +257,12 @@ void MPDevice::sendData(MPCmd::Command cmd, const QByteArray &data, MPCommandCb 
     sendData(cmd, data, CMD_DEFAULT_TIMEOUT, std::move(cb));
 }
 
+void MPDevice::enqueueAndRunJob(AsyncJobs *jobs)
+{
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
 void MPDevice::commandFailed()
 {
     //TODO: fix this to work as it should on all platforms

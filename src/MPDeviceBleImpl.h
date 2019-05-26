@@ -81,8 +81,6 @@ private:
     QByteArray createCheckCredMessage(const BleCredential &cred);
     QByteArray createCredentialMessage(const CredMap &credMap);
 
-    void dequeueAndRun(AsyncJobs *job);
-
     inline void flipBit();
     void resetFlipBit();
 
