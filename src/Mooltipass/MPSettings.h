@@ -8,6 +8,7 @@
 
 class MPDevice;
 class IMessageProtocol;
+class WSServerCon;
 
 class MPSettings : public QObject
 {
@@ -30,8 +31,6 @@ class MPSettings : public QObject
     QT_SETTINGS_PROPERTY(int, keyAfterPassSend, 0, MPParams::KEY_AFTER_PASS_SEND_PARAM)
     QT_SETTINGS_PROPERTY(bool, delayAfterKeyEntryEnable, false, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM)
     QT_SETTINGS_PROPERTY(int, delayAfterKeyEntry, 0, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM)
-
-
 
     //MP Mini only
     QT_SETTINGS_PROPERTY(int, screenBrightness, 0, MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
@@ -58,12 +57,15 @@ public:
     MPParams::Param getParamId(const QString& paramName);
     QString getParamName(MPParams::Param param);
     void sendEveryParameter();
+    void connectSendParams(WSServerCon* wsServerCon);
 
     void updateParam(MPParams::Param param, bool en);
     void updateParam(MPParams::Param param, int val);
 
 private:
     void fillParameterMapping();
+    void convertKnockValue(int& val);
+    void checkTimeoutBoundaries(int& val);
 
 
     MPDevice* mpDevice = nullptr;

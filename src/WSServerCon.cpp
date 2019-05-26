@@ -329,35 +329,12 @@ void WSServerCon::resetDevice(MPDevice *dev)
     //Whenever mp status changes, send state update to client
     connect(mpdevice, &MPDevice::statusChanged, this, &WSServerCon::statusChanged);
 
-    MPSettings *settings = mpdevice->settings();
-    connect(settings, SIGNAL(keyboardLayoutChanged(int, int)), this, SLOT(sendParams(int, int)));
-    connect(settings, SIGNAL(lockTimeoutEnabledChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(lockTimeoutChanged(int, int)), this, SLOT(sendParams(int, int)));
-    connect(settings, SIGNAL(screensaverChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(userRequestCancelChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(userInteractionTimeoutChanged(int, int)), this, SLOT(sendParams(int, int)));
-    connect(settings, SIGNAL(flashScreenChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(offlineModeChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(tutorialEnabledChanged(bool, int)), this, SLOT(sendParams(bool, int)));
+    mpdevice->settings()->connectSendParams(this);
+
     connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
-    connect(settings, SIGNAL(flashMbSizeChanged(int)), this, SLOT(sendVersion()));
+    connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
     connect(mpdevice, SIGNAL(hwVersionChanged(QString)), this, SLOT(sendVersion()));
     connect(mpdevice, SIGNAL(serialNumberChanged(quint32)), this, SLOT(sendVersion()));
-    connect(settings, SIGNAL(screenBrightnessChanged(int, int)), this, SLOT(sendParams(int, int)));
-    connect(settings, SIGNAL(knockEnabledChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(knockSensitivityChanged(int, int)), this, SLOT(sendParams(int, int)));
-    connect(settings, SIGNAL(randomStartingPinChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(hashDisplayChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(lockUnlockModeChanged(int, int)), this, SLOT(sendParams(int, int)));
-
-    connect(settings, SIGNAL(keyAfterLoginSendEnableChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(keyAfterLoginSendChanged(int, int)), this, SLOT(sendParams(int, int)));
-    connect(settings, SIGNAL(keyAfterPassSendEnableChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(keyAfterPassSendChanged(int, int)), this, SLOT(sendParams(int, int)));
-    connect(settings, SIGNAL(delayAfterKeyEntryEnableChanged(bool, int)), this, SLOT(sendParams(bool, int)));
-    connect(settings, SIGNAL(delayAfterKeyEntryChanged(int, int)), this, SLOT(sendParams(int, int)));
-
-    connect(mpdevice, SIGNAL(uidChanged(qint64)), this, SLOT(sendDeviceUID()));
 
     connect(mpdevice, &MPDevice::filesCacheChanged, this, &WSServerCon::sendFilesCache);
 

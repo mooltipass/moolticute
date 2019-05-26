@@ -2,6 +2,7 @@
 #include "AsyncJobs.h"
 #include "MPDevice.h"
 #include "IMessageProtocol.h"
+#include "WSServerCon.h"
 
 MPSettings::MPSettings(MPDevice *parent, IMessageProtocol *mesProt)
     : QObject(parent),
@@ -380,16 +381,31 @@ void MPSettings::sendEveryParameter()
 {
     for (int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); ++i)
     {
-        const auto slotName = metaObject()->property(i).notifySignal().name();
+        const auto signalName = metaObject()->property(i).notifySignal().name();
         QVariant value = metaObject()->property(i).read(this);
         if (value.type() == QVariant::Bool)
         {
-            emit QMetaObject::invokeMethod(this, slotName, Q_ARG(bool, value.toBool()));
+            emit QMetaObject::invokeMethod(this, signalName, Q_ARG(bool, value.toBool()));
         }
         else
         {
-            emit QMetaObject::invokeMethod(this, slotName, Q_ARG(int, value.toInt()));
+            emit QMetaObject::invokeMethod(this, signalName, Q_ARG(int, value.toInt()));
         }
+    }
+}
+
+void MPSettings::connectSendParams(WSServerCon *wsServerCon)
+{
+    //Connect every propertyChanged signals to the correct sendParams slot
+    for (int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); ++i)
+    {
+        const auto signal = metaObject()->property(i).notifySignal();
+        const bool isFirstParamBool = signal.parameterType(0) == QVariant::Bool;
+        const auto slot = wsServerCon->metaObject()->method(
+                            wsServerCon->metaObject()->indexOfMethod(
+                                isFirstParamBool ? "sendParams(bool,int)" : "sendParams(int,int)"
+                          ));
+        connect(this, signal, wsServerCon, slot);
     }
 }
 
@@ -397,21 +413,13 @@ void MPSettings::updateParam(MPParams::Param param, int val)
 {
     if (MPParams::MINI_KNOCK_THRES_PARAM == param)
     {
-        switch(val)
-        {
-        case 0: val = KNOCKING_VERY_LOW; break;
-        case 1: val = KNOCKING_LOW; break;
-        case 2: val = KNOCKING_MEDIUM; break;
-        case 3: val = KNOCKING_HIGH; break;
-        default:
-            val = KNOCKING_MEDIUM;
-        }
+        convertKnockValue(val);
     }
     else if (MPParams::USER_INTER_TIMEOUT_PARAM == param || MPParams::LOCK_TIMEOUT_PARAM == param)
     {
-        if (val < 0) val = 0;
-        if (val > 0xFF) val = 0xFF;
+        checkTimeoutBoundaries(val);
     }
+
     QMetaEnum m = QMetaEnum::fromType<MPParams::Param>();
     QString logInf = QStringLiteral("Updating %1 param: %2").arg(m.valueToKey(param)).arg(val);
 
@@ -461,6 +469,25 @@ void MPSettings::fillParameterMapping()
         {MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, "delay_after_key_enabled"},
         {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, "delay_after_key"}
     };
+}
+
+void MPSettings::convertKnockValue(int &val)
+{
+    switch(val)
+    {
+    case 0: val = KNOCKING_VERY_LOW; break;
+    case 1: val = KNOCKING_LOW; break;
+    case 2: val = KNOCKING_MEDIUM; break;
+    case 3: val = KNOCKING_HIGH; break;
+    default:
+        val = KNOCKING_MEDIUM;
+    }
+}
+
+void MPSettings::checkTimeoutBoundaries(int &val)
+{
+    if (val < 0) val = 0;
+    if (val > 0xFF) val = 0xFF;
 }
 
 void MPSettings::updateParam(MPParams::Param param, bool en)
