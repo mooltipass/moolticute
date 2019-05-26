@@ -23,6 +23,7 @@
 #include "MessageProtocolBLE.h"
 #include "MPDeviceBleImpl.h"
 #include "BleCommon.h"
+#include "MPSettingsBLE.h"
 
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
@@ -119,16 +120,16 @@ void MPDevice::setupMessageProtocol()
     {
         pMesProt = new MessageProtocolBLE{};
         bleImpl = new MPDeviceBleImpl(dynamic_cast<MessageProtocolBLE*>(pMesProt), this);
-
+        pSettings = new MPSettingsBLE{this, pMesProt};
         qDebug() << "Mooltipass Mini BLE is connected";
     }
     else
     {
         pMesProt = new MessageProtocolMini{};
+        pSettings = new MPSettingsMini{this, pMesProt};
         qDebug() << "Mooltipass Mini is connected";
     }
 
-    pSettings = new MPSettings{this, pMesProt};
 
 #ifndef Q_OS_WIN
     sendInitMessages();

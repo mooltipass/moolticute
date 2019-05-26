@@ -46,7 +46,7 @@
 #define QT_SETTINGS_PROPERTY(type, name, def, prop) \
     protected: \
         Q_PROPERTY (type name READ get_##name WRITE set_##name NOTIFY name##Changed) \
-    private: \
+    protected: \
         type m_##name = def; \
     public: \
         type get_##name () const { return m_##name; } \

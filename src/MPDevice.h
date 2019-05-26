@@ -27,6 +27,7 @@
 #include "MPNode.h"
 #include "FilesCache.h"
 #include "MPSettings.h"
+#include "MPSettingsMini.h"
 
 using MPCommandCb = std::function<void(bool success, const QByteArray &data, bool &done)>;
 using MPDeviceProgressCb = std::function<void(const QVariantMap &data)>;
@@ -83,7 +84,7 @@ public:
     virtual ~MPDevice();
 
     friend class MPDeviceBleImpl;
-    friend class MPSettings;
+    friend class MPSettingsMini;
 
     void setupMessageProtocol();
     void sendInitMessages();

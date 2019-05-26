@@ -198,6 +198,7 @@ public:
         LOCK_UNLOCK_FEATURE_PARAM,
         HASH_DISPLAY_FEATURE_PARAM,
         RANDOM_INIT_PIN_PARAM,
+        PROMPT_ANIMATION_PARAM
     };
     Q_ENUM(Param)
 };

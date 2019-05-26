@@ -78,7 +78,9 @@ SOURCES += src/main_daemon.cpp \
     src/HaveIBeenPwned.cpp \
     src/Mooltipass/MPNodeMini.cpp \
     src/Mooltipass/MPNodeBLE.cpp \
-    src/Mooltipass/MPSettings.cpp
+    src/Mooltipass/MPSettings.cpp \
+    src/Mooltipass/MPSettingsMini.cpp \
+    src/Mooltipass/MPSettingsBLE.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -107,7 +109,9 @@ HEADERS  += \
     src/BleCommon.h \
     src/Mooltipass/MPNodeMini.h \
     src/Mooltipass/MPNodeBLE.h \
-    src/Mooltipass/MPSettings.h
+    src/Mooltipass/MPSettings.h \
+    src/Mooltipass/MPSettingsMini.h \
+    src/Mooltipass/MPSettingsBLE.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \
