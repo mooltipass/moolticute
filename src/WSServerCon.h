@@ -44,6 +44,7 @@ public:
 signals:
     void notifyAllClients(const QJsonObject &obj);
     void sendMessageToGUI(const QString &msg, bool &isGuiRunning);
+    void parameterProcessFinished();
 
 private slots:
     void processMessage(const QString &msg);

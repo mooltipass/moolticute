@@ -16,8 +16,16 @@ public:
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
 
+private slots:
+    void setSettings();
+
 private:
+    void connectSendParams(WSServerCon* wsServerCon) override;
     void fillParameterMapping();
+
+    QByteArray m_settings;
+
+    static constexpr int RANDOM_PIN_BYTE_ID = 5;
 };
 
 #endif // MPSETTINGSBLE_H

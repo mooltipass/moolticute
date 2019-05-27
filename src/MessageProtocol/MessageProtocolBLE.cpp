@@ -325,6 +325,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::STORE_CREDENTIAL      , 0x0006},
         {MPCmd::GET_CREDENTIAL        , 0x0007},
         {MPCmd::GET_DEVICE_SETTINGS   , 0x000C},
+        {MPCmd::SET_DEVICE_SETTINGS   , 0x000D},
         {MPCmd::GET_AVAILABLE_USERS   , 0x000F},
         {MPCmd::CHECK_CREDENTIAL      , 0x0012},
         {MPCmd::GET_USER_SETTINGS     , 0x0013},

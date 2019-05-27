@@ -49,7 +49,7 @@ public:
     MPParams::Param getParamId(const QString& paramName);
     QString getParamName(MPParams::Param param);
     void sendEveryParameter();
-    void connectSendParams(WSServerCon* wsServerCon);
+    virtual void connectSendParams(WSServerCon* wsServerCon);
 
     //reload parameters from MP
     virtual void loadParameters() = 0;

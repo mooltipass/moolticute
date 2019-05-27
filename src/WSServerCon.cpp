@@ -292,6 +292,10 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "param_set")
+    {
+        processParametersSet(root["data"].toObject());
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -548,8 +552,8 @@ void WSServerCon::processParametersSet(const QJsonObject &data)
         {
             settings->updateParam(paramId, value.toInt());
         }
-
     }
+    emit parameterProcessFinished();
 
     //reload parameters from device after changed all params, this will trigger
     //websocket update of clients too
@@ -575,11 +579,7 @@ void WSServerCon::checkHaveIBeenPwned(const QString &service, const QString &log
 
 void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb &cbProgress)
 {
-    if (root["msg"] == "param_set")
-    {
-        processParametersSet(root["data"].toObject());
-    }
-    else if (root["msg"] == "start_memcheck")
+    if (root["msg"] == "start_memcheck")
     {
         //start integrity check
         mpdevice->startIntegrityCheck(

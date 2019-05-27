@@ -130,6 +130,7 @@ public:
             STORE_CREDENTIAL    ,
             GET_CREDENTIAL      ,
             GET_DEVICE_SETTINGS ,
+            SET_DEVICE_SETTINGS ,
             GET_AVAILABLE_USERS ,
             CHECK_CREDENTIAL    ,
             GET_USER_SETTINGS   ,

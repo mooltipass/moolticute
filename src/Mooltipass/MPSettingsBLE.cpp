@@ -2,6 +2,7 @@
 #include "AsyncJobs.h"
 #include "MPDevice.h"
 #include "IMessageProtocol.h"
+#include "WSServerCon.h"
 
 MPSettingsBLE::MPSettingsBLE(MPDevice *parent, IMessageProtocol *mesProt)
     : MPSettings(parent, mesProt)
@@ -16,13 +17,15 @@ void MPSettingsBLE::loadParameters()
                           "Loading device parameters",
                           this);
 
-    //TODO: Implement settings for BLE
+    //TODO: Implement loading correct settings, when implemented on fw side
     jobs->append(new MPCommandJob(mpDevice,
                    MPCmd::GET_DEVICE_SETTINGS,
                    [this] (const QByteArray &data, bool &)
                     {
-                        qDebug() << "Full device settings payload: " << pMesProt->getFullPayload(data).toHex();
+                        m_settings = pMesProt->getFullPayload(data);
+                        qDebug() << "Full device settings payload: " << m_settings.toHex();
                         qWarning() << "Load Parameters processing haven't been implemented for BLE yet.";
+                        set_randomStartingPin(m_settings.at(RANDOM_PIN_BYTE_ID) != 0);
                         return true;
                     }
     ));
@@ -32,10 +35,44 @@ void MPSettingsBLE::loadParameters()
 
 void MPSettingsBLE::updateParam(MPParams::Param param, int val)
 {
-    Q_UNUSED(param)
-    Q_UNUSED(val)
-    //TODO implement
+    //TODO: Updating params, when implemented on fw side
+    if (param == MPParams::RANDOM_INIT_PIN_PARAM)
+    {
+        m_settings[RANDOM_PIN_BYTE_ID] = static_cast<char>(val);
+    }
 }
+
+void MPSettingsBLE::connectSendParams(WSServerCon *wsServerCon)
+{
+    MPSettings::connectSendParams(wsServerCon);
+    connect(wsServerCon, SIGNAL(parameterProcessFinished()), this, SLOT(setSettings()));
+}
+
+void MPSettingsBLE::setSettings()
+{
+    AsyncJobs *jobs = new AsyncJobs(
+                          "Setting device parameters",
+                          this);
+
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::SET_DEVICE_SETTINGS,
+                   m_settings,
+                   [this] (const QByteArray &data, bool &)
+                    {
+                        if (0x01 == pMesProt->getFirstPayloadByte(data))
+                        {
+                            qDebug() << "Set device settings was successfull";
+                        }
+                        else
+                        {
+                            qWarning() << "Set device settings failed";
+                        }
+                        return true;
+                    }
+    ));
+    mpDevice->enqueueAndRunJob(jobs);
+}
+
 
 void MPSettingsBLE::fillParameterMapping()
 {
