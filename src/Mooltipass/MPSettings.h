@@ -32,6 +32,8 @@ class MPSettings : public QObject
     QT_SETTINGS_PROPERTY(bool, delayAfterKeyEntryEnable, false, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM)
     QT_SETTINGS_PROPERTY(int, delayAfterKeyEntry, 0, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM)
 
+    QT_SETTINGS_PROPERTY(bool, randomStartingPin, false, MPParams::RANDOM_INIT_PIN_PARAM)
+
 public:
     MPSettings(MPDevice *parent, IMessageProtocol *mesProt);
     virtual ~MPSettings();
@@ -56,8 +58,6 @@ public:
 
 protected:
     void fillParameterMapping();
-    void convertKnockValue(int& val);
-    void checkTimeoutBoundaries(int& val);
 
     void sendEveryParameter(const QMetaObject* meta);
     void connectSendParams(WSServerCon* wsServerCon, const QMetaObject* meta);

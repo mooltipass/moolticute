@@ -69,27 +69,9 @@ void MPSettings::fillParameterMapping()
         {MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM, "key_after_pass_enabled"},
         {MPParams::KEY_AFTER_PASS_SEND_PARAM, "key_after_pass"},
         {MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, "delay_after_key_enabled"},
-        {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, "delay_after_key"}
+        {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, "delay_after_key"},
+        {MPParams::RANDOM_INIT_PIN_PARAM, "random_starting_pin"}
     };
-}
-
-void MPSettings::convertKnockValue(int &val)
-{
-    switch(val)
-    {
-    case 0: val = KNOCKING_VERY_LOW; break;
-    case 1: val = KNOCKING_LOW; break;
-    case 2: val = KNOCKING_MEDIUM; break;
-    case 3: val = KNOCKING_HIGH; break;
-    default:
-        val = KNOCKING_MEDIUM;
-    }
-}
-
-void MPSettings::checkTimeoutBoundaries(int &val)
-{
-    if (val < 0) val = 0;
-    if (val > 0xFF) val = 0xFF;
 }
 
 void MPSettings::sendEveryParameter(const QMetaObject* meta)

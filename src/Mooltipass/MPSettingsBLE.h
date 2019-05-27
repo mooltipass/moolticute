@@ -15,6 +15,9 @@ public:
 
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
+
+private:
+    void fillParameterMapping();
 };
 
 #endif // MPSETTINGSBLE_H

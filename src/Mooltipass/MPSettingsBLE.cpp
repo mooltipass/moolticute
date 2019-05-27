@@ -6,7 +6,7 @@
 MPSettingsBLE::MPSettingsBLE(MPDevice *parent, IMessageProtocol *mesProt)
     : MPSettings(parent, mesProt)
 {
-
+    fillParameterMapping();
 }
 
 void MPSettingsBLE::loadParameters()
@@ -35,4 +35,9 @@ void MPSettingsBLE::updateParam(MPParams::Param param, int val)
     Q_UNUSED(param)
     Q_UNUSED(val)
     //TODO implement
+}
+
+void MPSettingsBLE::fillParameterMapping()
+{
+    m_paramMap.insert(MPParams::PROMPT_ANIMATION_PARAM, "prompt_animation");
 }
