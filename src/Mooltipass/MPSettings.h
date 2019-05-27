@@ -59,6 +59,9 @@ protected:
     void convertKnockValue(int& val);
     void checkTimeoutBoundaries(int& val);
 
+    void sendEveryParameter(const QMetaObject* meta);
+    void connectSendParams(WSServerCon* wsServerCon, const QMetaObject* meta);
+
     MPDevice* mpDevice = nullptr;
     IMessageProtocol* pMesProt = nullptr;
     QMap<MPParams::Param, QString> m_paramMap;

@@ -29,71 +29,27 @@ QString MPSettings::getParamName(MPParams::Param param)
 
 void MPSettings::sendEveryParameter()
 {
-    for (int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); ++i)
-    {
-        const auto signalName = metaObject()->property(i).notifySignal().name();
-        QVariant value = metaObject()->property(i).read(this);
-        if (value.type() == QVariant::Bool)
-        {
-            emit QMetaObject::invokeMethod(this, signalName, Q_ARG(bool, value.toBool()));
-        }
-        else
-        {
-            emit QMetaObject::invokeMethod(this, signalName, Q_ARG(int, value.toInt()));
-        }
-    }
-
-    auto* superMetaObject = metaObject()->superClass();
+    sendEveryParameter(metaObject());
+    //When called from a child class need to send parent's properties too
+    const auto* superMetaObject = metaObject()->superClass();
     if (nullptr == superMetaObject)
     {
         return;
     }
-
-    for (int i = superMetaObject->propertyOffset(); i < superMetaObject->propertyCount(); ++i)
-    {
-        const auto signalName = superMetaObject->property(i).notifySignal().name();
-        QVariant value = superMetaObject->property(i).read(this);
-        if (value.type() == QVariant::Bool)
-        {
-            emit QMetaObject::invokeMethod(this, signalName, Q_ARG(bool, value.toBool()));
-        }
-        else
-        {
-            emit QMetaObject::invokeMethod(this, signalName, Q_ARG(int, value.toInt()));
-        }
-    }
+    sendEveryParameter(superMetaObject);
 }
 
 void MPSettings::connectSendParams(WSServerCon *wsServerCon)
 {
     //Connect every propertyChanged signals to the correct sendParams slot
-    for (int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); ++i)
-    {
-        const auto signal = metaObject()->property(i).notifySignal();
-        const bool isFirstParamBool = signal.parameterType(0) == QVariant::Bool;
-        const auto slot = wsServerCon->metaObject()->method(
-                            wsServerCon->metaObject()->indexOfMethod(
-                                isFirstParamBool ? "sendParams(bool,int)" : "sendParams(int,int)"
-                          ));
-        connect(this, signal, wsServerCon, slot);
-    }
-
+    connectSendParams(wsServerCon, metaObject());
+    //When called from a child class need to connect parent's properties too
     auto* superMetaObject = metaObject()->superClass();
     if (nullptr == superMetaObject)
     {
         return;
     }
-
-    for (int i = superMetaObject->propertyOffset(); i < superMetaObject->propertyCount(); ++i)
-    {
-        const auto signal = superMetaObject->property(i).notifySignal();
-        const bool isFirstParamBool = signal.parameterType(0) == QVariant::Bool;
-        const auto slot = wsServerCon->metaObject()->method(
-                            wsServerCon->metaObject()->indexOfMethod(
-                                isFirstParamBool ? "sendParams(bool,int)" : "sendParams(int,int)"
-                          ));
-        connect(this, signal, wsServerCon, slot);
-    }
+    connectSendParams(wsServerCon, superMetaObject);
 }
 
 void MPSettings::fillParameterMapping()
@@ -134,6 +90,37 @@ void MPSettings::checkTimeoutBoundaries(int &val)
 {
     if (val < 0) val = 0;
     if (val > 0xFF) val = 0xFF;
+}
+
+void MPSettings::sendEveryParameter(const QMetaObject* meta)
+{
+    for (int i = meta->propertyOffset(); i < meta->propertyCount(); ++i)
+    {
+        const auto signalName = meta->property(i).notifySignal().name();
+        QVariant value = meta->property(i).read(this);
+        if (value.type() == QVariant::Bool)
+        {
+            emit QMetaObject::invokeMethod(this, signalName, Q_ARG(bool, value.toBool()));
+        }
+        else
+        {
+            emit QMetaObject::invokeMethod(this, signalName, Q_ARG(int, value.toInt()));
+        }
+    }
+}
+
+void MPSettings::connectSendParams(WSServerCon *wsServerCon, const QMetaObject* meta)
+{
+    for (int i = meta->propertyOffset(); i < meta->propertyCount(); ++i)
+    {
+        const auto signal = meta->property(i).notifySignal();
+        const bool isFirstParamBool = signal.parameterType(0) == QVariant::Bool;
+        const auto slot = wsServerCon->metaObject()->method(
+                            wsServerCon->metaObject()->indexOfMethod(
+                                isFirstParamBool ? "sendParams(bool,int)" : "sendParams(int,int)"
+                          ));
+        connect(this, signal, wsServerCon, slot);
+    }
 }
 
 void MPSettings::updateParam(MPParams::Param param, bool en)
