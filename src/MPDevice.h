@@ -72,6 +72,7 @@ class MPDevice: public QObject
     QT_WRITABLE_PROPERTY(bool, memMgmtMode, false)
     QT_WRITABLE_PROPERTY(QString, hwVersion, QString())
     QT_WRITABLE_PROPERTY(quint32, serialNumber, 0)              // serial number if firmware is above 1.2
+    QT_WRITABLE_PROPERTY(int, flashMbSize, 0)
 
     QT_WRITABLE_PROPERTY(quint32, credentialsDbChangeNumber, 0)  // credentials db change number
     QT_WRITABLE_PROPERTY(quint32, dataDbChangeNumber, 0)         // data db change number

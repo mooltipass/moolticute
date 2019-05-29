@@ -25,10 +25,10 @@ void MPSettingsBLE::loadParameters()
                         m_settings = pMesProt->getFullPayload(data);
                         qDebug() << "Full device settings payload: " << m_settings.toHex();
                         qWarning() << "Load Parameters processing haven't been implemented for BLE yet.";
-                        set_reservedBle(m_settings.at(RESERVED_BYTE) != 0);
-                        set_userInteractionTimeout(m_settings.at(USER_INTERACTION_TIMEOUT_BYTE));
-                        set_randomStartingPin(m_settings.at(RANDOM_PIN_BYTE) != 0);
-                        set_promptAnimation(m_settings.at(ANIMATION_DURING_PROMPT_BYTE) != 0);
+                        set_reserved_ble(m_settings.at(RESERVED_BYTE) != 0);
+                        set_user_interaction_timeout(m_settings.at(USER_INTERACTION_TIMEOUT_BYTE));
+                        set_random_starting_pin(m_settings.at(RANDOM_PIN_BYTE) != 0);
+                        set_prompt_animation(m_settings.at(ANIMATION_DURING_PROMPT_BYTE) != 0);
                         return true;
                     }
     ));

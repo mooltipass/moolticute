@@ -24,7 +24,7 @@ void MPSettingsMini::loadParameters()
         qDebug() << "received MP version FLASH size: " << flashSize << "Mb";
         QString hw = QString(pMesProt->getPayloadBytes(data, 1, pMesProt->getMessageSize(data) - 2));
         qDebug() << "received MP version hw: " << hw;
-        set_flashMbSize(flashSize);
+        mpDevice->set_flashMbSize(flashSize);
         mpDevice->set_hwVersion(hw);
 
         QRegularExpressionMatchIterator i = regVersion.globalMatch(hw);
@@ -50,7 +50,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto language = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received language: " << language;
-        set_keyboardLayout(language);
+        set_keyboard_layout(language);
         return true;
     }));
 
@@ -61,7 +61,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto lockTimeoutEnabled = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received lock timeout enable: " << lockTimeoutEnabled;
-        set_lockTimeoutEnabled(lockTimeoutEnabled != 0);
+        set_lock_timeout_enabled(lockTimeoutEnabled != 0);
         return true;
     }));
 
@@ -72,7 +72,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto lockTimeout = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received lock timeout: " << lockTimeout;
-        set_lockTimeout(lockTimeout);
+        set_lock_timeout(lockTimeout);
         return true;
     }));
 
@@ -94,7 +94,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto userRequestCancel = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received userRequestCancel: " << userRequestCancel;
-        set_userRequestCancel(userRequestCancel != 0);
+        set_user_request_cancel(userRequestCancel != 0);
         return true;
     }));
 
@@ -105,7 +105,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto userInteractionTimeout = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received userInteractionTimeout: " << userInteractionTimeout;
-        set_userInteractionTimeout(userInteractionTimeout);
+        set_user_interaction_timeout(userInteractionTimeout);
         return true;
     }));
 
@@ -116,7 +116,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto flashScreen = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received flashScreen: " << flashScreen;
-        set_flashScreen(flashScreen != 0);
+        set_flash_screen(flashScreen != 0);
         return true;
     }));
 
@@ -127,7 +127,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto offlineMode = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received offlineMode: " << offlineMode;
-        set_offlineMode(offlineMode != 0);
+        set_offline_mode(offlineMode != 0);
         return true;
     }));
 
@@ -138,7 +138,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto tutorialEnabled = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received tutorialEnabled: " << tutorialEnabled;
-        set_tutorialEnabled(tutorialEnabled != 0);
+        set_tutorial_enabled(tutorialEnabled != 0);
         return true;
     }));
 
@@ -149,7 +149,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto screenBrightness = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received screenBrightness: " << screenBrightness;
-        set_screenBrightness(screenBrightness);
+        set_screen_brightness(screenBrightness);
         return true;
     }));
 
@@ -160,7 +160,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto knockEnabled = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received set_knockEnabled: " << knockEnabled;
-        set_knockEnabled(knockEnabled != 0);
+        set_knock_enabled(knockEnabled != 0);
         return true;
     }));
 
@@ -180,7 +180,7 @@ void MPSettingsMini::loadParameters()
         else if (s >= KNOCKING_LOW)      v = 1;
         else if (s >= KNOCKING_MEDIUM)   v = 2;
         else v = 3;
-        set_knockSensitivity(v);
+        set_knock_sensitivity(v);
         return true;
     }));
 
@@ -191,7 +191,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto randomStartingPin = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received randomStartingPin: " << randomStartingPin;
-        set_randomStartingPin(randomStartingPin != 0);
+        set_random_starting_pin(randomStartingPin != 0);
         return true;
     }));
 
@@ -203,7 +203,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto hashDisplay = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received hashDisplay: " << hashDisplay;
-        set_hashDisplay(hashDisplay != 0);
+        set_hash_display(hashDisplay != 0);
         return true;
     }));
 
@@ -214,7 +214,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto lockUnlockMode = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received lockUnlockMode: " << lockUnlockMode;
-        set_lockUnlockMode(lockUnlockMode);
+        set_lock_unlock_mode(lockUnlockMode);
         return true;
     }));
 
@@ -226,7 +226,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto keyAfterLoginSend = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received key after login send enabled: " << keyAfterLoginSend;
-        set_keyAfterLoginSendEnable(keyAfterLoginSend != 0);
+        set_key_after_login_enabled(keyAfterLoginSend != 0);
         return true;
     }));
 
@@ -237,7 +237,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto keyAfterLoginSend = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received key after login send " << keyAfterLoginSend;
-        set_keyAfterLoginSend(keyAfterLoginSend);
+        set_key_after_login(keyAfterLoginSend);
         return true;
     }));
 
@@ -248,7 +248,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto keyAfterPassSend = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received key after pass send enabled: " << keyAfterPassSend;
-        set_keyAfterPassSendEnable(keyAfterPassSend != 0);
+        set_key_after_pass_enabled(keyAfterPassSend != 0);
         return true;
     }));
 
@@ -259,7 +259,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto keyAfterPassSend = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received key after pass send " << keyAfterPassSend;
-        set_keyAfterPassSend(keyAfterPassSend);
+        set_key_after_pass(keyAfterPassSend);
         return true;
     }));
 
@@ -270,7 +270,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto delayAfterKeyEntry = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received delay after key entry enabled: " << delayAfterKeyEntry;
-        set_delayAfterKeyEntryEnable(delayAfterKeyEntry != 0);
+        set_delay_after_key_enabled(delayAfterKeyEntry != 0);
         return true;
     }));
 
@@ -281,7 +281,7 @@ void MPSettingsMini::loadParameters()
     {
         const auto delayAfterKeyEntry = pMesProt->getFirstPayloadByte(data);
         qDebug() << "received delay after key entry " << delayAfterKeyEntry;
-        set_delayAfterKeyEntry(delayAfterKeyEntry);
+        set_delay_after_key(delayAfterKeyEntry);
         return true;
     }));
 

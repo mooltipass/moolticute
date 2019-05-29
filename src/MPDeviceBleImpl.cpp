@@ -44,7 +44,7 @@ void MPDeviceBleImpl::getPlatInfo()
         serialNum |= static_cast<quint32>((serialUpper<<16));
         mpDev->set_serialNumber(serialNum);
         const auto memorySize = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[12]), static_cast<quint8>(response[13]));
-        mpDev->settings()->set_flashMbSize(memorySize);
+        mpDev->set_flashMbSize(memorySize);
     });
 
     mpDev->enqueueAndRunJob(jobs);

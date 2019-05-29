@@ -14,25 +14,24 @@ class MPSettings : public QObject
 {
     Q_OBJECT
 
-    QT_SETTINGS_PROPERTY(int, keyboardLayout, 0, MPParams::KEYBOARD_LAYOUT_PARAM)
-    QT_SETTINGS_PROPERTY(bool, lockTimeoutEnabled, false, MPParams::LOCK_TIMEOUT_ENABLE_PARAM)
-    QT_SETTINGS_PROPERTY(int, lockTimeout, 0, MPParams::LOCK_TIMEOUT_PARAM)
+    QT_SETTINGS_PROPERTY(int, keyboard_layout, 0, MPParams::KEYBOARD_LAYOUT_PARAM)
+    QT_SETTINGS_PROPERTY(bool, lock_timeout_enabled, false, MPParams::LOCK_TIMEOUT_ENABLE_PARAM)
+    QT_SETTINGS_PROPERTY(int, lock_timeout, 0, MPParams::LOCK_TIMEOUT_PARAM)
     QT_SETTINGS_PROPERTY(bool, screensaver, false, MPParams::SCREENSAVER_PARAM)
-    QT_SETTINGS_PROPERTY(bool, userRequestCancel, false, MPParams::USER_REQ_CANCEL_PARAM)
-    QT_SETTINGS_PROPERTY(int, userInteractionTimeout, 0, MPParams::USER_INTER_TIMEOUT_PARAM)
-    QT_SETTINGS_PROPERTY(bool, flashScreen, false, MPParams::FLASH_SCREEN_PARAM)
-    QT_SETTINGS_PROPERTY(bool, offlineMode, false, MPParams::OFFLINE_MODE_PARAM)
-    QT_SETTINGS_PROPERTY(bool, tutorialEnabled, false, MPParams::TUTORIAL_BOOL_PARAM)
-    QT_SETTINGS_PROPERTY(int, flashMbSize, 0, MPParams::FLASH_SCREEN_PARAM)
+    QT_SETTINGS_PROPERTY(bool, user_request_cancel, false, MPParams::USER_REQ_CANCEL_PARAM)
+    QT_SETTINGS_PROPERTY(int, user_interaction_timeout, 0, MPParams::USER_INTER_TIMEOUT_PARAM)
+    QT_SETTINGS_PROPERTY(bool, flash_screen, false, MPParams::FLASH_SCREEN_PARAM)
+    QT_SETTINGS_PROPERTY(bool, offline_mode, false, MPParams::OFFLINE_MODE_PARAM)
+    QT_SETTINGS_PROPERTY(bool, tutorial_enabled, false, MPParams::TUTORIAL_BOOL_PARAM)
 
-    QT_SETTINGS_PROPERTY(bool, keyAfterLoginSendEnable, false, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM)
-    QT_SETTINGS_PROPERTY(int, keyAfterLoginSend, 0, MPParams::KEY_AFTER_LOGIN_SEND_PARAM)
-    QT_SETTINGS_PROPERTY(bool, keyAfterPassSendEnable, false, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM)
-    QT_SETTINGS_PROPERTY(int, keyAfterPassSend, 0, MPParams::KEY_AFTER_PASS_SEND_PARAM)
-    QT_SETTINGS_PROPERTY(bool, delayAfterKeyEntryEnable, false, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM)
-    QT_SETTINGS_PROPERTY(int, delayAfterKeyEntry, 0, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM)
+    QT_SETTINGS_PROPERTY(bool, key_after_login_enabled, false, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM)
+    QT_SETTINGS_PROPERTY(int, key_after_login, 0, MPParams::KEY_AFTER_LOGIN_SEND_PARAM)
+    QT_SETTINGS_PROPERTY(bool, key_after_pass_enabled, false, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM)
+    QT_SETTINGS_PROPERTY(int, key_after_pass, 0, MPParams::KEY_AFTER_PASS_SEND_PARAM)
+    QT_SETTINGS_PROPERTY(bool, delay_after_key_enabled, false, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM)
+    QT_SETTINGS_PROPERTY(int, delay_after_key, 0, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM)
 
-    QT_SETTINGS_PROPERTY(bool, randomStartingPin, false, MPParams::RANDOM_INIT_PIN_PARAM)
+    QT_SETTINGS_PROPERTY(bool, random_starting_pin, false, MPParams::RANDOM_INIT_PIN_PARAM)
 
 public:
     MPSettings(MPDevice *parent, IMessageProtocol *mesProt);

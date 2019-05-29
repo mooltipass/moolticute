@@ -431,7 +431,7 @@ void WSServerCon::sendVersion()
     if (!settings)
         return;
     QJsonObject data = {{ "hw_version", mpdevice->get_hwVersion() },
-                        { "flash_size", settings->get_flashMbSize() }};
+                        { "flash_size", mpdevice->get_flashMbSize() }};
     data["hw_serial"] = static_cast<qint64>(mpdevice->get_serialNumber());
     if (mpdevice->isBLE())
     {

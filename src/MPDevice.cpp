@@ -163,7 +163,7 @@ void MPDevice::sendInitMessages()
           */
         if (isBLE())
         {
-            pSettings->flashMbSizeChanged(MPParams::FLASH_SCREEN_PARAM, 0);
+            flashMbSizeChanged(0);
         }
     });
 }
@@ -231,7 +231,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
             //If user interaction is required, add additional timeout
             if (MPCmd::isUserRequired(c))
             {
-                timeout += static_cast<quint32>(pSettings->get_userInteractionTimeout()) * 1000;
+                timeout += static_cast<quint32>(pSettings->get_user_interaction_timeout()) * 1000;
             }
         }
         cmd.timerTimeout->setInterval(static_cast<int>(timeout));
@@ -942,7 +942,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
 QByteArray MPDevice::getMemoryFirstNodeAddress(void)
 {
     /* Address format is 2 bytes little endian. last 3 bits are node number and first 13 bits are page address */
-    switch(pSettings->get_flashMbSize())
+    switch(get_flashMbSize())
     {
         case(1): /* 128 pages for graphics */ return QByteArray::fromHex("0004");
         case(2): /* 128 pages for graphics */ return QByteArray::fromHex("0004");
@@ -956,7 +956,7 @@ QByteArray MPDevice::getMemoryFirstNodeAddress(void)
 
 quint16 MPDevice::getNodesPerPage(void)
 {
-    if(pSettings->get_flashMbSize() >= 16)
+    if(get_flashMbSize() >= 16)
     {
         return 4;
     }
@@ -968,7 +968,7 @@ quint16 MPDevice::getNodesPerPage(void)
 
 quint16 MPDevice::getNumberOfPages(void)
 {
-    const auto flashSize = pSettings->get_flashMbSize();
+    const auto flashSize = get_flashMbSize();
     if(flashSize >= 16)
     {
         return 256*flashSize;
