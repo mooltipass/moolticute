@@ -4,7 +4,7 @@
 #include "MPSettings.h"
 #include "DeviceSettingsMini.h"
 
-class MPSettingsMini : public DeviceSettingsMini, public MPSettings
+class MPSettingsMini : public MPSettings<DeviceSettingsMini>
 {
     Q_OBJECT
 
