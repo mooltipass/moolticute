@@ -5,9 +5,9 @@
 #include "WSServerCon.h"
 
 MPSettingsBLE::MPSettingsBLE(MPDevice *parent, IMessageProtocol *mesProt)
-    : MPSettings(parent, mesProt)
+    : DeviceSettingsBLE(parent),
+      MPSettings(parent, mesProt)
 {
-    fillParameterMapping();
 }
 
 void MPSettingsBLE::loadParameters()
@@ -22,13 +22,13 @@ void MPSettingsBLE::loadParameters()
                    MPCmd::GET_DEVICE_SETTINGS,
                    [this] (const QByteArray &data, bool &)
                     {
-                        m_settings = pMesProt->getFullPayload(data);
-                        qDebug() << "Full device settings payload: " << m_settings.toHex();
+                        m_lastDeviceSettings = pMesProt->getFullPayload(data);
+                        qDebug() << "Full device settings payload: " << m_lastDeviceSettings.toHex();
                         qWarning() << "Load Parameters processing haven't been implemented for BLE yet.";
-                        set_reserved_ble(m_settings.at(RESERVED_BYTE) != 0);
-                        set_user_interaction_timeout(m_settings.at(USER_INTERACTION_TIMEOUT_BYTE));
-                        set_random_starting_pin(m_settings.at(RANDOM_PIN_BYTE) != 0);
-                        set_prompt_animation(m_settings.at(ANIMATION_DURING_PROMPT_BYTE) != 0);
+                        set_reserved_ble(m_lastDeviceSettings.at(DeviceSettingsBLE::RESERVED_BYTE) != 0);
+                        set_user_interaction_timeout(m_lastDeviceSettings.at(DeviceSettingsBLE::USER_INTERACTION_TIMEOUT_BYTE));
+                        set_random_starting_pin(m_lastDeviceSettings.at(DeviceSettingsBLE::RANDOM_PIN_BYTE) != 0);
+                        set_prompt_animation(m_lastDeviceSettings.at(DeviceSettingsBLE::ANIMATION_DURING_PROMPT_BYTE) != 0);
                         return true;
                     }
     ));
@@ -38,12 +38,12 @@ void MPSettingsBLE::loadParameters()
 
 void MPSettingsBLE::updateParam(MPParams::Param param, int val)
 {
-    m_settings[m_bleByteMapping[param]] = static_cast<char>(val);
+    m_lastDeviceSettings[m_bleByteMapping[param]] = static_cast<char>(val);
 }
 
 void MPSettingsBLE::connectSendParams(WSServerCon *wsServerCon)
 {
-    MPSettings::connectSendParams(wsServerCon);
+    DeviceSettings::connectSendParams(wsServerCon);
     connect(wsServerCon, SIGNAL(parameterProcessFinished()), this, SLOT(setSettings()));
 }
 
@@ -55,7 +55,7 @@ void MPSettingsBLE::setSettings()
 
     jobs->append(new MPCommandJob(mpDevice,
                    MPCmd::SET_DEVICE_SETTINGS,
-                   m_settings,
+                   m_lastDeviceSettings,
                    [this] (const QByteArray &data, bool &)
                     {
                         if (0x01 == pMesProt->getFirstPayloadByte(data))
@@ -73,12 +73,3 @@ void MPSettingsBLE::setSettings()
 }
 
 
-void MPSettingsBLE::fillParameterMapping()
-{
-    m_bleByteMapping[MPParams::RANDOM_INIT_PIN_PARAM] = RANDOM_PIN_BYTE;
-    m_bleByteMapping[MPParams::USER_INTER_TIMEOUT_PARAM] = USER_INTERACTION_TIMEOUT_BYTE;
-    m_paramMap.insert(MPParams::RESERVED_BLE, "reserved_ble");
-    m_bleByteMapping[MPParams::RESERVED_BLE] = RESERVED_BYTE;
-    m_paramMap.insert(MPParams::PROMPT_ANIMATION_PARAM, "prompt_animation");
-    m_bleByteMapping[MPParams::PROMPT_ANIMATION_PARAM] = ANIMATION_DURING_PROMPT_BYTE;
-}

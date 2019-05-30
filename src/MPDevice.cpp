@@ -231,7 +231,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
             //If user interaction is required, add additional timeout
             if (MPCmd::isUserRequired(c))
             {
-                timeout += static_cast<quint32>(pSettings->get_user_interaction_timeout()) * 1000;
+                timeout += static_cast<quint32>(dynamic_cast<MPSettingsMini*>(pSettings)->get_user_interaction_timeout()) * 1000;
             }
         }
         cmd.timerTimeout->setInterval(static_cast<int>(timeout));

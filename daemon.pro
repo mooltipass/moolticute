@@ -11,7 +11,7 @@ CONFIG -= app_bundle
 
 CONFIG += c++11
 
-INCLUDEPATH += $$PWD/src $$PWD/src/MessageProtocol $$PWD/src/Mooltipass
+INCLUDEPATH += $$PWD/src $$PWD/src/MessageProtocol $$PWD/src/Mooltipass $$PWD/src/Settings
 
 win32 {
     LIBS += -lsetupapi -luser32
@@ -80,7 +80,10 @@ SOURCES += src/main_daemon.cpp \
     src/Mooltipass/MPNodeBLE.cpp \
     src/Mooltipass/MPSettings.cpp \
     src/Mooltipass/MPSettingsMini.cpp \
-    src/Mooltipass/MPSettingsBLE.cpp
+    src/Mooltipass/MPSettingsBLE.cpp \
+    src/Settings/DeviceSettings.cpp \
+    src/Settings/DeviceSettingsMini.cpp \
+    src/Settings/DeviceSettingsBLE.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -111,7 +114,10 @@ HEADERS  += \
     src/Mooltipass/MPNodeBLE.h \
     src/Mooltipass/MPSettings.h \
     src/Mooltipass/MPSettingsMini.h \
-    src/Mooltipass/MPSettingsBLE.h
+    src/Mooltipass/MPSettingsBLE.h \
+    src/Settings/DeviceSettings.h \
+    src/Settings/DeviceSettingsMini.h \
+    src/Settings/DeviceSettingsBLE.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \
