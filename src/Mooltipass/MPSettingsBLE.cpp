@@ -5,7 +5,8 @@
 #include "WSServerCon.h"
 
 MPSettingsBLE::MPSettingsBLE(MPDevice *parent, IMessageProtocol *mesProt)
-    : MPSettings(parent, mesProt)
+    : DeviceSettingsBLE(parent),
+      MPSettings(parent, mesProt)
 {
 }
 

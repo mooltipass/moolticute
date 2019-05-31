@@ -4,7 +4,7 @@
 #include "MPSettings.h"
 #include "DeviceSettingsBLE.h"
 
-class MPSettingsBLE : public MPSettings<DeviceSettingsBLE>
+class MPSettingsBLE : public DeviceSettingsBLE, public MPSettings
 {
     Q_OBJECT
 

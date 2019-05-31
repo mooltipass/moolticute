@@ -4,7 +4,8 @@
 #include "IMessageProtocol.h"
 
 MPSettingsMini::MPSettingsMini(MPDevice *parent, IMessageProtocol *mesProt)
-    : MPSettings(parent, mesProt)
+    : DeviceSettingsMini(parent),
+      MPSettings(parent, mesProt)
 {
 }
 
