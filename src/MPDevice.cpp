@@ -6991,7 +6991,7 @@ MPDeviceBleImpl *MPDevice::ble() const
     return bleImpl;
 }
 
-MPSettings* MPDevice::settings() const
+DeviceSettings* MPDevice::settings() const
 {
     return pSettings;
 }

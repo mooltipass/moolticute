@@ -5,7 +5,8 @@
 
 MPSettingsMini::MPSettingsMini(MPDevice *parent, IMessageProtocol *mesProt)
     : DeviceSettingsMini(parent),
-      MPSettings(parent, mesProt)
+      mpDevice{parent},
+      pMesProt{mesProt}
 {
 }
 

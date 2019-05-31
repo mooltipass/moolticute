@@ -18,27 +18,27 @@ QString DeviceSettings::getParamName(MPParams::Param param)
 
 void DeviceSettings::sendEveryParameter()
 {
-    sendEveryParameter(metaObject());
     //When called from a child class need to send parent's properties too
-    const auto* superMetaObject = metaObject()->superClass();
-    if (nullptr == superMetaObject)
+    auto* metaObj = metaObject();
+    while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
     {
-        return;
+        sendEveryParameter(metaObj);
+        metaObj = metaObj->superClass();
     }
-    sendEveryParameter(superMetaObject);
+
 }
 
 void DeviceSettings::connectSendParams(QObject *slotObject)
 {
     //Connect every propertyChanged signals to the correct sendParams slot
-    connectSendParams(slotObject, metaObject());
     //When called from a child class need to connect parent's properties too
-    auto* superMetaObject = metaObject()->superClass();
-    if (nullptr == superMetaObject)
+    auto* metaObj = metaObject();
+    while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
     {
-        return;
+        connectSendParams(slotObject, metaObj);
+        metaObj = metaObj->superClass();
     }
-    connectSendParams(slotObject, superMetaObject);
+
 }
 
 void DeviceSettings::sendEveryParameter(const QMetaObject* meta)
@@ -70,6 +70,11 @@ void DeviceSettings::connectSendParams(QObject *slotObject, const QMetaObject* m
                           ));
         connect(this, signal, slotObject, slot);
     }
+}
+
+void DeviceSettings::updateParam(MPParams::Param param, bool en)
+{
+    updateParam(param, static_cast<int>(en));
 }
 
 void DeviceSettings::fillParameterMapping()

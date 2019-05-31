@@ -6,7 +6,8 @@
 
 MPSettingsBLE::MPSettingsBLE(MPDevice *parent, IMessageProtocol *mesProt)
     : DeviceSettingsBLE(parent),
-      MPSettings(parent, mesProt)
+      mpDevice{parent},
+      pMesProt{mesProt}
 {
 }
 
@@ -41,10 +42,10 @@ void MPSettingsBLE::updateParam(MPParams::Param param, int val)
     m_lastDeviceSettings[m_bleByteMapping[param]] = static_cast<char>(val);
 }
 
-void MPSettingsBLE::connectSendParams(WSServerCon *wsServerCon)
+void MPSettingsBLE::connectSendParams(QObject *slotObject)
 {
-    DeviceSettings::connectSendParams(wsServerCon);
-    connect(wsServerCon, SIGNAL(parameterProcessFinished()), this, SLOT(setSettings()));
+    DeviceSettings::connectSendParams(slotObject);
+    connect(slotObject, SIGNAL(parameterProcessFinished()), this, SLOT(setSettings()));
 }
 
 void MPSettingsBLE::setSettings()

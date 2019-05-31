@@ -78,7 +78,6 @@ SOURCES += src/main_daemon.cpp \
     src/HaveIBeenPwned.cpp \
     src/Mooltipass/MPNodeMini.cpp \
     src/Mooltipass/MPNodeBLE.cpp \
-    src/Mooltipass/MPSettings.cpp \
     src/Mooltipass/MPSettingsMini.cpp \
     src/Mooltipass/MPSettingsBLE.cpp \
     src/Settings/DeviceSettings.cpp \
@@ -112,7 +111,6 @@ HEADERS  += \
     src/BleCommon.h \
     src/Mooltipass/MPNodeMini.h \
     src/Mooltipass/MPNodeBLE.h \
-    src/Mooltipass/MPSettings.h \
     src/Mooltipass/MPSettingsMini.h \
     src/Mooltipass/MPSettingsBLE.h \
     src/Settings/DeviceSettings.h \

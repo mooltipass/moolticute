@@ -22,7 +22,6 @@
 #include "ParseDomain.h"
 #include "MPDeviceBleImpl.h"
 #include "HaveIBeenPwned.h"
-#include "MPSettings.h"
 
 #include <QCryptographicHash>
 
@@ -361,7 +360,7 @@ void WSServerCon::statusChanged()
 
 void WSServerCon::sendParams(int value, int param)
 {
-    MPSettings *settings = mpdevice->settings();
+    DeviceSettings *settings = mpdevice->settings();
     if (!settings)
         return;
     QJsonObject data = {{ "parameter", settings->getParamName(MPParams::Param(param)) },
@@ -371,7 +370,7 @@ void WSServerCon::sendParams(int value, int param)
 
 void WSServerCon::sendParams(bool value, int param)
 {
-    MPSettings *settings = mpdevice->settings();
+    DeviceSettings *settings = mpdevice->settings();
     if (!settings)
         return;
     QJsonObject data = {{ "parameter", settings->getParamName(MPParams::Param(param)) },
@@ -427,7 +426,7 @@ void WSServerCon::sendMemMgmtMode()
 
 void WSServerCon::sendVersion()
 {
-    MPSettings *settings = mpdevice->settings();
+    DeviceSettings *settings = mpdevice->settings();
     if (!settings)
         return;
     QJsonObject data = {{ "hw_version", mpdevice->get_hwVersion() },
@@ -536,7 +535,7 @@ void WSServerCon::sendUserSettings(QJsonObject settings)
 
 void WSServerCon::processParametersSet(const QJsonObject &data)
 {
-    MPSettings *settings = mpdevice->settings();
+    DeviceSettings *settings = mpdevice->settings();
     if (!settings)
         return;
 

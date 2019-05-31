@@ -46,6 +46,11 @@ public:
     void sendEveryParameter();
     virtual void connectSendParams(QObject* slotObject);
 
+    //reload parameters from MP
+    virtual void loadParameters() = 0;
+    virtual void updateParam(MPParams::Param param, int val) = 0;
+    void updateParam(MPParams::Param param, bool en);
+
 
 protected:
     void sendEveryParameter(const QMetaObject* meta);
@@ -54,6 +59,9 @@ protected:
     void fillParameterMapping();
 
     QMap<MPParams::Param, QString> m_paramMap;
+
+    //flag set when loading all parameters
+    bool m_readingParams = false;
 };
 
 #endif // DEVICESETTINGS_H

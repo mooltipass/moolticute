@@ -26,7 +26,7 @@
 #include "AsyncJobs.h"
 #include "MPNode.h"
 #include "FilesCache.h"
-#include "MPSettings.h"
+#include "DeviceSettings.h"
 #include "MPSettingsMini.h"
 
 using MPCommandCb = std::function<void(bool success, const QByteArray &data, bool &done)>;
@@ -182,7 +182,7 @@ public:
 
     // Returns bleImpl
     MPDeviceBleImpl* ble() const;
-    MPSettings* settings() const;
+    DeviceSettings* settings() const;
 
     IMessageProtocol* getMesProt() const;
 
@@ -402,7 +402,7 @@ private:
     //Message Protocol
     IMessageProtocol *pMesProt = nullptr;
     MPDeviceBleImpl *bleImpl = nullptr;
-    MPSettings *pSettings = nullptr;
+    DeviceSettings *pSettings = nullptr;
 
 protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
