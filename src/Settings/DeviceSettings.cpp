@@ -38,7 +38,26 @@ void DeviceSettings::connectSendParams(QObject *slotObject)
         connectSendParams(slotObject, metaObj);
         metaObj = metaObj->superClass();
     }
+}
 
+void DeviceSettings::setProperty(const QString &propName, int value)
+{
+    bool propSet = false;
+    auto* metaObj = metaObject();
+    while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
+    {
+        if (setProperty(propName, value, metaObj))
+        {
+            propSet = true;
+            return;
+        }
+        metaObj = metaObj->superClass();
+    }
+
+    if (!propSet)
+    {
+        qWarning() << "Unable to set property: " << propName;
+    }
 }
 
 void DeviceSettings::sendEveryParameter(const QMetaObject* meta)
@@ -70,6 +89,19 @@ void DeviceSettings::connectSendParams(QObject *slotObject, const QMetaObject* m
                           ));
         connect(this, signal, slotObject, slot);
     }
+}
+
+bool DeviceSettings::setProperty(const QString &propName, int value, const QMetaObject *meta)
+{
+    for (int i = meta->propertyOffset(); i < meta->propertyCount(); ++i)
+    {
+        if (meta->property(i).name() == propName)
+        {
+            meta->property(i).write(this, value);
+            return true;
+        }
+    }
+    return false;
 }
 
 void DeviceSettings::updateParam(MPParams::Param param, bool en)

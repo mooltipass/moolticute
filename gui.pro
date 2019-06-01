@@ -6,6 +6,8 @@ TARGET = moolticute
 
 CONFIG += c++11
 
+INCLUDEPATH += $$PWD/src $$PWD/src/Settings
+
 mac {
     LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation
 }
@@ -59,7 +61,11 @@ SOURCES += src/main_gui.cpp \
     src/SystemNotifications/SystemNotification.cpp \
     src/RequestLoginNameDialog.cpp \
     src/RequestDomainSelectionDialog.cpp \
-    src/BleDev.cpp
+    src/BleDev.cpp \
+    src/Settings/DeviceSettings.cpp \
+    src/Settings/DeviceSettingsBLE.cpp \
+    src/Settings/DeviceSettingsMini.cpp \
+    src/Settings/SettingGuiMini.cpp
 
 HEADERS  += src/MainWindow.h \
     src/ParseDomain.h \
@@ -104,7 +110,11 @@ HEADERS  += src/MainWindow.h \
     src/RequestDomainSelectionDialog.h \
     src/SystemNotifications/ISystemNotification.h \
     src/SystemNotifications/SystemNotification.h \
-    src/BleDev.h
+    src/BleDev.h \
+    src/Settings/DeviceSettings.h \
+    src/Settings/DeviceSettingsBLE.h \
+    src/Settings/DeviceSettingsMini.h \
+    src/Settings/SettingGuiMini.h
 
 mac {
     HEADERS += src/MacUtils.h \

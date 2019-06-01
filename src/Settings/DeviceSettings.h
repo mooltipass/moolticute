@@ -45,6 +45,7 @@ public:
     QString getParamName(MPParams::Param param);
     void sendEveryParameter();
     virtual void connectSendParams(QObject* slotObject);
+    void setProperty(const QString& propName, int value);
 
     //reload parameters from MP
     virtual void loadParameters() = 0;
@@ -55,6 +56,7 @@ public:
 protected:
     void sendEveryParameter(const QMetaObject* meta);
     void connectSendParams(QObject* slotObject, const QMetaObject* meta);
+    bool setProperty(const QString& propName, int value, const QMetaObject* meta);
 
     void fillParameterMapping();
 
