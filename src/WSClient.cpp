@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "WSClient.h"
 #include "SystemNotifications/SystemNotification.h"
+#include "SettingsGuiHelper.h"
 
 #define WS_URI                      "ws://localhost"
 #define QUERY_RANDOM_NUMBER_TIME    10 * 60 * 1000 //10 min
@@ -32,6 +33,7 @@ WSClient::WSClient(QObject *parent):
     connect(SystemNotification::instance().getNotification(), &ISystemNotification::sendLoginMessage, this, &WSClient::sendLoginJson);
     connect(SystemNotification::instance().getNotification(), &ISystemNotification::sendDomainMessage, this, &WSClient::sendDomainJson);
     randomNumTimer->start(QUERY_RANDOM_NUMBER_TIME);
+    m_settingsHelper = new SettingsGuiHelper(this);
 }
 
 WSClient::~WSClient()
@@ -160,7 +162,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
     else if (rootobj["msg"] == "param_changed")
     {
-        udateParameters(rootobj["data"].toObject());
+        m_settingsHelper->updateParameters(rootobj["data"].toObject());
     }
     else if (rootobj["msg"] == "memorymgmt_changed")
     {
@@ -476,13 +478,6 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
 }
 
-void WSClient::udateParameters(const QJsonObject &data)
-{
-    QString param = data["parameter"].toString();
-    m_settings->updateParam(m_settings->getParamId(param), data["value"].toInt());
-}
-
-
 bool WSClient::isMPMini() const
 {
     return  get_mpHwVersion() == Common::MP_Mini;
@@ -708,6 +703,11 @@ bool WSClient::isFw12()
 void WSClient::sendLockDevice()
 {
     sendJsonData({{ "msg", "lock_device" }});
+}
+
+SettingsGuiHelper* WSClient::settingsHelper()
+{
+    return m_settingsHelper;
 }
 
 void WSClient::queryRandomNumbers()

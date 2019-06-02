@@ -27,6 +27,17 @@
 #include "SystemEventHandler.h"
 
 #include <DbBackupsTrackerController.h>
+#include <QComboBox>
+
+template <typename T>
+static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
+{
+    int idx = cb->findData(QVariant::fromValue(value));
+    if (idx < 0)
+        idx = defaultIdx;
+    cb->setCurrentIndex(idx);
+}
+
 
 namespace Ui {
 class MainWindow;
@@ -47,6 +58,9 @@ public:
     bool isHttpDebugChecked();
 
     void updateBackupControlsVisibility(bool visible);
+
+    friend class SettingsGuiHelper;
+    friend class SettingsGuiMini;
 
 signals:
     void windowCloseRequested();

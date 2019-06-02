@@ -24,7 +24,8 @@
 #include <QJsonDocument>
 #include "Common.h"
 #include "QtHelper.h"
-#include "DeviceSettings.h"
+
+class SettingsGuiHelper;
 
 class WSClient: public QObject
 {
@@ -107,6 +108,7 @@ public:
     bool isFw12();
 
     void sendLockDevice();
+    SettingsGuiHelper* settingsHelper();
 
 signals:
     void wsConnected();
@@ -151,14 +153,12 @@ private slots:
     void onTextMessageReceived(const QString &message);
 
 private:
-    void udateParameters(const QJsonObject &data);
-
     QWebSocket *wsocket = nullptr;
 
     QJsonObject memData;
     QJsonArray filesCache;
 
-    DeviceSettings* m_settings = nullptr;
+    SettingsGuiHelper* m_settingsHelper = nullptr;
 
     QTimer *randomNumTimer = nullptr;
     QString HIBP_COMPROMISED_FORMAT = tr("this password has been compromised %1 times.");
