@@ -1,18 +1,38 @@
 #include "SettingsGuiHelper.h"
 #include "SettingsGuiMini.h"
+#include "SettingsGuiBLE.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
 
-SettingsGuiHelper::SettingsGuiHelper(QObject *parent)
+SettingsGuiHelper::SettingsGuiHelper(WSClient* parent)
     : QObject(parent),
-      m_settings{new SettingsGuiMini(this)}
+      m_wsClient{parent}
 {
 }
 
 void SettingsGuiHelper::createSettingUIMapping(MainWindow *mw)
 {
     m_mw = mw;
+    const auto type = m_wsClient->get_mpHwVersion();
+    if (type != m_deviceType)
+    {
+        delete m_settings;
+    }
+    m_deviceType = type;
+    if (m_deviceType == Common::MP_BLE)
+    {
+        m_settings = new SettingsGuiBLE(this);
+    }
+    else if (m_deviceType == Common::MP_Mini || m_deviceType == Common::MP_Classic)
+    {
+        m_settings = new SettingsGuiMini(this);
+    }
+    else
+    {
+        return;
+    }
+
     connect(m_settings, &DeviceSettings::keyboard_layoutChanged, [=]()
     {
         updateComboBoxIndex(mw->ui->comboBoxLang, m_settings->get_keyboard_layout());
@@ -137,7 +157,7 @@ bool SettingsGuiHelper::checkSettingsChanged()
 
     if (auto* set = dynamic_cast<SettingsGuiMini*>(m_settings))
     {
-        return set->checkSettingsChanged(m_mw);
+        return set->checkSettingsChanged();
     }
 
     return false;
@@ -161,10 +181,7 @@ void SettingsGuiHelper::resetSettings()
     updateComboBoxIndex(m_mw->ui->comboBoxPasswordOutput, m_settings->get_key_after_pass_enabled());
     updateComboBoxIndex(m_mw->ui->comboBoxLang, m_settings->get_keyboard_layout());
 
-    if (auto* set = dynamic_cast<SettingsGuiMini*>(m_settings))
-    {
-        set->resetSettings(m_mw);
-    }
+    m_settings->loadParameters();
 }
 
 void SettingsGuiHelper::getChangedSettings(QJsonObject &o)
@@ -203,7 +220,7 @@ void SettingsGuiHelper::getChangedSettings(QJsonObject &o)
     if (auto* set = dynamic_cast<SettingsGuiMini*>(m_settings))
     {
         WSClient* wsClient = static_cast<WSClient*>(parent());
-        set->getChangedSettings(m_mw, o, wsClient->get_status() == Common::NoCardInserted);
+        set->getChangedSettings(o, wsClient->get_status() == Common::NoCardInserted);
     }
 }
 

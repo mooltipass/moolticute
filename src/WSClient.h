@@ -35,7 +35,7 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(Common::MPStatus, status, Common::UnknownStatus)
     QT_WRITABLE_PROPERTY(bool, memMgmtMode, false)
 
-    QT_WRITABLE_PROPERTY(Common::MPHwVersion, mpHwVersion, Common::MP_Classic)
+    QT_WRITABLE_PROPERTY(Common::MPHwVersion, mpHwVersion, Common::MP_Unknown)
     QT_WRITABLE_PROPERTY(QString, fwVersion, QString())
     QT_WRITABLE_PROPERTY(quint32, hwSerial, 0)
     QT_WRITABLE_PROPERTY(int, hwMemory, 0)

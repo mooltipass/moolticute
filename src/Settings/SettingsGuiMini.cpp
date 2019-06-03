@@ -15,89 +15,85 @@ void SettingsGuiMini::updateParam(MPParams::Param param, int val)
 
 void SettingsGuiMini::createSettingUIMapping(MainWindow *mw)
 {
+    m_mw = mw;
     connect(this, &SettingsGuiMini::screen_brightnessChanged, [=]()
     {
-        updateComboBoxIndex(mw->ui->comboBoxScreenBrightness, get_screen_brightness());
-        mw->checkSettingsChanged();
+        updateComboBoxIndex(m_mw->ui->comboBoxScreenBrightness, get_screen_brightness());
+        m_mw->checkSettingsChanged();
     });
     connect(this, &SettingsGuiMini::knock_enabledChanged, [=]()
     {
-        mw->ui->checkBoxKnock->setChecked(get_knock_enabled());
-        mw->checkSettingsChanged();
+        m_mw->ui->checkBoxKnock->setChecked(get_knock_enabled());
+        m_mw->checkSettingsChanged();
     });
     connect(this, &SettingsGuiMini::knock_sensitivityChanged, [=]()
     {
-        mw->ui->comboBoxKnock->setCurrentIndex(get_knock_sensitivity());
-        mw->checkSettingsChanged();
+        m_mw->ui->comboBoxKnock->setCurrentIndex(get_knock_sensitivity());
+        m_mw->checkSettingsChanged();
     });
     connect(this, &SettingsGuiMini::random_starting_pinChanged, [=]()
     {
-        mw->ui->randomStartingPinCheckBox->setChecked(get_random_starting_pin());
-        mw->checkSettingsChanged();
+        m_mw->ui->randomStartingPinCheckBox->setChecked(get_random_starting_pin());
+        m_mw->checkSettingsChanged();
     });
 
     connect(this, &SettingsGuiMini::hash_displayChanged, [=]()
     {
-        mw->ui->hashDisplayFeatureCheckBox->setChecked(get_hash_display());
-        mw->checkSettingsChanged();
+        m_mw->ui->hashDisplayFeatureCheckBox->setChecked(get_hash_display());
+        m_mw->checkSettingsChanged();
     });
 
     connect(this, &SettingsGuiMini::lock_unlock_modeChanged, [=]()
     {
-        updateComboBoxIndex(mw->ui->lockUnlockModeComboBox, get_lock_unlock_mode());
-        mw->checkSettingsChanged();
+        updateComboBoxIndex(m_mw->ui->lockUnlockModeComboBox, get_lock_unlock_mode());
+        m_mw->checkSettingsChanged();
     });
 }
 
-bool SettingsGuiMini::checkSettingsChanged(MainWindow *mw)
+bool SettingsGuiMini::checkSettingsChanged()
 {
-    if (mw->ui->checkBoxKnock->isChecked() != get_knock_enabled())
+    if (m_mw->ui->checkBoxKnock->isChecked() != get_knock_enabled())
         return true;
-    if (mw->ui->comboBoxKnock->currentData().toInt() != get_knock_sensitivity())
+    if (m_mw->ui->comboBoxKnock->currentData().toInt() != get_knock_sensitivity())
         return true;
-    if (mw->ui->randomStartingPinCheckBox->isChecked() != get_random_starting_pin())
+    if (m_mw->ui->randomStartingPinCheckBox->isChecked() != get_random_starting_pin())
         return true;
-    if (mw->ui->hashDisplayFeatureCheckBox->isChecked() != get_hash_display())
+    if (m_mw->ui->hashDisplayFeatureCheckBox->isChecked() != get_hash_display())
         return true;
-    if (mw->ui->lockUnlockModeComboBox->currentData().toInt() != get_lock_unlock_mode())
+    if (m_mw->ui->lockUnlockModeComboBox->currentData().toInt() != get_lock_unlock_mode())
         return true;
-    if (mw->ui->comboBoxScreenBrightness->currentData().toInt() != get_screen_brightness())
+    if (m_mw->ui->comboBoxScreenBrightness->currentData().toInt() != get_screen_brightness())
         return true;
     return false;
 }
 
-void SettingsGuiMini::resetSettings(MainWindow *mw)
+void SettingsGuiMini::getChangedSettings(QJsonObject &o, bool isNoCardInsterted)
 {
-    mw->ui->checkBoxKnock->setChecked(get_knock_enabled());
-    mw->ui->checkBoxScreensaver->setChecked(get_screensaver());
-    mw->ui->randomStartingPinCheckBox->setChecked(get_random_starting_pin());
-    mw->ui->hashDisplayFeatureCheckBox->setChecked(get_hash_display());
-    updateComboBoxIndex(mw->ui->lockUnlockModeComboBox, get_lock_unlock_mode());
-    updateComboBoxIndex(mw->ui->comboBoxScreenBrightness, get_screen_brightness());
-    mw->ui->comboBoxKnock->setCurrentIndex(get_knock_sensitivity());
-}
-
-void SettingsGuiMini::getChangedSettings(MainWindow *mw, QJsonObject &o, bool isNoCardInsterted)
-{
-    if (mw->ui->comboBoxScreenBrightness->currentData().toInt() != get_screen_brightness())
-        o["screen_brightness"] = mw->ui->comboBoxScreenBrightness->currentData().toInt();
-    if (mw->ui->randomStartingPinCheckBox->isChecked() != get_random_starting_pin())
-        o["random_starting_pin"] = mw->ui->randomStartingPinCheckBox->isChecked();
-    if (mw->ui->hashDisplayFeatureCheckBox->isChecked() != get_hash_display())
-        o["hash_display"] = mw->ui->hashDisplayFeatureCheckBox->isChecked();
-    if (mw->ui->lockUnlockModeComboBox->currentData().toInt() != get_lock_unlock_mode())
-        o["lock_unlock_mode"] = mw->ui->lockUnlockModeComboBox->currentData().toInt();
+    if (m_mw->ui->comboBoxScreenBrightness->currentData().toInt() != get_screen_brightness())
+        o["screen_brightness"] = m_mw->ui->comboBoxScreenBrightness->currentData().toInt();
+    if (m_mw->ui->randomStartingPinCheckBox->isChecked() != get_random_starting_pin())
+        o["random_starting_pin"] = m_mw->ui->randomStartingPinCheckBox->isChecked();
+    if (m_mw->ui->hashDisplayFeatureCheckBox->isChecked() != get_hash_display())
+        o["hash_display"] = m_mw->ui->hashDisplayFeatureCheckBox->isChecked();
+    if (m_mw->ui->lockUnlockModeComboBox->currentData().toInt() != get_lock_unlock_mode())
+        o["lock_unlock_mode"] = m_mw->ui->lockUnlockModeComboBox->currentData().toInt();
 
     if (isNoCardInsterted)
     {
-        if (mw->ui->checkBoxKnock->isChecked() != get_knock_enabled())
-            o["knock_enabled"] = mw->ui->checkBoxKnock->isChecked();
-        if (mw->ui->comboBoxKnock->currentData().toInt() != get_knock_sensitivity())
-            o["knock_sensitivity"] = mw->ui->comboBoxKnock->currentData().toInt();
+        if (m_mw->ui->checkBoxKnock->isChecked() != get_knock_enabled())
+            o["knock_enabled"] = m_mw->ui->checkBoxKnock->isChecked();
+        if (m_mw->ui->comboBoxKnock->currentData().toInt() != get_knock_sensitivity())
+            o["knock_sensitivity"] = m_mw->ui->comboBoxKnock->currentData().toInt();
     }
 }
 
 void SettingsGuiMini::loadParameters()
 {
-    qCritical() << "Not implemented yet";
+    m_mw->ui->checkBoxKnock->setChecked(get_knock_enabled());
+    m_mw->ui->checkBoxScreensaver->setChecked(get_screensaver());
+    m_mw->ui->randomStartingPinCheckBox->setChecked(get_random_starting_pin());
+    m_mw->ui->hashDisplayFeatureCheckBox->setChecked(get_hash_display());
+    updateComboBoxIndex(m_mw->ui->lockUnlockModeComboBox, get_lock_unlock_mode());
+    updateComboBoxIndex(m_mw->ui->comboBoxScreenBrightness, get_screen_brightness());
+    m_mw->ui->comboBoxKnock->setCurrentIndex(get_knock_sensitivity());
 }

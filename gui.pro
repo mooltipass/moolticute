@@ -66,7 +66,8 @@ SOURCES += src/main_gui.cpp \
     src/Settings/DeviceSettingsBLE.cpp \
     src/Settings/DeviceSettingsMini.cpp \
     src/Settings/SettingsGuiHelper.cpp \
-    src/Settings/SettingsGuiMini.cpp
+    src/Settings/SettingsGuiMini.cpp \
+    src/Settings/SettingsGuiBLE.cpp
 
 HEADERS  += src/MainWindow.h \
     src/ParseDomain.h \
@@ -116,7 +117,8 @@ HEADERS  += src/MainWindow.h \
     src/Settings/DeviceSettingsBLE.h \
     src/Settings/DeviceSettingsMini.h \
     src/Settings/SettingsGuiHelper.h \
-    src/Settings/SettingsGuiMini.h
+    src/Settings/SettingsGuiMini.h \
+    src/Settings/SettingsGuiBLE.h
 
 mac {
     HEADERS += src/MacUtils.h \

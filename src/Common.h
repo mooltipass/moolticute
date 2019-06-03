@@ -166,6 +166,7 @@ public:
         MP_Classic = 0,
         MP_Mini = 1,
         MP_BLE = 2,
+        MP_Unknown = -1
     } MPHwVersion;
 
 

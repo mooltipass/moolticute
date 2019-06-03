@@ -1,25 +1,25 @@
-#ifndef SETTINGSGUIMINI_H
-#define SETTINGSGUIMINI_H
+#ifndef SETTINGSGUIBLE_H
+#define SETTINGSGUIBLE_H
 
 #include <QObject>
-#include "DeviceSettingsMini.h"
+#include "DeviceSettingsBLE.h"
 
 class MainWindow;
 
-class SettingsGuiMini : public DeviceSettingsMini
+class SettingsGuiBLE : public DeviceSettingsBLE
 {
     Q_OBJECT
-
 public:
-    explicit SettingsGuiMini(QObject* parent);
+    explicit SettingsGuiBLE(QObject *parent = nullptr);
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
     void createSettingUIMapping(MainWindow *mw);
     bool checkSettingsChanged();
-    void getChangedSettings(QJsonObject& o, bool isNoCardInsterted);
+    void getChangedSettings(QJsonObject& o);
 
 private:
     MainWindow* m_mw = nullptr;
+
 };
 
-#endif // SETTINGSGUIMINI_H
+#endif // SETTINGSGUIBLE_H

@@ -465,9 +465,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         ui->UIDRequestResultIcon->setVisible(false);
     });
 
-
-    wsClient->settingsHelper()->createSettingUIMapping(this);
-
     //When something changed in GUI, show save/reset buttons
     connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
     connect(ui->checkBoxLock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
@@ -1628,6 +1625,7 @@ void MainWindow::on_pushButtonGetAvailableUsers_clicked()
 
 void MainWindow::onDeviceConnected()
 {
+    wsClient->settingsHelper()->createSettingUIMapping(this);
     if (wsClient->isMPBLE())
     {
         wsClient->sendUserSettingsRequest();

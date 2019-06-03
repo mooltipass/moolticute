@@ -61,6 +61,7 @@ public:
 
     friend class SettingsGuiHelper;
     friend class SettingsGuiMini;
+    friend class SettingsGuiBLE;
 
 signals:
     void windowCloseRequested();
