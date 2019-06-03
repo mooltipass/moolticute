@@ -120,6 +120,10 @@ void SettingsGuiHelper::createSettingUIMapping(MainWindow *mw)
     {
         set->createSettingUIMapping(mw);
     }
+    else if (auto* set = dynamic_cast<SettingsGuiBLE*>(m_settings))
+    {
+        set->createSettingUIMapping(mw);
+    }
 }
 
 bool SettingsGuiHelper::checkSettingsChanged()
@@ -158,6 +162,10 @@ bool SettingsGuiHelper::checkSettingsChanged()
     if (auto* set = dynamic_cast<SettingsGuiMini*>(m_settings))
     {
         return set->checkSettingsChanged();
+    }
+    else if (auto* set = dynamic_cast<SettingsGuiBLE*>(m_settings))
+    {
+        set->checkSettingsChanged();
     }
 
     return false;
@@ -219,8 +227,11 @@ void SettingsGuiHelper::getChangedSettings(QJsonObject &o)
 
     if (auto* set = dynamic_cast<SettingsGuiMini*>(m_settings))
     {
-        WSClient* wsClient = static_cast<WSClient*>(parent());
-        set->getChangedSettings(o, wsClient->get_status() == Common::NoCardInserted);
+        set->getChangedSettings(o, m_wsClient->get_status() == Common::NoCardInserted);
+    }
+    else if (auto* set = dynamic_cast<SettingsGuiBLE*>(m_settings))
+    {
+        set->getChangedSettings(o);
     }
 }
 

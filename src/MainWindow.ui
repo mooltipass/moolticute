@@ -1157,6 +1157,29 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </widget>
             </item>
             <item>
+             <widget class="QGroupBox" name="groupBox_BLESettings">
+              <property name="title">
+               <string>BLE Settings</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_31">
+               <item>
+                <widget class="QCheckBox" name="checkBoxBLEReserved">
+                 <property name="text">
+                  <string>BLE Reserved</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxPromptAnim">
+                 <property name="text">
+                  <string>Prompt Animation</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <widget class="QGroupBox" name="groupBox_UserSettings">
               <property name="title">
                <string>User Security Settings (Only changeable from device)</string>
@@ -1244,6 +1267,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
            <zorder>groupBox_2</zorder>
            <zorder>advancedSettingsGB</zorder>
            <zorder>groupBox_UserSettings</zorder>
+           <zorder>groupBox_BLESettings</zorder>
           </widget>
          </widget>
         </item>

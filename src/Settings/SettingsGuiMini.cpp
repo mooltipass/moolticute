@@ -8,6 +8,17 @@ SettingsGuiMini::SettingsGuiMini(QObject* parent)
 
 }
 
+void SettingsGuiMini::loadParameters()
+{
+    m_mw->ui->checkBoxKnock->setChecked(get_knock_enabled());
+    m_mw->ui->checkBoxScreensaver->setChecked(get_screensaver());
+    m_mw->ui->randomStartingPinCheckBox->setChecked(get_random_starting_pin());
+    m_mw->ui->hashDisplayFeatureCheckBox->setChecked(get_hash_display());
+    updateComboBoxIndex(m_mw->ui->lockUnlockModeComboBox, get_lock_unlock_mode());
+    updateComboBoxIndex(m_mw->ui->comboBoxScreenBrightness, get_screen_brightness());
+    m_mw->ui->comboBoxKnock->setCurrentIndex(get_knock_sensitivity());
+}
+
 void SettingsGuiMini::updateParam(MPParams::Param param, int val)
 {
     setProperty(getParamName(param), val);
@@ -16,6 +27,7 @@ void SettingsGuiMini::updateParam(MPParams::Param param, int val)
 void SettingsGuiMini::createSettingUIMapping(MainWindow *mw)
 {
     m_mw = mw;
+    m_mw->ui->groupBox_BLESettings->hide();
     connect(this, &SettingsGuiMini::screen_brightnessChanged, [=]()
     {
         updateComboBoxIndex(m_mw->ui->comboBoxScreenBrightness, get_screen_brightness());
@@ -85,15 +97,4 @@ void SettingsGuiMini::getChangedSettings(QJsonObject &o, bool isNoCardInsterted)
         if (m_mw->ui->comboBoxKnock->currentData().toInt() != get_knock_sensitivity())
             o["knock_sensitivity"] = m_mw->ui->comboBoxKnock->currentData().toInt();
     }
-}
-
-void SettingsGuiMini::loadParameters()
-{
-    m_mw->ui->checkBoxKnock->setChecked(get_knock_enabled());
-    m_mw->ui->checkBoxScreensaver->setChecked(get_screensaver());
-    m_mw->ui->randomStartingPinCheckBox->setChecked(get_random_starting_pin());
-    m_mw->ui->hashDisplayFeatureCheckBox->setChecked(get_hash_display());
-    updateComboBoxIndex(m_mw->ui->lockUnlockModeComboBox, get_lock_unlock_mode());
-    updateComboBoxIndex(m_mw->ui->comboBoxScreenBrightness, get_screen_brightness());
-    m_mw->ui->comboBoxKnock->setCurrentIndex(get_knock_sensitivity());
 }

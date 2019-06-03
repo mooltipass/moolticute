@@ -492,6 +492,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->checkBoxSlowHost, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
     connect(ui->spinBoxInputDelayAfterKeyPressed, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
 
+    connect(ui->checkBoxBLEReserved, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    connect(ui->checkBoxPromptAnim, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+
     //Setup the confirm view
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
 

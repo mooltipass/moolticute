@@ -332,6 +332,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
     //Whenever mp status changes, send state update to client
     connect(mpdevice, &MPDevice::statusChanged, this, &WSServerCon::statusChanged);
 
+    sendVersion();
     mpdevice->settings()->connectSendParams(this);
 
     connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
