@@ -2,24 +2,22 @@
 #define SETTINGSGUIMINI_H
 
 #include <QObject>
+#include "ISettingsGui.h"
 #include "DeviceSettingsMini.h"
 
 class MainWindow;
 
-class SettingsGuiMini : public DeviceSettingsMini
+class SettingsGuiMini : public DeviceSettingsMini, public ISettingsGui
 {
     Q_OBJECT
 
 public:
-    explicit SettingsGuiMini(QObject* parent);
+    explicit SettingsGuiMini(QObject* parent, MainWindow* mw);
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
-    void createSettingUIMapping(MainWindow *mw);
-    bool checkSettingsChanged();
-    void getChangedSettings(QJsonObject& o, bool isNoCardInsterted);
-
-private:
-    MainWindow* m_mw = nullptr;
+    void createSettingUIMapping() override;
+    bool checkSettingsChanged() override;
+    void getChangedSettings(QJsonObject& o, bool isNoCardInsterted) override;
 };
 
 #endif // SETTINGSGUIMINI_H

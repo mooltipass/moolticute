@@ -465,35 +465,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         ui->UIDRequestResultIcon->setVisible(false);
     });
 
-    //When something changed in GUI, show save/reset buttons
-    connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxLock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->spinBoxLock, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxScreensaver, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxInput, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->spinBoxInput, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxFlash, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxBoot, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxTuto, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-
     ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
     connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
-    connect(ui->comboBoxScreenBrightness, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxKnock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->randomStartingPinCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->hashDisplayFeatureCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->lockUnlockModeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxSendAfterLogin, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->comboBoxLoginOutput, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxSendAfterPassword, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->comboBoxPasswordOutput, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxSlowHost, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->spinBoxInputDelayAfterKeyPressed, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
-
-    connect(ui->checkBoxBLEReserved, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxPromptAnim, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
+    wsClient->settingsHelper()->setMainWindow(this);
 
     //Setup the confirm view
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
@@ -1628,7 +1603,7 @@ void MainWindow::on_pushButtonGetAvailableUsers_clicked()
 
 void MainWindow::onDeviceConnected()
 {
-    wsClient->settingsHelper()->createSettingUIMapping(this);
+    wsClient->settingsHelper()->createSettingUIMapping();
     if (wsClient->isMPBLE())
     {
         wsClient->sendUserSettingsRequest();

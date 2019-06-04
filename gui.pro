@@ -118,7 +118,8 @@ HEADERS  += src/MainWindow.h \
     src/Settings/DeviceSettingsMini.h \
     src/Settings/SettingsGuiHelper.h \
     src/Settings/SettingsGuiMini.h \
-    src/Settings/SettingsGuiBLE.h
+    src/Settings/SettingsGuiBLE.h \
+    src/Settings/ISettingsGui.h
 
 mac {
     HEADERS += src/MacUtils.h \
