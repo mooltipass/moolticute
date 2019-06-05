@@ -23,16 +23,6 @@ void SettingsGuiBLE::updateParam(MPParams::Param param, int val)
 void SettingsGuiBLE::createSettingUIMapping()
 {
     ui->groupBox_BLESettings->show();
-    connect(this, &SettingsGuiBLE::reserved_bleChanged, [=]()
-    {
-        ui->checkBoxBLEReserved->setChecked(get_reserved_ble());
-        m_mw->checkSettingsChanged();
-    });
-    connect(this, &SettingsGuiBLE::prompt_animationChanged, [=]()
-    {
-        ui->checkBoxPromptAnim->setChecked(get_prompt_animation());
-        m_mw->checkSettingsChanged();
-    });
 }
 
 bool SettingsGuiBLE::checkSettingsChanged()

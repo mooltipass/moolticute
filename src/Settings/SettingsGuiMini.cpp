@@ -28,38 +28,6 @@ void SettingsGuiMini::updateParam(MPParams::Param param, int val)
 void SettingsGuiMini::createSettingUIMapping()
 {
     ui->groupBox_BLESettings->hide();
-    connect(this, &SettingsGuiMini::screen_brightnessChanged, [=]()
-    {
-        updateComboBoxIndex(ui->comboBoxScreenBrightness, get_screen_brightness());
-        m_mw->checkSettingsChanged();
-    });
-    connect(this, &SettingsGuiMini::knock_enabledChanged, [=]()
-    {
-        ui->checkBoxKnock->setChecked(get_knock_enabled());
-        m_mw->checkSettingsChanged();
-    });
-    connect(this, &SettingsGuiMini::knock_sensitivityChanged, [=]()
-    {
-        ui->comboBoxKnock->setCurrentIndex(get_knock_sensitivity());
-        m_mw->checkSettingsChanged();
-    });
-    connect(this, &SettingsGuiMini::random_starting_pinChanged, [=]()
-    {
-        ui->randomStartingPinCheckBox->setChecked(get_random_starting_pin());
-        m_mw->checkSettingsChanged();
-    });
-
-    connect(this, &SettingsGuiMini::hash_displayChanged, [=]()
-    {
-        ui->hashDisplayFeatureCheckBox->setChecked(get_hash_display());
-        m_mw->checkSettingsChanged();
-    });
-
-    connect(this, &SettingsGuiMini::lock_unlock_modeChanged, [=]()
-    {
-        updateComboBoxIndex(ui->lockUnlockModeComboBox, get_lock_unlock_mode());
-        m_mw->checkSettingsChanged();
-    });
 }
 
 bool SettingsGuiMini::checkSettingsChanged()

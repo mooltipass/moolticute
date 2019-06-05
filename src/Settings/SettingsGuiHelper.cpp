@@ -15,32 +15,48 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
 {
     m_mw = mw;
     ui = mw->ui;
+    m_widgetMapping = {
+        {MPParams::KEYBOARD_LAYOUT_PARAM, ui->comboBoxLang},
+        {MPParams::LOCK_TIMEOUT_ENABLE_PARAM, ui->checkBoxLock},
+        {MPParams::LOCK_TIMEOUT_PARAM, ui->spinBoxLock},
+        {MPParams::SCREENSAVER_PARAM, ui->checkBoxScreensaver},
+        {MPParams::USER_REQ_CANCEL_PARAM, ui->checkBoxInput},
+        {MPParams::USER_INTER_TIMEOUT_PARAM, ui->spinBoxInput},
+        {MPParams::FLASH_SCREEN_PARAM, ui->checkBoxFlash},
+        {MPParams::OFFLINE_MODE_PARAM, ui->checkBoxBoot},
+        {MPParams::TUTORIAL_BOOL_PARAM, ui->checkBoxTuto},
+        {MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM, ui->checkBoxSendAfterLogin},
+        {MPParams::KEY_AFTER_LOGIN_SEND_PARAM, ui->comboBoxLoginOutput},
+        {MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM, ui->checkBoxSendAfterPassword},
+        {MPParams::KEY_AFTER_PASS_SEND_PARAM, ui->comboBoxPasswordOutput},
+        {MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, ui->checkBoxSlowHost},
+        {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, ui->spinBoxInputDelayAfterKeyPressed},
+        {MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM, ui->comboBoxScreenBrightness},
+        {MPParams::RANDOM_INIT_PIN_PARAM, ui->randomStartingPinCheckBox},
+        {MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM, ui->checkBoxKnock},
+        {MPParams::MINI_KNOCK_THRES_PARAM, ui->comboBoxKnock},
+        {MPParams::HASH_DISPLAY_FEATURE_PARAM, ui->hashDisplayFeatureCheckBox},
+        {MPParams::LOCK_UNLOCK_FEATURE_PARAM, ui->lockUnlockModeComboBox},
+        {MPParams::RESERVED_BLE, ui->checkBoxBLEReserved},
+        {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxPromptAnim},
+        {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxLockDevice}
+    };
     //When something changed in GUI, show save/reset buttons
-    connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxLock, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->spinBoxLock, SIGNAL(valueChanged(int)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxScreensaver, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxInput, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->spinBoxInput, SIGNAL(valueChanged(int)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxFlash, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxBoot, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxTuto, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-
-    connect(ui->comboBoxScreenBrightness, SIGNAL(currentIndexChanged(int)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxKnock, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->randomStartingPinCheckBox, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->hashDisplayFeatureCheckBox, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->lockUnlockModeComboBox, SIGNAL(currentIndexChanged(int)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxSendAfterLogin, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->comboBoxLoginOutput, SIGNAL(currentIndexChanged(int)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxSendAfterPassword, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->comboBoxPasswordOutput, SIGNAL(currentIndexChanged(int)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxSlowHost, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->spinBoxInputDelayAfterKeyPressed, SIGNAL(valueChanged(int)), m_mw, SLOT(checkSettingsChanged()));
-
-    connect(ui->checkBoxBLEReserved, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxPromptAnim, SIGNAL(toggled(bool)), m_mw, SLOT(checkSettingsChanged()));
+    for (const auto& widget : m_widgetMapping)
+    {
+        std::string signal;
+        if (dynamic_cast<QComboBox*>(widget))
+        {
+            signal = SIGNAL(currentIndexChanged(int));
+        } else if (dynamic_cast<QCheckBox*>(widget))
+        {
+            signal = SIGNAL(toggled(bool));
+        } else if (dynamic_cast<QSpinBox*>(widget))
+        {
+            signal = SIGNAL(valueChanged(int));
+        }
+        connect(widget, signal.c_str(), m_mw, SLOT(checkSettingsChanged()));
+    }
 }
 
 void SettingsGuiHelper::createSettingUIMapping()
@@ -64,93 +80,8 @@ void SettingsGuiHelper::createSettingUIMapping()
         return;
     }
 
-    if (!(m_guiSettings = dynamic_cast<ISettingsGui*>(m_settings)))
-    {
-        return;
-    }
-
-    connect(m_settings, &DeviceSettings::keyboard_layoutChanged, [=]()
-    {
-        updateComboBoxIndex(ui->comboBoxLang, m_settings->get_keyboard_layout());
-        m_mw->checkSettingsChanged();
-    });
-    connect(m_settings, &DeviceSettings::lock_timeout_enabledChanged, [=]()
-    {
-        ui->checkBoxLock->setChecked(m_settings->get_lock_timeout_enabled());
-        m_mw->checkSettingsChanged();
-    });
-    connect(m_settings, &DeviceSettings::lock_timeoutChanged, [=]()
-    {
-        ui->spinBoxLock->setValue(m_settings->get_lock_timeout());
-        m_mw->checkSettingsChanged();
-    });
-    connect(m_settings, &DeviceSettings::screensaverChanged, [=]()
-    {
-        ui->checkBoxScreensaver->setChecked(m_settings->get_screensaver());
-        m_mw->checkSettingsChanged();
-    });
-    connect(m_settings, &DeviceSettings::user_request_cancelChanged, [=]()
-    {
-        ui->checkBoxInput->setChecked(m_settings->get_user_request_cancel());
-        m_mw->checkSettingsChanged();
-    });
-    connect(m_settings, &DeviceSettings::user_interaction_timeoutChanged, [=]()
-    {
-        ui->spinBoxInput->setValue(m_settings->get_user_interaction_timeout());
-        m_mw->checkSettingsChanged();
-    });
-    connect(m_settings, &DeviceSettings::flash_screenChanged, [=]()
-    {
-        ui->checkBoxFlash->setChecked(m_settings->get_flash_screen());
-        m_mw->checkSettingsChanged();
-    });
-    connect(m_settings, &DeviceSettings::offline_modeChanged, [=]()
-    {
-        ui->checkBoxBoot->setChecked(m_settings->get_offline_mode());
-        m_mw->checkSettingsChanged();
-    });
-    connect(m_settings, &DeviceSettings::tutorial_enabledChanged, [=]()
-    {
-        ui->checkBoxTuto->setChecked(m_settings->get_tutorial_enabled());
-        m_mw->checkSettingsChanged();
-    });
-
-    connect(m_settings, &DeviceSettings::key_after_login_enabledChanged, [=]()
-    {
-        ui->checkBoxSendAfterLogin->setChecked(m_settings->get_key_after_login_enabled());
-        m_mw->checkSettingsChanged();
-    });
-
-    connect(m_settings, &DeviceSettings::key_after_loginChanged, [=]()
-    {
-        updateComboBoxIndex(ui->comboBoxLoginOutput, m_settings->get_key_after_login());
-        m_mw->checkSettingsChanged();
-    });
-
-    connect(m_settings, &DeviceSettings::key_after_pass_enabledChanged, [=]()
-    {
-        ui->checkBoxSendAfterPassword->setChecked(m_settings->get_key_after_pass_enabled());
-        m_mw->checkSettingsChanged();
-    });
-
-    connect(m_settings, &DeviceSettings::key_after_passChanged, [=]()
-    {
-        updateComboBoxIndex(ui->comboBoxPasswordOutput, m_settings->get_key_after_pass());
-        m_mw->checkSettingsChanged();
-    });
-
-    connect(m_settings, &DeviceSettings::delay_after_key_enabledChanged, [=]()
-    {
-        ui->checkBoxSlowHost->setChecked(m_settings->get_delay_after_key_enabled());
-        m_mw->checkSettingsChanged();
-    });
-
-    connect(m_settings, &DeviceSettings::delay_after_keyChanged, [=]()
-    {
-        ui->spinBoxInputDelayAfterKeyPressed->setValue(m_settings->get_delay_after_key());
-        m_mw->checkSettingsChanged();
-    });
-
+    m_guiSettings = dynamic_cast<ISettingsGui*>(m_settings);
+    m_settings->connectSendParams(this);
     m_guiSettings->createSettingUIMapping();
 }
 
@@ -187,9 +118,7 @@ bool SettingsGuiHelper::checkSettingsChanged()
     if (ui->spinBoxInputDelayAfterKeyPressed->value() != m_settings->get_delay_after_key())
         return true;
 
-    m_guiSettings->checkSettingsChanged();
-
-    return false;
+    return m_guiSettings->checkSettingsChanged();
 }
 
 void SettingsGuiHelper::resetSettings()
@@ -258,4 +187,36 @@ void SettingsGuiHelper::updateParameters(const QJsonObject &data)
         val = data["value"].toBool();
     }
     m_settings->updateParam(m_settings->getParamId(param), val);
+}
+
+void SettingsGuiHelper::sendParams(bool value, int param)
+{
+    QWidget* widget = m_widgetMapping[MPParams::Param(param)];
+    if (auto* comboBox = dynamic_cast<QCheckBox*>(widget))
+    {
+        comboBox->setChecked(value);
+    }
+    else
+    {
+        qCritical() << "Invalid widget";
+    }
+    m_mw->checkSettingsChanged();
+}
+
+void SettingsGuiHelper::sendParams(int value, int param)
+{
+    QWidget* widget = m_widgetMapping[MPParams::Param(param)];
+    if (auto* comboBox = dynamic_cast<QComboBox*>(widget))
+    {
+        updateComboBoxIndex(comboBox, value);
+    }
+    else if (auto* spinBox = dynamic_cast<QSpinBox*>(widget))
+    {
+        spinBox->setValue(value);
+    }
+    else
+    {
+        qCritical() << "Invalid widget";
+    }
+    m_mw->checkSettingsChanged();
 }

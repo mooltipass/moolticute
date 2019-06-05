@@ -24,6 +24,10 @@ public:
     void getChangedSettings(QJsonObject& o);
     void updateParameters(const QJsonObject &data);
 
+private slots:
+    void sendParams(bool value, int param);
+    void sendParams(int value, int param);
+
 private:
     WSClient* m_wsClient = nullptr;
     DeviceSettings* m_settings = nullptr;
@@ -32,6 +36,7 @@ private:
     Ui::MainWindow* ui = nullptr;
 
     Common::MPHwVersion m_deviceType = Common::MP_Unknown;
+    QMap<MPParams::Param, QWidget*> m_widgetMapping;
 };
 
 #endif // SETTINGSGUIHELPER_H
