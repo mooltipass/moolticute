@@ -11,8 +11,7 @@ SettingsGuiBLE::SettingsGuiBLE(QObject *parent, MainWindow *mw)
 
 void SettingsGuiBLE::loadParameters()
 {
-    ui->checkBoxBLEReserved->setChecked(get_reserved_ble());
-    ui->checkBoxPromptAnim->setChecked(get_prompt_animation());
+    qCritical() << "Unimplemented";
 }
 
 void SettingsGuiBLE::updateParam(MPParams::Param param, int val)
@@ -23,22 +22,4 @@ void SettingsGuiBLE::updateParam(MPParams::Param param, int val)
 void SettingsGuiBLE::createSettingUIMapping()
 {
     ui->groupBox_BLESettings->show();
-}
-
-bool SettingsGuiBLE::checkSettingsChanged()
-{
-    if (ui->checkBoxBLEReserved->isChecked() != get_reserved_ble())
-        return true;
-    if (ui->checkBoxPromptAnim->isChecked() != get_prompt_animation())
-        return true;
-    return false;
-}
-
-void SettingsGuiBLE::getChangedSettings(QJsonObject &o, bool isNoCardInsterted)
-{
-    Q_UNUSED(isNoCardInsterted)
-    if (ui->checkBoxBLEReserved->isChecked() != get_reserved_ble())
-        o["reserved_ble"] = ui->checkBoxBLEReserved->isChecked();
-    if (ui->checkBoxPromptAnim->isChecked() != get_prompt_animation())
-        o["prompt_animation"] = ui->checkBoxPromptAnim->isChecked();
 }

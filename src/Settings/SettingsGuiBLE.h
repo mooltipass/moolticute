@@ -15,8 +15,6 @@ public:
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
     void createSettingUIMapping() override;
-    bool checkSettingsChanged() override;
-    void getChangedSettings(QJsonObject& o, bool isNoCardInsterted) override;
 };
 
 #endif // SETTINGSGUIBLE_H

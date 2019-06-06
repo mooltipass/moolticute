@@ -38,8 +38,7 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::HASH_DISPLAY_FEATURE_PARAM, ui->hashDisplayFeatureCheckBox},
         {MPParams::LOCK_UNLOCK_FEATURE_PARAM, ui->lockUnlockModeComboBox},
         {MPParams::RESERVED_BLE, ui->checkBoxBLEReserved},
-        {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxPromptAnim},
-        {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxLockDevice}
+        {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxPromptAnim}
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)
@@ -87,95 +86,103 @@ void SettingsGuiHelper::createSettingUIMapping()
 
 bool SettingsGuiHelper::checkSettingsChanged()
 {
-    if (ui->comboBoxLang->currentData().toInt() != m_settings->get_keyboard_layout())
-        return true;
-    if (ui->checkBoxLock->isChecked() != m_settings->get_lock_timeout_enabled())
-        return true;
-    if (ui->spinBoxLock->value() != m_settings->get_lock_timeout())
-        return true;
-    if (ui->checkBoxScreensaver->isChecked() != m_settings->get_screensaver())
-        return true;
-    if (ui->checkBoxInput->isChecked() != m_settings->get_user_request_cancel())
-        return true;
-    if (ui->spinBoxInput->value() != m_settings->get_user_interaction_timeout())
-        return true;
-    if (ui->checkBoxFlash->isChecked() != m_settings->get_flash_screen())
-        return true;
-    if (ui->checkBoxBoot->isChecked() != m_settings->get_offline_mode())
-        return true;
-    if (ui->checkBoxTuto->isChecked() != m_settings->get_tutorial_enabled())
-        return true;
-    if (ui->checkBoxSendAfterLogin->isChecked() != m_settings->get_key_after_login_enabled())
-        return true;
-    if (ui->comboBoxLoginOutput->currentData().toInt() != m_settings->get_key_after_login())
-        return true;
-    if (ui->checkBoxSendAfterPassword->isChecked() != m_settings->get_key_after_pass_enabled())
-        return true;
-    if (ui->comboBoxPasswordOutput->currentData().toInt() != m_settings->get_key_after_pass())
-        return true;
-    if (ui->checkBoxSlowHost->isChecked() != m_settings->get_delay_after_key_enabled())
-        return true;
-    if (ui->spinBoxInputDelayAfterKeyPressed->value() != m_settings->get_delay_after_key())
-        return true;
-
-    return m_guiSettings->checkSettingsChanged();
+    auto* metaObj = m_settings->getMetaObject();
+    while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
+    {
+        for (int i = metaObj->propertyOffset(); i < metaObj->propertyCount(); ++i)
+        {
+            const auto paramId = m_settings->getParamId(metaObj->property(i).name());
+            QWidget* widget = m_widgetMapping[paramId];
+            const auto val = metaObj->property(i).read(m_settings);
+            if (auto* combobox = dynamic_cast<QComboBox*>(widget))
+            {
+                if (combobox->currentData().toInt() != val.toInt())
+                {
+                    return true;
+                }
+            }
+            else if (auto* checkBox = dynamic_cast<QCheckBox*>(widget))
+            {
+                if (checkBox->isChecked() != val.toBool())
+                {
+                    return true;
+                }
+            }
+            else if (auto* spinBox = dynamic_cast<QSpinBox*>(widget))
+            {
+                if (spinBox->value() != val.toInt())
+                {
+                    return true;
+                }
+            }
+        }
+        metaObj = metaObj->superClass();
+    }
+    return false;
 }
 
 void SettingsGuiHelper::resetSettings()
 {
-    ui->checkBoxLock->setChecked(m_settings->get_lock_timeout_enabled());
-    ui->spinBoxLock->setValue(m_settings->get_lock_timeout());
-    ui->checkBoxInput->setChecked(m_settings->get_user_request_cancel());
-    ui->spinBoxInput->setValue(m_settings->get_user_interaction_timeout());
-    ui->checkBoxFlash->setChecked(m_settings->get_flash_screen());
-    ui->checkBoxBoot->setChecked(m_settings->get_offline_mode());
-    ui->checkBoxTuto->setChecked(m_settings->get_tutorial_enabled());
-    ui->checkBoxSendAfterLogin->setChecked(m_settings->get_key_after_login_enabled());
-    ui->checkBoxSendAfterPassword->setChecked(m_settings->get_key_after_pass_enabled());
-    ui->checkBoxSlowHost->setChecked(m_settings->get_delay_after_key_enabled());
-    ui->spinBoxInputDelayAfterKeyPressed->setValue(m_settings->get_delay_after_key());
-
-    updateComboBoxIndex(ui->comboBoxLoginOutput, m_settings->get_key_after_login());
-    updateComboBoxIndex(ui->comboBoxPasswordOutput, m_settings->get_key_after_pass_enabled());
-    updateComboBoxIndex(ui->comboBoxLang, m_settings->get_keyboard_layout());
-
-    m_settings->loadParameters();
+    auto* metaObj = m_settings->getMetaObject();
+    while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
+    {
+        for (int i = metaObj->propertyOffset(); i < metaObj->propertyCount(); ++i)
+        {
+            const auto paramId = m_settings->getParamId(metaObj->property(i).name());
+            QWidget* widget = m_widgetMapping[paramId];
+            const auto val = metaObj->property(i).read(m_settings);
+            if (auto* combobox = dynamic_cast<QComboBox*>(widget))
+            {
+                updateComboBoxIndex(combobox, val.toInt());
+            }
+            else if (auto* checkBox = dynamic_cast<QCheckBox*>(widget))
+            {
+                checkBox->setChecked(val.toBool());
+            }
+            else if (auto* spinBox = dynamic_cast<QSpinBox*>(widget))
+            {
+                spinBox->setValue(val.toInt());
+            }
+        }
+        metaObj = metaObj->superClass();
+    }
 }
 
 void SettingsGuiHelper::getChangedSettings(QJsonObject &o)
 {
-    if (ui->comboBoxLang->currentData().toInt() != m_settings->get_keyboard_layout())
-        o["keyboard_layout"] = ui->comboBoxLang->currentData().toInt();
-    if (ui->checkBoxLock->isChecked() != m_settings->get_lock_timeout_enabled())
-        o["lock_timeout_enabled"] = ui->checkBoxLock->isChecked();
-    if (ui->spinBoxLock->value() != m_settings->get_lock_timeout())
-        o["lock_timeout"] = ui->spinBoxLock->value();
-    if (ui->checkBoxScreensaver->isChecked() != m_settings->get_screensaver())
-        o["screensaver"] = ui->checkBoxScreensaver->isChecked();
-    if (ui->checkBoxInput->isChecked() != m_settings->get_user_request_cancel())
-        o["user_request_cancel"] = ui->checkBoxInput->isChecked();
-    if (ui->spinBoxInput->value() != m_settings->get_user_interaction_timeout())
-        o["user_interaction_timeout"] = ui->spinBoxInput->value();
-    if (ui->checkBoxFlash->isChecked() != m_settings->get_flash_screen())
-        o["flash_screen"] = ui->checkBoxFlash->isChecked();
-    if (ui->checkBoxBoot->isChecked() != m_settings->get_offline_mode())
-        o["offline_mode"] = ui->checkBoxBoot->isChecked();
-    if (ui->checkBoxTuto->isChecked() != m_settings->get_tutorial_enabled())
-        o["tutorial_enabled"] = ui->checkBoxTuto->isChecked();
-    if (ui->checkBoxSendAfterLogin->isChecked() != m_settings->get_key_after_login_enabled())
-        o["key_after_login_enabled"] = ui->checkBoxSendAfterLogin->isChecked();
-    if (ui->comboBoxLoginOutput->currentData().toInt() != m_settings->get_key_after_login())
-        o["key_after_login"] = ui->comboBoxLoginOutput->currentData().toInt();
-    if (ui->checkBoxSendAfterPassword->isChecked() != m_settings->get_key_after_pass_enabled())
-        o.insert("key_after_pass_enabled", ui->checkBoxSendAfterPassword->isChecked());
-    if (ui->comboBoxPasswordOutput->currentData().toInt() != m_settings->get_key_after_pass())
-        o["key_after_pass"] = ui->comboBoxPasswordOutput->currentData().toInt();
-    if (ui->checkBoxSlowHost->isChecked() != m_settings->get_delay_after_key_enabled())
-        o["delay_after_key_enabled"] = ui->checkBoxSlowHost->isChecked();
-    if (ui->spinBoxInputDelayAfterKeyPressed->value() != m_settings->get_delay_after_key())
-        o["delay_after_key"] = ui->spinBoxInputDelayAfterKeyPressed->value();
-
-    m_guiSettings->getChangedSettings(o, m_wsClient->get_status() == Common::NoCardInserted);
+    auto* metaObj = m_settings->getMetaObject();
+    while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
+    {
+        for (int i = metaObj->propertyOffset(); i < metaObj->propertyCount(); ++i)
+        {
+            const QString paramName = metaObj->property(i).name();
+            const auto paramId = m_settings->getParamId(metaObj->property(i).name());
+            QWidget* widget = m_widgetMapping[paramId];
+            const auto val = metaObj->property(i).read(m_settings);
+            if (auto* combobox = dynamic_cast<QComboBox*>(widget))
+            {
+                if (combobox->currentData().toInt() != val.toInt())
+                {
+                    o[paramName] = combobox->currentData().toInt();
+                }
+            }
+            else if (auto* checkBox = dynamic_cast<QCheckBox*>(widget))
+            {
+                if (checkBox->isChecked() != val.toBool())
+                {
+                    o[paramName] = checkBox->isChecked();
+                }
+            }
+            else if (auto* spinBox = dynamic_cast<QSpinBox*>(widget))
+            {
+                if (spinBox->value() != val.toInt())
+                {
+                    o[paramName] = spinBox->value();
+                }
+            }
+        }
+        metaObj = metaObj->superClass();
+    }
 }
 
 void SettingsGuiHelper::updateParameters(const QJsonObject &data)

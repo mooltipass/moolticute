@@ -52,6 +52,7 @@ public:
     virtual void updateParam(MPParams::Param param, int val) = 0;
     void updateParam(MPParams::Param param, bool en);
 
+    const QMetaObject* getMetaObject() const {return metaObject();}
 
 protected:
     void sendEveryParameter(const QMetaObject* meta);
