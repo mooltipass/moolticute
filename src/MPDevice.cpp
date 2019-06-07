@@ -48,6 +48,11 @@ MPDevice::MPDevice(QObject *parent):
             Common::MPStatus s = pMesProt->getStatus(data);
             Common::MPStatus prevStatus = get_status();
 
+            if (isBLE())
+            {
+                bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
+            }
+
             /* Trigger on status change */
             if (s != prevStatus)
             {
@@ -128,22 +133,6 @@ void MPDevice::setupMessageProtocol()
 #ifndef Q_OS_WIN
     sendInitMessages();
 #endif
-
-    //For testing storeCredential and getCredential
-    //TODO: Only for testing
-//    QTimer::singleShot(2000, [this](){
-//        if (isBLE())
-//        {
-//            bleImpl->storeCredential(BleCredential{"test", "user", "desc", "3rd", "pwd"});
-//        }
-//    });
-
-//    QTimer::singleShot(20000, [this](){
-//        if (isBLE())
-//        {
-//            bleImpl->getCredential("test", "user");
-//        }
-    //    });
 }
 
 void MPDevice::sendInitMessages()

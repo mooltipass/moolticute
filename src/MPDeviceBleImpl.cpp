@@ -195,68 +195,39 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
     dequeueAndRun(jobs);
 }
 
-void MPDeviceBleImpl::storeCredential(const BleCredential &cred)
-{
-    auto *jobs = new AsyncJobs(QString("Store Credential"), this);
-
-    jobs->append(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, createStoreCredMessage(cred),
-                            [this](const QByteArray &data, bool &)
-                            {
-                                if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
-                                {
-                                    qDebug() << "Credential stored successfully";
-                                }
-                                else
-                                {
-                                    qWarning() << "Credential store failed";
-                                }
-                                return true;
-                            }));
-
-    dequeueAndRun(jobs);
-}
-
 void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerCb cb)
 {
     auto *jobs = new AsyncJobs(QString("Store Credential"), this);
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, createStoreCredMessage(cred),
-                            [this, cb](const QByteArray &data, bool &)
+    jobs->append(new MPCommandJob(mpDev, MPCmd::CHECK_CREDENTIAL, createCheckCredMessage(cred),
+                        [this, cb, jobs, cred] (const QByteArray &data, bool &)
+                        {
+                            if (MSG_SUCCESS != bleProt->getFirstPayloadByte(data))
                             {
-                                if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
-                                {
-                                    qDebug() << "Credential stored successfully";
-                                    cb(true, "");
-                                }
-                                else
-                                {
-                                    qWarning() << "Credential store failed";
-                                    cb(false, "Credential store failed");
-                                }
-                                return true;
-                            }));
-
-    dequeueAndRun(jobs);
-}
-
-void MPDeviceBleImpl::getCredential(QString service, QString login)
-{
-    auto *jobs = new AsyncJobs(QString("Get Credential"), this);
-
-        jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
-                                [this, service, login](const QByteArray &data, bool &)
-                                {
-                                    if (MSG_FAILED == bleProt->getMessageSize(data))
-                                    {
-                                        qWarning() << "Credential get failed";
-                                        return true;
-                                    }
-                                    qDebug() << "Credential got successfully";
-                                    QByteArray response = bleProt->getFullPayload(data);
-                                    qDebug() << response.toHex();
-                                    BleCredential cred = retrieveCredentialFromResponse(response, service, login);
-                                    return true;
-                                }));
+                                jobs->prepend(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, createStoreCredMessage(cred),
+                                   [this, cb](const QByteArray &data, bool &)
+                                   {
+                                       if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
+                                       {
+                                           qDebug() << "Credential stored successfully";
+                                           cb(true, "");
+                                       }
+                                       else
+                                       {
+                                           qWarning() << "Credential store failed";
+                                           cb(false, "Credential store failed");
+                                       }
+                                       return true;
+                                   }));
+                            }
+                            else
+                            {
+                                qWarning() << "Credential is already exists";
+                                cb(false, "Credential is already exists");
+                            }
+                            return true;
+                        }
+               ));
 
     dequeueAndRun(jobs);
 }
@@ -385,6 +356,114 @@ bool MPDeviceBleImpl::isAfterAuxFlash()
     return false;
 }
 
+void MPDeviceBleImpl::getUserCategories(const MessageHandlerCbData &cb)
+{
+    AsyncJobs *jobs = new AsyncJobs("Get User Categories", this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_USER_CATEGORIES,
+                            [this, cb](const QByteArray &data, bool &)
+                            {
+                                if (MSG_SUCCESS == bleProt->getMessageSize(data))
+                                {
+                                    qWarning() << "Get user categories failed";
+                                    cb(false, "Get user categories failed", QByteArray{});
+                                    return true;
+                                }
+                                qDebug() << "User categories got successfully";
+
+                                cb(true, "", bleProt->getFullPayload(data));
+                                return true;
+                            }));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed getting user categories: " << failedJob->getErrorStr();
+        cb(false, failedJob->getErrorStr(), QByteArray{});
+    });
+
+    dequeueAndRun(jobs);
+}
+
+void MPDeviceBleImpl::setUserCategories(const QJsonObject &categories, const MessageHandlerCbData &cb)
+{
+    AsyncJobs *jobs = new AsyncJobs("Set User Categories", this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::SET_USER_CATEGORIES,
+                                  createUserCategoriesMsg(categories),
+                            [this, cb](const QByteArray &data, bool &)
+                            {
+                                if (MSG_FAILED == bleProt->getFirstPayloadByte(data))
+                                {
+                                    qWarning() << "Set user categories failed";
+                                    cb(false, "Set user categories failed", QByteArray{});
+                                    return true;
+                                }
+                                qDebug() << "User categories set successfully";
+                                cb(true, "", QByteArray{});
+                                return true;
+                            }));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed setting user categories: " << failedJob->getErrorStr();
+        cb(false, failedJob->getErrorStr(), QByteArray{});
+    });
+
+    dequeueAndRun(jobs);
+}
+
+void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categories)
+{
+    for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
+    {
+        QString catName = "category_" + QString::number(i+1);
+        QString category = bleProt->toQString(data.mid(i*USER_CATEGORY_LENGTH, (i+1)*USER_CATEGORY_LENGTH));
+        bool defaultCat = std::all_of(std::begin(category), std::end(category),
+                                   [](const QChar& c) { return c == QChar{0xFFFF};});
+        categories[catName] = defaultCat ? "" : category;
+    }
+}
+
+QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categories)
+{
+    QByteArray data;
+    for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
+    {
+        QByteArray categoryArr = bleProt->toByteArray(categories["category_" + QString::number(i+1)].toString());
+        categoryArr.append(USER_CATEGORY_LENGTH - categoryArr.size(), static_cast<char>(0x00));
+        data.append(categoryArr);
+    }
+    return data;
+}
+
+void MPDeviceBleImpl::readUserSettings(const QByteArray& settings)
+{
+    quint8 d = settings[0];
+    if (d != m_currentUserSettings)
+    {
+        set_loginPrompt(d&LOGIN_PROMPT);
+        set_PINforMMM(d&PIN_FOR_MMM);
+        set_storagePrompt(d&STORAGE_PROMPT);
+        set_advancedMenu(d&ADVANCED_MENU);
+        set_bluetoothEnabled(d&BLUETOOTH_ENABLED);
+        set_credentialDisplayPrompt(d&CREDENTIAL_PROMPT);
+        m_currentUserSettings = d;
+        sendUserSettings();
+    }
+}
+
+void MPDeviceBleImpl::sendUserSettings()
+{
+    QJsonObject settingJson;
+    settingJson["login_prompt"] = get_loginPrompt();
+    settingJson["pin_for_mmm"] = get_PINforMMM();
+    settingJson["storage_prompt"] = get_storagePrompt();
+    settingJson["advanced_menu"] = get_advancedMenu();
+    settingJson["bluetooth_enabled"] = get_bluetoothEnabled();
+    settingJson["credential_prompt"] = get_credentialDisplayPrompt();
+    emit userSettingsChanged(settingJson);
+}
+
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
 {
     return createCredentialMessage(cred.getAttributes());
@@ -395,6 +474,14 @@ QByteArray MPDeviceBleImpl::createGetCredMessage(QString service, QString login)
     CredMap getMsgMap{{BleCredential::CredAttr::SERVICE, service},
                       {BleCredential::CredAttr::LOGIN, login}};
     return createCredentialMessage(getMsgMap);
+}
+
+QByteArray MPDeviceBleImpl::createCheckCredMessage(const BleCredential &cred)
+{
+    auto checkCred = cred.getAttributes();
+    checkCred.remove(BleCredential::CredAttr::DESCRIPTION);
+    checkCred.remove(BleCredential::CredAttr::THIRD);
+    return createCredentialMessage(checkCred);
 }
 
 QByteArray MPDeviceBleImpl::createCredentialMessage(const CredMap &credMap)

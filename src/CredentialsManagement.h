@@ -78,10 +78,14 @@ private slots:
     void onSelectLoginTimerTimeOut();
     void updateFavMenu();
     void credentialDataChanged();
+    void checkDeviceType();
 
     void on_toolButtonFavFilter_clicked();
 
     void on_toolButtonEditService_clicked();
+
+    void on_pushButtonSaveCategories_clicked();
+    void onCategoryEdited(const QString& edited);
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
@@ -111,6 +115,7 @@ private:
     QJsonArray m_loadedModelSerialiation;
     bool m_selectionCanceled;
     bool m_isClean = true;
+    bool m_isSetCategoryClean = true;
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 

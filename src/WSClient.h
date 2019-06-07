@@ -70,6 +70,7 @@ class WSClient: public QObject
 
     QT_WRITABLE_PROPERTY(QString, mainMCUVersion, QString())
     QT_WRITABLE_PROPERTY(QString, auxMCUVersion, QString())
+    QT_WRITABLE_PROPERTY(bool, advancedMenu, false)
 
 public:
     explicit WSClient(QObject *parent = nullptr);
@@ -122,6 +123,9 @@ public:
     void sendUploadBundle(QString bundleFilePath);
     void sendFetchData(QString fileName, Common::FetchType fetchType);
     void sendStopFetchData();
+    void sendGetUserCategories();
+    void sendSetUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
+    void sendUserSettingsRequest();
 
     bool isFw12();
 
@@ -151,6 +155,10 @@ signals:
     void displayDebugPlatInfo(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
     void displayUploadBundleResult(bool success);
     void displayAvailableUsers(const QString& num);
+    void displayUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
+    void updateUserSettingsOnUI(const QJsonObject& userSettings);
+    void deviceConnacted();
+    void deviceDisconnected();
     void deleteDataNodesFinished();
 
 public slots:

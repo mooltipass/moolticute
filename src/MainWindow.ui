@@ -1157,6 +1157,75 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </widget>
             </item>
             <item>
+             <widget class="QGroupBox" name="groupBox_UserSettings">
+              <property name="title">
+               <string>User Security Settings (Only changeable from device)</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_30">
+               <item>
+                <widget class="QCheckBox" name="cbLoginPrompt">
+                 <property name="toolTip">
+                  <string>Confirm to output each credential. Control this setting in the settings menu of the advanced menu</string>
+                 </property>
+                 <property name="text">
+                  <string>Login Confirmation Prompt</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cbPinForMMM">
+                 <property name="toolTip">
+                  <string>Require PIN to enter management mode. Control this setting in the settings menu of the advanced menu</string>
+                 </property>
+                 <property name="text">
+                  <string>PIN for Management Mode</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cbStoragePrompt">
+                 <property name="toolTip">
+                  <string>Prompt to display credentials on screen during manual recall. Control this setting in the settings menu of the advanced menu</string>
+                 </property>
+                 <property name="text">
+                  <string>Password Display on Screen Prompts</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cbAdvancedMenu">
+                 <property name="toolTip">
+                  <string>Switch menu modes by a long wheel press in the main menu</string>
+                 </property>
+                 <property name="text">
+                  <string>Advanced Menu</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cbBluetoothEnabled">
+                 <property name="toolTip">
+                  <string>Use Bluetooth Menu to enable/disable the Mooltipass Bluetooth interface</string>
+                 </property>
+                 <property name="text">
+                  <string>Bluetooth Status</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cbCredentialPrompt">
+                 <property name="toolTip">
+                  <string>Require approval when modifying credentials in management mode. Control this setting in the settings menu of the advanced menu</string>
+                 </property>
+                 <property name="text">
+                  <string>Prompts for Credentials Save in Management Mode</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <spacer name="verticalSpacer_3">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -1174,6 +1243,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
            <zorder>groupBox</zorder>
            <zorder>groupBox_2</zorder>
            <zorder>advancedSettingsGB</zorder>
+           <zorder>groupBox_UserSettings</zorder>
           </widget>
          </widget>
         </item>

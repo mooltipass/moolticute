@@ -361,6 +361,10 @@ void WSServerCon::resetDevice(MPDevice *dev)
 
     connect(mpdevice, &MPDevice::dbChangeNumbersChanged, this, &WSServerCon::sendCardDbMetadata);
 
+    if (nullptr != mpdevice->ble())
+    {
+        connect(mpdevice->ble(), &MPDeviceBleImpl::userSettingsChanged, this, &WSServerCon::sendUserSettings);
+    }
 }
 
 void WSServerCon::statusChanged()
@@ -727,6 +731,13 @@ void WSServerCon::sendHibpNotification(QString credInfo, QString pwnedNum)
     {
         qDebug() << "Cannot send pwned notification to GUI: " << credInfo << ": " << pwnedNum;
     }
+}
+
+void WSServerCon::sendUserSettings(QJsonObject settings)
+{
+    QJsonObject oroot = { {"msg", "send_user_settings"} };
+    oroot["data"] = settings;
+    sendJsonMessage(oroot);
 }
 
 void WSServerCon::processParametersSet(const QJsonObject &data)
@@ -1371,6 +1382,52 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
                                      oroot["data"] = ores;
                                      sendJsonMessage(oroot);
                                  });
+    }
+    else if (root["msg"] == "get_user_categories")
+    {
+         QJsonObject o = root["data"].toObject();
+         bleImpl->getUserCategories([this, root, bleImpl](bool success, QString errstr, QByteArray data)
+                 {
+                     if (!WSServer::Instance()->checkClientExists(this))
+                         return;
+
+                     if (!success)
+                     {
+                         sendFailedJson(root, errstr);
+                         return;
+                     }
+
+                     QJsonObject ores;
+                     QJsonObject oroot = root;
+                     bleImpl->fillGetCategory(data, ores);
+                     oroot["data"] = ores;
+                     sendJsonMessage(oroot);
+                 });
+    }
+    else if (root["msg"] == "set_user_categories")
+    {
+         QJsonObject o = root["data"].toObject();
+         bleImpl->setUserCategories(o, [this, root](bool success, QString errstr, QByteArray)
+                 {
+                     if (!WSServer::Instance()->checkClientExists(this))
+                         return;
+
+                     if (!success)
+                     {
+                         sendFailedJson(root, errstr);
+                         return;
+                     }
+
+                     QJsonObject ores;
+                     QJsonObject oroot = root;
+                     ores["success"] = "true";
+                     oroot["data"] = ores;
+                     sendJsonMessage(oroot);
+                 });
+    }
+    else if (root["msg"] == "get_user_settings")
+    {
+         bleImpl->sendUserSettings();
     }
     else
     {

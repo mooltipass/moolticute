@@ -131,6 +131,9 @@ private slots:
 
     void on_pushButtonGetAvailableUsers_clicked();
 
+    void onDeviceConnected();
+    void onDeviceDisconnected();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 

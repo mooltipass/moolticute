@@ -145,11 +145,13 @@ void WSClient::onTextMessageReceived(const QString &message)
     if (rootobj["msg"] == "mp_connected")
     {
         set_connected(true);
+        emit deviceConnacted();
     }
     else if (rootobj["msg"] == "mp_disconnected")
     {
         set_memMgmtMode(false);
         set_connected(false);
+        emit deviceDisconnected();
     }
     else if (rootobj["msg"] == "status_changed")
     {
@@ -449,6 +451,29 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit displayAvailableUsers(o["num"].toString());
     }
+    else if(rootobj["msg"] == "get_user_categories")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit displayUserCategories(o["category_1"].toString(),
+                                   o["category_2"].toString(),
+                                   o["category_3"].toString(),
+                                   o["category_4"].toString());
+    }
+    else if(rootobj["msg"] == "set_user_categories")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        if (!success)
+        {
+            SystemNotification::instance().createNotification(tr("Error"), tr("Set user category failed."));
+            sendGetUserCategories();
+        }
+    }
+    else if(rootobj["msg"] == "send_user_settings")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit updateUserSettingsOnUI(o);
+    }
 }
 
 void WSClient::udateParameters(const QJsonObject &data)
@@ -685,6 +710,27 @@ void WSClient::sendFetchData(QString fileName, Common::FetchType fetchType)
 void WSClient::sendStopFetchData()
 {
     sendJsonData({{ "msg", "stop_fetch_data" }});
+}
+
+void WSClient::sendGetUserCategories()
+{
+    sendJsonData({{ "msg", "get_user_categories" }});
+}
+
+void WSClient::sendSetUserCategories(const QString &cat1, const QString &cat2, const QString &cat3, const QString &cat4)
+{
+    QJsonObject o;
+    o["category_1"] = cat1;
+    o["category_2"] = cat2;
+    o["category_3"] = cat3;
+    o["category_4"] = cat4;
+    sendJsonData({{ "msg", "set_user_categories" },
+                  {"data", o}});
+}
+
+void WSClient::sendUserSettingsRequest()
+{
+    sendJsonData({{ "msg", "get_user_settings" }});
 }
 
 bool WSClient::isFw12()

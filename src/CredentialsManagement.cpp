@@ -70,6 +70,24 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->toolButtonEditService->setIcon(AppGui::qtAwesome()->icon(fa::edit));
     ui->toolButtonEditService->setToolTip(tr("Edit Service Name"));
 
+    ui->label_UserCategories->setText(tr("Set user categories"));
+    ui->labelCategory1->setText(tr("Category 1:"));
+    ui->labelCategory2->setText(tr("Category 2:"));
+    ui->labelCategory3->setText(tr("Category 3:"));
+    ui->labelCategory4->setText(tr("Category 4:"));
+    const int maxCategoryLength = 32;
+    ui->lineEditCategory1->setMaxLength(maxCategoryLength);
+    ui->lineEditCategory2->setMaxLength(maxCategoryLength);
+    ui->lineEditCategory3->setMaxLength(maxCategoryLength);
+    ui->lineEditCategory4->setMaxLength(maxCategoryLength);
+    ui->pushButtonSaveCategories->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonSaveCategories->setText(tr("Save"));
+    ui->pushButtonSaveCategories->hide();
+    connect(ui->lineEditCategory1, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
+    connect(ui->lineEditCategory2, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
+    connect(ui->lineEditCategory3, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
+    connect(ui->lineEditCategory4, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
+
     QAction *action = m_favMenu.addAction(tr("Not a favorite"));
     connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
 
@@ -167,6 +185,27 @@ void CredentialsManagement::setWsClient(WSClient *c)
         ui->lineEditFilterCred->clear();
     });
     connect(wsClient, &WSClient::passwordUnlocked, this, &CredentialsManagement::onPasswordUnlocked);
+    connect(wsClient, &WSClient::mpHwVersionChanged, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::displayUserCategories, this,
+             [this](const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4)
+                {
+                    ui->lineEditCategory1->setText(cat1);
+                    ui->lineEditCategory2->setText(cat2);
+                    ui->lineEditCategory3->setText(cat3);
+                    ui->lineEditCategory4->setText(cat4);
+                }
+    );
+    connect(wsClient, &WSClient::statusChanged, this,
+             [this](Common::MPStatus status)
+                {
+                    if (Common::MPStatus::Unlocked == status)
+                    {
+                        wsClient->sendGetUserCategories();
+                    }
+                }
+    );
 }
 
 void CredentialsManagement::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
@@ -903,6 +942,21 @@ void CredentialsManagement::credentialDataChanged()
     disconnect(m_pCredModel, &CredentialModel::rowsRemoved, this, &CredentialsManagement::credentialDataChanged);
 }
 
+void CredentialsManagement::checkDeviceType()
+{
+    if (wsClient->isMPBLE() && !wsClient->get_memMgmtMode() && wsClient->get_advancedMenu())
+    {
+        ui->label_UserCategories->show();
+        ui->widget_UserCategories->show();
+        wsClient->sendGetUserCategories();
+    }
+    else
+    {
+        ui->label_UserCategories->hide();
+        ui->widget_UserCategories->hide();
+    }
+}
+
 void CredentialsManagement::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LanguageChange)
@@ -922,4 +976,24 @@ void CredentialsManagement::on_toolButtonEditService_clicked()
     ui->credDisplayServiceInput->setReadOnly(false);
     ui->credDisplayServiceInput->setFrame(true);
     ui->credDisplayServiceInput->setFocus();
+}
+
+void CredentialsManagement::on_pushButtonSaveCategories_clicked()
+{
+    wsClient->sendSetUserCategories(ui->lineEditCategory1->text(),
+                                    ui->lineEditCategory2->text(),
+                                    ui->lineEditCategory3->text(),
+                                    ui->lineEditCategory4->text());
+    ui->pushButtonSaveCategories->hide();
+    m_isSetCategoryClean = true;
+}
+
+void CredentialsManagement::onCategoryEdited(const QString &edited)
+{
+    Q_UNUSED(edited);
+    if (m_isSetCategoryClean)
+    {
+        ui->pushButtonSaveCategories->show();
+        m_isSetCategoryClean = false;
+    }
 }
