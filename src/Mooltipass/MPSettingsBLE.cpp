@@ -39,7 +39,10 @@ void MPSettingsBLE::loadParameters()
 
 void MPSettingsBLE::updateParam(MPParams::Param param, int val)
 {
-    m_lastDeviceSettings[m_bleByteMapping[param]] = static_cast<char>(val);
+    if (m_bleByteMapping.contains(param))
+    {
+        m_lastDeviceSettings[m_bleByteMapping[param]] = static_cast<char>(val);
+    }
 }
 
 void MPSettingsBLE::connectSendParams(QObject *slotObject)
