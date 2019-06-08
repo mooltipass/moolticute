@@ -15,7 +15,7 @@ public:
     explicit SettingsGuiMini(QObject* parent, MainWindow* mw);
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
-    void createSettingUIMapping() override;
+    void updateUI() override;
 };
 
 #endif // SETTINGSGUIMINI_H

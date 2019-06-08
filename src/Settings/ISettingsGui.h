@@ -12,7 +12,7 @@ class ISettingsGui
 public:
     ISettingsGui(MainWindow* mw): m_mw{mw}{}
     virtual ~ISettingsGui(){};
-    virtual void createSettingUIMapping() = 0;
+    virtual void updateUI() = 0;
 
 protected:
     MainWindow* m_mw = nullptr;

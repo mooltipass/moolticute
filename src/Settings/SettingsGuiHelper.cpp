@@ -1,4 +1,5 @@
 #include "SettingsGuiHelper.h"
+#include "ISettingsGui.h"
 #include "SettingsGuiMini.h"
 #include "SettingsGuiBLE.h"
 #include "MainWindow.h"
@@ -79,9 +80,8 @@ void SettingsGuiHelper::createSettingUIMapping()
         return;
     }
 
-    m_guiSettings = dynamic_cast<ISettingsGui*>(m_settings);
     m_settings->connectSendParams(this);
-    m_guiSettings->createSettingUIMapping();
+    dynamic_cast<ISettingsGui*>(m_settings)->updateUI();
 }
 
 bool SettingsGuiHelper::checkSettingsChanged()

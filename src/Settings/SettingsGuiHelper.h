@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QJsonObject>
 #include "DeviceSettings.h"
-#include "ISettingsGui.h"
 #include "WSClient.h"
 
 namespace Ui {
@@ -31,7 +30,6 @@ private slots:
 private:
     WSClient* m_wsClient = nullptr;
     DeviceSettings* m_settings = nullptr;
-    ISettingsGui* m_guiSettings = nullptr;
     MainWindow* m_mw = nullptr;
     Ui::MainWindow* ui = nullptr;
 

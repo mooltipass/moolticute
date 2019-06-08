@@ -19,7 +19,7 @@ void SettingsGuiMini::updateParam(MPParams::Param param, int val)
     setProperty(getParamName(param), val);
 }
 
-void SettingsGuiMini::createSettingUIMapping()
+void SettingsGuiMini::updateUI()
 {
     ui->groupBox_BLESettings->hide();
 }

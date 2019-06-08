@@ -14,7 +14,7 @@ public:
     explicit SettingsGuiBLE(QObject* parent, MainWindow* mw);
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
-    void createSettingUIMapping() override;
+    void updateUI() override;
 };
 
 #endif // SETTINGSGUIBLE_H

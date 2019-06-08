@@ -19,7 +19,7 @@ void SettingsGuiBLE::updateParam(MPParams::Param param, int val)
     setProperty(getParamName(param), val);
 }
 
-void SettingsGuiBLE::createSettingUIMapping()
+void SettingsGuiBLE::updateUI()
 {
     ui->groupBox_BLESettings->show();
 }
