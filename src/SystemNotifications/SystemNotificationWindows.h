@@ -26,6 +26,8 @@ public:
     const static QString WINDOWS10_VERSION;
     const static QString NOTIFICATIONS_SETTING_REGENTRY;
     const static QString DND_ENABLED_REGENTRY;
+    const static QString TOAST_ENABLED_SETTING_REGPATH;
+    const static QString TOAST_ENABLED_REGENTRY;
     const static bool IS_WIN10;
 
 signals:
