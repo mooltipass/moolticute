@@ -155,13 +155,16 @@ bool MPDevice_win::openPath()
 
 void MPDevice_win::platformWrite(const QByteArray &data)
 {
+    const char zeroByte = static_cast<char>(0x00);
     QByteArray ba;
-    ba.append((QChar)0x00); //add report id (even if not used). windows requires that
+    ba.append(zeroByte); //add report id (even if not used). windows requires that
     ba.append(data);
 
     //resize array to fit windows requirements (at least outReportLen size)
     if (ba.size() < platformDef.outReportLen)
-        ba.resize(platformDef.outReportLen);
+    {
+        ba.append(platformDef.outReportLen - ba.size(), zeroByte);
+    }
 
     ::ZeroMemory(&writeOverlapped, sizeof(writeOverlapped));
 
