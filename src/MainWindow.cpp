@@ -25,18 +25,10 @@
 #include "PasswordProfilesModel.h"
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
+#include "SettingsGuiHelper.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
-
-template <typename T>
-static void updateComboBoxIndex(QComboBox* cb, const T & value, int defaultIdx = 0)
-{
-    int idx = cb->findData(QVariant::fromValue(value));
-    if (idx < 0)
-        idx = defaultIdx;
-    cb->setCurrentIndex(idx);
-}
 
 void MainWindow::initHelpLabels()
 {
@@ -473,151 +465,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         ui->UIDRequestResultIcon->setVisible(false);
     });
 
-
-    connect(wsClient, &WSClient::keyboardLayoutChanged, [=]()
-    {
-        updateComboBoxIndex(ui->comboBoxLang, wsClient->get_keyboardLayout());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::lockTimeoutEnabledChanged, [=]()
-    {
-        ui->checkBoxLock->setChecked(wsClient->get_lockTimeoutEnabled());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::lockTimeoutChanged, [=]()
-    {
-        ui->spinBoxLock->setValue(wsClient->get_lockTimeout());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::screensaverChanged, [=]()
-    {
-        ui->checkBoxScreensaver->setChecked(wsClient->get_screensaver());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::userRequestCancelChanged, [=]()
-    {
-        ui->checkBoxInput->setChecked(wsClient->get_userRequestCancel());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::userInteractionTimeoutChanged, [=]()
-    {
-        ui->spinBoxInput->setValue(wsClient->get_userInteractionTimeout());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::flashScreenChanged, [=]()
-    {
-        ui->checkBoxFlash->setChecked(wsClient->get_flashScreen());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::offlineModeChanged, [=]()
-    {
-        ui->checkBoxBoot->setChecked(wsClient->get_offlineMode());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::tutorialEnabledChanged, [=]()
-    {
-        ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
-        checkSettingsChanged();
-    });
-
-
-    connect(wsClient, &WSClient::screenBrightnessChanged, [=]()
-    {
-        updateComboBoxIndex(ui->comboBoxScreenBrightness, wsClient->get_screenBrightness());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::knockEnabledChanged, [=]()
-    {
-        ui->checkBoxKnock->setChecked(wsClient->get_knockEnabled());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::knockSensitivityChanged, [=]()
-    {
-        ui->comboBoxKnock->setCurrentIndex(wsClient->get_knockSensitivity());
-        checkSettingsChanged();
-    });
-    connect(wsClient, &WSClient::randomStartingPinChanged, [=]()
-    {
-        ui->randomStartingPinCheckBox->setChecked(wsClient->get_randomStartingPin());
-        checkSettingsChanged();
-    });
-
-    connect(wsClient, &WSClient::displayHashChanged, [=]()
-    {
-        ui->hashDisplayFeatureCheckBox->setChecked(wsClient->get_displayHash());
-        checkSettingsChanged();
-    });
-
-    connect(wsClient, &WSClient::lockUnlockModeChanged, [=]()
-    {
-        updateComboBoxIndex(ui->lockUnlockModeComboBox, wsClient->get_lockUnlockMode());
-        checkSettingsChanged();
-    });
-
-
-    connect(wsClient, &WSClient::keyAfterLoginSendEnableChanged, [=]()
-    {
-        ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
-        checkSettingsChanged();
-    });
-
-    connect(wsClient, &WSClient::keyAfterLoginSendChanged, [=]()
-    {
-
-        updateComboBoxIndex(ui->comboBoxLoginOutput, wsClient->get_keyAfterLoginSend());
-        checkSettingsChanged();
-    });
-
-    connect(wsClient, &WSClient::keyAfterPassSendEnableChanged, [=]()
-    {
-        ui->checkBoxSendAfterPassword->setChecked(wsClient->get_keyAfterPassSendEnable());
-        checkSettingsChanged();
-    });
-
-    connect(wsClient, &WSClient::keyAfterPassSendChanged, [=]()
-    {
-        updateComboBoxIndex(ui->comboBoxPasswordOutput, wsClient->get_keyAfterPassSend());
-        checkSettingsChanged();
-    });
-
-    connect(wsClient, &WSClient::delayAfterKeyEntryEnableChanged, [=]()
-    {
-        ui->checkBoxSlowHost->setChecked(wsClient->get_delayAfterKeyEntryEnable());
-        checkSettingsChanged();
-    });
-
-    connect(wsClient, &WSClient::delayAfterKeyEntryChanged, [=]()
-    {
-        ui->spinBoxInputDelayAfterKeyPressed->setValue(wsClient->get_delayAfterKeyEntry());
-        checkSettingsChanged();
-    });
-
-    //When something changed in GUI, show save/reset buttons
-    connect(ui->comboBoxLang, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxLock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->spinBoxLock, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxScreensaver, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxInput, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->spinBoxInput, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxFlash, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxBoot, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxTuto, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-
     ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
     connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
-    connect(ui->comboBoxScreenBrightness, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxKnock, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->comboBoxKnock, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->randomStartingPinCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->hashDisplayFeatureCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->lockUnlockModeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxSendAfterLogin, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->comboBoxLoginOutput, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxSendAfterPassword, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->comboBoxPasswordOutput, SIGNAL(currentIndexChanged(int)), this, SLOT(checkSettingsChanged()));
-    connect(ui->checkBoxSlowHost, SIGNAL(toggled(bool)), this, SLOT(checkSettingsChanged()));
-    connect(ui->spinBoxInputDelayAfterKeyPressed, SIGNAL(valueChanged(int)), this, SLOT(checkSettingsChanged()));
+    wsClient->settingsHelper()->setMainWindow(this);
 
     //Setup the confirm view
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
@@ -829,50 +680,8 @@ void MainWindow::updateSerialInfos() {
 
 void MainWindow::checkSettingsChanged()
 {
+    bool uichanged = wsClient->settingsHelper()->checkSettingsChanged();
     //lang combobox
-    bool uichanged = false;
-    if (ui->comboBoxLang->currentData().toInt() != wsClient->get_keyboardLayout())
-        uichanged = true;
-    if (ui->checkBoxLock->isChecked() != wsClient->get_lockTimeoutEnabled())
-        uichanged = true;
-    if (ui->spinBoxLock->value() != wsClient->get_lockTimeout())
-        uichanged = true;
-    if (ui->checkBoxScreensaver->isChecked() != wsClient->get_screensaver())
-        uichanged = true;
-    if (ui->checkBoxInput->isChecked() != wsClient->get_userRequestCancel())
-        uichanged = true;
-    if (ui->spinBoxInput->value() != wsClient->get_userInteractionTimeout())
-        uichanged = true;
-    if (ui->checkBoxFlash->isChecked() != wsClient->get_flashScreen())
-        uichanged = true;
-    if (ui->checkBoxBoot->isChecked() != wsClient->get_offlineMode())
-        uichanged = true;
-    if (ui->checkBoxTuto->isChecked() != wsClient->get_tutorialEnabled())
-        uichanged = true;
-    if (ui->checkBoxKnock->isChecked() != wsClient->get_knockEnabled())
-        uichanged = true;
-    if (ui->comboBoxKnock->currentData().toInt() != wsClient->get_knockSensitivity())
-        uichanged = true;
-    if (ui->randomStartingPinCheckBox->isChecked() != wsClient->get_randomStartingPin())
-        uichanged = true;
-    if (ui->hashDisplayFeatureCheckBox->isChecked() != wsClient->get_displayHash())
-        uichanged = true;
-    if (ui->lockUnlockModeComboBox->currentData().toInt() != wsClient->get_lockUnlockMode())
-        uichanged = true;
-    if (ui->comboBoxScreenBrightness->currentData().toInt() != wsClient->get_screenBrightness())
-        uichanged = true;
-    if (ui->checkBoxSendAfterLogin->isChecked() != wsClient->get_keyAfterLoginSendEnable())
-        uichanged = true;
-    if (ui->comboBoxLoginOutput->currentData().toInt() != wsClient->get_keyAfterLoginSend())
-        uichanged = true;
-    if (ui->checkBoxSendAfterPassword->isChecked() != wsClient->get_keyAfterPassSendEnable())
-        uichanged = true;
-    if (ui->comboBoxPasswordOutput->currentData().toInt() != wsClient->get_keyAfterPassSend())
-        uichanged = true;
-    if (ui->checkBoxSlowHost->isChecked() != wsClient->get_delayAfterKeyEntryEnable())
-        uichanged = true;
-    if (ui->spinBoxInputDelayAfterKeyPressed->value() != wsClient->get_delayAfterKeyEntry())
-        uichanged = true;
 
     if (uichanged)
     {
@@ -888,29 +697,7 @@ void MainWindow::checkSettingsChanged()
 
 void MainWindow::on_pushButtonSettingsReset_clicked()
 {
-    ui->checkBoxLock->setChecked(wsClient->get_lockTimeoutEnabled());
-    ui->spinBoxLock->setValue(wsClient->get_lockTimeout());
-    ui->checkBoxScreensaver->setChecked(wsClient->get_screensaver());
-    ui->checkBoxInput->setChecked(wsClient->get_userRequestCancel());
-    ui->spinBoxInput->setValue(wsClient->get_userInteractionTimeout());
-    ui->checkBoxFlash->setChecked(wsClient->get_flashScreen());
-    ui->checkBoxBoot->setChecked(wsClient->get_offlineMode());
-    ui->checkBoxTuto->setChecked(wsClient->get_tutorialEnabled());
-    ui->checkBoxKnock->setChecked(wsClient->get_knockEnabled());
-    ui->randomStartingPinCheckBox->setChecked(wsClient->get_randomStartingPin());
-    ui->hashDisplayFeatureCheckBox->setChecked(wsClient->get_displayHash());
-    ui->checkBoxSendAfterLogin->setChecked(wsClient->get_keyAfterLoginSendEnable());
-    ui->checkBoxSendAfterPassword->setChecked(wsClient->get_keyAfterPassSendEnable());
-    ui->checkBoxSlowHost->setChecked(wsClient->get_delayAfterKeyEntryEnable());
-    ui->spinBoxInputDelayAfterKeyPressed->setValue(wsClient->get_delayAfterKeyEntry());
-
-    updateComboBoxIndex(ui->lockUnlockModeComboBox, wsClient->get_lockUnlockMode());
-    updateComboBoxIndex(ui->comboBoxLoginOutput, wsClient->get_keyAfterLoginSend());
-    updateComboBoxIndex(ui->comboBoxPasswordOutput, wsClient->get_keyAfterPassSend());
-    updateComboBoxIndex(ui->comboBoxScreenBrightness, wsClient->get_screenBrightness());
-    updateComboBoxIndex(ui->comboBoxLang, wsClient->get_keyboardLayout());
-
-    ui->comboBoxKnock->setCurrentIndex(wsClient->get_knockSensitivity());
+    wsClient->settingsHelper()->resetSettings();
 
     ui->pushButtonSettingsReset->setVisible(false);
     ui->pushButtonSettingsSave->setVisible(false);
@@ -919,53 +706,7 @@ void MainWindow::on_pushButtonSettingsReset_clicked()
 void MainWindow::on_pushButtonSettingsSave_clicked()
 {
     QJsonObject o;
-
-    if (ui->comboBoxLang->currentData().toInt() != wsClient->get_keyboardLayout())
-        o["keyboard_layout"] = ui->comboBoxLang->currentData().toInt();
-    if (ui->checkBoxLock->isChecked() != wsClient->get_lockTimeoutEnabled())
-        o["lock_timeout_enabled"] = ui->checkBoxLock->isChecked();
-    if (ui->spinBoxLock->value() != wsClient->get_lockTimeout())
-        o["lock_timeout"] = ui->spinBoxLock->value();
-    if (ui->checkBoxScreensaver->isChecked() != wsClient->get_screensaver())
-        o["screensaver"] = ui->checkBoxScreensaver->isChecked();
-    if (ui->checkBoxInput->isChecked() != wsClient->get_userRequestCancel())
-        o["user_request_cancel"] = ui->checkBoxInput->isChecked();
-    if (ui->spinBoxInput->value() != wsClient->get_userInteractionTimeout())
-        o["user_interaction_timeout"] = ui->spinBoxInput->value();
-    if (ui->checkBoxFlash->isChecked() != wsClient->get_flashScreen())
-        o["flash_screen"] = ui->checkBoxFlash->isChecked();
-    if (ui->checkBoxBoot->isChecked() != wsClient->get_offlineMode())
-        o["offline_mode"] = ui->checkBoxBoot->isChecked();
-    if (ui->checkBoxTuto->isChecked() != wsClient->get_tutorialEnabled())
-        o["tutorial_enabled"] = ui->checkBoxTuto->isChecked();
-    if (ui->comboBoxScreenBrightness->currentData().toInt() != wsClient->get_screenBrightness())
-        o["screen_brightness"] = ui->comboBoxScreenBrightness->currentData().toInt();
-    if (ui->checkBoxSendAfterLogin->isChecked() != wsClient->get_keyAfterLoginSendEnable())
-        o["key_after_login_enabled"] = ui->checkBoxSendAfterLogin->isChecked();
-    if (ui->comboBoxLoginOutput->currentData().toInt() != wsClient->get_keyAfterLoginSend())
-        o["key_after_login"] = ui->comboBoxLoginOutput->currentData().toInt();
-    if (ui->checkBoxSendAfterPassword->isChecked() != wsClient->get_keyAfterPassSendEnable())
-        o["key_after_pass_enabled"] = ui->checkBoxSendAfterPassword->isChecked();
-    if (ui->comboBoxPasswordOutput->currentData().toInt() != wsClient->get_keyAfterPassSend())
-        o["key_after_pass"] = ui->comboBoxPasswordOutput->currentData().toInt();
-    if (ui->checkBoxSlowHost->isChecked() != wsClient->get_delayAfterKeyEntryEnable())
-        o["delay_after_key_enabled"] = ui->checkBoxSlowHost->isChecked();
-    if (ui->randomStartingPinCheckBox->isChecked() != wsClient->get_randomStartingPin())
-        o["random_starting_pin"] = ui->randomStartingPinCheckBox->isChecked();
-    if (ui->hashDisplayFeatureCheckBox->isChecked() != wsClient->get_displayHash())
-        o["hash_display"] = ui->hashDisplayFeatureCheckBox->isChecked();
-    if (ui->lockUnlockModeComboBox->currentData().toInt() != wsClient->get_lockUnlockMode())
-        o["lock_unlock_mode"] = ui->lockUnlockModeComboBox->currentData().toInt();
-    if (ui->spinBoxInputDelayAfterKeyPressed->value() != wsClient->get_delayAfterKeyEntry())
-        o["delay_after_key"] = ui->spinBoxInputDelayAfterKeyPressed->value();
-
-
-    if(wsClient->get_status() == Common::NoCardInserted) {
-        if (ui->checkBoxKnock->isChecked() != wsClient->get_knockEnabled())
-            o["knock_enabled"] = ui->checkBoxKnock->isChecked();
-        if (ui->comboBoxKnock->currentData().toInt() != wsClient->get_knockSensitivity())
-            o["knock_sensitivity"] = ui->comboBoxKnock->currentData().toInt();
-    }
+    wsClient->settingsHelper()->getChangedSettings(o);
 
     wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
 }
@@ -1862,6 +1603,7 @@ void MainWindow::on_pushButtonGetAvailableUsers_clicked()
 
 void MainWindow::onDeviceConnected()
 {
+    wsClient->settingsHelper()->createSettingUIMapping();
     if (wsClient->isMPBLE())
     {
         wsClient->sendUserSettingsRequest();

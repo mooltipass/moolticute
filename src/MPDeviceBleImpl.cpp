@@ -46,7 +46,7 @@ void MPDeviceBleImpl::getPlatInfo()
         mpDev->set_flashMbSize(memorySize);
     });
 
-    dequeueAndRun(jobs);
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 void MPDeviceBleImpl::getDebugPlatInfo(const MessageHandlerCbData &cb)
@@ -62,7 +62,7 @@ void MPDeviceBleImpl::getDebugPlatInfo(const MessageHandlerCbData &cb)
         cb(true, "", bleProt->getFullPayload(data));
     });
 
-    dequeueAndRun(jobs);
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 QVector<int> MPDeviceBleImpl::calcDebugPlatInfo(const QByteArray &platInfo)
@@ -172,7 +172,7 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb,
         cb(true, "");
     });
 
-    dequeueAndRun(jobs);
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
@@ -192,7 +192,7 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
                         return true;
                     }));
 
-    dequeueAndRun(jobs);
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerCb cb)
@@ -229,7 +229,7 @@ void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerC
                         }
                ));
 
-    dequeueAndRun(jobs);
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 void MPDeviceBleImpl::getCredential(const QString& service, const QString& login, const QString& reqid, const MessageHandlerCbData &cb)
@@ -268,7 +268,7 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
         cb(false, failedJob->getErrorStr(), QByteArray{});
     });
 
-    dequeueAndRun(jobs);
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const
@@ -381,7 +381,7 @@ void MPDeviceBleImpl::getUserCategories(const MessageHandlerCbData &cb)
         cb(false, failedJob->getErrorStr(), QByteArray{});
     });
 
-    dequeueAndRun(jobs);
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 void MPDeviceBleImpl::setUserCategories(const QJsonObject &categories, const MessageHandlerCbData &cb)
@@ -409,7 +409,7 @@ void MPDeviceBleImpl::setUserCategories(const QJsonObject &categories, const Mes
         cb(false, failedJob->getErrorStr(), QByteArray{});
     });
 
-    dequeueAndRun(jobs);
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categories)
@@ -603,10 +603,4 @@ void MPDeviceBleImpl::writeFetchData(QFile *file, MPCmd::Command cmd)
                         }
                         return true;
     });
-}
-
-void MPDeviceBleImpl::dequeueAndRun(AsyncJobs *jobs)
-{
-    mpDev->jobsQueue.enqueue(jobs);
-    mpDev->runAndDequeueJobs();
 }

@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "WSClient.h"
 #include "SystemNotifications/SystemNotification.h"
+#include "SettingsGuiHelper.h"
 
 #define WS_URI                      "ws://localhost"
 #define QUERY_RANDOM_NUMBER_TIME    10 * 60 * 1000 //10 min
@@ -32,6 +33,7 @@ WSClient::WSClient(QObject *parent):
     connect(SystemNotification::instance().getNotification(), &ISystemNotification::sendLoginMessage, this, &WSClient::sendLoginJson);
     connect(SystemNotification::instance().getNotification(), &ISystemNotification::sendDomainMessage, this, &WSClient::sendDomainJson);
     randomNumTimer->start(QUERY_RANDOM_NUMBER_TIME);
+    m_settingsHelper = new SettingsGuiHelper(this);
 }
 
 WSClient::~WSClient()
@@ -160,7 +162,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
     else if (rootobj["msg"] == "param_changed")
     {
-        udateParameters(rootobj["data"].toObject());
+        m_settingsHelper->updateParameters(rootobj["data"].toObject());
     }
     else if (rootobj["msg"] == "memorymgmt_changed")
     {
@@ -476,55 +478,6 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
 }
 
-void WSClient::udateParameters(const QJsonObject &data)
-{
-    QString param = data["parameter"].toString();
-
-    if (param == "keyboard_layout")
-        set_keyboardLayout(data["value"].toInt());
-    else if (param == "lock_timeout_enabled")
-        set_lockTimeoutEnabled(data["value"].toBool());
-    else if (param == "lock_timeout")
-        set_lockTimeout(data["value"].toInt());
-    else if (param == "screensaver")
-        set_screensaver(data["value"].toBool());
-    else if (param == "user_request_cancel")
-        set_userRequestCancel(data["value"].toBool());
-    else if (param == "user_interaction_timeout")
-        set_userInteractionTimeout(data["value"].toInt());
-    else if (param == "flash_screen")
-        set_flashScreen(data["value"].toBool());
-    else if (param == "offline_mode")
-        set_offlineMode(data["value"].toBool());
-    else if (param == "tutorial_enabled")
-        set_tutorialEnabled(data["value"].toBool());
-    else if (param == "screen_brightness")
-        set_screenBrightness(data["value"].toInt());
-    else if (param == "knock_enabled")
-        set_knockEnabled(data["value"].toBool());
-    else if (param == "knock_sensitivity")
-        set_knockSensitivity(data["value"].toInt());
-    else if (param == "random_starting_pin")
-        set_randomStartingPin(data["value"].toBool());
-    else if (param == "hash_display")
-        set_displayHash(data["value"].toBool());
-    else if (param == "lock_unlock_mode")
-        set_lockUnlockMode(data["value"].toInt());
-    else if (param == "key_after_login_enabled")
-        set_keyAfterLoginSendEnable(data["value"].toBool());
-    else if (param == "key_after_login")
-        set_keyAfterLoginSend(data["value"].toInt());
-    else if (param == "key_after_pass_enabled")
-        set_keyAfterPassSendEnable(data["value"].toBool());
-    else if (param == "key_after_pass")
-        set_keyAfterPassSend(data["value"].toInt());
-    else if (param == "delay_after_key_enabled")
-        set_delayAfterKeyEntryEnable(data["value"].toBool());
-    else if (param == "delay_after_key")
-        set_delayAfterKeyEntry(data["value"].toInt());
-}
-
-
 bool WSClient::isMPMini() const
 {
     return  get_mpHwVersion() == Common::MP_Mini;
@@ -750,6 +703,11 @@ bool WSClient::isFw12()
 void WSClient::sendLockDevice()
 {
     sendJsonData({{ "msg", "lock_device" }});
+}
+
+SettingsGuiHelper* WSClient::settingsHelper()
+{
+    return m_settingsHelper;
 }
 
 void WSClient::queryRandomNumbers()

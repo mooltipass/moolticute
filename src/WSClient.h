@@ -25,42 +25,20 @@
 #include "Common.h"
 #include "QtHelper.h"
 
+class SettingsGuiHelper;
+
 class WSClient: public QObject
 {
     Q_OBJECT
 
     QT_WRITABLE_PROPERTY(bool, connected, false)
     QT_WRITABLE_PROPERTY(Common::MPStatus, status, Common::UnknownStatus)
-    QT_WRITABLE_PROPERTY(int, keyboardLayout, 0)
-    QT_WRITABLE_PROPERTY(bool, lockTimeoutEnabled, false)
-    QT_WRITABLE_PROPERTY(int, lockTimeout, 0)
-    QT_WRITABLE_PROPERTY(bool, screensaver, false)
-    QT_WRITABLE_PROPERTY(bool, userRequestCancel, false)
-    QT_WRITABLE_PROPERTY(int, userInteractionTimeout, 0)
-    QT_WRITABLE_PROPERTY(bool, flashScreen, false)
-    QT_WRITABLE_PROPERTY(bool, offlineMode, false)
-    QT_WRITABLE_PROPERTY(bool, tutorialEnabled, false)
-    QT_WRITABLE_PROPERTY(int, screenBrightness, 0)
-    QT_WRITABLE_PROPERTY(bool, knockEnabled, false)
-    QT_WRITABLE_PROPERTY(int, knockSensitivity, 0)
     QT_WRITABLE_PROPERTY(bool, memMgmtMode, false)
 
-    QT_WRITABLE_PROPERTY(Common::MPHwVersion, mpHwVersion, Common::MP_Classic)
+    QT_WRITABLE_PROPERTY(Common::MPHwVersion, mpHwVersion, Common::MP_Unknown)
     QT_WRITABLE_PROPERTY(QString, fwVersion, QString())
     QT_WRITABLE_PROPERTY(quint32, hwSerial, 0)
     QT_WRITABLE_PROPERTY(int, hwMemory, 0)
-
-    QT_WRITABLE_PROPERTY(bool, keyAfterLoginSendEnable, false)
-    QT_WRITABLE_PROPERTY(int, keyAfterLoginSend, 0)
-    QT_WRITABLE_PROPERTY(bool, keyAfterPassSendEnable, false)
-    QT_WRITABLE_PROPERTY(int, keyAfterPassSend, 0)
-    QT_WRITABLE_PROPERTY(bool, delayAfterKeyEntryEnable, false)
-    QT_WRITABLE_PROPERTY(int, delayAfterKeyEntry, 0)
-
-
-    QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
-    QT_WRITABLE_PROPERTY(bool, displayHash, false)
-    QT_WRITABLE_PROPERTY(int, lockUnlockMode, false)
 
     QT_WRITABLE_PROPERTY(qint64, uid, -1)
 
@@ -130,6 +108,7 @@ public:
     bool isFw12();
 
     void sendLockDevice();
+    SettingsGuiHelper* settingsHelper();
 
 signals:
     void wsConnected();
@@ -174,12 +153,12 @@ private slots:
     void onTextMessageReceived(const QString &message);
 
 private:
-    void udateParameters(const QJsonObject &data);
-
     QWebSocket *wsocket = nullptr;
 
     QJsonObject memData;
     QJsonArray filesCache;
+
+    SettingsGuiHelper* m_settingsHelper = nullptr;
 
     QTimer *randomNumTimer = nullptr;
     QString HIBP_COMPROMISED_FORMAT = tr("this password has been compromised %1 times.");

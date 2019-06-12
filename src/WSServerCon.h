@@ -44,6 +44,7 @@ public:
 signals:
     void notifyAllClients(const QJsonObject &obj);
     void sendMessageToGUI(const QString &msg, bool &isGuiRunning);
+    void parameterProcessFinished();
 
 private slots:
     void processMessage(const QString &msg);
@@ -51,29 +52,10 @@ private slots:
     void statusChanged();
 
     //parameters slots that sends json to websocket
-    void sendKeyboardLayout();
-    void sendLockTimeoutEnabled();
-    void sendLockTimeout();
-    void sendScreensaver();
-    void sendUserRequestCancel();
-    void sendUserInteractionTimeout();
-    void sendFlashScreen();
-    void sendOfflineMode();
-    void sendTutorialEnabled();
+    void sendParams(int value, int param);
+    void sendParams(bool value, int param);
     void sendMemMgmtMode();
     void sendVersion();
-    void sendScreenBrightness();
-    void sendKnockEnabled();
-    void sendKnockSensitivity();
-    void sendRandomStartingPin();
-    void sendHashDisplayEnabled();
-    void sendLockUnlockMode();
-    void sendKeyAfterLoginSendEnable();
-    void sendKeyAfterLoginSend();
-    void sendKeyAfterPassSendEnable();
-    void sendKeyAfterPassSend();
-    void sendDelayAfterKeyEntryEnable();
-    void sendDelayAfterKeyEntry();
     void sendDeviceUID();
     void sendFilesCache();
 

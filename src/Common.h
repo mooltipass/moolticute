@@ -166,6 +166,7 @@ public:
         MP_Classic = 0,
         MP_Mini = 1,
         MP_BLE = 2,
+        MP_Unknown = -1
     } MPHwVersion;
 
 
@@ -209,6 +210,15 @@ public:
         RANDOM_BYTES
     };
 };
+
+enum class DeviceType
+{
+    MOOLTIPASS = 0,
+    MINI = 1,
+    BLE = 2
+};
+
+const QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
 
 Q_DECLARE_METATYPE(Common::MPStatus)
 Q_DECLARE_METATYPE(Common::MPHwVersion)

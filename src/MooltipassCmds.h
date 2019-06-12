@@ -130,6 +130,7 @@ public:
             STORE_CREDENTIAL    ,
             GET_CREDENTIAL      ,
             GET_DEVICE_SETTINGS ,
+            SET_DEVICE_SETTINGS ,
             GET_AVAILABLE_USERS ,
             CHECK_CREDENTIAL    ,
             GET_USER_SETTINGS   ,
@@ -198,6 +199,8 @@ public:
         LOCK_UNLOCK_FEATURE_PARAM,
         HASH_DISPLAY_FEATURE_PARAM,
         RANDOM_INIT_PIN_PARAM,
+        RESERVED_BLE,
+        PROMPT_ANIMATION_PARAM
     };
     Q_ENUM(Param)
 };

@@ -26,6 +26,8 @@
 #include "AsyncJobs.h"
 #include "MPNode.h"
 #include "FilesCache.h"
+#include "DeviceSettings.h"
+#include "MPSettingsMini.h"
 
 using MPCommandCb = std::function<void(bool success, const QByteArray &data, bool &done)>;
 using MPDeviceProgressCb = std::function<void(const QVariantMap &data)>;
@@ -67,37 +69,11 @@ class MPDevice: public QObject
     Q_OBJECT
 
     QT_WRITABLE_PROPERTY(Common::MPStatus, status, Common::UnknownStatus)
-    QT_WRITABLE_PROPERTY(int, keyboardLayout, 0)
-    QT_WRITABLE_PROPERTY(bool, lockTimeoutEnabled, false)
-    QT_WRITABLE_PROPERTY(int, lockTimeout, 0)
-    QT_WRITABLE_PROPERTY(bool, screensaver, false)
-    QT_WRITABLE_PROPERTY(bool, userRequestCancel, false)
-    QT_WRITABLE_PROPERTY(int, userInteractionTimeout, 0)
-    QT_WRITABLE_PROPERTY(bool, flashScreen, false)
-    QT_WRITABLE_PROPERTY(bool, offlineMode, false)
-    QT_WRITABLE_PROPERTY(bool, tutorialEnabled, false)
     QT_WRITABLE_PROPERTY(bool, memMgmtMode, false)
-    QT_WRITABLE_PROPERTY(int, flashMbSize, 0)
     QT_WRITABLE_PROPERTY(QString, hwVersion, QString())
-
-    QT_WRITABLE_PROPERTY(bool, keyAfterLoginSendEnable, false)
-    QT_WRITABLE_PROPERTY(int, keyAfterLoginSend, 0)
-    QT_WRITABLE_PROPERTY(bool, keyAfterPassSendEnable, false)
-    QT_WRITABLE_PROPERTY(int, keyAfterPassSend, 0)
-    QT_WRITABLE_PROPERTY(bool, delayAfterKeyEntryEnable, false)
-    QT_WRITABLE_PROPERTY(int, delayAfterKeyEntry, 0)
-
-
-
-    //MP Mini only
-    QT_WRITABLE_PROPERTY(int, screenBrightness, 0) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
-    QT_WRITABLE_PROPERTY(bool, knockEnabled, false)
-    QT_WRITABLE_PROPERTY(int, knockSensitivity, 0) // 0-very low, 1-low, 2-medium, 3-high
-    QT_WRITABLE_PROPERTY(bool, randomStartingPin, false)
-    QT_WRITABLE_PROPERTY(bool, hashDisplay, false)
-    QT_WRITABLE_PROPERTY(int, lockUnlockMode, 0)
-
     QT_WRITABLE_PROPERTY(quint32, serialNumber, 0)              // serial number if firmware is above 1.2
+    QT_WRITABLE_PROPERTY(int, flashMbSize, 0)
+
     QT_WRITABLE_PROPERTY(quint32, credentialsDbChangeNumber, 0)  // credentials db change number
     QT_WRITABLE_PROPERTY(quint32, dataDbChangeNumber, 0)         // data db change number
     QT_WRITABLE_PROPERTY(QByteArray, cardCPZ, QByteArray())     // Card CPZ
@@ -109,21 +85,7 @@ public:
     virtual ~MPDevice();
 
     friend class MPDeviceBleImpl;
-
-    enum KnockSensitivityThreshold
-    {
-        KNOCKING_VERY_LOW = 15,
-        KNOCKING_LOW = 11,
-        KNOCKING_MEDIUM = 8,
-        KNOCKING_HIGH = 5
-    };
-
-    enum class DeviceType
-    {
-        MOOLTIPASS = 0,
-        MINI = 1,
-        BLE = 2
-    };
+    friend class MPSettingsMini;
 
     void setupMessageProtocol();
     void sendInitMessages();
@@ -132,31 +94,7 @@ public:
     void sendData(MPCmd::Command cmd, quint32 timeout, MPCommandCb cb);
     void sendData(MPCmd::Command cmd, MPCommandCb cb);
     void sendData(MPCmd::Command cmd, const QByteArray &data, MPCommandCb cb);
-
-    void updateKeyboardLayout(int lang);
-    void updateLockTimeoutEnabled(bool en);
-    void updateLockTimeout(int timeout);
-    void updateScreensaver(bool en);
-    void updateUserRequestCancel(bool en);
-    void updateUserInteractionTimeout(int timeout);
-    void updateFlashScreen(bool en);
-    void updateOfflineMode(bool en);
-    void updateTutorialEnabled(bool en);
-    void updateKeyAfterLoginSendEnable(bool en);
-    void updateKeyAfterLoginSend(int value);
-    void updateKeyAfterPassSendEnable(bool en);
-    void updateKeyAfterPassSend(int value);
-    void updateDelayAfterKeyEntryEnable(bool en);
-    void updateDelayAfterKeyEntry(int val);
-
-
-    //MP Mini only
-    void updateScreenBrightness(int bval); //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%
-    void updateKnockEnabled(bool en);
-    void updateKnockSensitivity(int s); // 0-very low, 1-low, 2-medium, 3-high
-    void updateRandomStartingPin(bool);
-    void updateHashDisplay(bool);
-    void updateLockUnlockMode(int);
+    void enqueueAndRunJob(AsyncJobs* jobs);
 
     void getUID(const QByteArray & key);
 
@@ -168,9 +106,6 @@ public:
     void exitMemMgmtMode(bool setMMMBool = true);
     void startIntegrityCheck(const std::function<void(bool success, int freeBlocks, int totalBlocks, QString errstr)> &cb,
                              const MPDeviceProgressCb &cbProgress);
-
-    //reload parameters from MP
-    void loadParameters();
 
     //Send current date to MP
     void setCurrentDate();
@@ -247,6 +182,7 @@ public:
 
     // Returns bleImpl
     MPDeviceBleImpl* ble() const;
+    DeviceSettings* settings() const;
 
     IMessageProtocol* getMesProt() const;
 
@@ -374,9 +310,6 @@ private:
     // Last page scanned
     quint16 lastFlashPageScanned = 0;
 
-    void updateParam(MPParams::Param param, bool en);
-    void updateParam(MPParams::Param param, int val);
-
     //timer that asks status
     QTimer *statusTimer = nullptr;
 
@@ -466,12 +399,10 @@ private:
 
     FilesCache filesCache;
 
-    //flag set when loading all parameters
-    bool readingParams = false;
-
     //Message Protocol
     IMessageProtocol *pMesProt = nullptr;
     MPDeviceBleImpl *bleImpl = nullptr;
+    DeviceSettings *pSettings = nullptr;
 
 protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
