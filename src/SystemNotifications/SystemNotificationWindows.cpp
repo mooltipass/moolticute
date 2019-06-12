@@ -12,6 +12,8 @@ const QString SystemNotificationWindows::SNORETOAST_INSTALL= "SnoreToast.exe -in
 const QString SystemNotificationWindows::WINDOWS10_VERSION = "10";
 const QString SystemNotificationWindows::NOTIFICATIONS_SETTING_REGENTRY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
 const QString SystemNotificationWindows::DND_ENABLED_REGENTRY = "NOC_GLOBAL_SETTING_TOASTS_ENABLED";
+const QString SystemNotificationWindows::TOAST_ENABLED_SETTING_REGPATH = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
+const QString SystemNotificationWindows::TOAST_ENABLED_REGENTRY = "ToastEnabled";
 const bool SystemNotificationWindows::IS_WIN10 = QSysInfo::productVersion() == WINDOWS10_VERSION;
 
 
@@ -157,7 +159,10 @@ bool SystemNotificationWindows::processResult(const QString &toastResponse, QStr
 bool SystemNotificationWindows::isDoNotDisturbEnabled() const
 {
     QSettings settings(NOTIFICATIONS_SETTING_REGENTRY, QSettings::NativeFormat);
-    return !settings.value(DND_ENABLED_REGENTRY).isNull();
+    bool isDoNotDisturb = !settings.value(DND_ENABLED_REGENTRY).isNull();
+    QSettings toastSetting(TOAST_ENABLED_SETTING_REGPATH, QSettings::NativeFormat);
+    isDoNotDisturb |= !toastSetting.value(TOAST_ENABLED_REGENTRY).toBool();
+    return isDoNotDisturb;
 }
 
 void SystemNotificationWindows::callbackFunction(int exitCode, QProcess::ExitStatus exitStatus)
