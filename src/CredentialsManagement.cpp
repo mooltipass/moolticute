@@ -248,6 +248,7 @@ void CredentialsManagement::onPasswordInputReturnPressed()
 
 void CredentialsManagement::on_pushButtonEnterMMM_clicked()
 {
+    clearMMMUi();
     wsClient->sendEnterMMRequest();
     emit wantEnterMemMode();
 }
@@ -832,6 +833,14 @@ void CredentialsManagement::setServiceInputAttributes(const QString &tooltipText
     pal.setColor(QPalette::Text, col);
     ui->credDisplayServiceInput->setPalette(pal);
     ui->credDisplayServiceInput->setToolTip(tooltipText);
+}
+
+void CredentialsManagement::clearMMMUi()
+{
+    clearLoginDescription();
+    ui->credDisplayFrame->setEnabled(false);
+    m_pCredModel->clear();
+    ui->credentialTreeView->repaint();
 }
 
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)

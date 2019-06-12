@@ -100,6 +100,7 @@ private:
     void enableNonCredentialEditWidgets();
     bool isServiceNameExist(const QString& serviceName) const;
     void setServiceInputAttributes(const QString& tooltipText, Qt::GlobalColor col);
+    void clearMMMUi();
 
     void changeCurrentFavorite(int iFavorite);
     virtual void changeEvent(QEvent *event);
