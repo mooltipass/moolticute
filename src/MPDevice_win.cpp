@@ -163,7 +163,7 @@ void MPDevice_win::platformWrite(const QByteArray &data)
     //resize array to fit windows requirements (at least outReportLen size)
     if (ba.size() < platformDef.outReportLen)
     {
-        ba.append(platformDef.outReportLen - ba.size(), zeroByte);
+        Common::fill(ba, platformDef.outReportLen - ba.size(), zeroByte);
     }
 
     ::ZeroMemory(&writeOverlapped, sizeof(writeOverlapped));

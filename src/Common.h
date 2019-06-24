@@ -161,6 +161,8 @@ public:
     static std::vector<qint64> getRngSeed();
     static void updateSeed(std::vector<qint64> &newInts);
 
+    static void fill(QByteArray &ba, int count, char c);
+
     typedef enum
     {
         MP_Classic = 0,
