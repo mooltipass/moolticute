@@ -430,7 +430,7 @@ QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categorie
     for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
     {
         QByteArray categoryArr = bleProt->toByteArray(categories["category_" + QString::number(i+1)].toString());
-        categoryArr.append(USER_CATEGORY_LENGTH - categoryArr.size(), static_cast<char>(0x00));
+        Common::fill(categoryArr, USER_CATEGORY_LENGTH - categoryArr.size(), static_cast<char>(0x00));
         data.append(categoryArr);
     }
     return data;

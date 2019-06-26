@@ -377,3 +377,11 @@ void Common::updateSeed(std::vector<qint64> &newInts)
 {
     mpRngIntegers = newInts;
 }
+
+void Common::fill(QByteArray &ba, int count, char c)
+{
+    for (int i = 0; i < count; ++i)
+    {
+        ba.append(c);
+    }
+}
