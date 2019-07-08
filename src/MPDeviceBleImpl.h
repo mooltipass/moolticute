@@ -68,6 +68,8 @@ public:
     void readUserSettings(const QByteArray& settings);
     void sendUserSettings();
 
+    void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
+
 signals:
     void userSettingsChanged(QJsonObject settings);
 
@@ -90,6 +92,7 @@ private:
 
     quint8 m_flipBit = 0x00;
     quint8 m_currentUserSettings = 0x00;
+    QString m_debugMsg = "";
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;
