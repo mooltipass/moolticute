@@ -262,7 +262,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::USB_KEYBOARD_PRESS    , 0x9B},
         {MPCmd::STACK_FREE            , 0x9C},
         {MPCmd::CLONE_SMARTCARD       , 0x9D},
-        {MPCmd::DEBUG                 , 0xA0},
+        {MPCmd::DEBUG                 , 0x8000},
         {MPCmd::PING                  , 0x0001},
         {MPCmd::VERSION               , 0xA2},
         {MPCmd::CONTEXT               , 0xA3},

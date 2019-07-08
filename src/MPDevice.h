@@ -399,6 +399,7 @@ private:
 
     FilesCache filesCache;
 
+    bool m_isDebugMsg = false;
     //Message Protocol
     IMessageProtocol *pMesProt = nullptr;
     MPDeviceBleImpl *bleImpl = nullptr;
