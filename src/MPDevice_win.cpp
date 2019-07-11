@@ -93,7 +93,7 @@ HANDLE MPDevice_win::openDevice(QString path, bool exlusive /* =false */)
     DWORD sharedOptRW = exlusive ? 0 : FILE_SHARE_READ | FILE_SHARE_WRITE;
     HANDLE h = CreateFileA(qToChar(path),
                            GENERIC_WRITE | GENERIC_READ,
-                           sharedOptRW,
+                           FILE_SHARE_READ | FILE_SHARE_WRITE,
                            nullptr,
                            OPEN_EXISTING,
                            FILE_FLAG_OVERLAPPED,
@@ -155,7 +155,7 @@ bool MPDevice_win::openPath()
 
 void MPDevice_win::platformWrite(const QByteArray &data)
 {
-    const char zeroByte = static_cast<char>(0x00);
+    const char zeroByte = static_cast<char>(0x03);
     QByteArray ba;
     ba.append(zeroByte); //add report id (even if not used). windows requires that
     ba.append(data);
