@@ -183,6 +183,7 @@ void MPDevice_win::platformWrite(const QByteArray &data)
         qWarning() << "Failed to write data to device! " << err;
         qWarning() << getLastError(err);
     }
+    QThread::msleep(5);
 }
 
 void MPDevice_win::platformRead()
