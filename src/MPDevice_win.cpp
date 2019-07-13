@@ -97,7 +97,7 @@ HANDLE MPDevice_win::openDevice(QString path, bool exlusive /* =false */)
     DWORD sharedOptRW = exlusive ? 0 : FILE_SHARE_READ | FILE_SHARE_WRITE;
     HANDLE h = CreateFileA(qToChar(path),
                            GENERIC_WRITE | GENERIC_READ,
-                           FILE_SHARE_READ | FILE_SHARE_WRITE,
+                           sharedOptRW,
                            nullptr,
                            OPEN_EXISTING,
                            FILE_FLAG_OVERLAPPED,
