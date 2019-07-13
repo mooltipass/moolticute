@@ -113,6 +113,13 @@ void MPManager::usbDeviceAdded(QString path)
             qDebug() << "Not a mooltipass device: " << path;
             return;
         }
+
+        if (isBluetooth && isBLEConnectedWithUsb())
+        {
+            qDebug() << "BLE is already connected with usb";
+            return;
+        }
+
         device = new MPDevice_win(this, MPDevice_win::getPlatDef(path, isBLE, isBluetooth));
 #elif defined(Q_OS_MAC)
         device = new MPDevice_mac(this, MPDevice_mac::getPlatDef(path));
@@ -268,4 +275,11 @@ void MPManager::checkUsbDevices()
         else
             it++;
     }
+}
+
+bool MPManager::isBLEConnectedWithUsb()
+{
+    return std::find_if(devices.begin(), devices.end(),
+              [](MPDevice * dev){ return dev->isBLE();})
+            != devices.end();
 }
