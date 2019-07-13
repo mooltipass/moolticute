@@ -63,6 +63,7 @@ public:
     USHORT outReportLen = 0;
     USHORT inReportLen = 0;
     bool isBLE = false;
+    bool isBluetooth = false;
 };
 
 inline bool operator==(const MPPlatformDef &lhs, const MPPlatformDef &rhs) { return lhs.id == rhs.id; }
@@ -84,8 +85,8 @@ public:
      * @param isBLE out param, true if device is a ble
      * @return true, if the device is mini/ble
      */
-    static bool checkDevice(QString path, bool &isBLE);
-    static MPPlatformDef getPlatDef(QString path, bool isBLE);
+    static bool checkDevice(QString path, bool &isBLE, bool &isBluetooth);
+    static MPPlatformDef getPlatDef(QString path, bool isBLE, bool isBluetooth);
 
 private slots:
     void ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLAPPED *overlapped);
@@ -106,6 +107,9 @@ private:
     OVERLAPPED writeOverlapped;
     OVERLAPPED readOverlapped;
     QWinOverlappedIoNotifier *oNotifier;
+
+    const static QString BT_GATT_SERVICE_GUID;
+    const static char ZERO_BYTE = static_cast<char>(0x00);
 };
 
 #endif // MPDEVICE_WIN_H

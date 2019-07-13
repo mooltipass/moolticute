@@ -21,6 +21,7 @@
 
 // Windows GUID object
 static GUID IClassGuid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30} };
+const QString MPDevice_win::BT_GATT_SERVICE_GUID = "00001812-0000-1000-8000-00805f9b34fb";
 
 MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
     MPDevice(parent),
@@ -35,6 +36,9 @@ MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
     if (p.isBLE)
     {
         deviceType = DeviceType::BLE;
+#if defined(Q_OS_WIN)
+        isBluetooth = platformDef.isBluetooth;
+#endif
     }
     setupMessageProtocol();
 
@@ -155,15 +159,19 @@ bool MPDevice_win::openPath()
 
 void MPDevice_win::platformWrite(const QByteArray &data)
 {
-    const char zeroByte = static_cast<char>(0x03);
+    char reportByte = ZERO_BYTE;
     QByteArray ba;
-    ba.append(zeroByte); //add report id (even if not used). windows requires that
+    if (isBluetooth)
+    {
+        reportByte = static_cast<char>(0x03);
+    }
+    ba.append(reportByte); //add report id (even if not used). windows requires that
     ba.append(data);
 
     //resize array to fit windows requirements (at least outReportLen size)
     if (ba.size() < platformDef.outReportLen)
     {
-        Common::fill(ba, platformDef.outReportLen - ba.size(), zeroByte);
+        Common::fill(ba, platformDef.outReportLen - ba.size(), ZERO_BYTE);
     }
 
     ::ZeroMemory(&writeOverlapped, sizeof(writeOverlapped));
@@ -183,7 +191,10 @@ void MPDevice_win::platformWrite(const QByteArray &data)
         qWarning() << "Failed to write data to device! " << err;
         qWarning() << getLastError(err);
     }
-    QThread::msleep(5);
+    if (isBluetooth)
+    {
+        QThread::msleep(5);
+    }
 }
 
 void MPDevice_win::platformRead()
@@ -264,7 +275,8 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
         free(dev_detail_data);
 
         bool isBLE = false;
-        if (!checkDevice(path, isBLE))
+        bool isBluetooth = false;
+        if (!checkDevice(path, isBLE, isBluetooth))
         {
             continue;
         }
@@ -272,7 +284,7 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
 
         //TODO: extract interface number from path string and check it
 
-        devlist << getPlatDef(path, isBLE);
+        devlist << getPlatDef(path, isBLE, isBluetooth);
     }
 
     SetupDiDestroyDeviceInfoList(dev_info_set);
@@ -280,7 +292,7 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
     return devlist;
 }
 
-bool MPDevice_win::checkDevice(QString path, bool &isBLE /* out */)
+bool MPDevice_win::checkDevice(QString path, bool &isBLE /* out */, bool &isBluetooth /* out */)
 {
     HIDD_ATTRIBUTES attrib;
     //Get vendorid/productid
@@ -301,15 +313,21 @@ bool MPDevice_win::checkDevice(QString path, bool &isBLE /* out */)
     }
 
     isBLE = attrib.VendorID == MOOLTIPASS_BLE_VENDORID;
+    if (isBLE && path.contains(BT_GATT_SERVICE_GUID))
+    {
+        qDebug() << "BT HID connected";
+        isBluetooth = true;
+    }
     return true;
 }
 
-MPPlatformDef MPDevice_win::getPlatDef(QString path, bool isBLE)
+MPPlatformDef MPDevice_win::getPlatDef(QString path, bool isBLE, bool isBluetooth)
 {
     MPPlatformDef def;
     def.path = path;
     def.id = path; //use path for ID
     def.isBLE = isBLE;
+    def.isBluetooth = isBluetooth;
     return def;
 }
 

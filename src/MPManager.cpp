@@ -107,12 +107,13 @@ void MPManager::usbDeviceAdded(QString path)
 #if defined(Q_OS_WIN)
         //Create our platform device object
         bool isBLE = false;
-        if (!MPDevice_win::checkDevice(path, isBLE))
+        bool isBluetooth = false;
+        if (!MPDevice_win::checkDevice(path, isBLE, isBluetooth))
         {
             qDebug() << "Not a mooltipass device: " << path;
             return;
         }
-        device = new MPDevice_win(this, MPDevice_win::getPlatDef(path, isBLE));
+        device = new MPDevice_win(this, MPDevice_win::getPlatDef(path, isBLE, isBluetooth));
 #elif defined(Q_OS_MAC)
         device = new MPDevice_mac(this, MPDevice_mac::getPlatDef(path));
 #endif
@@ -208,6 +209,14 @@ void MPManager::checkUsbDevices()
         return;
     }
 
+#if defined(Q_OS_WIN)
+    //Remove bt connection if usb is connected too
+    if (devlist.size() > 1)
+    {
+        devlist.erase(std::remove_if(devlist.begin(), devlist.end(),
+                       [](MPPlatformDef def){return def.isBluetooth;}));
+    }
+#endif
 
     if (AppDaemon::isEmulationMode())
     {
@@ -219,7 +228,7 @@ void MPManager::checkUsbDevices()
     }
     else
     {
-        foreach (const MPPlatformDef &def, devlist)
+        for (const MPPlatformDef &def : devlist)
         {
             //This is a new connected mooltipass
             if (!devices.contains(def.id))

@@ -407,6 +407,7 @@ private:
 
 protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
+    bool isBluetooth = false;
 };
 
 #endif // MPDEVICE_H
