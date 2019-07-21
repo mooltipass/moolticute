@@ -196,6 +196,8 @@ public:
     inline bool isBLE() const { return DeviceType::BLE == deviceType;}
     //true if device fw version is at least 1.2
     inline bool isFw12() const { return isFw12Flag; }
+    //true if device is connected with Bluetooth
+    inline bool isBT() const { return isBluetooth; }
 
     QList<QVariantMap> getFilesCache();
     bool hasFilesCache();
