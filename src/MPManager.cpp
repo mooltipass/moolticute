@@ -47,7 +47,7 @@ bool MPManager::initialize()
         connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved(QString)));
 
 #elif defined(Q_OS_LINUX)
-        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded(QString, bool)), this, SLOT(usbDeviceAdded(QString, bool)), Qt::QueuedConnection);
+        connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded(QString, bool, bool)), this, SLOT(usbDeviceAdded(QString, bool, bool)), Qt::QueuedConnection);
         connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved(QString)), Qt::QueuedConnection);
 #endif
     }
@@ -134,7 +134,7 @@ void MPManager::usbDeviceAdded(QString path)
 }
 
 #if defined(Q_OS_LINUX)
-void MPManager::usbDeviceAdded(QString path, bool isBLE)
+void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
 {
     if (!devices.contains(path))
     {
@@ -144,6 +144,7 @@ void MPManager::usbDeviceAdded(QString path, bool isBLE)
         def.path = path;
         def.id = path;
         def.isBLE = isBLE;
+        def.isBluetooth = isBT;
         device = new MPDevice_linux(this, def);
 
         devices[path] = device;
