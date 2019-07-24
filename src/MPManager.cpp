@@ -138,6 +138,11 @@ void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
 {
     if (!devices.contains(path))
     {
+        if (isBLE && isBLEConnectedWithUsb())
+        {
+            qDebug() << "BLE is already connected with usb";
+            return;
+        }
         MPDevice *device = nullptr;
         //Create our platform device object
         MPPlatformDef def;
@@ -217,7 +222,7 @@ void MPManager::checkUsbDevices()
         return;
     }
 
-#if defined(Q_OS_WIN)
+#if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
     //Remove bt connection if usb is connected too
     if (devlist.size() > 1)
     {
