@@ -261,6 +261,12 @@ bool AppGui::initialize()
         createMainWindow();
     });
 
+#ifdef Q_OS_MAC
+    //Workaround for Qt display issues for Dark Mode
+    this->setStyleSheet("QComboBox, QRadioButton, QCheckBox:unchecked, QCheckBox:checked, QLabel, QPushButton"
+                          "{ color: black }");
+#endif
+
     return true;
 }
 
