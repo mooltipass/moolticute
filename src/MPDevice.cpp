@@ -663,6 +663,12 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         {
             /* Received packet indicating we received all CPZ CTR packets */
             qDebug() << "All CPZ CTR packets received";
+            if (isBLE())
+            {
+                const auto cpzCtr = pMesProt->getFullPayload(data);
+                cpzCtrValue.append(cpzCtr);
+                cpzCtrValueClone.append(cpzCtr);
+            }
             return true;
         }
         else
@@ -745,8 +751,10 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             else
             {
-                startNode = pMesProt->getFullPayload(data);
-                startNodeClone = pMesProt->getFullPayload(data);
+                const auto node = isBLE() ? pMesProt->getPayloadBytes(data, 0, 2) :
+                                            pMesProt->getFullPayload(data);
+                startNode = node;
+                startNodeClone = node;
                 qDebug() << "Start node addr:" << startNode.toHex();
 
                 //if parent address is not null, load nodes
