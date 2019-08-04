@@ -464,6 +464,22 @@ void MPDeviceBleImpl::sendUserSettings()
     emit userSettingsChanged(settingJson);
 }
 
+void MPDeviceBleImpl::processDebugMsg(const QByteArray &data, bool &isDebugMsg)
+{
+    if (isFirstPacket(data))
+    {
+        isDebugMsg = true;
+    }
+
+    m_debugMsg += bleProt->toQString(bleProt->getFullPayload(data));
+    if (isLastPacket(data))
+    {
+        qWarning() << m_debugMsg;
+        isDebugMsg = false;
+        m_debugMsg.clear();
+    }
+}
+
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
 {
     return createCredentialMessage(cred.getAttributes());

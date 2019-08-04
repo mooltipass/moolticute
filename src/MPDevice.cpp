@@ -282,9 +282,16 @@ void MPDevice::newDataRead(const QByteArray &data)
     //this should be done by the platform code
 
     QByteArray dataReceived = data;
-    if (!isBLE() && pMesProt->getCommand(data) == MPCmd::DEBUG)
+    if (m_isDebugMsg || pMesProt->getCommand(data) == MPCmd::DEBUG)
     {
-        qWarning() << data;
+        if (isBLE())
+        {
+            bleImpl->processDebugMsg(data, m_isDebugMsg);
+        }
+        else
+        {
+            qWarning() << data.toHex();
+        }
         return;
     }
 
