@@ -663,6 +663,12 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         {
             /* Received packet indicating we received all CPZ CTR packets */
             qDebug() << "All CPZ CTR packets received";
+            if (isBLE())
+            {
+                const auto cpzCtr = pMesProt->getFullPayload(data);
+                cpzCtrValue.append(cpzCtr);
+                cpzCtrValueClone.append(cpzCtr);
+            }
             return true;
         }
         else
@@ -672,56 +678,62 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             return false;
         }
     });
-    cpzJob->setReturnCheck(false); //disable return command check
+    if (!isBLE())
+    {
+        cpzJob->setReturnCheck(false); //disable return command check
+    }
     jobs->append(cpzJob);
 
     /* Get favorites */
-    for (uint i = 0; i<MOOLTIPASS_FAV_MAX; i++)
+    if (!isBLE()) //TODO: favourite is not implemented yet for BLE
     {
-        jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE,
-                                      QByteArray(1, static_cast<quint8>(i)),
-                                      [this, i, cbProgress](const QByteArray &, QByteArray &) -> bool
+        for (uint i = 0; i<MOOLTIPASS_FAV_MAX; i++)
         {
-            if (i == 0)
+            jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE,
+                                          QByteArray(1, static_cast<quint8>(i)),
+                                          [this, i, cbProgress](const QByteArray &, QByteArray &) -> bool
             {
-                qInfo() << "Loading favorites...";
-                QVariantMap data = {
-                    {"total", progressTotal},
-                    {"current", progressCurrent},
-                    {"msg", "Loading Favorites..."}
-                };
-                cbProgress(data);
-            }
-            return true;
-        },
-                                      [this, i, jobs, cbProgress](const QByteArray &data, bool &) -> bool
-        {
-            if (pMesProt->getMessageSize(data) == 1)
-            {
-                /* Received one byte as answer: command fail */
-                jobs->setCurrentJobError("Mooltipass refused to send us favorites");
-                qCritical() << "Get favorite: couldn't get answer";
-                return false;
-            }
-            else
-            {
-                /* Append favorite to list */
-                qDebug() << "Favorite" << i << ": parent address:" << pMesProt->getPayloadBytes(data, 0, 2).toHex() << ", child address:" << pMesProt->getPayloadBytes(data, 2, 2).toHex();
-                favoritesAddrs.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
-                favoritesAddrsClone.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
-
-                progressCurrent++;
-                QVariantMap data = {
-                    {"total", progressTotal},
-                    {"current", progressCurrent},
-                    {"msg", "Favorite %1 loaded"},
-                    {"msg_args", QVariantList({i})}
-                };
-                cbProgress(data);
-
+                if (i == 0)
+                {
+                    qInfo() << "Loading favorites...";
+                    QVariantMap data = {
+                        {"total", progressTotal},
+                        {"current", progressCurrent},
+                        {"msg", "Loading Favorites..."}
+                    };
+                    cbProgress(data);
+                }
                 return true;
-            }
-        }));
+            },
+                                          [this, i, jobs, cbProgress](const QByteArray &data, bool &) -> bool
+            {
+                if (pMesProt->getMessageSize(data) == 1)
+                {
+                    /* Received one byte as answer: command fail */
+                    jobs->setCurrentJobError("Mooltipass refused to send us favorites");
+                    qCritical() << "Get favorite: couldn't get answer";
+                    return false;
+                }
+                else
+                {
+                    /* Append favorite to list */
+                    qDebug() << "Favorite" << i << ": parent address:" << pMesProt->getPayloadBytes(data, 0, 2).toHex() << ", child address:" << pMesProt->getPayloadBytes(data, 2, 2).toHex();
+                    favoritesAddrs.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
+                    favoritesAddrsClone.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
+
+                    progressCurrent++;
+                    QVariantMap data = {
+                        {"total", progressTotal},
+                        {"current", progressCurrent},
+                        {"msg", "Favorite %1 loaded"},
+                        {"msg_args", QVariantList({i})}
+                    };
+                    cbProgress(data);
+
+                    return true;
+                }
+            }));
+        }
     }
 
     if (getCreds)
@@ -739,8 +751,10 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             else
             {
-                startNode = pMesProt->getFullPayload(data);
-                startNodeClone = pMesProt->getFullPayload(data);
+                const auto node = isBLE() ? pMesProt->getPayloadBytes(data, 0, 2) :
+                                            pMesProt->getFullPayload(data);
+                startNode = node;
+                startNodeClone = node;
                 qDebug() << "Start node addr:" << startNode.toHex();
 
                 //if parent address is not null, load nodes
@@ -767,7 +781,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         }));
     }
 
-    if (getData)
+    if (getData && !isBLE()) //TODO: Data fetching is not implemented yet for BLE
     {
         //Get parent data node start address
         jobs->append(new MPCommandJob(this, MPCmd::GET_DN_START_PARENT,
@@ -819,56 +833,6 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     }
 }
 
-//TODO: Remove if favorites, cpz_ctr, ctrvalue and getData implemented for BLE too
-void MPDevice::memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds)
-{
-    /* For when the MMM is left */
-    cleanMMMVars();
-
-    if (getCreds)
-    {
-        /* Get parent node start address */
-        jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
-                                      [this, jobs, fullScan, cbProgress](const QByteArray &data, bool &) -> bool
-        {
-            if (pMesProt->getMessageSize(data) == 1)
-            {
-                /* Received one byte as answer: command fail */
-                jobs->setCurrentJobError("Mooltipass refused to send us starting parent");
-                qCritical() << "Get start node addr: couldn't get answer";
-                return false;
-            }
-            else
-            {
-                startNode = pMesProt->getPayloadBytes(data, 0, 2);
-                startNodeClone = pMesProt->getPayloadBytes(data, 0, 2);
-                qDebug() << "Start node addr:" << startNode.toHex();
-
-                //if parent address is not null, load nodes
-                if (startNode != MPNode::EmptyAddress)
-                {
-                    qInfo() << "Loading parent nodes...";
-                    if (!fullScan)
-                    {
-                        /* Traverse the flash by following the linked list */
-                        loadLoginNode(jobs, startNode, cbProgress);
-                    }
-                    else
-                    {
-                        /* Full scan will be triggered once the answer from get data start node is received */
-                    }
-                }
-                else
-                {
-                    qInfo() << "No parent nodes to load.";
-                }
-
-                return true;
-            }
-        }));
-    }
-}
-
 void MPDevice::startMemMgmtMode(bool wantData,
                                 const MPDeviceProgressCb &cbProgress,
                                 const std::function<void(bool success, int errCode, QString errMsg)> &cb)
@@ -890,14 +854,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
     jobs->append(startMmmJob);
 
     /* Load flash contents the usual way */
-    if (isBLE())
-    {
-        memMgmtModeReadFlashBLE(jobs, false, cbProgress, !wantData);
-    }
-    else
-    {
-        memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
-    }
+    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
 
     connect(jobs, &AsyncJobs::finished, [this, cb, wantData](const QByteArray &data)
     {
