@@ -105,7 +105,8 @@ public:
     void sendSetUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
     void sendUserSettingsRequest();
 
-    bool isFw12();
+    inline bool isFw12() const { return isFwVersion(12); }
+    inline bool isFw13() const { return isFwVersion(13); }
 
     void sendLockDevice();
     SettingsGuiHelper* settingsHelper();
@@ -153,6 +154,8 @@ private slots:
     void onTextMessageReceived(const QString &message);
 
 private:
+    bool isFwVersion(int version) const;
+
     QWebSocket *wsocket = nullptr;
 
     QJsonObject memData;

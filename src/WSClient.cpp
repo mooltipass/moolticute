@@ -478,6 +478,21 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
 }
 
+bool WSClient::isFwVersion(int version) const
+{
+    static QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
+    QRegularExpressionMatchIterator i = regVersion.globalMatch(m_fwVersion);
+    if (i.hasNext())
+    {
+        QRegularExpressionMatch match = i.next();
+        int v = match.captured(1).toInt() * 10 +
+                match.captured(2).toInt();
+        return v >= version;
+    }
+
+    return false;
+}
+
 bool WSClient::isMPMini() const
 {
     return  get_mpHwVersion() == Common::MP_Mini;
@@ -684,20 +699,6 @@ void WSClient::sendSetUserCategories(const QString &cat1, const QString &cat2, c
 void WSClient::sendUserSettingsRequest()
 {
     sendJsonData({{ "msg", "get_user_settings" }});
-}
-
-bool WSClient::isFw12()
-{
-    static QRegularExpression regVersion("v([0-9]+)\\.([0-9]+)(.*)");
-    QRegularExpressionMatchIterator i = regVersion.globalMatch(m_fwVersion);
-    if (i.hasNext())
-    {
-        QRegularExpressionMatch match = i.next();
-        int v = match.captured(1).toInt() * 10 +
-                match.captured(2).toInt();
-        return v >= 12;
-    } else
-        return false;
 }
 
 void WSClient::sendLockDevice()
