@@ -111,11 +111,10 @@ bool MessageProtocolBLE::isCPZInvalid(const QByteArray &data)
 
 QVector<QByteArray> MessageProtocolBLE::createWriteNodePackets(const QByteArray &data, const QByteArray &address)
 {
-    Q_UNUSED(data);
-    Q_UNUSED(address);
     QVector<QByteArray> packets;
-    qWarning("Not implemented yet");
-    packets.append(QByteArray());
+    QByteArray test{address};
+    test.append(data);
+    packets.append(test);
     return packets;
 }
 
@@ -300,7 +299,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::CANCEL_USER_REQUEST   , 0x0005},
         {MPCmd::PLEASE_RETRY          , 0x0002},
         {MPCmd::READ_FLASH_NODE       , 0x0102},
-        {MPCmd::WRITE_FLASH_NODE      , 0xC6},
+        {MPCmd::WRITE_FLASH_NODE      , 0x010D},
         {MPCmd::GET_FAVORITE          , 0xC7},
         {MPCmd::SET_FAVORITE          , 0xC8},
         {MPCmd::GET_STARTING_PARENT   , 0x0100},
