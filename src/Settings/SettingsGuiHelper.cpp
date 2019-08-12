@@ -237,7 +237,7 @@ void SettingsGuiHelper::sendParams(int value, int param)
 void SettingsGuiHelper::checkKeyboardLayout()
 {
     const auto containsFw13LangLayouts = ui->comboBoxLang->findText(m_fw13LangMap.firstKey()) != -1;
-    const bool isFw13 = m_wsClient->isFw12();
+    const bool isFw13 = m_wsClient->isFw13();
     if (!containsFw13LangLayouts && isFw13)
     {
         for (const auto& langs : m_fw13LangMap.toStdMap())
