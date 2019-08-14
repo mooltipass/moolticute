@@ -10,6 +10,11 @@ SettingsGuiHelper::SettingsGuiHelper(WSClient* parent)
     : QObject(parent),
       m_wsClient{parent}
 {
+    m_fw13LangMap = {{"ca_FR", ID_KEYB_CA_FR_LUT},
+                     {"ca_MAC", ID_KEYB_CA_MAC_LUT},
+                     {"dk_MAC", ID_KEYB_DK_MAC_LUT},
+                     {"uk_MAC", ID_KEYB_UK_MAC_LUT},
+                     {"por", ID_KEYB_POR_LUT}};
 }
 
 void SettingsGuiHelper::setMainWindow(MainWindow *mw)
@@ -41,6 +46,7 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::RESERVED_BLE, ui->checkBoxBLEReserved},
         {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxPromptAnim}
     };
+    setupKeyboardLayout();
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)
     {
@@ -226,4 +232,66 @@ void SettingsGuiHelper::sendParams(int value, int param)
         qCritical() << "Invalid widget";
     }
     m_mw->checkSettingsChanged();
+}
+
+void SettingsGuiHelper::checkKeyboardLayout()
+{
+    const auto containsFw13LangLayouts = ui->comboBoxLang->findText(m_fw13LangMap.firstKey()) != -1;
+    const bool isFw13 = m_wsClient->isFw13();
+    if (!containsFw13LangLayouts && isFw13)
+    {
+        for (const auto& langs : m_fw13LangMap.toStdMap())
+        {
+            ui->comboBoxLang->addItem(langs.first, langs.second);
+        }
+        ui->comboBoxLang->model()->sort(0);
+    }
+    else if (containsFw13LangLayouts && !isFw13)
+    {
+        for (const auto& lang : m_fw13LangMap.keys())
+        {
+            ui->comboBoxLang->removeItem(ui->comboBoxLang->findText(lang));
+        }
+    }
+}
+
+void SettingsGuiHelper::setupKeyboardLayout()
+{
+    //Add languages to combobox
+    auto* langCb = ui->comboBoxLang;
+    langCb->addItem("en_US", ID_KEYB_EN_US_LUT);
+    langCb->addItem("fr_FR", ID_KEYB_FR_FR_LUT);
+    langCb->addItem("es_ES", ID_KEYB_ES_ES_LUT);
+    langCb->addItem("de_DE", ID_KEYB_DE_DE_LUT);
+    langCb->addItem("es_AR", ID_KEYB_ES_AR_LUT);
+    langCb->addItem("en_AU", ID_KEYB_EN_AU_LUT);
+    langCb->addItem("fr_BE", ID_KEYB_FR_BE_LUT);
+    langCb->addItem("po_BR", ID_KEYB_PO_BR_LUT);
+    langCb->addItem("en_CA", ID_KEYB_EN_CA_LUT);
+    langCb->addItem("cz_CZ", ID_KEYB_CZ_CZ_LUT);
+    langCb->addItem("da_DK", ID_KEYB_DA_DK_LUT);
+    langCb->addItem("fi_FI", ID_KEYB_FI_FI_LUT);
+    langCb->addItem("hu_HU", ID_KEYB_HU_HU_LUT);
+    langCb->addItem("is_IS", ID_KEYB_IS_IS_LUT);
+    langCb->addItem("it_IT", ID_KEYB_IT_IT_LUT);
+    langCb->addItem("nl_NL", ID_KEYB_NL_NL_LUT);
+    langCb->addItem("no_NO", ID_KEYB_NO_NO_LUT);
+    langCb->addItem("po_PO", ID_KEYB_PO_PO_LUT);
+    langCb->addItem("ro_RO", ID_KEYB_RO_RO_LUT);
+    langCb->addItem("sl_SL", ID_KEYB_SL_SL_LUT);
+    langCb->addItem("frde_CH", ID_KEYB_FRDE_CH_LUT);
+    langCb->addItem("en_UK", ID_KEYB_EN_UK_LUT);
+    langCb->addItem("cs_QWERTY", ID_KEYB_CZ_QWERTY_LUT);
+    langCb->addItem("en_DV", ID_KEYB_EN_DV_LUT);
+    langCb->addItem("fr_MAC", ID_KEYB_FR_MAC_LUT);
+    langCb->addItem("fr_CH_MAC", ID_KEYB_FR_CH_MAC_LUT);
+    langCb->addItem("de_CH_MAC", ID_KEYB_DE_CH_MAC_LUT);
+    langCb->addItem("de_MAC", ID_KEYB_DE_MAC_LUT);
+    langCb->addItem("us_MAC", ID_KEYB_US_MAC_LUT);
+
+    QSortFilterProxyModel* proxy = new QSortFilterProxyModel(langCb);
+    proxy->setSourceModel( langCb->model());
+    langCb->model()->setParent(proxy);
+    langCb->setModel(proxy);
+    langCb->model()->sort(0);
 }
