@@ -3347,6 +3347,32 @@ void MPDevice::exitMemMgmtMode(bool setMMMBool)
 {
     AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
+    if (isBLE() && loginChildNodesClone.size() > 0)
+    {
+        qDebug() << "Testing write flash node " << loginChildNodesClone.size();
+        if (auto *node = loginChildNodesClone.at(0))
+        {
+            auto test = pMesProt->createWriteNodePackets(node->getNodeData(), node->getAddress());
+            jobs->append(new MPCommandJob(this, MPCmd::WRITE_FLASH_NODE, test[0],
+                [this](const QByteArray &data, bool &) -> bool
+            {
+                if (pMesProt->getFirstPayloadByte(data) == 0)
+                {
+                    qCritical() << "Couldn't Write In Flash";
+                    return true;
+                }
+                else
+                {
+                    qDebug() << "Writing flash node was successfull";
+                    return true;
+                }
+            }));
+    #ifdef DEV_DEBUG
+            qDebug() << "Write node packet #" << static_cast<quint8>(test[0][2]) << " : " << test[0].toHex();
+    #endif
+        }
+    }
+
     jobs->append(new MPCommandJob(this, MPCmd::END_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
 
     connect(jobs, &AsyncJobs::finished, [this, setMMMBool](const QByteArray &)
@@ -6560,7 +6586,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
 
     /* Out of pure coding laziness, ask free addresses even if we don't need them */
-    loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
+    if (!isBLE())
+    {
+        loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
+    }
 
     connect(jobs, &AsyncJobs::finished, [this, cb, cbProgress](const QByteArray &)
     {
