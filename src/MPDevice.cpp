@@ -481,6 +481,10 @@ void MPDevice::sendDataDequeue()
         qDebug() << "Full packet#" << i++ << ": " << a;
 #endif
 
+        if (0 == i%5)
+        {
+            QThread::msleep(10);
+        }
         platformWrite(data);
     }
 
