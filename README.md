@@ -10,7 +10,7 @@ the power of the device to more platform/tools.
 With it you can manage your Mooltipass with a cross-platform app, as well as provide a daemon service that
 handles all USB communication with the device.
 
-This tool is written with a daemon that runs in background, and a user interface app to control you Mooltipass.
+This tool is written with a daemon that runs in background, and a user interface app to control your Mooltipass.
 Other clients could also connect and talk to the daemon (it uses a websocket connection and simple JSON messages).
 The official Mooltipass App only works with Chrome as it relies on USB HID library that is only implemented in Chrome.
 A Firefox (or any other browser) extension could easily be written by using the Moolticute daemon.
@@ -75,7 +75,7 @@ Two method can be used to build, by using QtCreator IDE, or from command line (t
 
 ##### Command line
 
-Qt needs to be installed correctly (see you Linux distribution for that)
+Qt needs to be installed correctly (see your Linux distribution for that)
 
 ```
 mkdir build
