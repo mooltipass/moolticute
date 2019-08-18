@@ -457,8 +457,8 @@ void MPDevice::sendDataDequeue()
     MPCommand &currentCmd = commandQueue.head();
     currentCmd.running = true;
 
-#ifdef DEV_DEBUG
     int i = 0;
+#ifdef DEV_DEBUG
     qDebug() << "Platform send command: " << pMesProt->printCmd(currentCmd.data[0]);
 #endif
     if (isBLE())
@@ -483,6 +483,9 @@ void MPDevice::sendDataDequeue()
 
         if (0 == i%5)
         {
+            /* Added a 10 msec delay for long messages
+             * after every 5th packet to avoid packet drop
+             */
             QThread::msleep(10);
         }
         platformWrite(data);
