@@ -5,15 +5,15 @@ Moolticute
 
 [![Build Status](https://travis-ci.org/mooltipass/moolticute.svg?branch=master)](https://travis-ci.org/mooltipass/moolticute)
 
-This project aims to be an easy companion to your [Mooltipass](http://www.themooltipass.com) device and extend
+This project aims to be an easy to use companion to your [Mooltipass](http://www.themooltipass.com) device and extend
 the power of the device to more platform/tools.
 With it you can manage your Mooltipass with a cross-platform app, as well as provide a daemon service that
 handles all USB communication with the device.
 
-This tool is written with a daemon that runs in background, and a user interface app to control you Mooltipass.
-Other clients could also connect and talk to the daemon (it uses a websocket connection and simple JSON messages).
+This tool comes with a daemon that runs in background, and a user interface app to control your Mooltipass.
+Other clients can also connect and talk to the daemon (it uses a websocket connection and simple JSON messages).
 The official Mooltipass App only works with Chrome as it relies on USB HID library that is only implemented in Chrome.
-A Firefox (or any other browser) extension could easily be written by using the Moolticute daemon.
+A Firefox (or any other browser) extension could easily be written that uses the Moolticute daemon.
 
 It is completely cross platform, and runs on Linux (using native hidraw API), OS X (native IOKit API), and Windows (native HID API).
 
@@ -70,12 +70,12 @@ Two method can be used to build, by using QtCreator IDE, or from command line (t
  - Start Qt-Creator
  - Open the main Moolticute.pro project file 
     - Note for Windows users: make sure that you select a "kit" that uses the MinGW compiler.
-      Moolticute currently won't compile successfully on the Microsoft Visual C++ compiler.
+      Moolticute currently won't compile successfully when using the Microsoft Visual C++ compiler.
  - Click on the "play" button to build and run
 
 ##### Command line
 
-Qt needs to be installed correctly (see you Linux distribution for that)
+Qt needs to be installed correctly (see your Linux distribution for that)
 
 ```
 mkdir build
@@ -84,7 +84,7 @@ qmake ../Moolticute.pro
 make
 ```
 
-Be careful to use the Qt5 qmake. You can check if you are using the correct qmake by using the command
+Be sure to use the Qt5 qmake. You can check if you are using the correct qmake by using the command
 ```
 ➜  ~  qmake --version
 QMake version 3.0
