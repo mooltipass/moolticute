@@ -70,6 +70,14 @@ public:
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
 
+    void incrementParentNodeNeeded() { ++m_parentNodeNeeded; m_parentAddrMapping[m_parentNodeNeeded] = QByteArray{}; }
+    void incrementChildNodeNeeded() { ++m_childNodeNeeded; m_childAddrMapping[m_childNodeNeeded] = QByteArray{}; }
+    int getParentNodeNeededCount() const { return m_parentNodeNeeded; }
+    int getChildNodeNeededCount() const { return m_childNodeNeeded; }
+    QByteArray getFreeAddress(const int virtualAddr);
+    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress);
+    void cleanFreeAddresses();
+
 signals:
     void userSettingsChanged(QJsonObject settings);
 
@@ -93,6 +101,11 @@ private:
     quint8 m_flipBit = 0x00;
     quint8 m_currentUserSettings = 0x00;
     QString m_debugMsg = "";
+
+    int m_parentNodeNeeded = 0;
+    int m_childNodeNeeded = 0;
+    QMap<int, QByteArray> m_parentAddrMapping;
+    QMap<int, QByteArray> m_childAddrMapping;
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;

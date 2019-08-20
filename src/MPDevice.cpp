@@ -2375,7 +2375,7 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     }
 
     /* Increment new addresses counter */
-    newAddressesNeededCounter += 1;
+    incrementNeededAddresses(MPNode::NodeParent);
 
     /* Create new node with null address and virtual address set to our counter value */
     newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
@@ -3350,10 +3350,21 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     return diagSavePacketsGenerated;
 }
 
+QByteArray MPDevice::getFreeAddress(quint32 virtualAddr)
+{
+    const int virtAddr = static_cast<int>(virtualAddr);
+    if (isBLE())
+    {
+        return bleImpl->getFreeAddress(virtAddr);
+    }
+    return freeAddresses[virtAddr];
+}
+
 void MPDevice::exitMemMgmtMode(bool setMMMBool)
 {
     AsyncJobs *jobs = new AsyncJobs("Exiting MMM", this);
 
+    //TODO: remove, only for testing
     if (isBLE() && loginChildNodesClone.size() > 0)
     {
         qDebug() << "Testing write flash node " << loginChildNodesClone.size();
@@ -4476,42 +4487,42 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
 {
     if (virtualStartNode != 0)
     {
-        qDebug() << "Setting start node to " << freeAddresses[virtualStartNode].toHex();
-        startNode = freeAddresses[virtualStartNode];
+        qDebug() << "Setting start node to " << getFreeAddress(virtualStartNode).toHex();
+        startNode = getFreeAddress(virtualStartNode);
     }
     if (virtualDataStartNode != 0)
     {
-        qDebug() << "Setting data start node to " << freeAddresses[virtualDataStartNode].toHex();
-        startDataNode = freeAddresses[virtualDataStartNode];
+        qDebug() << "Setting data start node to " << getFreeAddress(virtualDataStartNode).toHex();
+        startDataNode = getFreeAddress(virtualDataStartNode);
     }
     qDebug() << "Replacing virtual addresses for login nodes...";
     for (auto &i: loginNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
-        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
-        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPreviousParentVirtualAddress()]);
-        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getStartChildVirtualAddress()]);
+        if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(getFreeAddress(i->getNextParentVirtualAddress()));
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(getFreeAddress(i->getPreviousParentVirtualAddress()));
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(getFreeAddress(i->getStartChildVirtualAddress()));
     }
     qDebug() << "Replacing virtual addresses for child nodes...";
     for (auto &i: loginChildNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
-        if (i->getNextChildAddress().isNull()) i->setNextChildAddress(freeAddresses[i->getNextChildVirtualAddress()]);
-        if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(freeAddresses[i->getPreviousChildVirtualAddress()]);
+        if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+        if (i->getNextChildAddress().isNull()) i->setNextChildAddress(getFreeAddress(i->getNextChildVirtualAddress()));
+        if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(getFreeAddress(i->getPreviousChildVirtualAddress()));
     }
     qDebug() << "Replacing virtual addresses for data nodes...";
     for (auto &i: dataNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
-        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
-        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPreviousParentVirtualAddress()]);
-        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getStartChildVirtualAddress()]);
+        if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(getFreeAddress(i->getNextParentVirtualAddress()));
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(getFreeAddress(i->getPreviousParentVirtualAddress()));
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(getFreeAddress(i->getStartChildVirtualAddress()));
     }
     qDebug() << "Replacing virtual addresses for data child nodes...";
     for (auto &i: dataChildNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
-        if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(freeAddresses[i->getNextChildVirtualAddress()]);
+        if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+        if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(getFreeAddress(i->getNextChildVirtualAddress()));
     }
 }
 
@@ -5139,6 +5150,10 @@ void MPDevice::cleanMMMVars(void)
     loginChildNodesClone.clear();
     dataChildNodesClone.clear();
     freeAddresses.clear();
+    if (isBLE())
+    {
+        bleImpl->cleanFreeAddresses();
+    }
 }
 
 void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, MessageHandlerCb cb, bool noDelete)
@@ -5292,7 +5307,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                             qDebug() << importedLoginNodes[i]->getService() << " : adding new child " << imported_child_node->getLogin() << " in the mooltipass...";
 
                             /* Increment new addresses counter */
-                            newAddressesNeededCounter += 1;
+                            incrementNeededAddresses(MPNode::NodeChild);
 
                             /* Create new node with null address and virtual address set to our counter value */
                             MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
@@ -5325,7 +5340,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
             if(service_node_found == false)
             {
                /* Increment new addresses counter */
-               newAddressesNeededCounter += 1;
+               incrementNeededAddresses(MPNode::NodeParent);
 
                /* Create new node with null address and virtual address set to our counter value */
                MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
@@ -5360,7 +5375,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                    }
 
                    /* Increment new addresses counter */
-                   newAddressesNeededCounter += 1;
+                   incrementNeededAddresses(MPNode::NodeChild);
 
                    /* Create new node with null address and virtual address set to our counter value */
                    MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
@@ -5500,7 +5515,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                                 qDebug() << importedDataNodes[i]->getService() << " : appending child data in the mooltipass...";
 
                                 /* Increment new addresses counter */
-                                newAddressesNeededCounter += 1;
+                                incrementNeededAddresses(MPNode::NodeChild);
 
                                 /* Create new node with null address and virtual address set to our counter value */
                                 MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
@@ -5545,7 +5560,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 if(service_node_found == false)
                 {
                    /* Increment new addresses counter */
-                   newAddressesNeededCounter += 1;
+                   incrementNeededAddresses(MPNode::NodeParent);
 
                    /* Create new node with null address and virtual address set to our counter value */
                    MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
@@ -5582,7 +5597,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                        }
 
                        /* Increment new addresses counter */
-                       newAddressesNeededCounter += 1;
+                       incrementNeededAddresses(MPNode::NodeChild);
 
                        /* Create new node with null address and virtual address set to our counter value */
                        MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
@@ -5955,7 +5970,13 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
 {
     qDebug() << "Loading free addresses from address:" << addressFrom.toHex();
 
-    jobs->append(new MPCommandJob(this, MPCmd::GET_30_FREE_SLOTS,
+    if (isBLE())
+    {
+        bleImpl->loadFreeAddresses(jobs, addressFrom, cbProgress);
+        return;
+    }
+
+    jobs->append(new MPCommandJob(this, MPCmd::GET_FREE_ADDRESSES,
                                   addressFrom,
                                   [this, jobs, discardFirstAddr, cbProgress](const QByteArray &data, bool &) -> bool
     {
@@ -6019,6 +6040,26 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
             return true;
         }
     }));
+}
+
+void MPDevice::incrementNeededAddresses(MPNode::NodeType type)
+{
+    ++newAddressesNeededCounter;
+    if (isBLE())
+    {
+        if (MPNode::NodeParent == type)
+        {
+            bleImpl->incrementParentNodeNeeded();
+        }
+        else if (MPNode::NodeChild == type)
+        {
+            bleImpl->incrementChildNodeNeeded();
+        }
+        else
+        {
+            qCritical() << "Invalid MPNode type: " << type;
+        }
+    }
 }
 
 void MPDevice::startIntegrityCheck(const std::function<void(bool success, int freeBlocks, int totalBlocks, QString errstr)> &cb,
@@ -6382,7 +6423,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 }
 
                 /* Increment new addresses counter */
-                newAddressesNeededCounter += 1;
+                incrementNeededAddresses(MPNode::NodeChild);
 
                 /* Create new node with null address and virtual address set to our counter value */
                 MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
@@ -6422,7 +6463,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 }
 
                 /* Increment new addresses counter */
-                newAddressesNeededCounter += 1;
+                incrementNeededAddresses(MPNode::NodeParent);
 
                 /* Remove child from previous parent */
                 removeChildFromDB(parentNodePtr, nodePtr, true, false);
@@ -6593,10 +6634,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
 
     /* Out of pure coding laziness, ask free addresses even if we don't need them */
-    if (!isBLE())
-    {
-        loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
-    }
+    loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
 
     connect(jobs, &AsyncJobs::finished, [this, cb, cbProgress](const QByteArray &)
     {

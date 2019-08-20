@@ -480,6 +480,68 @@ void MPDeviceBleImpl::processDebugMsg(const QByteArray &data, bool &isDebugMsg)
     }
 }
 
+QByteArray MPDeviceBleImpl::getFreeAddress(const int virtualAddr)
+{
+    if (m_parentAddrMapping.contains(virtualAddr))
+    {
+        return m_parentAddrMapping[virtualAddr];
+    }
+    else if (m_childAddrMapping.contains(virtualAddr))
+    {
+        return m_childAddrMapping[virtualAddr];
+    }
+    qCritical() << "No address loaded for virtual address: " << virtualAddr;
+    return QByteArray{};
+}
+
+void MPDeviceBleImpl::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress)
+{
+    Q_UNUSED(cbProgress)
+    if (0 == m_parentNodeNeeded && 0 == m_childNodeNeeded)
+    {
+        qDebug() << "No free address is required";
+        return;
+    }
+    auto addressPackage = addressFrom;
+    addressPackage.append(bleProt->toLittleEndianFromInt(m_parentNodeNeeded));
+    addressPackage.append(bleProt->toLittleEndianFromInt(m_childNodeNeeded));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_FREE_ADDRESSES,
+                                  addressPackage,
+                                  [this](const QByteArray &data, bool &) -> bool
+        {
+            const auto msgSize = bleProt->getMessageSize(data);
+            if ((m_parentNodeNeeded + m_childNodeNeeded)*2 != msgSize)
+            {
+                qCritical() << "Not enough address retrieved during loadFreeAddresses";
+                return false;
+            }
+            const auto receivedAddresses = bleProt->getFullPayload(data);
+            qDebug() << receivedAddresses.toHex();
+            int pos = 0;
+
+            for (auto& ba : m_parentAddrMapping)
+            {
+                ba.append(receivedAddresses.mid(pos, 2));
+                pos += 2;
+            }
+            for (auto& ba : m_childAddrMapping)
+            {
+                ba.append(receivedAddresses.mid(pos, 2));
+                pos += 2;
+            }
+            return true;
+        }
+    ));
+}
+
+void MPDeviceBleImpl::cleanFreeAddresses()
+{
+    m_parentNodeNeeded = 0;
+    m_parentAddrMapping.clear();
+    m_childNodeNeeded = 0;
+    m_childAddrMapping.clear();
+}
+
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
 {
     return createCredentialMessage(cred.getAttributes());

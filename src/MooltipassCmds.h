@@ -116,7 +116,7 @@ public:
             ADD_CARD_CPZ_CTR    ,
             GET_CARD_CPZ_CTR    ,
             CARD_CPZ_CTR_PACKET ,
-            GET_30_FREE_SLOTS   ,
+            GET_FREE_ADDRESSES  ,
             GET_DN_START_PARENT ,
             SET_DN_START_PARENT ,
             END_MEMORYMGMT      ,

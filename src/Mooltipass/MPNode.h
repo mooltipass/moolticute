@@ -30,7 +30,7 @@ public:
     MPNode(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
     MPNode(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
 
-    enum
+    enum NodeType
     {
         NodeUnknown = -1,
         NodeParent = 0,

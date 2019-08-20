@@ -255,6 +255,7 @@ private:
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
     void startImportFileMerging(const MPDeviceProgressCb &progressCb, MessageHandlerCb cb, bool noDelete);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress);
+    void incrementNeededAddresses(MPNode::NodeType type);
     MPNode *findNodeWithAddressWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr);
     MPNode *findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QString& name);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
@@ -292,6 +293,7 @@ private:
     // Generate save packets
     bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, const MPDeviceProgressCb &cbProgress);
 
+    QByteArray getFreeAddress(quint32 virtualAddr);
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
 
