@@ -247,6 +247,8 @@ private:
     bool setDataNodeCb(AsyncJobs *jobs, int current,
                        const MPDeviceProgressCb &cbProgress,
                        const QByteArray &data, bool &done);
+    int getParentNodeSize() const;
+    int getChildNodeSize() const;
 
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds);

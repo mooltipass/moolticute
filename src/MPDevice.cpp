@@ -24,6 +24,7 @@
 #include "MPDeviceBleImpl.h"
 #include "BleCommon.h"
 #include "MPSettingsBLE.h"
+#include "MPNodeBLE.h"
 
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
@@ -2378,7 +2379,7 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     incrementNeededAddresses(MPNode::NodeParent);
 
     /* Create new node with null address and virtual address set to our counter value */
-    newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+    newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
     newNodePt->setType(MPNode::NodeParent);
     newNodePt->setService(service);
 
@@ -4265,6 +4266,24 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
     return true;
 }
 
+int MPDevice::getParentNodeSize() const
+{
+    if (isBLE())
+    {
+        return MPNodeBLE::PARENT_NODE_LENGTH;
+    }
+    return MP_NODE_SIZE;
+}
+
+int MPDevice::getChildNodeSize() const
+{
+    if (isBLE())
+    {
+        return MPNodeBLE::CHILD_NODE_LENGTH;
+    }
+    return MP_NODE_SIZE;
+}
+
 void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
                            MessageHandlerCb cb,
                            const MPDeviceProgressCb &cbProgress)
@@ -5310,7 +5329,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                             incrementNeededAddresses(MPNode::NodeChild);
 
                             /* Create new node with null address and virtual address set to our counter value */
-                            MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                            MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                             newChildNodePt->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
                             newChildNodePt->setMergeTagged();
 
@@ -5343,7 +5362,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                incrementNeededAddresses(MPNode::NodeParent);
 
                /* Create new node with null address and virtual address set to our counter value */
-               MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+               MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                newNodePt->setLoginNodeData(importedLoginNodes[i]->getNodeFlags(), importedLoginNodes[i]->getLoginNodeData());
                newNodePt->setMergeTagged();
 
@@ -5378,7 +5397,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                    incrementNeededAddresses(MPNode::NodeChild);
 
                    /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                   MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                    newChildNodePt->setLoginChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getLoginChildNodeData());
                    newChildNodePt->setMergeTagged();
 
@@ -5518,7 +5537,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                                 incrementNeededAddresses(MPNode::NodeChild);
 
                                 /* Create new node with null address and virtual address set to our counter value */
-                                MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                                MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                                 newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
                                 newDataChildNodePt->setMergeTagged();
 
@@ -5563,7 +5582,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                    incrementNeededAddresses(MPNode::NodeParent);
 
                    /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                   MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                    newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
                    newNodePt->setMergeTagged();
 
@@ -5600,7 +5619,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                        incrementNeededAddresses(MPNode::NodeChild);
 
                        /* Create new node with null address and virtual address set to our counter value */
-                       MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                       MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                        newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
                        newDataChildNodePt->setMergeTagged();
 
@@ -6426,7 +6445,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 incrementNeededAddresses(MPNode::NodeChild);
 
                 /* Create new node with null address and virtual address set to our counter value */
-                MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                 newNodePt->setType(MPNode::NodeChild);
                 loginChildNodes.append(newNodePt);
                 newNodePt->setNotDeletedTagged();
