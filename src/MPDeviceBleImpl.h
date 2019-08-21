@@ -70,8 +70,8 @@ public:
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
 
-    void incrementParentNodeNeeded() { ++m_parentNodeNeeded; m_parentAddrMapping[m_parentNodeNeeded] = QByteArray{}; }
-    void incrementChildNodeNeeded() { ++m_childNodeNeeded; m_childAddrMapping[m_childNodeNeeded] = QByteArray{}; }
+    void incrementParentNodeNeeded(int mappingAddr) { ++m_parentNodeNeeded; m_parentAddrMapping[mappingAddr] = QByteArray{}; }
+    void incrementChildNodeNeeded(int mappingAddr) { ++m_childNodeNeeded; m_childAddrMapping[mappingAddr] = QByteArray{}; }
     int getParentNodeNeededCount() const { return m_parentNodeNeeded; }
     int getChildNodeNeededCount() const { return m_childNodeNeeded; }
     QByteArray getFreeAddress(const int virtualAddr);

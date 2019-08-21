@@ -303,7 +303,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::GET_FAVORITE          , 0xC7},
         {MPCmd::SET_FAVORITE          , 0xC8},
         {MPCmd::GET_STARTING_PARENT   , 0x0100},
-        {MPCmd::SET_STARTING_PARENT   , 0xCA},
+        {MPCmd::SET_STARTING_PARENT   , 0x0105},
         {MPCmd::GET_CTRVALUE          , 0x0109},
         {MPCmd::SET_CTRVALUE          , 0xCC},
         {MPCmd::ADD_CARD_CPZ_CTR      , 0xCD},

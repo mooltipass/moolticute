@@ -6068,11 +6068,11 @@ void MPDevice::incrementNeededAddresses(MPNode::NodeType type)
     {
         if (MPNode::NodeParent == type)
         {
-            bleImpl->incrementParentNodeNeeded();
+            bleImpl->incrementParentNodeNeeded(newAddressesNeededCounter);
         }
         else if (MPNode::NodeChild == type)
         {
-            bleImpl->incrementChildNodeNeeded();
+            bleImpl->incrementChildNodeNeeded(newAddressesNeededCounter);
         }
         else
         {
@@ -6699,6 +6699,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 /* Create password change jobs */
                 for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
                 {
+                    if (isBLE())
+                    {
+                        bleImpl->storeCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
+                        continue;
+                    }
                     QByteArray sdata = pMesProt->toByteArray(mmmPasswordChangeArray[i][0]);
                     sdata.append((char)0);
 
