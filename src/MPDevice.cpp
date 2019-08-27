@@ -6662,21 +6662,32 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         connect(mergeOperations, &AsyncJobs::finished, [this, cb, cbProgress](const QByteArray &data)
         {
             Q_UNUSED(data);
+
+            if (mmmPasswordChangeArray.isEmpty())
+            {
+                cb(true, "Changes Applied to Memory");
+                qInfo() << "No passwords to be changed";
+                return;
+            }
+
+            AsyncJobs *pwdChangeJobs = new AsyncJobs("Changing passwords...", this);
+
+            if (isBLE())
+            {
+                for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
+                {
+                    bleImpl->storeCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
+                }
+            }
+
             exitMemMgmtMode(true);
             qInfo() << "Merge operations succeeded!";
 
-            if (mmmPasswordChangeArray.size() > 0)
+            if (!isBLE())
             {
-                AsyncJobs *pwdChangeJobs = new AsyncJobs("Changing passwords...", this);
-
                 /* Create password change jobs */
                 for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
                 {
-                    if (isBLE())
-                    {
-                        bleImpl->storeCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
-                        continue;
-                    }
                     QByteArray sdata = pMesProt->toByteArray(mmmPasswordChangeArray[i][0]);
                     sdata.append((char)0);
 
@@ -6743,30 +6754,25 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                         return true;
                     }));
                 }
-
-                connect(pwdChangeJobs, &AsyncJobs::finished, [this, cb](const QByteArray &)
-                {
-                    cb(true, "Changes Applied to Memory");
-                    qInfo() << "Passwords changed!";
-                    mmmPasswordChangeArray.clear();
-                });
-
-                connect(pwdChangeJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
-                {
-                    Q_UNUSED(failedJob);
-                    mmmPasswordChangeArray.clear();
-                    qCritical() << "Couldn't change passwords";
-                    cb(false, "Please Approve Password Changes On The Device");
-                });
-
-                jobsQueue.enqueue(pwdChangeJobs);
-                runAndDequeueJobs();
             }
-            else
+
+            connect(pwdChangeJobs, &AsyncJobs::finished, [this, cb](const QByteArray &)
             {
                 cb(true, "Changes Applied to Memory");
-                qInfo() << "No passwords to be changed";
-            }
+                qInfo() << "Passwords changed!";
+                mmmPasswordChangeArray.clear();
+            });
+
+            connect(pwdChangeJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
+            {
+                Q_UNUSED(failedJob);
+                mmmPasswordChangeArray.clear();
+                qCritical() << "Couldn't change passwords";
+                cb(false, "Please Approve Password Changes On The Device");
+            });
+
+            jobsQueue.enqueue(pwdChangeJobs);
+            runAndDequeueJobs();
         });
         connect(mergeOperations, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
         {
