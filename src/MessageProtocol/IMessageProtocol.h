@@ -172,6 +172,10 @@ public:
     virtual MPNode* createMPNode(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
     virtual MPNode* createMPNode(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
 
+    virtual int getParentNodeSize() const = 0;
+    virtual int getChildNodeSize() const = 0;
+
+
     QMap<quint16,quint16> m_commandMapping;
 };
 

@@ -24,7 +24,6 @@
 #include "MPDeviceBleImpl.h"
 #include "BleCommon.h"
 #include "MPSettingsBLE.h"
-#include "MPNodeBLE.h"
 
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
@@ -4237,24 +4236,6 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
               ));
 
     return true;
-}
-
-int MPDevice::getParentNodeSize() const
-{
-    if (isBLE())
-    {
-        return MPNodeBLE::PARENT_NODE_LENGTH;
-    }
-    return MP_NODE_SIZE;
-}
-
-int MPDevice::getChildNodeSize() const
-{
-    if (isBLE())
-    {
-        return MPNodeBLE::CHILD_NODE_LENGTH;
-    }
-    return MP_NODE_SIZE;
 }
 
 void MPDevice::setDataNode(QString service, const QByteArray &nodeData,

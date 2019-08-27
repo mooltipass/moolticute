@@ -237,6 +237,16 @@ MPNode* MessageProtocolBLE::createMPNode(QObject *parent, QByteArray &&nodeAddre
     return new MPNodeBLE(parent, qMove(nodeAddress), virt_addr);
 }
 
+int MessageProtocolBLE::getParentNodeSize() const
+{
+    return MPNodeBLE::PARENT_NODE_LENGTH;
+}
+
+int MessageProtocolBLE::getChildNodeSize() const
+{
+    return MPNodeBLE::CHILD_NODE_LENGTH;
+}
+
 void MessageProtocolBLE::fillCommandMapping()
 {
     //TODO fill commandId mapping, when they are implemented for BLE
