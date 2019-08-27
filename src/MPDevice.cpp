@@ -6648,6 +6648,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             {
                 cb(true, "Changes Applied to Memory");
                 qInfo() << "No passwords to be changed";
+                exitMemMgmtMode(true);
                 return;
             }
 
