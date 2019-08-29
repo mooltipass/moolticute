@@ -133,6 +133,7 @@ public:
     bool getNotDeletedTagged() const;
 
     static QByteArray EmptyAddress;
+    static constexpr int ADDRESS_LENGTH = 2;
 
     QJsonObject toJson() const;
 
@@ -160,7 +161,6 @@ protected:
     IMessageProtocol *pMesProt = nullptr;
     const bool isBLE = false;
 
-    static constexpr int ADDRESS_LENGTH = 2;
     static constexpr int CTR_LENGTH = 3;
     static constexpr int NODE_FLAG_ADDR_START = 0;
 

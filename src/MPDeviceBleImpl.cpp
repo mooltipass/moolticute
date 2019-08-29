@@ -510,7 +510,7 @@ void MPDeviceBleImpl::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addre
                                   [this](const QByteArray &data, bool &) -> bool
         {
             const auto msgSize = bleProt->getMessageSize(data);
-            if ((m_parentNodeNeeded + m_childNodeNeeded)*2 != msgSize)
+            if ((m_parentNodeNeeded + m_childNodeNeeded) * MPNode::ADDRESS_LENGTH != msgSize)
             {
                 qCritical() << "Not enough address retrieved during loadFreeAddresses";
                 return false;
@@ -521,13 +521,13 @@ void MPDeviceBleImpl::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addre
 
             for (auto& ba : m_parentAddrMapping)
             {
-                ba.append(receivedAddresses.mid(pos, 2));
-                pos += 2;
+                ba.append(receivedAddresses.mid(pos, MPNode::ADDRESS_LENGTH));
+                pos += MPNode::ADDRESS_LENGTH;
             }
             for (auto& ba : m_childAddrMapping)
             {
-                ba.append(receivedAddresses.mid(pos, 2));
-                pos += 2;
+                ba.append(receivedAddresses.mid(pos, MPNode::ADDRESS_LENGTH));
+                pos += MPNode::ADDRESS_LENGTH;
             }
             return true;
         }
