@@ -503,17 +503,27 @@ void MPDeviceBleImpl::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addre
         return;
     }
     auto addressPackage = addressFrom;
-    addressPackage.append(bleProt->toLittleEndianFromInt(m_parentNodeNeeded));
-    addressPackage.append(bleProt->toLittleEndianFromInt(m_childNodeNeeded));
+    auto freeAddrNum = MAX_FREE_ADDR_REQ;
+    int parentNodeRequested = getNodeAskedNumber(MPNode::NodeParent, freeAddrNum);
+    addressPackage.append(bleProt->toLittleEndianFromInt(parentNodeRequested));
+    int childNodeRequested = getNodeAskedNumber(MPNode::NodeChild, freeAddrNum);
+    addressPackage.append(bleProt->toLittleEndianFromInt(childNodeRequested));
+
     jobs->append(new MPCommandJob(mpDev, MPCmd::GET_FREE_ADDRESSES,
                                   addressPackage,
-                                  [this](const QByteArray &data, bool &) -> bool
+                                  [this, parentNodeRequested, childNodeRequested](const QByteArray &data, bool &) -> bool
         {
             const auto msgSize = bleProt->getMessageSize(data);
-            if ((m_parentNodeNeeded + m_childNodeNeeded) * MPNode::ADDRESS_LENGTH != msgSize)
+            if (1 == msgSize)
             {
                 qCritical() << "Not enough address retrieved during loadFreeAddresses";
                 return false;
+            }
+            if ((parentNodeRequested + childNodeRequested) * MPNode::ADDRESS_LENGTH != msgSize)
+            {
+                qDebug() << "Need more free address";
+                //TODO implement getting the remaining addresses
+                return true;
             }
             const auto receivedAddresses = bleProt->getFullPayload(data);
             qDebug() << receivedAddresses.toHex();
@@ -681,4 +691,26 @@ void MPDeviceBleImpl::writeFetchData(QFile *file, MPCmd::Command cmd)
                         }
                         return true;
     });
+}
+
+quint16 MPDeviceBleImpl::getNodeAskedNumber(MPNode::NodeType nodeType, int& freeAddrNum)
+{
+    auto& m_nodeNeeded = MPNode::NodeParent == nodeType ? m_parentNodeNeeded : m_childNodeNeeded;
+    if (freeAddrNum)
+    {
+        if (m_nodeNeeded > freeAddrNum)
+        {
+            int nodeNeededNum = freeAddrNum;
+            m_nodeNeeded -= freeAddrNum;
+            freeAddrNum = 0;
+            return nodeNeededNum;
+        }
+        else
+        {
+            int nodeNeededNum = m_nodeNeeded;
+            m_nodeNeeded = 0;
+            return nodeNeededNum;
+        }
+    }
+    return 0;
 }

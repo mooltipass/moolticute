@@ -85,6 +85,7 @@ private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
     void writeFetchData(QFile *file, MPCmd::Command cmd);
+    quint16 getNodeAskedNumber(MPNode::NodeType nodeType, int& freeAddrNum);
 
     QByteArray createStoreCredMessage(const BleCredential &cred);
     QByteArray createGetCredMessage(QString service, QString login);
@@ -113,6 +114,7 @@ private:
     static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;
     static constexpr int USER_CATEGORY_COUNT = 4;
     static constexpr int USER_CATEGORY_LENGTH = 66;
+    static constexpr int MAX_FREE_ADDR_REQ = 266;
     const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
 };
 
