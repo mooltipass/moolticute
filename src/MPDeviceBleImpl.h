@@ -34,6 +34,14 @@ class MPDeviceBleImpl: public QObject
         CREDENTIAL_PROMPT = 0x20
     };
 
+    struct FreeAddressInfo
+    {
+        QByteArray addressPackage = {};
+        int parentNodeRequested = 0;
+        int childNodeRequested = 0;
+        int startingPosition = 0;
+    };
+
 public:
     MPDeviceBleImpl(MessageProtocolBLE *mesProt, MPDevice *dev);
 
@@ -75,7 +83,7 @@ public:
     int getParentNodeNeededCount() const { return m_parentNodeNeeded; }
     int getChildNodeNeededCount() const { return m_childNodeNeeded; }
     QByteArray getFreeAddress(const int virtualAddr);
-    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress, bool isFirst = true, bool isLastChild = true);
+    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress);
     void cleanFreeAddresses();
 
 signals:
@@ -86,6 +94,9 @@ private:
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
     void writeFetchData(QFile *file, MPCmd::Command cmd);
     quint16 getNodeAskedNumber(MPNode::NodeType nodeType, int& freeAddrNum);
+    void processReceivedAddrNumber(MPNode::NodeType nodeType, const QByteArray& receivedAddr, int& pos);
+    void loadRemainingFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress, bool isLastChild);
+    MPCommandJob* createGetFreeAddressPackage(AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress, FreeAddressInfo addressInfo);
 
     QByteArray createStoreCredMessage(const BleCredential &cred);
     QByteArray createGetCredMessage(QString service, QString login);
