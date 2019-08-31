@@ -75,7 +75,7 @@ public:
     int getParentNodeNeededCount() const { return m_parentNodeNeeded; }
     int getChildNodeNeededCount() const { return m_childNodeNeeded; }
     QByteArray getFreeAddress(const int virtualAddr);
-    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress);
+    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress, bool isFirst = true, bool isLastChild = true);
     void cleanFreeAddresses();
 
 signals:

@@ -494,7 +494,7 @@ QByteArray MPDeviceBleImpl::getFreeAddress(const int virtualAddr)
     return QByteArray{};
 }
 
-void MPDeviceBleImpl::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress)
+void MPDeviceBleImpl::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress, bool isFirst /*= true*/, bool isLastChild /*= true*/)
 {
     Q_UNUSED(cbProgress)
     if (0 == m_parentNodeNeeded && 0 == m_childNodeNeeded)
@@ -504,44 +504,83 @@ void MPDeviceBleImpl::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addre
     }
     auto addressPackage = addressFrom;
     auto freeAddrNum = MAX_FREE_ADDR_REQ;
+    if (!isFirst)
+    {
+        --freeAddrNum;
+    }
     int parentNodeRequested = getNodeAskedNumber(MPNode::NodeParent, freeAddrNum);
+    if (!isFirst && !isLastChild)
+    {
+        ++parentNodeRequested;
+    }
     addressPackage.append(bleProt->toLittleEndianFromInt(parentNodeRequested));
     int childNodeRequested = getNodeAskedNumber(MPNode::NodeChild, freeAddrNum);
+    if (!isFirst && isLastChild)
+    {
+        ++childNodeRequested;
+    }
     addressPackage.append(bleProt->toLittleEndianFromInt(childNodeRequested));
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_FREE_ADDRESSES,
+    auto freeAddrJob = new MPCommandJob(mpDev, MPCmd::GET_FREE_ADDRESSES,
                                   addressPackage,
-                                  [this, parentNodeRequested, childNodeRequested](const QByteArray &data, bool &) -> bool
+                                  [this, parentNodeRequested, childNodeRequested,
+                                        jobs, cbProgress, isFirst](const QByteArray &data, bool &) -> bool
         {
             const auto msgSize = bleProt->getMessageSize(data);
-            if (1 == msgSize)
+            const bool correctMsgSize = (parentNodeRequested + childNodeRequested) * MPNode::ADDRESS_LENGTH == msgSize;
+            if (1 == msgSize || !correctMsgSize)
             {
                 qCritical() << "Not enough address retrieved during loadFreeAddresses";
                 return false;
             }
-            if ((parentNodeRequested + childNodeRequested) * MPNode::ADDRESS_LENGTH != msgSize)
-            {
-                qDebug() << "Need more free address";
-                //TODO implement getting the remaining addresses
-                return true;
-            }
+
             const auto receivedAddresses = bleProt->getFullPayload(data);
             qDebug() << receivedAddresses.toHex();
+
             int pos = 0;
+            if (!isFirst)
+            {
+                pos += MPNode::ADDRESS_LENGTH;
+            }
 
             for (auto& ba : m_parentAddrMapping)
             {
-                ba.append(receivedAddresses.mid(pos, MPNode::ADDRESS_LENGTH));
-                pos += MPNode::ADDRESS_LENGTH;
+                if (ba.isEmpty())
+                {
+                    ba.append(receivedAddresses.mid(pos, MPNode::ADDRESS_LENGTH));
+                    pos += MPNode::ADDRESS_LENGTH;
+                }
             }
+
             for (auto& ba : m_childAddrMapping)
             {
-                ba.append(receivedAddresses.mid(pos, MPNode::ADDRESS_LENGTH));
-                pos += MPNode::ADDRESS_LENGTH;
+                if (ba.isEmpty())
+                {
+                    ba.append(receivedAddresses.mid(pos, MPNode::ADDRESS_LENGTH));
+                    pos += MPNode::ADDRESS_LENGTH;
+                }
             }
+
+            if (m_parentNodeNeeded + m_childNodeNeeded > 0)
+            {
+                qDebug() << "Need more addresses: " << m_parentNodeNeeded + m_childNodeNeeded;
+                const auto lastAddr = receivedAddresses.right(2);
+                qDebug() << "Last addr: " << lastAddr.toHex();
+                loadFreeAddresses(jobs, lastAddr, cbProgress, false, childNodeRequested > 0);
+            }
+
             return true;
         }
-    ));
+    );
+
+    if (isFirst)
+    {
+        jobs->append(freeAddrJob);
+    }
+    else
+    {
+        jobs->prepend(freeAddrJob);
+    }
 }
 
 void MPDeviceBleImpl::cleanFreeAddresses()
@@ -709,6 +748,7 @@ quint16 MPDeviceBleImpl::getNodeAskedNumber(MPNode::NodeType nodeType, int& free
         {
             int nodeNeededNum = m_nodeNeeded;
             m_nodeNeeded = 0;
+            freeAddrNum -= nodeNeededNum;
             return nodeNeededNum;
         }
     }
