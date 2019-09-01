@@ -3355,7 +3355,7 @@ QByteArray MPDevice::getFreeAddress(quint32 virtualAddr)
     const int virtAddr = static_cast<int>(virtualAddr);
     if (isBLE())
     {
-        return bleImpl->getFreeAddress(virtAddr);
+        return bleImpl->getFreeAddressProvider().getFreeAddress(virtAddr);
     }
     return freeAddresses[virtAddr];
 }
@@ -5125,7 +5125,7 @@ void MPDevice::cleanMMMVars(void)
     freeAddresses.clear();
     if (isBLE())
     {
-        bleImpl->cleanFreeAddresses();
+        bleImpl->getFreeAddressProvider().cleanFreeAddresses();
     }
 }
 
@@ -5945,7 +5945,7 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
 
     if (isBLE())
     {
-        bleImpl->loadFreeAddresses(jobs, addressFrom, cbProgress);
+        bleImpl->getFreeAddressProvider().loadFreeAddresses(jobs, addressFrom, cbProgress);
         return;
     }
 
@@ -6022,11 +6022,11 @@ void MPDevice::incrementNeededAddresses(MPNode::NodeType type)
     {
         if (MPNode::NodeParent == type)
         {
-            bleImpl->incrementParentNodeNeeded(newAddressesNeededCounter);
+            bleImpl->getFreeAddressProvider().incrementParentNodeNeeded(newAddressesNeededCounter);
         }
         else if (MPNode::NodeChild == type)
         {
-            bleImpl->incrementChildNodeNeeded(newAddressesNeededCounter);
+            bleImpl->getFreeAddressProvider().incrementChildNodeNeeded(newAddressesNeededCounter);
         }
         else
         {

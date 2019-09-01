@@ -3,6 +3,7 @@
 
 #include "MPDevice.h"
 #include "BleCommon.h"
+#include "MPBLEFreeAddressProvider.h"
 
 class MessageProtocolBLE;
 
@@ -77,14 +78,7 @@ public:
     void sendUserSettings();
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
-
-    void incrementParentNodeNeeded(int mappingAddr) { ++m_parentNodeNeeded; m_parentAddrMapping[mappingAddr] = QByteArray{}; }
-    void incrementChildNodeNeeded(int mappingAddr) { ++m_childNodeNeeded; m_childAddrMapping[mappingAddr] = QByteArray{}; }
-    int getParentNodeNeededCount() const { return m_parentNodeNeeded; }
-    int getChildNodeNeededCount() const { return m_childNodeNeeded; }
-    QByteArray getFreeAddress(const int virtualAddr);
-    void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress);
-    void cleanFreeAddresses();
+    MPBLEFreeAddressProvider& getFreeAddressProvider() { return freeAddressProv; }
 
 signals:
     void userSettingsChanged(QJsonObject settings);
@@ -93,10 +87,6 @@ private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
     void writeFetchData(QFile *file, MPCmd::Command cmd);
-    quint16 getNodeAskedNumber(MPNode::NodeType nodeType, int& freeAddrNum);
-    void processReceivedAddrNumber(MPNode::NodeType nodeType, const QByteArray& receivedAddr, int& pos);
-    void loadRemainingFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress, bool isLastChild);
-    MPCommandJob* createGetFreeAddressPackage(AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress, FreeAddressInfo addressInfo);
 
     QByteArray createStoreCredMessage(const BleCredential &cred);
     QByteArray createGetCredMessage(QString service, QString login);
@@ -114,10 +104,7 @@ private:
     quint8 m_currentUserSettings = 0x00;
     QString m_debugMsg = "";
 
-    int m_parentNodeNeeded = 0;
-    int m_childNodeNeeded = 0;
-    QMap<int, QByteArray> m_parentAddrMapping;
-    QMap<int, QByteArray> m_childAddrMapping;
+    MPBLEFreeAddressProvider freeAddressProv;
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;
@@ -125,7 +112,6 @@ private:
     static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;
     static constexpr int USER_CATEGORY_COUNT = 4;
     static constexpr int USER_CATEGORY_LENGTH = 66;
-    static constexpr int MAX_FREE_ADDR_REQ = 266;
     const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
 };
 
