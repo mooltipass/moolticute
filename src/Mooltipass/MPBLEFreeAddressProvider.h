@@ -9,7 +9,6 @@ class MPBLEFreeAddressProvider
 {
     struct FreeAddressInfo
     {
-        QByteArray addressPackage = {};
         int parentNodeRequested = 0;
         int childNodeRequested = 0;
         int startingPosition = 0;
@@ -28,7 +27,7 @@ private:
     quint16 getNodeAskedNumber(MPNode::NodeType nodeType, int& freeAddrNum);
     void processReceivedAddrNumber(MPNode::NodeType nodeType, const QByteArray& receivedAddr, int& pos);
     void loadRemainingFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress, bool isLastChild);
-    MPCommandJob* createGetFreeAddressPackage(AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress, FreeAddressInfo addressInfo);
+    MPCommandJob* createGetFreeAddressPackage(AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress, FreeAddressInfo addressInfo, const QByteArray& addrPackage);
 
 
     MessageProtocolBLE *bleProt;
