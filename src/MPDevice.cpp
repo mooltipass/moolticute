@@ -3105,7 +3105,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     };
 
     /* Change numbers */
-    if (isFw12())
+    if (isFw12() || isBLE())
     {
         if ((get_credentialsDbChangeNumber() != credentialsDbChangeNumberClone) || (get_dataDbChangeNumber() != dataDbChangeNumberClone))
         {
@@ -3113,10 +3113,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             qDebug() << "Updating cred & data change numbers";
             qDebug() << "Cred DB: " << get_credentialsDbChangeNumber() << " clone: " << credentialsDbChangeNumberClone;
             qDebug() << "Data cred DB: " << get_dataDbChangeNumber() << " clone: " << dataDbChangeNumberClone;
-            QByteArray updateChangeNumbersPacket = QByteArray();
-            updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
-            updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-            jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
+            updateChangeNumbers(jobs, Common::CredentialNumberChanged|Common::DataNumberChanged);
         }
     }
 
@@ -4419,15 +4416,12 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
         if (generateSavePackets(saveJobs, false, true, cbProgress))
         {
             /* Increment db change number */
-            if ((services.size() > 0) && isFw12())
+            if (services.size() > 0 && (isFw12() || isBLE()))
             {
                 set_dataDbChangeNumber(get_dataDbChangeNumber() + 1);
                 dataDbChangeNumberClone = get_dataDbChangeNumber();
                 filesCache.setDbChangeNumber(get_dataDbChangeNumber());
-                QByteArray updateChangeNumbersPacket = QByteArray();
-                updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
-                updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-                saveJobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
+                updateChangeNumbers(saveJobs, Common::DataNumberChanged);
                 emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
             }
 
@@ -4497,6 +4491,20 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
         if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
         if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(getFreeAddress(i->getNextChildVirtualAddress()));
     }
+}
+
+void MPDevice::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
+{
+    if (isBLE())
+    {
+        bleImpl->updateChangeNumbers(jobs, flags);
+        return;
+    }
+
+    QByteArray updateChangeNumbersPacket = QByteArray{};
+    updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
+    updateChangeNumbersPacket.append(get_dataDbChangeNumber());
+    jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
 }
 
 quint64 MPDevice::getUInt64EncryptionKey()
@@ -6590,18 +6598,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     }
 
     /* Increment db change numbers */
-    /**
-     * TODO: Uncomment and adjust, when SET_USER_CHANGE_NB
-     *       is implemented for BLE
-     */
-    if (isFw12() /*|| isBLE()*/)
+    if (isFw12() || isBLE())
     {
         set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
         credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
-        QByteArray updateChangeNumbersPacket = QByteArray();
-        updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
-        updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-        jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
+        updateChangeNumbers(jobs, Common::CredentialNumberChanged);
     }
 
     emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());

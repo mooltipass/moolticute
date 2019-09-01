@@ -80,6 +80,8 @@ public:
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
     MPBLEFreeAddressProvider& getFreeAddressProvider() { return freeAddressProv; }
 
+    void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
+
 signals:
     void userSettingsChanged(QJsonObject settings);
 

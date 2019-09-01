@@ -300,6 +300,8 @@ private:
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
 
+    void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
+
     // Crypto
     quint64 getUInt64EncryptionKey();
     QString encryptSimpleCrypt(const QByteArray &data);

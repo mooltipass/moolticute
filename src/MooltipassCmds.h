@@ -121,6 +121,7 @@ public:
             SET_DN_START_PARENT ,
             END_MEMORYMGMT      ,
             SET_USER_CHANGE_NB  ,
+            SET_DATA_CHANGE_NB  ,
             GET_DESCRIPTION     ,
             GET_USER_CHANGE_NB  ,
             SET_DESCRIPTION     ,
