@@ -34,7 +34,6 @@ private:
     QHash<QString, QString> logins;
     QHash<QString, QString> descriptions;
     QString context;
-    MessageProtocolMini mesProtMini;
 
     void sendReadSignal(const QByteArray &data);
 };
