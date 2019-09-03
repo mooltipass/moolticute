@@ -156,10 +156,10 @@ public:
     QByteArray toLittleEndianFromInt32(quint32 num)
     {
         QByteArray littleEndian;
-        littleEndian.append(static_cast<char>(num&0xFF));
-        littleEndian.append(static_cast<char>((num&0xFF00)>>8));
-        littleEndian.append(static_cast<char>((num&0xFF0000)>>16));
-        littleEndian.append(static_cast<char>((num&0xFF000000)>>24));
+        littleEndian.append(static_cast<char>(num&0x0FF));
+        littleEndian.append(static_cast<char>((num&0x0FF00)>>8));
+        littleEndian.append(static_cast<char>((num&0x0FF0000)>>16));
+        littleEndian.append(static_cast<char>((num&0x0FF000000)>>24));
         return littleEndian;
     }
 

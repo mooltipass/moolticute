@@ -24,6 +24,12 @@ public:
     void cleanFreeAddresses();
 
 private:
+    /**
+     * @brief getNodeAskedNumber
+     * @param nodeType: The type of requested address (child/parent)
+     * @param freeAddrNum: Remaining free address number for the next packet
+     * @return Number of addresses which will requested in the next packet of nodeType
+     */
     quint16 getNodeAskedNumber(MPNode::NodeType nodeType, int& freeAddrNum);
     void processReceivedAddrNumber(MPNode::NodeType nodeType, const QByteArray& receivedAddr, int& pos);
     void loadRemainingFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress, bool isLastChild);

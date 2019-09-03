@@ -88,11 +88,20 @@ void MPBLEFreeAddressProvider::processReceivedAddrNumber(MPNode::NodeType nodeTy
 
 void MPBLEFreeAddressProvider::loadRemainingFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress, bool isLastChild)
 {
+    /*
+     * During loading the remaining free addresses, the first one
+     * will be the same as addressFrom, so the useful free address
+     * which we are receiving is decreased by one
+     */
     auto freeAddrNum = MAX_FREE_ADDR_REQ - 1;
     auto addressPackage = addressFrom;
     FreeAddressInfo addressInfo;
     addressInfo.parentNodeRequested = getNodeAskedNumber(MPNode::NodeParent, freeAddrNum);
     addressInfo.childNodeRequested = getNodeAskedNumber(MPNode::NodeChild, freeAddrNum);
+    /*
+     * Increasing the requested node number of addressFrom's type,
+     * because it will be received again in the response.
+     */
     if (isLastChild)
     {
         ++addressInfo.childNodeRequested;
@@ -103,6 +112,10 @@ void MPBLEFreeAddressProvider::loadRemainingFreeAddresses(AsyncJobs *jobs, const
     }
     addressPackage.append(bleProt->toLittleEndianFromInt(addressInfo.parentNodeRequested));
     addressPackage.append(bleProt->toLittleEndianFromInt(addressInfo.childNodeRequested));
+    /*
+     *  Skipping the first received address,
+     *  because it is the same as addressFrom
+     */
     addressInfo.startingPosition = MPNode::ADDRESS_LENGTH;
 
     jobs->prepend(createGetFreeAddressPackage(jobs, cbProgress, addressInfo, addressPackage));
@@ -130,11 +143,20 @@ MPCommandJob* MPBLEFreeAddressProvider::createGetFreeAddressPackage(AsyncJobs *j
                 processReceivedAddrNumber(MPNode::NodeParent, receivedAddresses, pos);
                 processReceivedAddrNumber(MPNode::NodeChild, receivedAddresses, pos);
 
+                // There are more needed nodes
                 if (m_parentNodeNeeded + m_childNodeNeeded > 0)
                 {
                     qDebug() << "Need more addresses: " << m_parentNodeNeeded + m_childNodeNeeded;
-                    const auto lastAddr = receivedAddresses.right(2);
+                    /*
+                     * Retreiving the last address, which will be the
+                     * starting search address of the next GET_FREE_ADDRESSES
+                     */
+                    const auto lastAddr = receivedAddresses.right(MPNode::ADDRESS_LENGTH);
                     qDebug() << "Last addr: " << lastAddr.toHex();
+                    /*
+                     * If we havent received child node in the currect package
+                     * last address belongs to a parent node
+                     */
                     loadRemainingFreeAddresses(jobs, lastAddr, cbProgress, addressInfo.childNodeRequested > 0);
                 }
 
