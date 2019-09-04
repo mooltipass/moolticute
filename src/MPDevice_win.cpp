@@ -331,6 +331,8 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
             qWarning() << getLastError(errorCode);
             return;
         }
+
+        emit platformWriteFinished();
     }
     else if (overlapped == &readOverlapped) //read op
     {

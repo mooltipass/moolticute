@@ -210,6 +210,7 @@ signals:
     /* Signal emited by platform code when new data comes from MP */
     /* A signal is used for platform code that uses a dedicated thread */
     void platformDataRead(const QByteArray &data);
+    void platformWriteFinished();
 
     /* the command has failed in platform code */
     void platformFailed();
@@ -218,6 +219,7 @@ signals:
 
 private slots:
     void newDataRead(const QByteArray &data);
+    void writeDataFinished();
     void commandFailed();
     void sendDataDequeue(); //execute commands from the command queue
     void runAndDequeueJobs(); //execute AsyncJobs from the jobs queues
@@ -289,6 +291,7 @@ private:
     QByteArray generateExportFileData(const QString &encryption = "none");
     void cleanImportedVars(void);
     void cleanMMMVars(void);
+    void addToWriteQueue(const QByteArray& data);
 
     // Functions added by mathieu for unit testing
     bool testCodeAgainstCleanDBChanges(AsyncJobs *jobs);
@@ -404,6 +407,8 @@ private:
     IMessageProtocol *pMesProt = nullptr;
     MPDeviceBleImpl *bleImpl = nullptr;
     DeviceSettings *pSettings = nullptr;
+
+    QQueue<QByteArray> m_writeQueue;
 
 protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
