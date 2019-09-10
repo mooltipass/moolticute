@@ -31,6 +31,7 @@ MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
     oNotifier = new QWinOverlappedIoNotifier(this);
     connect(oNotifier, SIGNAL(notified(quint32,quint32,OVERLAPPED*)),
             this, SLOT(ovlpNotified(quint32,quint32,OVERLAPPED*)));
+    connect(this, SIGNAL(platformWriteFinished()), this, SLOT(writeDataFinished()));
 
     if (p.isBLE)
     {
@@ -154,6 +155,16 @@ bool MPDevice_win::openPath()
 }
 
 void MPDevice_win::platformWrite(const QByteArray &data)
+{
+
+    if (m_writeQueue.isEmpty())
+    {
+        platformWriteToDevice(data);
+    }
+    m_writeQueue.append(data);
+}
+
+void MPDevice_win::platformWriteToDevice(const QByteArray &data)
 {
     const char zeroByte = static_cast<char>(0x00);
     QByteArray ba;
@@ -347,5 +358,20 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
         emit platformDataRead(readBuffer.right(readBuffer.length() - 1));
 
         platformRead();
+    }
+}
+
+void MPDevice_win::writeDataFinished()
+{
+    if (m_writeQueue.isEmpty())
+    {
+        // WriteQueue is empty, platformWrite was called directly
+        return;
+    }
+    m_writeQueue.dequeue();
+    if (!m_writeQueue.isEmpty())
+    {
+        // If there are more data to write in the queue, write the next one
+        platformWriteToDevice(m_writeQueue.head());
     }
 }

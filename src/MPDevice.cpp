@@ -103,7 +103,6 @@ MPDevice::MPDevice(QObject *parent):
     });
 
     connect(this, SIGNAL(platformDataRead(QByteArray)), this, SLOT(newDataRead(QByteArray)));
-    connect(this, SIGNAL(platformWriteFinished()), this, SLOT(writeDataFinished()));
 
 //    connect(this, SIGNAL(platformFailed()), this, SLOT(commandFailed()));
 }
@@ -197,7 +196,7 @@ void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeou
                 commandQueue.head().retries_done++;
                 for (const auto &data : commandQueue.head().data)
                 {
-                    addToWriteQueue(data);
+                    platformWrite(data);
                 }
             }
             else
@@ -352,7 +351,7 @@ void MPDevice::newDataRead(const QByteArray &data)
                 {
                     for (const auto &data : commandQueue.head().data)
                     {
-                        addToWriteQueue(data);
+                        platformWrite(data);
                     }
                     commandQueue.head().timerTimeout->start(); //restart timer
                 }
@@ -450,21 +449,6 @@ void MPDevice::newDataRead(const QByteArray &data)
     }
 }
 
-void MPDevice::writeDataFinished()
-{
-    if (m_writeQueue.isEmpty())
-    {
-        // WriteQueue is empty, platformWrite was called directly
-        return;
-    }
-    m_writeQueue.dequeue();
-    if (!m_writeQueue.isEmpty())
-    {
-        // If there are more data to write in the queue, write the next one
-        platformWrite(m_writeQueue.head());
-    }
-}
-
 void MPDevice::sendDataDequeue()
 {
     if (commandQueue.isEmpty())
@@ -497,7 +481,7 @@ void MPDevice::sendDataDequeue()
         qDebug() << "Full packet#" << i++ << ": " << a;
 #endif
 
-        addToWriteQueue(data);
+        platformWrite(data);
     }
 
     if (isBLE())
@@ -5144,15 +5128,6 @@ void MPDevice::cleanMMMVars(void)
     {
         bleImpl->getFreeAddressProvider().cleanFreeAddresses();
     }
-}
-
-void MPDevice::addToWriteQueue(const QByteArray &data)
-{
-    if (m_writeQueue.isEmpty())
-    {
-        platformWrite(data);
-    }
-    m_writeQueue.append(data);
 }
 
 void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, MessageHandlerCb cb, bool noDelete)

@@ -87,12 +87,18 @@ public:
     static bool checkDevice(QString path, bool &isBLE);
     static MPPlatformDef getPlatDef(QString path, bool isBLE);
 
+signals:
+    void platformWriteFinished();
+
 private slots:
     void ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLAPPED *overlapped);
+    void writeDataFinished();
 
 private:
     virtual void platformRead();
     virtual void platformWrite(const QByteArray &data);
+    void platformWriteToDevice(const QByteArray &data);
+    void addToWriteQueue(const QByteArray& data);
 
     bool openPath();
     static HANDLE openDevice(QString path, bool exlusive = false);
@@ -106,6 +112,8 @@ private:
     OVERLAPPED writeOverlapped;
     OVERLAPPED readOverlapped;
     QWinOverlappedIoNotifier *oNotifier;
+
+    QQueue<QByteArray> m_writeQueue;
 };
 
 #endif // MPDEVICE_WIN_H
