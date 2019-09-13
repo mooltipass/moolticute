@@ -457,8 +457,8 @@ void MPDevice::sendDataDequeue()
     MPCommand &currentCmd = commandQueue.head();
     currentCmd.running = true;
 
-    int i = 0;
 #ifdef DEV_DEBUG
+    int i = 0;
     qDebug() << "Platform send command: " << pMesProt->printCmd(currentCmd.data[0]);
 #endif
     if (isBLE())
