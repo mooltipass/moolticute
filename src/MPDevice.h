@@ -401,11 +401,12 @@ private:
 
     bool m_isDebugMsg = false;
     //Message Protocol
-    IMessageProtocol *pMesProt = nullptr;
     MPDeviceBleImpl *bleImpl = nullptr;
     DeviceSettings *pSettings = nullptr;
 
 protected:
+    IMessageProtocol *pMesProt = nullptr;
+
     DeviceType deviceType = DeviceType::MOOLTIPASS;
 };
 

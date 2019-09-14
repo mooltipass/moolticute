@@ -23,11 +23,16 @@ public:
     void getChangedSettings(QJsonObject& o);
     void updateParameters(const QJsonObject &data);
 
+public slots:
+    void checkKeyboardLayout();
+
 private slots:
     void sendParams(bool value, int param);
     void sendParams(int value, int param);
 
 private:
+    void setupKeyboardLayout();
+
     WSClient* m_wsClient = nullptr;
     DeviceSettings* m_settings = nullptr;
     MainWindow* m_mw = nullptr;
@@ -35,6 +40,7 @@ private:
 
     Common::MPHwVersion m_deviceType = Common::MP_Unknown;
     QMap<MPParams::Param, QWidget*> m_widgetMapping;
+    QMap<QString, int> m_fw13LangMap;
 };
 
 #endif // SETTINGSGUIHELPER_H

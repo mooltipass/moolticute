@@ -26,6 +26,8 @@ MPDevice_emul::MPDevice_emul(QObject *parent):
     MPDevice(parent)
 {
     qDebug() << "Emulation Device";
+    setupMessageProtocol();
+    sendInitMessages();
 }
 
 void MPDevice_emul::platformWrite(const QByteArray &data)
@@ -33,7 +35,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
     qDebug() << "Sending into emu" << MPCmd::printCmd(data) << data.mid(2);
 
     const char commandData = static_cast<char>(data[1]);
-    MPCmd::Command cmd = mesProtMini.getGeneralCommandId(static_cast<quint8>(commandData));
+    MPCmd::Command cmd = pMesProt->getGeneralCommandId(static_cast<quint8>(commandData));
     switch(cmd)
     {
     case MPCmd::PING:
@@ -104,7 +106,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
     }
     case MPCmd::CONTEXT:
     {
-        context = mesProtMini.toQString(data.mid(2, data.length()));
+        context = pMesProt->toQString(data.mid(2, data.length()));
         qDebug() << "Context : " << context;
         QByteArray d;
         d[0] = 1;
@@ -148,7 +150,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         d[0] = 1;
         d[1] = commandData;
 
-        context = mesProtMini.toQString(data.mid(2, data.length()));
+        context = pMesProt->toQString(data.mid(2, data.length()));
         qDebug() << "Context : " << context;
         if (!passwords.contains(context))
         {
@@ -169,7 +171,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         QByteArray d;
         d[0] = 1;
         d[1] = commandData;
-        QString login = mesProtMini.toQString(data.mid(2, data.length()));
+        QString login = pMesProt->toQString(data.mid(2, data.length()));
         logins[context] = login;
         d[2] = 0x01;
         d.resize(64);
@@ -178,7 +180,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
     }
     case MPCmd::SET_PASSWORD:
     {
-        QString password = mesProtMini.toQString(data.mid(2, data.length()));
+        QString password = pMesProt->toQString(data.mid(2, data.length()));
         passwords[context] = password;
 
         QByteArray d;
