@@ -248,6 +248,9 @@ private:
                        const MPDeviceProgressCb &cbProgress,
                        const QByteArray &data, bool &done);
 
+    inline int getParentNodeSize() const { return pMesProt->getParentNodeSize(); }
+    inline int getChildNodeSize() const { return pMesProt->getChildNodeSize(); }
+
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
@@ -255,6 +258,7 @@ private:
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
     void startImportFileMerging(const MPDeviceProgressCb &progressCb, MessageHandlerCb cb, bool noDelete);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress);
+    void incrementNeededAddresses(MPNode::NodeType type);
     MPNode *findNodeWithAddressWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr);
     MPNode *findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QString& name);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
@@ -292,8 +296,11 @@ private:
     // Generate save packets
     bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, const MPDeviceProgressCb &cbProgress);
 
+    QByteArray getFreeAddress(quint32 virtualAddr);
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
+
+    void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 
     // Crypto
     quint64 getUInt64EncryptionKey();

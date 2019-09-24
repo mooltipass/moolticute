@@ -3,6 +3,7 @@
 
 #include "MPDevice.h"
 #include "BleCommon.h"
+#include "MPBLEFreeAddressProvider.h"
 
 class MessageProtocolBLE;
 
@@ -32,6 +33,14 @@ class MPDeviceBleImpl: public QObject
         ADVANCED_MENU     = 0x08,
         BLUETOOTH_ENABLED = 0x10,
         CREDENTIAL_PROMPT = 0x20
+    };
+
+    struct FreeAddressInfo
+    {
+        QByteArray addressPackage = {};
+        int parentNodeRequested = 0;
+        int childNodeRequested = 0;
+        int startingPosition = 0;
     };
 
 public:
@@ -69,6 +78,9 @@ public:
     void sendUserSettings();
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
+    MPBLEFreeAddressProvider& getFreeAddressProvider() { return freeAddressProv; }
+
+    void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 
 signals:
     void userSettingsChanged(QJsonObject settings);
@@ -93,6 +105,8 @@ private:
     quint8 m_flipBit = 0x00;
     quint8 m_currentUserSettings = 0x00;
     QString m_debugMsg = "";
+
+    MPBLEFreeAddressProvider freeAddressProv;
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;

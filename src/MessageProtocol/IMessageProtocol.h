@@ -153,6 +153,16 @@ public:
         return littleEndian;
     }
 
+    QByteArray toLittleEndianFromInt32(quint32 num)
+    {
+        QByteArray littleEndian;
+        littleEndian.append(static_cast<char>(num&0x0FF));
+        littleEndian.append(static_cast<char>((num&0x0FF00)>>8));
+        littleEndian.append(static_cast<char>((num&0x0FF0000)>>16));
+        littleEndian.append(static_cast<char>((num&0x0FF000000)>>24));
+        return littleEndian;
+    }
+
     /**
      * @brief convertDate
      * @param dateTime: current dateTime
@@ -171,6 +181,10 @@ public:
     virtual MPNode* createMPNode(QObject *parent = nullptr, const QByteArray &nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
     virtual MPNode* createMPNode(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
     virtual MPNode* createMPNode(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) = 0;
+
+    virtual int getParentNodeSize() const = 0;
+    virtual int getChildNodeSize() const = 0;
+
 
     QMap<quint16,quint16> m_commandMapping;
 };

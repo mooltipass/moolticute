@@ -111,11 +111,10 @@ bool MessageProtocolBLE::isCPZInvalid(const QByteArray &data)
 
 QVector<QByteArray> MessageProtocolBLE::createWriteNodePackets(const QByteArray &data, const QByteArray &address)
 {
-    Q_UNUSED(data);
-    Q_UNUSED(address);
     QVector<QByteArray> packets;
-    qWarning("Not implemented yet");
-    packets.append(QByteArray());
+    QByteArray test{address};
+    test.append(data);
+    packets.append(test);
     return packets;
 }
 
@@ -238,6 +237,16 @@ MPNode* MessageProtocolBLE::createMPNode(QObject *parent, QByteArray &&nodeAddre
     return new MPNodeBLE(parent, qMove(nodeAddress), virt_addr);
 }
 
+int MessageProtocolBLE::getParentNodeSize() const
+{
+    return MPNodeBLE::PARENT_NODE_LENGTH;
+}
+
+int MessageProtocolBLE::getChildNodeSize() const
+{
+    return MPNodeBLE::CHILD_NODE_LENGTH;
+}
+
 void MessageProtocolBLE::fillCommandMapping()
 {
     //TODO fill commandId mapping, when they are implemented for BLE
@@ -300,21 +309,22 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::CANCEL_USER_REQUEST   , 0x0005},
         {MPCmd::PLEASE_RETRY          , 0x0002},
         {MPCmd::READ_FLASH_NODE       , 0x0102},
-        {MPCmd::WRITE_FLASH_NODE      , 0xC6},
+        {MPCmd::WRITE_FLASH_NODE      , 0x010D},
         {MPCmd::GET_FAVORITE          , 0xC7},
         {MPCmd::SET_FAVORITE          , 0xC8},
         {MPCmd::GET_STARTING_PARENT   , 0x0100},
-        {MPCmd::SET_STARTING_PARENT   , 0xCA},
+        {MPCmd::SET_STARTING_PARENT   , 0x0105},
         {MPCmd::GET_CTRVALUE          , 0x0109},
         {MPCmd::SET_CTRVALUE          , 0xCC},
         {MPCmd::ADD_CARD_CPZ_CTR      , 0xCD},
         {MPCmd::GET_CARD_CPZ_CTR      , 0x010E},
         {MPCmd::CARD_CPZ_CTR_PACKET   , 0xCF},
-        {MPCmd::GET_30_FREE_SLOTS     , 0xD0},
+        {MPCmd::GET_FREE_ADDRESSES    , 0x0108},
         {MPCmd::GET_DN_START_PARENT   , 0xD1},
         {MPCmd::SET_DN_START_PARENT   , 0xD2},
         {MPCmd::END_MEMORYMGMT        , 0x0101},
-        {MPCmd::SET_USER_CHANGE_NB    , 0xD4},
+        {MPCmd::SET_USER_CHANGE_NB    , 0x0103},
+        {MPCmd::SET_DATA_CHANGE_NB    , 0x0104},
         {MPCmd::GET_DESCRIPTION       , 0xD5},
         {MPCmd::GET_USER_CHANGE_NB    , 0x000A},
         {MPCmd::SET_DESCRIPTION       , 0xD8},

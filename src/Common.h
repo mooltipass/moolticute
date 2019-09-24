@@ -216,6 +216,12 @@ public:
         ACCELEROMETER,
         RANDOM_BYTES
     };
+
+    enum ChangeNumberFlag : quint8
+    {
+        CredentialNumberChanged = 0x01,
+        DataNumberChanged = 0x02
+    };
 };
 
 enum class DeviceType

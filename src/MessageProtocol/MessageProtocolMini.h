@@ -38,6 +38,9 @@ public:
     MPNode* createMPNode(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
     MPNode* createMPNode(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0) override;
 
+    int getParentNodeSize() const override { return MP_NODE_SIZE; }
+    int getChildNodeSize() const override { return MP_NODE_SIZE; }
+
     virtual void fillCommandMapping() override;
 };
 

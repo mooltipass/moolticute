@@ -337,12 +337,12 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             {
                 ui->cbLoginPrompt->setChecked(settings["login_prompt"].toBool());
                 ui->cbPinForMMM->setChecked(settings["pin_for_mmm"].toBool());
-                ui->cbStoragePrompt->setChecked(settings["storage_prompt"].toBool());
+                ui->cbStoragePrompt->setChecked(settings["credential_prompt"].toBool());
                 bool advancedMenu = settings["advanced_menu"].toBool();
                 ui->cbAdvancedMenu->setChecked(advancedMenu);
                 wsClient->set_advancedMenu(advancedMenu);
                 ui->cbBluetoothEnabled->setChecked(settings["bluetooth_enabled"].toBool());
-                ui->cbCredentialPrompt->setChecked(settings["credential_prompt"].toBool());
+                ui->cbCredentialPrompt->setChecked(settings["storage_prompt"].toBool());
             });
 
     //When device has new parameters, update the GUI

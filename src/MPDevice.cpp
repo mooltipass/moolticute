@@ -2368,10 +2368,10 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     }
 
     /* Increment new addresses counter */
-    newAddressesNeededCounter += 1;
+    incrementNeededAddresses(MPNode::NodeParent);
 
     /* Create new node with null address and virtual address set to our counter value */
-    newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+    newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
     newNodePt->setType(MPNode::NodeParent);
     newNodePt->setService(service);
 
@@ -3098,7 +3098,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     };
 
     /* Change numbers */
-    if (isFw12())
+    if (isFw12() || isBLE())
     {
         if ((get_credentialsDbChangeNumber() != credentialsDbChangeNumberClone) || (get_dataDbChangeNumber() != dataDbChangeNumberClone))
         {
@@ -3106,10 +3106,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             qDebug() << "Updating cred & data change numbers";
             qDebug() << "Cred DB: " << get_credentialsDbChangeNumber() << " clone: " << credentialsDbChangeNumberClone;
             qDebug() << "Data cred DB: " << get_dataDbChangeNumber() << " clone: " << dataDbChangeNumberClone;
-            QByteArray updateChangeNumbersPacket = QByteArray();
-            updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
-            updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-            jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
+            updateChangeNumbers(jobs, Common::CredentialNumberChanged|Common::DataNumberChanged);
         }
     }
 
@@ -3223,7 +3220,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getParentNodeSize(), 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3236,7 +3233,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getChildNodeSize(), 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3341,6 +3338,16 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     }
 
     return diagSavePacketsGenerated;
+}
+
+QByteArray MPDevice::getFreeAddress(quint32 virtualAddr)
+{
+    const int virtAddr = static_cast<int>(virtualAddr);
+    if (isBLE())
+    {
+        return bleImpl->getFreeAddressProvider().getFreeAddress(virtAddr);
+    }
+    return freeAddresses[virtAddr];
 }
 
 void MPDevice::exitMemMgmtMode(bool setMMMBool)
@@ -4402,15 +4409,12 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
         if (generateSavePackets(saveJobs, false, true, cbProgress))
         {
             /* Increment db change number */
-            if ((services.size() > 0) && isFw12())
+            if (services.size() > 0 && (isFw12() || isBLE()))
             {
                 set_dataDbChangeNumber(get_dataDbChangeNumber() + 1);
                 dataDbChangeNumberClone = get_dataDbChangeNumber();
                 filesCache.setDbChangeNumber(get_dataDbChangeNumber());
-                QByteArray updateChangeNumbersPacket = QByteArray();
-                updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
-                updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-                saveJobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
+                updateChangeNumbers(saveJobs, Common::DataNumberChanged);
                 emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
             }
 
@@ -4443,43 +4447,57 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
 {
     if (virtualStartNode != 0)
     {
-        qDebug() << "Setting start node to " << freeAddresses[virtualStartNode].toHex();
-        startNode = freeAddresses[virtualStartNode];
+        qDebug() << "Setting start node to " << getFreeAddress(virtualStartNode).toHex();
+        startNode = getFreeAddress(virtualStartNode);
     }
     if (virtualDataStartNode != 0)
     {
-        qDebug() << "Setting data start node to " << freeAddresses[virtualDataStartNode].toHex();
-        startDataNode = freeAddresses[virtualDataStartNode];
+        qDebug() << "Setting data start node to " << getFreeAddress(virtualDataStartNode).toHex();
+        startDataNode = getFreeAddress(virtualDataStartNode);
     }
     qDebug() << "Replacing virtual addresses for login nodes...";
     for (auto &i: loginNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
-        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
-        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPreviousParentVirtualAddress()]);
-        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getStartChildVirtualAddress()]);
+        if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(getFreeAddress(i->getNextParentVirtualAddress()));
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(getFreeAddress(i->getPreviousParentVirtualAddress()));
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(getFreeAddress(i->getStartChildVirtualAddress()));
     }
     qDebug() << "Replacing virtual addresses for child nodes...";
     for (auto &i: loginChildNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
-        if (i->getNextChildAddress().isNull()) i->setNextChildAddress(freeAddresses[i->getNextChildVirtualAddress()]);
-        if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(freeAddresses[i->getPreviousChildVirtualAddress()]);
+        if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+        if (i->getNextChildAddress().isNull()) i->setNextChildAddress(getFreeAddress(i->getNextChildVirtualAddress()));
+        if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(getFreeAddress(i->getPreviousChildVirtualAddress()));
     }
     qDebug() << "Replacing virtual addresses for data nodes...";
     for (auto &i: dataNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
-        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(freeAddresses[i->getNextParentVirtualAddress()]);
-        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(freeAddresses[i->getPreviousParentVirtualAddress()]);
-        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(freeAddresses[i->getStartChildVirtualAddress()]);
+        if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+        if (i->getNextParentAddress().isNull()) i->setNextParentAddress(getFreeAddress(i->getNextParentVirtualAddress()));
+        if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(getFreeAddress(i->getPreviousParentVirtualAddress()));
+        if (i->getStartChildAddress().isNull()) i->setStartChildAddress(getFreeAddress(i->getStartChildVirtualAddress()));
     }
     qDebug() << "Replacing virtual addresses for data child nodes...";
     for (auto &i: dataChildNodes)
     {
-        if (i->getAddress().isNull()) i->setAddress(freeAddresses[i->getVirtualAddress()]);
-        if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(freeAddresses[i->getNextChildVirtualAddress()]);
+        if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+        if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(getFreeAddress(i->getNextChildVirtualAddress()));
     }
+}
+
+void MPDevice::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
+{
+    if (isBLE())
+    {
+        bleImpl->updateChangeNumbers(jobs, flags);
+        return;
+    }
+
+    QByteArray updateChangeNumbersPacket = QByteArray{};
+    updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
+    updateChangeNumbersPacket.append(get_dataDbChangeNumber());
+    jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
 }
 
 quint64 MPDevice::getUInt64EncryptionKey()
@@ -5106,6 +5124,10 @@ void MPDevice::cleanMMMVars(void)
     loginChildNodesClone.clear();
     dataChildNodesClone.clear();
     freeAddresses.clear();
+    if (isBLE())
+    {
+        bleImpl->getFreeAddressProvider().cleanFreeAddresses();
+    }
 }
 
 void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, MessageHandlerCb cb, bool noDelete)
@@ -5259,10 +5281,10 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                             qDebug() << importedLoginNodes[i]->getService() << " : adding new child " << imported_child_node->getLogin() << " in the mooltipass...";
 
                             /* Increment new addresses counter */
-                            newAddressesNeededCounter += 1;
+                            incrementNeededAddresses(MPNode::NodeChild);
 
                             /* Create new node with null address and virtual address set to our counter value */
-                            MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                            MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                             newChildNodePt->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
                             newChildNodePt->setMergeTagged();
 
@@ -5292,10 +5314,10 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
             if(service_node_found == false)
             {
                /* Increment new addresses counter */
-               newAddressesNeededCounter += 1;
+               incrementNeededAddresses(MPNode::NodeParent);
 
                /* Create new node with null address and virtual address set to our counter value */
-               MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+               MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                newNodePt->setLoginNodeData(importedLoginNodes[i]->getNodeFlags(), importedLoginNodes[i]->getLoginNodeData());
                newNodePt->setMergeTagged();
 
@@ -5327,10 +5349,10 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                    }
 
                    /* Increment new addresses counter */
-                   newAddressesNeededCounter += 1;
+                   incrementNeededAddresses(MPNode::NodeChild);
 
                    /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                   MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                    newChildNodePt->setLoginChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getLoginChildNodeData());
                    newChildNodePt->setMergeTagged();
 
@@ -5467,10 +5489,10 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                                 qDebug() << importedDataNodes[i]->getService() << " : appending child data in the mooltipass...";
 
                                 /* Increment new addresses counter */
-                                newAddressesNeededCounter += 1;
+                                incrementNeededAddresses(MPNode::NodeChild);
 
                                 /* Create new node with null address and virtual address set to our counter value */
-                                MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                                MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                                 newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
                                 newDataChildNodePt->setMergeTagged();
 
@@ -5512,10 +5534,10 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 if(service_node_found == false)
                 {
                    /* Increment new addresses counter */
-                   newAddressesNeededCounter += 1;
+                   incrementNeededAddresses(MPNode::NodeParent);
 
                    /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                   MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                    newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
                    newNodePt->setMergeTagged();
 
@@ -5549,10 +5571,10 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                        }
 
                        /* Increment new addresses counter */
-                       newAddressesNeededCounter += 1;
+                       incrementNeededAddresses(MPNode::NodeChild);
 
                        /* Create new node with null address and virtual address set to our counter value */
-                       MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                       MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                        newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
                        newDataChildNodePt->setMergeTagged();
 
@@ -5922,7 +5944,13 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
 {
     qDebug() << "Loading free addresses from address:" << addressFrom.toHex();
 
-    jobs->append(new MPCommandJob(this, MPCmd::GET_30_FREE_SLOTS,
+    if (isBLE())
+    {
+        bleImpl->getFreeAddressProvider().loadFreeAddresses(jobs, addressFrom, cbProgress);
+        return;
+    }
+
+    jobs->append(new MPCommandJob(this, MPCmd::GET_FREE_ADDRESSES,
                                   addressFrom,
                                   [this, jobs, discardFirstAddr, cbProgress](const QByteArray &data, bool &) -> bool
     {
@@ -5986,6 +6014,26 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
             return true;
         }
     }));
+}
+
+void MPDevice::incrementNeededAddresses(MPNode::NodeType type)
+{
+    ++newAddressesNeededCounter;
+    if (isBLE())
+    {
+        if (MPNode::NodeParent == type)
+        {
+            bleImpl->getFreeAddressProvider().incrementParentNodeNeeded(newAddressesNeededCounter);
+        }
+        else if (MPNode::NodeChild == type)
+        {
+            bleImpl->getFreeAddressProvider().incrementChildNodeNeeded(newAddressesNeededCounter);
+        }
+        else
+        {
+            qCritical() << "Invalid MPNode type: " << type;
+        }
+    }
 }
 
 void MPDevice::startIntegrityCheck(const std::function<void(bool success, int freeBlocks, int totalBlocks, QString errstr)> &cb,
@@ -6349,10 +6397,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 }
 
                 /* Increment new addresses counter */
-                newAddressesNeededCounter += 1;
+                incrementNeededAddresses(MPNode::NodeChild);
 
                 /* Create new node with null address and virtual address set to our counter value */
-                MPNode* newNodePt = pMesProt->createMPNode(QByteArray(MP_NODE_SIZE, 0), this, QByteArray(), newAddressesNeededCounter);
+                MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
                 newNodePt->setType(MPNode::NodeChild);
                 loginChildNodes.append(newNodePt);
                 newNodePt->setNotDeletedTagged();
@@ -6389,7 +6437,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 }
 
                 /* Increment new addresses counter */
-                newAddressesNeededCounter += 1;
+                incrementNeededAddresses(MPNode::NodeParent);
 
                 /* Remove child from previous parent */
                 removeChildFromDB(parentNodePtr, nodePtr, true, false);
@@ -6543,18 +6591,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     }
 
     /* Increment db change numbers */
-    /**
-     * TODO: Uncomment and adjust, when SET_USER_CHANGE_NB
-     *       is implemented for BLE
-     */
-    if (isFw12() /*|| isBLE()*/)
+    if (isFw12() || isBLE())
     {
         set_credentialsDbChangeNumber(get_credentialsDbChangeNumber() + 1);
         credentialsDbChangeNumberClone = get_credentialsDbChangeNumber();
-        QByteArray updateChangeNumbersPacket = QByteArray();
-        updateChangeNumbersPacket.append(get_credentialsDbChangeNumber());
-        updateChangeNumbersPacket.append(get_dataDbChangeNumber());
-        jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
+        updateChangeNumbers(jobs, Common::CredentialNumberChanged);
     }
 
     emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
@@ -6596,13 +6637,30 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         connect(mergeOperations, &AsyncJobs::finished, [this, cb, cbProgress](const QByteArray &data)
         {
             Q_UNUSED(data);
+
+            if (mmmPasswordChangeArray.isEmpty())
+            {
+                cb(true, "Changes Applied to Memory");
+                qInfo() << "No passwords to be changed";
+                exitMemMgmtMode(true);
+                return;
+            }
+
+            AsyncJobs *pwdChangeJobs = new AsyncJobs("Changing passwords...", this);
+
+            if (isBLE())
+            {
+                for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
+                {
+                    bleImpl->storeCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
+                }
+            }
+
             exitMemMgmtMode(true);
             qInfo() << "Merge operations succeeded!";
 
-            if (mmmPasswordChangeArray.size() > 0)
+            if (!isBLE())
             {
-                AsyncJobs *pwdChangeJobs = new AsyncJobs("Changing passwords...", this);
-
                 /* Create password change jobs */
                 for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
                 {
@@ -6672,30 +6730,25 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                         return true;
                     }));
                 }
-
-                connect(pwdChangeJobs, &AsyncJobs::finished, [this, cb](const QByteArray &)
-                {
-                    cb(true, "Changes Applied to Memory");
-                    qInfo() << "Passwords changed!";
-                    mmmPasswordChangeArray.clear();
-                });
-
-                connect(pwdChangeJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
-                {
-                    Q_UNUSED(failedJob);
-                    mmmPasswordChangeArray.clear();
-                    qCritical() << "Couldn't change passwords";
-                    cb(false, "Please Approve Password Changes On The Device");
-                });
-
-                jobsQueue.enqueue(pwdChangeJobs);
-                runAndDequeueJobs();
             }
-            else
+
+            connect(pwdChangeJobs, &AsyncJobs::finished, [this, cb](const QByteArray &)
             {
                 cb(true, "Changes Applied to Memory");
-                qInfo() << "No passwords to be changed";
-            }
+                qInfo() << "Passwords changed!";
+                mmmPasswordChangeArray.clear();
+            });
+
+            connect(pwdChangeJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
+            {
+                Q_UNUSED(failedJob);
+                mmmPasswordChangeArray.clear();
+                qCritical() << "Couldn't change passwords";
+                cb(false, "Please Approve Password Changes On The Device");
+            });
+
+            jobsQueue.enqueue(pwdChangeJobs);
+            runAndDequeueJobs();
         });
         connect(mergeOperations, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
         {

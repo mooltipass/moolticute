@@ -4,7 +4,8 @@
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),
-    mpDev(dev)
+    mpDev(dev),
+    freeAddressProv(mesProt, dev)
 {
 
 }
@@ -477,6 +478,23 @@ void MPDeviceBleImpl::processDebugMsg(const QByteArray &data, bool &isDebugMsg)
         qWarning() << m_debugMsg;
         isDebugMsg = false;
         m_debugMsg.clear();
+    }
+}
+
+void MPDeviceBleImpl::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
+{
+    if (flags&Common::CredentialNumberChanged)
+    {
+        jobs->append(new MPCommandJob(mpDev, MPCmd::SET_USER_CHANGE_NB,
+                                      bleProt->toLittleEndianFromInt32(mpDev->get_credentialsDbChangeNumber()),
+                                      bleProt->getDefaultFuncDone()));
+    }
+
+    if (flags&Common::DataNumberChanged)
+    {
+        jobs->append(new MPCommandJob(mpDev, MPCmd::SET_DATA_CHANGE_NB,
+                                      bleProt->toLittleEndianFromInt32(mpDev->get_dataDbChangeNumber()),
+                                      bleProt->getDefaultFuncDone()));
     }
 }
 
