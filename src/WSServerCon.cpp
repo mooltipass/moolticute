@@ -295,6 +295,70 @@ void WSServerCon::processMessage(const QString &message)
     {
         processParametersSet(root["data"].toObject());
     }
+    else if (root["msg"] == "export_database")
+    {
+        QString encryptionMethod  = "none";
+        if (root.contains("data"))
+        {
+            QJsonObject o = root["data"].toObject();
+            encryptionMethod = o.value("encryption").toString();
+        }
+
+        mpdevice->exportDatabase(encryptionMethod,
+                                 [=](bool success, QString errstr, QByteArray fileData)
+        {
+            qDebug() << "send exported DB on WS: success:" << success
+                     << ", fileData size:" << fileData.size()
+                     << ", errstr:" << errstr;
+
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["file_data"] = QString(fileData.toBase64());
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
+    else if (root["msg"] == "import_database")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QByteArray data = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
+        if (data.isEmpty())
+        {
+            sendFailedJson(root, "file_data is empty");
+            return;
+        }
+
+        mpdevice->importDatabase(data, o["no_delete"].toBool(),
+                    [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -898,70 +962,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });
-    }
-    else if (root["msg"] == "export_database")
-    {
-        QString encryptionMethod  = "none";
-        if (root.contains("data"))
-        {
-            QJsonObject o = root["data"].toObject();
-            encryptionMethod = o.value("encryption").toString();
-        }
-
-        mpdevice->exportDatabase(encryptionMethod,
-                                 [=](bool success, QString errstr, QByteArray fileData)
-        {
-            qDebug() << "send exported DB on WS: success:" << success
-                     << ", fileData size:" << fileData.size()
-                     << ", errstr:" << errstr;
-
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["file_data"] = QString(fileData.toBase64());
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        cbProgress);
-    }
-    else if (root["msg"] == "import_database")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        QByteArray data = QByteArray::fromBase64(o["file_data"].toString().toLocal8Bit());
-        if (data.isEmpty())
-        {
-            sendFailedJson(root, "file_data is empty");
-            return;
-        }
-
-        mpdevice->importDatabase(data, o["no_delete"].toBool(),
-                    [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = "true";
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        cbProgress);
     }
     else if (root["msg"] == "import_csv")
     {
