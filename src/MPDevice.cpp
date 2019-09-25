@@ -4804,6 +4804,10 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
 
     exportTopObject.insert("dataDbChangeNumber", QJsonValue((quint8)get_dataDbChangeNumber()));
     exportTopObject.insert("credentialsDbChangeNumber", QJsonValue((quint8)get_credentialsDbChangeNumber()));
+    if (isBLE())
+    {
+        exportTopObject.insert("isBle", QJsonValue(true));
+    }
 
     QJsonDocument fileContentDoc(exportTopObject);
     payload = fileContentDoc.toJson();
@@ -5285,6 +5289,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
 
                             /* Create new node with null address and virtual address set to our counter value */
                             MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+                            newChildNodePt->setType(MPNode::NodeChild);
                             newChildNodePt->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
                             newChildNodePt->setMergeTagged();
 
@@ -5318,6 +5323,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
 
                /* Create new node with null address and virtual address set to our counter value */
                MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+               newNodePt->setType(MPNode::NodeParent);
                newNodePt->setLoginNodeData(importedLoginNodes[i]->getNodeFlags(), importedLoginNodes[i]->getLoginNodeData());
                newNodePt->setMergeTagged();
 
@@ -5353,6 +5359,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
 
                    /* Create new node with null address and virtual address set to our counter value */
                    MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+                   newChildNodePt->setType(MPNode::NodeChild);
                    newChildNodePt->setLoginChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getLoginChildNodeData());
                    newChildNodePt->setMergeTagged();
 
@@ -5493,6 +5500,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
 
                                 /* Create new node with null address and virtual address set to our counter value */
                                 MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+                                newDataChildNodePt->setType(MPNode::NodeChild);
                                 newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
                                 newDataChildNodePt->setMergeTagged();
 
@@ -5538,6 +5546,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
 
                    /* Create new node with null address and virtual address set to our counter value */
                    MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+                   newNodePt->setType(MPNode::NodeParent);
                    newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
                    newNodePt->setMergeTagged();
 
@@ -5575,6 +5584,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
 
                        /* Create new node with null address and virtual address set to our counter value */
                        MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+                       newDataChildNodePt->setType(MPNode::NodeChild);
                        newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
                        newDataChildNodePt->setMergeTagged();
 

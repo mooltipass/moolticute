@@ -337,7 +337,7 @@ private:
     QByteArray ctrValue;
     QByteArray startNode;
     quint32 virtualStartNode = 0;
-    QByteArray startDataNode;
+    QByteArray startDataNode = MPNode::EmptyAddress;
     quint32 virtualDataStartNode = 0;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
@@ -354,7 +354,7 @@ private:
     quint32 dataDbChangeNumberClone;
     QByteArray ctrValueClone;
     QByteArray startNodeClone;
-    QByteArray startDataNodeClone;
+    QByteArray startDataNodeClone = MPNode::EmptyAddress;
     QList<QByteArray> cpzCtrValueClone;
     QList<QByteArray> favoritesAddrsClone;
     QList<MPNode *> loginNodesClone;         //list of all parent nodes for credentials
