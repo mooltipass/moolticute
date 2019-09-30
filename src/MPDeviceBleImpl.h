@@ -82,6 +82,9 @@ public:
 
     void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 
+    QJsonObject getUserCategories() const { return m_categories; };
+    void checkUserCategories(const QJsonObject &categories);
+
 signals:
     void userSettingsChanged(QJsonObject settings);
 
@@ -107,6 +110,7 @@ private:
     QString m_debugMsg = "";
 
     MPBLEFreeAddressProvider freeAddressProv;
+    QJsonObject m_categories;
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;

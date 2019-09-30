@@ -4779,6 +4779,14 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     /* Mooltipass serial */
     exportTopArray.append(QJsonValue((qint64)get_serialNumber()));
 
+    if (isBLE())
+    {
+        /* isBle */
+        exportTopArray.append(QJsonValue{true});
+        /* user category names */
+        exportTopArray.append(bleImpl->getUserCategories());
+    }
+
     /* Generate file payload */
     QJsonDocument payloadDoc(exportTopArray);
     auto payload = payloadDoc.toJson();
@@ -4804,10 +4812,6 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
 
     exportTopObject.insert("dataDbChangeNumber", QJsonValue((quint8)get_dataDbChangeNumber()));
     exportTopObject.insert("credentialsDbChangeNumber", QJsonValue((quint8)get_credentialsDbChangeNumber()));
-    if (isBLE())
-    {
-        exportTopObject.insert("isBle", QJsonValue(true));
-    }
 
     QJsonDocument fileContentDoc(exportTopObject);
     payload = fileContentDoc.toJson();
@@ -4905,8 +4909,10 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 {
     /** Mooltiapp / Chrome App save file **/
 
+    const auto dataSize = dataArray.size();
+    const auto isBleExport = 16 == dataArray.size() && dataArray[14].toBool();
     /* Checks */
-    if (!((dataArray[9].toString() == "mooltipass" && dataArray.size() == 10) || (dataArray[9].toString() == "moolticute" && dataArray.size() == 14)))
+    if (!((dataArray[9].toString() == "mooltipass" && dataSize == 10) || (dataArray[9].toString() == "moolticute" && (dataSize == 14 || isBleExport))))
     {
         qCritical() << "Invalid MooltiApp file";
         errorString = "Selected File Isn't Correct";
@@ -5077,6 +5083,11 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
             importedDataChildNodes.append(importedNode);
             //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
+        }
+
+        if (isBleExport)
+        {
+            bleImpl->checkUserCategories(dataArray[15].toObject());
         }
     }
 
