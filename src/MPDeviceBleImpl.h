@@ -83,7 +83,8 @@ public:
     void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 
     QJsonObject getUserCategories() const { return m_categories; };
-    void checkUserCategories(const QJsonObject &categories);
+    void updateUserCategories(const QJsonObject &categories);
+    bool isUserCategoriesChanged(const QJsonObject &categories) const;
 
 signals:
     void userSettingsChanged(QJsonObject settings);

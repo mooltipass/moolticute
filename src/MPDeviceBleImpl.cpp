@@ -500,10 +500,34 @@ void MPDeviceBleImpl::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
     }
 }
 
-void MPDeviceBleImpl::checkUserCategories(const QJsonObject &categories)
+void MPDeviceBleImpl::updateUserCategories(const QJsonObject &categories)
 {
-    //TODO implement
-    qDebug() << "User category number: " << categories.size();
+    if (isUserCategoriesChanged(categories))
+    {
+        qDebug() << "Updating user category names";
+        setUserCategories(categories,
+                          [](bool success, QString errstr, QByteArray)
+                            {
+                                if (!success)
+                                {
+                                    qCritical() << "Update user categories failed: " << errstr;
+                                }
+                            }
+        );
+    }
+}
+
+bool MPDeviceBleImpl::isUserCategoriesChanged(const QJsonObject &categories) const
+{
+    for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
+    {
+        QString categoryName = "category_" + QString::number(i+1);
+        if (categories[categoryName] != m_categories[categoryName])
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)

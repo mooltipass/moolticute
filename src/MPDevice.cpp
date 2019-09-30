@@ -5087,7 +5087,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 
         if (isBleExport)
         {
-            bleImpl->checkUserCategories(dataArray[15].toObject());
+            bleImpl->updateUserCategories(dataArray[15].toObject());
         }
     }
 
