@@ -408,6 +408,28 @@ protected:
     IMessageProtocol *pMesProt = nullptr;
 
     DeviceType deviceType = DeviceType::MOOLTIPASS;
+    static constexpr int EXPORT_MP_DATA_SIZE = 10;
+    static constexpr int EXPORT_MC_DATA_SIZE = 14;
+    static constexpr int EXPORT_BLE_DATA_SIZE = 16;
+    enum ExportPayloadData
+    {
+        EXPORT_CTR = 0,
+        EXPORT_CPZ_CTR = 1,
+        EXPORT_STARTING_PARENT = 2,
+        EXPORT_DATA_STARTING_PARENT = 3,
+        EXPORT_FAVORITES = 4,
+        EXPORT_SERVICE_NODES = 5,
+        EXPORT_SERVICE_CHILD_NODES = 6,
+        EXPORT_MC_SERVICE_NODES = 7,
+        EXPORT_MC_SERVICE_CHILD_NODES = 8,
+        EXPORT_DEVICE_VERSION = 9,
+        EXPORT_BUNDLE_VERSION = 10,
+        EXPORT_CRED_CHANGE_NUMBER = 11,
+        EXPORT_DATA_CHANGE_NUMBER = 12,
+        EXPORT_DB_MINI_SERIAL_NUM = 13,
+        EXPORT_IS_BLE = 14,
+        EXPORT_BLE_USER_CATEGORIES = 15
+    };
 };
 
 #endif // MPDEVICE_H
