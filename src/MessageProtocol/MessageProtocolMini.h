@@ -40,6 +40,7 @@ public:
 
     int getParentNodeSize() const override { return MP_NODE_SIZE; }
     int getChildNodeSize() const override { return MP_NODE_SIZE; }
+    uint getMaxFavorite() const override { return MOOLTIPASS_FAV_MAX; }
 
     virtual void fillCommandMapping() override;
 };

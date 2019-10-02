@@ -46,6 +46,7 @@ public:
 
     int getParentNodeSize() const override;
     int getChildNodeSize() const override;
+    uint getMaxFavorite() const override { return MAX_FAVORITE_NUM; }
 
 private:
     virtual void fillCommandMapping() override;
@@ -61,6 +62,7 @@ private:
     static constexpr quint8 PAYLOAD_LEN_UPPER_BYTE = 5;
     static constexpr quint8 FIRST_PAYLOAD_BYTE_MESSAGE = 6;
     static constexpr quint8 FIRST_PAYLOAD_BYTE_PACKET = 2;
+    static constexpr uint MAX_FAVORITE_NUM = 10;
 };
 
 #endif // MESSAGEPROTOCOLBLE_H

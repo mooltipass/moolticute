@@ -310,7 +310,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::PLEASE_RETRY          , 0x0002},
         {MPCmd::READ_FLASH_NODE       , 0x0102},
         {MPCmd::WRITE_FLASH_NODE      , 0x010D},
-        {MPCmd::GET_FAVORITE          , 0xC7},
+        {MPCmd::GET_FAVORITE          , 0x010C},
         {MPCmd::SET_FAVORITE          , 0xC8},
         {MPCmd::GET_STARTING_PARENT   , 0x0100},
         {MPCmd::SET_STARTING_PARENT   , 0x0105},
