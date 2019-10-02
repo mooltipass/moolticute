@@ -3252,8 +3252,16 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             {
                 qDebug() << "Generating favorite" << i << "update packet";
                 diagSavePacketsGenerated = true;
-                QByteArray updateFavPacket = QByteArray();
-                updateFavPacket.append(i);
+                QByteArray updateFavPacket;
+                if (isBLE())
+                {
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(0));
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i));
+                }
+                else
+                {
+                    updateFavPacket.append(i);
+                }
                 updateFavPacket.append(favoritesAddrs[i]);
                 jobs->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, updateFavPacket, pMesProt->getDefaultFuncDone()));
             }
