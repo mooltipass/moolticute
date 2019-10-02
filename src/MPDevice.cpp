@@ -4910,11 +4910,11 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     /** Mooltiapp / Chrome App save file **/
 
     const auto dataSize = dataArray.size();
-    const bool isBleExport = EXPORT_BLE_DATA_SIZE == dataArray.size() && dataArray[EXPORT_IS_BLE].toBool();
-    const QString deviceVersion = dataArray[EXPORT_DEVICE_VERSION].toString();
+    const bool isBleExport = BLE_EXPORT_FIELD_NUM == dataArray.size() && dataArray[EXPORT_IS_BLE_INDEX].toBool();
+    const QString deviceVersion = dataArray[EXPORT_DEVICE_VERSION_INDEX].toString();
     /* Checks */
-    if (!((deviceVersion == "mooltipass" && dataSize == EXPORT_MP_DATA_SIZE)
-          || (deviceVersion == "moolticute" && (dataSize == EXPORT_MC_DATA_SIZE || isBleExport))))
+    if (!((deviceVersion == "mooltipass" && dataSize == MP_EXPORT_FIELD_NUM)
+          || (deviceVersion == "moolticute" && (dataSize == MC_EXPORT_FIELD_NUM || isBleExport))))
     {
         qCritical() << "Invalid MooltiApp file";
         errorString = "Selected File Isn't Correct";
@@ -4931,22 +4931,22 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     {
         qInfo() << "Dealing with Moolticute export file";
         isMooltiAppImportFile = false;
-        importedCredentialsDbChangeNumber = dataArray[EXPORT_CRED_CHANGE_NUMBER].toInt();
+        importedCredentialsDbChangeNumber = dataArray[EXPORT_CRED_CHANGE_NUMBER_INDEX].toInt();
         qDebug() << "Imported cred change number: " << importedCredentialsDbChangeNumber;
-        importedDataDbChangeNumber = dataArray[EXPORT_DATA_CHANGE_NUMBER].toInt();
+        importedDataDbChangeNumber = dataArray[EXPORT_DATA_CHANGE_NUMBER_INDEX].toInt();
         qDebug() << "Imported data change number: " << importedDataDbChangeNumber;
-        importedDbMiniSerialNumber = dataArray[EXPORT_DB_MINI_SERIAL_NUM].toInt();
+        importedDbMiniSerialNumber = dataArray[EXPORT_DB_MINI_SERIAL_NUM_INDEX].toInt();
         qDebug() << "Imported mini serial number: " << importedDbMiniSerialNumber;
     }
 
     /* Read CTR */
     importedCtrValue = QByteArray();
-    auto qjobject = dataArray[EXPORT_CTR].toObject();
+    auto qjobject = dataArray[EXPORT_CTR_INDEX].toObject();
     for (qint32 i = 0; i < qjobject.size(); i++) {importedCtrValue.append(qjobject[QString::number(i)].toInt());}
     qDebug() << "Imported CTR: " << importedCtrValue.toHex();
 
     /* Read CPZ CTR values */
-    auto qjarray = dataArray[EXPORT_CPZ_CTR].toArray();
+    auto qjarray = dataArray[EXPORT_CPZ_CTR_INDEX].toArray();
     for (qint32 i = 0; i < qjarray.size(); i++)
     {
         qjobject = qjarray[i].toObject();
@@ -4976,18 +4976,18 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 
     /* Read Starting Parent */
     importedStartNode = QByteArray();
-    qjarray = dataArray[EXPORT_STARTING_PARENT].toArray();
+    qjarray = dataArray[EXPORT_STARTING_PARENT_INDEX].toArray();
     for (qint32 i = 0; i < qjarray.size(); i++) {importedStartNode.append(qjarray[i].toInt());}
     qDebug() << "Imported start node: " << importedStartNode.toHex();
 
     /* Read Data Starting Parent */
     importedStartDataNode = QByteArray();
-    qjarray = dataArray[EXPORT_DATA_STARTING_PARENT].toArray();
+    qjarray = dataArray[EXPORT_DATA_STARTING_PARENT_INDEX].toArray();
     for (qint32 i = 0; i < qjarray.size(); i++) {importedStartDataNode.append(qjarray[i].toInt());}
     qDebug() << "Imported data start node: " << importedStartDataNode.toHex();
 
     /* Read favorites */
-    qjarray = dataArray[EXPORT_FAVORITES].toArray();
+    qjarray = dataArray[EXPORT_FAVORITES_INDEX].toArray();
     for (qint32 i = 0; i < qjarray.size(); i++)
     {
         qjobject = qjarray[i].toObject();
@@ -4998,7 +4998,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     }
 
     /* Read service nodes */
-    qjarray = dataArray[EXPORT_SERVICE_NODES].toArray();
+    qjarray = dataArray[EXPORT_SERVICE_NODES_INDEX].toArray();
     for (qint32 i = 0; i < qjarray.size(); i++)
     {
         qjobject = qjarray[i].toObject();
@@ -5020,7 +5020,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     }
 
     /* Read service child nodes */
-    qjarray = dataArray[EXPORT_SERVICE_CHILD_NODES].toArray();
+    qjarray = dataArray[EXPORT_SERVICE_CHILD_NODES_INDEX].toArray();
     for (qint32 i = 0; i < qjarray.size(); i++)
     {
         qjobject = qjarray[i].toObject();
@@ -5044,7 +5044,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     if (!isMooltiAppImportFile)
     {
         /* Read service nodes */
-        qjarray = dataArray[EXPORT_MC_SERVICE_NODES].toArray();
+        qjarray = dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray();
         for (qint32 i = 0; i < qjarray.size(); i++)
         {
             qjobject = qjarray[i].toObject();
@@ -5066,7 +5066,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         }
 
         /* Read service child nodes */
-        qjarray = dataArray[EXPORT_MC_SERVICE_CHILD_NODES].toArray();
+        qjarray = dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray();
         for (qint32 i = 0; i < qjarray.size(); i++)
         {
             qjobject = qjarray[i].toObject();
@@ -5089,7 +5089,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 
         if (isBleExport)
         {
-            bleImpl->updateUserCategories(dataArray[EXPORT_BLE_USER_CATEGORIES].toObject());
+            bleImpl->updateUserCategories(dataArray[EXPORT_BLE_USER_CATEGORIES_INDEX].toObject());
         }
     }
 
