@@ -1122,10 +1122,19 @@ void MainWindow::dbImported(bool success, QString message)
 {
     ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
-    if (!success)
-        QMessageBox::warning(this, tr("Error"), message);
-    else
+    if (success)
+    {
+        if (wsClient->isMPBLE())
+        {
+            wsClient->sendGetUserCategories();
+        }
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Error"), message);
+    }
+
 
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
 
