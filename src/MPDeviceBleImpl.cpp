@@ -530,6 +530,20 @@ bool MPDeviceBleImpl::isUserCategoriesChanged(const QJsonObject &categories) con
     return false;
 }
 
+QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
+{
+    QList<QByteArray> res;
+    int start = 0;
+    int end = FAV_DATA_SIZE;
+    while (res.size() < FAV_NUMBER)
+    {
+        res.append(bleProt->getPayloadBytes(data, start, end));
+        start = end;
+        end += FAV_DATA_SIZE;
+    }
+    return res;
+}
+
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
 {
     return createCredentialMessage(cred.getAttributes());

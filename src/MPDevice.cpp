@@ -685,62 +685,95 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     jobs->append(cpzJob);
 
     /* Get favorites */
-    for (uint i = 0; i < pMesProt->getMaxFavorite(); ++i)
+    if (isBLE())
     {
-        QByteArray favData;
-        if (isBLE())
+        jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITES,
+                                  [this, jobs, cbProgress](const QByteArray &data, bool &)
+                    {
+                        if (pMesProt->getMessageSize(data) == 1)
+                        {
+                            /* Received one byte as answer: command fail */
+                            jobs->setCurrentJobError("Mooltipass refused to send us favorites");
+                            qCritical() << "Get favorite: couldn't get answer";
+                            return false;
+                        }
+                        qDebug() << "Received favorites: " << data.toHex();
+                        /* Append favorite to list */
+                        favoritesAddrs = bleImpl->getFavorites(data);
+                        favoritesAddrsClone = favoritesAddrs;
+
+                        progressCurrent++;
+                        QVariantMap cbData = {
+                            {"total", 1},
+                            {"current", 1},
+                            {"msg", "Favorite are loaded"}
+                        };
+                        cbProgress(cbData);
+                        return true;
+                    })
+        );
+    }
+    else
+    {
+        for (uint i = 0; i < pMesProt->getMaxFavorite(); ++i)
         {
-            favData.append(pMesProt->toLittleEndianFromInt(0));
-            favData.append(pMesProt->toLittleEndianFromInt(i));
-        }
-        else
-        {
-            favData.append(static_cast<quint8>(i));
-        }
-        jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE, favData,
-                                      [this, i, cbProgress](const QByteArray &, QByteArray &) -> bool
-        {
-            if (i == 0)
+            QByteArray favData;
+            if (isBLE())
             {
-                qInfo() << "Loading favorites...";
-                QVariantMap data = {
-                    {"total", progressTotal},
-                    {"current", progressCurrent},
-                    {"msg", "Loading Favorites..."}
-                };
-                cbProgress(data);
-            }
-            return true;
-        },
-                                      [this, i, jobs, cbProgress](const QByteArray &data, bool &) -> bool
-        {
-            if (pMesProt->getMessageSize(data) == 1)
-            {
-                /* Received one byte as answer: command fail */
-                jobs->setCurrentJobError("Mooltipass refused to send us favorites");
-                qCritical() << "Get favorite: couldn't get answer";
-                return false;
+                favData.append(pMesProt->toLittleEndianFromInt(0));
+                favData.append(pMesProt->toLittleEndianFromInt(i));
             }
             else
             {
-                /* Append favorite to list */
-                qDebug() << "Favorite" << i << ": parent address:" << pMesProt->getPayloadBytes(data, 0, 2).toHex() << ", child address:" << pMesProt->getPayloadBytes(data, 2, 2).toHex();
-                favoritesAddrs.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
-                favoritesAddrsClone.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
-
-                progressCurrent++;
-                QVariantMap data = {
-                    {"total", progressTotal},
-                    {"current", progressCurrent},
-                    {"msg", "Favorite %1 loaded"},
-                    {"msg_args", QVariantList({i})}
-                };
-                cbProgress(data);
-
-                return true;
+                favData.append(static_cast<quint8>(i));
             }
-        }));
+            jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE,
+                                          QByteArray(1, static_cast<quint8>(i)),
+                                          [this, i, cbProgress](const QByteArray &, QByteArray &) -> bool
+            {
+                if (i == 0)
+                {
+                    qInfo() << "Loading favorites...";
+                    QVariantMap data = {
+                        {"total", progressTotal},
+                        {"current", progressCurrent},
+                        {"msg", "Loading Favorites..."}
+                    };
+                    cbProgress(data);
+                }
+                return true;
+            },
+                                          [this, i, jobs, cbProgress](const QByteArray &data, bool &) -> bool
+            {
+                if (pMesProt->getMessageSize(data) == 1)
+                {
+                    /* Received one byte as answer: command fail */
+                    jobs->setCurrentJobError("Mooltipass refused to send us favorites");
+                    qCritical() << "Get favorite: couldn't get answer";
+                    return false;
+                }
+                else
+                {
+                    /* Append favorite to list */
+                    qDebug() << "Favorite" << i << ": parent address:" << pMesProt->getPayloadBytes(data, 0, 2).toHex() << ", child address:" << pMesProt->getPayloadBytes(data, 2, 2).toHex();
+                    favoritesAddrs.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
+                    favoritesAddrsClone.append(pMesProt->getPayloadBytes(data, 0, MOOLTIPASS_ADDRESS_SIZE));
+
+                    progressCurrent++;
+                    QVariantMap data = {
+                        {"total", progressTotal},
+                        {"current", progressCurrent},
+                        {"msg", "Favorite %1 loaded"},
+                        {"msg_args", QVariantList({i})}
+                    };
+                    cbProgress(data);
+
+                    return true;
+                }
+            }));
+        }
     }
+
 
     if (getCreds)
     {
