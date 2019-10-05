@@ -697,7 +697,9 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                             qCritical() << "Get favorite: couldn't get answer";
                             return false;
                         }
+#ifdef DEV_DEBUG
                         qDebug() << "Received favorites: " << data.toHex();
+#endif
                         /* Append favorite to list */
                         favoritesAddrs = bleImpl->getFavorites(data);
                         favoritesAddrsClone = favoritesAddrs;
@@ -3288,8 +3290,8 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
                 QByteArray updateFavPacket;
                 if (isBLE())
                 {
-                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(0));
-                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i));
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i/10));
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i%10));
                 }
                 else
                 {
