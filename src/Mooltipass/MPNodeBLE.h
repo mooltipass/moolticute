@@ -28,6 +28,8 @@ public:
     QDate getDateCreated() const override;
     QDate getDateLastUsed() const override;
 
+    int getCategory() const;
+
     static constexpr int PARENT_NODE_LENGTH = 264;
     static constexpr int CHILD_NODE_LENGTH = 528;
 

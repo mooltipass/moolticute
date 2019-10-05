@@ -20,6 +20,7 @@
 #include "MooltipassCmds.h"
 
 #include "MPDevice.h"
+#include "MPNodeBLE.h"
 
 QByteArray MPNode::EmptyAddress = QByteArray(2, 0);
 
@@ -439,6 +440,10 @@ QJsonObject MPNode::toJson() const
         obj["address"] = QJsonArray({{ address.at(0) },
                                      { address.at(1) }});
         obj["favorite"] = favorite;
+        if (isBLE)
+        {
+            obj["category"] = QString::number(static_cast<const MPNodeBLE*>(this)->getCategory());
+        }
     }
     else if (getType() == NodeChildData)
     {
