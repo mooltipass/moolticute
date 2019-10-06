@@ -719,16 +719,6 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     {
         for (uint i = 0; i < pMesProt->getMaxFavorite(); ++i)
         {
-            QByteArray favData;
-            if (isBLE())
-            {
-                favData.append(pMesProt->toLittleEndianFromInt(0));
-                favData.append(pMesProt->toLittleEndianFromInt(i));
-            }
-            else
-            {
-                favData.append(static_cast<quint8>(i));
-            }
             jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE,
                                           QByteArray(1, static_cast<quint8>(i)),
                                           [this, i, cbProgress](const QByteArray &, QByteArray &) -> bool
