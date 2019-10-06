@@ -83,6 +83,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonSaveCategories->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSaveCategories->setText(tr("Save"));
     ui->pushButtonSaveCategories->hide();
+    ui->credDisplayCategoryInput->hide();
+    ui->credDisplayCategoryLabel->hide();
     connect(ui->lineEditCategory1, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory2, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory3, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
@@ -91,7 +93,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QAction *action = m_favMenu.addAction(tr("Not a favorite"));
     connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
 
-    for (int i = 1; i < 15;i++)
+    for (int i = 1; i <= BLE_FAVORITE_NUM;i++)
     {
         action = m_favMenu.addAction(tr("Set as favorite #%1").arg(i));
         connect(action, &QAction::triggered, [this, i](){ changeCurrentFavorite(i - 1); });
@@ -180,6 +182,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::enableCredentialsManagement);
     connect(wsClient, &WSClient::memoryDataChanged, [=]()
     {
+        updateDeviceType(wsClient->isMPBLE());
         m_pCredModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
         m_loadedModelSerialiation = m_pCredModel->getJsonChanges();
         ui->lineEditFilterCred->clear();
@@ -195,6 +198,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
                     ui->lineEditCategory2->setText(cat2);
                     ui->lineEditCategory3->setText(cat3);
                     ui->lineEditCategory4->setText(cat4);
+                    m_pCredModel->updateCategories(cat1, cat2, cat3, cat4);
                 }
     );
     connect(wsClient, &WSClient::statusChanged, this,
@@ -767,6 +771,7 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
             ui->credDisplayCreationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayModificationDateInput->setText(pLoginItem->accessedDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayPasswordInput->setLocked(pLoginItem->passwordLocked());
+            ui->credDisplayCategoryInput->setText(pLoginItem->category());
         }
     }
 }
@@ -779,6 +784,7 @@ void CredentialsManagement::clearLoginDescription()
     ui->credDisplayDescriptionInput->setText("");
     ui->credDisplayCreationDateInput->setText("");
     ui->credDisplayModificationDateInput->setText("");
+    ui->credDisplayCategoryInput->setText("");
 }
 
 QModelIndex CredentialsManagement::getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex)
@@ -841,6 +847,21 @@ void CredentialsManagement::clearMMMUi()
     ui->credDisplayFrame->setEnabled(false);
     m_pCredModel->clear();
     ui->credentialTreeView->repaint();
+}
+
+void CredentialsManagement::updateDeviceType(bool isBle)
+{
+    m_pCredModel->setIsBle(isBle);
+    if (isBle)
+    {
+        ui->credDisplayCategoryInput->show();
+        ui->credDisplayCategoryLabel->show();
+    }
+    else
+    {
+        ui->credDisplayCategoryInput->hide();
+        ui->credDisplayCategoryLabel->hide();
+    }
 }
 
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
@@ -916,8 +937,23 @@ void CredentialsManagement::onSelectLoginTimerTimeOut()
 void CredentialsManagement::updateFavMenu()
 {
     QList<QAction*> actions = m_favMenu.actions();
+    bool isBle = wsClient->isMPBLE();
+    int i = 0;
     for (QAction* action : actions)
+    {
         action->setEnabled(true);
+        if (i++ > MINI_FAVORITE_NUM)
+        {
+            if (isBle)
+            {
+                action->setVisible(true);
+            }
+            else
+            {
+                action->setVisible(false);
+            }
+        }
+    }
 
     // check taken favs
     if (m_pCredModel)
@@ -994,6 +1030,10 @@ void CredentialsManagement::on_pushButtonSaveCategories_clicked()
                                     ui->lineEditCategory3->text(),
                                     ui->lineEditCategory4->text());
     ui->pushButtonSaveCategories->hide();
+    m_pCredModel->updateCategories(ui->lineEditCategory1->text(),
+                                   ui->lineEditCategory2->text(),
+                                   ui->lineEditCategory3->text(),
+                                   ui->lineEditCategory4->text());
     m_isSetCategoryClean = true;
 }
 

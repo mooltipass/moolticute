@@ -101,6 +101,7 @@ private:
     bool isServiceNameExist(const QString& serviceName) const;
     void setServiceInputAttributes(const QString& tooltipText, Qt::GlobalColor col);
     void clearMMMUi();
+    void updateDeviceType(bool isBle);
 
     void changeCurrentFavorite(int iFavorite);
     virtual void changeEvent(QEvent *event);
@@ -123,6 +124,10 @@ private:
     void setFilterCredLayout();
     
     LoginItem * tryGetSelectedLogin();
+
+
+    static constexpr int MINI_FAVORITE_NUM = 14;
+    static constexpr int BLE_FAVORITE_NUM = 50;
 
 signals:
     void wantEnterMemMode();

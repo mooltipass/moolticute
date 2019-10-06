@@ -216,6 +216,13 @@ void CredentialModel::load(const QJsonArray &json)
             QDate dUpdatedDate = QDate::fromString(cnode["date_last_used"].toString(), Qt::ISODate);
             pLoginItem->setAccessedDate(dUpdatedDate);
 
+            // Update login item category
+            if (m_isBle)
+            {
+                QString categoryName = m_categories[cnode["category"].toVariant().toInt()];
+                pLoginItem->setCategory(categoryName);
+            }
+
             QJsonArray a = cnode["address"].toArray();
             if (a.size() < 2)
             {
@@ -272,6 +279,19 @@ LoginItem *CredentialModel::getLoginItemByIndex(const QModelIndex &idx) const
 ServiceItem *CredentialModel::getServiceItemByIndex(const QModelIndex &idx) const
 {
     return dynamic_cast<ServiceItem *>(getItemByIndex(idx));
+}
+
+void CredentialModel::setIsBle(bool isBle)
+{
+    m_isBle = isBle;
+}
+
+void CredentialModel::updateCategories(const QString &cat1, const QString &cat2, const QString &cat3, const QString &cat4)
+{
+    m_categories[1] = cat1;
+    m_categories[2] = cat2;
+    m_categories[3] = cat3;
+    m_categories[4] = cat4;
 }
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName)
