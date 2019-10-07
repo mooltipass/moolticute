@@ -22,6 +22,7 @@
 #include "DbMasterController.h"
 #include "PromptWidget.h"
 #include "SystemNotifications/SystemNotification.h"
+#include "DeviceDetector.h"
 
 #ifdef Q_OS_WIN
 #include "SystemNotifications/SystemNotificationWindows.h"
@@ -80,6 +81,7 @@ bool AppGui::initialize()
 #ifdef Q_OS_WIN
     SystemNotification::instance();
 #endif
+    DeviceDetector::instance();
 
     setQuitOnLastWindowClosed(false);
 

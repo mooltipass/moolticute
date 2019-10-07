@@ -19,6 +19,7 @@
 #include "WSClient.h"
 #include "SystemNotifications/SystemNotification.h"
 #include "SettingsGuiHelper.h"
+#include "DeviceDetector.h"
 
 #define WS_URI                      "ws://localhost"
 #define QUERY_RANDOM_NUMBER_TIME    10 * 60 * 1000 //10 min
@@ -199,6 +200,7 @@ void WSClient::onTextMessageReceived(const QString &message)
         {
             set_mpHwVersion(Common::MP_Classic);
         }
+        DeviceDetector::instance().setDeviceType(get_mpHwVersion());
         set_fwVersion(o["hw_version"].toString());
         set_hwSerial(o["hw_serial"].toInt());
         set_hwMemory(o["flash_size"].toInt());
