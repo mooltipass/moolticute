@@ -771,7 +771,10 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
             ui->credDisplayCreationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayModificationDateInput->setText(pLoginItem->accessedDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayPasswordInput->setLocked(pLoginItem->passwordLocked());
-            ui->credDisplayCategoryInput->setText(pLoginItem->category());
+            if (wsClient->isMPBLE())
+            {
+                ui->credDisplayCategoryInput->setText(m_pCredModel->getCategoryName(pLoginItem->category()));
+            }
         }
     }
 }
@@ -851,7 +854,6 @@ void CredentialsManagement::clearMMMUi()
 
 void CredentialsManagement::updateDeviceType(bool isBle)
 {
-    m_pCredModel->setIsBle(isBle);
     if (isBle)
     {
         ui->credDisplayCategoryInput->show();

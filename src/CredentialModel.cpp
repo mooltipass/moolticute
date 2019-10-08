@@ -13,6 +13,7 @@
 #include "LoginItem.h"
 #include "TreeItem.h"
 #include "ParseDomain.h"
+#include "DeviceDetector.h"
 
 CredentialModel::CredentialModel(QObject *parent) : QAbstractItemModel(parent)
 {
@@ -217,10 +218,9 @@ void CredentialModel::load(const QJsonArray &json)
             pLoginItem->setAccessedDate(dUpdatedDate);
 
             // Update login item category
-            if (m_isBle)
+            if (DeviceDetector::instance().isBle())
             {
-                QString categoryName = m_categories[cnode["category"].toVariant().toInt()];
-                pLoginItem->setCategory(categoryName);
+                pLoginItem->setCategory(cnode["category"].toVariant().toInt());
             }
 
             QJsonArray a = cnode["address"].toArray();
@@ -281,9 +281,9 @@ ServiceItem *CredentialModel::getServiceItemByIndex(const QModelIndex &idx) cons
     return dynamic_cast<ServiceItem *>(getItemByIndex(idx));
 }
 
-void CredentialModel::setIsBle(bool isBle)
+QString CredentialModel::getCategoryName(int catId) const
 {
-    m_isBle = isBle;
+    return m_categories[catId];
 }
 
 void CredentialModel::updateCategories(const QString &cat1, const QString &cat2, const QString &cat3, const QString &cat4)

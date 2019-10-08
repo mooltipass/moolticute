@@ -51,7 +51,7 @@ public:
     QModelIndex getServiceIndexByName(const QString &sServiceName, int column = 0) const;
     LoginItem *getLoginItemByIndex(const QModelIndex &idx) const;
     ServiceItem *getServiceItemByIndex(const QModelIndex &idx) const;
-    void setIsBle(bool isBle);
+    QString getCategoryName(int catId) const;
     void updateCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
 
 private:
@@ -59,7 +59,6 @@ private:
 
 private:
     RootItem *m_pRootItem;
-    bool m_isBle = false;
     QList<QString> m_categories{"Default category", "", "", "", ""};
 
 signals:
