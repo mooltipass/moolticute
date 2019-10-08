@@ -10,10 +10,17 @@
 #include "ServiceItem.h"
 #include "LoginItem.h"
 #include "AppGui.h"
+#include "DeviceDetector.h"
 
 ItemDelegate::ItemDelegate(QWidget* parent):
     QStyledItemDelegate(parent)
 {
+    m_categoryColor = {{0, QColor("black")},
+                       {1, QColor("red")},
+                       {2, QColor("blue")},
+                       {3, QColor("green")},
+                       {4, QColor("orange")},
+                      };
 }
 
 QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -55,8 +62,9 @@ void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewIte
 void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite) const
 {
     QFont f = loginFont();
-
-    QIcon star = AppGui::qtAwesome()->icon(fa::star);
+    bool isBle = DeviceDetector::instance().isBle();
+    QIcon star = isBle ? AppGui::qtAwesome()->icon(fa::star, {{"color" , m_categoryColor[iFavorite/MAX_BLE_CAT_NUM]}}) :
+                         AppGui::qtAwesome()->icon(fa::star);
     QSize iconSz = QSize(option.rect.height(), option.rect.height());
     QPoint pos = option.rect.topLeft() + QPoint(0, -(option.rect.height()-iconSz.height())/2);
     QRect iconRect(pos, iconSz);
@@ -67,7 +75,12 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
     // Fav number
     f = favFont();
     painter->setFont(f);
-    QString sFavNumber = QString::number(iFavorite + 1);
+    int favNum = (iFavorite + 1);
+    if (isBle)
+    {
+        favNum %= MAX_BLE_CAT_NUM;
+    }
+    QString sFavNumber = QString::number(favNum);
     QPen pen = painter->pen();
     pen.setColor(QColor("white"));
     painter->setPen(pen);
