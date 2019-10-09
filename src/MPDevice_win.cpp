@@ -202,10 +202,6 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
         qWarning() << "Failed to write data to device! " << err;
         qWarning() << getLastError(err);
     }
-    if (isBluetooth)
-    {
-        QThread::msleep(5);
-    }
 }
 
 void MPDevice_win::platformRead()
