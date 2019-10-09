@@ -88,12 +88,18 @@ public:
     static bool checkDevice(QString path, bool &isBLE, bool &isBluetooth);
     static MPPlatformDef getPlatDef(QString path, bool isBLE, bool isBluetooth);
 
+signals:
+    void platformWriteFinished();
+
 private slots:
     void ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLAPPED *overlapped);
+    void writeDataFinished();
 
 private:
     virtual void platformRead();
     virtual void platformWrite(const QByteArray &data);
+    void platformWriteToDevice(const QByteArray &data);
+    void addToWriteQueue(const QByteArray& data);
 
     bool openPath();
     static HANDLE openDevice(QString path, bool exlusive = false);
@@ -107,6 +113,8 @@ private:
     OVERLAPPED writeOverlapped;
     OVERLAPPED readOverlapped;
     QWinOverlappedIoNotifier *oNotifier;
+	
+	QQueue<QByteArray> m_writeQueue;
 
     const static QString BT_GATT_SERVICE_GUID;
     const static char ZERO_BYTE = static_cast<char>(0x00);

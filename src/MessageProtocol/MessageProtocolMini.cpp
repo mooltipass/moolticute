@@ -223,7 +223,7 @@ void MessageProtocolMini::fillCommandMapping()
         {MPCmd::ADD_CARD_CPZ_CTR      , 0xCD},
         {MPCmd::GET_CARD_CPZ_CTR      , 0xCE},
         {MPCmd::CARD_CPZ_CTR_PACKET   , 0xCF},
-        {MPCmd::GET_30_FREE_SLOTS     , 0xD0},
+        {MPCmd::GET_FREE_ADDRESSES    , 0xD0},
         {MPCmd::GET_DN_START_PARENT   , 0xD1},
         {MPCmd::SET_DN_START_PARENT   , 0xD2},
         {MPCmd::END_MEMORYMGMT        , 0xD3},

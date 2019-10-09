@@ -30,7 +30,7 @@ public:
     MPNode(QByteArray &&d, QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
     MPNode(QObject *parent = nullptr, QByteArray &&nodeAddress = QByteArray(2, 0), const quint32 virt_addr = 0);
 
-    enum
+    enum NodeType
     {
         NodeUnknown = -1,
         NodeParent = 0,
@@ -133,6 +133,7 @@ public:
     bool getNotDeletedTagged() const;
 
     static QByteArray EmptyAddress;
+    static constexpr int ADDRESS_LENGTH = 2;
 
     QJsonObject toJson() const;
 
@@ -160,7 +161,6 @@ protected:
     IMessageProtocol *pMesProt = nullptr;
     const bool isBLE = false;
 
-    static constexpr int ADDRESS_LENGTH = 2;
     static constexpr int CTR_LENGTH = 3;
     static constexpr int NODE_FLAG_ADDR_START = 0;
 

@@ -250,20 +250,17 @@ private:
                        const MPDeviceProgressCb &cbProgress,
                        const QByteArray &data, bool &done);
 
+    inline int getParentNodeSize() const { return pMesProt->getParentNodeSize(); }
+    inline int getChildNodeSize() const { return pMesProt->getChildNodeSize(); }
+
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds);
-    /**
-     * @brief memMgmtModeReadFlashBLE
-     * Added temporary, for now only getCreds
-     * implemented for BLE, after the other cmds
-     * created it can use memMgmtModeReadFlash too.
-     */
-    void memMgmtModeReadFlashBLE(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds);
     MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
     MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
     void startImportFileMerging(const MPDeviceProgressCb &progressCb, MessageHandlerCb cb, bool noDelete);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress);
+    void incrementNeededAddresses(MPNode::NodeType type);
     MPNode *findNodeWithAddressWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr);
     MPNode *findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QString& name);
     MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
@@ -301,8 +298,11 @@ private:
     // Generate save packets
     bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, const MPDeviceProgressCb &cbProgress);
 
+    QByteArray getFreeAddress(quint32 virtualAddr);
     // once we fetched free addresses, this function is called
     void changeVirtualAddressesToFreeAddresses(void);
+
+    void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 
     // Crypto
     quint64 getUInt64EncryptionKey();
@@ -339,7 +339,7 @@ private:
     QByteArray ctrValue;
     QByteArray startNode;
     quint32 virtualStartNode = 0;
-    QByteArray startDataNode;
+    QByteArray startDataNode = MPNode::EmptyAddress;
     quint32 virtualDataStartNode = 0;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
@@ -356,7 +356,7 @@ private:
     quint32 dataDbChangeNumberClone;
     QByteArray ctrValueClone;
     QByteArray startNodeClone;
-    QByteArray startDataNodeClone;
+    QByteArray startDataNodeClone = MPNode::EmptyAddress;
     QList<QByteArray> cpzCtrValueClone;
     QList<QByteArray> favoritesAddrsClone;
     QList<MPNode *> loginNodesClone;         //list of all parent nodes for credentials
@@ -403,13 +403,36 @@ private:
 
     bool m_isDebugMsg = false;
     //Message Protocol
-    IMessageProtocol *pMesProt = nullptr;
     MPDeviceBleImpl *bleImpl = nullptr;
     DeviceSettings *pSettings = nullptr;
 
 protected:
+    IMessageProtocol *pMesProt = nullptr;
+	bool isBluetooth = false;
+
     DeviceType deviceType = DeviceType::MOOLTIPASS;
-    bool isBluetooth = false;
+    static constexpr int MP_EXPORT_FIELD_NUM = 10;
+    static constexpr int MC_EXPORT_FIELD_NUM = 14;
+    static constexpr int BLE_EXPORT_FIELD_NUM = 16;
+    enum ExportPayloadData
+    {
+        EXPORT_CTR_INDEX = 0,
+        EXPORT_CPZ_CTR_INDEX = 1,
+        EXPORT_STARTING_PARENT_INDEX = 2,
+        EXPORT_DATA_STARTING_PARENT_INDEX = 3,
+        EXPORT_FAVORITES_INDEX = 4,
+        EXPORT_SERVICE_NODES_INDEX = 5,
+        EXPORT_SERVICE_CHILD_NODES_INDEX = 6,
+        EXPORT_MC_SERVICE_NODES_INDEX = 7,
+        EXPORT_MC_SERVICE_CHILD_NODES_INDEX = 8,
+        EXPORT_DEVICE_VERSION_INDEX = 9,
+        EXPORT_BUNDLE_VERSION_INDEX = 10,
+        EXPORT_CRED_CHANGE_NUMBER_INDEX = 11,
+        EXPORT_DATA_CHANGE_NUMBER_INDEX = 12,
+        EXPORT_DB_MINI_SERIAL_NUM_INDEX = 13,
+        EXPORT_IS_BLE_INDEX = 14,
+        EXPORT_BLE_USER_CATEGORIES_INDEX = 15
+    };
 };
 
 #endif // MPDEVICE_H

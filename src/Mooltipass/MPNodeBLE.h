@@ -28,9 +28,10 @@ public:
     QDate getDateCreated() const override;
     QDate getDateLastUsed() const override;
 
-protected:
     static constexpr int PARENT_NODE_LENGTH = 264;
     static constexpr int CHILD_NODE_LENGTH = 528;
+
+protected:
     static constexpr int SERVICE_LENGTH = 252;
     static constexpr int CTR_DATA_ADDR_START = 261;
     static constexpr int CTR_ADDR_START = 395;

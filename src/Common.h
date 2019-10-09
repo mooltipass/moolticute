@@ -91,6 +91,11 @@
 #define ID_KEYB_SL_SL_LUT       BITMAP_ID_OFFSET+37
 #define ID_KEYB_FRDE_CH_LUT     BITMAP_ID_OFFSET+38
 #define ID_KEYB_EN_UK_LUT       BITMAP_ID_OFFSET+39
+#define ID_KEYB_CA_FR_LUT       BITMAP_ID_OFFSET+45
+#define ID_KEYB_CA_MAC_LUT      BITMAP_ID_OFFSET+46
+#define ID_KEYB_DK_MAC_LUT      BITMAP_ID_OFFSET+47
+#define ID_KEYB_UK_MAC_LUT      BITMAP_ID_OFFSET+48
+#define ID_KEYB_POR_LUT         BITMAP_ID_OFFSET+49
 #define ID_KEYB_CZ_QWERTY_LUT   BITMAP_ID_OFFSET+51
 #define ID_KEYB_EN_DV_LUT       BITMAP_ID_OFFSET+52
 #define ID_KEYB_FR_MAC_LUT      BITMAP_ID_OFFSET+53
@@ -211,6 +216,12 @@ public:
     {
         ACCELEROMETER,
         RANDOM_BYTES
+    };
+
+    enum ChangeNumberFlag : quint8
+    {
+        CredentialNumberChanged = 0x01,
+        DataNumberChanged = 0x02
     };
 };
 

@@ -82,7 +82,8 @@ SOURCES += src/main_daemon.cpp \
     src/Mooltipass/MPSettingsBLE.cpp \
     src/Settings/DeviceSettings.cpp \
     src/Settings/DeviceSettingsMini.cpp \
-    src/Settings/DeviceSettingsBLE.cpp
+    src/Settings/DeviceSettingsBLE.cpp \
+    src/Mooltipass/MPBLEFreeAddressProvider.cpp
 
 HEADERS  += \
     src/Common.h \
@@ -115,7 +116,8 @@ HEADERS  += \
     src/Mooltipass/MPSettingsBLE.h \
     src/Settings/DeviceSettings.h \
     src/Settings/DeviceSettingsMini.h \
-    src/Settings/DeviceSettingsBLE.h
+    src/Settings/DeviceSettingsBLE.h \
+    src/Mooltipass/MPBLEFreeAddressProvider.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \

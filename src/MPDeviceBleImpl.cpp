@@ -4,7 +4,8 @@
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),
-    mpDev(dev)
+    mpDev(dev),
+    freeAddressProv(mesProt, dev)
 {
 
 }
@@ -390,7 +391,7 @@ void MPDeviceBleImpl::setUserCategories(const QJsonObject &categories, const Mes
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::SET_USER_CATEGORIES,
                                   createUserCategoriesMsg(categories),
-                            [this, cb](const QByteArray &data, bool &)
+                            [this, cb, categories](const QByteArray &data, bool &)
                             {
                                 if (MSG_FAILED == bleProt->getFirstPayloadByte(data))
                                 {
@@ -398,6 +399,7 @@ void MPDeviceBleImpl::setUserCategories(const QJsonObject &categories, const Mes
                                     cb(false, "Set user categories failed", QByteArray{});
                                     return true;
                                 }
+                                m_categories = categories;
                                 qDebug() << "User categories set successfully";
                                 cb(true, "", QByteArray{});
                                 return true;
@@ -422,6 +424,7 @@ void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categ
                                    [](const QChar& c) { return c == QChar{0xFFFF};});
         categories[catName] = defaultCat ? "" : category;
     }
+    m_categories = categories;
 }
 
 QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categories)
@@ -478,6 +481,53 @@ void MPDeviceBleImpl::processDebugMsg(const QByteArray &data, bool &isDebugMsg)
         isDebugMsg = false;
         m_debugMsg.clear();
     }
+}
+
+void MPDeviceBleImpl::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
+{
+    if (flags&Common::CredentialNumberChanged)
+    {
+        jobs->append(new MPCommandJob(mpDev, MPCmd::SET_USER_CHANGE_NB,
+                                      bleProt->toLittleEndianFromInt32(mpDev->get_credentialsDbChangeNumber()),
+                                      bleProt->getDefaultFuncDone()));
+    }
+
+    if (flags&Common::DataNumberChanged)
+    {
+        jobs->append(new MPCommandJob(mpDev, MPCmd::SET_DATA_CHANGE_NB,
+                                      bleProt->toLittleEndianFromInt32(mpDev->get_dataDbChangeNumber()),
+                                      bleProt->getDefaultFuncDone()));
+    }
+}
+
+void MPDeviceBleImpl::updateUserCategories(const QJsonObject &categories)
+{
+    if (isUserCategoriesChanged(categories))
+    {
+        qDebug() << "Updating user category names";
+        setUserCategories(categories,
+                          [](bool success, QString errstr, QByteArray)
+                            {
+                                if (!success)
+                                {
+                                    qCritical() << "Update user categories failed: " << errstr;
+                                }
+                            }
+        );
+    }
+}
+
+bool MPDeviceBleImpl::isUserCategoriesChanged(const QJsonObject &categories) const
+{
+    for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
+    {
+        QString categoryName = "category_" + QString::number(i+1);
+        if (categories[categoryName] != m_categories[categoryName])
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)

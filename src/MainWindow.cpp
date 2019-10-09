@@ -241,43 +241,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         ui->lineEdit_dbBackupFilePath->setText(path);
     });
 
-    //Add languages to combobox
-    ui->comboBoxLang->addItem("en_US", ID_KEYB_EN_US_LUT);
-    ui->comboBoxLang->addItem("fr_FR", ID_KEYB_FR_FR_LUT);
-    ui->comboBoxLang->addItem("es_ES", ID_KEYB_ES_ES_LUT);
-    ui->comboBoxLang->addItem("de_DE", ID_KEYB_DE_DE_LUT);
-    ui->comboBoxLang->addItem("es_AR", ID_KEYB_ES_AR_LUT);
-    ui->comboBoxLang->addItem("en_AU", ID_KEYB_EN_AU_LUT);
-    ui->comboBoxLang->addItem("fr_BE", ID_KEYB_FR_BE_LUT);
-    ui->comboBoxLang->addItem("po_BR", ID_KEYB_PO_BR_LUT);
-    ui->comboBoxLang->addItem("en_CA", ID_KEYB_EN_CA_LUT);
-    ui->comboBoxLang->addItem("cz_CZ", ID_KEYB_CZ_CZ_LUT);
-    ui->comboBoxLang->addItem("da_DK", ID_KEYB_DA_DK_LUT);
-    ui->comboBoxLang->addItem("fi_FI", ID_KEYB_FI_FI_LUT);
-    ui->comboBoxLang->addItem("hu_HU", ID_KEYB_HU_HU_LUT);
-    ui->comboBoxLang->addItem("is_IS", ID_KEYB_IS_IS_LUT);
-    ui->comboBoxLang->addItem("it_IT", ID_KEYB_IT_IT_LUT);
-    ui->comboBoxLang->addItem("nl_NL", ID_KEYB_NL_NL_LUT);
-    ui->comboBoxLang->addItem("no_NO", ID_KEYB_NO_NO_LUT);
-    ui->comboBoxLang->addItem("po_PO", ID_KEYB_PO_PO_LUT);
-    ui->comboBoxLang->addItem("ro_RO", ID_KEYB_RO_RO_LUT);
-    ui->comboBoxLang->addItem("sl_SL", ID_KEYB_SL_SL_LUT);
-    ui->comboBoxLang->addItem("frde_CH", ID_KEYB_FRDE_CH_LUT);
-    ui->comboBoxLang->addItem("en_UK", ID_KEYB_EN_UK_LUT);
-    ui->comboBoxLang->addItem("cs_QWERTY", ID_KEYB_CZ_QWERTY_LUT);
-    ui->comboBoxLang->addItem("en_DV", ID_KEYB_EN_DV_LUT);
-    ui->comboBoxLang->addItem("fr_MAC", ID_KEYB_FR_MAC_LUT);
-    ui->comboBoxLang->addItem("fr_CH_MAC", ID_KEYB_FR_CH_MAC_LUT);
-    ui->comboBoxLang->addItem("de_CH_MAC", ID_KEYB_DE_CH_MAC_LUT);
-    ui->comboBoxLang->addItem("de_MAC", ID_KEYB_DE_MAC_LUT);
-    ui->comboBoxLang->addItem("us_MAC", ID_KEYB_US_MAC_LUT);
-
-    QSortFilterProxyModel* proxy = new QSortFilterProxyModel(ui->comboBoxLang);
-    proxy->setSourceModel( ui->comboBoxLang->model());
-    ui->comboBoxLang->model()->setParent(proxy);
-    ui->comboBoxLang->setModel(proxy);
-    ui->comboBoxLang->model()->sort(0);
-
     ui->widgetParamMini->setVisible(false);
     ui->comboBoxScreenBrightness->addItem("10%", 25);
     ui->comboBoxScreenBrightness->addItem("20%", 51);
@@ -374,12 +337,12 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             {
                 ui->cbLoginPrompt->setChecked(settings["login_prompt"].toBool());
                 ui->cbPinForMMM->setChecked(settings["pin_for_mmm"].toBool());
-                ui->cbStoragePrompt->setChecked(settings["storage_prompt"].toBool());
+                ui->cbStoragePrompt->setChecked(settings["credential_prompt"].toBool());
                 bool advancedMenu = settings["advanced_menu"].toBool();
                 ui->cbAdvancedMenu->setChecked(advancedMenu);
                 wsClient->set_advancedMenu(advancedMenu);
                 ui->cbBluetoothEnabled->setChecked(settings["bluetooth_enabled"].toBool());
-                ui->cbCredentialPrompt->setChecked(settings["credential_prompt"].toBool());
+                ui->cbCredentialPrompt->setChecked(settings["storage_prompt"].toBool());
             });
 
     //When device has new parameters, update the GUI
@@ -395,6 +358,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         onDeviceConnected();
     });
 
+    connect(wsClient, &WSClient::fwVersionChanged, wsClient->settingsHelper(), &SettingsGuiHelper::checkKeyboardLayout);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::fwVersionChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
@@ -1158,10 +1122,19 @@ void MainWindow::dbImported(bool success, QString message)
 {
     ui->widgetHeader->setEnabled(true);
     disconnect(wsClient, &WSClient::dbImported, this, &MainWindow::dbImported);
-    if (!success)
-        QMessageBox::warning(this, tr("Error"), message);
-    else
+    if (success)
+    {
+        if (wsClient->isMPBLE())
+        {
+            wsClient->sendGetUserCategories();
+        }
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Error"), message);
+    }
+
 
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
 
