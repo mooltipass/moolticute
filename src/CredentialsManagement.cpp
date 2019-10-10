@@ -27,6 +27,7 @@
 #include "TreeItem.h"
 #include "LoginItem.h"
 #include "ServiceItem.h"
+#include "DeviceDetector.h"
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
@@ -90,14 +91,6 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->lineEditCategory3, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory4, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
 
-    QAction *action = m_favMenu.addAction(tr("Not a favorite"));
-    connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
-
-    for (int i = 1; i <= BLE_FAVORITE_NUM;i++)
-    {
-        action = m_favMenu.addAction(tr("Set as favorite #%1").arg(i));
-        connect(action, &QAction::triggered, [this, i](){ changeCurrentFavorite(i - 1); });
-    }
     ui->pushButtonFavorite->setMenu(&m_favMenu);
 
     m_pCredModel = new CredentialModel(this);
@@ -121,6 +114,9 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
         // Save selected credential
         saveSelectedCredential();
     });
+
+    connect(&DeviceDetector::instance(), &DeviceDetector::deviceChanged,
+            this, &CredentialsManagement::updateFavMenuOnDevChanged);
 
     connect(ui->addCredServiceInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredLoginInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
@@ -741,6 +737,10 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 {
     ui->credDisplayFrame->setEnabled(true);
     updateLoginDescription(srcIndex);
+    if (wsClient->isMPBLE())
+    {
+        updateBleFavs(srcIndex);
+    }
 }
 
 void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
@@ -866,6 +866,25 @@ void CredentialsManagement::updateDeviceType(bool isBle)
     }
 }
 
+void CredentialsManagement::updateBleFavs(const QModelIndex &srcIndex)
+{
+    const auto category = getCategory(srcIndex);
+    int i = 0;
+    int from = category * 10 + 1;
+    int to = from + 10;
+    for (QAction* action : m_favMenu.actions())
+    {
+        bool visible = false;
+        // Setting visible No Favorite and category's favs
+        if (0 == i || (i >= from && i < to))
+        {
+            visible = true;
+        }
+        action->setVisible(visible);
+        ++i;
+    }
+}
+
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
 {
     QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
@@ -939,22 +958,9 @@ void CredentialsManagement::onSelectLoginTimerTimeOut()
 void CredentialsManagement::updateFavMenu()
 {
     QList<QAction*> actions = m_favMenu.actions();
-    bool isBle = wsClient->isMPBLE();
-    int i = 0;
     for (QAction* action : actions)
     {
         action->setEnabled(true);
-        if (i++ > MINI_FAVORITE_NUM)
-        {
-            if (isBle)
-            {
-                action->setVisible(true);
-            }
-            else
-            {
-                action->setVisible(false);
-            }
-        }
     }
 
     // check taken favs
@@ -1004,11 +1010,30 @@ void CredentialsManagement::checkDeviceType()
     }
 }
 
+void CredentialsManagement::updateFavMenuOnDevChanged(Common::MPHwVersion newDev)
+{
+    m_favMenu.clear();
+    QAction *action = m_favMenu.addAction(tr("Not a favorite"));
+    connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
+    bool isBle = Common::MP_BLE == newDev;
+    const auto size = isBle ? BLE_FAVORITE_NUM : MINI_FAVORITE_NUM;
+    for (int i = 0; i < size; ++i)
+    {
+        action = m_favMenu.addAction(tr("Set as favorite #%1").arg(isBle ? (i%10)+1 : i+1));
+        connect(action, &QAction::triggered, [this, i](){ changeCurrentFavorite(i); });
+    }
+}
+
 void CredentialsManagement::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LanguageChange)
         ui->retranslateUi(this);
     QWidget::changeEvent(event);
+}
+
+int CredentialsManagement::getCategory(const QModelIndex &srcIndex)
+{
+    return m_pCredModel->getLoginItemByIndex(srcIndex)->category();
 }
 
 void CredentialsManagement::on_toolButtonFavFilter_clicked()

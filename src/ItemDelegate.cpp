@@ -75,11 +75,12 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
     // Fav number
     f = favFont();
     painter->setFont(f);
-    int favNum = (iFavorite + 1);
+    int favNum = iFavorite;
     if (isBle)
     {
         favNum %= MAX_BLE_CAT_NUM;
     }
+    ++favNum;
     QString sFavNumber = QString::number(favNum);
     QPen pen = painter->pen();
     pen.setColor(QColor("white"));

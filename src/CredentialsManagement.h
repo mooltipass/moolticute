@@ -79,6 +79,7 @@ private slots:
     void updateFavMenu();
     void credentialDataChanged();
     void checkDeviceType();
+    void updateFavMenuOnDevChanged(Common::MPHwVersion newDev);
 
     void on_toolButtonFavFilter_clicked();
 
@@ -95,16 +96,17 @@ private:
     QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
     void setCredentialsClean();
 
-private:
     void disableNonCredentialEditWidgets();
     void enableNonCredentialEditWidgets();
     bool isServiceNameExist(const QString& serviceName) const;
     void setServiceInputAttributes(const QString& tooltipText, Qt::GlobalColor col);
     void clearMMMUi();
     void updateDeviceType(bool isBle);
+    void updateBleFavs(const QModelIndex &srcIndex);
 
     void changeCurrentFavorite(int iFavorite);
     virtual void changeEvent(QEvent *event);
+    int getCategory(const QModelIndex &srcIndex);
 
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
