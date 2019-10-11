@@ -50,6 +50,9 @@ private:
     IOHIDManagerRef hidmanagerBLE;
     QHash<QString, MPPlatformDef> deviceHash;
 
+    static const QString TRANSPORT_BLE;
+    static const QString TRANSPORT_USB;
+
     //Callbacks from IOHIDManager
     friend void _device_matching_callback(void *user_data, IOReturn inResult, void *inSender, IOHIDDeviceRef inIOHIDDeviceRef);
     friend void _device_removal_callback(void *user_data, IOReturn inResult, void *inSender,IOHIDDeviceRef inIOHIDDeviceRef);

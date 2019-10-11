@@ -56,7 +56,7 @@ private slots:
     void usbDeviceRemoved();
     void usbDeviceAdded(QString path);
 #if defined(Q_OS_LINUX)
-    void usbDeviceAdded(QString path, bool isBLE);
+    void usbDeviceAdded(QString path, bool isBLE, bool isBT);
 #endif
     void usbDeviceRemoved(QString path);
 
@@ -64,6 +64,7 @@ private:
     MPManager();
 
     void checkUsbDevices();
+    bool isBLEConnectedWithUsb();
 
     QHash<QString, MPDevice *> devices;
 };

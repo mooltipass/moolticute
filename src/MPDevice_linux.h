@@ -24,12 +24,12 @@
 
 #include <QThread>
 
-class MPPlatformDef
+struct MPPlatformDef
 {
-public:
     QString id; //unique id for all platform
 
     bool isBLE = false;
+    bool isBluetooth = false;
     QString path;
 };
 
@@ -51,9 +51,10 @@ public:
      * Checking if the device is a mooltipass device
      * @param path to the device
      * @param isBLE out param, true if device is a ble
+     * @param isBT out param, true if device is connected with BT
      * @return true, if the device is mini/ble
      */
-    static bool checkDevice(struct udev_device *raw_dev, bool &isBLE);
+    static bool checkDevice(struct udev_device *raw_dev, bool &isBLE, bool &isBT);
     static int INVALID_VALUE;
 
 private slots:

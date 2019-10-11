@@ -35,6 +35,11 @@ void _read_report_callback(void *context,
 
     MPDevice_mac *dev = reinterpret_cast<MPDevice_mac *>(context);
     QByteArray data((const char *)report, report_length);
+    if (dev->isBT())
+    {
+        //BT is sending an extra byte
+        data.remove(0,1);
+    }
     emit dev->platformDataRead(data);
 }
 
@@ -45,6 +50,7 @@ MPDevice_mac::MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef):
     if (platformDef.isBLE)
     {
         deviceType = DeviceType::BLE;
+        isBluetooth = platformDef.isBluetooth;
     }
     setupMessageProtocol();
     /**
@@ -107,11 +113,19 @@ void MPDevice_mac::platformWrite(const QByteArray &data)
 {
     QtConcurrent::run(usbWriteThreadPool, [=]()
     {
+        QByteArray dataArray;
+        int reportId = 0;
+        if (isBT())
+        {
+            dataArray.append(static_cast<char>(0x00));
+            reportId = 3;
+        }
+        dataArray.append(data);
         IOReturn res = IOHIDDeviceSetReport(hidref,
                                             kIOHIDReportTypeOutput,
-                                            0,
-                                            (const uint8_t *)data.constData(),
-                                            data.size());
+                                            reportId,
+                                            (const uint8_t *)dataArray.constData(),
+                                            dataArray.size());
         if (res != kIOReturnSuccess)
             qWarning() << "Failed to write data to device";
     });
