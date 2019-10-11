@@ -38,6 +38,7 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
     if (platformDef.isBLE)
     {
         deviceType = DeviceType::BLE;
+        isBluetooth = platformDef.isBluetooth;
     }
     setupMessageProtocol();
 
@@ -89,7 +90,15 @@ void MPDevice_linux::readyRead(int fd)
     }
     else
     {
-        emit platformDataRead(recvData);
+        if (isBluetooth)
+        {
+            emit platformDataRead(recvData.remove(0,1));
+        }
+        else
+        {
+            emit platformDataRead(recvData);
+        }
+
         failToWriteLogged = false;
     }
 
@@ -119,7 +128,7 @@ int MPDevice_linux::getDescriptorSize(const char *devpath)
     return descSize;
 }
 
-bool MPDevice_linux::checkDevice(struct udev_device *raw_dev, bool &isBLE)
+bool MPDevice_linux::checkDevice(struct udev_device *raw_dev, bool &isBLE, bool &isBT)
 {
     int bus_type = 0;
     unsigned short dev_vid = 0;
@@ -154,12 +163,17 @@ bool MPDevice_linux::checkDevice(struct udev_device *raw_dev, bool &isBLE)
 
     bool isMini = dev_vid == MOOLTIPASS_VENDORID && dev_pid == MOOLTIPASS_PRODUCTID;
     bool isBle = dev_vid == MOOLTIPASS_BLE_VENDORID && dev_pid == MOOLTIPASS_BLE_PRODUCTID;
-    if (bus_type == BUS_USB &&
-        (isMini || isBle) &&
-        getDescriptorSize(dev_path) == MOOLTIPASS_USBHID_DESC_SIZE)
+    if ((bus_type == BUS_USB || bus_type == BUS_BLUETOOTH) &&
+        (isMini || isBle))
     {
-        isBLE = isBle;
-        return true;
+        const auto descSize = getDescriptorSize(dev_path);
+        if (MOOLTIPASS_USBHID_DESC_SIZE == descSize ||
+            MOOLTIPASS_BLEHID_DESC_SIZE == descSize)
+        {
+            isBLE = isBle;
+            isBT = bus_type == BUS_BLUETOOTH;
+            return true;
+        }
     }
 
     udev_device_unref(raw_dev);
@@ -175,10 +189,11 @@ void MPDevice_linux::writeNextPacket()
 
     QByteArray ba = sendBuffer.dequeue();
     /**
-      * Adding a plus 0x00 byte before the message
+      * Adding a plus 0x00 or 0x03 byte before the message
       * for setting the report number.
       */
-    ba.insert(0, static_cast<char>(0x0));
+    const auto reportId =  static_cast<char>(isBluetooth ? 0x03 : 0x00);
+    ba.insert(0, static_cast<char>(reportId));
     ssize_t res = ::write(devfd, ba.data(), static_cast<size_t>(ba.size()));
 
     if (res < 0)
@@ -217,14 +232,15 @@ QList<MPPlatformDef> MPDevice_linux::enumerateDevices()
     {
         const char *sysfs_path = udev_list_entry_get_name(dev);
         struct udev_device *raw_dev = udev_device_new_from_syspath(udev, sysfs_path);
-        bool isBLE;
-        if (checkDevice(raw_dev, isBLE))
+        bool isBLE, isBT;
+        if (checkDevice(raw_dev, isBLE, isBT))
         {
             const char *dev_path = udev_device_get_devnode(raw_dev);
             MPPlatformDef def;
             def.path = QString::fromUtf8(dev_path);
             def.id = def.path;
             def.isBLE = isBLE;
+            def.isBluetooth = isBT;
             devlist << def;
 
             qDebug() << "Found mooltipass: " << def.path;

@@ -37,7 +37,7 @@ public:
 public slots:
     void monitorUSB(int fd);
 signals:
-    void usbDeviceAdded(QString path, bool isBLE);
+    void usbDeviceAdded(QString path, bool isBLE, bool isBT);
     void usbDeviceRemoved(QString path);
 
 private:

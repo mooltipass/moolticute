@@ -64,12 +64,12 @@ void UsbMonitor_linux::monitorUSB(int fd)
               * it the device haven't detected yet
               * during usb enumeration.
               */
-            bool isBLE;
-            if (MPDevice_linux::checkDevice(dev, isBLE))
+            bool isBLE, isBT;
+            if (MPDevice_linux::checkDevice(dev, isBLE, isBT))
             {
-                QTimer::singleShot(100, [this, dev_path, isBLE]()
+                QTimer::singleShot(100, [this, dev_path, isBLE, isBT]()
                 {
-                    emit usbDeviceAdded(QString::fromUtf8(dev_path), isBLE);
+                    emit usbDeviceAdded(QString::fromUtf8(dev_path), isBLE, isBT);
                 });
             }
             unrefed = true;

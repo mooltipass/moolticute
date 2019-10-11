@@ -18,6 +18,28 @@
  ******************************************************************************/
 #include "UsbMonitor_mac.h"
 
+const QString UsbMonitor_mac::TRANSPORT_BLE = "Bluetooth Low Energy";
+const QString UsbMonitor_mac::TRANSPORT_USB = "USB";
+
+QString toQString(CFStringRef str)
+{
+    if (!str)
+    {
+        return QString{};
+    }
+
+    CFIndex length = CFStringGetLength(str);
+    if (length == 0)
+    {
+        return QString{};
+    }
+
+    QString string(length, Qt::Uninitialized);
+    CFStringGetCharacters(str, CFRangeMake(0, length), reinterpret_cast<UniChar *>
+        (const_cast<QChar *>(string.unicode())));
+    return string;
+}
+
 void _device_matching_callback(void *user_data,
                                IOReturn inResult, // the result of the matching operation
                                void *inSender, // the IOHIDManagerRef for the new device
@@ -38,12 +60,33 @@ void _device_matching_callback(void *user_data,
         qWarning("VendorID is not found.");
     }
 
+
     MPPlatformDef def;
     def.hidref = inIOHIDDeviceRef;
     def.id = QString("%1").arg((quint64)def.hidref);
     def.isBLE = vendorID == MOOLTIPASS_BLE_VENDORID;
 
-    if (!um->deviceHash.contains(def.id))
+    if (def.isBLE)
+    {
+        CFTypeRef bleNumRef = (CFTypeRef)IOHIDDeviceGetProperty(inIOHIDDeviceRef, CFSTR(kIOHIDTransportKey));
+        const QString transport = toQString(CFStringRef(bleNumRef));
+        if (UsbMonitor_mac::TRANSPORT_BLE == transport)
+        {
+            qDebug() << "BT connection";
+            def.isBluetooth = true;
+        }
+        else if (UsbMonitor_mac::TRANSPORT_USB == transport)
+        {
+            qDebug() << "USB connection.";
+        }
+        else
+        {
+            qCritical() << "Unknown connection.";
+            return;
+        }
+    }
+
+    if (um->deviceHash.isEmpty())
     {
         um->deviceHash[def.id] = def;
         emit um->usbDeviceAdded(def.id);
