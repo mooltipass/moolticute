@@ -80,6 +80,7 @@ private slots:
     void credentialDataChanged();
     void checkDeviceType();
     void updateFavMenuOnDevChanged(Common::MPHwVersion newDev);
+    void updateDeviceType(Common::MPHwVersion newDev);
 
     void on_toolButtonFavFilter_clicked();
 
@@ -101,7 +102,6 @@ private:
     bool isServiceNameExist(const QString& serviceName) const;
     void setServiceInputAttributes(const QString& tooltipText, Qt::GlobalColor col);
     void clearMMMUi();
-    void updateDeviceType(bool isBle);
     void updateBleFavs(const QModelIndex &srcIndex);
 
     void changeCurrentFavorite(int iFavorite);

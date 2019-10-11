@@ -28,7 +28,7 @@ public:
     const QString &description() const;
     void setDescription(const QString &sDescription);
     int category() const;
-    void setCategory(int sCategory);
+    void setCategory(int iCategory);
     TreeItem *child(int iIndex);
     const QVector<TreeItem *> &childs() const;
     int childCount() const;

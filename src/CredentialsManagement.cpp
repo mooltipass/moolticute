@@ -117,6 +117,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     connect(&DeviceDetector::instance(), &DeviceDetector::deviceChanged,
             this, &CredentialsManagement::updateFavMenuOnDevChanged);
+    connect(&DeviceDetector::instance(), &DeviceDetector::deviceChanged,
+            this, &CredentialsManagement::updateDeviceType);
 
     connect(ui->addCredServiceInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredLoginInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
@@ -178,7 +180,6 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::enableCredentialsManagement);
     connect(wsClient, &WSClient::memoryDataChanged, [=]()
     {
-        updateDeviceType(wsClient->isMPBLE());
         m_pCredModel->load(wsClient->getMemoryData()["login_nodes"].toArray());
         m_loadedModelSerialiation = m_pCredModel->getJsonChanges();
         ui->lineEditFilterCred->clear();
@@ -852,26 +853,12 @@ void CredentialsManagement::clearMMMUi()
     ui->credentialTreeView->repaint();
 }
 
-void CredentialsManagement::updateDeviceType(bool isBle)
-{
-    if (isBle)
-    {
-        ui->credDisplayCategoryInput->show();
-        ui->credDisplayCategoryLabel->show();
-    }
-    else
-    {
-        ui->credDisplayCategoryInput->hide();
-        ui->credDisplayCategoryLabel->hide();
-    }
-}
-
 void CredentialsManagement::updateBleFavs(const QModelIndex &srcIndex)
 {
     const auto category = getCategory(srcIndex);
     int i = 0;
-    int from = category * 10 + 1;
-    int to = from + 10;
+    int from = category * MAX_BLE_CAT_NUM  + 1;
+    int to = from + MAX_BLE_CAT_NUM ;
     for (QAction* action : m_favMenu.actions())
     {
         bool visible = false;
@@ -1019,8 +1006,22 @@ void CredentialsManagement::updateFavMenuOnDevChanged(Common::MPHwVersion newDev
     const auto size = isBle ? BLE_FAVORITE_NUM : MINI_FAVORITE_NUM;
     for (int i = 0; i < size; ++i)
     {
-        action = m_favMenu.addAction(tr("Set as favorite #%1").arg(isBle ? (i%10)+1 : i+1));
+        action = m_favMenu.addAction(tr("Set as favorite #%1").arg(isBle ? (i%MAX_BLE_CAT_NUM)+1 : i+1));
         connect(action, &QAction::triggered, [this, i](){ changeCurrentFavorite(i); });
+    }
+}
+
+void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
+{
+    if (Common::MP_BLE == newDev)
+    {
+        ui->credDisplayCategoryInput->show();
+        ui->credDisplayCategoryLabel->show();
+    }
+    else
+    {
+        ui->credDisplayCategoryInput->hide();
+        ui->credDisplayCategoryLabel->hide();
     }
 }
 

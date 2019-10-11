@@ -26,8 +26,6 @@ private:
     QFont loginFont() const;
     QFont favFont() const;
     QMap<int, QColor> m_categoryColor;
-
-    static constexpr int MAX_BLE_CAT_NUM = 10;
 };
 
 

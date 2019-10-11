@@ -3280,8 +3280,8 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
                 QByteArray updateFavPacket;
                 if (isBLE())
                 {
-                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i/10));
-                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i%10));
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i/MAX_BLE_CAT_NUM));
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i%MAX_BLE_CAT_NUM));
                 }
                 else
                 {

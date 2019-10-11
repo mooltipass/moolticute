@@ -59,7 +59,7 @@ private:
 
 private:
     RootItem *m_pRootItem;
-    QList<QString> m_categories{"Default category", "", "", "", ""};
+    QList<QString> m_categories{tr("Default category"), "", "", "", ""};
 
 signals:
     void modelLoaded(bool bClearLoginDescription);

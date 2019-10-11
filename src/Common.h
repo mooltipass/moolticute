@@ -41,6 +41,8 @@
 #define MP_NODE_SIZE            132
 #define MP_NODE_DATA_ENC_SIZE   128
 
+#define MAX_BLE_CAT_NUM 10
+
 #define MOOLTIPASS_BLOCK_SIZE   32
 #define MOOLTIPASS_DESC_SIZE    23 //max size allowed for description
 
