@@ -23,9 +23,9 @@ private:
     void paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option, const LoginItem *pLoginItem) const;
     void paintFavorite(QPainter *painter, const QStyleOptionViewItem &option, int iFavorite) const;
     void paintArrow(QPainter *painter, const QStyleOptionViewItem &option) const;
+    bool paintCategoryIcon(QPainter *painter, const QStyleOptionViewItem &option, int catId) const;
     QFont loginFont() const;
     QFont favFont() const;
-    QMap<int, QColor> m_categoryColor;
 };
 
 

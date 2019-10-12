@@ -15,12 +15,6 @@
 ItemDelegate::ItemDelegate(QWidget* parent):
     QStyledItemDelegate(parent)
 {
-    m_categoryColor = {{0, QColor("black")},
-                       {1, QColor("red")},
-                       {2, QColor("blue")},
-                       {3, QColor("green")},
-                       {4, QColor("orange")},
-                      };
 }
 
 QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -63,7 +57,8 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
 {
     QFont f = loginFont();
     bool isBle = DeviceDetector::instance().isBle();
-    QIcon star = isBle ? AppGui::qtAwesome()->icon(fa::star, {{"color" , m_categoryColor[iFavorite/MAX_BLE_CAT_NUM]}}) :
+    QIcon star = isBle ? AppGui::qtAwesome()->icon(fa::star,
+                                 {{"color" , Common::BLE_CATEGORY_COLOR[iFavorite/MAX_BLE_CAT_NUM]}}) :
                          AppGui::qtAwesome()->icon(fa::star);
     QSize iconSz = QSize(option.rect.height(), option.rect.height());
     QPoint pos = option.rect.topLeft() + QPoint(0, -(option.rect.height()-iconSz.height())/2);
@@ -103,6 +98,26 @@ void ItemDelegate::paintArrow(QPainter *painter, const QStyleOptionViewItem &opt
     arrow.paint(painter, arrowRec);
 }
 
+bool ItemDelegate::paintCategoryIcon(QPainter *painter, const QStyleOptionViewItem &option, int catId) const
+{
+    if (!DeviceDetector::instance().isAdvancedMode() || 0 == catId)
+    {
+        //Not ble or default category login
+        return false;
+    }
+
+    QIcon categoryIcon = AppGui::qtAwesome()->icon(fa::folder,
+                                    {{ "color", Common::BLE_CATEGORY_COLOR[catId] }});
+
+    const int categoryIconSize = 15;
+    QPoint catPos(option.rect.topLeft() + QPoint(option.rect.height()/2, 0));
+    catPos.setX(catPos.x() + categoryIconSize);
+    QSize catSz(QSize(categoryIconSize, categoryIconSize));
+    QRect catRec(catPos, catSz);
+    categoryIcon.paint(painter, catRec);
+    return true;
+}
+
 void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem &option,  const LoginItem *pLoginItem) const
 {
     if (pLoginItem != nullptr)
@@ -110,11 +125,13 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
         ServiceItem *pServiceItem = dynamic_cast<ServiceItem *>(pLoginItem->parentItem());
         if ((pServiceItem != nullptr) && (pServiceItem->isExpanded()))
         {
-            if (pLoginItem->favorite() == Common::FAV_NOT_SET)
+            const bool noFav = pLoginItem->favorite() == Common::FAV_NOT_SET;
+            if (noFav)
                 paintArrow(painter, option);
             else
                 paintFavorite(painter, option, pLoginItem->favorite());
 
+            const bool catPainted = noFav && paintCategoryIcon(painter, option, pLoginItem->category());
             QPen pen;
             pen.setColor(QColor("#3D96AF"));
             painter->setPen(pen);
@@ -125,10 +142,20 @@ void ItemDelegate::paintLoginItem(QPainter *painter, const QStyleOptionViewItem 
             painter->setFont(font);
 
             int indent = 0;
-            if (pLoginItem->favorite() == Common::FAV_NOT_SET)
+            if (noFav)
+            {
                 indent += option.rect.height() * 2;
+            }
             else
+            {
                 indent += option.rect.height();
+            }
+
+            if (catPainted)
+            {
+                indent += 10;
+            }
+
             QRect loginRect(option.rect.x() + indent,
                             option.rect.y(),
                             option.rect.width() - indent,

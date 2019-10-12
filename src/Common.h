@@ -144,6 +144,7 @@ public:
         UnkownSmartcad = 9,
     } MPStatus;
     static QHash<MPStatus, QString> MPStatusUserString, MPStatusString;
+    static QMap<int, QColor> BLE_CATEGORY_COLOR;
 
     static Common::MPStatus statusFromString(const QString &st);
 

@@ -34,14 +34,17 @@ public:
     bool isBle() const;
     bool isMini() const;
 
+    bool isAdvancedMode() const;
+
 signals:
     void deviceChanged(Common::MPHwVersion newDevType);
 
 public slots:
-
+    void onAdvancedModeChanged(bool isEnabled);
 
 private:
     Common::MPHwVersion m_deviceType = Common::MP_Unknown;
+    bool m_advancedMode = false;
 };
 
 #endif // DEVICEDETECTOR_H

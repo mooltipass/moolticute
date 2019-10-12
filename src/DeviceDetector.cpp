@@ -24,3 +24,13 @@ bool DeviceDetector::isMini() const
 {
     return Common::MP_Mini == m_deviceType;
 }
+
+bool DeviceDetector::isAdvancedMode() const
+{
+    return isBle() && m_advancedMode;
+}
+
+void DeviceDetector::onAdvancedModeChanged(bool isEnabled)
+{
+    m_advancedMode = isEnabled;
+}
