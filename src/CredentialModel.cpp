@@ -294,7 +294,7 @@ void CredentialModel::updateCategories(const QString &cat1, const QString &cat2,
     m_categories[4] = cat4;
 }
 
-void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName)
+void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat)
 {
     // Retrieve item
     LoginItem *pLoginItem = getLoginItemByIndex(idx);
@@ -303,6 +303,10 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPa
         updateLoginItem(idx, PasswordRole, sPassword);
         updateLoginItem(idx, DescriptionRole, sDescription);
         updateLoginItem(idx, ItemNameRole, sName);
+        if (DeviceDetector::instance().isBle())
+        {
+            updateLoginItem(idx, CategoryRole, iCat);
+        }
     }
 }
 
@@ -370,6 +374,16 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &ro
         if (iFavorite != pLoginItem->favorite())
         {
             pLoginItem->setFavorite(iFavorite);
+            bChanged = true;
+        }
+        break;
+    }
+    case CategoryRole:
+    {
+        int iCat = vValue.toInt();
+        if (iCat != pLoginItem->category())
+        {
+            pLoginItem->setCategory(iCat);
             bChanged = true;
         }
         break;

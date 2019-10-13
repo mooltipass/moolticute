@@ -27,7 +27,8 @@ public:
         DescriptionRole,
         DateUpdatedRole,
         DateAccessedRole,
-        FavoriteRole
+        FavoriteRole,
+        CategoryRole
     };
 
     CredentialModel(QObject *parent=nullptr);
@@ -45,7 +46,7 @@ public:
     void addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription="");
     bool removeCredential(const QModelIndex &idx);
     TreeItem *getItemByIndex(const QModelIndex &idx) const;
-    void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName);
+    void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat);
     void updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue);
     void clear();
     QModelIndex getServiceIndexByName(const QString &sServiceName, int column = 0) const;

@@ -74,7 +74,9 @@ QJsonObject LoginItem::toJson() const
             { "password", p },
             { "description", m_sDescription },
             { "address", addr },
-            { "favorite", m_iFavorite }};
+            { "favorite", m_iFavorite },
+            //{ "category", m_iCategory }
+    };
 }
 
 void LoginItem::setPasswordLocked(bool bLocked)
