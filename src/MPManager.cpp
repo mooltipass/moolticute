@@ -207,21 +207,6 @@ void MPManager::checkUsbDevices()
 #endif
     }
 
-    if (devlist.isEmpty() && !AppDaemon::isEmulationMode())
-    {
-        //No USB devices found, means all MPs are gone disconnected
-        qDebug() << "Disconnecting devices";
-        auto it = devices.begin();
-        while (it != devices.end())
-        {
-            emit mpDisconnected(it.value());
-            delete it.value();
-            it++;
-        }
-        devices.clear();
-        return;
-    }
-
 #if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
     //Remove bt connection if usb is connected too
     if (devlist.size() > 1)
