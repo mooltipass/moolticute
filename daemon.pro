@@ -65,6 +65,7 @@ SOURCES += src/main_daemon.cpp \
     src/Mooltipass/MPNode.cpp \
     src/WSServerCon.cpp \
     src/MPDevice_emul.cpp \
+    src/MPDevice_localSocket.cpp \
     src/http-parser/http_parser.c \
     src/HttpClient.cpp \
     src/HttpServer.cpp \
@@ -98,6 +99,7 @@ HEADERS  += \
     src/version.h \
     src/WSServerCon.h \
     src/MPDevice_emul.h \
+    src/MPDevice_localSocket.h \
     src/http-parser/http_parser.h \
     src/HttpClient.h \
     src/HttpServer.h \

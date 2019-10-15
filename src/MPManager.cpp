@@ -27,6 +27,8 @@
 #include "UsbMonitor_mac.h"
 #endif
 
+#include "MPDevice_localSocket.h"
+
 MPManager::MPManager():
     QObject(nullptr)
 {
@@ -51,6 +53,10 @@ bool MPManager::initialize()
         connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved(QString)), Qt::QueuedConnection);
 #endif
     }
+
+    // no localSocket devices will ever be connected at startup
+    connect(MPDevice_localSocket::MonitorInstance(), SIGNAL(localDeviceAdded(QString)), this, SLOT(usbDeviceAdded()));
+    connect(MPDevice_localSocket::MonitorInstance(), SIGNAL(localDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved()));
 
     bool startUsbCheck = true;
 #if defined(Q_OS_MAC)
@@ -251,7 +257,27 @@ void MPManager::checkUsbDevices()
             }
             detectedDevs.append(def.id);
         }
+    
+        QList<MPLocalDef> local_devlist = MPDevice_localSocket::enumerateDevices();
+        for (const MPLocalDef &def : local_devlist)
+        {
+            //This is a new connected mooltipass
+            if (!devices.contains(def.id))
+            {
+                MPDevice *device = new MPDevice_localSocket(this, def);
+
+                devices[def.id] = device;
+                emit mpConnected(device);
+            }
+            else
+            {
+                qDebug() << "Device is already connected: " << def.id;
+            }
+            detectedDevs.append(def.id);
+        }
+
     }
+
     //Clear disconnected devices
     auto it = devices.begin();
     while (it != devices.end())
