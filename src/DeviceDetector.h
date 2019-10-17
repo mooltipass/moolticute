@@ -2,7 +2,7 @@
 #define DEVICEDETECTOR_H
 
 #include <QObject>
-#include <Common.h>
+#include "Common.h"
 
 class DeviceDetector : public QObject
 {
