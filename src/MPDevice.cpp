@@ -24,6 +24,7 @@
 #include "MPDeviceBleImpl.h"
 #include "BleCommon.h"
 #include "MPSettingsBLE.h"
+#include "MPNodeBLE.h"
 
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
@@ -6400,7 +6401,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         QJsonObject qjobject = creds[i].toObject();
 
         /* Check format */
-        if (qjobject.size() != 6)
+        const auto objSize = qjobject.size();
+        if (objSize != 6 && objSize != 7)
         {
             qCritical() << "Unknown JSON return format:" << qjobject;
             cb(false, "Wrong JSON formated credential list");
@@ -6416,6 +6418,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             QString password = qjobject["password"].toString();
             QString description = qjobject["description"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
+            int category = 0;
+            if (isBLE())
+            {
+                category = qjobject["category"].toInt();
+            }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
 
@@ -6468,6 +6475,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 newNodePt->setNotDeletedTagged();
                 newNodePt->setLogin(login);
                 newNodePt->setDescription(description);
+                if (auto* test = dynamic_cast<MPNodeBLE*>(newNodePt))
+                {
+                    test->setCategory(category);
+                }
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
 
@@ -6509,6 +6520,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 nodePtr->setLogin(login);
                 nodePtr->setDescription(description);
                 nodePtr->setFavoriteProperty(favorite);
+                if (auto* test = dynamic_cast<MPNodeBLE*>(nodePtr))
+                {
+                    test->setCategory(category);
+                }
                 addChildToDB(parentPtr, nodePtr);
 
                 /* Check for changed password */
@@ -6545,6 +6560,16 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     qDebug() << "Detected description change";
                     nodePtr->setDescription(description);
                     packet_send_needed = true;
+                }
+
+                if (isBLE())
+                {
+                    auto* nodeBle = dynamic_cast<MPNodeBLE*>(nodePtr);
+                    if (category != nodeBle->getCategory())
+                    {
+                        nodeBle->setCategory(category);
+                        packet_send_needed = true;
+                    }
                 }
 
                 /* Check for changed login */

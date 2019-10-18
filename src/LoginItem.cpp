@@ -75,7 +75,7 @@ QJsonObject LoginItem::toJson() const
             { "description", m_sDescription },
             { "address", addr },
             { "favorite", m_iFavorite },
-            //{ "category", m_iCategory }
+            { "category", m_iCategory }
     };
 }
 

@@ -156,3 +156,10 @@ int MPNodeBLE::getCategory() const
     qCritical() << "Invalid bitfield for category";
     return 0;
 }
+
+void MPNodeBLE::setCategory(int category)
+{
+    quint8 categoryBit = data[0]&0x0F0;
+    categoryBit |= category;
+    data[0] = static_cast<char>(categoryBit);
+}
