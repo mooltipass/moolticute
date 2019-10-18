@@ -538,7 +538,7 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
         ui->credDisplayPasswordInput->setText(pLoginItem->password());
         ui->credDisplayDescriptionInput->setText(pLoginItem->description());
         ui->credDisplayLoginInput->setText(pLoginItem->name());
-        ui->credDisplayCategoryInput->currentIndexChanged(pLoginItem->category());
+        ui->credDisplayCategoryInput->setCurrentIndex(pLoginItem->category());
         auto *serviceItem = pLoginItem->parentItem();
         if (nullptr != serviceItem)
         {
