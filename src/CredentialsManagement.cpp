@@ -480,7 +480,7 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
             if ((!sPassword.isEmpty() && (sPassword != pLoginItem->password())) ||
                     (!sDescription.isEmpty() && (sDescription != pLoginItem->description())) ||
                     (!sLogin.isEmpty() && (sLogin != pLoginItem->name())) ||
-                    (iCategory != pLoginItem->category()))
+                    (wsClient->isMPBLE() && iCategory != pLoginItem->category()))
             {
                 auto btn = QMessageBox::question(this,
                                                  tr("Discard Modifications ?"),
@@ -589,7 +589,7 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
             bool bPasswordCondition = !sPassword.isEmpty() && (sPassword != pLoginItem->password());
             bool bDescriptionCondition = !sDescription.isEmpty() && (sDescription != pLoginItem->description());
             bool bLoginCondition = !sLogin.isEmpty() && (sLogin != pLoginItem->name());
-            bool bCategoryCondition = iCategory != pLoginItem->category();
+            bool bCategoryCondition = wsClient->isMPBLE() && iCategory != pLoginItem->category();
 
             bool isServiceExist = false;
             if (bServiceCondition)

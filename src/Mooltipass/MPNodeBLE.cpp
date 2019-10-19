@@ -160,6 +160,9 @@ int MPNodeBLE::getCategory() const
 void MPNodeBLE::setCategory(int category)
 {
     quint8 categoryBit = data[0]&0x0F0;
-    categoryBit |= category;
+    if (category > 0)
+    {
+        categoryBit |= (0b1 << (category - 1));
+    }
     data[0] = static_cast<char>(categoryBit);
 }

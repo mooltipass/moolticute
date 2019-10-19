@@ -5,6 +5,7 @@
 // Application
 #include "LoginItem.h"
 #include "ServiceItem.h"
+#include "DeviceDetector.h"
 
 LoginItem::LoginItem(const QString &sLoginName) : TreeItem(sLoginName),
     m_iFavorite(-1), m_sPassword(""), m_sPasswordOrig(""), m_bPasswordLocked(true)
@@ -69,14 +70,20 @@ QJsonObject LoginItem::toJson() const
     }
 
     QString service = (m_pParentItem != nullptr) ? m_pParentItem->name() : "";
-    return {{ "service", service },
-            { "login", m_sName },
-            { "password", p },
-            { "description", m_sDescription },
-            { "address", addr },
-            { "favorite", m_iFavorite },
-            { "category", m_iCategory }
-    };
+    QJsonObject ret = {{ "service", service },
+                       { "login", m_sName },
+                       { "password", p },
+                       { "description", m_sDescription },
+                       { "address", addr },
+                       { "favorite", m_iFavorite },
+                       { "category", m_iCategory }
+               };
+
+    if (DeviceDetector::instance().isBle())
+    {
+        ret.insert("category", m_iCategory);
+    }
+    return ret;
 }
 
 void LoginItem::setPasswordLocked(bool bLocked)
