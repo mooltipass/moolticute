@@ -70,8 +70,14 @@ QList<MPLocalDef> MPDeviceLocalMonitor::enumerateDevices() const
 MPDevice_localSocket::MPDevice_localSocket(QObject *parent, const MPLocalDef & def): MPDevice(parent)
 {
     socket = MonitorInstance()->sockets[def.id];
+    deviceType = DeviceType::BLE;
+    isBluetooth = false;
+
     if(socket)
         connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
+
+    setupMessageProtocol();
+    sendInitMessages();
 }
 
 MPDevice_localSocket::~MPDevice_localSocket()
@@ -96,7 +102,12 @@ void MPDevice_localSocket::readData()
 
         packetFill += bytesRead;
         if(packetFill == sizeof(packet)) {
-            //emit newDataRead(const QByteArray &data);
+            if(packet[0] == 0 && packet[1] == 0) { // USB data packet
+                unsigned int payload_length = ((uint8_t)packet[2])|(((uint8_t)packet[3])<<8);
+                if(payload_length <= 552)
+                    emit platformDataRead(QByteArray(packet+4, payload_length));
+            }
+
             packetFill = 0;
         }
     }
