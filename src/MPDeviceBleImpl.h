@@ -85,6 +85,7 @@ public:
     QJsonObject getUserCategories() const { return m_categories; };
     void updateUserCategories(const QJsonObject &categories);
     bool isUserCategoriesChanged(const QJsonObject &categories) const;
+    void setNodeCategory(MPNode* node, int category);
 
     QList<QByteArray> getFavorites(const QByteArray& data);
 

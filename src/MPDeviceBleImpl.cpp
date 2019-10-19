@@ -1,6 +1,7 @@
 #include "MPDeviceBleImpl.h"
 #include "AsyncJobs.h"
 #include "MessageProtocolBLE.h"
+#include "MPNodeBLE.h"
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),
@@ -528,6 +529,15 @@ bool MPDeviceBleImpl::isUserCategoriesChanged(const QJsonObject &categories) con
         }
     }
     return false;
+}
+
+void MPDeviceBleImpl::setNodeCategory(MPNode* node, int category)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        qDebug() << "Setting category to: " << category;
+        nodeBle->setCategory(category);
+    }
 }
 
 QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)

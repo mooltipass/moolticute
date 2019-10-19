@@ -6475,9 +6475,9 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 newNodePt->setNotDeletedTagged();
                 newNodePt->setLogin(login);
                 newNodePt->setDescription(description);
-                if (auto* test = dynamic_cast<MPNodeBLE*>(newNodePt))
+                if (isBLE())
                 {
-                    test->setCategory(category);
+                    bleImpl->setNodeCategory(newNodePt, category);
                 }
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
@@ -6520,9 +6520,9 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 nodePtr->setLogin(login);
                 nodePtr->setDescription(description);
                 nodePtr->setFavoriteProperty(favorite);
-                if (auto* test = dynamic_cast<MPNodeBLE*>(nodePtr))
+                if (isBLE())
                 {
-                    test->setCategory(category);
+                    bleImpl->setNodeCategory(nodePtr, category);
                 }
                 addChildToDB(parentPtr, nodePtr);
 
