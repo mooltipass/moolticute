@@ -516,6 +516,11 @@ void CredentialsManagement::on_pushButtonConfirm_clicked()
 {
     saveSelectedCredential();
     updateSaveDiscardState();
+    if (wsClient->isMPBLE())
+    {
+        const auto& currentIndex = ui->credentialTreeView->selectionModel()->currentIndex();
+        updateBleFavs(getSourceIndexFromProxyIndex(currentIndex));
+    }
 }
 
 void CredentialsManagement::on_pushButtonCancel_clicked()

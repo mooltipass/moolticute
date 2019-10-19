@@ -384,6 +384,11 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &ro
         if (iCat != pLoginItem->category())
         {
             pLoginItem->setCategory(iCat);
+            // When category changed reset favorite
+            if (pLoginItem->favorite() > Common::FAV_NOT_SET)
+            {
+                pLoginItem->setFavorite(Common::FAV_NOT_SET);
+            }
             bChanged = true;
         }
         break;
