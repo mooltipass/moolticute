@@ -21,6 +21,12 @@ CredentialView::CredentialView(QWidget *parent) : QTreeView(parent)
   , tempCurrentLoginItem(nullptr)
   , columnBreakRatio(0.75)
 {
+#ifndef Q_OS_WIN
+    /* On Linux and Mac selected credential is
+     * not visible without this in the treeview.
+     */
+    setStyleSheet(CSS_CREDVIEW_SELECTION);
+#endif
     m_tSelectionTimer.setInterval(50);
     m_tSelectionTimer.setSingleShot(true);
     connect(&m_tSelectionTimer, &QTimer::timeout, this, &CredentialView::onSelectionTimerTimeOut);

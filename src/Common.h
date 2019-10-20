@@ -144,7 +144,7 @@ public:
         UnkownSmartcad = 9,
     } MPStatus;
     static QHash<MPStatus, QString> MPStatusUserString, MPStatusString;
-    static QMap<int, QColor> BLE_CATEGORY_COLOR;
+    static QMap<int, QString> BLE_CATEGORY_COLOR;
 
     static Common::MPStatus statusFromString(const QString &st);
 
@@ -278,6 +278,13 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                                 "padding-left: 4px;"\
                                 "border: 1px solid #FcFcFc;"\
                             "}"
+
+#define CSS_CREDVIEW_SELECTION "QTreeView::branch:selected {" \
+                                    "background-color: white;" \
+                               "}" \
+                               "QTreeView::item:selected {" \
+                                    "background-color: rgba( 128, 128, 128, 100);" \
+                               "}"
 
 enum class CloseBehavior
 {

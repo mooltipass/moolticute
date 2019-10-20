@@ -19,7 +19,6 @@
 #include "Common.h"
 #include <QLocalServer>
 #include <QLocalSocket>
-#include <QColor>
 #include <time.h>
 #include "version.h"
 #include <chrono>
@@ -92,12 +91,12 @@ QHash<Common::MPStatus, QString> Common::MPStatusString = {
     { Common::UnkownSmartcad, "UnkownSmartcad" }
 };
 
-QMap<int, QColor> Common::BLE_CATEGORY_COLOR = {
-    {0, QColor{"black"}},
-    {1, QColor{"red"}},
-    {2, QColor{"blue"}},
-    {3, QColor{"green"}},
-    {4, QColor{"orange"}}
+QMap<int, QString> Common::BLE_CATEGORY_COLOR = {
+    {0, "black"},
+    {1, "red"},
+    {2, "blue"},
+    {3, "green"},
+    {4, "orange"}
 };
 
 Common::MPStatus Common::statusFromString(const QString &st)

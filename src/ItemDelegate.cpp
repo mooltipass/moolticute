@@ -58,7 +58,7 @@ void ItemDelegate::paintFavorite(QPainter *painter, const QStyleOptionViewItem &
     QFont f = loginFont();
     bool isBle = DeviceDetector::instance().isBle();
     QIcon star = isBle ? AppGui::qtAwesome()->icon(fa::star,
-                                 {{"color" , Common::BLE_CATEGORY_COLOR[iFavorite/MAX_BLE_CAT_NUM]}}) :
+                                 {{"color" , QColor{Common::BLE_CATEGORY_COLOR[iFavorite/MAX_BLE_CAT_NUM]}}}) :
                          AppGui::qtAwesome()->icon(fa::star);
     QSize iconSz = QSize(option.rect.height(), option.rect.height());
     QPoint pos = option.rect.topLeft() + QPoint(0, -(option.rect.height()-iconSz.height())/2);
@@ -107,11 +107,15 @@ bool ItemDelegate::paintCategoryIcon(QPainter *painter, const QStyleOptionViewIt
     }
 
     QIcon categoryIcon = AppGui::qtAwesome()->icon(fa::folder,
-                                    {{ "color", Common::BLE_CATEGORY_COLOR[catId] }});
+                                    {{ "color", QColor{Common::BLE_CATEGORY_COLOR[catId]}}});
 
     const int categoryIconSize = 15;
+    int catIconXPos = categoryIconSize;
     QPoint catPos(option.rect.topLeft() + QPoint(option.rect.height()/2, 0));
-    catPos.setX(catPos.x() + categoryIconSize);
+#ifndef Q_OS_WIN
+    catIconXPos += 3;
+#endif
+    catPos.setX(catPos.x() + catIconXPos);
     QSize catSz(QSize(categoryIconSize, categoryIconSize));
     QRect catRec(catPos, catSz);
     categoryIcon.paint(painter, catRec);

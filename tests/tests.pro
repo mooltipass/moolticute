@@ -42,6 +42,7 @@ SOURCES += \
     ../src/DbExportsRegistry.cpp \
     ../src/DbBackupChangeNumbersComparator.cpp \
     ../src/ParseDomain.cpp \
+    ../src/DeviceDetector.cpp \
     main.cpp \
     FilesCacheTests.cpp \
     UpdaterTests.cpp \
@@ -65,6 +66,7 @@ HEADERS += \
     ../src/DbExportsRegistry.h \
     ../src/DbBackupChangeNumbersComparator.h \
     ../src/ParseDomain.h \
+    ../src/DeviceDetector.h \
     UpdaterTests.h \
     FilesCacheTests.h \
     DbBackupsTrackerTests.h \
