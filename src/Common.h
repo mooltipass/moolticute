@@ -279,10 +279,7 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                                 "border: 1px solid #FcFcFc;"\
                             "}"
 
-#define CSS_CREDVIEW_SELECTION "QTreeView::branch:selected {" \
-                                    "background-color: white;" \
-                               "}" \
-                               "QTreeView::item:selected {" \
+#define CSS_CREDVIEW_SELECTION "QTreeView::item:selected {" \
                                     "background-color: rgba( 128, 128, 128, 100);" \
                                "}"
 
