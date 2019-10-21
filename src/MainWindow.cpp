@@ -465,6 +465,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     // Restore geometry and state from last session.
     restoreGeometry(s.value("MainWindow/geometry").toByteArray());
     restoreState(s.value("MainWindow/windowState").toByteArray());
+
+    ui->checkBoxDebugHttp->setChecked(s.value("settings/http_dev_server").toBool());
+    ui->checkBoxDebugLog->setChecked(s.value("settings/enable_dev_log").toBool());
 }
 
 MainWindow::~MainWindow()
@@ -1033,6 +1036,11 @@ bool MainWindow::isHttpDebugChecked()
     return ui->checkBoxDebugHttp->isChecked();
 }
 
+bool MainWindow::isDebugLogChecked()
+{
+    return ui->checkBoxDebugLog->isChecked();
+}
+
 void MainWindow::on_checkBoxSSHAgent_stateChanged(int)
 {
     QSettings s;
@@ -1594,4 +1602,16 @@ void MainWindow::onDeviceConnected()
 void MainWindow::onDeviceDisconnected()
 {
     ui->groupBox_UserSettings->hide();
+}
+
+void MainWindow::on_checkBoxDebugHttp_stateChanged(int)
+{
+    QSettings s;
+    s.setValue("settings/http_dev_server", isHttpDebugChecked());
+}
+
+void MainWindow::on_checkBoxDebugLog_stateChanged(int)
+{
+    QSettings s;
+    s.setValue("settings/enable_dev_log", isDebugLogChecked());
 }

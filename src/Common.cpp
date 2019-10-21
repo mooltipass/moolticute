@@ -114,6 +114,8 @@ Common::MPStatus Common::statusFromString(const QString &st)
 static QLocalServer *debugLogServer = nullptr;
 static QList<QLocalSocket *> debugLogClients;
 static Common::GuiLogCallback guiLogCallback = [](const QByteArray &) {};
+static QByteArray startingDaemonBuffer;
+
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QString fname = context.file;
@@ -162,12 +164,28 @@ static void _messageOutput(QtMsgType type, const QMessageLogContext &context, co
             type == QtInfoMsg)
             guiLogCallback(s.toUtf8());
 
+        if (Common::isDaemon() && debugLogClients.isEmpty())
+        {
+            startingDaemonBuffer.append(s.toUtf8());
+        }
+
         for (QLocalSocket *sock: debugLogClients)
         {
             sock->write(s.toUtf8());
             sock->flush();
         }
     }
+}
+
+static bool is_daemon = false;
+void Common::setIsDaemon(bool en)
+{
+    is_daemon = en;
+}
+
+bool Common::isDaemon()
+{
+    return is_daemon;
 }
 
 void Common::installMessageOutputHandler(QLocalServer *logServer, GuiLogCallback guicb)
@@ -185,6 +203,14 @@ void Common::installMessageOutputHandler(QLocalServer *logServer, GuiLogCallback
             //New clients gets added to the list
             //and logs will be forwarded to them
             debugLogClients.append(s);
+
+            //Send first bytes before client connects
+            if (!startingDaemonBuffer.isEmpty())
+            {
+                s->write(startingDaemonBuffer);
+                s->flush();
+                startingDaemonBuffer.clear();
+            }
 
             QObject::connect(s, &QLocalSocket::disconnected, [s]()
             {

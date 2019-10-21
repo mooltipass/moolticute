@@ -25,6 +25,7 @@
 #include "BleCommon.h"
 #include "MPSettingsBLE.h"
 #include "MPNodeBLE.h"
+#include "AppDaemon.h"
 
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
@@ -143,9 +144,9 @@ void MPDevice::sendInitMessages()
     QTimer::singleShot(100, [this]() {
         if (isBLE())
         {
-#ifdef DEV_DEBUG
-            qDebug() << "Resetting flip bit for BLE";
-#endif
+            if (AppDaemon::isDebugDev())
+                qDebug() << "Resetting flip bit for BLE";
+
             bleImpl->sendResetFlipBit();
             if (bleImpl->isAfterAuxFlash())
             {
@@ -369,25 +370,26 @@ void MPDevice::newDataRead(const QByteArray &data)
     {
         qWarning() << "Wrong answer received: " << pMesProt->printCmd(dataCommand)
                    << " for command: " << pMesProt->printCmd(currentCommand);
-#ifdef DEV_DEBUG
-        qWarning() << "Full response: " << data.toHex();
-#endif
+        if (AppDaemon::isDebugDev())
+            qWarning() << "Full response: " << data.toHex();
+
         return;
     }
 
-#ifdef DEV_DEBUG
-    QString resMsg = "Received answer: ";
-    if (isBLE() && !bleImpl->isFirstPacket(data))
+    if (AppDaemon::isDebugDev())
     {
-        resMsg += pMesProt->printCmd(pMesProt->getCommand(currentCmd.data[0]));
+        QString resMsg = "Received answer: ";
+        if (isBLE() && !bleImpl->isFirstPacket(data))
+        {
+            resMsg += pMesProt->printCmd(pMesProt->getCommand(currentCmd.data[0]));
+        }
+        else
+        {
+            qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
+            resMsg += pMesProt->printCmd(dataCommand);
+        }
+        qDebug() << resMsg << " Full packet:" << data.toHex();
     }
-    else
-    {
-        qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
-        resMsg += pMesProt->printCmd(dataCommand);
-    }
-    qDebug() << resMsg << " Full packet:" << data.toHex();
-#endif
 
     /**
       * For BLE it is waiting while every packet is received,
@@ -458,10 +460,10 @@ void MPDevice::sendDataDequeue()
     MPCommand &currentCmd = commandQueue.head();
     currentCmd.running = true;
 
-#ifdef DEV_DEBUG
     int i = 0;
-    qDebug() << "Platform send command: " << pMesProt->printCmd(currentCmd.data[0]);
-#endif
+    if (AppDaemon::isDebugDev())
+        qDebug() << "Platform send command: " << pMesProt->printCmd(currentCmd.data[0]);
+
     if (isBLE())
     {
         bleImpl->flipMessageBit(currentCmd.data);
@@ -469,18 +471,19 @@ void MPDevice::sendDataDequeue()
     // send data with platform code
     for (const auto &data : currentCmd.data)
     {
-#ifdef DEV_DEBUG
-        auto toHex = [](quint16 b) -> QString { return QString("0x%1").arg((quint16)b, 2, 16, QChar('0')); };
-        QString a = "[";
-        for (int i = 0;i < data.size();i++)
+        if (AppDaemon::isDebugDev())
         {
-            a += toHex((quint8)data.at(i));
-            if (i < data.size() - 1) a += ", ";
-        }
-        a += "]";
+            auto toHex = [](quint16 b) -> QString { return QString("0x%1").arg((quint16)b, 2, 16, QChar('0')); };
+            QString a = "[";
+            for (int i = 0;i < data.size();i++)
+            {
+                a += toHex((quint8)data.at(i));
+                if (i < data.size() - 1) a += ", ";
+            }
+            a += "]";
 
-        qDebug() << "Full packet#" << i++ << ": " << a;
-#endif
+            qDebug() << "Full packet#" << i++ << ": " << a;
+        }
 
         platformWrite(data);
     }
@@ -3103,9 +3106,9 @@ void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& addres
                 return true;
             }
         }));
-#ifdef DEV_DEBUG
-        qDebug() << "Write node packet #" << static_cast<quint8>(packet[2]) << " : " << packet.toHex();
-#endif
+
+        if (AppDaemon::isDebugDev())
+            qDebug() << "Write node packet #" << static_cast<quint8>(packet[2]) << " : " << packet.toHex();
     }
 }
 
@@ -3634,9 +3637,10 @@ void MPDevice::writeCancelRequest()
     ba.append(pMesProt->createPackets(QByteArray{}, cancelRequestCmd)[0]);
 
     qDebug() << "Platform send command: " << pMesProt->printCmd(cancelRequestCmd);
-#ifdef DEV_DEBUG
-    qDebug() << "Message:" << ba.toHex();
-#endif
+
+    if (AppDaemon::isDebugDev())
+        qDebug() << "Message:" << ba.toHex();
+
     qDebug() << "Platform send command: " << QString("0x%1").arg(static_cast<quint8>(ba[1]), 2, 16, QChar('0'));
     if (isBLE())
     {
@@ -6046,16 +6050,16 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
                 if (discardFirstAddr)
                 {
                     freeAddresses.append(pMesProt->getPayloadBytes(data, 2 + i*2, 2));
-#ifdef DEV_DEBUG
-                    qDebug() << "Received free address " << pMesProt->getPayloadBytes(data, 2 + i*2, 2).toHex();
-#endif
+
+                    if (AppDaemon::isDebugDev())
+                        qDebug() << "Received free address " << pMesProt->getPayloadBytes(data, 2 + i*2, 2).toHex();
                 }
                 else
                 {
                     freeAddresses.append(pMesProt->getPayloadBytes(data,i*2, 2));
-#ifdef DEV_DEBUG
-                    qDebug() << "Received free address " << pMesProt->getPayloadBytes(data,i*2, 2).toHex();
-#endif
+
+                    if (AppDaemon::isDebugDev())
+                        qDebug() << "Received free address " << pMesProt->getPayloadBytes(data,i*2, 2).toHex();
                 }
             }
 

@@ -56,6 +56,7 @@ public:
     void daemonLogAppend(const QByteArray &logdata);
 
     bool isHttpDebugChecked();
+    bool isDebugLogChecked();
 
     void updateBackupControlsVisibility(bool visible);
 
@@ -148,6 +149,10 @@ private slots:
 
     void onDeviceConnected();
     void onDeviceDisconnected();
+
+    void on_checkBoxDebugHttp_stateChanged(int arg1);
+
+    void on_checkBoxDebugLog_stateChanged(int arg1);
 
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
