@@ -41,8 +41,12 @@ public:
     int getParentNodeSize() const override { return MP_NODE_SIZE; }
     int getChildNodeSize() const override { return MP_NODE_SIZE; }
     uint getMaxFavorite() const override { return MOOLTIPASS_FAV_MAX; }
+    int getCredentialPackageSize() const override { return CRED_PACKAGE_SIZE; }
 
     virtual void fillCommandMapping() override;
+
+private:
+    static constexpr uint CRED_PACKAGE_SIZE = 6;
 };
 
 #endif // MESSAGEPROTOCOLMINI_H

@@ -6405,8 +6405,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         QJsonObject qjobject = creds[i].toObject();
 
         /* Check format */
-        const auto objSize = qjobject.size();
-        if (objSize != 6 && objSize != 7)
+        if (qjobject.size() != pMesProt->getCredentialPackageSize())
         {
             qCritical() << "Unknown JSON return format:" << qjobject;
             cb(false, "Wrong JSON formated credential list");

@@ -48,6 +48,8 @@ public:
     int getChildNodeSize() const override;
     uint getMaxFavorite() const override { return MAX_FAVORITE_NUM; }
 
+    int getCredentialPackageSize() const override { return CRED_PACKAGE_SIZE; }
+
 private:
     virtual void fillCommandMapping() override;
     int getStartingPayloadPosition(const QByteArray &data) const;
@@ -63,6 +65,7 @@ private:
     static constexpr quint8 FIRST_PAYLOAD_BYTE_MESSAGE = 6;
     static constexpr quint8 FIRST_PAYLOAD_BYTE_PACKET = 2;
     static constexpr uint MAX_FAVORITE_NUM = 10;
+    static constexpr uint CRED_PACKAGE_SIZE = 7;
 };
 
 #endif // MESSAGEPROTOCOLBLE_H
