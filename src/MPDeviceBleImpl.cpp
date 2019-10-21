@@ -1,6 +1,7 @@
 #include "MPDeviceBleImpl.h"
 #include "AsyncJobs.h"
 #include "MessageProtocolBLE.h"
+#include "AppDaemon.h"
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),
@@ -256,9 +257,10 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
                                     return true;
                                 }
                                 qDebug() << "Credential got successfully";
-#ifdef DEV_DEBUG
-                                qDebug() << data.toHex();
-#endif
+
+                                if (AppDaemon::isDebugDev())
+                                    qDebug() << data.toHex();
+
                                 cb(true, "", bleProt->getFullPayload(data));
                                 return true;
                             }));
@@ -298,9 +300,10 @@ BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray respons
         {
             cred.set(attr, attrVal);
         }
-#ifdef DEV_DEBUG
-        qDebug() << "nextIndex: " << index << " attrName: " << attrVal;
-#endif
+
+        if (AppDaemon::isDebugDev())
+            qDebug() << "nextIndex: " << index << " attrName: " << attrVal;
+
         lastIndex = index;
         attr = static_cast<BleCredential::CredAttr>(static_cast<int>(attr) + 1);
     }
@@ -626,9 +629,10 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
                                           {"msg", "Writing bundle data to device..." }
                                       };
                                       cbProgress(progress);
-#ifdef DEV_DEBUG
-                                      qDebug() << "Sending message to address #" << curAddress;
-#endif
+
+                                      if (AppDaemon::isDebugDev())
+                                          qDebug() << "Sending message to address #" << curAddress;
+
                                       return true;
                                   }));
             curAddress += BUNBLE_DATA_WRITE_SIZE;

@@ -197,8 +197,12 @@ bool AppGui::initialize()
     daemonProcess = new QProcess(this);
     QString program = QCoreApplication::applicationDirPath () + "/moolticuted";
     QStringList arguments;
-    // TODO handle Debug arguments
-    //arguments << "-e" <<  "-s 8080";
+
+    if (s.value("settings/enable_dev_log").toBool())
+        arguments << "-l";
+    if (s.value("settings/http_dev_server").toBool())
+        arguments << "-s 8484";
+
     qInfo() << "Running " << program << " " << arguments;
 
     connect(daemonProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
@@ -215,9 +219,7 @@ bool AppGui::initialize()
         {
             QTimer::singleShot(1500, [=]()
             {
-                QStringList args = arguments;
-                args << "-s 8484";
-                daemonProcess->start(program, args);
+                daemonProcess->start(program, arguments);
             });
             needRestart = false;
         }
@@ -689,7 +691,6 @@ void AppGui::restartDaemon()
         QTimer::singleShot(1500, [=]()
         {
             QStringList args = daemonProcess->arguments();
-            args << "-s 8484";
             daemonProcess->start(daemonProcess->program(), args);
         });
     }

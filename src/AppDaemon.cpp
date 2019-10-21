@@ -108,6 +108,10 @@ bool AppDaemon::initialize()
                                        QCoreApplication::translate("main", "port"));
     parser.addOption(debugHttpServer);
 
+    QCommandLineOption debugDevOption(QStringList() << "l" << "debug-log",
+                                      QCoreApplication::translate("main", "Enable full dev debug log"));
+    parser.addOption(debugDevOption);
+
     parser.process(qApp->arguments());
 
     emulationMode = parser.isSet(emulMode);
@@ -127,6 +131,9 @@ bool AppDaemon::initialize()
             return false;
         }
     }
+
+    if (parser.isSet(debugDevOption))
+        debugDevEnabled = true;
 
     //Install and start mp manager instance and ws server
     if (!WSServer::Instance()->initialize())
@@ -161,4 +168,10 @@ QHostAddress AppDaemon::getListenAddress()
         return QHostAddress::Any;
 
     return QHostAddress::LocalHost;
+}
+
+bool AppDaemon::isDebugDev()
+{
+    auto daemon = dynamic_cast<AppDaemon *>(qApp);
+    return daemon->debugDevEnabled;
 }
