@@ -121,6 +121,12 @@ template<class T>
 T const& qAsConst(T&t){return t;}
 #endif
 
+//Q_DISABLE_COPY_MOVE from Qt 5.15
+#define DISABLE_COPY_MOVE(Class) \
+    Q_DISABLE_COPY(Class) \
+    Class(const Class &&) Q_DECL_EQ_DELETE;\
+    Class &operator=(const Class &&) Q_DECL_EQ_DELETE;
+
 class Common
 {
 public:

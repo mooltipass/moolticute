@@ -7,12 +7,9 @@
 class DeviceDetector : public QObject
 {
     Q_OBJECT
+    DISABLE_COPY_MOVE(DeviceDetector)
 private:
     explicit DeviceDetector(QObject *parent = nullptr);
-    DeviceDetector(const DeviceDetector&) = delete;
-    DeviceDetector(const DeviceDetector&&) = delete;
-    DeviceDetector& operator=(const DeviceDetector& other) = delete;
-    DeviceDetector& operator=(const DeviceDetector&& other) = delete;
 
     DeviceDetector *_instance = nullptr;
 public:
