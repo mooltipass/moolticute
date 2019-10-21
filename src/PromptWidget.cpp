@@ -37,7 +37,7 @@ PromptWidget::PromptWidget(QWidget *parent) :
 
 PromptWidget::~PromptWidget()
 {
-    cleanPromptMessage();
+    delete m_promptMessage;
 }
 
 void PromptWidget::setText(const QString &text)
