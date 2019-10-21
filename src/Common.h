@@ -124,6 +124,8 @@ class Common
 public:
     typedef std::function<void(const QByteArray &)> GuiLogCallback;
 
+    static void setIsDaemon(bool en);
+    static bool isDaemon();
     static void installMessageOutputHandler(QLocalServer *logServer = nullptr, GuiLogCallback guicb = [](const QByteArray &){});
 
     Q_ENUMS(MPStatus)

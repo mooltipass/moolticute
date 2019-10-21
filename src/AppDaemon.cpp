@@ -32,6 +32,7 @@ AppDaemon::AppDaemon(int &argc, char **argv):
     QAPP(argc, argv),
     sharedMem("moolticute")
 {
+    Common::setIsDaemon(true);
 }
 
 bool AppDaemon::initialize()
@@ -46,9 +47,10 @@ bool AppDaemon::initialize()
     QCoreApplication::setOrganizationDomain("themooltipass.com");
     QCoreApplication::setApplicationName("moolticute");
 
+    qInfo() << "------------------------------------";
     qInfo() << "Moolticute Daemon version: " << APP_VERSION;
-    qInfo() << "(c) 2016 Raoul Hecky";
-    qInfo() << "https://github.com/raoulh/moolticute";
+    qInfo() << "(c) The Mooltipass Team";
+    qInfo() << "https://github.com/mooltipass/moolticute";
     qInfo() << "------------------------------------";
 
 #ifdef Q_OS_MAC

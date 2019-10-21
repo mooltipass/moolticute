@@ -73,6 +73,12 @@ bool AppGui::initialize()
         }
     });
 
+    qInfo() << "------------------------------------";
+    qInfo() << "Moolticute Gui version: " << APP_VERSION;
+    qInfo() << "(c) The Mooltipass Team";
+    qInfo() << "https://github.com/mooltipass/moolticute";
+    qInfo() << "------------------------------------";
+
     setupLanguage();
 
     QSimpleUpdater::getInstance();
