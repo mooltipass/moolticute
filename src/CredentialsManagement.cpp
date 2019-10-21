@@ -1081,15 +1081,17 @@ void CredentialsManagement::on_toolButtonEditService_clicked()
 
 void CredentialsManagement::on_pushButtonSaveCategories_clicked()
 {
-    wsClient->sendSetUserCategories(ui->lineEditCategory1->text(),
-                                    ui->lineEditCategory2->text(),
-                                    ui->lineEditCategory3->text(),
-                                    ui->lineEditCategory4->text());
+    const auto cat1 = ui->lineEditCategory1->text();
+    const auto cat2 = ui->lineEditCategory2->text();
+    const auto cat3 = ui->lineEditCategory3->text();
+    const auto cat4 = ui->lineEditCategory4->text();
+    wsClient->sendSetUserCategories(cat1, cat2, cat3, cat4);
     ui->pushButtonSaveCategories->hide();
-    m_pCredModel->updateCategories(ui->lineEditCategory1->text(),
-                                   ui->lineEditCategory2->text(),
-                                   ui->lineEditCategory3->text(),
-                                   ui->lineEditCategory4->text());
+    m_pCredModel->updateCategories(cat1, cat2, cat3, cat4);
+    ui->credDisplayCategoryInput->setItemText(1, cat1);
+    ui->credDisplayCategoryInput->setItemText(2, cat2);
+    ui->credDisplayCategoryInput->setItemText(3, cat3);
+    ui->credDisplayCategoryInput->setItemText(4, cat4);
     m_isSetCategoryClean = true;
 }
 
