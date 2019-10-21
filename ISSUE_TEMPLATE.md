@@ -7,6 +7,8 @@ Use one of the two templates below and delete the other. All issues not followin
 
 ### Step by step guide to reproduce the problem
 
+### Moolticute Version
+
 ### Operating System
 Mention if you are using either:
 - Windows 7/10
