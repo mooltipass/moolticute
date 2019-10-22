@@ -105,6 +105,16 @@ void TreeItem::setDescription(const QString &sDescription)
     m_sDescription = sDescription;
 }
 
+int TreeItem::category() const
+{
+    return m_iCategory;
+}
+
+void TreeItem::setCategory(int iCategory)
+{
+    m_iCategory = iCategory;
+}
+
 const QVector<TreeItem *> &TreeItem::childs() const
 {
     return m_vChilds;

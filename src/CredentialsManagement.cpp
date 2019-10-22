@@ -27,6 +27,7 @@
 #include "TreeItem.h"
 #include "LoginItem.h"
 #include "ServiceItem.h"
+#include "DeviceDetector.h"
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
@@ -83,19 +84,13 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonSaveCategories->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSaveCategories->setText(tr("Save"));
     ui->pushButtonSaveCategories->hide();
+    ui->credDisplayCategoryInput->hide();
+    ui->credDisplayCategoryLabel->hide();
     connect(ui->lineEditCategory1, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory2, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory3, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory4, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
 
-    QAction *action = m_favMenu.addAction(tr("Not a favorite"));
-    connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
-
-    for (int i = 1; i < 15;i++)
-    {
-        action = m_favMenu.addAction(tr("Set as favorite #%1").arg(i));
-        connect(action, &QAction::triggered, [this, i](){ changeCurrentFavorite(i - 1); });
-    }
     ui->pushButtonFavorite->setMenu(&m_favMenu);
 
     m_pCredModel = new CredentialModel(this);
@@ -103,6 +98,11 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     m_pCredModelFilter = new CredentialModelFilter(this);
     m_pCredModelFilter->setSourceModel(m_pCredModel);
     ui->credentialTreeView->setModel(m_pCredModelFilter);
+
+    for (int i = 0; i < BLE_FAVORITE_NUM/MAX_BLE_CAT_NUM; ++i)
+    {
+        ui->credDisplayCategoryInput->addItem(m_pCredModel->getCategoryName(i), i);
+    }
 
     connect(m_pCredModel, &CredentialModel::modelReset, this, &CredentialsManagement::updateFavMenu);
     connect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::updateFavMenu);
@@ -120,6 +120,11 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
         saveSelectedCredential();
     });
 
+    connect(&DeviceDetector::instance(), &DeviceDetector::deviceChanged,
+            this, &CredentialsManagement::updateFavMenuOnDevChanged);
+    connect(&DeviceDetector::instance(), &DeviceDetector::deviceChanged,
+            this, &CredentialsManagement::updateDeviceType);
+
     connect(ui->addCredServiceInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredLoginInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
     connect(ui->addCredPasswordInput, &QLineEdit::textChanged, this, &CredentialsManagement::updateQuickAddCredentialsButtonState);
@@ -130,6 +135,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credDisplayLoginInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayDescriptionInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayPasswordInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
+    connect(ui->credDisplayCategoryInput, QOverload<int>::of(&QComboBox::currentIndexChanged), [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayServiceInput, &QLineEdit::editingFinished,
         [this] {
             ui->toolButtonEditService->show();
@@ -188,6 +194,8 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::mpHwVersionChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::advancedMenuChanged,
+            [this](bool isEnabled){ ui->credDisplayCategoryInput->setEnabled(isEnabled); });
     connect(wsClient, &WSClient::displayUserCategories, this,
              [this](const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4)
                 {
@@ -195,6 +203,11 @@ void CredentialsManagement::setWsClient(WSClient *c)
                     ui->lineEditCategory2->setText(cat2);
                     ui->lineEditCategory3->setText(cat3);
                     ui->lineEditCategory4->setText(cat4);
+                    ui->credDisplayCategoryInput->setItemText(1, cat1);
+                    ui->credDisplayCategoryInput->setItemText(2, cat2);
+                    ui->credDisplayCategoryInput->setItemText(3, cat3);
+                    ui->credDisplayCategoryInput->setItemText(4, cat4);
+                    m_pCredModel->updateCategories(cat1, cat2, cat3, cat4);
                 }
     );
     connect(wsClient, &WSClient::statusChanged, this,
@@ -407,7 +420,11 @@ void CredentialsManagement::saveCredential(const QModelIndex currentSelectionInd
     LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
     if (pLoginItem != nullptr) {
         const QString newServiceName = ui->credDisplayServiceInput->text();
-        m_pCredModel->updateLoginItem(srcIndex, ui->credDisplayPasswordInput->text(), ui->credDisplayDescriptionInput->text(), ui->credDisplayLoginInput->text());
+        m_pCredModel->updateLoginItem(srcIndex,
+                                      ui->credDisplayPasswordInput->text(),
+                                      ui->credDisplayDescriptionInput->text(),
+                                      ui->credDisplayLoginInput->text(),
+                                      ui->credDisplayCategoryInput->currentData().toInt());
         ui->credentialTreeView->refreshLoginItem(srcIndex);
         if (pLoginItem->parentItem()->name() != newServiceName)
         {
@@ -458,10 +475,12 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
             QString sPassword = ui->credDisplayPasswordInput->text();
             QString sDescription = ui->credDisplayDescriptionInput->text();
             QString sLogin = ui->credDisplayLoginInput->text();
+            int iCategory = ui->credDisplayCategoryInput->currentData().toInt();
 
             if ((!sPassword.isEmpty() && (sPassword != pLoginItem->password())) ||
                     (!sDescription.isEmpty() && (sDescription != pLoginItem->description())) ||
-                    (!sLogin.isEmpty() && (sLogin != pLoginItem->name())))
+                    (!sLogin.isEmpty() && (sLogin != pLoginItem->name())) ||
+                    (wsClient->isMPBLE() && iCategory != pLoginItem->category()))
             {
                 auto btn = QMessageBox::question(this,
                                                  tr("Discard Modifications ?"),
@@ -497,6 +516,11 @@ void CredentialsManagement::on_pushButtonConfirm_clicked()
 {
     saveSelectedCredential();
     updateSaveDiscardState();
+    if (wsClient->isMPBLE())
+    {
+        const auto& currentIndex = ui->credentialTreeView->selectionModel()->currentIndex();
+        updateBleFavs(getSourceIndexFromProxyIndex(currentIndex));
+    }
 }
 
 void CredentialsManagement::on_pushButtonCancel_clicked()
@@ -519,6 +543,7 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
         ui->credDisplayPasswordInput->setText(pLoginItem->password());
         ui->credDisplayDescriptionInput->setText(pLoginItem->description());
         ui->credDisplayLoginInput->setText(pLoginItem->name());
+        ui->credDisplayCategoryInput->setCurrentIndex(pLoginItem->category());
         auto *serviceItem = pLoginItem->parentItem();
         if (nullptr != serviceItem)
         {
@@ -563,11 +588,13 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
             QString sPassword = ui->credDisplayPasswordInput->text();
             QString sDescription = ui->credDisplayDescriptionInput->text();
             QString sLogin = ui->credDisplayLoginInput->text();
+            int iCategory = ui->credDisplayCategoryInput->currentData().toInt();
 
             bool bServiceCondition = sService != pLoginItem->parentItem()->name();
             bool bPasswordCondition = !sPassword.isEmpty() && (sPassword != pLoginItem->password());
             bool bDescriptionCondition = !sDescription.isEmpty() && (sDescription != pLoginItem->description());
             bool bLoginCondition = !sLogin.isEmpty() && (sLogin != pLoginItem->name());
+            bool bCategoryCondition = wsClient->isMPBLE() && iCategory != pLoginItem->category();
 
             bool isServiceExist = false;
             if (bServiceCondition)
@@ -585,7 +612,9 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
                 setServiceInputAttributes("", Qt::black);
             }
 
-            if (!isServiceExist && !sService.isEmpty() && (bServiceCondition || bPasswordCondition || bDescriptionCondition || bLoginCondition))
+            if (!isServiceExist && !sService.isEmpty() &&
+                    (bServiceCondition || bPasswordCondition ||
+                     bDescriptionCondition || bLoginCondition || bCategoryCondition))
             {
                 ui->pushButtonCancel->show();
                 ui->pushButtonConfirm->show();
@@ -737,6 +766,10 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 {
     ui->credDisplayFrame->setEnabled(true);
     updateLoginDescription(srcIndex);
+    if (wsClient->isMPBLE())
+    {
+        updateBleFavs(srcIndex);
+    }
 }
 
 void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
@@ -767,6 +800,10 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
             ui->credDisplayCreationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayModificationDateInput->setText(pLoginItem->accessedDate().toString(Qt::DefaultLocaleShortDate));
             ui->credDisplayPasswordInput->setLocked(pLoginItem->passwordLocked());
+            if (wsClient->isMPBLE())
+            {
+                ui->credDisplayCategoryInput->setCurrentIndex(pLoginItem->category());
+            }
         }
     }
 }
@@ -779,6 +816,7 @@ void CredentialsManagement::clearLoginDescription()
     ui->credDisplayDescriptionInput->setText("");
     ui->credDisplayCreationDateInput->setText("");
     ui->credDisplayModificationDateInput->setText("");
+    ui->credDisplayCategoryInput->setCurrentIndex(0);
 }
 
 QModelIndex CredentialsManagement::getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex)
@@ -841,6 +879,25 @@ void CredentialsManagement::clearMMMUi()
     ui->credDisplayFrame->setEnabled(false);
     m_pCredModel->clear();
     ui->credentialTreeView->repaint();
+}
+
+void CredentialsManagement::updateBleFavs(const QModelIndex &srcIndex)
+{
+    const auto category = getCategory(srcIndex);
+    int i = 0;
+    int from = category * MAX_BLE_CAT_NUM  + 1;
+    int to = from + MAX_BLE_CAT_NUM ;
+    for (QAction* action : m_favMenu.actions())
+    {
+        bool visible = false;
+        // Setting visible No Favorite and category's favs
+        if (0 == i || (i >= from && i < to))
+        {
+            visible = true;
+        }
+        action->setVisible(visible);
+        ++i;
+    }
 }
 
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
@@ -917,7 +974,9 @@ void CredentialsManagement::updateFavMenu()
 {
     QList<QAction*> actions = m_favMenu.actions();
     for (QAction* action : actions)
+    {
         action->setEnabled(true);
+    }
 
     // check taken favs
     if (m_pCredModel)
@@ -966,11 +1025,44 @@ void CredentialsManagement::checkDeviceType()
     }
 }
 
+void CredentialsManagement::updateFavMenuOnDevChanged(Common::MPHwVersion newDev)
+{
+    m_favMenu.clear();
+    QAction *action = m_favMenu.addAction(tr("Not a favorite"));
+    connect(action, &QAction::triggered, [this](){ changeCurrentFavorite(Common::FAV_NOT_SET); });
+    bool isBle = Common::MP_BLE == newDev;
+    const auto size = isBle ? BLE_FAVORITE_NUM : MINI_FAVORITE_NUM;
+    for (int i = 0; i < size; ++i)
+    {
+        action = m_favMenu.addAction(tr("Set as favorite #%1").arg(isBle ? (i%MAX_BLE_CAT_NUM)+1 : i+1));
+        connect(action, &QAction::triggered, [this, i](){ changeCurrentFavorite(i); });
+    }
+}
+
+void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
+{
+    if (Common::MP_BLE == newDev)
+    {
+        ui->credDisplayCategoryInput->show();
+        ui->credDisplayCategoryLabel->show();
+    }
+    else
+    {
+        ui->credDisplayCategoryInput->hide();
+        ui->credDisplayCategoryLabel->hide();
+    }
+}
+
 void CredentialsManagement::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LanguageChange)
         ui->retranslateUi(this);
     QWidget::changeEvent(event);
+}
+
+int CredentialsManagement::getCategory(const QModelIndex &srcIndex)
+{
+    return m_pCredModel->getLoginItemByIndex(srcIndex)->category();
 }
 
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
@@ -989,11 +1081,17 @@ void CredentialsManagement::on_toolButtonEditService_clicked()
 
 void CredentialsManagement::on_pushButtonSaveCategories_clicked()
 {
-    wsClient->sendSetUserCategories(ui->lineEditCategory1->text(),
-                                    ui->lineEditCategory2->text(),
-                                    ui->lineEditCategory3->text(),
-                                    ui->lineEditCategory4->text());
+    const auto cat1 = ui->lineEditCategory1->text();
+    const auto cat2 = ui->lineEditCategory2->text();
+    const auto cat3 = ui->lineEditCategory3->text();
+    const auto cat4 = ui->lineEditCategory4->text();
+    wsClient->sendSetUserCategories(cat1, cat2, cat3, cat4);
     ui->pushButtonSaveCategories->hide();
+    m_pCredModel->updateCategories(cat1, cat2, cat3, cat4);
+    ui->credDisplayCategoryInput->setItemText(1, cat1);
+    ui->credDisplayCategoryInput->setItemText(2, cat2);
+    ui->credDisplayCategoryInput->setItemText(3, cat3);
+    ui->credDisplayCategoryInput->setItemText(4, cat4);
     m_isSetCategoryClean = true;
 }
 

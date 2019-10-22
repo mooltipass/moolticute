@@ -24,6 +24,7 @@
 #include "MPDeviceBleImpl.h"
 #include "BleCommon.h"
 #include "MPSettingsBLE.h"
+#include "MPNodeBLE.h"
 #include "AppDaemon.h"
 
 MPDevice::MPDevice(QObject *parent):
@@ -688,9 +689,39 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     jobs->append(cpzJob);
 
     /* Get favorites */
-    if (!isBLE()) //TODO: favourite is not implemented yet for BLE
+    if (isBLE())
     {
-        for (uint i = 0; i<MOOLTIPASS_FAV_MAX; i++)
+        jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITES,
+                                  [this, jobs, cbProgress](const QByteArray &data, bool &)
+                    {
+                        if (pMesProt->getMessageSize(data) == 1)
+                        {
+                            /* Received one byte as answer: command fail */
+                            jobs->setCurrentJobError("Mooltipass refused to send us favorites");
+                            qCritical() << "Get favorite: couldn't get answer";
+                            return false;
+                        }
+#ifdef DEV_DEBUG
+                        qDebug() << "Received favorites: " << data.toHex();
+#endif
+                        /* Append favorite to list */
+                        favoritesAddrs = bleImpl->getFavorites(data);
+                        favoritesAddrsClone = favoritesAddrs;
+
+                        progressCurrent++;
+                        QVariantMap cbData = {
+                            {"total", 1},
+                            {"current", 1},
+                            {"msg", "Favorite are loaded"}
+                        };
+                        cbProgress(cbData);
+                        return true;
+                    })
+        );
+    }
+    else
+    {
+        for (uint i = 0; i < pMesProt->getMaxFavorite(); ++i)
         {
             jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE,
                                           QByteArray(1, static_cast<quint8>(i)),
@@ -738,6 +769,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }));
         }
     }
+
 
     if (getCreds)
     {
@@ -3249,8 +3281,16 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             {
                 qDebug() << "Generating favorite" << i << "update packet";
                 diagSavePacketsGenerated = true;
-                QByteArray updateFavPacket = QByteArray();
-                updateFavPacket.append(i);
+                QByteArray updateFavPacket;
+                if (isBLE())
+                {
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i/MAX_BLE_CAT_NUM));
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i%MAX_BLE_CAT_NUM));
+                }
+                else
+                {
+                    updateFavPacket.append(i);
+                }
                 updateFavPacket.append(favoritesAddrs[i]);
                 jobs->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, updateFavPacket, pMesProt->getDefaultFuncDone()));
             }
@@ -6365,7 +6405,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         QJsonObject qjobject = creds[i].toObject();
 
         /* Check format */
-        if (qjobject.size() != 6)
+        if (qjobject.size() != pMesProt->getCredentialPackageSize())
         {
             qCritical() << "Unknown JSON return format:" << qjobject;
             cb(false, "Wrong JSON formated credential list");
@@ -6381,6 +6421,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             QString password = qjobject["password"].toString();
             QString description = qjobject["description"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
+            int category = 0;
+            if (isBLE())
+            {
+                category = qjobject["category"].toInt();
+            }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
 
@@ -6433,6 +6478,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 newNodePt->setNotDeletedTagged();
                 newNodePt->setLogin(login);
                 newNodePt->setDescription(description);
+                if (isBLE())
+                {
+                    bleImpl->setNodeCategory(newNodePt, category);
+                }
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
 
@@ -6474,6 +6523,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 nodePtr->setLogin(login);
                 nodePtr->setDescription(description);
                 nodePtr->setFavoriteProperty(favorite);
+                if (isBLE())
+                {
+                    bleImpl->setNodeCategory(nodePtr, category);
+                }
                 addChildToDB(parentPtr, nodePtr);
 
                 /* Check for changed password */
@@ -6510,6 +6563,16 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     qDebug() << "Detected description change";
                     nodePtr->setDescription(description);
                     packet_send_needed = true;
+                }
+
+                if (isBLE())
+                {
+                    auto* nodeBle = dynamic_cast<MPNodeBLE*>(nodePtr);
+                    if (category != nodeBle->getCategory())
+                    {
+                        nodeBle->setCategory(category);
+                        packet_send_needed = true;
+                    }
                 }
 
                 /* Check for changed login */

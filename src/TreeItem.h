@@ -27,6 +27,8 @@ public:
     void setAccessedDate(const QDate &dDate);
     const QString &description() const;
     void setDescription(const QString &sDescription);
+    int category() const;
+    void setCategory(int iCategory);
     TreeItem *child(int iIndex);
     const QVector<TreeItem *> &childs() const;
     int childCount() const;
@@ -53,6 +55,7 @@ protected:
     QDate m_dUpdatedDate;
     QDate m_dAccessedDate;
     QString m_sDescription;
+    int m_iCategory;
 };
 
 #endif // TREEITEM_H

@@ -91,6 +91,14 @@ QHash<Common::MPStatus, QString> Common::MPStatusString = {
     { Common::UnkownSmartcad, "UnkownSmartcad" }
 };
 
+QMap<int, QString> Common::BLE_CATEGORY_COLOR = {
+    {0, "black"},
+    {1, "red"},
+    {2, "blue"},
+    {3, "green"},
+    {4, "orange"}
+};
+
 Common::MPStatus Common::statusFromString(const QString &st)
 {
     for (auto it = MPStatusString.begin();it != MPStatusString.end();it++)

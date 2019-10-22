@@ -184,6 +184,9 @@ public:
 
     virtual int getParentNodeSize() const = 0;
     virtual int getChildNodeSize() const = 0;
+    virtual uint getMaxFavorite() const = 0;
+
+    virtual int getCredentialPackageSize() const = 0;
 
 
     QMap<quint16,quint16> m_commandMapping;

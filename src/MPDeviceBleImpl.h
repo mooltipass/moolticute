@@ -85,6 +85,9 @@ public:
     QJsonObject getUserCategories() const { return m_categories; };
     void updateUserCategories(const QJsonObject &categories);
     bool isUserCategoriesChanged(const QJsonObject &categories) const;
+    void setNodeCategory(MPNode* node, int category);
+
+    QList<QByteArray> getFavorites(const QByteArray& data);
 
 signals:
     void userSettingsChanged(QJsonObject settings);
@@ -119,6 +122,8 @@ private:
     static constexpr int BUNBLE_DATA_ADDRESS_SIZE = 4;
     static constexpr int USER_CATEGORY_COUNT = 4;
     static constexpr int USER_CATEGORY_LENGTH = 66;
+    static constexpr int FAV_DATA_SIZE = 4;
+    static constexpr int FAV_NUMBER = 50;
     const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
 };
 

@@ -1,6 +1,7 @@
 #include "MPDeviceBleImpl.h"
 #include "AsyncJobs.h"
 #include "MessageProtocolBLE.h"
+#include "MPNodeBLE.h"
 #include "AppDaemon.h"
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
@@ -531,6 +532,29 @@ bool MPDeviceBleImpl::isUserCategoriesChanged(const QJsonObject &categories) con
         }
     }
     return false;
+}
+
+void MPDeviceBleImpl::setNodeCategory(MPNode* node, int category)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        qDebug() << "Setting category to: " << category;
+        nodeBle->setCategory(category);
+    }
+}
+
+QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
+{
+    QList<QByteArray> res;
+    int start = 0;
+    int end = FAV_DATA_SIZE;
+    while (res.size() < FAV_NUMBER)
+    {
+        res.append(bleProt->getPayloadBytes(data, start, end));
+        start = end;
+        end += FAV_DATA_SIZE;
+    }
+    return res;
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)

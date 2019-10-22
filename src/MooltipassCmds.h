@@ -108,6 +108,7 @@ public:
             READ_FLASH_NODE     ,
             WRITE_FLASH_NODE    ,
             GET_FAVORITE        ,
+            GET_FAVORITES       ,
             SET_FAVORITE        ,
             GET_STARTING_PARENT ,
             SET_STARTING_PARENT ,

@@ -26,6 +26,7 @@
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
 #include "SettingsGuiHelper.h"
+#include "DeviceDetector.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -332,6 +333,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->cbBluetoothEnabled->setDisabled(true);
     ui->cbCredentialPrompt->setDisabled(true);
 
+    connect(wsClient, &WSClient::advancedMenuChanged,
+            &DeviceDetector::instance(), &DeviceDetector::onAdvancedModeChanged);
     connect(wsClient, &WSClient::updateUserSettingsOnUI,
             [this](const QJsonObject& settings)
             {

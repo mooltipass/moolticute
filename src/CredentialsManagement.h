@@ -79,6 +79,8 @@ private slots:
     void updateFavMenu();
     void credentialDataChanged();
     void checkDeviceType();
+    void updateFavMenuOnDevChanged(Common::MPHwVersion newDev);
+    void updateDeviceType(Common::MPHwVersion newDev);
 
     void on_toolButtonFavFilter_clicked();
 
@@ -95,15 +97,16 @@ private:
     QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
     void setCredentialsClean();
 
-private:
     void disableNonCredentialEditWidgets();
     void enableNonCredentialEditWidgets();
     bool isServiceNameExist(const QString& serviceName) const;
     void setServiceInputAttributes(const QString& tooltipText, Qt::GlobalColor col);
     void clearMMMUi();
+    void updateBleFavs(const QModelIndex &srcIndex);
 
     void changeCurrentFavorite(int iFavorite);
     virtual void changeEvent(QEvent *event);
+    int getCategory(const QModelIndex &srcIndex);
 
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
@@ -123,6 +126,10 @@ private:
     void setFilterCredLayout();
     
     LoginItem * tryGetSelectedLogin();
+
+
+    static constexpr int MINI_FAVORITE_NUM = 14;
+    static constexpr int BLE_FAVORITE_NUM = 50;
 
 signals:
     void wantEnterMemMode();

@@ -41,6 +41,8 @@
 #define MP_NODE_SIZE            132
 #define MP_NODE_DATA_ENC_SIZE   128
 
+#define MAX_BLE_CAT_NUM 10
+
 #define MOOLTIPASS_BLOCK_SIZE   32
 #define MOOLTIPASS_DESC_SIZE    23 //max size allowed for description
 
@@ -119,6 +121,12 @@ template<class T>
 T const& qAsConst(T&t){return t;}
 #endif
 
+//Q_DISABLE_COPY_MOVE from Qt 5.15
+#define DISABLE_COPY_MOVE(Class) \
+    Q_DISABLE_COPY(Class) \
+    Class(const Class &&) Q_DECL_EQ_DELETE;\
+    Class &operator=(const Class &&) Q_DECL_EQ_DELETE;
+
 class Common
 {
 public:
@@ -144,6 +152,7 @@ public:
         UnkownSmartcad = 9,
     } MPStatus;
     static QHash<MPStatus, QString> MPStatusUserString, MPStatusString;
+    static QMap<int, QString> BLE_CATEGORY_COLOR;
 
     static Common::MPStatus statusFromString(const QString &st);
 
@@ -277,6 +286,10 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                                 "padding-left: 4px;"\
                                 "border: 1px solid #FcFcFc;"\
                             "}"
+
+#define CSS_CREDVIEW_SELECTION "QTreeView::item:selected {" \
+                                    "background-color: rgba( 128, 128, 128, 100);" \
+                               "}"
 
 enum class CloseBehavior
 {
