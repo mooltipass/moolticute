@@ -75,8 +75,16 @@ private:
     virtual void platformWrite(const QByteArray &data);
 
     QPointer<QLocalSocket> socket;
-    char packet[560];
-    int packetFill = 0;
+    
+    // incoming messages
+    char incomingPacket[560];
+    int incomingPacketFill = 0;
+
+    // outgoing messages
+    bool expectFlipBit = false;
+    char outgoingPacket[560];
+    int outgoingPacketFill = 0;
+    unsigned char expectedByte1 = 0;
 };
 
 #endif // MPDEVICE_LOCALSOCKET_H

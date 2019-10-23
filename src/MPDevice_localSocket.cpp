@@ -92,7 +92,7 @@ void MPDevice_localSocket::readData()
         return;
 
     for(;;) {
-        int bytesRead = socket->read(packet, sizeof(packet) - packetFill);
+        int bytesRead = socket->read(incomingPacket, sizeof(incomingPacket) - incomingPacketFill);
         
         if(bytesRead < 0)
             return; // socket closed?
@@ -100,29 +100,102 @@ void MPDevice_localSocket::readData()
         if(bytesRead == 0)
             break;
 
-        packetFill += bytesRead;
-        if(packetFill == sizeof(packet)) {
-            if(packet[0] == 0 && packet[1] == 0) { // USB data packet
-                unsigned int payload_length = ((uint8_t)packet[2])|(((uint8_t)packet[3])<<8);
-                if(payload_length <= 552)
-                    emit platformDataRead(QByteArray(packet+4, payload_length));
+        incomingPacketFill += bytesRead;
+        if(incomingPacketFill == sizeof(incomingPacket)) {
+            if(incomingPacket[0] == 0 && incomingPacket[1] == 0) { // USB data packet
+                unsigned int payload_length = ((uint8_t)incomingPacket[2])|(((uint8_t)incomingPacket[3])<<8);
+                if(payload_length <= 552) {
+                    // not so quick. Now we need to split the data into hid packets
+                    qDebug() << "Receive data" << QByteArray(incomingPacket+4, payload_length).toHex();
+//                    emit platformDataRead(QByteArray(incomingPacket+4, payload_length));
+
+                    int n_hid_packets = (payload_length+61) / 62;
+
+                    for(int p=0;p < n_hid_packets;p++) {
+                        unsigned char hidPacket[64];
+                        int bytesRemain = payload_length - p * 62;
+                        if(bytesRemain > 62)
+                            bytesRemain = 62;
+
+                        hidPacket[0] = bytesRemain;
+                        hidPacket[1] = (p<<4) | (n_hid_packets-1);
+                        memcpy(hidPacket+2, incomingPacket + 4 + p * 62, bytesRemain);
+
+                        QByteArray ba((const char*)hidPacket, bytesRemain+2);
+                        qDebug() << "HID" << ba.toHex();
+                        emit platformDataRead(ba);
+                    }
+                }
             }
 
-            packetFill = 0;
+            incomingPacketFill = 0;
         }
     }
 }
 
 void MPDevice_localSocket::platformWrite(const QByteArray &ba)
 {
+    // we need to emulate bits of the aux mcu here
+    // this means reassembling the small hid packets into larger messages
     if(socket) {
-        Q_ASSERT(ba.length() <= 552);
-        unsigned char outgoingPacket[560];
-        memset(outgoingPacket, 0, sizeof(outgoingPacket));
-        outgoingPacket[2] = ba.length() & 0xff;
-        outgoingPacket[3] = (ba.length() >> 8) & 0xff;
-        memcpy(outgoingPacket+4, ba.constData(), ba.length());
-        socket->write((const char*)outgoingPacket, sizeof(outgoingPacket));
+        if(ba.length() < 2) {
+            qDebug() << "virtual HID packet too short";
+            return;
+        }
+
+        uint8_t byte0 = ba[0], byte1 = ba[1];
+
+        if(byte0 == 0xff && byte1 == 0xff) {
+            expectFlipBit = false;
+            outgoingPacketFill = 0;
+
+        } else {
+            if(((byte0 >> 7) & 1) == expectFlipBit) {
+                // new message
+                outgoingPacketFill = 0;
+                expectFlipBit = !expectFlipBit;
+
+            } else if(outgoingPacketFill == 0) {
+                qWarning() << "virtual HID invalid flip bit";
+                return;
+
+            } else if(expectedByte1 != byte1) {
+                qWarning() << "virtual HID byte1 sequence incorrect";
+                outgoingPacketFill = 0;
+                return;
+            }
+
+            if((byte0 & 63)+2 != ba.length() || (byte0 & 63) + outgoingPacketFill > 552) {
+                qWarning() << "virtual HID packet payload length incorrect";
+                outgoingPacketFill = 0;
+
+            } else {
+                if(outgoingPacketFill == 0) {
+                    memset(outgoingPacket, 0, sizeof(outgoingPacket));
+                    outgoingPacketFill = 4;
+                }
+
+                memcpy(outgoingPacket + outgoingPacketFill, ba.constData() + 2, ba.length()-2);
+                outgoingPacketFill += ba.length()-2;
+                if(((byte1 & 0xf0) >> 4) == (byte1 & 0x0f)) {
+                    // final packet, send !
+                    outgoingPacket[2] = (outgoingPacketFill-4) & 0xff;
+                    outgoingPacket[3] = ((outgoingPacketFill-4) >> 8) & 0xff;
+
+                    socket->write((const char*)outgoingPacket, sizeof(outgoingPacket));
+                    
+                    qDebug() << "Reassembled message" << QByteArray(outgoingPacket, outgoingPacketFill).toHex();
+
+                    outgoingPacketFill = 0;
+                    
+                    if(byte0 & 0x40) {
+                        // simulate device ack
+                        emit platformDataRead(ba);
+                    }
+                }
+                expectedByte1 += 0x10;
+            }
+        }
     }
 }
 
