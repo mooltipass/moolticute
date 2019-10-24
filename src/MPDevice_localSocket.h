@@ -77,14 +77,8 @@ private:
     QPointer<QLocalSocket> socket;
     
     // incoming messages
-    char incomingPacket[560];
+    uint8_t incomingPacket[64];
     int incomingPacketFill = 0;
-
-    // outgoing messages
-    bool expectFlipBit = false;
-    char outgoingPacket[560];
-    int outgoingPacketFill = 0;
-    unsigned char expectedByte1 = 0;
 };
 
 #endif // MPDEVICE_LOCALSOCKET_H
