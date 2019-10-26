@@ -49,7 +49,8 @@ MPDevice::MPDevice(QObject *parent):
 
             if (isBLE())
             {
-                bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
+                if(pMesProt->getMessageSize(data) >= 4) // these settings are sent only when user is logged in
+                    bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
             }
 
             /* Trigger on status change */
