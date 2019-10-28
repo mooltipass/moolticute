@@ -259,8 +259,19 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
                                                     &required_size,
                                                     nullptr);
 
+        if (0 == required_size)
+        {
+            qCritical() << "Invalid DeviceInterfaceDetailData buffer size";
+            continue;
+        }
+
         //alloc data
         dev_detail_data = (SP_DEVICE_INTERFACE_DETAIL_DATA_A*) malloc(required_size);
+        if (!dev_detail_data)
+        {
+            qCritical() << "Allocating SP_DEVICE_INTERFACE_DETAIL_DATA_A data failed.";
+            break;
+        }
         dev_detail_data->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA_A);
 
         //Get device info now
