@@ -21,5 +21,12 @@ void SettingsGuiBLE::updateParam(MPParams::Param param, int val)
 
 void SettingsGuiBLE::updateUI()
 {
+    ui->groupBox_keyboard->hide();
+    ui->groupBox_miscellaneous->hide();
     ui->groupBox_BLESettings->show();
+
+    ui->settings_inactivity_lock->hide();
+    ui->checkBoxScreensaver->hide();
+    ui->hashDisplayFeatureCheckBox->hide();
+    ui->settings_advanced_lockunlock->hide();
 }

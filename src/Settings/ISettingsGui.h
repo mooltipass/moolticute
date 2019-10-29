@@ -11,7 +11,7 @@ class ISettingsGui
 {
 public:
     ISettingsGui(MainWindow* mw): m_mw{mw}{}
-    virtual ~ISettingsGui(){};
+    virtual ~ISettingsGui(){}
     virtual void updateUI() = 0;
 
 protected:

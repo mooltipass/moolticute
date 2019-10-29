@@ -520,7 +520,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              <number>150</number>
             </property>
             <item>
-             <widget class="QGroupBox" name="groupBox">
+             <widget class="QGroupBox" name="groupBox_keyboard">
               <property name="title">
                <string>Keyboard Output</string>
               </property>
@@ -901,7 +901,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_3">
+             <widget class="QGroupBox" name="groupBox_miscellaneous">
               <property name="title">
                <string>Miscellaneous</string>
               </property>
@@ -1262,8 +1262,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </spacer>
             </item>
            </layout>
-           <zorder>groupBox_3</zorder>
-           <zorder>groupBox</zorder>
+           <zorder>groupBox_miscellaneous</zorder>
+           <zorder>groupBox_keyboard</zorder>
            <zorder>groupBox_2</zorder>
            <zorder>advancedSettingsGB</zorder>
            <zorder>groupBox_UserSettings</zorder>
