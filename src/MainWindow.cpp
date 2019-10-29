@@ -536,10 +536,11 @@ void MainWindow::updatePage()
     ui->label_exportDBHelp->setVisible(!isCardUnknown);
     ui->label_MooltiAppHelp->setVisible(!isCardUnknown);
 
-    ui->label_27->setVisible(!isCardUnknown);
-    ui->label_29->setVisible(!isCardUnknown);
-    ui->pushButtonIntegrity->setVisible(!isCardUnknown);
-    ui->label_integrityCheckHelp->setVisible(!isCardUnknown);
+    const bool integrityVisible = !isCardUnknown&& !wsClient->isMPBLE();
+    ui->label_integrityCheck->setVisible(integrityVisible);
+    ui->label_integrityCheckDesc->setVisible(integrityVisible);
+    ui->pushButtonIntegrity->setVisible(integrityVisible);
+    ui->label_integrityCheckHelp->setVisible(integrityVisible);
 
     ui->groupBox_ResetCard->setVisible(isCardUnknown);
 
@@ -1592,10 +1593,12 @@ void MainWindow::onDeviceConnected()
     {
         wsClient->sendUserSettingsRequest();
         ui->groupBox_UserSettings->show();
+        ui->pushButtonFiles->hide();
     }
     else
     {
         ui->groupBox_UserSettings->hide();
+        ui->pushButtonFiles->show();
     }
 }
 
