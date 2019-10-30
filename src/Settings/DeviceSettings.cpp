@@ -112,21 +112,7 @@ void DeviceSettings::updateParam(MPParams::Param param, bool en)
 void DeviceSettings::fillParameterMapping()
 {
     m_paramMap = {
-        {MPParams::KEYBOARD_LAYOUT_PARAM, "keyboard_layout"},
-        {MPParams::LOCK_TIMEOUT_ENABLE_PARAM, "lock_timeout_enabled"},
-        {MPParams::LOCK_TIMEOUT_PARAM, "lock_timeout"},
-        {MPParams::SCREENSAVER_PARAM, "screensaver"},
-        {MPParams::USER_REQ_CANCEL_PARAM, "user_request_cancel"},
         {MPParams::USER_INTER_TIMEOUT_PARAM, "user_interaction_timeout"},
-        {MPParams::FLASH_SCREEN_PARAM, "flash_screen"},
-        {MPParams::OFFLINE_MODE_PARAM, "offline_mode"},
-        {MPParams::TUTORIAL_BOOL_PARAM, "tutorial_enabled"},
-        {MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM, "key_after_login_enabled"},
-        {MPParams::KEY_AFTER_LOGIN_SEND_PARAM, "key_after_login"},
-        {MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM, "key_after_pass_enabled"},
-        {MPParams::KEY_AFTER_PASS_SEND_PARAM, "key_after_pass"},
-        {MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, "delay_after_key_enabled"},
-        {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, "delay_after_key"},
         {MPParams::RANDOM_INIT_PIN_PARAM, "random_starting_pin"}
     };
 }

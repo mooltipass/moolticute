@@ -21,5 +21,12 @@ void SettingsGuiMini::updateParam(MPParams::Param param, int val)
 
 void SettingsGuiMini::updateUI()
 {
+    ui->groupBox_keyboard->show();
+    ui->groupBox_miscellaneous->show();
     ui->groupBox_BLESettings->hide();
+
+    ui->settings_inactivity_lock->show();
+    ui->checkBoxScreensaver->show();
+    ui->hashDisplayFeatureCheckBox->show();
+    ui->settings_advanced_lockunlock->show();
 }
