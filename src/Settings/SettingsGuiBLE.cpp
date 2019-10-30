@@ -24,6 +24,7 @@ void SettingsGuiBLE::updateUI()
     ui->groupBox_keyboard->hide();
     ui->groupBox_miscellaneous->hide();
     ui->groupBox_BLESettings->show();
+    ui->checkBoxBLEReserved->hide();
 
     ui->settings_inactivity_lock->hide();
     ui->checkBoxScreensaver->hide();
