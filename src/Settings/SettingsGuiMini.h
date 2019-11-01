@@ -16,6 +16,11 @@ public:
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
     void updateUI() override;
+
+
+    static const int TAB_INDEX = 43;
+    static const int ENTER_INDEX = 40;
+    static const int SPACE_INDEX = 44;
 };
 
 #endif // SETTINGSGUIMINI_H

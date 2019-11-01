@@ -18,11 +18,8 @@ class DeviceSettingsMini : public DeviceSettings
     QT_SETTINGS_PROPERTY(bool, tutorial_enabled, false, MPParams::TUTORIAL_BOOL_PARAM)
 
     QT_SETTINGS_PROPERTY(bool, key_after_login_enabled, false, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM)
-    QT_SETTINGS_PROPERTY(int, key_after_login, 0, MPParams::KEY_AFTER_LOGIN_SEND_PARAM)
     QT_SETTINGS_PROPERTY(bool, key_after_pass_enabled, false, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM)
-    QT_SETTINGS_PROPERTY(int, key_after_pass, 0, MPParams::KEY_AFTER_PASS_SEND_PARAM)
     QT_SETTINGS_PROPERTY(bool, delay_after_key_enabled, false, MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM)
-    QT_SETTINGS_PROPERTY(int, delay_after_key, 0, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM)
 
     //MP Mini only
     QT_SETTINGS_PROPERTY(int, screen_brightness, 0, MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM) //51-20%, 89-35%, 128-50%, 166-65%, 204-80%, 255-100%

@@ -36,11 +36,8 @@ void DeviceSettingsMini::fillParameterMapping()
     m_paramMap.insert(MPParams::OFFLINE_MODE_PARAM, "offline_mode");
     m_paramMap.insert(MPParams::TUTORIAL_BOOL_PARAM, "tutorial_enabled");
     m_paramMap.insert(MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM, "key_after_login_enabled");
-    m_paramMap.insert(MPParams::KEY_AFTER_LOGIN_SEND_PARAM, "key_after_login");
     m_paramMap.insert(MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM, "key_after_pass_enabled");
-    m_paramMap.insert(MPParams::KEY_AFTER_PASS_SEND_PARAM, "key_after_pass");
     m_paramMap.insert(MPParams::DELAY_AFTER_KEY_ENTRY_BOOL_PARAM, "delay_after_key_enabled");
-    m_paramMap.insert(MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, "delay_after_key");
     m_paramMap.insert(MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM, "screen_brightness");
     m_paramMap.insert(MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM, "knock_enabled");
     m_paramMap.insert(MPParams::MINI_KNOCK_THRES_PARAM, "knock_sensitivity");

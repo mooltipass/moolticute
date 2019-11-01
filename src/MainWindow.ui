@@ -597,6 +597,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QCheckBox" name="checkBoxSlowHost">
                     <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_keyPressDelay">
+                    <property name="text">
                      <string>For slow computers: wait</string>
                     </property>
                    </widget>
@@ -661,6 +668,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QCheckBox" name="checkBoxSendAfterLogin">
                     <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_sendLoginChar">
+                    <property name="text">
                      <string>Send</string>
                     </property>
                    </widget>
@@ -718,6 +732,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   </property>
                   <item>
                    <widget class="QCheckBox" name="checkBoxSendAfterPassword">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_sendPwdChar">
                     <property name="text">
                      <string>Send</string>
                     </property>

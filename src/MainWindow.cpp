@@ -254,12 +254,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxKnock->addItem(tr("Low"), 1);
     ui->comboBoxKnock->addItem(tr("Medium"), 2);
     ui->comboBoxKnock->addItem(tr("High"), 3);
-    ui->comboBoxLoginOutput->addItem(tr("Tab"), 43);
-    ui->comboBoxLoginOutput->addItem(tr("Enter"), 40);
-    ui->comboBoxLoginOutput->addItem(tr("Space"), 44);
-    ui->comboBoxPasswordOutput->addItem(tr("Tab"), 43);
-    ui->comboBoxPasswordOutput->addItem(tr("Enter"), 40);
-    ui->comboBoxPasswordOutput->addItem(tr("Space"), 44);
 
     // Close behavior
 #ifdef Q_OS_MAC

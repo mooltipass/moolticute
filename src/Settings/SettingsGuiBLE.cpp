@@ -21,10 +21,28 @@ void SettingsGuiBLE::updateParam(MPParams::Param param, int val)
 
 void SettingsGuiBLE::updateUI()
 {
-    ui->groupBox_keyboard->hide();
+    // Keyboard groupbox
+    ui->comboBoxLoginOutput->clear();
+    ui->comboBoxLoginOutput->addItem(tr("None"), NONE_INDEX);
+    ui->comboBoxLoginOutput->addItem(tr("Tab"), TAB_INDEX);
+    ui->comboBoxLoginOutput->addItem(tr("Enter"), ENTER_INDEX);
+    ui->comboBoxLoginOutput->addItem(tr("Space"), SPACE_INDEX);
+    ui->comboBoxPasswordOutput->clear();
+    ui->comboBoxPasswordOutput->addItem(tr("None"), NONE_INDEX);
+    ui->comboBoxPasswordOutput->addItem(tr("Tab"), TAB_INDEX);
+    ui->comboBoxPasswordOutput->addItem(tr("Enter"), ENTER_INDEX);
+    ui->comboBoxPasswordOutput->addItem(tr("Space"), SPACE_INDEX);
+    ui->checkBoxSlowHost->hide();
+    ui->checkBoxSendAfterLogin->hide();
+    ui->checkBoxSendAfterPassword->hide();
+    ui->settings_keyboard_layout->hide();
+
+    // Miscellaneous groupbox
     ui->groupBox_miscellaneous->hide();
+
     ui->groupBox_BLESettings->show();
 
+    // Inactivity groupbox
     ui->settings_inactivity_lock->hide();
     ui->checkBoxScreensaver->hide();
     ui->hashDisplayFeatureCheckBox->hide();

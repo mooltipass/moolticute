@@ -21,10 +21,26 @@ void SettingsGuiMini::updateParam(MPParams::Param param, int val)
 
 void SettingsGuiMini::updateUI()
 {
-    ui->groupBox_keyboard->show();
+    // Keyboard groupbox
+    ui->comboBoxLoginOutput->clear();
+    ui->comboBoxLoginOutput->addItem(tr("Tab"), TAB_INDEX);
+    ui->comboBoxLoginOutput->addItem(tr("Enter"), ENTER_INDEX);
+    ui->comboBoxLoginOutput->addItem(tr("Space"), SPACE_INDEX);
+    ui->comboBoxPasswordOutput->clear();
+    ui->comboBoxPasswordOutput->addItem(tr("Tab"), TAB_INDEX);
+    ui->comboBoxPasswordOutput->addItem(tr("Enter"), ENTER_INDEX);
+    ui->comboBoxPasswordOutput->addItem(tr("Space"), SPACE_INDEX);
+    ui->checkBoxSlowHost->show();
+    ui->checkBoxSendAfterLogin->show();
+    ui->checkBoxSendAfterPassword->show();
+    ui->settings_keyboard_layout->show();
+
+    // Miscellaneous groupbox
     ui->groupBox_miscellaneous->show();
+
     ui->groupBox_BLESettings->hide();
 
+    // Inactivity groupbox
     ui->settings_inactivity_lock->show();
     ui->checkBoxScreensaver->show();
     ui->hashDisplayFeatureCheckBox->show();

@@ -112,6 +112,9 @@ void DeviceSettings::updateParam(MPParams::Param param, bool en)
 void DeviceSettings::fillParameterMapping()
 {
     m_paramMap = {
+        {MPParams::KEY_AFTER_LOGIN_SEND_PARAM, "key_after_login"},
+        {MPParams::KEY_AFTER_PASS_SEND_PARAM, "key_after_pass"},
+        {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, "delay_after_key"},
         {MPParams::USER_INTER_TIMEOUT_PARAM, "user_interaction_timeout"},
         {MPParams::RANDOM_INIT_PIN_PARAM, "random_starting_pin"}
     };
