@@ -25,7 +25,6 @@ void MPSettingsBLE::loadParameters()
                     {
                         m_lastDeviceSettings = pMesProt->getFullPayload(data);
                         qDebug() << "Full device settings payload: " << m_lastDeviceSettings.toHex();
-                        qWarning() << "Load Parameters processing haven't been implemented for BLE yet.";
                         set_reserved_ble(m_lastDeviceSettings.at(DeviceSettingsBLE::RESERVED_BYTE) != 0);
                         set_user_interaction_timeout(m_lastDeviceSettings.at(DeviceSettingsBLE::USER_INTERACTION_TIMEOUT_BYTE));
                         set_random_starting_pin(m_lastDeviceSettings.at(DeviceSettingsBLE::RANDOM_PIN_BYTE) != 0);
@@ -33,6 +32,22 @@ void MPSettingsBLE::loadParameters()
                         set_key_after_login(m_lastDeviceSettings.at(DeviceSettingsBLE::DEFAULT_CHAR_AFTER_LOGIN));
                         set_key_after_pass(m_lastDeviceSettings.at(DeviceSettingsBLE::DEFAULT_CHAR_AFTER_PASS));
                         set_delay_after_key(m_lastDeviceSettings.at(DeviceSettingsBLE::DELAY_BETWEEN_KEY_PRESS));
+                        return true;
+                    }
+    ));
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::GET_USER_LANG,
+                   [this] (const QByteArray &data, bool &)
+                    {
+                        qCritical() << "User language: " << pMesProt->getFullPayload(data).toHex();
+                        return true;
+                    }
+    ));
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::GET_DEVICE_LANG,
+                   [this] (const QByteArray &data, bool &)
+                    {
+                        qCritical() << "Device language: " << pMesProt->getFullPayload(data).toHex();
                         return true;
                     }
     ));
