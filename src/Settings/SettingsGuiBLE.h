@@ -18,7 +18,7 @@ public:
 
     static const int NONE_INDEX = 0;
     static const int TAB_INDEX = 9;
-    static const int ENTER_INDEX = 13;
+    static const int ENTER_INDEX = 10;
     static const int SPACE_INDEX = 32;
 };
 
