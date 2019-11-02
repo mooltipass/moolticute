@@ -51,6 +51,52 @@ void MPSettingsBLE::loadParameters()
                         return true;
                     }
     ));
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::GET_LANG_NUM,
+                   [this, jobs] (const QByteArray &data, bool &)
+                    {
+                        const auto payload = pMesProt->getFullPayload(data);
+                        const int langNum = pMesProt->toIntFromLittleEndian(payload[0], payload[1]);
+                        qCritical() << "Language number: " << langNum;
+                        for (int i = 0; i < langNum; ++i)
+                        {
+                            jobs->append(new MPCommandJob(mpDevice,
+                                           MPCmd::GET_LANG_DESC,
+                                           QByteArray(1, static_cast<char>(i)),
+                                           [this, i] (const QByteArray &data, bool &)
+                                            {
+                                                qCritical() << i << " lang desc: " << pMesProt->toQString(pMesProt->getFullPayload(data));
+                                                return true;
+                                            }
+                            ));
+                        }
+                        return true;
+                    }
+    ));
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::GET_KEYB_LAYOUT_NUM,
+                   [this, jobs] (const QByteArray &data, bool &)
+                    {
+                        const auto payload = pMesProt->getFullPayload(data);
+                        const auto layoutNum = pMesProt->toIntFromLittleEndian(payload[0], payload[1]);
+                        qCritical() << "Keyboard layout number: " << layoutNum;
+                        for (int i = 0; i < layoutNum; ++i)
+                        {
+                            jobs->append(new MPCommandJob(mpDevice,
+                                           MPCmd::GET_LAYOUT_DESC,
+                                           QByteArray(1, static_cast<char>(i)),
+                                           [this, i] (const QByteArray &data, bool &)
+                                            {
+                                                qCritical() << i << " layout desc: " << pMesProt->toQString(pMesProt->getFullPayload(data));
+                                                return true;
+                                            }
+                            ));
+                        }
+                        return true;
+                    }
+    ));
+
+
     mpDevice->enqueueAndRunJob(jobs);
     return;
 }
