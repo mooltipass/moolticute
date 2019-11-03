@@ -154,6 +154,7 @@ void MPDevice::sendInitMessages()
                 writeCancelRequest();
             }
             bleImpl->getPlatInfo();
+            bleImpl->readLanguages();
         }
 
         exitMemMgmtMode(false);

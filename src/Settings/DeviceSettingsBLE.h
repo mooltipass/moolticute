@@ -8,6 +8,8 @@ class DeviceSettingsBLE : public DeviceSettings
     Q_OBJECT
 
     //MP BLE only
+    QT_SETTINGS_PROPERTY(int, device_language, 0, MPParams::DEVICE_LANGUAGE)
+    QT_SETTINGS_PROPERTY(int, user_language, 0, MPParams::USER_LANGUAGE)
     QT_SETTINGS_PROPERTY(bool, reserved_ble, false, MPParams::RESERVED_BLE)
     QT_SETTINGS_PROPERTY(bool, prompt_animation, false, MPParams::PROMPT_ANIMATION_PARAM)
 

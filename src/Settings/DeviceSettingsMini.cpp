@@ -27,7 +27,6 @@ void DeviceSettingsMini::checkTimeoutBoundaries(int &val)
 
 void DeviceSettingsMini::fillParameterMapping()
 {
-    m_paramMap.insert(MPParams::KEYBOARD_LAYOUT_PARAM, "keyboard_layout");
     m_paramMap.insert(MPParams::LOCK_TIMEOUT_ENABLE_PARAM, "lock_timeout_enabled");
     m_paramMap.insert(MPParams::LOCK_TIMEOUT_PARAM, "lock_timeout");
     m_paramMap.insert(MPParams::SCREENSAVER_PARAM, "screensaver");

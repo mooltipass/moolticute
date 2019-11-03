@@ -112,6 +112,7 @@ void DeviceSettings::updateParam(MPParams::Param param, bool en)
 void DeviceSettings::fillParameterMapping()
 {
     m_paramMap = {
+        {MPParams::KEYBOARD_LAYOUT_PARAM, "keyboard_layout"},
         {MPParams::KEY_AFTER_LOGIN_SEND_PARAM, "key_after_login"},
         {MPParams::KEY_AFTER_PASS_SEND_PARAM, "key_after_pass"},
         {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, "delay_after_key"},

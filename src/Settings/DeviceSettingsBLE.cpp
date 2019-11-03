@@ -8,6 +8,8 @@ DeviceSettingsBLE::DeviceSettingsBLE(QObject *parent)
 
 void DeviceSettingsBLE::fillParameterMapping()
 {
+    m_paramMap.insert(MPParams::DEVICE_LANGUAGE, "device_language");
+    m_paramMap.insert(MPParams::USER_LANGUAGE, "user_language");
     m_bleByteMapping[MPParams::RANDOM_INIT_PIN_PARAM] = RANDOM_PIN_BYTE;
     m_bleByteMapping[MPParams::USER_INTER_TIMEOUT_PARAM] = USER_INTERACTION_TIMEOUT_BYTE;
     m_bleByteMapping[MPParams::KEY_AFTER_LOGIN_SEND_PARAM] = DEFAULT_CHAR_AFTER_LOGIN;

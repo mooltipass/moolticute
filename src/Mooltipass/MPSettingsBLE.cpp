@@ -39,7 +39,9 @@ void MPSettingsBLE::loadParameters()
                    MPCmd::GET_USER_LANG,
                    [this] (const QByteArray &data, bool &)
                     {
-                        qCritical() << "User language: " << pMesProt->getFullPayload(data).toHex();
+                        const auto langId = pMesProt->getFirstPayloadByte(data);
+                        qDebug() << "User language: " << langId;
+                        set_user_language(langId);
                         return true;
                     }
     ));
@@ -47,55 +49,23 @@ void MPSettingsBLE::loadParameters()
                    MPCmd::GET_DEVICE_LANG,
                    [this] (const QByteArray &data, bool &)
                     {
-                        qCritical() << "Device language: " << pMesProt->getFullPayload(data).toHex();
+                        const auto langId = pMesProt->getFirstPayloadByte(data);
+                        qDebug() << "Device language: " << langId;
+                        set_device_language(langId);
                         return true;
                     }
     ));
     jobs->append(new MPCommandJob(mpDevice,
-                   MPCmd::GET_LANG_NUM,
-                   [this, jobs] (const QByteArray &data, bool &)
+                   MPCmd::GET_KEYB_LAYOUT_ID,
+                   QByteArray(1, 0x01), // TODO 0 BLE, other USB
+                   [this] (const QByteArray &data, bool &)
                     {
-                        const auto payload = pMesProt->getFullPayload(data);
-                        const int langNum = pMesProt->toIntFromLittleEndian(payload[0], payload[1]);
-                        qCritical() << "Language number: " << langNum;
-                        for (int i = 0; i < langNum; ++i)
-                        {
-                            jobs->append(new MPCommandJob(mpDevice,
-                                           MPCmd::GET_LANG_DESC,
-                                           QByteArray(1, static_cast<char>(i)),
-                                           [this, i] (const QByteArray &data, bool &)
-                                            {
-                                                qCritical() << i << " lang desc: " << pMesProt->toQString(pMesProt->getFullPayload(data));
-                                                return true;
-                                            }
-                            ));
-                        }
+                        const auto layoutId = pMesProt->getFirstPayloadByte(data);
+                        qDebug() << "Keyboard layout: " << layoutId;
+                        set_keyboard_layout(layoutId);
                         return true;
                     }
     ));
-    jobs->append(new MPCommandJob(mpDevice,
-                   MPCmd::GET_KEYB_LAYOUT_NUM,
-                   [this, jobs] (const QByteArray &data, bool &)
-                    {
-                        const auto payload = pMesProt->getFullPayload(data);
-                        const auto layoutNum = pMesProt->toIntFromLittleEndian(payload[0], payload[1]);
-                        qCritical() << "Keyboard layout number: " << layoutNum;
-                        for (int i = 0; i < layoutNum; ++i)
-                        {
-                            jobs->append(new MPCommandJob(mpDevice,
-                                           MPCmd::GET_LAYOUT_DESC,
-                                           QByteArray(1, static_cast<char>(i)),
-                                           [this, i] (const QByteArray &data, bool &)
-                                            {
-                                                qCritical() << i << " layout desc: " << pMesProt->toQString(pMesProt->getFullPayload(data));
-                                                return true;
-                                            }
-                            ));
-                        }
-                        return true;
-                    }
-    ));
-
 
     mpDevice->enqueueAndRunJob(jobs);
     return;

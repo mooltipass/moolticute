@@ -209,7 +209,9 @@ public:
         HASH_DISPLAY_FEATURE_PARAM,
         RANDOM_INIT_PIN_PARAM,
         RESERVED_BLE,
-        PROMPT_ANIMATION_PARAM
+        PROMPT_ANIMATION_PARAM,
+        DEVICE_LANGUAGE,
+        USER_LANGUAGE
     };
     Q_ENUM(Param)
 };
