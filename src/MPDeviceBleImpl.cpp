@@ -612,7 +612,7 @@ void MPDeviceBleImpl::readLanguages()
                                                 const QString layout = bleProt->toQString(bleProt->getFullPayload(data));
                                                 if (AppDaemon::isDebugDev())
                                                 {
-                                                    qCritical() << i << " layout desc: " << layout;
+                                                    qDebug() << i << " layout desc: " << layout;
                                                 }
                                                 m_keyboardLayouts[QString::number(i)] = layout;
                                                 if (i == (layoutNum - 1))

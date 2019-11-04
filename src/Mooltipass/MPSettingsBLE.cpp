@@ -107,6 +107,25 @@ void MPSettingsBLE::setSettings()
                         return true;
                     }
     ));
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::SET_USER_LANG,
+                   QByteArray(1, get_user_language()),
+                   pMesProt->getDefaultFuncDone()
+    ));
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::SET_DEVICE_LANG,
+                   QByteArray(1, get_device_language()),
+                   pMesProt->getDefaultFuncDone()
+    ));
+    QByteArray layoutData;
+    layoutData.append(static_cast<char>(0x01)); // 0 for BLE, other for USB
+    layoutData.append(get_keyboard_layout());
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::SET_KEYB_LAYOUT_ID,
+                   layoutData,
+                   pMesProt->getDefaultFuncDone()
+    ));
+
     mpDevice->enqueueAndRunJob(jobs);
 }
 
