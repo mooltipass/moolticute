@@ -33,7 +33,8 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxSlowHost->show();
     ui->checkBoxSendAfterLogin->show();
     ui->checkBoxSendAfterPassword->show();
-    ui->settings_keyboard_layout->show();
+    ui->settings_user_language->hide();
+    ui->settings_device_language->hide();
 
     // Miscellaneous groupbox
     ui->groupBox_miscellaneous->show();
