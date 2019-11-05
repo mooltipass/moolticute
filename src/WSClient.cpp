@@ -478,6 +478,16 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit updateUserSettingsOnUI(o);
     }
+    else if (rootobj["msg"] == "device_languages")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit updateBLEDeviceLanguage(o);
+    }
+    else if (rootobj["msg"] == "keyboard_layouts")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit updateBLEKeyboardLayout(o);
+    }
 }
 
 bool WSClient::isFwVersion(int version) const

@@ -174,6 +174,8 @@ private:
 
     void displayMCUVersion(bool visible = true);
 
+    void updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items);
+
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
 

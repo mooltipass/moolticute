@@ -342,6 +342,21 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->cbCredentialPrompt->setChecked(settings["storage_prompt"].toBool());
             });
 
+    connect(wsClient, &WSClient::updateBLEDeviceLanguage,
+            [this](const QJsonObject& langs)
+            {
+                updateBLEComboboxItems(ui->comboBoxDeviceLang, langs);
+                updateBLEComboboxItems(ui->comboBoxUserLanguage, langs);
+            }
+    );
+    connect(wsClient, &WSClient::updateBLEKeyboardLayout,
+            [this](const QJsonObject& layouts)
+            {
+                updateBLEComboboxItems(ui->comboBoxLang, layouts);
+            }
+    );
+
+
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
     {
@@ -1370,6 +1385,23 @@ void MainWindow::displayMCUVersion(bool visible)
     ui->labelAboutMainMCU->setVisible(visible);
     ui->labelAboutMainMCUValue->setVisible(visible);
     ui->labelAboutMainMCUValue->setText(wsClient->get_mainMCUVersion());
+}
+
+void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)
+{
+    cb->clear();
+    for (auto it = items.begin(); it != items.end(); ++it)
+    {
+        const auto text = it.value().toString();
+        const auto value = it.key().toInt();
+        qCritical() << text << " -> " << value;
+        cb->addItem(text, value);
+    }
+    QSortFilterProxyModel* proxy = new QSortFilterProxyModel(cb);
+    proxy->setSourceModel( cb->model());
+    cb->model()->setParent(proxy);
+    cb->setModel(proxy);
+    cb->model()->sort(0);
 }
 
 void MainWindow::on_toolButton_clearBackupFilePath_released()

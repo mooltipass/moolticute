@@ -140,6 +140,8 @@ signals:
     void deviceConnacted();
     void deviceDisconnected();
     void deleteDataNodesFinished();
+    void updateBLEDeviceLanguage(const QJsonObject& langs);
+    void updateBLEKeyboardLayout(const QJsonObject& langs);
 
 public slots:
     void sendJsonData(const QJsonObject &data);
