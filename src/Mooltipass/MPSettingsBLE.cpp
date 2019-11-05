@@ -77,6 +77,10 @@ void MPSettingsBLE::updateParam(MPParams::Param param, int val)
     {
         m_lastDeviceSettings[m_bleByteMapping[param]] = static_cast<char>(val);
     }
+    else if (MPParams::KEYBOARD_LAYOUT_PARAM == param)
+    {
+        set_keyboard_layout(val);
+    }
 }
 
 void MPSettingsBLE::connectSendParams(QObject *slotObject)
