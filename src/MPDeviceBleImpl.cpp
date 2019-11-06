@@ -583,7 +583,7 @@ void MPDeviceBleImpl::readLanguages()
                                                 {
                                                     qDebug() << i << " lang desc: " << lang;
                                                 }
-                                                m_deviceLanguages[QString::number(i)] = lang;
+                                                m_deviceLanguages[lang] = i;
                                                 if (i == (langNum - 1))
                                                 {
                                                     emit bleDeviceLanguage(m_deviceLanguages);
@@ -614,7 +614,7 @@ void MPDeviceBleImpl::readLanguages()
                                                 {
                                                     qDebug() << i << " layout desc: " << layout;
                                                 }
-                                                m_keyboardLayouts[QString::number(i)] = layout;
+                                                m_keyboardLayouts[layout] = i;
                                                 if (i == (layoutNum - 1))
                                                 {
                                                     emit bleKeyboardLayout(m_keyboardLayouts);

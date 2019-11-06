@@ -1392,10 +1392,7 @@ void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)
     cb->clear();
     for (auto it = items.begin(); it != items.end(); ++it)
     {
-        const auto text = it.value().toString();
-        const auto value = it.key().toInt();
-        qCritical() << text << " -> " << value;
-        cb->addItem(text, value);
+        cb->addItem(it.key(), it.value().toInt());
     }
     QSortFilterProxyModel* proxy = new QSortFilterProxyModel(cb);
     proxy->setSourceModel( cb->model());
