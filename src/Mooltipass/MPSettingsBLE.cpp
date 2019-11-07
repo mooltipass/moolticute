@@ -81,6 +81,14 @@ void MPSettingsBLE::updateParam(MPParams::Param param, int val)
     {
         set_keyboard_layout(val);
     }
+    else if (MPParams::DEVICE_LANGUAGE == param)
+    {
+        set_device_language(val);
+    }
+    else if (MPParams::USER_LANGUAGE == param)
+    {
+        set_user_language(val);
+    }
 }
 
 void MPSettingsBLE::connectSendParams(QObject *slotObject)

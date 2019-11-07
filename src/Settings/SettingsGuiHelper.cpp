@@ -44,7 +44,9 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::HASH_DISPLAY_FEATURE_PARAM, ui->hashDisplayFeatureCheckBox},
         {MPParams::LOCK_UNLOCK_FEATURE_PARAM, ui->lockUnlockModeComboBox},
         {MPParams::RESERVED_BLE, ui->checkBoxBLEReserved},
-        {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxPromptAnim}
+        {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxPromptAnim},
+        {MPParams::DEVICE_LANGUAGE, ui->comboBoxDeviceLang},
+        {MPParams::USER_LANGUAGE, ui->comboBoxUserLanguage}
     };
     setupKeyboardLayout();
     //When something changed in GUI, show save/reset buttons
