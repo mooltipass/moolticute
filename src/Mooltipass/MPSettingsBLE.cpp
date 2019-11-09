@@ -18,7 +18,6 @@ void MPSettingsBLE::loadParameters()
                           "Loading device parameters",
                           this);
 
-    //TODO: Implement loading correct settings, when implemented on fw side
     jobs->append(new MPCommandJob(mpDevice,
                    MPCmd::GET_DEVICE_SETTINGS,
                    [this] (const QByteArray &data, bool &)
@@ -57,7 +56,7 @@ void MPSettingsBLE::loadParameters()
     ));
     jobs->append(new MPCommandJob(mpDevice,
                    MPCmd::GET_KEYB_LAYOUT_ID,
-                   QByteArray(1, 0x01), // TODO 0 BLE, other USB
+                   QByteArray(1, getLayoutBTByte()),
                    [this] (const QByteArray &data, bool &)
                     {
                         const auto layoutId = pMesProt->getFirstPayloadByte(data);
@@ -97,6 +96,11 @@ void MPSettingsBLE::connectSendParams(QObject *slotObject)
     connect(slotObject, SIGNAL(parameterProcessFinished()), this, SLOT(setSettings()));
 }
 
+char MPSettingsBLE::getLayoutBTByte()
+{
+    return !mpDevice->isBT();
+}
+
 void MPSettingsBLE::setSettings()
 {
     AsyncJobs *jobs = new AsyncJobs(
@@ -130,7 +134,7 @@ void MPSettingsBLE::setSettings()
                    pMesProt->getDefaultFuncDone()
     ));
     QByteArray layoutData;
-    layoutData.append(static_cast<char>(0x01)); // 0 for BLE, other for USB
+    layoutData.append(getLayoutBTByte());
     layoutData.append(get_keyboard_layout());
     jobs->append(new MPCommandJob(mpDevice,
                    MPCmd::SET_KEYB_LAYOUT_ID,
