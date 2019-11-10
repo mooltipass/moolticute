@@ -75,8 +75,7 @@ QJsonObject LoginItem::toJson() const
                        { "password", p },
                        { "description", m_sDescription },
                        { "address", addr },
-                       { "favorite", m_iFavorite },
-                       { "category", m_iCategory }
+                       { "favorite", m_iFavorite }
                };
 
     if (DeviceDetector::instance().isBle())
