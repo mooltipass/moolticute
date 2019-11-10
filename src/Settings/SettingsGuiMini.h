@@ -16,6 +16,7 @@ public:
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
     void updateUI() override;
+    void setupKeyboardLayout() override;
 
 
     static const int TAB_INDEX = 43;

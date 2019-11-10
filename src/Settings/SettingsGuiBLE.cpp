@@ -49,3 +49,8 @@ void SettingsGuiBLE::updateUI()
     ui->hashDisplayFeatureCheckBox->hide();
     ui->settings_advanced_lockunlock->hide();
 }
+
+void SettingsGuiBLE::setupKeyboardLayout()
+{
+    qCritical() << "Setting up keyboard layout";
+}
