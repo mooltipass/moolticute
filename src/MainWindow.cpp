@@ -354,6 +354,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             {
                 updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
                 updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
+                wsClient->settingsHelper()->resetSettings();
             }
     );
 

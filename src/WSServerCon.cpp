@@ -1216,7 +1216,11 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "get_user_settings")
     {
-         bleImpl->sendUserSettings();
+        bleImpl->sendUserSettings();
+    }
+    else if (root["msg"] == "request_keyboard_layout")
+    {
+        bleImpl->readLanguages();
     }
     else
     {

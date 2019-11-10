@@ -55,5 +55,9 @@ void SettingsGuiBLE::updateUI()
 
 void SettingsGuiBLE::setupKeyboardLayout()
 {
-    qCritical() << "Setting up keyboard layout";
+    if (ui->comboBoxUsbLayout->count() > 0)
+    {
+        return;
+    }
+    m_mw->wsClient->requestBleKeyboardLayout();
 }
