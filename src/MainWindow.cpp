@@ -352,7 +352,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::updateBLEKeyboardLayout,
             [this](const QJsonObject& layouts)
             {
-                updateBLEComboboxItems(ui->comboBoxLang, layouts);
+                updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
+                updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
             }
     );
 

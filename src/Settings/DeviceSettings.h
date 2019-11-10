@@ -10,7 +10,6 @@ class DeviceSettings : public QObject
 {
     Q_OBJECT
 
-    QT_SETTINGS_PROPERTY(int, keyboard_layout, 0, MPParams::KEYBOARD_LAYOUT_PARAM)
     QT_SETTINGS_PROPERTY(int, key_after_login, 0, MPParams::KEY_AFTER_LOGIN_SEND_PARAM)
     QT_SETTINGS_PROPERTY(int, key_after_pass, 0, MPParams::KEY_AFTER_PASS_SEND_PARAM)
     QT_SETTINGS_PROPERTY(int, delay_after_key, 0, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM)

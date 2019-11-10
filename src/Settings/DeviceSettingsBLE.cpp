@@ -8,6 +8,8 @@ DeviceSettingsBLE::DeviceSettingsBLE(QObject *parent)
 
 void DeviceSettingsBLE::fillParameterMapping()
 {
+    m_paramMap.insert(MPParams::KEYBOARD_USB_LAYOUT, "keyboard_usb_layout");
+    m_paramMap.insert(MPParams::KEYBOARD_BT_LAYOUT, "keyboard_bt_layout");
     m_paramMap.insert(MPParams::DEVICE_LANGUAGE, "device_language");
     m_paramMap.insert(MPParams::USER_LANGUAGE, "user_language");
     m_bleByteMapping[MPParams::RANDOM_INIT_PIN_PARAM] = RANDOM_PIN_BYTE;

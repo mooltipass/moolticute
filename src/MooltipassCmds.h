@@ -214,7 +214,9 @@ public:
         RESERVED_BLE,
         PROMPT_ANIMATION_PARAM,
         DEVICE_LANGUAGE,
-        USER_LANGUAGE
+        USER_LANGUAGE,
+        KEYBOARD_USB_LAYOUT,
+        KEYBOARD_BT_LAYOUT
     };
     Q_ENUM(Param)
 };

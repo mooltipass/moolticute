@@ -35,6 +35,9 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxSlowHost->hide();
     ui->checkBoxSendAfterLogin->hide();
     ui->checkBoxSendAfterPassword->hide();
+    ui->settings_keyboard_layout->hide();
+    ui->settings_usb_layout->show();
+    ui->settings_bt_layout->show();
     ui->settings_user_language->show();
     ui->settings_device_language->show();
 

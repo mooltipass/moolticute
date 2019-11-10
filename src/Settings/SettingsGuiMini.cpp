@@ -33,6 +33,9 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxSlowHost->show();
     ui->checkBoxSendAfterLogin->show();
     ui->checkBoxSendAfterPassword->show();
+    ui->settings_keyboard_layout->show();
+    ui->settings_usb_layout->hide();
+    ui->settings_bt_layout->hide();
     ui->settings_user_language->hide();
     ui->settings_device_language->hide();
 
@@ -51,7 +54,10 @@ void SettingsGuiMini::updateUI()
 void SettingsGuiMini::setupKeyboardLayout()
 {
     auto* langCb = ui->comboBoxLang;
-    langCb->clear();
+    if (langCb->count() > 0)
+    {
+        return;
+    }
     langCb->addItem("en_US", ID_KEYB_EN_US_LUT);
     langCb->addItem("fr_FR", ID_KEYB_FR_FR_LUT);
     langCb->addItem("es_ES", ID_KEYB_ES_ES_LUT);

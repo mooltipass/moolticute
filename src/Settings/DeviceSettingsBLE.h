@@ -8,6 +8,8 @@ class DeviceSettingsBLE : public DeviceSettings
     Q_OBJECT
 
     //MP BLE only
+    QT_SETTINGS_PROPERTY(int, keyboard_usb_layout, 0, MPParams::KEYBOARD_USB_LAYOUT)
+    QT_SETTINGS_PROPERTY(int, keyboard_bt_layout, 0, MPParams::KEYBOARD_BT_LAYOUT)
     QT_SETTINGS_PROPERTY(int, device_language, 0, MPParams::DEVICE_LANGUAGE)
     QT_SETTINGS_PROPERTY(int, user_language, 0, MPParams::USER_LANGUAGE)
     QT_SETTINGS_PROPERTY(bool, reserved_ble, false, MPParams::RESERVED_BLE)
@@ -28,6 +30,9 @@ public:
         DEFAULT_CHAR_AFTER_PASS = 6,
         DELAY_BETWEEN_KEY_PRESS = 7
     };
+
+    static constexpr char USB_LAYOUT_ID = 0x01;
+    static constexpr char BT_LAYOUT_ID = 0x00;
 
 protected:
     void fillParameterMapping();

@@ -8,6 +8,7 @@ class DeviceSettingsMini : public DeviceSettings
 {
     Q_OBJECT
 
+    QT_SETTINGS_PROPERTY(int, keyboard_layout, 0, MPParams::KEYBOARD_LAYOUT_PARAM)
     QT_SETTINGS_PROPERTY(bool, lock_timeout_enabled, false, MPParams::LOCK_TIMEOUT_ENABLE_PARAM)
     QT_SETTINGS_PROPERTY(int, lock_timeout, 0, MPParams::LOCK_TIMEOUT_PARAM)
     QT_SETTINGS_PROPERTY(bool, screensaver, false, MPParams::SCREENSAVER_PARAM)

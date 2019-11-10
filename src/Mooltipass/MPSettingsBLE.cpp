@@ -56,12 +56,23 @@ void MPSettingsBLE::loadParameters()
     ));
     jobs->append(new MPCommandJob(mpDevice,
                    MPCmd::GET_KEYB_LAYOUT_ID,
-                   QByteArray(1, getLayoutBTByte()),
+                   QByteArray(1, USB_LAYOUT_ID),
                    [this] (const QByteArray &data, bool &)
                     {
                         const auto layoutId = pMesProt->getFirstPayloadByte(data);
-                        qDebug() << "Keyboard layout: " << layoutId;
-                        set_keyboard_layout(layoutId);
+                        qDebug() << "Keyboard USB layout: " << layoutId;
+                        set_keyboard_usb_layout(layoutId);
+                        return true;
+                    }
+    ));
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::GET_KEYB_LAYOUT_ID,
+                   QByteArray(1, BT_LAYOUT_ID),
+                   [this] (const QByteArray &data, bool &)
+                    {
+                        const auto layoutId = pMesProt->getFirstPayloadByte(data);
+                        qDebug() << "Keyboard Bluetooth layout: " << layoutId;
+                        set_keyboard_bt_layout(layoutId);
                         return true;
                     }
     ));
@@ -76,9 +87,13 @@ void MPSettingsBLE::updateParam(MPParams::Param param, int val)
     {
         m_lastDeviceSettings[m_bleByteMapping[param]] = static_cast<char>(val);
     }
-    else if (MPParams::KEYBOARD_LAYOUT_PARAM == param)
+    else if (MPParams::KEYBOARD_USB_LAYOUT == param)
     {
-        set_keyboard_layout(val);
+        set_keyboard_usb_layout(val);
+    }
+    else if (MPParams::KEYBOARD_BT_LAYOUT == param)
+    {
+        set_keyboard_bt_layout(val);
     }
     else if (MPParams::DEVICE_LANGUAGE == param)
     {
@@ -133,12 +148,20 @@ void MPSettingsBLE::setSettings()
                    QByteArray(1, get_device_language()),
                    pMesProt->getDefaultFuncDone()
     ));
-    QByteArray layoutData;
-    layoutData.append(getLayoutBTByte());
-    layoutData.append(get_keyboard_layout());
+    QByteArray layoutUsbData;
+    layoutUsbData.append(USB_LAYOUT_ID);
+    layoutUsbData.append(get_keyboard_usb_layout());
     jobs->append(new MPCommandJob(mpDevice,
                    MPCmd::SET_KEYB_LAYOUT_ID,
-                   layoutData,
+                   layoutUsbData,
+                   pMesProt->getDefaultFuncDone()
+    ));
+    QByteArray layoutBtData;
+    layoutBtData.append(BT_LAYOUT_ID);
+    layoutBtData.append(get_keyboard_bt_layout());
+    jobs->append(new MPCommandJob(mpDevice,
+                   MPCmd::SET_KEYB_LAYOUT_ID,
+                   layoutBtData,
                    pMesProt->getDefaultFuncDone()
     ));
 

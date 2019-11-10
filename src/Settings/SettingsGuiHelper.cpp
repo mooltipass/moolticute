@@ -46,9 +46,10 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::RESERVED_BLE, ui->checkBoxBLEReserved},
         {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxPromptAnim},
         {MPParams::DEVICE_LANGUAGE, ui->comboBoxDeviceLang},
-        {MPParams::USER_LANGUAGE, ui->comboBoxUserLanguage}
+        {MPParams::USER_LANGUAGE, ui->comboBoxUserLanguage},
+        {MPParams::KEYBOARD_USB_LAYOUT, ui->comboBoxUsbLayout},
+        {MPParams::KEYBOARD_BT_LAYOUT, ui->comboBoxBtLayout}
     };
-    setupKeyboardLayout();
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)
     {
@@ -260,10 +261,4 @@ void SettingsGuiHelper::checkKeyboardLayout()
             ui->comboBoxLang->removeItem(ui->comboBoxLang->findText(lang));
         }
     }
-}
-
-void SettingsGuiHelper::setupKeyboardLayout()
-{
-    //Add languages to combobox
-
 }
