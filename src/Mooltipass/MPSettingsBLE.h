@@ -22,11 +22,6 @@ private slots:
 
 private:
     void connectSendParams(QObject* slotObject) override;
-    /**
-     * @brief getLayoutBTByte
-     * @return 0 for BT, 1 for USB
-     */
-    char getLayoutBTByte();
 
     MPDevice* mpDevice = nullptr;
     IMessageProtocol* pMesProt = nullptr;

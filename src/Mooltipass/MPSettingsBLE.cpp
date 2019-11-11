@@ -111,11 +111,6 @@ void MPSettingsBLE::connectSendParams(QObject *slotObject)
     connect(slotObject, SIGNAL(parameterProcessFinished()), this, SLOT(setSettings()));
 }
 
-char MPSettingsBLE::getLayoutBTByte()
-{
-    return !mpDevice->isBT();
-}
-
 void MPSettingsBLE::setSettings()
 {
     AsyncJobs *jobs = new AsyncJobs(
