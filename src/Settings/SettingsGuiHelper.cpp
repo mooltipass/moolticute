@@ -48,7 +48,8 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::DEVICE_LANGUAGE, ui->comboBoxDeviceLang},
         {MPParams::USER_LANGUAGE, ui->comboBoxUserLanguage},
         {MPParams::KEYBOARD_USB_LAYOUT, ui->comboBoxUsbLayout},
-        {MPParams::KEYBOARD_BT_LAYOUT, ui->comboBoxBtLayout}
+        {MPParams::KEYBOARD_BT_LAYOUT, ui->comboBoxBtLayout},
+        {MPParams::BOOT_ANIMATION_PARAM, ui->checkBoxBootAnim}
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)

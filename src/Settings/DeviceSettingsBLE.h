@@ -14,6 +14,7 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(int, user_language, 0, MPParams::USER_LANGUAGE)
     QT_SETTINGS_PROPERTY(bool, reserved_ble, false, MPParams::RESERVED_BLE)
     QT_SETTINGS_PROPERTY(bool, prompt_animation, false, MPParams::PROMPT_ANIMATION_PARAM)
+    QT_SETTINGS_PROPERTY(bool, bool_animation, false, MPParams::BOOT_ANIMATION_PARAM)
 
 public:
     DeviceSettingsBLE(QObject *parent);
@@ -28,7 +29,8 @@ public:
         DEVICE_DEFAULT_LANG = 4,
         DEFAULT_CHAR_AFTER_LOGIN = 5,
         DEFAULT_CHAR_AFTER_PASS = 6,
-        DELAY_BETWEEN_KEY_PRESS = 7
+        DELAY_BETWEEN_KEY_PRESS = 7,
+        BOOT_ANIMATION_BYTE = 8
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;

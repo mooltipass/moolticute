@@ -1361,6 +1361,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxBootAnim">
+                 <property name="text">
+                  <string>Boot Animation</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>

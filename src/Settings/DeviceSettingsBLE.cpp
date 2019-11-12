@@ -21,5 +21,7 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::RESERVED_BLE] = RESERVED_BYTE;
     m_paramMap.insert(MPParams::PROMPT_ANIMATION_PARAM, "prompt_animation");
     m_bleByteMapping[MPParams::PROMPT_ANIMATION_PARAM] = ANIMATION_DURING_PROMPT_BYTE;
+    m_paramMap.insert(MPParams::BOOT_ANIMATION_PARAM, "bool_animation");
+    m_bleByteMapping[MPParams::BOOT_ANIMATION_PARAM] = BOOT_ANIMATION_BYTE;
 }
 
