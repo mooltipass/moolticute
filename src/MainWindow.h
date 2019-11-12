@@ -60,6 +60,12 @@ public:
 
     void updateBackupControlsVisibility(bool visible);
 
+
+    const static QString NONE_STRING;
+    const static QString TAB_STRING;
+    const static QString ENTER_STRING;
+    const static QString SPACE_STRING;
+
     friend class SettingsGuiHelper;
     friend class SettingsGuiMini;
     friend class SettingsGuiBLE;
@@ -205,7 +211,6 @@ private:
     SystemEventHandler eventHandler;
 
     const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
-    const QString NONE_STRING = tr("None");
 };
 
 #endif // MAINWINDOW_H

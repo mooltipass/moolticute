@@ -23,13 +23,13 @@ void SettingsGuiMini::updateUI()
 {
     // Keyboard groupbox
     ui->comboBoxLoginOutput->clear();
-    ui->comboBoxLoginOutput->addItem(tr("Tab"), TAB_INDEX);
-    ui->comboBoxLoginOutput->addItem(tr("Enter"), ENTER_INDEX);
-    ui->comboBoxLoginOutput->addItem(tr("Space"), SPACE_INDEX);
+    ui->comboBoxLoginOutput->addItem(MainWindow::TAB_STRING, TAB_INDEX);
+    ui->comboBoxLoginOutput->addItem(MainWindow::ENTER_STRING, ENTER_INDEX);
+    ui->comboBoxLoginOutput->addItem(MainWindow::SPACE_STRING, SPACE_INDEX);
     ui->comboBoxPasswordOutput->clear();
-    ui->comboBoxPasswordOutput->addItem(tr("Tab"), TAB_INDEX);
-    ui->comboBoxPasswordOutput->addItem(tr("Enter"), ENTER_INDEX);
-    ui->comboBoxPasswordOutput->addItem(tr("Space"), SPACE_INDEX);
+    ui->comboBoxPasswordOutput->addItem(MainWindow::TAB_STRING, TAB_INDEX);
+    ui->comboBoxPasswordOutput->addItem(MainWindow::ENTER_STRING, ENTER_INDEX);
+    ui->comboBoxPasswordOutput->addItem(MainWindow::SPACE_STRING, SPACE_INDEX);
     ui->checkBoxSlowHost->show();
     ui->checkBoxSendAfterLogin->show();
     ui->checkBoxSendAfterPassword->show();

@@ -31,6 +31,11 @@
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
 
+const QString MainWindow::NONE_STRING = tr("None");
+const QString MainWindow::TAB_STRING = tr("Tab");
+const QString MainWindow::ENTER_STRING = tr("Enter");
+const QString MainWindow::SPACE_STRING = tr("Space");
+
 void MainWindow::initHelpLabels()
 {
     auto getFontAwesomeIconPixmap = [=](int character, QSize size = QSize(20, 20))
