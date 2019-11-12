@@ -570,7 +570,7 @@ void MPDeviceBleImpl::readLanguages()
                     {
                         const auto payload = bleProt->getFullPayload(data);
                         const int langNum = bleProt->toIntFromLittleEndian(payload[0], payload[1]);
-                        qCritical() << "Language number: " << langNum;
+                        qDebug() << "Language number: " << langNum;
                         for (int i = 0; i < langNum; ++i)
                         {
                             jobs->append(new MPCommandJob(mpDev,
@@ -601,7 +601,7 @@ void MPDeviceBleImpl::readLanguages()
                     {
                         const auto payload = bleProt->getFullPayload(data);
                         const auto layoutNum = bleProt->toIntFromLittleEndian(payload[0], payload[1]);
-                        qCritical() << "Keyboard layout number: " << layoutNum;
+                        qDebug() << "Keyboard layout number: " << layoutNum;
                         for (int i = 0; i < layoutNum; ++i)
                         {
                             jobs->append(new MPCommandJob(mpDev,

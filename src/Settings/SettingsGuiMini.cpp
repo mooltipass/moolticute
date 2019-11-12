@@ -56,6 +56,7 @@ void SettingsGuiMini::setupKeyboardLayout()
     auto* langCb = ui->comboBoxLang;
     if (langCb->count() > 0)
     {
+        //Combobox for Mini layouts is filled
         return;
     }
     langCb->addItem("en_US", ID_KEYB_EN_US_LUT);

@@ -57,6 +57,7 @@ void SettingsGuiBLE::setupKeyboardLayout()
 {
     if (ui->comboBoxUsbLayout->count() > 0)
     {
+        //Combobox for BLE layouts is filled
         return;
     }
     m_mw->wsClient->requestBleKeyboardLayout();

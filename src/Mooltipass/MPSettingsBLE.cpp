@@ -88,21 +88,9 @@ void MPSettingsBLE::updateParam(MPParams::Param param, int val)
     {
         m_lastDeviceSettings[m_bleByteMapping[param]] = static_cast<char>(val);
     }
-    else if (MPParams::KEYBOARD_USB_LAYOUT == param)
+    else
     {
-        set_keyboard_usb_layout(val);
-    }
-    else if (MPParams::KEYBOARD_BT_LAYOUT == param)
-    {
-        set_keyboard_bt_layout(val);
-    }
-    else if (MPParams::DEVICE_LANGUAGE == param)
-    {
-        set_device_language(val);
-    }
-    else if (MPParams::USER_LANGUAGE == param)
-    {
-        set_user_language(val);
+        setProperty(m_paramMap[param], val);
     }
 }
 

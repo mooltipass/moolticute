@@ -480,13 +480,11 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
     else if (rootobj["msg"] == "device_languages")
     {
-        QJsonObject o = rootobj["data"].toObject();
-        emit updateBLEDeviceLanguage(o);
+        emit updateBLEDeviceLanguage(rootobj["data"].toObject());
     }
     else if (rootobj["msg"] == "keyboard_layouts")
     {
-        QJsonObject o = rootobj["data"].toObject();
-        emit updateBLEKeyboardLayout(o);
+        emit updateBLEKeyboardLayout(rootobj["data"].toObject());
     }
 }
 
