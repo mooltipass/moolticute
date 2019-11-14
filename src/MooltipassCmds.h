@@ -138,6 +138,16 @@ public:
             GET_USER_SETTINGS   ,
             GET_USER_CATEGORIES ,
             SET_USER_CATEGORIES ,
+            GET_USER_LANG       ,
+            GET_DEVICE_LANG     ,
+            GET_KEYB_LAYOUT_ID  ,
+            GET_LANG_NUM        ,
+            GET_KEYB_LAYOUT_NUM ,
+            GET_LANG_DESC       ,
+            GET_LAYOUT_DESC     ,
+            SET_KEYB_LAYOUT_ID  ,
+            SET_USER_LANG       ,
+            SET_DEVICE_LANG     ,
             CMD_DBG_MESSAGE     ,
             CMD_DBG_OPEN_DISP_BUFFER    ,
             CMD_DBG_SEND_TO_DISP_BUFFER ,
@@ -202,7 +212,12 @@ public:
         HASH_DISPLAY_FEATURE_PARAM,
         RANDOM_INIT_PIN_PARAM,
         RESERVED_BLE,
-        PROMPT_ANIMATION_PARAM
+        PROMPT_ANIMATION_PARAM,
+        BOOT_ANIMATION_PARAM,
+        DEVICE_LANGUAGE,
+        USER_LANGUAGE,
+        KEYBOARD_USB_LAYOUT,
+        KEYBOARD_BT_LAYOUT
     };
     Q_ENUM(Param)
 };

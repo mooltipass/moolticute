@@ -410,7 +410,10 @@ void WSServerCon::resetDevice(MPDevice *dev)
 
     if (nullptr != mpdevice->ble())
     {
-        connect(mpdevice->ble(), &MPDeviceBleImpl::userSettingsChanged, this, &WSServerCon::sendUserSettings);
+        const auto* mpBle = mpdevice->ble();
+        connect(mpBle, &MPDeviceBleImpl::userSettingsChanged, this, &WSServerCon::sendUserSettings);
+        connect(mpBle, &MPDeviceBleImpl::bleDeviceLanguage, this, &WSServerCon::sendDeviceLanguage);
+        connect(mpBle, &MPDeviceBleImpl::bleKeyboardLayout, this, &WSServerCon::sendKeyboardLayout);
     }
 }
 
@@ -542,6 +545,28 @@ void WSServerCon::sendFilesCache()
     oroot["data"] = array;
     oroot["sync"] = mpdevice->isFilesCacheInSync();
     sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendDeviceLanguage(const QJsonObject &langs)
+{
+    if (!mpdevice || !mpdevice->ble())
+    {
+        return;
+    }
+    sendJsonMessage({{ "msg", "device_languages" },
+                     { "data", langs }
+                    });
+}
+
+void WSServerCon::sendKeyboardLayout(const QJsonObject &layouts)
+{
+    if (!mpdevice || !mpdevice->ble())
+    {
+        return;
+    }
+    sendJsonMessage({{ "msg", "keyboard_layouts" },
+                     { "data", layouts }
+                    });
 }
 
 void WSServerCon::sendCardDbMetadata()
@@ -1191,7 +1216,11 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "get_user_settings")
     {
-         bleImpl->sendUserSettings();
+        bleImpl->sendUserSettings();
+    }
+    else if (root["msg"] == "request_keyboard_layout")
+    {
+        bleImpl->readLanguages();
     }
     else
     {

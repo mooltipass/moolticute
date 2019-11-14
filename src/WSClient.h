@@ -108,6 +108,8 @@ public:
     inline bool isFw12() const { return isFwVersion(12); }
     inline bool isFw13() const { return isFwVersion(13); }
 
+    void requestBleKeyboardLayout();
+
     void sendLockDevice();
     SettingsGuiHelper* settingsHelper();
 
@@ -140,6 +142,8 @@ signals:
     void deviceConnacted();
     void deviceDisconnected();
     void deleteDataNodesFinished();
+    void updateBLEDeviceLanguage(const QJsonObject& langs);
+    void updateBLEKeyboardLayout(const QJsonObject& layouts);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

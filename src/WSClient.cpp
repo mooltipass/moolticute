@@ -478,6 +478,14 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit updateUserSettingsOnUI(o);
     }
+    else if (rootobj["msg"] == "device_languages")
+    {
+        emit updateBLEDeviceLanguage(rootobj["data"].toObject());
+    }
+    else if (rootobj["msg"] == "keyboard_layouts")
+    {
+        emit updateBLEKeyboardLayout(rootobj["data"].toObject());
+    }
 }
 
 bool WSClient::isFwVersion(int version) const
@@ -701,6 +709,11 @@ void WSClient::sendSetUserCategories(const QString &cat1, const QString &cat2, c
 void WSClient::sendUserSettingsRequest()
 {
     sendJsonData({{ "msg", "get_user_settings" }});
+}
+
+void WSClient::requestBleKeyboardLayout()
+{
+    sendJsonData({{ "msg", "request_keyboard_layout" }});
 }
 
 void WSClient::sendLockDevice()

@@ -31,6 +31,11 @@
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
 
+const QString MainWindow::NONE_STRING = tr("None");
+const QString MainWindow::TAB_STRING = tr("Tab");
+const QString MainWindow::ENTER_STRING = tr("Enter");
+const QString MainWindow::SPACE_STRING = tr("Space");
+
 void MainWindow::initHelpLabels()
 {
     auto getFontAwesomeIconPixmap = [=](int character, QSize size = QSize(20, 20))
@@ -254,12 +259,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxKnock->addItem(tr("Low"), 1);
     ui->comboBoxKnock->addItem(tr("Medium"), 2);
     ui->comboBoxKnock->addItem(tr("High"), 3);
-    ui->comboBoxLoginOutput->addItem(tr("Tab"), 43);
-    ui->comboBoxLoginOutput->addItem(tr("Enter"), 40);
-    ui->comboBoxLoginOutput->addItem(tr("Space"), 44);
-    ui->comboBoxPasswordOutput->addItem(tr("Tab"), 43);
-    ui->comboBoxPasswordOutput->addItem(tr("Enter"), 40);
-    ui->comboBoxPasswordOutput->addItem(tr("Space"), 44);
 
     // Close behavior
 #ifdef Q_OS_MAC
@@ -347,6 +346,23 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->cbBluetoothEnabled->setChecked(settings["bluetooth_enabled"].toBool());
                 ui->cbCredentialPrompt->setChecked(settings["storage_prompt"].toBool());
             });
+
+    connect(wsClient, &WSClient::updateBLEDeviceLanguage,
+            [this](const QJsonObject& langs)
+            {
+                updateBLEComboboxItems(ui->comboBoxDeviceLang, langs);
+                updateBLEComboboxItems(ui->comboBoxUserLanguage, langs);
+            }
+    );
+    connect(wsClient, &WSClient::updateBLEKeyboardLayout,
+            [this](const QJsonObject& layouts)
+            {
+                updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
+                updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
+                wsClient->settingsHelper()->resetSettings();
+            }
+    );
+
 
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
@@ -1376,6 +1392,20 @@ void MainWindow::displayMCUVersion(bool visible)
     ui->labelAboutMainMCU->setVisible(visible);
     ui->labelAboutMainMCUValue->setVisible(visible);
     ui->labelAboutMainMCUValue->setText(wsClient->get_mainMCUVersion());
+}
+
+void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)
+{
+    cb->clear();
+    for (auto it = items.begin(); it != items.end(); ++it)
+    {
+        cb->addItem(it.key(), it.value().toInt());
+    }
+    QSortFilterProxyModel* proxy = new QSortFilterProxyModel(cb);
+    proxy->setSourceModel( cb->model());
+    cb->model()->setParent(proxy);
+    cb->setModel(proxy);
+    cb->model()->sort(0);
 }
 
 void MainWindow::on_toolButton_clearBackupFilePath_released()

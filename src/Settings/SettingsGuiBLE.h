@@ -15,6 +15,12 @@ public:
     void loadParameters() override;
     void updateParam(MPParams::Param param, int val) override;
     void updateUI() override;
+    void setupKeyboardLayout() override;
+
+    static const int NONE_INDEX = 0;
+    static const int TAB_INDEX = 9;
+    static const int ENTER_INDEX = 10;
+    static const int SPACE_INDEX = 32;
 };
 
 #endif // SETTINGSGUIBLE_H

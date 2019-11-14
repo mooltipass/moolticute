@@ -89,8 +89,12 @@ public:
 
     QList<QByteArray> getFavorites(const QByteArray& data);
 
+    void readLanguages();
+
 signals:
     void userSettingsChanged(QJsonObject settings);
+    void bleDeviceLanguage(const QJsonObject& langs);
+    void bleKeyboardLayout(const QJsonObject& layouts);
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
@@ -115,6 +119,8 @@ private:
 
     MPBLEFreeAddressProvider freeAddressProv;
     QJsonObject m_categories;
+    QJsonObject m_deviceLanguages;
+    QJsonObject m_keyboardLayouts;
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;

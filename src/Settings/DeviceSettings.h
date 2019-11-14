@@ -10,6 +10,10 @@ class DeviceSettings : public QObject
 {
     Q_OBJECT
 
+    QT_SETTINGS_PROPERTY(int, key_after_login, 0, MPParams::KEY_AFTER_LOGIN_SEND_PARAM)
+    QT_SETTINGS_PROPERTY(int, key_after_pass, 0, MPParams::KEY_AFTER_PASS_SEND_PARAM)
+    QT_SETTINGS_PROPERTY(int, delay_after_key, 0, MPParams::DELAY_AFTER_KEY_ENTRY_PARAM)
+
     QT_SETTINGS_PROPERTY(int, user_interaction_timeout, 0, MPParams::USER_INTER_TIMEOUT_PARAM)
     QT_SETTINGS_PROPERTY(bool, random_starting_pin, false, MPParams::RANDOM_INIT_PIN_PARAM)
 
@@ -35,6 +39,7 @@ public:
     virtual void loadParameters() = 0;
     virtual void updateParam(MPParams::Param param, int val) = 0;
     void updateParam(MPParams::Param param, bool en);
+    virtual void setupKeyboardLayout() {}
 
     const QMetaObject* getMetaObject() const {return metaObject();}
 

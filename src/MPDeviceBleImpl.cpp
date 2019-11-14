@@ -557,6 +557,79 @@ QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
     return res;
 }
 
+void MPDeviceBleImpl::readLanguages()
+{
+    m_deviceLanguages = QJsonObject{};
+    m_keyboardLayouts = QJsonObject{};
+    AsyncJobs *jobs = new AsyncJobs(
+                          "Read languages",
+                          this);
+    jobs->append(new MPCommandJob(mpDev,
+                   MPCmd::GET_LANG_NUM,
+                   [this, jobs] (const QByteArray &data, bool &)
+                    {
+                        const auto payload = bleProt->getFullPayload(data);
+                        const int langNum = bleProt->toIntFromLittleEndian(payload[0], payload[1]);
+                        qDebug() << "Language number: " << langNum;
+                        for (int i = 0; i < langNum; ++i)
+                        {
+                            jobs->append(new MPCommandJob(mpDev,
+                                           MPCmd::GET_LANG_DESC,
+                                           QByteArray(1, static_cast<char>(i)),
+                                           [this, i, langNum] (const QByteArray &data, bool &)
+                                            {
+                                                const QString lang = bleProt->toQString(bleProt->getFullPayload(data));
+                                                if (AppDaemon::isDebugDev())
+                                                {
+                                                    qDebug() << i << " lang desc: " << lang;
+                                                }
+                                                m_deviceLanguages[lang] = i;
+                                                if (i == (langNum - 1))
+                                                {
+                                                    emit bleDeviceLanguage(m_deviceLanguages);
+                                                }
+                                                return true;
+                                            }
+                            ));
+                        }
+                        return true;
+                    }
+    ));
+    jobs->append(new MPCommandJob(mpDev,
+                   MPCmd::GET_KEYB_LAYOUT_NUM,
+                   [this, jobs] (const QByteArray &data, bool &)
+                    {
+                        const auto payload = bleProt->getFullPayload(data);
+                        const auto layoutNum = bleProt->toIntFromLittleEndian(payload[0], payload[1]);
+                        qDebug() << "Keyboard layout number: " << layoutNum;
+                        for (int i = 0; i < layoutNum; ++i)
+                        {
+                            jobs->append(new MPCommandJob(mpDev,
+                                           MPCmd::GET_LAYOUT_DESC,
+                                           QByteArray(1, static_cast<char>(i)),
+                                           [this, i, layoutNum] (const QByteArray &data, bool &)
+                                            {
+                                                const QString layout = bleProt->toQString(bleProt->getFullPayload(data));
+                                                if (AppDaemon::isDebugDev())
+                                                {
+                                                    qDebug() << i << " layout desc: " << layout;
+                                                }
+                                                m_keyboardLayouts[layout] = i;
+                                                if (i == (layoutNum - 1))
+                                                {
+                                                    emit bleKeyboardLayout(m_keyboardLayouts);
+                                                }
+                                                return true;
+                                            }
+                            ));
+                        }
+                        return true;
+                    }
+    ));
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
 {
     return createCredentialMessage(cred.getAttributes());
