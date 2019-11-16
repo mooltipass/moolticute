@@ -401,56 +401,9 @@ void MPDevice::newDataRead(const QByteArray &data)
       */
     if (isBLE())
     {
-        bool isFirst = bleImpl->isFirstPacket(data);
-        if (isFirst)
+        if (!bleImpl->processReceivedData(data, dataReceived))
         {
-            auto& cmd = commandQueue.head();
-            cmd.responseSize = pMesProt->getMessageSize(data);
-            cmd.response.append(data);
-            if (commandQueue.head().responseSize > 60)
-            {
-                commandQueue.head().timerTimeout = new QTimer(this);
-                qCritical() << "Message with multiple packet, setting timout";
-                connect(cmd.timerTimeout, &QTimer::timeout, [this]()
-                {
-                    qCritical() << "Timout for multiple message expired";
-                    delete commandQueue.head().timerTimeout;
-                    commandQueue.head().timerTimeout = nullptr;
-                    bool done = true;
-                    commandQueue.head().cb(false, QByteArray{}, done);
-                    commandQueue.dequeue();
-                    sendDataDequeue();
-                });
-                cmd.timerTimeout->setInterval(CMD_LONG_MSG_TIMEOUT);
-                cmd.timerTimeout->start();
-            }
-        }
-
-        if (bleImpl->isLastPacket(data))
-        {
-            if (!isFirst)
-            {
-                commandQueue.head().timerTimeout->stop();
-                /**
-                 * @brief EXTRA_INFO_SIZE
-                 * Extra bytes of the first packet.
-                 * In the last package only the remaining bytes
-                 * of payload is appended.
-                 */
-                constexpr int EXTRA_INFO_SIZE = 6;
-                int fullResponseSize = commandQueue.head().responseSize + EXTRA_INFO_SIZE;
-                QByteArray responseData = commandQueue.head().response;
-                responseData.append(pMesProt->getFullPayload(data).left(fullResponseSize - responseData.size()));
-                dataReceived = responseData;
-            }
-        }
-        else
-        {
-            if (!isFirst)
-            {
-                commandQueue.head().response.append(pMesProt->getFullPayload(data));
-            }
-            commandQueue.head().checkReturn = false;
+            //Expecting more packet
             return;
         }
     }

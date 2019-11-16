@@ -350,6 +350,58 @@ void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
     flipBit();
 }
 
+bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &dataReceived)
+{
+    const bool isFirst = isFirstPacket(data);
+    auto& cmd = mpDev->commandQueue.head();
+    if (isFirst)
+    {
+        cmd.responseSize = bleProt->getMessageSize(data);
+        cmd.response.append(data);
+        /*
+         *  When multiple packet from the device expected
+         *  start a timer with 2 sec to detect resets and
+         *  clean the command queue if it occurs.
+         */
+        if (cmd.responseSize > FIRST_PACKET_PAYLOAD_SIZE)
+        {
+            cmd.timerTimeout = new QTimer(this);
+            connect(cmd.timerTimeout, &QTimer::timeout, this, &MPDeviceBleImpl::handleLongMessageTimeout);
+            cmd.timerTimeout->setInterval(LONG_MESSAGE_TIMEOUT_MS);
+            cmd.timerTimeout->start();
+        }
+    }
+
+    const bool isLast = isLastPacket(data);
+    if (isLast)
+    {
+        if (!isFirst)
+        {
+            cmd.timerTimeout->stop();
+            /**
+             * @brief EXTRA_INFO_SIZE
+             * Extra bytes of the first packet.
+             * In the last package only the remaining bytes
+             * of payload is appended.
+             */
+            constexpr int EXTRA_INFO_SIZE = 6;
+            int fullResponseSize = cmd.responseSize + EXTRA_INFO_SIZE;
+            QByteArray responseData = cmd.response;
+            responseData.append(bleProt->getFullPayload(data).left(fullResponseSize - responseData.size()));
+            dataReceived = responseData;
+        }
+    }
+    else
+    {
+        if (!isFirst)
+        {
+            cmd.response.append(bleProt->getFullPayload(data));
+        }
+        cmd.checkReturn = false;
+    }
+    return isLast;
+}
+
 bool MPDeviceBleImpl::isAfterAuxFlash()
 {
     QSettings s;
@@ -628,6 +680,18 @@ void MPDeviceBleImpl::readLanguages()
     ));
 
     mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::handleLongMessageTimeout()
+{
+    qWarning() << "Timout for multiple packet expired";
+    auto& cmd = mpDev->commandQueue.head();
+    delete cmd.timerTimeout;
+    cmd.timerTimeout = nullptr;
+    bool done = true;
+    cmd.cb(false, QByteArray{}, done);
+    mpDev->commandQueue.dequeue();
+    mpDev->sendDataDequeue();
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)

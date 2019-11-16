@@ -66,6 +66,13 @@ public:
     void setCurrentFlipBit(QByteArray &msg);
     void flipMessageBit(QVector<QByteArray> &msg);
     void flipMessageBit(QByteArray &msg);
+    /**
+     * @brief processReceivedData
+     * @param data actual packet from the device
+     * @param dataReceived full message data
+     * @return true if data is last packet of the message
+     */
+    bool processReceivedData(const QByteArray& data, QByteArray& dataReceived);
 
     bool isAfterAuxFlash();
 
@@ -95,6 +102,9 @@ signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);
     void bleKeyboardLayout(const QJsonObject& layouts);
+
+private slots:
+    void handleLongMessageTimeout();
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
@@ -130,6 +140,8 @@ private:
     static constexpr int USER_CATEGORY_LENGTH = 66;
     static constexpr int FAV_DATA_SIZE = 4;
     static constexpr int FAV_NUMBER = 50;
+    static constexpr int LONG_MESSAGE_TIMEOUT_MS = 2000;
+    static constexpr int FIRST_PACKET_PAYLOAD_SIZE = 58;
     const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
 };
 
