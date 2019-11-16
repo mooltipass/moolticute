@@ -49,6 +49,7 @@
 #define CMD_MAX_RETRY            3 //retry sending command before dropping
 #define CMD_DEFAULT_TIMEOUT     0xFFAAFFAA
 #define CMD_DEFAULT_TIMEOUT_VAL 3000 //3seconds default timeout
+#define CMD_LONG_MSG_TIMEOUT    2000
 
 //Data node header size. It contains the size of data in 4 bytes Big endian
 #define MP_DATA_HEADER_SIZE      4
