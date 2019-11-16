@@ -146,8 +146,13 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb,
     timer->start();
     auto *jobs = new AsyncJobs(QString("Upload bundle file"), this);
     jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_ERASE_DATA_FLASH,
-                      [cbProgress] (const QByteArray &, bool &) -> bool
+                      [cbProgress, this] (const QByteArray &data, bool &) -> bool
                     {
+                        if (MSG_SUCCESS != bleProt->getFirstPayloadByte(data))
+                        {
+                            qWarning() << "Erase data flash failed";
+                            return false;
+                        }
                         QVariantMap progress = {
                             {"total", 0},
                             {"current", 0},
