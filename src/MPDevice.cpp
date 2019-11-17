@@ -165,16 +165,6 @@ void MPDevice::sendInitMessages()
     }
 
     exitMemMgmtMode(false);
-    //TODO Remove when GET_MOOLTIPASS_PARM implemented for BLE
-    /**
-      * Temporary solution until GET_MOOLTIPASS_PARM
-      * is not implemented for the ble device we do not
-      * get if BLE is detected.
-      */
-    if (isBLE())
-    {
-        flashMbSizeChanged(0);
-    }
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
