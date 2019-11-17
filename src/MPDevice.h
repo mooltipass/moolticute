@@ -232,6 +232,7 @@ private:
     /* Platform function for writing data, should be implemented in platform class */
     virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
 
+    void addTimerJob(int msec);
     void loadLoginNode(AsyncJobs *jobs, const QByteArray &address,
                        const MPDeviceProgressCb &cbProgress);
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
@@ -433,6 +434,8 @@ protected:
         EXPORT_IS_BLE_INDEX = 14,
         EXPORT_BLE_USER_CATEGORIES_INDEX = 15
     };
+    static constexpr int STATUS_STARTING_DELAY = 500;
+    static constexpr int INIT_STARTING_DELAY = 300;
 };
 
 #endif // MPDEVICE_H
