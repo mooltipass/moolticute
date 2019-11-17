@@ -599,7 +599,14 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxUsbLayout"/>
+                   <widget class="QComboBox" name="comboBoxUsbLayout">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_50">
@@ -640,7 +647,14 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxBtLayout"/>
+                   <widget class="QComboBox" name="comboBoxBtLayout">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_51">
@@ -681,7 +695,14 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxDeviceLang"/>
+                   <widget class="QComboBox" name="comboBoxDeviceLang">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_48">
@@ -722,7 +743,14 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxUserLanguage"/>
+                   <widget class="QComboBox" name="comboBoxUserLanguage">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_49">
