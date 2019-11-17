@@ -401,37 +401,9 @@ void MPDevice::newDataRead(const QByteArray &data)
       */
     if (isBLE())
     {
-        bool isFirst = bleImpl->isFirstPacket(data);
-        if (isFirst)
+        if (!bleImpl->processReceivedData(data, dataReceived))
         {
-            commandQueue.head().responseSize = pMesProt->getMessageSize(data);
-            commandQueue.head().response.append(data);
-        }
-
-        if (bleImpl->isLastPacket(data))
-        {
-            if (!isFirst)
-            {
-                /**
-                 * @brief EXTRA_INFO_SIZE
-                 * Extra bytes of the first packet.
-                 * In the last package only the remaining bytes
-                 * of payload is appended.
-                 */
-                constexpr int EXTRA_INFO_SIZE = 6;
-                int fullResponseSize = commandQueue.head().responseSize + EXTRA_INFO_SIZE;
-                QByteArray responseData = commandQueue.head().response;
-                responseData.append(pMesProt->getFullPayload(data).left(fullResponseSize - responseData.size()));
-                dataReceived = responseData;
-            }
-        }
-        else
-        {
-            if (!isFirst)
-            {
-                commandQueue.head().response.append(pMesProt->getFullPayload(data));
-            }
-            commandQueue.head().checkReturn = false;
+            //Expecting more packet
             return;
         }
     }
