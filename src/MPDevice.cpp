@@ -140,34 +140,41 @@ void MPDevice::setupMessageProtocol()
 
 void MPDevice::sendInitMessages()
 {
-    statusTimer->start(500);
-    QTimer::singleShot(100, [this]() {
-        if (isBLE())
+    statusTimer->start(STATUS_STARTING_DELAY);
+    addTimerJob(INIT_STARTING_DELAY);
+    if (isBLE())
+    {
+        /**
+          * Reset Flip Bit is written directly to device
+          * so TimerJob has no effect, hence sending
+          * it with a lower timeout.
+          */
+        QTimer::singleShot(INIT_STARTING_DELAY/2, [this]()
         {
             if (AppDaemon::isDebugDev())
                 qDebug() << "Resetting flip bit for BLE";
-
             bleImpl->sendResetFlipBit();
-            if (bleImpl->isAfterAuxFlash())
-            {
-                qDebug() << "Fixing communication with device after Aux Flash";
-                writeCancelRequest();
-            }
-            bleImpl->getPlatInfo();
-        }
+        });
 
-        exitMemMgmtMode(false);
-        //TODO Remove when GET_MOOLTIPASS_PARM implemented for BLE
-        /**
-          * Temporary solution until GET_MOOLTIPASS_PARM
-          * is not implemented for the ble device we do not
-          * get if BLE is detected.
-          */
-        if (isBLE())
+        if (bleImpl->isAfterAuxFlash())
         {
-            flashMbSizeChanged(0);
+            qDebug() << "Fixing communication with device after Aux Flash";
+            writeCancelRequest();
         }
-    });
+        bleImpl->getPlatInfo();
+    }
+
+    exitMemMgmtMode(false);
+    //TODO Remove when GET_MOOLTIPASS_PARM implemented for BLE
+    /**
+      * Temporary solution until GET_MOOLTIPASS_PARM
+      * is not implemented for the ble device we do not
+      * get if BLE is detected.
+      */
+    if (isBLE())
+    {
+        flashMbSizeChanged(0);
+    }
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
@@ -526,6 +533,14 @@ void MPDevice::runAndDequeueJobs()
     });
 
     currentJobs->start();
+}
+
+void MPDevice::addTimerJob(int msec)
+{
+    auto *waitingJob = new AsyncJobs(QString("Waiting job"), this);
+    waitingJob->append(new TimerJob{msec});
+    jobsQueue.enqueue(waitingJob);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateFilesCache()
