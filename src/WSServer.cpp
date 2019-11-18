@@ -16,6 +16,7 @@
  **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **
  ******************************************************************************/
+#include <QWebSocketCorsAuthenticator>
 #include "WSServer.h"
 #include "WSServerCon.h"
 #include "AppDaemon.h"
@@ -29,6 +30,8 @@ bool WSServer::initialize()
     wsServer = new QWebSocketServer(QStringLiteral("Moolticute Server"),
                                     QWebSocketServer::NonSecureMode,
                                     this);
+
+    connect(wsServer, &QWebSocketServer::originAuthenticationRequired, this, &WSServer::originAuthenticationRequired);
 
     if (wsServer->listen(AppDaemon::getListenAddress(), MOOLTICUTE_DAEMON_PORT))
     {
@@ -148,6 +151,34 @@ void WSServer::mpRemoved(MPDevice *dev)
             it.value()->resetDevice(device);
         }
     }
+}
+
+void WSServer::originAuthenticationRequired(QWebSocketCorsAuthenticator *authenticator)
+{
+    /* Origin header can be:
+     *   - empty string (used by non browser tools, mc-agent, ...)
+     *   - chrome-extension://xxxxxxxxx (for our extension)
+     *   - moz-extension://xxxxxxxxxxxx (for our extension)
+     *   - http:// any website url
+     *
+     *  Only the firsts form are accepted, others coming from web browser are denied
+     */
+
+    qDebug() << "QWebSocket origin header: " << authenticator->origin();
+
+    if (authenticator->origin().isEmpty())
+    {
+        authenticator->setAllowed(true);
+        qDebug() << "QWebSocket origin header: Accepted";
+        return;
+    }
+
+    QRegularExpression reg("[a-z]+-extension:\\/\\/");
+    QRegularExpressionMatch match = reg.match(authenticator->origin());
+
+    authenticator->setAllowed(match.hasMatch());
+
+    qDebug() << "QWebSocket origin header: " << (authenticator->allowed()? "Accepted": "Denied");
 }
 
 bool WSServer::checkClientExists(WSServerCon *wscon)
