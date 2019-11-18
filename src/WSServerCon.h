@@ -68,6 +68,7 @@ private slots:
     void sendUserSettings(QJsonObject settings);
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
+    bool processSetCredential(QJsonObject &root, QJsonObject &o);
 
     QWebSocket *wsClient;
 

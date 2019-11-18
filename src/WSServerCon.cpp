@@ -732,56 +732,10 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
     else if (root["msg"] == "set_credential")
     {
         QJsonObject o = root["data"].toObject();
-        QString loginName = o["login"].toString();
-        bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
-        bool isGuiRunning = false;
-        if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveLoginConfirmed"))
+        if (!processSetCredential(root, o))
         {
-            root["msg"] = "request_login";
-            QJsonDocument requestLoginDoc(root);
-            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
-            if (isGuiRunning)
-            {
-                return;
-            }
-            qDebug() << "GUI is not running, saving credential with empty login";
+            return;
         }
-
-        QString originalService = o["service"].toString();
-        ParseDomain url(originalService);
-        QSettings s;
-        bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool() && url.isWebsite();
-        bool isManualCredential = o.contains("saveManualCredential");
-        if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !isManualCredential && !o.contains("saveDomainConfirmed"))
-        {
-            root["msg"] = "request_domain";
-            o["domain"] = url.getFullDomain();
-            o["subdomain"] = url.getFullSubdomain();
-            root["data"] = o;
-            QJsonDocument requestLoginDoc(root);
-            emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
-            if (isGuiRunning)
-            {
-                return;
-            }
-            qDebug() << "GUI is not running, saving credential with subdomain";
-        }
-
-        if (!o.contains("saveDomainConfirmed") && url.isWebsite())
-        {
-            o["service"] = url.getFullDomain();
-        }
-
-        if (isManualCredential)
-        {
-            o["service"] = url.getManuallyEnteredDomainName(originalService);
-        }
-
-        const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
-        emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
-
-        checkHaveIBeenPwned(o["service"].toString(), loginName, o["password"].toString());
-
         mpdevice->setCredential(o["service"].toString(), o["login"].toString(),
                 o["password"].toString(), o["description"].toString(), o.contains("description"),
                 [=](bool success, QString errstr)
@@ -1104,7 +1058,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         {
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
         }
-        bleImpl->getCredential(service, login, reqid,
+        bleImpl->getCredential(service, login, reqid, o["fallback_service"].toString(),
                 [this, root, bleImpl, service, login](bool success, QString errstr, QByteArray data)
                 {
                     if (!WSServer::Instance()->checkClientExists(this))
@@ -1133,26 +1087,10 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     else if (root["msg"] == "set_credential")
     {
         QJsonObject o = root["data"].toObject();
-        QString loginName = o["login"].toString();
-        QString originalService = o["service"].toString();
-        ParseDomain url(originalService);
-        QSettings s;
-        bool isManualCredential = o.contains("saveManualCredential");
-        if (isManualCredential)
+        if (!processSetCredential(root, o))
         {
-            o["service"] = url.getManuallyEnteredDomainName(originalService);
+            return;
         }
-        else
-        {
-            o["service"] = url.getFullSubdomain();
-        }
-
-        const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
-        bool isGuiRunning;
-        emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
-
-        checkHaveIBeenPwned(o["service"].toString(), loginName, o["password"].toString());
-
         bleImpl->storeCredential(BleCredential{o["service"].toString(), o["login"].toString(),
                                                o["description"].toString(), "", o["password"].toString()},
                                  [=](bool success, QString errstr)
@@ -1237,4 +1175,58 @@ bool WSServerCon::checkMemModeEnabled(const QJsonObject &root)
     }
 
     return false;
+}
+
+bool WSServerCon::processSetCredential(QJsonObject &root, QJsonObject &o)
+{
+    QString loginName = o["login"].toString();
+    bool isMsgContainsExtInfo = o.contains("extension_version") || o.contains("mc_cli_version");
+    bool isGuiRunning = false;
+    if (loginName.isEmpty() && isMsgContainsExtInfo && !o.contains("saveLoginConfirmed"))
+    {
+        root["msg"] = "request_login";
+        QJsonDocument requestLoginDoc(root);
+        emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
+        if (isGuiRunning)
+        {
+            return false;
+        }
+        qDebug() << "GUI is not running, saving credential with empty login";
+    }
+
+    QString originalService = o["service"].toString();
+    ParseDomain url(originalService);
+    QSettings s;
+    bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool() && url.isWebsite();
+    bool isManualCredential = o.contains("saveManualCredential");
+    if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !isManualCredential && !o.contains("saveDomainConfirmed"))
+    {
+        root["msg"] = "request_domain";
+        o["domain"] = url.getFullDomain();
+        o["subdomain"] = url.getFullSubdomain();
+        root["data"] = o;
+        QJsonDocument requestLoginDoc(root);
+        emit sendMessageToGUI(requestLoginDoc.toJson(), isGuiRunning);
+        if (isGuiRunning)
+        {
+            return false;
+        }
+        qDebug() << "GUI is not running, saving credential with subdomain";
+    }
+
+    if (!o.contains("saveDomainConfirmed") && url.isWebsite())
+    {
+        o["service"] = url.getFullDomain();
+    }
+
+    if (isManualCredential)
+    {
+        o["service"] = url.getManuallyEnteredDomainName(originalService);
+    }
+
+    const QJsonDocument credDetectedDoc(QJsonObject{{ "msg", "credential_detected" }});
+    emit sendMessageToGUI(credDetectedDoc.toJson(QJsonDocument::JsonFormat::Compact), isGuiRunning);
+
+    checkHaveIBeenPwned(o["service"].toString(), loginName, o["password"].toString());
+    return true;
 }

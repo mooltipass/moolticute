@@ -59,7 +59,8 @@ public:
     inline void stopFetchData() { fetchState = Common::FetchState::STOPPED; }
 
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb);
-    void getCredential(const QString& service, const QString& login, const QString& reqid, const MessageHandlerCbData &cb);
+    void getCredential(const QString& service, const QString& login, const QString& reqid, const QString& fallbackService, const MessageHandlerCbData &cb);
+    void getFallbackServiceCredential(AsyncJobs *jobs, const QString& fallbackService, const QString& login, const MessageHandlerCbData &cb);
     BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;
 
     void sendResetFlipBit();
