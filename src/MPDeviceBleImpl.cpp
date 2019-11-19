@@ -240,7 +240,7 @@ void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerC
     mpDev->enqueueAndRunJob(jobs);
 }
 
-void MPDeviceBleImpl::getCredential(const QString& service, const QString& login, const QString& reqid, const MessageHandlerCbData &cb)
+void MPDeviceBleImpl::getCredential(const QString& service, const QString& login, const QString& reqid, const QString& fallbackService, const MessageHandlerCbData &cb)
 {
     AsyncJobs *jobs;
     const QString getCred = "Get Credential";
@@ -254,12 +254,16 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
     }
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
-                            [this, service, login, cb](const QByteArray &data, bool &)
+                            [this, service, login, cb, fallbackService, jobs](const QByteArray &data, bool &)
                             {
                                 if (MSG_FAILED == bleProt->getMessageSize(data))
                                 {
-                                    qWarning() << "Credential get failed";
-                                    cb(false, "Get credential failed", QByteArray{});
+                                    if (fallbackService.isEmpty())
+                                    {
+                                        qWarning() << "Credential get failed";
+                                        cb(false, "Get credential failed", QByteArray{});
+                                    }
+                                    getFallbackServiceCredential(jobs, fallbackService, login, cb);
                                     return true;
                                 }
                                 qDebug() << "Credential got successfully";
@@ -278,6 +282,22 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
     });
 
     mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::getFallbackServiceCredential(AsyncJobs *jobs, const QString &fallbackService, const QString &login, const MessageHandlerCbData &cb)
+{
+    jobs->prepend(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(fallbackService, login),
+    [this, cb](const QByteArray &data, bool &)
+    {
+        if (MSG_FAILED == bleProt->getMessageSize(data))
+        {
+            qWarning() << "Credential get for fallback service failed";
+            cb(false, "Get credential failed", QByteArray{});
+        }
+        qDebug() << "Credential for fallback service got successfully";
+        cb(true, "", bleProt->getFullPayload(data));
+        return true;
+    }));
 }
 
 BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const
