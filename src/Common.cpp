@@ -120,33 +120,33 @@ static void _messageOutput(QtMsgType type, const QMessageLogContext &context, co
 {
     QString fname = context.file;
     fname = fname.section('\\', -1, -1);
-
+    const auto timestamp = QDateTime::currentDateTime().toString(Qt::ISODateWithMs);
     QString s;
     switch (type) {
     default:
     case QtDebugMsg:
     {
-        s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtInfoMsg:
     {
-        s = QString(COLOR_GREEN "INFO" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_GREEN "INFO" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtWarningMsg:
     {
-        s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtCriticalMsg:
     {
-        s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtFatalMsg:
     {
-        s = QString(COLOR_RED "FATAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_RED "FATAL" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     }
