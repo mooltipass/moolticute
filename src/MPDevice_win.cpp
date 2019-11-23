@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "MPDevice_win.h"
 #include "HIDLoader.h"
+#include "AppDaemon.h"
 
 // Windows GUID object
 static GUID IClassGuid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30} };
@@ -160,10 +161,13 @@ bool MPDevice_win::openPath()
 
 void MPDevice_win::platformWrite(const QByteArray &data)
 {
-
     if (m_writeQueue.isEmpty())
     {
         platformWriteToDevice(data);
+    }
+    else if (AppDaemon::isDebugDev())
+    {
+        qDebug() << "Write queue is not empty";
     }
     m_writeQueue.append(data);
 }
@@ -201,6 +205,10 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
     {
         qWarning() << "Failed to write data to device! " << err;
         qWarning() << getLastError(err);
+    }
+    if (AppDaemon::isDebugDev())
+    {
+        qDebug() << "Written to device: " << ba.toHex() << ", Error: " << err;
     }
 }
 
@@ -392,6 +400,10 @@ void MPDevice_win::writeDataFinished()
     if (m_writeQueue.isEmpty())
     {
         // WriteQueue is empty, platformWrite was called directly
+        if (AppDaemon::isDebugDev())
+        {
+            qWarning() << "writeDataFinished, but commandqueue was empty";
+        }
         return;
     }
     m_writeQueue.dequeue();
