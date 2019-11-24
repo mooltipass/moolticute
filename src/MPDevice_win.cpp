@@ -19,6 +19,7 @@
 #include "MPDevice_win.h"
 #include "HIDLoader.h"
 #include "AppDaemon.h"
+#include <cstring>
 
 // Windows GUID object
 static GUID IClassGuid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30} };
@@ -191,9 +192,12 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
 
     ::ZeroMemory(&writeOverlapped, sizeof(writeOverlapped));
 
+    const auto bufferSize = static_cast<size_t>(ba.size());
+    char* buffer = new char[bufferSize];
+    std::memcpy(buffer, ba.constData(), bufferSize);
     bool ret = WriteFile(platformDef.devHandle,
-                         ba.constData(),
-                         ba.size(),
+                         buffer,
+                         bufferSize,
                          nullptr,
                          &writeOverlapped);
 
