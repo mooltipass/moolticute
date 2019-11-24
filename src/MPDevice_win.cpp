@@ -192,6 +192,11 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
 
     ::ZeroMemory(&writeOverlapped, sizeof(writeOverlapped));
 
+    /**
+     * Need to copy the local buffer, because WriteFile is
+     * async and it is possible using the buffer after this
+     * function returned and QByteArray was deallocated.
+     */
     const auto bufferSize = static_cast<size_t>(ba.size());
     char* buffer = new char[bufferSize];
     std::memcpy(buffer, ba.constData(), bufferSize);
@@ -211,10 +216,6 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
     {
         qWarning() << "Failed to write data to device! " << err;
         qWarning() << getLastError(err);
-    }
-    if (AppDaemon::isDebugDev())
-    {
-        qDebug() << "Written to device: " << ba.toHex() << ", Error: " << err;
     }
 }
 
