@@ -19,6 +19,7 @@
 #include "MPDevice_win.h"
 #include "HIDLoader.h"
 #include "AppDaemon.h"
+#include <cstring>
 
 // Windows GUID object
 static GUID IClassGuid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30} };
@@ -191,9 +192,19 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
 
     ::ZeroMemory(&writeOverlapped, sizeof(writeOverlapped));
 
+    /**
+     * Need to copy the local buffer, because WriteFile is
+     * async and it is possible using the buffer after this
+     * function returned and QByteArray was deallocated.
+     */
+    const auto bufferSize = static_cast<size_t>(ba.size());
+    char* buffer = new char[bufferSize];
+    std::memcpy(buffer, ba.constData(), bufferSize);
+    m_writeBufferQueue.enqueue(buffer);
+
     bool ret = WriteFile(platformDef.devHandle,
-                         ba.constData(),
-                         ba.size(),
+                         buffer,
+                         bufferSize,
                          nullptr,
                          &writeOverlapped);
 
@@ -205,10 +216,6 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
     {
         qWarning() << "Failed to write data to device! " << err;
         qWarning() << getLastError(err);
-    }
-    if (AppDaemon::isDebugDev())
-    {
-        qDebug() << "Written to device: " << ba.toHex() << ", Error: " << err;
     }
 }
 
@@ -397,6 +404,7 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
 
 void MPDevice_win::writeDataFinished()
 {
+    delete[] m_writeBufferQueue.dequeue();
     if (m_writeQueue.isEmpty())
     {
         // WriteQueue is empty, platformWrite was called directly

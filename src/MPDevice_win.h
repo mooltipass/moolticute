@@ -114,7 +114,8 @@ private:
     OVERLAPPED readOverlapped;
     QWinOverlappedIoNotifier *oNotifier;
 	
-	QQueue<QByteArray> m_writeQueue;
+    QQueue<QByteArray> m_writeQueue;
+    QQueue<char*> m_writeBufferQueue;
 
     const static QString BT_GATT_SERVICE_GUID;
     const static char ZERO_BYTE = static_cast<char>(0x00);
