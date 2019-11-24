@@ -195,6 +195,8 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
     const auto bufferSize = static_cast<size_t>(ba.size());
     char* buffer = new char[bufferSize];
     std::memcpy(buffer, ba.constData(), bufferSize);
+    m_writeBufferQueue.enqueue(buffer);
+
     bool ret = WriteFile(platformDef.devHandle,
                          buffer,
                          bufferSize,
@@ -401,6 +403,7 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
 
 void MPDevice_win::writeDataFinished()
 {
+    delete[] m_writeBufferQueue.dequeue();
     if (m_writeQueue.isEmpty())
     {
         // WriteQueue is empty, platformWrite was called directly
