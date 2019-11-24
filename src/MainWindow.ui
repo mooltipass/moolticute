@@ -698,7 +698,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    <widget class="QComboBox" name="comboBoxBtLayout">
                     <property name="minimumSize">
                      <size>
-                      <width>120</width>
+                      <width>200</width>
                       <height>0</height>
                      </size>
                     </property>
@@ -746,7 +746,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    <widget class="QComboBox" name="comboBoxUsbLayout">
                     <property name="minimumSize">
                      <size>
-                      <width>120</width>
+                      <width>200</width>
                       <height>0</height>
                      </size>
                     </property>
