@@ -149,7 +149,7 @@ void MPDevice::sendInitMessages()
           * so TimerJob has no effect, hence sending
           * it with a lower timeout.
           */
-        QTimer::singleShot(INIT_STARTING_DELAY/2, [this]()
+        QTimer::singleShot(RESET_SEND_DELAY, [this]()
         {
             if (AppDaemon::isDebugDev())
                 qDebug() << "Resetting flip bit for BLE";
