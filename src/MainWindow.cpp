@@ -452,6 +452,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
     wsClient->settingsHelper()->setMainWindow(this);
+#ifdef Q_OS_WIN
+    const auto keyboardLayoutWidth = 150;
+    ui->comboBoxBtLayout->setMinimumWidth(keyboardLayoutWidth);
+    ui->comboBoxUsbLayout->setMinimumWidth(keyboardLayoutWidth);
+#endif
 
     //Setup the confirm view
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
