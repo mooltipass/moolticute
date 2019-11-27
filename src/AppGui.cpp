@@ -176,6 +176,9 @@ bool AppGui::initialize()
 #else
         Q_UNUSED(this)
         Q_UNUSED(reason)
+#if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
+        mainWindowShow();
+#endif
 #endif
     });
 
