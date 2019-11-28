@@ -54,6 +54,8 @@ public:
     ServiceItem *getServiceItemByIndex(const QModelIndex &idx) const;
     QString getCategoryName(int catId) const;
     void updateCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
+    bool isUserCategoryClean() const { return m_categoryClean; }
+    void setUserCategoryClean(bool clean) { m_categoryClean = clean; }
 
 private:
     ServiceItem *addService(const QString &sServiceName);
@@ -61,6 +63,7 @@ private:
 private:
     RootItem *m_pRootItem;
     QList<QString> m_categories{tr("Default category"), "", "", "", ""};
+    bool m_categoryClean = false;
 
 signals:
     void modelLoaded(bool bClearLoginDescription);
