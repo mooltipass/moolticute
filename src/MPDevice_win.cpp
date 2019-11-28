@@ -370,8 +370,7 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
     //we can then compare which OVERLAPPED this operation is
 
     bool fail = true;
-    if (errorCode == ERROR_SUCCESS ||
-        errorCode == ERROR_MORE_DATA)
+    if (errorCode == ERROR_SUCCESS)
         fail = false;
 
     if (overlapped == &writeOverlapped) //write op
