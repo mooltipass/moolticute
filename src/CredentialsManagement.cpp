@@ -194,7 +194,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::mpHwVersionChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::checkDeviceType);
-    connect(wsClient, &WSClient::deviceConnacted, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::deviceConnected, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::advancedMenuChanged,
             [this](bool isEnabled){ ui->credDisplayCategoryInput->setEnabled(isEnabled); });
     connect(wsClient, &WSClient::displayUserCategories, this,
