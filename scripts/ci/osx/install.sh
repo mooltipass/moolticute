@@ -4,4 +4,5 @@ set -ev
 echo "install.sh"
 
 brew update > /dev/null
-brew install qt5 jq lftp wget
+brew upgrade wget
+brew install qt5 jq lftp
