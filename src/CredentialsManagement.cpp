@@ -480,7 +480,7 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
             if ((!sPassword.isEmpty() && (sPassword != pLoginItem->password())) ||
                     (!sDescription.isEmpty() && (sDescription != pLoginItem->description())) ||
                     (!sLogin.isEmpty() && (sLogin != pLoginItem->name())) ||
-                    (wsClient->isMPBLE() && iCategory != pLoginItem->category()))
+                    (wsClient->isMPBLE() && iCategory != 0 && iCategory != pLoginItem->category()))
             {
                 auto btn = QMessageBox::question(this,
                                                  tr("Discard Modifications ?"),
