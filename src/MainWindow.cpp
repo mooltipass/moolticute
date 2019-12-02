@@ -158,7 +158,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
-    connect(wsClient, &WSClient::deviceConnacted, this, &MainWindow::onDeviceConnected);
+    connect(wsClient, &WSClient::deviceConnected, this, &MainWindow::onDeviceConnected);
     connect(wsClient, &WSClient::deviceDisconnected, this, &MainWindow::onDeviceDisconnected);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);

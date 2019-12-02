@@ -103,6 +103,7 @@ private:
     void setServiceInputAttributes(const QString& tooltipText, Qt::GlobalColor col);
     void clearMMMUi();
     void updateBleFavs(const QModelIndex &srcIndex);
+    void sendGetUserCategories();
 
     void changeCurrentFavorite(int iFavorite);
     virtual void changeEvent(QEvent *event);

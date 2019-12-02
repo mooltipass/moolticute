@@ -292,6 +292,7 @@ void CredentialModel::updateCategories(const QString &cat1, const QString &cat2,
     m_categories[2] = cat2;
     m_categories[3] = cat3;
     m_categories[4] = cat4;
+    m_categoryClean = true;
 }
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat)

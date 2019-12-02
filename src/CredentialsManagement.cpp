@@ -194,6 +194,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::mpHwVersionChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::deviceConnected, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::advancedMenuChanged,
             [this](bool isEnabled){ ui->credDisplayCategoryInput->setEnabled(isEnabled); });
     connect(wsClient, &WSClient::displayUserCategories, this,
@@ -215,10 +216,12 @@ void CredentialsManagement::setWsClient(WSClient *c)
                 {
                     if (Common::MPStatus::Unlocked == status && wsClient->get_advancedMenu())
                     {
-                        wsClient->sendGetUserCategories();
+                        sendGetUserCategories();
                     }
                 }
     );
+    connect(wsClient, &WSClient::deviceDisconnected,
+             [this](){ m_pCredModel->setUserCategoryClean(false);});
 }
 
 void CredentialsManagement::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
@@ -900,6 +903,15 @@ void CredentialsManagement::updateBleFavs(const QModelIndex &srcIndex)
     }
 }
 
+void CredentialsManagement::sendGetUserCategories()
+{
+    if (!m_pCredModel->isUserCategoryClean())
+    {
+        wsClient->sendGetUserCategories();
+        m_pCredModel->setUserCategoryClean(true);
+    }
+}
+
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
 {
     QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
@@ -1016,7 +1028,7 @@ void CredentialsManagement::checkDeviceType()
     {
         ui->label_UserCategories->show();
         ui->widget_UserCategories->show();
-        wsClient->sendGetUserCategories();
+        sendGetUserCategories();
     }
     else
     {

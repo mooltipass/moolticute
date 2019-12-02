@@ -148,7 +148,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     if (rootobj["msg"] == "mp_connected")
     {
         set_connected(true);
-        emit deviceConnacted();
+        emit deviceConnected();
     }
     else if (rootobj["msg"] == "mp_disconnected")
     {

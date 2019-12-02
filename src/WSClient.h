@@ -139,7 +139,7 @@ signals:
     void displayAvailableUsers(const QString& num);
     void displayUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
     void updateUserSettingsOnUI(const QJsonObject& userSettings);
-    void deviceConnacted();
+    void deviceConnected();
     void deviceDisconnected();
     void deleteDataNodesFinished();
     void updateBLEDeviceLanguage(const QJsonObject& langs);
