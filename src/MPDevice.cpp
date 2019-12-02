@@ -678,9 +678,10 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                             qCritical() << "Get favorite: couldn't get answer";
                             return false;
                         }
-#ifdef DEV_DEBUG
-                        qDebug() << "Received favorites: " << data.toHex();
-#endif
+                        if (AppDaemon::isDebugDev())
+                        {
+                            qDebug() << "Received favorites: " << data.toHex();
+                        }
                         /* Append favorite to list */
                         favoritesAddrs = bleImpl->getFavorites(data);
                         favoritesAddrsClone = favoritesAddrs;
@@ -3010,7 +3011,7 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
             temp_cnode_address = i.mid(2, 2);
 
             /* Check if favorite is set */
-            if ((temp_pnode_address != MPNode::EmptyAddress) || (temp_pnode_address != MPNode::EmptyAddress))
+            if (temp_pnode_address != MPNode::EmptyAddress)
             {
                 /* Find the nodes in memory */
                 MPNode *temp_cnode_pointer = nullptr;
