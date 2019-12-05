@@ -166,6 +166,8 @@ private:
     virtual void closeEvent(QCloseEvent *event);
     virtual void changeEvent(QEvent *event);
 
+    void updateDeviceDependentUI();
+
     void checkAutoStart();
     
     void checkSubdomainSelection();

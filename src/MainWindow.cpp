@@ -374,7 +374,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         {
             ui->groupBox_Information->hide();
         }
-        onDeviceConnected();
+        updateDeviceDependentUI();
     });
 
     connect(wsClient, &WSClient::fwVersionChanged, wsClient->settingsHelper(), &SettingsGuiHelper::checkKeyboardLayout);
@@ -534,6 +534,20 @@ void MainWindow::changeEvent(QEvent *event)
         retranslateUi();
     }
     QMainWindow::changeEvent(event);
+}
+
+void MainWindow::updateDeviceDependentUI()
+{
+    if (wsClient->isMPBLE())
+    {
+        ui->groupBox_UserSettings->show();
+        ui->pushButtonFiles->hide();
+    }
+    else
+    {
+        ui->groupBox_UserSettings->hide();
+        ui->pushButtonFiles->show();
+    }
 }
 
 void MainWindow::updateBackupControlsVisibility(bool visible)
@@ -1627,14 +1641,8 @@ void MainWindow::onDeviceConnected()
     if (wsClient->isMPBLE())
     {
         wsClient->sendUserSettingsRequest();
-        ui->groupBox_UserSettings->show();
-        ui->pushButtonFiles->hide();
     }
-    else
-    {
-        ui->groupBox_UserSettings->hide();
-        ui->pushButtonFiles->show();
-    }
+    updateDeviceDependentUI();
 }
 
 void MainWindow::onDeviceDisconnected()
