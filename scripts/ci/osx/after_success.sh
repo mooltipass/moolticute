@@ -80,13 +80,20 @@ echo "Verifying code signed app"
 codesign --verify --verbose=4 build/$APP.app
 spctl --assess --verbose=4 --raw build/$APP.app
 
-#install https://github.com/al45tair/dmgbuild
-wget_retry https://github.com/al45tair/dmgbuild/archive/v1.3.3.zip
-unzip v1.3.3.zip
-cd dmgbuild-1.3.3
-python setup.py install --user
-./scripts/dmgbuild -s ../mac/settings.py "Moolticute" ../build/$APP-$VERSION.dmg
-cd ..
+#install https://github.com/andreyvit/create-dmg
+brew install create-dmg
+
+create-dmg \
+    --volname "$APP" \
+    --volicon "img/AppIcon.icns" \
+    --background "img/dmg_background.png" \
+    --window-pos 100 100 \
+    --window-size 640 480 \
+    --icon-size 128 \
+    --icon "$APP.app" 192 344 \
+    --app-drop-link 448 344 \
+    build/$APP-$VERSION.dmg \
+    build/
 
 #sign dmg
 codesign --force --verify --verbose --sign "$ID" build/$APP-$VERSION.dmg
