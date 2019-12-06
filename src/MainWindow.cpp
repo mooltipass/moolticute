@@ -538,6 +538,7 @@ void MainWindow::changeEvent(QEvent *event)
 
 void MainWindow::updateDeviceDependentUI()
 {
+    wsClient->settingsHelper()->createSettingUIMapping();
     if (wsClient->isMPBLE())
     {
         ui->groupBox_UserSettings->show();
@@ -1637,7 +1638,6 @@ void MainWindow::on_pushButtonGetAvailableUsers_clicked()
 
 void MainWindow::onDeviceConnected()
 {
-    wsClient->settingsHelper()->createSettingUIMapping();
     if (wsClient->isMPBLE())
     {
         wsClient->sendUserSettingsRequest();
