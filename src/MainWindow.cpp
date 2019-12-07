@@ -168,11 +168,27 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->widgetFiles, &FilesManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
 
-    connect(wsClient, &WSClient::statusChanged, [this]()
+    connect(wsClient, &WSClient::statusChanged, [this](Common::MPStatus status)
     {
-        this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
-        if (wsClient->get_status() == Common::UnkownSmartcad)
+        this->enableKnockSettings(status == Common::NoCardInserted);
+        if (status == Common::UnkownSmartcad)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
+        qCritical() << "Actual status: " << Common::MPStatusString[status];
+        if (wsClient->isMPBLE())
+        {
+            if (Common::NoCardInserted == status)
+            {
+                ui->settings_user_language->hide();
+                ui->settings_bt_layout->hide();
+                ui->settings_usb_layout->hide();
+            }
+            else
+            {
+                ui->settings_user_language->show();
+                ui->settings_bt_layout->show();
+                ui->settings_usb_layout->show();
+            }
+        }
     });
 
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
