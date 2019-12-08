@@ -23,5 +23,7 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::PROMPT_ANIMATION_PARAM] = ANIMATION_DURING_PROMPT_BYTE;
     m_paramMap.insert(MPParams::BOOT_ANIMATION_PARAM, "bool_animation");
     m_bleByteMapping[MPParams::BOOT_ANIMATION_PARAM] = BOOT_ANIMATION_BYTE;
+    m_paramMap.insert(MPParams::DEVICE_LOCK_USB_DISC, "device_lock_usb_disc");
+    m_bleByteMapping[MPParams::DEVICE_LOCK_USB_DISC] = DEVICE_LOCK_USB_BYTE;
 }
 
