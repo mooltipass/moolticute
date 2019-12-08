@@ -160,6 +160,7 @@ public:
             CMD_DBG_FLASH_AUX_MCU       ,
             CMD_DBG_GET_PLAT_INFO       ,
             CMD_DBG_REINDEX_BUNDLE      ,
+            CMD_DBG_UPDATE_MAIN_AUX
         };
         Q_ENUM(Command)
 

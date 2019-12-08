@@ -1011,8 +1011,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "flash_mcu")
     {
-        QJsonObject o = root["data"].toObject();
-        bleImpl->flashMCU(o["type"].toString(), [this, root](bool success, QString errstr)
+        bleImpl->flashMCU([this, root](bool success, QString errstr)
         {
             if (!success)
             {

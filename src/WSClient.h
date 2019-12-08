@@ -97,7 +97,7 @@ public:
     void sendRefreshFilesCacheRequest();
 
     void sendPlatInfoRequest();
-    void sendFlashMCU(QString type);
+    void sendFlashMCU();
     void sendUploadBundle(QString bundleFilePath);
     void sendFetchData(QString fileName, Common::FetchType fetchType);
     void sendStopFetchData();

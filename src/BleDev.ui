@@ -122,35 +122,26 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_bundleText">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <spacer name="horizontalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <property name="maximumSize">
+          <property name="sizeHint" stdset="0">
            <size>
-            <width>125</width>
-            <height>16777215</height>
+            <width>40</width>
+            <height>20</height>
            </size>
           </property>
-          <property name="font">
-           <font>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Select Bundle File:</string>
-          </property>
-          <property name="scaledContents">
-           <bool>false</bool>
-          </property>
-         </widget>
+         </spacer>
         </item>
         <item>
          <widget class="QPushButton" name="btnFileBrowser">
+          <property name="minimumSize">
+           <size>
+            <width>140</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>100</width>
@@ -164,7 +155,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Browse</string>
+           <string>Select Bundle File</string>
           </property>
          </widget>
         </item>
@@ -182,26 +173,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="label_ReflashAuxMCU">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Flash Aux MCU:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnReflashAuxMCU">
+         <widget class="QPushButton" name="btnUpdatePlatform">
           <property name="minimumSize">
            <size>
             <width>80</width>
@@ -221,7 +193,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Flash</string>
+           <string>Update Platform</string>
           </property>
          </widget>
         </item>
@@ -237,44 +209,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_FlashMainMCU">
-          <property name="font">
-           <font>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Flash Main MCU:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnFlashMainMCU">
-          <property name="minimumSize">
-           <size>
-            <width>80</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Flash</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </item>

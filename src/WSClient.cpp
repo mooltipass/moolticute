@@ -660,12 +660,9 @@ void WSClient::sendPlatInfoRequest()
     sendJsonData({{ "msg", "get_debug_platinfo" }});
 }
 
-void WSClient::sendFlashMCU(QString type)
+void WSClient::sendFlashMCU()
 {
-    QJsonObject o;
-    o["type"] = type;
-    sendJsonData({{ "msg", "flash_mcu" },
-                  {"data", o}});
+    sendJsonData({{ "msg", "flash_mcu" }});
 }
 
 void WSClient::sendUploadBundle(QString bundleFilePath)
