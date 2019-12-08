@@ -1396,6 +1396,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxDeviceLockUSBDisc">
+                 <property name="text">
+                  <string>Device Lock on USB Disconnection</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
