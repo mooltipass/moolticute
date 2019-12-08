@@ -21,6 +21,9 @@ BleDev::BleDev(QWidget *parent) :
     ui->progressBarUpload->hide();
     ui->label_UploadProgress->hide();
 
+#ifdef Q_OS_WIN
+    ui->btnFileBrowser->setMinimumWidth(140);
+#endif
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
     ui->btnUpdatePlatform->setIcon(AppGui::qtAwesome()->icon(fa::upload, whiteButtons));
     ui->btnFetchDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
