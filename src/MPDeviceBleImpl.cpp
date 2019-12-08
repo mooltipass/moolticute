@@ -289,9 +289,6 @@ BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray respons
             cred.set(attr, attrVal);
         }
 
-        if (AppDaemon::isDebugDev())
-            qDebug() << "nextIndex: " << index << " attrName: " << attrVal;
-
         lastIndex = index;
         attr = static_cast<BleCredential::CredAttr>(static_cast<int>(attr) + 1);
     }
