@@ -93,7 +93,7 @@ create-dmg \
     --icon "$APP.app" 192 344 \
     --app-drop-link 448 344 \
     build/$APP-$VERSION.dmg \
-    build/
+    build/$APP.app
 
 #sign dmg
 codesign --force --verify --verbose --sign "$ID" build/$APP-$VERSION.dmg
