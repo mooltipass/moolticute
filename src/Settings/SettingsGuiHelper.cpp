@@ -77,6 +77,11 @@ void SettingsGuiHelper::createSettingUIMapping()
     {
         delete m_settings;
     }
+    else if (m_settings)
+    {
+        // If type is not different do not recreate m_settings
+        return;
+    }
     m_deviceType = type;
     if (m_deviceType == Common::MP_BLE)
     {
