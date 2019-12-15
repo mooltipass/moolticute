@@ -29,10 +29,6 @@ private slots:
     void displayDebugPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
 
     void displayUploadBundleResultReceived(bool success);
-    
-    void on_btnReflashAuxMCU_clicked();
-    
-    void on_btnFlashMainMCU_clicked();
 
     void updateProgress(int total, int curr, QString msg);
 
@@ -41,6 +37,8 @@ private slots:
     void on_btnFetchAccData_clicked();
 
     void on_btnFetchRandomData_clicked();
+
+    void on_btnUpdatePlatform_clicked();
 
 private:
     void initUITexts();

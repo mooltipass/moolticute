@@ -53,7 +53,7 @@ public:
     void getDebugPlatInfo(const MessageHandlerCbData &cb);
     QVector<int> calcDebugPlatInfo(const QByteArray &platInfo);
 
-    void flashMCU(QString type, const MessageHandlerCb &cb);
+    void flashMCU(const MessageHandlerCb &cb);
     void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
     void fetchData(QString filePath, MPCmd::Command cmd);
     inline void stopFetchData() { fetchState = Common::FetchState::STOPPED; }

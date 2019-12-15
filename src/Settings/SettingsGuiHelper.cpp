@@ -49,7 +49,8 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::USER_LANGUAGE, ui->comboBoxUserLanguage},
         {MPParams::KEYBOARD_USB_LAYOUT, ui->comboBoxUsbLayout},
         {MPParams::KEYBOARD_BT_LAYOUT, ui->comboBoxBtLayout},
-        {MPParams::BOOT_ANIMATION_PARAM, ui->checkBoxBootAnim}
+        {MPParams::BOOT_ANIMATION_PARAM, ui->checkBoxBootAnim},
+        {MPParams::DEVICE_LOCK_USB_DISC, ui->checkBoxDeviceLockUSBDisc}
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)
@@ -75,6 +76,11 @@ void SettingsGuiHelper::createSettingUIMapping()
     if (type != m_deviceType)
     {
         delete m_settings;
+    }
+    else if (m_settings)
+    {
+        // If type is not different do not recreate m_settings
+        return;
     }
     m_deviceType = type;
     if (m_deviceType == Common::MP_BLE)

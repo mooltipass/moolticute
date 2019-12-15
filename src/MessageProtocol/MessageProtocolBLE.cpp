@@ -363,6 +363,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::CMD_DBG_FLASH_AUX_MCU       , 0x8009},
         {MPCmd::CMD_DBG_GET_PLAT_INFO       , 0x800A},
         {MPCmd::CMD_DBG_REINDEX_BUNDLE      , 0x800B},
+        {MPCmd::CMD_DBG_UPDATE_MAIN_AUX     , 0x800E}
     };
 }
 

@@ -78,66 +78,28 @@ QVector<int> MPDeviceBleImpl::calcDebugPlatInfo(const QByteArray &platInfo)
     return platInfos;
 }
 
-void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
+void MPDeviceBleImpl::flashMCU(const MessageHandlerCb &cb)
 {
     /**
      * Stoping statusTimer to avoid sending
      * MOOLTIPASS_STATUS message during flash.
      */
     mpDev->statusTimer->stop();
-    if (type != "aux" && type != "main")
-    {
-        qCritical() << "Flashing called for an invalid type of " << type;
-        cb(false, "Failed flash.");
-        return;
-    }
-    auto *jobs = new AsyncJobs(QString("Flashing %1 MCU").arg(type), this);
-    const bool isAuxFlash = type == "aux";
-    const quint8 cmd = isAuxFlash ? MPCmd::CMD_DBG_FLASH_AUX_MCU : MPCmd::CMD_DBG_REBOOT_TO_BOOTLOADER;
-    auto flashJob = new MPCommandJob(mpDev, cmd, bleProt->getDefaultFuncDone());
+    auto *jobs = new AsyncJobs("Flashing Aux and Main MCU", this);
+    auto flashJob = new MPCommandJob(mpDev, MPCmd::CMD_DBG_UPDATE_MAIN_AUX, bleProt->getDefaultFuncDone());
     flashJob->setReturnCheck(false);
     jobs->append(flashJob);
-    if (isAuxFlash)
-    {
-        QSettings s;
-        s.setValue(AFTER_AUX_FLASH_SETTING, true);
-    }
+    QSettings s;
+    s.setValue(AFTER_AUX_FLASH_SETTING, true);
 
-    connect(jobs, &AsyncJobs::failed, [cb, isAuxFlash](AsyncJob *failedJob)
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
-        if (isAuxFlash)
-        {
-            cb(false, "Failed to flash Aux MCU!");
-        }
-        else
-        {
-            cb(true, "");
-        }
+        cb(false, "Failed to flash Aux and Main MCU!");
     });
 
-    mpDev->jobsQueue.enqueue(jobs);
-
-    if (!isAuxFlash)
-    {
-        /**
-          * Main MCU flash does not cause a reconnect of the device,
-          * so daemon keeps sending messages to the device, which
-          * is causing failure in the communication, this is why
-          * this sleep is added.*/
-
-        auto *waitingJob = new AsyncJobs(QString("Waiting job for Main MCU flash"), this);
-        qDebug() << "Waiting for device to start after Main MCU flash";
-        const auto flashTimeout = 5000;
-        waitingJob->append(new TimerJob{flashTimeout});
-        /**
-          * Restart statusTimer after Main MCU flash
-          */
-        QTimer::singleShot(flashTimeout, [this]() {mpDev->statusTimer->start();});
-        mpDev->jobsQueue.enqueue(waitingJob);
-    }
-
-    mpDev->runAndDequeueJobs();
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress)
@@ -326,9 +288,6 @@ BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray respons
         {
             cred.set(attr, attrVal);
         }
-
-        if (AppDaemon::isDebugDev())
-            qDebug() << "nextIndex: " << index << " attrName: " << attrVal;
 
         lastIndex = index;
         attr = static_cast<BleCredential::CredAttr>(static_cast<int>(attr) + 1);
