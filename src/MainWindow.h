@@ -184,6 +184,8 @@ private:
 
     void updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items);
 
+    bool shouldUpdateItems(QJsonObject& cache, const QJsonObject& received);
+
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
 
@@ -211,6 +213,9 @@ private:
     void initHelpLabels();
 
     SystemEventHandler eventHandler;
+
+    QJsonObject m_keyboardLayoutCache;
+    QJsonObject m_languagesCache;
 
     const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
 };

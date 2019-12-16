@@ -371,15 +371,21 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::updateBLEDeviceLanguage,
             [this](const QJsonObject& langs)
             {
-                updateBLEComboboxItems(ui->comboBoxDeviceLang, langs);
-                updateBLEComboboxItems(ui->comboBoxUserLanguage, langs);
+                if (shouldUpdateItems(m_languagesCache, langs))
+                {
+                    updateBLEComboboxItems(ui->comboBoxDeviceLang, langs);
+                    updateBLEComboboxItems(ui->comboBoxUserLanguage, langs);
+                }
             }
     );
     connect(wsClient, &WSClient::updateBLEKeyboardLayout,
             [this](const QJsonObject& layouts)
             {
-                updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
-                updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
+                if (shouldUpdateItems(m_keyboardLayoutCache, layouts))
+                {
+                    updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
+                    updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
+                }
                 wsClient->settingsHelper()->resetSettings();
             }
     );
@@ -1447,6 +1453,17 @@ void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)
     cb->model()->setParent(proxy);
     cb->setModel(proxy);
     cb->model()->sort(0);
+}
+
+bool MainWindow::shouldUpdateItems(QJsonObject &cache, const QJsonObject &received)
+{
+    if (cache == received)
+    {
+        return false;
+    }
+
+    cache = received;
+    return true;
 }
 
 void MainWindow::on_toolButton_clearBackupFilePath_released()
