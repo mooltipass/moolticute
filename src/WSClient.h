@@ -104,6 +104,7 @@ public:
     void sendGetUserCategories();
     void sendSetUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
     void sendUserSettingsRequest();
+    void sendLoadParams();
 
     inline bool isFw12() const { return isFwVersion(12); }
     inline bool isFw13() const { return isFwVersion(13); }

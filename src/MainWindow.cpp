@@ -188,6 +188,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->settings_bt_layout->show();
                 ui->settings_usb_layout->show();
             }
+
+            if (Common::Unlocked == status)
+            {
+                wsClient->sendLoadParams();
+            }
         }
     });
 

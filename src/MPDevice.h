@@ -208,6 +208,8 @@ public:
     void updateFileInCache(QString fileName, int size);
     void removeFileFromCache(QString fileName);
 
+    void loadParams() { pSettings->loadParameters(); }
+
 signals:
     /* Signal emited by platform code when new data comes from MP */
     /* A signal is used for platform code that uses a dedicated thread */
