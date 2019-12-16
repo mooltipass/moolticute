@@ -173,7 +173,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         this->enableKnockSettings(status == Common::NoCardInserted);
         if (status == Common::UnkownSmartcad)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
-        qCritical() << "Actual status: " << Common::MPStatusString[status];
+
         if (wsClient->isMPBLE())
         {
             if (Common::NoCardInserted == status)
