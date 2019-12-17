@@ -1463,12 +1463,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="cbCredentialPrompt">
+                <widget class="QCheckBox" name="cbKnockDisabled">
                  <property name="toolTip">
-                  <string>Require approval when modifying credentials in management mode. Control this setting in the settings menu of the advanced menu</string>
+                  <string/>
                  </property>
                  <property name="text">
-                  <string>Prompts for Credentials Save in Management Mode</string>
+                  <string>Knock Detection Disabled</string>
                  </property>
                 </widget>
                </item>

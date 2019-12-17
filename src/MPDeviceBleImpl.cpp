@@ -489,7 +489,7 @@ void MPDeviceBleImpl::readUserSettings(const QByteArray& settings)
         set_storagePrompt(d&STORAGE_PROMPT);
         set_advancedMenu(d&ADVANCED_MENU);
         set_bluetoothEnabled(d&BLUETOOTH_ENABLED);
-        set_credentialDisplayPrompt(d&CREDENTIAL_PROMPT);
+        set_knockDisabled(d&KNOCK_DISABLED);
         m_currentUserSettings = d;
         sendUserSettings();
     }
@@ -503,7 +503,7 @@ void MPDeviceBleImpl::sendUserSettings()
     settingJson["storage_prompt"] = get_storagePrompt();
     settingJson["advanced_menu"] = get_advancedMenu();
     settingJson["bluetooth_enabled"] = get_bluetoothEnabled();
-    settingJson["credential_prompt"] = get_credentialDisplayPrompt();
+    settingJson["knock_disabled"] = get_knockDisabled();
     emit userSettingsChanged(settingJson);
 }
 

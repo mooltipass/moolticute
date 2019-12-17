@@ -330,7 +330,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->cbStoragePrompt->setDisabled(true);
     ui->cbAdvancedMenu->setDisabled(true);
     ui->cbBluetoothEnabled->setDisabled(true);
-    ui->cbCredentialPrompt->setDisabled(true);
+    ui->cbKnockDisabled->setDisabled(true);
 
     connect(wsClient, &WSClient::advancedMenuChanged,
             &DeviceDetector::instance(), &DeviceDetector::onAdvancedModeChanged);
@@ -344,7 +344,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->cbAdvancedMenu->setChecked(advancedMenu);
                 wsClient->set_advancedMenu(advancedMenu);
                 ui->cbBluetoothEnabled->setChecked(settings["bluetooth_enabled"].toBool());
-                ui->cbCredentialPrompt->setChecked(settings["storage_prompt"].toBool());
+                ui->cbKnockDisabled->setChecked(settings["knock_disabled"].toBool());
             });
 
     connect(wsClient, &WSClient::updateBLEDeviceLanguage,

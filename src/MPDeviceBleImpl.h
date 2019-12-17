@@ -23,7 +23,7 @@ class MPDeviceBleImpl: public QObject
     QT_WRITABLE_PROPERTY(bool, storagePrompt, false)
     QT_WRITABLE_PROPERTY(bool, advancedMenu, false)
     QT_WRITABLE_PROPERTY(bool, bluetoothEnabled, false)
-    QT_WRITABLE_PROPERTY(bool, credentialDisplayPrompt, false)
+    QT_WRITABLE_PROPERTY(bool, knockDisabled, false)
 
     enum UserSettingsMask : quint8
     {
@@ -32,7 +32,7 @@ class MPDeviceBleImpl: public QObject
         STORAGE_PROMPT    = 0x04,
         ADVANCED_MENU     = 0x08,
         BLUETOOTH_ENABLED = 0x10,
-        CREDENTIAL_PROMPT = 0x20
+        KNOCK_DISABLED    = 0x20
     };
 
     struct FreeAddressInfo
