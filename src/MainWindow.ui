@@ -1220,6 +1220,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QCheckBox" name="checkBoxKnock">
                     <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_KnockEnable">
+                    <property name="text">
                      <string>Enable knock detection with</string>
                     </property>
                    </widget>

@@ -42,7 +42,12 @@ void SettingsGuiBLE::updateUI()
     ui->settings_device_language->show();
 
     // Miscellaneous groupbox
-    ui->groupBox_miscellaneous->hide();
+    ui->settings_miscellaneous_brightness->hide();
+    ui->checkBoxTuto->hide();
+    ui->checkBoxBoot->hide();
+    ui->checkBoxKnock->hide();
+    ui->checkBoxFlash->hide();
+    ui->checkBoxLockDevice->hide();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();
