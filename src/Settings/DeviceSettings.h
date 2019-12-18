@@ -51,6 +51,8 @@ protected:
 
     void fillParameterMapping();
 
+    void convertKnockValue(int& val);
+
     QMap<MPParams::Param, QString> m_paramMap;
 
     //flag set when loading all parameters

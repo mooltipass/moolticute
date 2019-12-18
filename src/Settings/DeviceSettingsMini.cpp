@@ -6,19 +6,6 @@ DeviceSettingsMini::DeviceSettingsMini(QObject *parent)
     fillParameterMapping();
 }
 
-void DeviceSettingsMini::convertKnockValue(int &val)
-{
-    switch(val)
-    {
-    case 0: val = KNOCKING_VERY_LOW; break;
-    case 1: val = KNOCKING_LOW; break;
-    case 2: val = KNOCKING_MEDIUM; break;
-    case 3: val = KNOCKING_HIGH; break;
-    default:
-        val = KNOCKING_MEDIUM;
-    }
-}
-
 void DeviceSettingsMini::checkTimeoutBoundaries(int &val)
 {
     if (val < 0) val = 0;

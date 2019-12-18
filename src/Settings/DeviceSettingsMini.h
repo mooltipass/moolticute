@@ -32,7 +32,6 @@ public:
     virtual ~DeviceSettingsMini() {}
 
 protected:
-    void convertKnockValue(int& val);
     void checkTimeoutBoundaries(int& val);
     void fillParameterMapping();
 };
