@@ -52,6 +52,7 @@ protected:
     void fillParameterMapping();
 
     void convertKnockValue(int& val);
+    int convertBackKnockValue(int val);
 
     QMap<MPParams::Param, QString> m_paramMap;
 

@@ -133,3 +133,11 @@ void DeviceSettings::convertKnockValue(int &val)
         val = KNOCKING_MEDIUM;
     }
 }
+
+int DeviceSettings::convertBackKnockValue(int val)
+{
+    if      (val >= KNOCKING_VERY_LOW) return 0;
+    else if (val >= KNOCKING_LOW)      return 1;
+    else if (val >= KNOCKING_MEDIUM)   return 2;
+    return 3;
+}

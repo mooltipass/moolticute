@@ -33,13 +33,8 @@ void MPSettingsBLE::loadParameters()
                         set_delay_after_key(m_lastDeviceSettings.at(DeviceSettingsBLE::DELAY_BETWEEN_KEY_PRESS));
                         set_bool_animation(m_lastDeviceSettings.at(DeviceSettingsBLE::BOOT_ANIMATION_BYTE) != 0);
                         set_device_lock_usb_disc(m_lastDeviceSettings.at(DeviceSettingsBLE::DEVICE_LOCK_USB_BYTE) != 0);
-                        int v;
-                        quint8 s = m_lastDeviceSettings.at(DeviceSettingsBLE::KNOCK_DET_BYTE);
-                        if      (s >= KNOCKING_VERY_LOW) v = 0;
-                        else if (s >= KNOCKING_LOW)      v = 1;
-                        else if (s >= KNOCKING_MEDIUM)   v = 2;
-                        else v = 3;
-                        set_knock_sensitivity(v);
+                        const int knockValue = convertBackKnockValue(m_lastDeviceSettings.at(DeviceSettingsBLE::KNOCK_DET_BYTE));
+                        set_knock_sensitivity(knockValue);
                         return true;
                     }
     ));
