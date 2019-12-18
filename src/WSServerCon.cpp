@@ -362,6 +362,10 @@ void WSServerCon::processMessage(const QString &message)
         },
         defaultProgressCb);
     }
+    else if (root["msg"] == "load_params")
+    {
+        mpdevice->loadParams();
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);

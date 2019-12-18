@@ -168,11 +168,32 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->widgetFiles, &FilesManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
 
-    connect(wsClient, &WSClient::statusChanged, [this]()
+    connect(wsClient, &WSClient::statusChanged, [this](Common::MPStatus status)
     {
-        this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
-        if (wsClient->get_status() == Common::UnkownSmartcad)
+        this->enableKnockSettings(status == Common::NoCardInserted);
+        if (status == Common::UnkownSmartcad)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
+
+        if (wsClient->isMPBLE())
+        {
+            if (Common::NoCardInserted == status)
+            {
+                ui->settings_user_language->hide();
+                ui->settings_bt_layout->hide();
+                ui->settings_usb_layout->hide();
+            }
+            else
+            {
+                ui->settings_user_language->show();
+                ui->settings_bt_layout->show();
+                ui->settings_usb_layout->show();
+            }
+
+            if (Common::Unlocked == status)
+            {
+                wsClient->sendLoadParams();
+            }
+        }
     });
 
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
@@ -350,15 +371,21 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::updateBLEDeviceLanguage,
             [this](const QJsonObject& langs)
             {
-                updateBLEComboboxItems(ui->comboBoxDeviceLang, langs);
-                updateBLEComboboxItems(ui->comboBoxUserLanguage, langs);
+                if (shouldUpdateItems(m_languagesCache, langs))
+                {
+                    updateBLEComboboxItems(ui->comboBoxDeviceLang, langs);
+                    updateBLEComboboxItems(ui->comboBoxUserLanguage, langs);
+                }
             }
     );
     connect(wsClient, &WSClient::updateBLEKeyboardLayout,
             [this](const QJsonObject& layouts)
             {
-                updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
-                updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
+                if (shouldUpdateItems(m_keyboardLayoutCache, layouts))
+                {
+                    updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
+                    updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
+                }
                 wsClient->settingsHelper()->resetSettings();
             }
     );
@@ -1426,6 +1453,17 @@ void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)
     cb->model()->setParent(proxy);
     cb->setModel(proxy);
     cb->model()->sort(0);
+}
+
+bool MainWindow::shouldUpdateItems(QJsonObject &cache, const QJsonObject &received)
+{
+    if (cache == received)
+    {
+        return false;
+    }
+
+    cache = received;
+    return true;
 }
 
 void MainWindow::on_toolButton_clearBackupFilePath_released()

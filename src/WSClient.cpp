@@ -708,6 +708,11 @@ void WSClient::sendUserSettingsRequest()
     sendJsonData({{ "msg", "get_user_settings" }});
 }
 
+void WSClient::sendLoadParams()
+{
+    sendJsonData({{ "msg", "load_params" }});
+}
+
 void WSClient::requestBleKeyboardLayout()
 {
     sendJsonData({{ "msg", "request_keyboard_layout" }});
