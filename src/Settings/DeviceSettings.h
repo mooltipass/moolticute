@@ -16,6 +16,7 @@ class DeviceSettings : public QObject
 
     QT_SETTINGS_PROPERTY(int, user_interaction_timeout, 0, MPParams::USER_INTER_TIMEOUT_PARAM)
     QT_SETTINGS_PROPERTY(bool, random_starting_pin, false, MPParams::RANDOM_INIT_PIN_PARAM)
+    QT_SETTINGS_PROPERTY(int, knock_sensitivity, 0, MPParams::MINI_KNOCK_THRES_PARAM) // 0-very low, 1-low, 2-medium, 3-high
 
 public:
     DeviceSettings(QObject *parent);

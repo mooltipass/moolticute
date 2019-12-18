@@ -33,6 +33,7 @@ void MPSettingsBLE::loadParameters()
                         set_delay_after_key(m_lastDeviceSettings.at(DeviceSettingsBLE::DELAY_BETWEEN_KEY_PRESS));
                         set_bool_animation(m_lastDeviceSettings.at(DeviceSettingsBLE::BOOT_ANIMATION_BYTE) != 0);
                         set_device_lock_usb_disc(m_lastDeviceSettings.at(DeviceSettingsBLE::DEVICE_LOCK_USB_BYTE) != 0);
+                        set_knock_sensitivity(m_lastDeviceSettings.at(DeviceSettingsBLE::KNOCK_DET_BYTE));
                         return true;
                     }
     ));
