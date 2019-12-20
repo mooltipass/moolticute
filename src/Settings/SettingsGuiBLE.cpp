@@ -46,6 +46,7 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxTuto->hide();
     ui->checkBoxBoot->hide();
     ui->checkBoxKnock->hide();
+    ui->labelRemoveCard->hide();
     ui->checkBoxFlash->hide();
     ui->checkBoxLockDevice->hide();
 

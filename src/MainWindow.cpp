@@ -170,7 +170,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::statusChanged, [this](Common::MPStatus status)
     {
-        this->enableKnockSettings(status == Common::NoCardInserted);
         if (status == Common::UnkownSmartcad)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
 
@@ -193,6 +192,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             {
                 wsClient->sendLoadParams();
             }
+        }
+        else
+        {
+            enableKnockSettings(status == Common::NoCardInserted);
         }
     });
 

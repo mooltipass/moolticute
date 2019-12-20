@@ -31,6 +31,8 @@ private slots:
     void sendParams(int value, int param);
 
 private:
+    void initKnockSetting();
+
     WSClient* m_wsClient = nullptr;
     DeviceSettings* m_settings = nullptr;
     MainWindow* m_mw = nullptr;
