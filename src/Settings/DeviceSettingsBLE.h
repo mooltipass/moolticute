@@ -32,7 +32,8 @@ public:
         DEFAULT_CHAR_AFTER_PASS = 6,
         DELAY_BETWEEN_KEY_PRESS = 7,
         BOOT_ANIMATION_BYTE = 8,
-        DEVICE_LOCK_USB_BYTE = 10
+        DEVICE_LOCK_USB_BYTE = 10,
+        KNOCK_DET_BYTE = 11
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;

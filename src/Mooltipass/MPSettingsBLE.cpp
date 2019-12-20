@@ -33,6 +33,8 @@ void MPSettingsBLE::loadParameters()
                         set_delay_after_key(m_lastDeviceSettings.at(DeviceSettingsBLE::DELAY_BETWEEN_KEY_PRESS));
                         set_bool_animation(m_lastDeviceSettings.at(DeviceSettingsBLE::BOOT_ANIMATION_BYTE) != 0);
                         set_device_lock_usb_disc(m_lastDeviceSettings.at(DeviceSettingsBLE::DEVICE_LOCK_USB_BYTE) != 0);
+                        const int knockValue = convertBackKnockValue(m_lastDeviceSettings.at(DeviceSettingsBLE::KNOCK_DET_BYTE));
+                        set_knock_sensitivity(knockValue);
                         return true;
                     }
     ));
@@ -87,6 +89,10 @@ void MPSettingsBLE::updateParam(MPParams::Param param, int val)
 {
     if (m_bleByteMapping.contains(param))
     {
+        if (MPParams::MINI_KNOCK_THRES_PARAM == param)
+        {
+            convertKnockValue(val);
+        }
         m_lastDeviceSettings[m_bleByteMapping[param]] = static_cast<char>(val);
     }
     else

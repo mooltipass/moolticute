@@ -1220,7 +1220,21 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QCheckBox" name="checkBoxKnock">
                     <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_KnockEnable">
+                    <property name="text">
                      <string>Enable knock detection with</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_KnockSensitivity">
+                    <property name="text">
+                     <string>Knock detection sensitivity:</string>
                     </property>
                    </widget>
                   </item>
@@ -1463,12 +1477,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="cbCredentialPrompt">
+                <widget class="QCheckBox" name="cbKnockDisabled">
                  <property name="toolTip">
-                  <string>Require approval when modifying credentials in management mode. Control this setting in the settings menu of the advanced menu</string>
+                  <string>Knock detection can be enabled/disabled on the device.</string>
                  </property>
                  <property name="text">
-                  <string>Prompts for Credentials Save in Management Mode</string>
+                  <string>Knock Detection Disabled</string>
                  </property>
                 </widget>
                </item>

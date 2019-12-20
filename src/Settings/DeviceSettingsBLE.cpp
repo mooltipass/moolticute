@@ -25,5 +25,6 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::BOOT_ANIMATION_PARAM] = BOOT_ANIMATION_BYTE;
     m_paramMap.insert(MPParams::DEVICE_LOCK_USB_DISC, "device_lock_usb_disc");
     m_bleByteMapping[MPParams::DEVICE_LOCK_USB_DISC] = DEVICE_LOCK_USB_BYTE;
+    m_bleByteMapping[MPParams::MINI_KNOCK_THRES_PARAM] = KNOCK_DET_BYTE;
 }
 

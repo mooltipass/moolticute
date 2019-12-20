@@ -116,6 +116,28 @@ void DeviceSettings::fillParameterMapping()
         {MPParams::KEY_AFTER_PASS_SEND_PARAM, "key_after_pass"},
         {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, "delay_after_key"},
         {MPParams::USER_INTER_TIMEOUT_PARAM, "user_interaction_timeout"},
-        {MPParams::RANDOM_INIT_PIN_PARAM, "random_starting_pin"}
+        {MPParams::RANDOM_INIT_PIN_PARAM, "random_starting_pin"},
+        {MPParams::MINI_KNOCK_THRES_PARAM, "knock_sensitivity"}
     };
+}
+
+void DeviceSettings::convertKnockValue(int &val)
+{
+    switch(val)
+    {
+    case 0: val = KNOCKING_VERY_LOW; break;
+    case 1: val = KNOCKING_LOW; break;
+    case 2: val = KNOCKING_MEDIUM; break;
+    case 3: val = KNOCKING_HIGH; break;
+    default:
+        val = KNOCKING_MEDIUM;
+    }
+}
+
+int DeviceSettings::convertBackKnockValue(int val)
+{
+    if      (val >= KNOCKING_VERY_LOW) return 0;
+    else if (val >= KNOCKING_LOW)      return 1;
+    else if (val >= KNOCKING_MEDIUM)   return 2;
+    return 3;
 }

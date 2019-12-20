@@ -99,6 +99,7 @@ void SettingsGuiHelper::createSettingUIMapping()
     m_settings->setupKeyboardLayout();
     m_settings->connectSendParams(this);
     dynamic_cast<ISettingsGui*>(m_settings)->updateUI();
+    initKnockSetting();
 }
 
 bool SettingsGuiHelper::checkSettingsChanged()
@@ -243,6 +244,18 @@ void SettingsGuiHelper::sendParams(int value, int param)
         qCritical() << "Invalid widget";
     }
     m_mw->checkSettingsChanged();
+}
+
+void SettingsGuiHelper::initKnockSetting()
+{
+    if (m_wsClient->isMPBLE())
+    {
+        m_mw->enableKnockSettings(true);
+    }
+    else
+    {
+        m_mw->enableKnockSettings(m_wsClient->get_status() == Common::NoCardInserted);
+    }
 }
 
 void SettingsGuiHelper::checkKeyboardLayout()

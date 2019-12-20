@@ -170,18 +170,12 @@ void MPSettingsMini::loadParameters()
                                   QByteArray(1, MPParams::MINI_KNOCK_THRES_PARAM),
                                   [this](const QByteArray &data, bool &) -> bool
     {
-        const auto knockEnabled = pMesProt->getFirstPayloadByte(data);
-        qDebug() << "received knock threshold: " << knockEnabled;
+        const auto knockSensitivity = pMesProt->getFirstPayloadByte(data);
+        qDebug() << "received knock threshold: " << knockSensitivity;
 
         // The conversion of the real-device 'knock threshold' property
         // to our made-up 'knock sensitivity' property:
-        int v;
-        quint8 s = knockEnabled;
-        if      (s >= KNOCKING_VERY_LOW) v = 0;
-        else if (s >= KNOCKING_LOW)      v = 1;
-        else if (s >= KNOCKING_MEDIUM)   v = 2;
-        else v = 3;
-        set_knock_sensitivity(v);
+        set_knock_sensitivity(convertBackKnockValue(knockSensitivity));
         return true;
     }));
 

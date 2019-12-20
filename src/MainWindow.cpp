@@ -170,7 +170,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::statusChanged, [this](Common::MPStatus status)
     {
-        this->enableKnockSettings(status == Common::NoCardInserted);
         if (status == Common::UnkownSmartcad)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
 
@@ -193,6 +192,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             {
                 wsClient->sendLoadParams();
             }
+        }
+        else
+        {
+            enableKnockSettings(status == Common::NoCardInserted);
         }
     });
 
@@ -351,7 +354,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->cbStoragePrompt->setDisabled(true);
     ui->cbAdvancedMenu->setDisabled(true);
     ui->cbBluetoothEnabled->setDisabled(true);
-    ui->cbCredentialPrompt->setDisabled(true);
+    ui->cbKnockDisabled->setDisabled(true);
 
     connect(wsClient, &WSClient::advancedMenuChanged,
             &DeviceDetector::instance(), &DeviceDetector::onAdvancedModeChanged);
@@ -365,7 +368,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->cbAdvancedMenu->setChecked(advancedMenu);
                 wsClient->set_advancedMenu(advancedMenu);
                 ui->cbBluetoothEnabled->setChecked(settings["bluetooth_enabled"].toBool());
-                ui->cbCredentialPrompt->setChecked(settings["storage_prompt"].toBool());
+                ui->cbKnockDisabled->setChecked(settings["knock_disabled"].toBool());
             });
 
     connect(wsClient, &WSClient::updateBLEDeviceLanguage,

@@ -40,7 +40,16 @@ void SettingsGuiMini::updateUI()
     ui->settings_device_language->hide();
 
     // Miscellaneous groupbox
-    ui->groupBox_miscellaneous->show();
+    ui->settings_miscellaneous_brightness->show();
+    ui->checkBoxTuto->show();
+    ui->checkBoxBoot->show();
+    ui->checkBoxKnock->show();
+    ui->label_KnockSensitivity->hide();
+    ui->label_KnockEnable->show();
+    ui->knockSettingsSuffixLabel->show();
+    ui->labelRemoveCard->show();
+    ui->checkBoxFlash->show();
+    ui->checkBoxLockDevice->show();
 
     ui->groupBox_BLESettings->hide();
 
