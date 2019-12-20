@@ -1232,6 +1232,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
+                   <widget class="QLabel" name="label_KnockSensitivity">
+                    <property name="text">
+                     <string>Knock detection sensitivity:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <widget class="QComboBox" name="comboBoxKnock"/>
                   </item>
                   <item>
@@ -1472,7 +1479,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QCheckBox" name="cbKnockDisabled">
                  <property name="toolTip">
-                  <string/>
+                  <string>Knock detection can be enabled/disabled on the device.</string>
                  </property>
                  <property name="text">
                   <string>Knock Detection Disabled</string>

@@ -44,6 +44,9 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxTuto->show();
     ui->checkBoxBoot->show();
     ui->checkBoxKnock->show();
+    ui->label_KnockSensitivity->hide();
+    ui->label_KnockEnable->show();
+    ui->knockSettingsSuffixLabel->show();
     ui->labelRemoveCard->show();
     ui->checkBoxFlash->show();
     ui->checkBoxLockDevice->show();
