@@ -101,7 +101,7 @@ void MPManager::usbDeviceAdded(QString path)
     Q_UNUSED(path);
     return;
 #endif
-    if (!devices.contains(path))
+    if (devices.empty())
     {
         MPDevice *device = nullptr;
 #if defined(Q_OS_WIN)
@@ -136,7 +136,7 @@ void MPManager::usbDeviceAdded(QString path)
 #if defined(Q_OS_LINUX)
 void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
 {
-    if (!devices.contains(path))
+    if (devices.empty())
     {
         if (isBLE && isBLEConnectedWithUsb())
         {
