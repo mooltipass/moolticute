@@ -196,6 +196,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         else
         {
             enableKnockSettings(status == Common::NoCardInserted);
+            if (Common::Unlocked == status)
+            {
+                wsClient->settingsHelper()->resetSettings();
+            }
         }
     });
 
