@@ -462,7 +462,7 @@ void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categ
         QString category = bleProt->toQString(data.mid(i*USER_CATEGORY_LENGTH, (i+1)*USER_CATEGORY_LENGTH));
         bool defaultCat = std::all_of(std::begin(category), std::end(category),
                                    [](const QChar& c) { return c == QChar{0xFFFF};});
-        categories[catName] = defaultCat ? "" : category;
+        categories[catName] = defaultCat ? catName : category;
     }
     m_categories = categories;
 }
