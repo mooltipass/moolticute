@@ -111,6 +111,7 @@ private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
     void sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress);
     void writeFetchData(QFile *file, MPCmd::Command cmd);
+    inline bool isBundleFileReadable(const QString& filePath);
 
     QByteArray createStoreCredMessage(const BleCredential &cred);
     QByteArray createGetCredMessage(QString service, QString login);

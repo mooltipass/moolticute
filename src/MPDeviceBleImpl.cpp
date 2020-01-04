@@ -104,6 +104,12 @@ void MPDeviceBleImpl::flashMCU(const MessageHandlerCb &cb)
 
 void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress)
 {
+    if (!isBundleFileReadable(filePath))
+    {
+        qCritical() << "Error opening bundle file: " << filePath;
+        cb(false, "Bundle file is not readable");
+        return;
+    }
     QElapsedTimer *timer = new QElapsedTimer{};
     timer->start();
     auto *jobs = new AsyncJobs(QString("Upload bundle file"), this);
@@ -828,4 +834,9 @@ void MPDeviceBleImpl::writeFetchData(QFile *file, MPCmd::Command cmd)
                         }
                         return true;
     });
+}
+
+bool MPDeviceBleImpl::isBundleFileReadable(const QString &filePath)
+{
+    return QFile{filePath}.open(QIODevice::ReadOnly);
 }
