@@ -77,6 +77,7 @@ public:
     PasswordLineEdit(QWidget* parent = nullptr);
     void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);
     void setMaxPasswordLength(int length);
+    static constexpr int INVALID_LENGTH = -1;
 
 protected:
     QAction *m_showPassword, *m_hidePassword;
@@ -87,6 +88,7 @@ private:
     PasswordProfilesModel *m_passwordProfilesModel;
     PasswordOptionsPopup *m_passwordOptionsPopup;
     void showPasswordOptions();
+    int m_passwordMaxLength = INVALID_LENGTH;
 };
 
 class LockedPasswordLineEdit : public PasswordLineEdit

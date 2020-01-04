@@ -90,6 +90,11 @@ void PasswordLineEdit::setMaxPasswordLength(int length)
     if(m_passwordOptionsPopup)
     {
         m_passwordOptionsPopup->setMaxPasswordLength(length);
+        m_passwordMaxLength = INVALID_LENGTH;
+    }
+    else
+    {
+        m_passwordMaxLength = length;
     }
 }
 
@@ -99,6 +104,10 @@ void PasswordLineEdit::showPasswordOptions()
     {
         m_passwordOptionsPopup = new PasswordOptionsPopup(this);
         m_passwordOptionsPopup->setPasswordProfilesModel(m_passwordProfilesModel);
+        if (INVALID_LENGTH != m_passwordMaxLength)
+        {
+            m_passwordOptionsPopup->setMaxPasswordLength(m_passwordMaxLength);
+        }
         connect(m_passwordOptionsPopup, &PasswordOptionsPopup::passwordGenerated,
                 this, &QLineEdit::setText);
         connect(m_passwordOptionsPopup, &PasswordOptionsPopup::passwordGenerated,
