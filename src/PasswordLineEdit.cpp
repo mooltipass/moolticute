@@ -84,6 +84,15 @@ void PasswordLineEdit::setPasswordProfilesModel(PasswordProfilesModel *passwordP
         m_passwordOptionsPopup->setPasswordProfilesModel(passwordProfilesModel);
 }
 
+void PasswordLineEdit::setMaxPasswordLength(int length)
+{
+    setMaxLength(length);
+    if(m_passwordOptionsPopup)
+    {
+        m_passwordOptionsPopup->setMaxPasswordLength(length);
+    }
+}
+
 void PasswordLineEdit::showPasswordOptions()
 {
     if (!m_passwordOptionsPopup)
@@ -235,6 +244,11 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent):
 void PasswordOptionsPopup::setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel)
 {
     m_passwordProfileCMB->setModel(passwordProfilesModel);
+}
+
+void PasswordOptionsPopup::setMaxPasswordLength(int length)
+{
+    m_lengthSlider->setMaximum(length);
 }
 
 void PasswordOptionsPopup::updatePasswordLength(int length)

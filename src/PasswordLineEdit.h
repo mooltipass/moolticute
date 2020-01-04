@@ -40,6 +40,7 @@ class PasswordOptionsPopup : public QFrame
 public:
     PasswordOptionsPopup(QWidget* parent);
     void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);
+    void setMaxPasswordLength(int length);
 
 Q_SIGNALS:
     void passwordGenerated(const QString & password);
@@ -75,6 +76,7 @@ class PasswordLineEdit : public QLineEdit
 public:
     PasswordLineEdit(QWidget* parent = nullptr);
     void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);
+    void setMaxPasswordLength(int length);
 
 protected:
     QAction *m_showPassword, *m_hidePassword;

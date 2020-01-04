@@ -131,6 +131,8 @@ private:
 
     static constexpr int MINI_FAVORITE_NUM = 14;
     static constexpr int BLE_FAVORITE_NUM = 50;
+    static constexpr int MINI_PASSWORD_LENGTH = 31;
+    static constexpr int BLE_PASSWORD_LENGTH = 64;
 
 signals:
     void wantEnterMemMode();
