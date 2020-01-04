@@ -1057,11 +1057,15 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
     {
         ui->credDisplayCategoryInput->show();
         ui->credDisplayCategoryLabel->show();
+        ui->addCredPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
+        ui->credDisplayPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
     }
     else
     {
         ui->credDisplayCategoryInput->hide();
         ui->credDisplayCategoryLabel->hide();
+        ui->addCredPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
+        ui->credDisplayPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
     }
 }
 
