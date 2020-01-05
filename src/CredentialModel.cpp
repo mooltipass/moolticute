@@ -469,6 +469,7 @@ void CredentialModel::addCredential(QString sServiceName, const QString &sLoginN
                 pAddedLoginItem->setPasswordLocked(false);
                 pAddedLoginItem->setPassword(sPassword);
                 pAddedLoginItem->setDescription(sDescription);
+                pAddedLoginItem->setCategory(0);
                 endInsertRows();
             }
         }
