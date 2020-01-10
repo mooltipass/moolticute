@@ -98,6 +98,8 @@ public:
 
     void getUID(const QByteArray & key);
 
+    void processStatusChange(const QByteArray &data);
+
     //mem mgmt mode
     //cbFailure is used to propagate an error to clients when entering mmm
     void startMemMgmtMode(bool wantData,
