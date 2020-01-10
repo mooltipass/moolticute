@@ -47,6 +47,7 @@ MPDevice::MPDevice(QObject *parent):
 
             if (isBLE())
             {
+                //Only send status message request at ble connection
                 statusTimer->stop();
             }
             processStatusChange(data);
@@ -245,9 +246,9 @@ void MPDevice::newDataRead(const QByteArray &data)
 
     if (commandQueue.isEmpty())
     {
-        if (MPCmd::MOOLTIPASS_STATUS == pMesProt->getCommand(data))
+        if (isBLE() && MPCmd::MOOLTIPASS_STATUS == pMesProt->getCommand(data))
         {
-            qCritical() << "Status message received";
+            qDebug() << "Received status: " << data.toHex();
             processStatusChange(data);
             return;
         }
@@ -320,9 +321,9 @@ void MPDevice::newDataRead(const QByteArray &data)
     if (currentCmd.checkReturn &&
         dataCommand != currentCommand)
     {
-        if (MPCmd::MOOLTIPASS_STATUS == dataCommand)
+        if (isBLE() && MPCmd::MOOLTIPASS_STATUS == dataCommand)
         {
-            qCritical() << "Status message received";
+            qDebug() << "Received status: " << data.toHex();
             processStatusChange(data);
             return;
         }
