@@ -372,6 +372,7 @@ void AppGui::connectedChanged()
         icon.setIsMask(true);
 #endif
         systray->setIcon(icon);
+        updateSystrayTooltip();
     }
 }
 
