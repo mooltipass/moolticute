@@ -45,62 +45,12 @@ MPDevice::MPDevice(QObject *parent):
             if (!success)
                 return;
 
-            /* Map status from received val */
-            Common::MPStatus s = pMesProt->getStatus(data);
-            Common::MPStatus prevStatus = get_status();
-
             if (isBLE())
             {
-                bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
+                //Only send status message request at ble connection
+                statusTimer->stop();
             }
-
-            /* Trigger on status change */
-            if (s != prevStatus)
-            {
-                qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
-
-                /* Update status */
-                set_status(s);
-
-                if (prevStatus == Common::UnknownStatus)
-                {
-                    QTimer::singleShot(10, [this]()
-                    {
-                        /* First start: load parameters */
-                        pSettings->loadParameters();
-                        setCurrentDate();
-                    });
-                }
-
-                if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
-                {
-                    QTimer::singleShot(20, [this]()
-                    {
-                        getCurrentCardCPZ();
-                    });
-                }
-                else
-                {
-                    filesCache.resetState();
-                }
-
-                if (s == Common::Unlocked)
-                {
-                    /* If v1.2 firmware, query user change number */
-                    QTimer::singleShot(50, [this]()
-                    {
-                        if (isFw12() || isBLE())
-                        {
-                            qInfo() << "Requesting change numbers";
-                            getChangeNumbers();
-                        }
-                        else
-                        {
-                            qInfo() << "Firmware below v1.2, do not request change numbers";
-                        }
-                    });
-                }
-            }
+            processStatusChange(data);
         });
     });
 
@@ -296,6 +246,12 @@ void MPDevice::newDataRead(const QByteArray &data)
 
     if (commandQueue.isEmpty())
     {
+        if (isBLE() && MPCmd::MOOLTIPASS_STATUS == pMesProt->getCommand(data))
+        {
+            qDebug() << "Received status: " << data.toHex();
+            processStatusChange(data);
+            return;
+        }
         qWarning() << "Command queue is empty!";
         qWarning() << "Packet data " << " size:" << pMesProt->getMessageSize(data) << " data:" << data.toHex();
         return;
@@ -365,6 +321,12 @@ void MPDevice::newDataRead(const QByteArray &data)
     if (currentCmd.checkReturn &&
         dataCommand != currentCommand)
     {
+        if (isBLE() && MPCmd::MOOLTIPASS_STATUS == dataCommand)
+        {
+            qDebug() << "Received status: " << data.toHex();
+            processStatusChange(data);
+            return;
+        }
         qWarning() << "Wrong answer received: " << pMesProt->printCmd(dataCommand)
                    << " for command: " << pMesProt->printCmd(currentCommand);
         if (AppDaemon::isDebugDev())
@@ -3476,6 +3438,66 @@ void MPDevice::getUID(const QByteArray & key)
 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
+}
+
+void MPDevice::processStatusChange(const QByteArray &data)
+{
+    /* Map status from received val */
+    Common::MPStatus s = pMesProt->getStatus(data);
+    Common::MPStatus prevStatus = get_status();
+
+    if (isBLE())
+    {
+        bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
+    }
+
+    /* Trigger on status change */
+    if (s != prevStatus)
+    {
+        qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
+
+        /* Update status */
+        set_status(s);
+
+        if (prevStatus == Common::UnknownStatus)
+        {
+            QTimer::singleShot(10, [this]()
+            {
+                /* First start: load parameters */
+                pSettings->loadParameters();
+                setCurrentDate();
+            });
+        }
+
+        if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
+        {
+            QTimer::singleShot(20, [this]()
+            {
+                getCurrentCardCPZ();
+            });
+        }
+        else
+        {
+            filesCache.resetState();
+        }
+
+        if (s == Common::Unlocked)
+        {
+            /* If v1.2 firmware, query user change number */
+            QTimer::singleShot(50, [this]()
+            {
+                if (isFw12() || isBLE())
+                {
+                    qInfo() << "Requesting change numbers";
+                    getChangeNumbers();
+                }
+                else
+                {
+                    qInfo() << "Firmware below v1.2, do not request change numbers";
+                }
+            });
+        }
+    }
 }
 
 void MPDevice::getCurrentCardCPZ()
