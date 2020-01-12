@@ -28,6 +28,7 @@
 #include "LoginItem.h"
 #include "ServiceItem.h"
 #include "DeviceDetector.h"
+#include "SettingsGuiBLE.h"
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
@@ -86,6 +87,10 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonSaveCategories->hide();
     ui->credDisplayCategoryInput->hide();
     ui->credDisplayCategoryLabel->hide();
+    ui->credDisplayKeyAfterLoginInput->hide();
+    ui->credDisplayKeyAfterLoginLabel->hide();
+    ui->credDisplayKeyAfterPwdInput->hide();
+    ui->credDisplayKeyAfterPwdLabel->hide();
     connect(ui->lineEditCategory1, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory2, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory3, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
@@ -103,6 +108,15 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     {
         ui->credDisplayCategoryInput->addItem(m_pCredModel->getCategoryName(i), i);
     }
+
+    ui->credDisplayKeyAfterLoginInput->addItem(MainWindow::NONE_STRING, SettingsGuiBLE::NONE_INDEX);
+    ui->credDisplayKeyAfterLoginInput->addItem(MainWindow::TAB_STRING, SettingsGuiBLE::TAB_INDEX);
+    ui->credDisplayKeyAfterLoginInput->addItem(MainWindow::ENTER_STRING, SettingsGuiBLE::ENTER_INDEX);
+    ui->credDisplayKeyAfterLoginInput->addItem(MainWindow::SPACE_STRING, SettingsGuiBLE::SPACE_INDEX);
+    ui->credDisplayKeyAfterPwdInput->addItem(MainWindow::NONE_STRING, SettingsGuiBLE::NONE_INDEX);
+    ui->credDisplayKeyAfterPwdInput->addItem(MainWindow::TAB_STRING, SettingsGuiBLE::TAB_INDEX);
+    ui->credDisplayKeyAfterPwdInput->addItem(MainWindow::ENTER_STRING, SettingsGuiBLE::ENTER_INDEX);
+    ui->credDisplayKeyAfterPwdInput->addItem(MainWindow::SPACE_STRING, SettingsGuiBLE::SPACE_INDEX);
 
     connect(m_pCredModel, &CredentialModel::modelReset, this, &CredentialsManagement::updateFavMenu);
     connect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::updateFavMenu);
@@ -1057,6 +1071,10 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
     {
         ui->credDisplayCategoryInput->show();
         ui->credDisplayCategoryLabel->show();
+        ui->credDisplayKeyAfterLoginInput->show();
+        ui->credDisplayKeyAfterLoginLabel->show();
+        ui->credDisplayKeyAfterPwdInput->show();
+        ui->credDisplayKeyAfterPwdLabel->show();
         ui->addCredPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
     }
@@ -1064,6 +1082,10 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
     {
         ui->credDisplayCategoryInput->hide();
         ui->credDisplayCategoryLabel->hide();
+        ui->credDisplayKeyAfterLoginInput->hide();
+        ui->credDisplayKeyAfterLoginLabel->hide();
+        ui->credDisplayKeyAfterPwdInput->hide();
+        ui->credDisplayKeyAfterPwdLabel->hide();
         ui->addCredPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
     }
