@@ -166,3 +166,35 @@ void MPNodeBLE::setCategory(int category)
     }
     data[0] = static_cast<char>(categoryBit);
 }
+
+int MPNodeBLE::getKeyAfterLogin() const
+{
+    if (!isValid()) return 0;
+    return pMesProt->toIntFromLittleEndian(data[KEY_AFTER_LOGIN_ADDR_START], data[KEY_AFTER_LOGIN_ADDR_START+1]);
+}
+
+void MPNodeBLE::setKeyAfterLogin(int key)
+{
+    if (isValid())
+    {
+        const auto keyArray = pMesProt->toLittleEndianFromInt(key);
+        data[KEY_AFTER_LOGIN_ADDR_START] = keyArray[0];
+        data[KEY_AFTER_LOGIN_ADDR_START+1] = keyArray[1];
+    }
+}
+
+int MPNodeBLE::getKeyAfterPwd() const
+{
+    if (!isValid()) return 0;
+    return pMesProt->toIntFromLittleEndian(data[KEY_AFTER_PWD_ADDR_START], data[KEY_AFTER_PWD_ADDR_START+1]);
+}
+
+void MPNodeBLE::setKeyAfterPwd(int key)
+{
+    if (isValid())
+    {
+        const auto keyArray = pMesProt->toLittleEndianFromInt(key);
+        data[KEY_AFTER_PWD_ADDR_START] = keyArray[0];
+        data[KEY_AFTER_PWD_ADDR_START+1] = keyArray[1];
+    }
+}
