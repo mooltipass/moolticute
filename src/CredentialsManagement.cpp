@@ -109,14 +109,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
         ui->credDisplayCategoryInput->addItem(m_pCredModel->getCategoryName(i), i);
     }
 
-    ui->credDisplayKeyAfterLoginInput->addItem(MainWindow::NONE_STRING, SettingsGuiBLE::NONE_INDEX);
-    ui->credDisplayKeyAfterLoginInput->addItem(MainWindow::TAB_STRING, SettingsGuiBLE::TAB_INDEX);
-    ui->credDisplayKeyAfterLoginInput->addItem(MainWindow::ENTER_STRING, SettingsGuiBLE::ENTER_INDEX);
-    ui->credDisplayKeyAfterLoginInput->addItem(MainWindow::SPACE_STRING, SettingsGuiBLE::SPACE_INDEX);
-    ui->credDisplayKeyAfterPwdInput->addItem(MainWindow::NONE_STRING, SettingsGuiBLE::NONE_INDEX);
-    ui->credDisplayKeyAfterPwdInput->addItem(MainWindow::TAB_STRING, SettingsGuiBLE::TAB_INDEX);
-    ui->credDisplayKeyAfterPwdInput->addItem(MainWindow::ENTER_STRING, SettingsGuiBLE::ENTER_INDEX);
-    ui->credDisplayKeyAfterPwdInput->addItem(MainWindow::SPACE_STRING, SettingsGuiBLE::SPACE_INDEX);
+    initKeyAfterInput(ui->credDisplayKeyAfterLoginInput);
+    initKeyAfterInput(ui->credDisplayKeyAfterPwdInput);
 
     connect(m_pCredModel, &CredentialModel::modelReset, this, &CredentialsManagement::updateFavMenu);
     connect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::updateFavMenu);
@@ -924,6 +918,14 @@ void CredentialsManagement::sendGetUserCategories()
         wsClient->sendGetUserCategories();
         m_pCredModel->setUserCategoryClean(true);
     }
+}
+
+void CredentialsManagement::initKeyAfterInput(QComboBox *cbKeyAfter)
+{
+    cbKeyAfter->addItem(MainWindow::NONE_STRING, SettingsGuiBLE::NONE_INDEX);
+    cbKeyAfter->addItem(MainWindow::TAB_STRING, SettingsGuiBLE::TAB_INDEX);
+    cbKeyAfter->addItem(MainWindow::ENTER_STRING, SettingsGuiBLE::ENTER_INDEX);
+    cbKeyAfter->addItem(MainWindow::SPACE_STRING, SettingsGuiBLE::SPACE_INDEX);
 }
 
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)

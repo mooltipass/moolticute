@@ -104,6 +104,7 @@ private:
     void clearMMMUi();
     void updateBleFavs(const QModelIndex &srcIndex);
     void sendGetUserCategories();
+    void initKeyAfterInput(QComboBox * cbKeyAfter);
 
     void changeCurrentFavorite(int iFavorite);
     virtual void changeEvent(QEvent *event);
