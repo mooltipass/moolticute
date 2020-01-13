@@ -81,6 +81,8 @@ QJsonObject LoginItem::toJson() const
     if (DeviceDetector::instance().isBle())
     {
         ret.insert("category", m_iCategory);
+        ret.insert("key_after_login", m_iKeyAfterLogin);
+        ret.insert("key_after_pwd", m_iKeyAfterPwd);
     }
     return ret;
 }

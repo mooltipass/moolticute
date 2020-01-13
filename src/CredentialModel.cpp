@@ -295,7 +295,7 @@ void CredentialModel::updateCategories(const QString &cat1, const QString &cat2,
     m_categoryClean = true;
 }
 
-void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat)
+void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat, int iLoginKey, int iPwdKey)
 {
     // Retrieve item
     LoginItem *pLoginItem = getLoginItemByIndex(idx);
@@ -307,6 +307,8 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPa
         if (DeviceDetector::instance().isBle())
         {
             updateLoginItem(idx, CategoryRole, iCat);
+            updateLoginItem(idx, KeyAfterLoginRole, iLoginKey);
+            updateLoginItem(idx, CategoryRole, iPwdKey);
         }
     }
 }
@@ -390,6 +392,26 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &ro
             {
                 pLoginItem->setFavorite(Common::FAV_NOT_SET);
             }
+            bChanged = true;
+        }
+        break;
+    }
+    case KeyAfterLoginRole:
+    {
+        int key = vValue.toInt();
+        if (key != pLoginItem->keyAfterLogin())
+        {
+            pLoginItem->setkeyAfterLogin(key);
+            bChanged = true;
+        }
+        break;
+    }
+    case KeyAfterPwdRole:
+    {
+        int key = vValue.toInt();
+        if (key != pLoginItem->keyAfterPwd())
+        {
+            pLoginItem->setkeyAfterPwd(key);
             bChanged = true;
         }
         break;
