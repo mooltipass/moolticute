@@ -310,7 +310,7 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPa
         {
             updateLoginItem(idx, CategoryRole, iCat);
             updateLoginItem(idx, KeyAfterLoginRole, iLoginKey);
-            updateLoginItem(idx, CategoryRole, iPwdKey);
+            updateLoginItem(idx, KeyAfterPwdRole, iPwdKey);
         }
     }
 }
