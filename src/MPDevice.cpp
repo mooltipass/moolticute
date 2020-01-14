@@ -6422,9 +6422,13 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             QString description = qjobject["description"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
             int category = 0;
+            int keyAfterLogin = 0;
+            int keyAfterPwd = 0;
             if (isBLE())
             {
                 category = qjobject["category"].toInt();
+                keyAfterLogin = qjobject["key_after_login"].toInt();
+                keyAfterPwd = qjobject["key_after_pwd"].toInt();
             }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
@@ -6481,6 +6485,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 if (isBLE())
                 {
                     bleImpl->setNodeCategory(newNodePt, category);
+                    bleImpl->setNodeKeyAfterLogin(newNodePt, keyAfterLogin);
+                    bleImpl->setNodeKeyAfterPwd(newNodePt, keyAfterPwd);
                 }
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
@@ -6526,6 +6532,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 if (isBLE())
                 {
                     bleImpl->setNodeCategory(nodePtr, category);
+                    bleImpl->setNodeKeyAfterLogin(nodePtr, keyAfterLogin);
+                    bleImpl->setNodeKeyAfterPwd(nodePtr, keyAfterPwd);
                 }
                 addChildToDB(parentPtr, nodePtr);
 
@@ -6571,6 +6579,16 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     if (category != nodeBle->getCategory())
                     {
                         nodeBle->setCategory(category);
+                        packet_send_needed = true;
+                    }
+                    if (keyAfterLogin != nodeBle->getKeyAfterLogin())
+                    {
+                        nodeBle->setKeyAfterLogin(keyAfterLogin);
+                        packet_send_needed = true;
+                    }
+                    if (keyAfterPwd != nodeBle->getKeyAfterPwd())
+                    {
+                        nodeBle->setKeyAfterPwd(keyAfterPwd);
                         packet_send_needed = true;
                     }
                 }

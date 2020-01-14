@@ -94,6 +94,8 @@ public:
     void updateUserCategories(const QJsonObject &categories);
     bool isUserCategoriesChanged(const QJsonObject &categories) const;
     void setNodeCategory(MPNode* node, int category);
+    void setNodeKeyAfterLogin(MPNode* node, int key);
+    void setNodeKeyAfterPwd(MPNode* node, int key);
 
     QList<QByteArray> getFavorites(const QByteArray& data);
 

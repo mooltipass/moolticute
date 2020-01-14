@@ -585,6 +585,24 @@ void MPDeviceBleImpl::setNodeCategory(MPNode* node, int category)
     }
 }
 
+void MPDeviceBleImpl::setNodeKeyAfterLogin(MPNode *node, int key)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        qDebug() << "Setting keyAfterLogin to: " << key;
+        nodeBle->setKeyAfterLogin(key);
+    }
+}
+
+void MPDeviceBleImpl::setNodeKeyAfterPwd(MPNode *node, int key)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        qDebug() << "Setting keyAfterPwd to: " << key;
+        nodeBle->setKeyAfterPwd(key);
+    }
+}
+
 QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
 {
     QList<QByteArray> res;
