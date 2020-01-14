@@ -221,6 +221,8 @@ void CredentialModel::load(const QJsonArray &json)
             if (DeviceDetector::instance().isBle())
             {
                 pLoginItem->setCategory(cnode["category"].toVariant().toInt());
+                pLoginItem->setkeyAfterLogin(cnode["key_after_login"].toVariant().toInt());
+                pLoginItem->setkeyAfterPwd(cnode["key_after_pwd"].toVariant().toInt());
             }
 
             QJsonArray a = cnode["address"].toArray();

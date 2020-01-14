@@ -563,8 +563,10 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
         ui->credDisplayDescriptionInput->setText(pLoginItem->description());
         ui->credDisplayLoginInput->setText(pLoginItem->name());
         ui->credDisplayCategoryInput->setCurrentIndex(pLoginItem->category());
-        ui->credDisplayKeyAfterLoginInput->setCurrentIndex(pLoginItem->keyAfterLogin());
-        ui->credDisplayKeyAfterPwdInput->setCurrentIndex(pLoginItem->keyAfterPwd());
+        auto keyAfterLoginIdx = ui->credDisplayKeyAfterLoginInput->findData(pLoginItem->keyAfterLogin());
+        ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
+        auto keyAfterPwdIdx = ui->credDisplayKeyAfterPwdInput->findData(pLoginItem->keyAfterPwd());
+        ui->credDisplayKeyAfterPwdInput->setCurrentIndex(keyAfterPwdIdx);
         auto *serviceItem = pLoginItem->parentItem();
         if (nullptr != serviceItem)
         {
@@ -830,8 +832,10 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
             if (wsClient->isMPBLE())
             {
                 ui->credDisplayCategoryInput->setCurrentIndex(pLoginItem->category());
-                ui->credDisplayKeyAfterLoginInput->setCurrentIndex(pLoginItem->keyAfterLogin());
-                ui->credDisplayKeyAfterPwdInput->setCurrentIndex(pLoginItem->keyAfterPwd());
+                auto keyAfterLoginIdx = ui->credDisplayKeyAfterLoginInput->findData(pLoginItem->keyAfterLogin());
+                ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
+                auto keyAfterPwdIdx = ui->credDisplayKeyAfterPwdInput->findData(pLoginItem->keyAfterPwd());
+                ui->credDisplayKeyAfterPwdInput->setCurrentIndex(keyAfterPwdIdx);
             }
         }
     }
