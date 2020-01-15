@@ -205,8 +205,8 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::deviceConnected, this, &CredentialsManagement::checkDeviceType);
-    connect(wsClient, &WSClient::advancedMenuChanged,
-            [this](bool isEnabled){ ui->credDisplayCategoryInput->setEnabled(isEnabled); });
+    connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::handleAdvancedModeChange);
+    handleAdvancedModeChange(wsClient->get_advancedMenu());
     connect(wsClient, &WSClient::displayUserCategories, this,
              [this](const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4)
                 {
@@ -946,11 +946,11 @@ void CredentialsManagement::sendGetUserCategories()
 
 void CredentialsManagement::initKeyAfterInput(QComboBox *cbKeyAfter)
 {
+    cbKeyAfter->addItem(MainWindow::DEFAULT_KEY_STRING, SettingsGuiBLE::DEFAULT_INDEX);
     cbKeyAfter->addItem(MainWindow::NONE_STRING, SettingsGuiBLE::NONE_INDEX);
     cbKeyAfter->addItem(MainWindow::TAB_STRING, SettingsGuiBLE::TAB_INDEX);
     cbKeyAfter->addItem(MainWindow::ENTER_STRING, SettingsGuiBLE::ENTER_INDEX);
     cbKeyAfter->addItem(MainWindow::SPACE_STRING, SettingsGuiBLE::SPACE_INDEX);
-    cbKeyAfter->addItem(MainWindow::DEFAULT_KEY_STRING, SettingsGuiBLE::DEFAULT_INDEX);
 }
 
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
@@ -1098,10 +1098,13 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
     {
         ui->credDisplayCategoryInput->show();
         ui->credDisplayCategoryLabel->show();
-        ui->credDisplayKeyAfterLoginInput->show();
-        ui->credDisplayKeyAfterLoginLabel->show();
-        ui->credDisplayKeyAfterPwdInput->show();
-        ui->credDisplayKeyAfterPwdLabel->show();
+        if (wsClient->get_advancedMenu())
+        {
+            ui->credDisplayKeyAfterLoginInput->show();
+            ui->credDisplayKeyAfterLoginLabel->show();
+            ui->credDisplayKeyAfterPwdInput->show();
+            ui->credDisplayKeyAfterPwdLabel->show();
+        }
         ui->addCredPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
     }
@@ -1167,5 +1170,24 @@ void CredentialsManagement::onCategoryEdited(const QString &edited)
     {
         ui->pushButtonSaveCategories->show();
         m_isSetCategoryClean = false;
+    }
+}
+
+void CredentialsManagement::handleAdvancedModeChange(bool isEnabled)
+{
+    ui->credDisplayCategoryInput->setEnabled(isEnabled);
+    if (isEnabled)
+    {
+        ui->credDisplayKeyAfterLoginLabel->show();
+        ui->credDisplayKeyAfterLoginInput->show();
+        ui->credDisplayKeyAfterPwdLabel->show();
+        ui->credDisplayKeyAfterPwdInput->show();
+    }
+    else
+    {
+        ui->credDisplayKeyAfterLoginLabel->hide();
+        ui->credDisplayKeyAfterLoginInput->hide();
+        ui->credDisplayKeyAfterPwdLabel->hide();
+        ui->credDisplayKeyAfterPwdInput->hide();
     }
 }

@@ -88,6 +88,7 @@ private slots:
 
     void on_pushButtonSaveCategories_clicked();
     void onCategoryEdited(const QString& edited);
+    void handleAdvancedModeChange(bool isEnabled);
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
