@@ -950,6 +950,7 @@ void CredentialsManagement::initKeyAfterInput(QComboBox *cbKeyAfter)
     cbKeyAfter->addItem(MainWindow::TAB_STRING, SettingsGuiBLE::TAB_INDEX);
     cbKeyAfter->addItem(MainWindow::ENTER_STRING, SettingsGuiBLE::ENTER_INDEX);
     cbKeyAfter->addItem(MainWindow::SPACE_STRING, SettingsGuiBLE::SPACE_INDEX);
+    cbKeyAfter->addItem(MainWindow::DEFAULT_KEY_STRING, SettingsGuiBLE::DEFAULT_INDEX);
 }
 
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)

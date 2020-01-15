@@ -35,6 +35,7 @@ const QString MainWindow::NONE_STRING = tr("None");
 const QString MainWindow::TAB_STRING = tr("Tab");
 const QString MainWindow::ENTER_STRING = tr("Enter");
 const QString MainWindow::SPACE_STRING = tr("Space");
+const QString MainWindow::DEFAULT_KEY_STRING = tr("Default Key");
 
 void MainWindow::initHelpLabels()
 {
