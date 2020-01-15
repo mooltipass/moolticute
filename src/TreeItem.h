@@ -60,8 +60,8 @@ protected:
     QDate m_dAccessedDate;
     QString m_sDescription;
     int m_iCategory;
-    int m_iKeyAfterLogin = 0;
-    int m_iKeyAfterPwd = 0;
+    int m_iKeyAfterLogin = 0xFFFF;
+    int m_iKeyAfterPwd = 0xFFFF;
 };
 
 #endif // TREEITEM_H
