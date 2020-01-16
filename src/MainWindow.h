@@ -161,6 +161,8 @@ private slots:
 
     void on_checkBoxDebugLog_stateChanged(int arg1);
 
+    void handleAdvancedModeChange(bool isEnabled);
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
