@@ -362,6 +362,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::advancedMenuChanged,
             &DeviceDetector::instance(), &DeviceDetector::onAdvancedModeChanged);
+    connect(wsClient, &WSClient::advancedMenuChanged, this, &MainWindow::handleAdvancedModeChange);
+    handleAdvancedModeChange(wsClient->get_advancedMenu());
+
     connect(wsClient, &WSClient::updateUserSettingsOnUI,
             [this](const QJsonObject& settings)
             {
@@ -575,7 +578,10 @@ void MainWindow::updateDeviceDependentUI()
     wsClient->settingsHelper()->createSettingUIMapping();
     if (wsClient->isMPBLE())
     {
-        ui->groupBox_UserSettings->show();
+        if (wsClient->get_advancedMenu())
+        {
+            ui->groupBox_UserSettings->show();
+        }
         ui->pushButtonFiles->hide();
     }
     else
@@ -1707,4 +1713,16 @@ void MainWindow::on_checkBoxDebugLog_stateChanged(int)
 {
     QSettings s;
     s.setValue("settings/enable_dev_log", isDebugLogChecked());
+}
+
+void MainWindow::handleAdvancedModeChange(bool isEnabled)
+{
+    if (isEnabled)
+    {
+        ui->groupBox_UserSettings->show();
+    }
+    else
+    {
+        ui->groupBox_UserSettings->hide();
+    }
 }
