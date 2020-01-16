@@ -498,8 +498,8 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
                     (!sDescription.isEmpty() && (sDescription != pLoginItem->description())) ||
                     (!sLogin.isEmpty() && (sLogin != pLoginItem->name())) ||
                     (wsClient->isMPBLE() && iCategory != 0 && iCategory != pLoginItem->category()) ||
-                    (wsClient->isMPBLE() && iKeyAfterLogin != 0 && iKeyAfterLogin != pLoginItem->keyAfterLogin()) ||
-                    (wsClient->isMPBLE() && iKeyAfterPwd != 0 && iKeyAfterPwd != pLoginItem->keyAfterPwd()))
+                    (wsClient->isMPBLE() && iKeyAfterLogin != SettingsGuiBLE::DEFAULT_INDEX && iKeyAfterLogin != pLoginItem->keyAfterLogin()) ||
+                    (wsClient->isMPBLE() && iKeyAfterPwd != SettingsGuiBLE::DEFAULT_INDEX && iKeyAfterPwd != pLoginItem->keyAfterPwd()))
             {
                 auto btn = QMessageBox::question(this,
                                                  tr("Discard Modifications ?"),
