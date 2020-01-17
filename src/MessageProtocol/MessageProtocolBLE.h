@@ -65,7 +65,7 @@ private:
     static constexpr quint8 FIRST_PAYLOAD_BYTE_MESSAGE = 6;
     static constexpr quint8 FIRST_PAYLOAD_BYTE_PACKET = 2;
     static constexpr uint MAX_FAVORITE_NUM = 10;
-    static constexpr uint CRED_PACKAGE_SIZE = 7;
+    static constexpr uint CRED_PACKAGE_SIZE = 9;
 };
 
 #endif // MESSAGEPROTOCOLBLE_H

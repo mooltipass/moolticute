@@ -21,6 +21,7 @@ public:
     static const int TAB_INDEX = 9;
     static const int ENTER_INDEX = 10;
     static const int SPACE_INDEX = 32;
+    static const int DEFAULT_INDEX = 0xFFFF;
 };
 
 #endif // SETTINGSGUIBLE_H

@@ -29,6 +29,10 @@ public:
     void setDescription(const QString &sDescription);
     int category() const;
     void setCategory(int iCategory);
+    int keyAfterLogin() const;
+    void setkeyAfterLogin(int key);
+    int keyAfterPwd() const;
+    void setkeyAfterPwd(int key);
     TreeItem *child(int iIndex);
     const QVector<TreeItem *> &childs() const;
     int childCount() const;
@@ -56,6 +60,8 @@ protected:
     QDate m_dAccessedDate;
     QString m_sDescription;
     int m_iCategory;
+    int m_iKeyAfterLogin = 0xFFFF;
+    int m_iKeyAfterPwd = 0xFFFF;
 };
 
 #endif // TREEITEM_H

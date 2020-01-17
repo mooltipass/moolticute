@@ -28,6 +28,7 @@
 #include "LoginItem.h"
 #include "ServiceItem.h"
 #include "DeviceDetector.h"
+#include "SettingsGuiBLE.h"
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
@@ -86,6 +87,10 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonSaveCategories->hide();
     ui->credDisplayCategoryInput->hide();
     ui->credDisplayCategoryLabel->hide();
+    ui->credDisplayKeyAfterLoginInput->hide();
+    ui->credDisplayKeyAfterLoginLabel->hide();
+    ui->credDisplayKeyAfterPwdInput->hide();
+    ui->credDisplayKeyAfterPwdLabel->hide();
     connect(ui->lineEditCategory1, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory2, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory3, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
@@ -103,6 +108,9 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     {
         ui->credDisplayCategoryInput->addItem(m_pCredModel->getCategoryName(i), i);
     }
+
+    initKeyAfterInput(ui->credDisplayKeyAfterLoginInput);
+    initKeyAfterInput(ui->credDisplayKeyAfterPwdInput);
 
     connect(m_pCredModel, &CredentialModel::modelReset, this, &CredentialsManagement::updateFavMenu);
     connect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::updateFavMenu);
@@ -136,6 +144,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credDisplayDescriptionInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayPasswordInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayCategoryInput, QOverload<int>::of(&QComboBox::currentIndexChanged), [this] { updateSaveDiscardState(); });
+    connect(ui->credDisplayKeyAfterLoginInput, QOverload<int>::of(&QComboBox::currentIndexChanged), [this] { updateSaveDiscardState(); });
+    connect(ui->credDisplayKeyAfterPwdInput, QOverload<int>::of(&QComboBox::currentIndexChanged), [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayServiceInput, &QLineEdit::editingFinished,
         [this] {
             ui->toolButtonEditService->show();
@@ -195,8 +205,8 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::deviceConnected, this, &CredentialsManagement::checkDeviceType);
-    connect(wsClient, &WSClient::advancedMenuChanged,
-            [this](bool isEnabled){ ui->credDisplayCategoryInput->setEnabled(isEnabled); });
+    connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::handleAdvancedModeChange);
+    handleAdvancedModeChange(wsClient->get_advancedMenu());
     connect(wsClient, &WSClient::displayUserCategories, this,
              [this](const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4)
                 {
@@ -427,7 +437,9 @@ void CredentialsManagement::saveCredential(const QModelIndex currentSelectionInd
                                       ui->credDisplayPasswordInput->text(),
                                       ui->credDisplayDescriptionInput->text(),
                                       ui->credDisplayLoginInput->text(),
-                                      ui->credDisplayCategoryInput->currentData().toInt());
+                                      ui->credDisplayCategoryInput->currentData().toInt(),
+                                      ui->credDisplayKeyAfterLoginInput->currentData().toInt(),
+                                      ui->credDisplayKeyAfterPwdInput->currentData().toInt());
         ui->credentialTreeView->refreshLoginItem(srcIndex);
         if (pLoginItem->parentItem()->name() != newServiceName)
         {
@@ -479,11 +491,15 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
             QString sDescription = ui->credDisplayDescriptionInput->text();
             QString sLogin = ui->credDisplayLoginInput->text();
             int iCategory = ui->credDisplayCategoryInput->currentData().toInt();
+            int iKeyAfterLogin = ui->credDisplayKeyAfterLoginInput->currentData().toInt();
+            int iKeyAfterPwd = ui->credDisplayKeyAfterPwdInput->currentData().toInt();
 
             if ((!sPassword.isEmpty() && (sPassword != pLoginItem->password())) ||
                     (!sDescription.isEmpty() && (sDescription != pLoginItem->description())) ||
                     (!sLogin.isEmpty() && (sLogin != pLoginItem->name())) ||
-                    (wsClient->isMPBLE() && iCategory != 0 && iCategory != pLoginItem->category()))
+                    (wsClient->isMPBLE() && iCategory != 0 && iCategory != pLoginItem->category()) ||
+                    (wsClient->isMPBLE() && iKeyAfterLogin != SettingsGuiBLE::DEFAULT_INDEX && iKeyAfterLogin != pLoginItem->keyAfterLogin()) ||
+                    (wsClient->isMPBLE() && iKeyAfterPwd != SettingsGuiBLE::DEFAULT_INDEX && iKeyAfterPwd != pLoginItem->keyAfterPwd()))
             {
                 auto btn = QMessageBox::question(this,
                                                  tr("Discard Modifications ?"),
@@ -547,6 +563,10 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
         ui->credDisplayDescriptionInput->setText(pLoginItem->description());
         ui->credDisplayLoginInput->setText(pLoginItem->name());
         ui->credDisplayCategoryInput->setCurrentIndex(pLoginItem->category());
+        auto keyAfterLoginIdx = ui->credDisplayKeyAfterLoginInput->findData(pLoginItem->keyAfterLogin());
+        ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
+        auto keyAfterPwdIdx = ui->credDisplayKeyAfterPwdInput->findData(pLoginItem->keyAfterPwd());
+        ui->credDisplayKeyAfterPwdInput->setCurrentIndex(keyAfterPwdIdx);
         auto *serviceItem = pLoginItem->parentItem();
         if (nullptr != serviceItem)
         {
@@ -592,12 +612,17 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
             QString sDescription = ui->credDisplayDescriptionInput->text();
             QString sLogin = ui->credDisplayLoginInput->text();
             int iCategory = ui->credDisplayCategoryInput->currentData().toInt();
+            int iKeyAfterLogin = ui->credDisplayKeyAfterLoginInput->currentData().toInt();
+            int iKeyAfterPwd = ui->credDisplayKeyAfterPwdInput->currentData().toInt();
+
 
             bool bServiceCondition = sService != pLoginItem->parentItem()->name();
             bool bPasswordCondition = !sPassword.isEmpty() && (sPassword != pLoginItem->password());
             bool bDescriptionCondition = !sDescription.isEmpty() && (sDescription != pLoginItem->description());
             bool bLoginCondition = !sLogin.isEmpty() && (sLogin != pLoginItem->name());
             bool bCategoryCondition = wsClient->isMPBLE() && iCategory != pLoginItem->category();
+            bool bKeyAfterLoginCondition = wsClient->isMPBLE() && iKeyAfterLogin != pLoginItem->keyAfterLogin();
+            bool bKeyAfterPwdCondition = wsClient->isMPBLE() && iKeyAfterPwd != pLoginItem->keyAfterPwd();
 
             bool isServiceExist = false;
             if (bServiceCondition)
@@ -617,7 +642,8 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
 
             if (!isServiceExist && !sService.isEmpty() &&
                     (bServiceCondition || bPasswordCondition ||
-                     bDescriptionCondition || bLoginCondition || bCategoryCondition))
+                     bDescriptionCondition || bLoginCondition || bCategoryCondition ||
+                     bKeyAfterLoginCondition || bKeyAfterPwdCondition))
             {
                 ui->pushButtonCancel->show();
                 ui->pushButtonConfirm->show();
@@ -806,6 +832,10 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
             if (wsClient->isMPBLE())
             {
                 ui->credDisplayCategoryInput->setCurrentIndex(pLoginItem->category());
+                auto keyAfterLoginIdx = ui->credDisplayKeyAfterLoginInput->findData(pLoginItem->keyAfterLogin());
+                ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
+                auto keyAfterPwdIdx = ui->credDisplayKeyAfterPwdInput->findData(pLoginItem->keyAfterPwd());
+                ui->credDisplayKeyAfterPwdInput->setCurrentIndex(keyAfterPwdIdx);
             }
         }
     }
@@ -820,6 +850,8 @@ void CredentialsManagement::clearLoginDescription()
     ui->credDisplayCreationDateInput->setText("");
     ui->credDisplayModificationDateInput->setText("");
     ui->credDisplayCategoryInput->setCurrentIndex(0);
+    ui->credDisplayKeyAfterLoginInput->setCurrentIndex(0);
+    ui->credDisplayKeyAfterPwdInput->setCurrentIndex(0);
 }
 
 QModelIndex CredentialsManagement::getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex)
@@ -910,6 +942,15 @@ void CredentialsManagement::sendGetUserCategories()
         wsClient->sendGetUserCategories();
         m_pCredModel->setUserCategoryClean(true);
     }
+}
+
+void CredentialsManagement::initKeyAfterInput(QComboBox *cbKeyAfter)
+{
+    cbKeyAfter->addItem(MainWindow::DEFAULT_KEY_STRING, SettingsGuiBLE::DEFAULT_INDEX);
+    cbKeyAfter->addItem(MainWindow::NONE_STRING, SettingsGuiBLE::NONE_INDEX);
+    cbKeyAfter->addItem(MainWindow::TAB_STRING, SettingsGuiBLE::TAB_INDEX);
+    cbKeyAfter->addItem(MainWindow::ENTER_STRING, SettingsGuiBLE::ENTER_INDEX);
+    cbKeyAfter->addItem(MainWindow::SPACE_STRING, SettingsGuiBLE::SPACE_INDEX);
 }
 
 void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
@@ -1057,6 +1098,13 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
     {
         ui->credDisplayCategoryInput->show();
         ui->credDisplayCategoryLabel->show();
+        if (wsClient->get_advancedMenu())
+        {
+            ui->credDisplayKeyAfterLoginInput->show();
+            ui->credDisplayKeyAfterLoginLabel->show();
+            ui->credDisplayKeyAfterPwdInput->show();
+            ui->credDisplayKeyAfterPwdLabel->show();
+        }
         ui->addCredPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
     }
@@ -1064,6 +1112,10 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
     {
         ui->credDisplayCategoryInput->hide();
         ui->credDisplayCategoryLabel->hide();
+        ui->credDisplayKeyAfterLoginInput->hide();
+        ui->credDisplayKeyAfterLoginLabel->hide();
+        ui->credDisplayKeyAfterPwdInput->hide();
+        ui->credDisplayKeyAfterPwdLabel->hide();
         ui->addCredPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
     }
@@ -1118,5 +1170,24 @@ void CredentialsManagement::onCategoryEdited(const QString &edited)
     {
         ui->pushButtonSaveCategories->show();
         m_isSetCategoryClean = false;
+    }
+}
+
+void CredentialsManagement::handleAdvancedModeChange(bool isEnabled)
+{
+    ui->credDisplayCategoryInput->setEnabled(isEnabled);
+    if (isEnabled)
+    {
+        ui->credDisplayKeyAfterLoginLabel->show();
+        ui->credDisplayKeyAfterLoginInput->show();
+        ui->credDisplayKeyAfterPwdLabel->show();
+        ui->credDisplayKeyAfterPwdInput->show();
+    }
+    else
+    {
+        ui->credDisplayKeyAfterLoginLabel->hide();
+        ui->credDisplayKeyAfterLoginInput->hide();
+        ui->credDisplayKeyAfterPwdLabel->hide();
+        ui->credDisplayKeyAfterPwdInput->hide();
     }
 }

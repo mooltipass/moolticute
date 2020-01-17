@@ -88,6 +88,7 @@ private slots:
 
     void on_pushButtonSaveCategories_clicked();
     void onCategoryEdited(const QString& edited);
+    void handleAdvancedModeChange(bool isEnabled);
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
@@ -104,6 +105,7 @@ private:
     void clearMMMUi();
     void updateBleFavs(const QModelIndex &srcIndex);
     void sendGetUserCategories();
+    void initKeyAfterInput(QComboBox * cbKeyAfter);
 
     void changeCurrentFavorite(int iFavorite);
     virtual void changeEvent(QEvent *event);

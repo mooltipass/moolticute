@@ -31,6 +31,11 @@ public:
     int getCategory() const;
     void setCategory(int category);
 
+    int getKeyAfterLogin() const;
+    void setKeyAfterLogin(int key);
+    int getKeyAfterPwd() const;
+    void setKeyAfterPwd(int key);
+
     static constexpr int PARENT_NODE_LENGTH = 264;
     static constexpr int CHILD_NODE_LENGTH = 528;
 
@@ -46,6 +51,9 @@ protected:
     static constexpr int PWD_ENC_LENGTH = 128;
     static constexpr int DATE_CREATED_ADDR_START = 8;
     static constexpr int DATE_LASTUSED_ADDR_START = 10;
+    static constexpr int KEY_AFTER_LOGIN_ADDR_START = 260;
+    static constexpr int KEY_AFTER_PWD_ADDR_START = 262;
+    static constexpr int KEY_AFTER_LENGTH = 2;
 };
 
 #endif // MPNODEBLE_H

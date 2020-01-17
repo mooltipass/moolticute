@@ -442,7 +442,10 @@ QJsonObject MPNode::toJson() const
         obj["favorite"] = favorite;
         if (isBLE)
         {
-            obj["category"] = QString::number(static_cast<const MPNodeBLE*>(this)->getCategory());
+            auto* bleNode = static_cast<const MPNodeBLE*>(this);
+            obj["category"] = QString::number(bleNode->getCategory());
+            obj["key_after_login"] = QString::number(bleNode->getKeyAfterLogin());
+            obj["key_after_pwd"] = QString::number(bleNode->getKeyAfterPwd());
         }
     }
     else if (getType() == NodeChildData)

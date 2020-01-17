@@ -580,8 +580,35 @@ void MPDeviceBleImpl::setNodeCategory(MPNode* node, int category)
 {
     if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
     {
-        qDebug() << "Setting category to: " << category;
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Setting category to: " << category;
+        }
         nodeBle->setCategory(category);
+    }
+}
+
+void MPDeviceBleImpl::setNodeKeyAfterLogin(MPNode *node, int key)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Setting keyAfterLogin to: " << key;
+        }
+        nodeBle->setKeyAfterLogin(key);
+    }
+}
+
+void MPDeviceBleImpl::setNodeKeyAfterPwd(MPNode *node, int key)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Setting keyAfterPwd to: " << key;
+        }
+        nodeBle->setKeyAfterPwd(key);
     }
 }
 

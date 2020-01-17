@@ -65,6 +65,7 @@ public:
     const static QString TAB_STRING;
     const static QString ENTER_STRING;
     const static QString SPACE_STRING;
+    const static QString DEFAULT_KEY_STRING;
 
     friend class SettingsGuiHelper;
     friend class SettingsGuiMini;
