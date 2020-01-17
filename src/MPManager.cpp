@@ -176,6 +176,7 @@ void MPManager::usbDeviceRemoved(QString path)
     {
         qDebug() << path << " is not connected.";
     }
+    checkUsbDevices();
 }
 
 MPDevice* MPManager::getDevice(int at)
