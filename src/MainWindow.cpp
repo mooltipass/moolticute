@@ -176,22 +176,18 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
         if (wsClient->isMPBLE())
         {
-            if (Common::NoCardInserted == status)
-            {
-                ui->settings_user_language->hide();
-                ui->settings_bt_layout->hide();
-                ui->settings_usb_layout->hide();
-            }
-            else
+            if (Common::Unlocked == status)
             {
                 ui->settings_user_language->show();
                 ui->settings_bt_layout->show();
                 ui->settings_usb_layout->show();
-            }
-
-            if (Common::Unlocked == status)
-            {
                 wsClient->sendLoadParams();
+            }
+            else
+            {
+                ui->settings_user_language->hide();
+                ui->settings_bt_layout->hide();
+                ui->settings_usb_layout->hide();
             }
         }
         else
