@@ -523,6 +523,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->checkBoxDebugHttp->setChecked(s.value("settings/http_dev_server").toBool());
     ui->checkBoxDebugLog->setChecked(s.value("settings/enable_dev_log").toBool());
+#ifdef Q_OS_MAC
+    resize(width(), MAC_DEFAULT_HEIGHT);
+#endif
 }
 
 MainWindow::~MainWindow()
