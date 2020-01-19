@@ -221,6 +221,9 @@ private:
     QJsonObject m_languagesCache;
 
     const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
+#ifdef Q_OS_MAC
+    static constexpr int MAC_DEFAULT_HEIGHT = 500;
+#endif
 };
 
 #endif // MAINWINDOW_H
