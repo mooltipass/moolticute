@@ -191,6 +191,10 @@ bool AppGui::initialize()
            mainWindowShow();
     });
 
+    resetLastNotificationStatus();
+    connect(wsClient, &WSClient::statusChanged, this, &AppGui::resetLastNotificationStatus);
+    connect(wsClient, &WSClient::connectedChanged, this, &AppGui::resetLastNotificationStatus);
+
     connect(wsClient, &WSClient::displayStatusWarning, this, &AppGui::displayStatusWarningNotification);
 
     connectedChanged();
@@ -642,12 +646,10 @@ void AppGui::updateAvailableReceived(QString version, QString changesetURL)
 void AppGui::displayStatusWarningNotification()
 {
     const auto actStatus = wsClient->get_status();
-    //Init with Error8, because it is not used
-    static Common::MPStatus lastStatus = Common::Error8;
 
-    if (actStatus != lastStatus)
+    if (actStatus != m_lastNotificationStatus)
     {
-        lastStatus = actStatus;
+        m_lastNotificationStatus = actStatus;
         QString title, message;
         if (actStatus == Common::UnknownStatus)
         {
@@ -675,6 +677,12 @@ void AppGui::displayStatusWarningNotification()
         }
         SystemNotification::instance().createNotification(title, message);
     }
+}
+
+void AppGui::resetLastNotificationStatus()
+{
+    //Reset with Error8, because it is not used
+    m_lastNotificationStatus = Common::Error8;
 }
 
 QtAwesome *AppGui::qtAwesome()
