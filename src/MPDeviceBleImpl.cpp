@@ -479,7 +479,7 @@ QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categorie
     for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
     {
         QByteArray categoryArr = bleProt->toByteArray(categories["category_" + QString::number(i+1)].toString());
-        Common::fill(categoryArr, USER_CATEGORY_LENGTH - categoryArr.size(), static_cast<char>(0x00));
+        Common::fill(categoryArr, USER_CATEGORY_LENGTH - categoryArr.size(), ZERO_BYTE);
         data.append(categoryArr);
     }
     return data;
@@ -624,6 +624,16 @@ QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
         end += FAV_DATA_SIZE;
     }
     return res;
+}
+
+QByteArray MPDeviceBleImpl::getStartAddressToSet(const QByteArray &startNode)
+{
+    QByteArray setAddress;
+    // Currently setting data type id to 0
+    setAddress.append(ZERO_BYTE);
+    setAddress.append(ZERO_BYTE);
+    setAddress.append(startNode);
+    return setAddress;
 }
 
 void MPDeviceBleImpl::readLanguages()
@@ -800,7 +810,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
     int byteCounter = BUNBLE_DATA_ADDRESS_SIZE;
     int curAddress = 0;
     QByteArray message;
-    message.fill(static_cast<char>(0), BUNBLE_DATA_ADDRESS_SIZE);
+    message.fill(ZERO_BYTE, BUNBLE_DATA_ADDRESS_SIZE);
     for (const auto byte : blob)
     {
         message.append(byte);

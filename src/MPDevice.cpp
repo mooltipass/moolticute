@@ -3241,7 +3241,16 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         {
             qDebug() << "Updating start node";
             diagSavePacketsGenerated = true;
-            jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, startNode, pMesProt->getDefaultFuncDone()));
+            QByteArray setAddress;
+            if (isBLE())
+            {
+                setAddress = bleImpl->getStartAddressToSet(startNode);
+            }
+            else
+            {
+                setAddress = startNode;
+            }
+            jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, setAddress, pMesProt->getDefaultFuncDone()));
         }
     }
     if (tackleData)
