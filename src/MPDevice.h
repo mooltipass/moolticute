@@ -342,7 +342,7 @@ private:
 
     // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
-    QByteArray startNode;
+    QVector<QByteArray> startNode = {0};
     quint32 virtualStartNode = 0;
     QByteArray startDataNode = MPNode::EmptyAddress;
     quint32 virtualDataStartNode = 0;
@@ -360,7 +360,7 @@ private:
     quint32 credentialsDbChangeNumberClone;
     quint32 dataDbChangeNumberClone;
     QByteArray ctrValueClone;
-    QByteArray startNodeClone;
+    QVector<QByteArray> startNodeClone = {0};
     QByteArray startDataNodeClone = MPNode::EmptyAddress;
     QList<QByteArray> cpzCtrValueClone;
     QList<QByteArray> favoritesAddrsClone;

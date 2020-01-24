@@ -9,7 +9,8 @@ MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     mpDev(dev),
     freeAddressProv(mesProt, dev)
 {
-
+    dev->startNode.resize(STARTING_NODE_COUNT);
+    dev->startNodeClone.resize(STARTING_NODE_COUNT);
 }
 
 bool MPDeviceBleImpl::isFirstPacket(const QByteArray &data)
