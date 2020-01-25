@@ -726,10 +726,16 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             else
             {
-                const auto node = isBLE() ? pMesProt->getPayloadBytes(data, 0, 2) :
-                                            pMesProt->getFullPayload(data);
-                startNode[0] = node;
-                startNodeClone[0] = node;
+                if (isBLE())
+                {
+                    startNode = bleImpl->processReceivedStartNodes(pMesProt->getFullPayload(data));
+                    startNodeClone = startNode;
+                }
+                else
+                {
+                    startNode[0] = pMesProt->getFullPayload(data);
+                    startNodeClone[0] = startNode[0];
+                }
                 qDebug() << "Start node addr:" << startNode[0].toHex();
 
                 //if parent address is not null, load nodes

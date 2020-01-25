@@ -393,6 +393,21 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
     return isLast;
 }
 
+ QVector<QByteArray> MPDeviceBleImpl::processReceivedStartNodes(const QByteArray &data) const
+{
+    if (data.size() < 2)
+    {
+        return {0};
+    }
+    QVector<QByteArray> res;
+    for (int i = 0; i < data.size() - 1; i += 2)
+    {
+        res.append(data.mid(i, 2));
+    }
+    qDebug() << "Received starting node: " << res.size();
+    return res;
+}
+
 bool MPDeviceBleImpl::isAfterAuxFlash()
 {
     QSettings s;

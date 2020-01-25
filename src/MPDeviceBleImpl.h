@@ -75,6 +75,8 @@ public:
      */
     bool processReceivedData(const QByteArray& data, QByteArray& dataReceived);
 
+    QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
+
     bool isAfterAuxFlash();
 
     void getUserCategories(const MessageHandlerCbData &cb);
