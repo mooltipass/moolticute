@@ -733,19 +733,19 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                 }
                 else
                 {
-                    startNode[0] = pMesProt->getFullPayload(data);
-                    startNodeClone[0] = startNode[0];
+                    startNode[CRED_ADDR_IDX] = pMesProt->getFullPayload(data);
+                    startNodeClone[CRED_ADDR_IDX] = startNode[CRED_ADDR_IDX];
                 }
-                qDebug() << "Start node addr:" << startNode[0].toHex();
+                qDebug() << "Start node addr:" << startNode[CRED_ADDR_IDX].toHex();
 
                 //if parent address is not null, load nodes
-                if (startNode[0] != MPNode::EmptyAddress)
+                if (startNode[CRED_ADDR_IDX] != MPNode::EmptyAddress)
                 {
                     qInfo() << "Loading parent nodes...";
                     if (!fullScan)
                     {
                         /* Traverse the flash by following the linked list */
-                        loadLoginNode(jobs, startNode[0], cbProgress);
+                        loadLoginNode(jobs, startNode[CRED_ADDR_IDX], cbProgress);
                     }
                     else
                     {
@@ -1556,7 +1556,7 @@ bool MPDevice::tagFavoriteNodes(void)
     MPNode* tempChildNodePt = nullptr;
 
     /* start with start node (duh) */
-    tempParentAddress = startNode[0];
+    tempParentAddress = startNode[CRED_ADDR_IDX];
     tempVirtualParentAddress = virtualStartNode;
 
     /* Loop through the parent nodes */
@@ -1662,7 +1662,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
     if (tagCredentials)
     {
         /* start with start node (duh) */
-        tempParentAddress = startNode[0];
+        tempParentAddress = startNode[CRED_ADDR_IDX];
         tempVirtualParentAddress = virtualStartNode;
 
         /* Loop through the parent nodes */
@@ -1678,10 +1678,10 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[0]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                     {
                         /* start node is incorrect */
-                        startNode[0] = QByteArray(MPNode::EmptyAddress);
+                        startNode[CRED_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
                         virtualStartNode = 0;
                     }
                     else
@@ -1702,10 +1702,10 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[0]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                     {
                         /* start node is already tagged... how's that possible? */
-                        startNode[0] = QByteArray(MPNode::EmptyAddress);
+                        startNode[CRED_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
                         virtualStartNode = 0;
                     }
                     else
@@ -1722,7 +1722,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
             else
             {
                 /* check previous node address */
-                if ((!tempParentAddress.isNull() && tempParentAddress == startNode[0]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                if ((!tempParentAddress.isNull() && tempParentAddress == startNode[CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                 {
                     /* first parent node: previous address should be an empty one */
                     if ((tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != 0))
@@ -2187,7 +2187,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     }
     else
     {
-        curNodeAddr = startNode[0];
+        curNodeAddr = startNode[CRED_ADDR_IDX];
         curNodeAddrVirtual = virtualStartNode;
     }
 
@@ -2216,7 +2216,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             }
             else
             {
-                startNode[0] = parentNodePt->getAddress();
+                startNode[CRED_ADDR_IDX] = parentNodePt->getAddress();
                 virtualStartNode = parentNodePt->getVirtualAddress();
             }
 
@@ -2282,7 +2282,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                         }
                         else
                         {
-                            startNode[0] = parentNodePt->getAddress();
+                            startNode[CRED_ADDR_IDX] = parentNodePt->getAddress();
                             virtualStartNode = parentNodePt->getVirtualAddress();
                         }
                         parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress);
@@ -2494,7 +2494,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
     }
     else
     {
-        curNodeAddr = startNode[0];
+        curNodeAddr = startNode[CRED_ADDR_IDX];
         curNodeAddrVirtual = virtualStartNode;
     }
 
@@ -2597,7 +2597,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                startNode[0] = MPNode::EmptyAddress;
+                                startNode[CRED_ADDR_IDX] = MPNode::EmptyAddress;
                                 virtualStartNode = 0;
                             }
 
@@ -2624,7 +2624,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                startNode[0] = nextNodePt->getAddress();
+                                startNode[CRED_ADDR_IDX] = nextNodePt->getAddress();
                                 virtualStartNode = nextNodePt->getVirtualAddress();
                             }
                             nextNodePt->setPreviousParentAddress(MPNode::EmptyAddress, 0);
@@ -3243,18 +3243,18 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         }
 
         /* Diff start node */
-        if (startNode != startNodeClone)
+        if (startNode[CRED_ADDR_IDX] != startNodeClone[CRED_ADDR_IDX])
         {
             qDebug() << "Updating start node";
             diagSavePacketsGenerated = true;
             QByteArray setAddress;
             if (isBLE())
             {
-                setAddress = bleImpl->getStartAddressToSet(startNode[0]);
+                setAddress = bleImpl->getStartAddressToSet(startNode[CRED_ADDR_IDX]);
             }
             else
             {
-                setAddress = startNode[0];
+                setAddress = startNode[CRED_ADDR_IDX];
             }
             jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, setAddress, pMesProt->getDefaultFuncDone()));
         }
@@ -4507,7 +4507,7 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
     if (virtualStartNode != 0)
     {
         qDebug() << "Setting start node to " << getFreeAddress(virtualStartNode).toHex();
-        startNode[0] = getFreeAddress(virtualStartNode);
+        startNode[CRED_ADDR_IDX] = getFreeAddress(virtualStartNode);
     }
     if (virtualDataStartNode != 0)
     {
@@ -4609,7 +4609,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping one parent node link in chain: test failed!";return false;} else qInfo() << "Skipping one parent node link in chain: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping first parent node";
-    startNode[0] = loginNodes[1]->getAddress();
+    startNode[CRED_ADDR_IDX] = loginNodes[1]->getAddress();
     loginNodes[1]->setPreviousParentAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true, true, true);
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping first parent node: test failed!";return false;} else qInfo() << "Skipping first parent node: passed!";
@@ -4620,7 +4620,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping last parent node: test failed!";return false;} else qInfo() << "Skipping last parent node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Setting invalid startNode";
-    startNode[0] = invalidAddress;
+    startNode[CRED_ADDR_IDX] = invalidAddress;
     checkLoadedNodes(true, true, true);
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Setting invalid startNode: test failed!";return false;} else qInfo() << "Setting invalid startNode: passed!";
 
@@ -4761,7 +4761,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     exportTopArray.append(QJsonValue(cpzCtrQJsonArray));
 
     /* Starting parent */
-    exportTopArray.append(QJsonValue(Common::bytesToJson(startNode[0])));
+    exportTopArray.append(QJsonValue(Common::bytesToJson(startNode[CRED_ADDR_IDX])));
 
     /* Data starting parent */
     exportTopArray.append(QJsonValue(Common::bytesToJson(startDataNode)));

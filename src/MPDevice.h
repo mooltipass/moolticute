@@ -438,6 +438,13 @@ protected:
         EXPORT_IS_BLE_INDEX = 14,
         EXPORT_BLE_USER_CATEGORIES_INDEX = 15
     };
+
+    enum AddressType
+    {
+        CRED_ADDR_IDX = 0,
+        WEBAUTHN_ADDR_IDX = 1
+    };
+
     static constexpr int RESET_SEND_DELAY = 300;
     static constexpr int INIT_STARTING_DELAY = RESET_SEND_DELAY + 150;
     static constexpr int STATUS_STARTING_DELAY = RESET_SEND_DELAY + 500;
