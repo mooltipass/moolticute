@@ -1083,7 +1083,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
-void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress, int addressIndex)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress, Common::AddressType addrType)
 {
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
@@ -1092,7 +1092,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
     MPNode *pnodeClone = pMesProt->createMPNode(this, address);
     if (isBLE())
     {
-        bleImpl->appendLoginNode(pnode, pnodeClone, addressIndex);
+        bleImpl->appendLoginNode(pnode, pnodeClone, addrType);
     }
     else
     {
@@ -1103,7 +1103,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
     /* Send read node command, expecting 3 packets */
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, jobs, pnode, pnodeClone, address, cbProgress, addressIndex](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnode, pnodeClone, address, cbProgress, addrType](const QByteArray &data, bool &done) -> bool
     {
         if (pMesProt->getMessageSize(data) == 1)
         {
@@ -1152,7 +1152,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
                 if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
                 {
                     qDebug() << srv << ": loading child nodes...";
-                    loadLoginChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress(), addressIndex);
+                    loadLoginChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress(), addrType);
                 }
                 else
                 {
@@ -1162,7 +1162,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
                 //Load next parent
                 if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
                 {
-                    loadLoginNode(jobs, pnode->getNextParentAddress(), cbProgress, addressIndex);
+                    loadLoginNode(jobs, pnode->getNextParentAddress(), cbProgress, addrType);
                 }
             }
 
@@ -1171,7 +1171,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
     }));
 }
 
-void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, int addressIndex)
+void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, Common::AddressType addrType)
 {
     qDebug() << "Loading cred child node at address:" << address.toHex();
 
@@ -1182,7 +1182,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     parentClone->appendChild(cnodeClone);
     if (isBLE())
     {
-        bleImpl->appendLoginChildNode(cnode, cnodeClone, addressIndex);
+        bleImpl->appendLoginChildNode(cnode, cnodeClone, addrType);
     }
     else
     {
@@ -1193,7 +1193,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     /* Query node */
     jobs->prepend(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, jobs, cnode, cnodeClone, address, parent, parentClone, addressIndex](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, cnode, cnodeClone, address, parent, parentClone, addrType](const QByteArray &data, bool &done) -> bool
     {
         if (pMesProt->getMessageSize(data) == 1)
         {
@@ -1222,7 +1222,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
                 //Load next child
                 if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
                 {
-                    loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress(), addressIndex);
+                    loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress(), addrType);
                 }
             }
 

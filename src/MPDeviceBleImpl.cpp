@@ -746,31 +746,37 @@ void MPDeviceBleImpl::loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgress
     }
 }
 
-void MPDeviceBleImpl::appendLoginNode(MPNode *loginNode, MPNode *loginNodeClone, int addrIndex)
+void MPDeviceBleImpl::appendLoginNode(MPNode *loginNode, MPNode *loginNodeClone, Common::AddressType addrType)
 {
-    if (Common::CRED_ADDR_IDX == addrIndex)
+    switch(addrType)
     {
-        mpDev->loginNodes.append(loginNode);
-        mpDev->loginNodesClone.append(loginNodeClone);
-    }
-    else
-    {
-        mpDev->webAuthnLoginNodes.append(loginNode);
-        mpDev->webAuthnLoginNodesClone.append(loginNodeClone);
+        case Common::CRED_ADDR_IDX:
+            mpDev->loginNodes.append(loginNode);
+            mpDev->loginNodesClone.append(loginNodeClone);
+            break;
+        case Common::WEBAUTHN_ADDR_IDX:
+            mpDev->webAuthnLoginNodes.append(loginNode);
+            mpDev->webAuthnLoginNodesClone.append(loginNodeClone);
+            break;
+        default:
+            qCritical() << "Invalid address type";
     }
 }
 
-void MPDeviceBleImpl::appendLoginChildNode(MPNode *loginChildNode, MPNode *loginChildNodeClone, int addrIndex)
+void MPDeviceBleImpl::appendLoginChildNode(MPNode *loginChildNode, MPNode *loginChildNodeClone, Common::AddressType addrType)
 {
-    if (Common::CRED_ADDR_IDX == addrIndex)
+    switch(addrType)
     {
-        mpDev->loginChildNodes.append(loginChildNode);
-        mpDev->loginChildNodesClone.append(loginChildNodeClone);
-    }
-    else
-    {
-        mpDev->webAuthnLoginChildNodes.append(loginChildNode);
-        mpDev->webAuthnLoginChildNodesClone.append(loginChildNodeClone);
+        case Common::CRED_ADDR_IDX:
+            mpDev->loginChildNodes.append(loginChildNode);
+            mpDev->loginChildNodesClone.append(loginChildNodeClone);
+            break;
+        case Common::WEBAUTHN_ADDR_IDX:
+            mpDev->webAuthnLoginChildNodes.append(loginChildNode);
+            mpDev->webAuthnLoginChildNodesClone.append(loginChildNodeClone);
+            break;
+        default:
+            qCritical() << "Invalid address type";
     }
 }
 

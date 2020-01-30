@@ -106,8 +106,8 @@ public:
     void readLanguages();
 
     void loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
-    void appendLoginNode(MPNode* loginNode, MPNode* loginNodeClone, int addrIndex);
-    void appendLoginChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, int addrIndex);
+    void appendLoginNode(MPNode* loginNode, MPNode* loginNodeClone, Common::AddressType addrType);
+    void appendLoginChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, Common::AddressType addrType);
 
 signals:
     void userSettingsChanged(QJsonObject settings);

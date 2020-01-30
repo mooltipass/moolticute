@@ -238,8 +238,9 @@ private:
 
     void addTimerJob(int msec);
     void loadLoginNode(AsyncJobs *jobs, const QByteArray &address,
-                       const MPDeviceProgressCb &cbProgress, int addressIndex = Common::CRED_ADDR_IDX);
-    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, int addressIndex = Common::CRED_ADDR_IDX);
+                       const MPDeviceProgressCb &cbProgress, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone,
+                            const QByteArray &address, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
                       const MPDeviceProgressCb &cbProgress);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress, quint32 nbBytesFetched);
