@@ -733,6 +733,47 @@ void MPDeviceBleImpl::readLanguages()
     mpDev->enqueueAndRunJob(jobs);
 }
 
+void MPDeviceBleImpl::loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress)
+{
+    if (mpDev->startNode[Common::WEBAUTHN_ADDR_IDX] != MPNode::EmptyAddress)
+    {
+        qInfo() << "Loading parent nodes...";
+        mpDev->loadLoginNode(jobs, mpDev->startNode[Common::WEBAUTHN_ADDR_IDX], cbProgress, Common::WEBAUTHN_ADDR_IDX);
+    }
+    else
+    {
+        qInfo() << "No parent webauthn nodes to load.";
+    }
+}
+
+void MPDeviceBleImpl::appendLoginNode(MPNode *loginNode, MPNode *loginNodeClone, int addrIndex)
+{
+    if (Common::CRED_ADDR_IDX == addrIndex)
+    {
+        mpDev->loginNodes.append(loginNode);
+        mpDev->loginNodesClone.append(loginNodeClone);
+    }
+    else
+    {
+        mpDev->webAuthnLoginNodes.append(loginNode);
+        mpDev->webAuthnLoginNodesClone.append(loginNodeClone);
+    }
+}
+
+void MPDeviceBleImpl::appendLoginChildNode(MPNode *loginChildNode, MPNode *loginChildNodeClone, int addrIndex)
+{
+    if (Common::CRED_ADDR_IDX == addrIndex)
+    {
+        mpDev->loginChildNodes.append(loginChildNode);
+        mpDev->loginChildNodesClone.append(loginChildNodeClone);
+    }
+    else
+    {
+        mpDev->webAuthnLoginChildNodes.append(loginChildNode);
+        mpDev->webAuthnLoginChildNodesClone.append(loginChildNodeClone);
+    }
+}
+
 void MPDeviceBleImpl::handleLongMessageTimeout()
 {
     qWarning() << "Timout for multiple packet expired";

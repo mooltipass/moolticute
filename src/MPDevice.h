@@ -238,8 +238,8 @@ private:
 
     void addTimerJob(int msec);
     void loadLoginNode(AsyncJobs *jobs, const QByteArray &address,
-                       const MPDeviceProgressCb &cbProgress);
-    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
+                       const MPDeviceProgressCb &cbProgress, int addressIndex = Common::CRED_ADDR_IDX);
+    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, int addressIndex = Common::CRED_ADDR_IDX);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
                       const MPDeviceProgressCb &cbProgress);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress, quint32 nbBytesFetched);
@@ -387,6 +387,13 @@ private:
     QList<MPNode *> importedDataNodes;          //list of all parent nodes for data nodes
     QList<MPNode *> importedDataChildNodes;     //list of all parent nodes for data nodes
 
+    //WebAuthn datas
+    QList<MPNode *> webAuthnLoginNodes;
+    QList<MPNode *> webAuthnLoginNodesClone;
+    QList<MPNode *> webAuthnLoginChildNodes;
+    QList<MPNode *> webAuthnLoginChildNodesClone;
+
+
     bool isFw12Flag = false;            // true if fw is at least v1.2
 
     //this queue is used to put jobs list in a wait
@@ -437,12 +444,6 @@ protected:
         EXPORT_DB_MINI_SERIAL_NUM_INDEX = 13,
         EXPORT_IS_BLE_INDEX = 14,
         EXPORT_BLE_USER_CATEGORIES_INDEX = 15
-    };
-
-    enum AddressType
-    {
-        CRED_ADDR_IDX = 0,
-        WEBAUTHN_ADDR_IDX = 1
     };
 
     static constexpr int RESET_SEND_DELAY = 300;

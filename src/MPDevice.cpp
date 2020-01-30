@@ -733,19 +733,19 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                 }
                 else
                 {
-                    startNode[CRED_ADDR_IDX] = pMesProt->getFullPayload(data);
-                    startNodeClone[CRED_ADDR_IDX] = startNode[CRED_ADDR_IDX];
+                    startNode[Common::CRED_ADDR_IDX] = pMesProt->getFullPayload(data);
+                    startNodeClone[Common::CRED_ADDR_IDX] = startNode[Common::CRED_ADDR_IDX];
                 }
-                qDebug() << "Start node addr:" << startNode[CRED_ADDR_IDX].toHex();
+                qDebug() << "Start node addr:" << startNode[Common::CRED_ADDR_IDX].toHex();
 
                 //if parent address is not null, load nodes
-                if (startNode[CRED_ADDR_IDX] != MPNode::EmptyAddress)
+                if (startNode[Common::CRED_ADDR_IDX] != MPNode::EmptyAddress)
                 {
                     qInfo() << "Loading parent nodes...";
                     if (!fullScan)
                     {
                         /* Traverse the flash by following the linked list */
-                        loadLoginNode(jobs, startNode[CRED_ADDR_IDX], cbProgress);
+                        loadLoginNode(jobs, startNode[Common::CRED_ADDR_IDX], cbProgress);
                     }
                     else
                     {
@@ -755,6 +755,12 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                 else
                 {
                     qInfo() << "No parent nodes to load.";
+                }
+
+                // For testing load webauthn nodes too
+                if (isBLE())
+                {
+                    bleImpl->loadWebAuthnNodes(jobs, cbProgress);
                 }
 
                 return true;
@@ -1077,20 +1083,27 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
-void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress, int addressIndex)
 {
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
     /* Create new parent node, append to list */
     MPNode *pnode = pMesProt->createMPNode(this, address);
-    loginNodes.append(pnode);
     MPNode *pnodeClone = pMesProt->createMPNode(this, address);
-    loginNodesClone.append(pnodeClone);
+    if (isBLE())
+    {
+        bleImpl->appendLoginNode(pnode, pnodeClone, addressIndex);
+    }
+    else
+    {
+        loginNodes.append(pnode);
+        loginNodesClone.append(pnodeClone);
+    }
 
     /* Send read node command, expecting 3 packets */
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, jobs, pnode, pnodeClone, address, cbProgress](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnode, pnodeClone, address, cbProgress, addressIndex](const QByteArray &data, bool &done) -> bool
     {
         if (pMesProt->getMessageSize(data) == 1)
         {
@@ -1139,7 +1152,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
                 if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
                 {
                     qDebug() << srv << ": loading child nodes...";
-                    loadLoginChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress());
+                    loadLoginChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress(), addressIndex);
                 }
                 else
                 {
@@ -1149,7 +1162,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
                 //Load next parent
                 if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
                 {
-                    loadLoginNode(jobs, pnode->getNextParentAddress(), cbProgress);
+                    loadLoginNode(jobs, pnode->getNextParentAddress(), cbProgress, addressIndex);
                 }
             }
 
@@ -1158,22 +1171,29 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
     }));
 }
 
-void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address)
+void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, int addressIndex)
 {
     qDebug() << "Loading cred child node at address:" << address.toHex();
 
     /* Create empty child node and add it to the list */
     MPNode *cnode = pMesProt->createMPNode(this, address);
-    loginChildNodes.append(cnode);
     parent->appendChild(cnode);
     MPNode *cnodeClone = pMesProt->createMPNode(this, address);
-    loginChildNodesClone.append(cnodeClone);
     parentClone->appendChild(cnodeClone);
+    if (isBLE())
+    {
+        bleImpl->appendLoginChildNode(cnode, cnodeClone, addressIndex);
+    }
+    else
+    {
+        loginChildNodes.append(cnode);
+        loginChildNodesClone.append(cnodeClone);
+    }
 
     /* Query node */
     jobs->prepend(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, jobs, cnode, cnodeClone, address, parent, parentClone](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, cnode, cnodeClone, address, parent, parentClone, addressIndex](const QByteArray &data, bool &done) -> bool
     {
         if (pMesProt->getMessageSize(data) == 1)
         {
@@ -1202,7 +1222,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
                 //Load next child
                 if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
                 {
-                    loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress());
+                    loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress(), addressIndex);
                 }
             }
 
@@ -1556,7 +1576,7 @@ bool MPDevice::tagFavoriteNodes(void)
     MPNode* tempChildNodePt = nullptr;
 
     /* start with start node (duh) */
-    tempParentAddress = startNode[CRED_ADDR_IDX];
+    tempParentAddress = startNode[Common::CRED_ADDR_IDX];
     tempVirtualParentAddress = virtualStartNode;
 
     /* Loop through the parent nodes */
@@ -1662,7 +1682,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
     if (tagCredentials)
     {
         /* start with start node (duh) */
-        tempParentAddress = startNode[CRED_ADDR_IDX];
+        tempParentAddress = startNode[Common::CRED_ADDR_IDX];
         tempVirtualParentAddress = virtualStartNode;
 
         /* Loop through the parent nodes */
@@ -1678,10 +1698,10 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[Common::CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                     {
                         /* start node is incorrect */
-                        startNode[CRED_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
+                        startNode[Common::CRED_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
                         virtualStartNode = 0;
                     }
                     else
@@ -1702,10 +1722,10 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[Common::CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                     {
                         /* start node is already tagged... how's that possible? */
-                        startNode[CRED_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
+                        startNode[Common::CRED_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
                         virtualStartNode = 0;
                     }
                     else
@@ -1722,7 +1742,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
             else
             {
                 /* check previous node address */
-                if ((!tempParentAddress.isNull() && tempParentAddress == startNode[CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                if ((!tempParentAddress.isNull() && tempParentAddress == startNode[Common::CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                 {
                     /* first parent node: previous address should be an empty one */
                     if ((tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != 0))
@@ -2187,7 +2207,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     }
     else
     {
-        curNodeAddr = startNode[CRED_ADDR_IDX];
+        curNodeAddr = startNode[Common::CRED_ADDR_IDX];
         curNodeAddrVirtual = virtualStartNode;
     }
 
@@ -2216,7 +2236,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             }
             else
             {
-                startNode[CRED_ADDR_IDX] = parentNodePt->getAddress();
+                startNode[Common::CRED_ADDR_IDX] = parentNodePt->getAddress();
                 virtualStartNode = parentNodePt->getVirtualAddress();
             }
 
@@ -2282,7 +2302,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                         }
                         else
                         {
-                            startNode[CRED_ADDR_IDX] = parentNodePt->getAddress();
+                            startNode[Common::CRED_ADDR_IDX] = parentNodePt->getAddress();
                             virtualStartNode = parentNodePt->getVirtualAddress();
                         }
                         parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress);
@@ -2494,7 +2514,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
     }
     else
     {
-        curNodeAddr = startNode[CRED_ADDR_IDX];
+        curNodeAddr = startNode[Common::CRED_ADDR_IDX];
         curNodeAddrVirtual = virtualStartNode;
     }
 
@@ -2597,7 +2617,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                startNode[CRED_ADDR_IDX] = MPNode::EmptyAddress;
+                                startNode[Common::CRED_ADDR_IDX] = MPNode::EmptyAddress;
                                 virtualStartNode = 0;
                             }
 
@@ -2624,7 +2644,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                startNode[CRED_ADDR_IDX] = nextNodePt->getAddress();
+                                startNode[Common::CRED_ADDR_IDX] = nextNodePt->getAddress();
                                 virtualStartNode = nextNodePt->getVirtualAddress();
                             }
                             nextNodePt->setPreviousParentAddress(MPNode::EmptyAddress, 0);
@@ -3243,18 +3263,18 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         }
 
         /* Diff start node */
-        if (startNode[CRED_ADDR_IDX] != startNodeClone[CRED_ADDR_IDX])
+        if (startNode[Common::CRED_ADDR_IDX] != startNodeClone[Common::CRED_ADDR_IDX])
         {
             qDebug() << "Updating start node";
             diagSavePacketsGenerated = true;
             QByteArray setAddress;
             if (isBLE())
             {
-                setAddress = bleImpl->getStartAddressToSet(startNode[CRED_ADDR_IDX]);
+                setAddress = bleImpl->getStartAddressToSet(startNode[Common::CRED_ADDR_IDX]);
             }
             else
             {
-                setAddress = startNode[CRED_ADDR_IDX];
+                setAddress = startNode[Common::CRED_ADDR_IDX];
             }
             jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, setAddress, pMesProt->getDefaultFuncDone()));
         }
@@ -4507,7 +4527,7 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
     if (virtualStartNode != 0)
     {
         qDebug() << "Setting start node to " << getFreeAddress(virtualStartNode).toHex();
-        startNode[CRED_ADDR_IDX] = getFreeAddress(virtualStartNode);
+        startNode[Common::CRED_ADDR_IDX] = getFreeAddress(virtualStartNode);
     }
     if (virtualDataStartNode != 0)
     {
@@ -4609,7 +4629,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping one parent node link in chain: test failed!";return false;} else qInfo() << "Skipping one parent node link in chain: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping first parent node";
-    startNode[CRED_ADDR_IDX] = loginNodes[1]->getAddress();
+    startNode[Common::CRED_ADDR_IDX] = loginNodes[1]->getAddress();
     loginNodes[1]->setPreviousParentAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true, true, true);
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping first parent node: test failed!";return false;} else qInfo() << "Skipping first parent node: passed!";
@@ -4620,7 +4640,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping last parent node: test failed!";return false;} else qInfo() << "Skipping last parent node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Setting invalid startNode";
-    startNode[CRED_ADDR_IDX] = invalidAddress;
+    startNode[Common::CRED_ADDR_IDX] = invalidAddress;
     checkLoadedNodes(true, true, true);
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Setting invalid startNode: test failed!";return false;} else qInfo() << "Setting invalid startNode: passed!";
 
@@ -4761,7 +4781,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     exportTopArray.append(QJsonValue(cpzCtrQJsonArray));
 
     /* Starting parent */
-    exportTopArray.append(QJsonValue(Common::bytesToJson(startNode[CRED_ADDR_IDX])));
+    exportTopArray.append(QJsonValue(Common::bytesToJson(startNode[Common::CRED_ADDR_IDX])));
 
     /* Data starting parent */
     exportTopArray.append(QJsonValue(Common::bytesToJson(startDataNode)));

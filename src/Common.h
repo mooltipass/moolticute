@@ -235,6 +235,12 @@ public:
         CredentialNumberChanged = 0x01,
         DataNumberChanged = 0x02
     };
+
+    enum AddressType
+    {
+        CRED_ADDR_IDX = 0,
+        WEBAUTHN_ADDR_IDX = 1
+    };
 };
 
 enum class DeviceType
