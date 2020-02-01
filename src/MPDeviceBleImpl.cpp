@@ -780,6 +780,40 @@ void MPDeviceBleImpl::appendLoginChildNode(MPNode *loginChildNode, MPNode *login
     }
 }
 
+void MPDeviceBleImpl::generateExportData(QJsonArray &exportTopArray)
+{
+    /* isBle */
+    exportTopArray.append(QJsonValue{true});
+    /* user category names */
+    exportTopArray.append(getUserCategories());
+    /* Webauthn parent nodes */
+    QJsonArray nodeQJsonArray = QJsonArray();
+    auto& login = mpDev->webAuthnLoginNodes;
+    for (qint32 i = 0; i < login.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(login[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(login[i]->getService());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(login[i]->getNodeData()));
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
+
+    /* Webauthn child nodes */
+    nodeQJsonArray = QJsonArray();
+    auto& loginChild = mpDev->webAuthnLoginChildNodes;
+    for (qint32 i = 0; i < loginChild.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(loginChild[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(loginChild[i]->getLogin());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(loginChild[i]->getNodeData()));
+        nodeObject["pointed"] = QJsonValue(false);
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
+}
+
 void MPDeviceBleImpl::handleLongMessageTimeout()
 {
     qWarning() << "Timout for multiple packet expired";

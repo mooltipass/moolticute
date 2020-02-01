@@ -4860,10 +4860,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
 
     if (isBLE())
     {
-        /* isBle */
-        exportTopArray.append(QJsonValue{true});
-        /* user category names */
-        exportTopArray.append(bleImpl->getUserCategories());
+        bleImpl->generateExportData(exportTopArray);
     }
 
     /* Generate file payload */

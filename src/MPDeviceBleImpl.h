@@ -108,6 +108,7 @@ public:
     void loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
     void appendLoginNode(MPNode* loginNode, MPNode* loginNodeClone, Common::AddressType addrType);
     void appendLoginChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, Common::AddressType addrType);
+    void generateExportData(QJsonArray& exportTopArray);
 
 signals:
     void userSettingsChanged(QJsonObject settings);

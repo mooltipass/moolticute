@@ -426,7 +426,7 @@ protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
     static constexpr int MP_EXPORT_FIELD_NUM = 10;
     static constexpr int MC_EXPORT_FIELD_NUM = 14;
-    static constexpr int BLE_EXPORT_FIELD_NUM = 16;
+    static constexpr int BLE_EXPORT_FIELD_NUM = 18;
     enum ExportPayloadData
     {
         EXPORT_CTR_INDEX = 0,
