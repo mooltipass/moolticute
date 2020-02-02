@@ -82,6 +82,15 @@ void MPDevice::setupMessageProtocol()
         qDebug() << "Mooltipass Mini is connected";
     }
 
+    importNodeMap = {
+        {EXPORT_SERVICE_NODES_INDEX, &importedLoginNodes},
+        {EXPORT_SERVICE_CHILD_NODES_INDEX, &importedLoginChildNodes},
+        {EXPORT_WEBAUTHN_NODES_INDEX, &importedWebauthnLoginNodes},
+        {EXPORT_WEBAUTHN_CHILD_NODES_INDEX, &importedWebauthnLoginChildNodes},
+        {EXPORT_MC_SERVICE_NODES_INDEX, &importedDataNodes},
+        {EXPORT_MC_SERVICE_CHILD_NODES_INDEX, &importedDataChildNodes},
+    };
+
 
 #ifndef Q_OS_WIN
     sendInitMessages();
@@ -1433,7 +1442,7 @@ void MPDevice::deletePossibleFavorite(QByteArray parentAddr, QByteArray childAdd
 }
 
 /* Find a node inside a given list given his address */
-MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr)
+MPNode *MPDevice::findNodeWithAddressInList(NodeList list, const QByteArray &address, const quint32 virt_addr)
 {
     auto it = std::find_if(list.begin(), list.end(), [&address, virt_addr](const MPNode *const node)
     {
@@ -1451,7 +1460,7 @@ MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArr
 }
 
 /* Find a node inside a given list given his address */
-MPNode *MPDevice::findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent)
+MPNode *MPDevice::findNodeWithNameInList(NodeList list, const QString& name, bool isParent)
 {
     auto it = std::find_if(list.begin(), list.end(), [&name, isParent](const MPNode *const node)
     {
@@ -1469,7 +1478,7 @@ MPNode *MPDevice::findNodeWithNameInList(QList<MPNode *> list, const QString& na
 }
 
 /* Find a node inside a given list given his address */
-MPNode *MPDevice::findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QString& name)
+MPNode *MPDevice::findNodeWithLoginWithGivenParentInList(NodeList list,  MPNode *parent, const QString& name)
 {
     /* get first child */
     MPNode* tempChildNodePt;
@@ -1508,7 +1517,7 @@ MPNode *MPDevice::findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  
 
 
 /* Find a node inside a given list given his address */
-MPNode *MPDevice::findNodeWithAddressWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr)
+MPNode *MPDevice::findNodeWithAddressWithGivenParentInList(NodeList list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr)
 {
     /* get first child */
     MPNode* tempChildNodePt;
@@ -4981,6 +4990,28 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
     }
 }
 
+void MPDevice::readExportNodes(QJsonArray &&nodes, ExportPayloadData id)
+{
+    for (qint32 i = 0; i < nodes.size(); i++)
+    {
+        QJsonObject qjobject = nodes[i].toObject();
+
+        /* Fetch address */
+        QJsonArray serviceAddrArr = qjobject["address"].toArray();
+        QByteArray serviceAddr = QByteArray();
+        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
+
+        /* Fetch core data */
+        QJsonObject dataObj = qjobject["data"].toObject();
+        QByteArray dataCore = QByteArray();
+        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
+
+        /* Recreate node and add it to the list of imported nodes */
+        MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
+        importNodeMap[id]->append(importedNode);
+    }
+}
+
 bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 {
     /** Mooltiapp / Chrome App save file **/
@@ -5074,97 +5105,27 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     }
 
     /* Read service nodes */
-    qjarray = dataArray[EXPORT_SERVICE_NODES_INDEX].toArray();
-    for (qint32 i = 0; i < qjarray.size(); i++)
-    {
-        qjobject = qjarray[i].toObject();
-
-        /* Fetch address */
-        QJsonArray serviceAddrArr = qjobject["address"].toArray();
-        QByteArray serviceAddr = QByteArray();
-        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-        /* Fetch core data */
-        QJsonObject dataObj = qjobject["data"].toObject();
-        QByteArray dataCore = QByteArray();
-        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-        /* Recreate node and add it to the list of imported nodes */
-        MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
-        importedLoginNodes.append(importedNode);
-        //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
-    }
+    readExportNodes(dataArray[EXPORT_SERVICE_NODES_INDEX].toArray(), EXPORT_SERVICE_NODES_INDEX);
 
     /* Read service child nodes */
-    qjarray = dataArray[EXPORT_SERVICE_CHILD_NODES_INDEX].toArray();
-    for (qint32 i = 0; i < qjarray.size(); i++)
-    {
-        qjobject = qjarray[i].toObject();
-
-        /* Fetch address */
-        QJsonArray serviceAddrArr = qjobject["address"].toArray();
-        QByteArray serviceAddr = QByteArray();
-        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-        /* Fetch core data */
-        QJsonObject dataObj = qjobject["data"].toObject();
-        QByteArray dataCore = QByteArray();
-        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-        /* Recreate node and add it to the list of imported nodes */
-        MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
-        importedLoginChildNodes.append(importedNode);
-        //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
-    }
+    readExportNodes(dataArray[EXPORT_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_SERVICE_CHILD_NODES_INDEX);
 
     if (!isMooltiAppImportFile)
     {
         /* Read service nodes */
-        qjarray = dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++)
-        {
-            qjobject = qjarray[i].toObject();
-
-            /* Fetch address */
-            QJsonArray serviceAddrArr = qjobject["address"].toArray();
-            QByteArray serviceAddr = QByteArray();
-            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-            /* Fetch core data */
-            QJsonObject dataObj = qjobject["data"].toObject();
-            QByteArray dataCore = QByteArray();
-            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-            /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
-            importedDataNodes.append(importedNode);
-            //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
-        }
+        readExportNodes(dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_NODES_INDEX);
 
         /* Read service child nodes */
-        qjarray = dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++)
-        {
-            qjobject = qjarray[i].toObject();
-
-            /* Fetch address */
-            QJsonArray serviceAddrArr = qjobject["address"].toArray();
-            QByteArray serviceAddr = QByteArray();
-            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-            /* Fetch core data */
-            QJsonObject dataObj = qjobject["data"].toObject();
-            QByteArray dataCore = QByteArray();
-            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-            /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
-            importedDataChildNodes.append(importedNode);
-            //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
-        }
+        readExportNodes(dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_CHILD_NODES_INDEX);
 
         if (isBleExport)
         {
+            /* Read webauthn nodes */
+            readExportNodes(dataArray[EXPORT_WEBAUTHN_NODES_INDEX].toArray(), EXPORT_WEBAUTHN_NODES_INDEX);
+
+            /* Read webauthn child nodes */
+            readExportNodes(dataArray[EXPORT_WEBAUTHN_CHILD_NODES_INDEX].toArray(), EXPORT_WEBAUTHN_CHILD_NODES_INDEX);
+
             bleImpl->updateUserCategories(dataArray[EXPORT_BLE_USER_CATEGORIES_INDEX].toObject());
         }
     }
@@ -5186,10 +5147,14 @@ void MPDevice::cleanImportedVars(void)
     qDeleteAll(importedLoginChildNodes);
     qDeleteAll(importedDataNodes);
     qDeleteAll(importedDataChildNodes);
+    qDeleteAll(importedWebauthnLoginNodes);
+    qDeleteAll(importedWebauthnLoginChildNodes);
     importedLoginNodes.clear();
     importedLoginChildNodes.clear();
     importedDataNodes.clear();
     importedDataChildNodes.clear();
+    importedWebauthnLoginNodes.clear();
+    importedWebauthnLoginChildNodes.clear();
 }
 
 void MPDevice::cleanMMMVars(void)
