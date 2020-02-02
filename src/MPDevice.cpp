@@ -766,7 +766,6 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                     qInfo() << "No parent nodes to load.";
                 }
 
-                // For testing load webauthn nodes too
                 if (isBLE())
                 {
                     bleImpl->loadWebAuthnNodes(jobs, cbProgress);
@@ -1092,7 +1091,7 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
-void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress, Common::AddressType addrType)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
@@ -1180,7 +1179,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
     }));
 }
 
-void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, Common::AddressType addrType)
+void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qDebug() << "Loading cred child node at address:" << address.toHex();
 
