@@ -118,6 +118,7 @@ private:
     QQueue<char*> m_writeBufferQueue;
 
     const static QString BT_GATT_SERVICE_GUID;
+    const static QString MC_COMMS_ID;
     const static char ZERO_BYTE = static_cast<char>(0x00);
 };
 
