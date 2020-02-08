@@ -227,8 +227,12 @@ void MPManager::checkUsbDevices()
     //Remove bt connection if usb is connected too
     if (devlist.size() > 1)
     {
-        devlist.erase(std::remove_if(devlist.begin(), devlist.end(),
-                       [](MPPlatformDef def){return def.isBluetooth;}));
+        auto it = std::remove_if(devlist.begin(), devlist.end(),
+                               [](MPPlatformDef def){return def.isBluetooth;});
+        if (it != devlist.end())
+        {
+            devlist.erase(it);
+        }
     }
 #endif
 
