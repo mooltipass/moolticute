@@ -24,6 +24,7 @@
 // Windows GUID object
 static GUID IClassGuid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30} };
 const QString MPDevice_win::BT_GATT_SERVICE_GUID = "00001812-0000-1000-8000-00805f9b34fb";
+const QString MPDevice_win::MC_COMMS_ID = "mi_00";
 
 MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
     MPDevice(parent),
@@ -346,10 +347,17 @@ bool MPDevice_win::checkDevice(QString path, bool &isBLE /* out */, bool &isBlue
     }
 
     isBLE = attrib.VendorID == MOOLTIPASS_BLE_VENDORID;
-    if (isBLE && path.contains(BT_GATT_SERVICE_GUID))
+    if (isBLE)
     {
-        qDebug() << "BT HID connected";
-        isBluetooth = true;
+        if (path.contains(BT_GATT_SERVICE_GUID))
+        {
+            qDebug() << "BT HID connected";
+            isBluetooth = true;
+        }
+        else if (!path.contains(MC_COMMS_ID))
+        {
+            return false;
+        }
     }
     return true;
 }
