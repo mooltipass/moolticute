@@ -5163,26 +5163,24 @@ void MPDevice::cleanMMMVars(void)
     virtualDataStartNode = 0;
     ctrValue.clear();
     cpzCtrValue.clear();
-    qDeleteAll(loginNodes);
-    loginNodes.clear();
-    qDeleteAll(dataNodes);
-    dataNodes.clear();
+    clearAndDelete(loginNodes);
+    clearAndDelete(dataNodes);
     favoritesAddrs.clear();
     loginChildNodes.clear();
     dataChildNodes.clear();
     /* Cleaning the clones as well */
     ctrValueClone.clear();
     cpzCtrValueClone.clear();
-    qDeleteAll(loginNodesClone);
-    loginNodesClone.clear();
-    qDeleteAll(dataNodesClone);
-    dataNodesClone.clear();
+    clearAndDelete(loginNodesClone);
+    clearAndDelete(dataNodesClone);
     favoritesAddrsClone.clear();
-    loginChildNodesClone.clear();
-    dataChildNodesClone.clear();
     freeAddresses.clear();
     if (isBLE())
     {
+        clearAndDelete(webAuthnLoginNodes);
+        clearAndDelete(webAuthnLoginNodesClone);
+        webAuthnLoginChildNodes.clear();
+        webAuthnLoginChildNodesClone.clear();
         bleImpl->getFreeAddressProvider().cleanFreeAddresses();
     }
 }

@@ -127,6 +127,13 @@ T const& qAsConst(T&t){return t;}
     Class(const Class &&) Q_DECL_EQ_DELETE;\
     Class &operator=(const Class &&) Q_DECL_EQ_DELETE;
 
+template<typename Container>
+void clearAndDelete(Container& cont)
+{
+    qDeleteAll(cont);
+    cont.clear();
+}
+
 class Common
 {
 public:
