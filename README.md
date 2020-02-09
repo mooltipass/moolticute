@@ -12,8 +12,6 @@ handles all USB communication with the device.
 
 This tool comes with a daemon that runs in background, and a user interface app to control your Mooltipass.
 Other clients can also connect and talk to the daemon (it uses a websocket connection and simple JSON messages).
-The official Mooltipass App only works with Chrome as it relies on USB HID library that is only implemented in Chrome.
-A Firefox (or any other browser) extension could easily be written that uses the Moolticute daemon.
 
 It is completely cross platform, and runs on Linux (using native hidraw API), OS X (native IOKit API), and Windows (native HID API).
 
