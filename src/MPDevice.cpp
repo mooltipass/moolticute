@@ -5240,236 +5240,19 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
             ctrValue = QByteArray(importedCtrValue);
         }
 
-        checkImportedLoginNodes(cb, Common::CRED_ADDR_IDX);
+        const bool loginImportSuccess = checkImportedLoginNodes(cb, Common::CRED_ADDR_IDX);
+        if (!loginImportSuccess)
+        {
+            return;
+        }
 
         /// Same but for data nodes
         if (!isMooltiAppImportFile)
         {
-            /// Find the data nodes we don't have in memory or that have been changed
-            for (qint32 i = 0; i < importedDataNodes.size(); i++)
+            const bool dataImportSuccess = checkImportedDataNodes(cb);
+            if (!dataImportSuccess)
             {
-                bool service_node_found = false;
-                quint32 encDataSize = 0;
-
-                // Loop in the memory nodes to compare data
-                for (qint32 j = 0; j < dataNodes.size(); j++)
-                {
-                    if ((importedDataNodes[i]->getService() == dataNodes[j]->getService()) && (importedDataNodes[i]->getStartDataCtr() == dataNodes[j]->getStartDataCtr()))
-                    {
-                        // We found a parent data node that has the same core data (doesn't mean the same prev / next node though!)
-                        qDebug() << "Data parent node core data match for " << importedDataNodes[i]->getService();
-                        dataNodes[j]->setMergeTagged();
-                        service_node_found = true;
-
-                        // Next step is to check if the children are the same
-                        quint32 cur_import_child_node_addr_v = importedDataNodes[i]->getStartChildVirtualAddress();
-                        QByteArray cur_import_child_node_addr = importedDataNodes[i]->getStartChildAddress();
-                        quint32 cur_matched_child_node_addr_v = dataNodes[j]->getStartChildVirtualAddress();
-                        QByteArray cur_matched_child_node_addr = dataNodes[j]->getStartChildAddress();
-                        MPNode* prev_matched_child_node = nullptr;
-                        MPNode* matched_child_node = nullptr;
-                        bool data_match_ongoing = true;
-
-                        /* Special case: parent doesn't have children but we do */
-                        if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0)))
-                        {
-                            dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress);
-                        }
-
-                        //qDebug() << "First child address for imported data node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
-                        while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
-                        {
-                            // Find the imported child node in our list
-                            MPNode* imported_child_node = findNodeWithAddressInList(importedDataChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
-                            encDataSize += MP_NODE_DATA_ENC_SIZE;
-
-                            // Check if we actually found the node
-                            if (!imported_child_node)
-                            {
-                                cleanImportedVars();
-                                exitMemMgmtMode(false);
-                                cb(false, "Couldn't Import Database: Corrupted Import File");
-                                qCritical() << "Couldn't find imported data child node in our list (corrupted import file?)";
-                                return;
-                            }
-
-                            // If we are still matching, check that we still can
-                            if (data_match_ongoing)
-                            {
-                                if ((cur_matched_child_node_addr == MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v == 0))
-                                {
-                                    /* No next node */
-                                    qDebug() << "Matched imported data child node chain is longer than what we have";
-                                    data_match_ongoing = false;
-                                }
-                                else
-                                {
-                                    matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
-
-                                    // Check if we actually found the node
-                                    if (!matched_child_node)
-                                    {
-                                        cleanImportedVars();
-                                        exitMemMgmtMode(false);
-                                        cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                                        qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
-                                        return;
-                                    }
-
-                                    // Check for data match
-                                    if (matched_child_node->getDataChildNodeData() != imported_child_node->getDataChildNodeData())
-                                    {
-                                        qDebug() << "Data child node mismatch for " << importedDataNodes[i]->getService();
-                                        data_match_ongoing = false;
-
-                                        /* Chain broken, delete all following data blocks */
-                                        while ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0))
-                                        {
-                                            matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
-
-                                            // Check if we actually found the node
-                                            if (!matched_child_node)
-                                            {
-                                                cleanImportedVars();
-                                                exitMemMgmtMode(false);
-                                                cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                                                qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
-                                                return;
-                                            }
-
-                                            /* Next item */
-                                            cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
-                                            cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
-
-                                            /* Delete current block */
-                                            dataChildNodes.removeOne(matched_child_node);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        matched_child_node->setMergeTagged();
-                                    }
-                                }
-                            }
-
-                            // If we stopped matching the child nodes, add child node data
-                            if (!data_match_ongoing)
-                            {
-                                qDebug() << importedDataNodes[i]->getService() << " : appending child data in the mooltipass...";
-
-                                /* Increment new addresses counter */
-                                incrementNeededAddresses(MPNode::NodeChild);
-
-                                /* Create new node with null address and virtual address set to our counter value */
-                                MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
-                                newDataChildNodePt->setType(MPNode::NodeChild);
-                                newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
-                                newDataChildNodePt->setMergeTagged();
-
-                                /* Add node to list */
-                                dataChildNodes.append(newDataChildNodePt);
-                                if (!prev_matched_child_node)
-                                {
-                                    /* First node */
-                                    dataNodes[j]->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
-                                }
-                                else
-                                {
-                                    prev_matched_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
-                                }
-
-                                /* Update prev matched child node */
-                                prev_matched_child_node = newDataChildNodePt;
-                            }
-
-                            // Fetch next matched child if comparison is still ongoing
-                            if (data_match_ongoing)
-                            {
-                                prev_matched_child_node = matched_child_node;
-                                matched_child_node->setMergeTagged();
-                                cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
-                                cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
-                            }
-
-                            cur_import_child_node_addr = imported_child_node->getNextChildDataAddress();
-                            cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
-                        }
-
-                        // Jump to next service node
-                        break;
-                    }
-                }
-
-                // Did we find the service core data?
-                if(service_node_found == false)
-                {
-                   /* Increment new addresses counter */
-                   incrementNeededAddresses(MPNode::NodeParent);
-
-                   /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
-                   newNodePt->setType(MPNode::NodeParent);
-                   newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
-                   newNodePt->setMergeTagged();
-
-                   /* Add node to list */
-                   dataNodes.append(newNodePt);
-                   if (!addOrphanParentToDB(newNodePt, true, false))
-                   {
-                       cleanImportedVars();
-                       exitMemMgmtMode(false);
-                       qCritical() << "Couldn't add data parent to DB (corrupted DB?)";
-                       cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                       return;
-                   }
-
-                   /* Next step is to follow the children */
-                   QByteArray curImportChildAddr = importedDataNodes[i]->getStartChildAddress();
-                   MPNode* prev_added_child_node = nullptr;
-                   while (curImportChildAddr != MPNode::EmptyAddress)
-                   {
-                       /* Find node in list */
-                       MPNode* curImportChildPt = findNodeWithAddressInList(importedDataChildNodes, curImportChildAddr);
-                       encDataSize += MP_NODE_DATA_ENC_SIZE;
-
-                       if (!curImportChildPt)
-                       {
-                           cleanImportedVars();
-                           exitMemMgmtMode(false);
-                           cb(false, "Couldn't Import Database: Corrupted Database File");
-                           qCritical() << "Couldn't find import child (import file problem?)";
-                           return;
-                       }
-
-                       /* Increment new addresses counter */
-                       incrementNeededAddresses(MPNode::NodeChild);
-
-                       /* Create new node with null address and virtual address set to our counter value */
-                       MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
-                       newDataChildNodePt->setType(MPNode::NodeChild);
-                       newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
-                       newDataChildNodePt->setMergeTagged();
-
-                       /* Add node to list */
-                       dataChildNodes.append(newDataChildNodePt);
-                       if (!prev_added_child_node)
-                       {
-                           /* First node */
-                           newNodePt->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
-                       }
-                       else
-                       {
-                           prev_added_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
-                       }
-
-                       /* Go to the next child */
-                       curImportChildAddr = curImportChildPt->getNextChildDataAddress();
-                       prev_added_child_node = newDataChildNodePt;
-                   }
-
-                   /* Update data size property */
-                   newNodePt->setEncDataSize(encDataSize);
-                }
+                return;
             }
         }
 
@@ -5639,7 +5422,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
     runAndDequeueJobs();
 }
 
-void MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::AddressType addrType)
+bool MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::AddressType addrType)
 {
     const bool isCred = addrType == Common::CRED_ADDR_IDX;
     NodeList& importNodes = isCred ? importedLoginNodes : importedWebauthnLoginNodes;
@@ -5686,7 +5469,7 @@ void MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
                         exitMemMgmtMode(false);
                         cb(false, "Couldn't Import Database: Corrupted Export File");
                         qCritical() << "Couldn't find imported child node in our list (corrupted import file?)";
-                        return;
+                        return false;
                     }
 
                     // We found the imported child, now we need to find the one that matches
@@ -5707,7 +5490,7 @@ void MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
                             exitMemMgmtMode(false);
                             cb(false, "Couldn't Import Database: Please Run Integrity Check");
                             qCritical() << "Couldn't find child node in our list (bad node reading?)";
-                            return;
+                            return false;
                         }
 
                         // We found the child, now we can compare the login name
@@ -5760,7 +5543,7 @@ void MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
                             exitMemMgmtMode(false);
                             cb(false, "Couldn't Import Database: Please Run Integrity Check");
                             qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
-                            return;
+                            return false;
                         }
                     }
 
@@ -5794,7 +5577,7 @@ void MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
                exitMemMgmtMode(false);
                qCritical() << "Couldn't add parent to DB (corrupted DB?)";
                cb(false, "Couldn't Import Database: Please Run Integrity Check");
-               return;
+               return false;
            }
 
            /* Next step is to follow the children */
@@ -5810,7 +5593,7 @@ void MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
                    exitMemMgmtMode(false);
                    cb(false, "Couldn't Import Database: Corrupted Import File");
                    qCritical() << "Couldn't find import child (import file problem?)";
-                   return;
+                   return false;
                }
 
                /* Increment new addresses counter */
@@ -5830,7 +5613,7 @@ void MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
                    exitMemMgmtMode(false);
                    cb(false, "Couldn't Import Database: Please Run Integrity Check");
                    qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
-                   return;
+                   return false;
                }
 
                /* Go to the next child */
@@ -5838,6 +5621,238 @@ void MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
            }
         }
     }
+    return true;
+}
+
+bool MPDevice::checkImportedDataNodes(const MessageHandlerCb &cb)
+{
+    /// Find the data nodes we don't have in memory or that have been changed
+    for (qint32 i = 0; i < importedDataNodes.size(); i++)
+    {
+        bool service_node_found = false;
+        quint32 encDataSize = 0;
+
+        // Loop in the memory nodes to compare data
+        for (qint32 j = 0; j < dataNodes.size(); j++)
+        {
+            if ((importedDataNodes[i]->getService() == dataNodes[j]->getService()) && (importedDataNodes[i]->getStartDataCtr() == dataNodes[j]->getStartDataCtr()))
+            {
+                // We found a parent data node that has the same core data (doesn't mean the same prev / next node though!)
+                qDebug() << "Data parent node core data match for " << importedDataNodes[i]->getService();
+                dataNodes[j]->setMergeTagged();
+                service_node_found = true;
+
+                // Next step is to check if the children are the same
+                quint32 cur_import_child_node_addr_v = importedDataNodes[i]->getStartChildVirtualAddress();
+                QByteArray cur_import_child_node_addr = importedDataNodes[i]->getStartChildAddress();
+                quint32 cur_matched_child_node_addr_v = dataNodes[j]->getStartChildVirtualAddress();
+                QByteArray cur_matched_child_node_addr = dataNodes[j]->getStartChildAddress();
+                MPNode* prev_matched_child_node = nullptr;
+                MPNode* matched_child_node = nullptr;
+                bool data_match_ongoing = true;
+
+                /* Special case: parent doesn't have children but we do */
+                if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0)))
+                {
+                    dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress);
+                }
+
+                //qDebug() << "First child address for imported data node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
+                while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
+                {
+                    // Find the imported child node in our list
+                    MPNode* imported_child_node = findNodeWithAddressInList(importedDataChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
+                    encDataSize += MP_NODE_DATA_ENC_SIZE;
+
+                    // Check if we actually found the node
+                    if (!imported_child_node)
+                    {
+                        cleanImportedVars();
+                        exitMemMgmtMode(false);
+                        cb(false, "Couldn't Import Database: Corrupted Import File");
+                        qCritical() << "Couldn't find imported data child node in our list (corrupted import file?)";
+                        return false;
+                    }
+
+                    // If we are still matching, check that we still can
+                    if (data_match_ongoing)
+                    {
+                        if ((cur_matched_child_node_addr == MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v == 0))
+                        {
+                            /* No next node */
+                            qDebug() << "Matched imported data child node chain is longer than what we have";
+                            data_match_ongoing = false;
+                        }
+                        else
+                        {
+                            matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
+
+                            // Check if we actually found the node
+                            if (!matched_child_node)
+                            {
+                                cleanImportedVars();
+                                exitMemMgmtMode(false);
+                                cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                                qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
+                                return false;
+                            }
+
+                            // Check for data match
+                            if (matched_child_node->getDataChildNodeData() != imported_child_node->getDataChildNodeData())
+                            {
+                                qDebug() << "Data child node mismatch for " << importedDataNodes[i]->getService();
+                                data_match_ongoing = false;
+
+                                /* Chain broken, delete all following data blocks */
+                                while ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0))
+                                {
+                                    matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
+
+                                    // Check if we actually found the node
+                                    if (!matched_child_node)
+                                    {
+                                        cleanImportedVars();
+                                        exitMemMgmtMode(false);
+                                        cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                                        qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
+                                        return false;
+                                    }
+
+                                    /* Next item */
+                                    cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
+                                    cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
+
+                                    /* Delete current block */
+                                    dataChildNodes.removeOne(matched_child_node);
+                                }
+                            }
+                            else
+                            {
+                                matched_child_node->setMergeTagged();
+                            }
+                        }
+                    }
+
+                    // If we stopped matching the child nodes, add child node data
+                    if (!data_match_ongoing)
+                    {
+                        qDebug() << importedDataNodes[i]->getService() << " : appending child data in the mooltipass...";
+
+                        /* Increment new addresses counter */
+                        incrementNeededAddresses(MPNode::NodeChild);
+
+                        /* Create new node with null address and virtual address set to our counter value */
+                        MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+                        newDataChildNodePt->setType(MPNode::NodeChild);
+                        newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
+                        newDataChildNodePt->setMergeTagged();
+
+                        /* Add node to list */
+                        dataChildNodes.append(newDataChildNodePt);
+                        if (!prev_matched_child_node)
+                        {
+                            /* First node */
+                            dataNodes[j]->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
+                        }
+                        else
+                        {
+                            prev_matched_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
+                        }
+
+                        /* Update prev matched child node */
+                        prev_matched_child_node = newDataChildNodePt;
+                    }
+
+                    // Fetch next matched child if comparison is still ongoing
+                    if (data_match_ongoing)
+                    {
+                        prev_matched_child_node = matched_child_node;
+                        matched_child_node->setMergeTagged();
+                        cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
+                        cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
+                    }
+
+                    cur_import_child_node_addr = imported_child_node->getNextChildDataAddress();
+                    cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
+                }
+
+                // Jump to next service node
+                break;
+            }
+        }
+
+        // Did we find the service core data?
+        if(service_node_found == false)
+        {
+           /* Increment new addresses counter */
+           incrementNeededAddresses(MPNode::NodeParent);
+
+           /* Create new node with null address and virtual address set to our counter value */
+           MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+           newNodePt->setType(MPNode::NodeParent);
+           newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
+           newNodePt->setMergeTagged();
+
+           /* Add node to list */
+           dataNodes.append(newNodePt);
+           if (!addOrphanParentToDB(newNodePt, true, false))
+           {
+               cleanImportedVars();
+               exitMemMgmtMode(false);
+               qCritical() << "Couldn't add data parent to DB (corrupted DB?)";
+               cb(false, "Couldn't Import Database: Please Run Integrity Check");
+               return false;
+           }
+
+           /* Next step is to follow the children */
+           QByteArray curImportChildAddr = importedDataNodes[i]->getStartChildAddress();
+           MPNode* prev_added_child_node = nullptr;
+           while (curImportChildAddr != MPNode::EmptyAddress)
+           {
+               /* Find node in list */
+               MPNode* curImportChildPt = findNodeWithAddressInList(importedDataChildNodes, curImportChildAddr);
+               encDataSize += MP_NODE_DATA_ENC_SIZE;
+
+               if (!curImportChildPt)
+               {
+                   cleanImportedVars();
+                   exitMemMgmtMode(false);
+                   cb(false, "Couldn't Import Database: Corrupted Database File");
+                   qCritical() << "Couldn't find import child (import file problem?)";
+                   return false;
+               }
+
+               /* Increment new addresses counter */
+               incrementNeededAddresses(MPNode::NodeChild);
+
+               /* Create new node with null address and virtual address set to our counter value */
+               MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+               newDataChildNodePt->setType(MPNode::NodeChild);
+               newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
+               newDataChildNodePt->setMergeTagged();
+
+               /* Add node to list */
+               dataChildNodes.append(newDataChildNodePt);
+               if (!prev_added_child_node)
+               {
+                   /* First node */
+                   newNodePt->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
+               }
+               else
+               {
+                   prev_added_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
+               }
+
+               /* Go to the next child */
+               curImportChildAddr = curImportChildPt->getNextChildDataAddress();
+               prev_added_child_node = newDataChildNodePt;
+           }
+
+           /* Update data size property */
+           newNodePt->setEncDataSize(encDataSize);
+        }
+    }
+    return true;
 }
 
 bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
