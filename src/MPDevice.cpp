@@ -1651,28 +1651,42 @@ bool MPDevice::tagFavoriteNodes(void)
     return true;
 }
 
-void MPDevice::detagPointedNodes(void)
+void MPDevice::detagPointedNodes(Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
-    for (auto &i: loginNodes)
+    if (Common::CRED_ADDR_IDX == addrType)
     {
-        i->removePointedToCheck();
+        for (auto &i: loginNodes)
+        {
+            i->removePointedToCheck();
+        }
+        for (auto &i: loginChildNodes)
+        {
+            i->removePointedToCheck();
+        }
+        for (auto &i: dataNodes)
+        {
+            i->removePointedToCheck();
+        }
+        for (auto &i: dataChildNodes)
+        {
+            i->removePointedToCheck();
+        }
     }
-    for (auto &i: loginChildNodes)
+    else
     {
-        i->removePointedToCheck();
-    }
-    for (auto &i: dataNodes)
-    {
-        i->removePointedToCheck();
-    }
-    for (auto &i: dataChildNodes)
-    {
-        i->removePointedToCheck();
+        for (auto &i: webAuthnLoginNodes)
+        {
+            i->removePointedToCheck();
+        }
+        for (auto &i: webAuthnLoginChildNodes)
+        {
+            i->removePointedToCheck();
+        }
     }
 }
 
 /* Follow the chain to tag pointed nodes (useful when doing integrity check when we are getting everything we can) */
-bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed)
+bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     quint32 tempVirtualParentAddress;
     QByteArray tempParentAddress;
@@ -1683,21 +1697,24 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
     MPNode* tempNextChildNodePt = nullptr;
     MPNode* tempChildNodePt = nullptr;
     bool return_bool = true;
+    const bool isCred = Common::CRED_ADDR_IDX == addrType;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
 
     /* first, detag all nodes */
-    detagPointedNodes();
+    detagPointedNodes(addrType);
 
     if (tagCredentials)
     {
         /* start with start node (duh) */
-        tempParentAddress = startNode[Common::CRED_ADDR_IDX];
+        tempParentAddress = startNode[addrType];
         tempVirtualParentAddress = virtualStartNode;
 
         /* Loop through the parent nodes */
         while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
         {
             /* Get pointer to next parent node */
-            tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress, tempVirtualParentAddress);
+            tempNextParentNodePt = findNodeWithAddressInList(nodes, tempParentAddress, tempVirtualParentAddress);
 
             /* Check that we could actually find it */
             if (!tempNextParentNodePt)
@@ -1706,10 +1723,10 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[Common::CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                     {
                         /* start node is incorrect */
-                        startNode[Common::CRED_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
+                        startNode[addrType] = QByteArray(MPNode::EmptyAddress);
                         virtualStartNode = 0;
                     }
                     else
@@ -1730,10 +1747,10 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[Common::CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                     {
                         /* start node is already tagged... how's that possible? */
-                        startNode[Common::CRED_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
+                        startNode[addrType] = QByteArray(MPNode::EmptyAddress);
                         virtualStartNode = 0;
                     }
                     else
@@ -1750,7 +1767,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
             else
             {
                 /* check previous node address */
-                if ((!tempParentAddress.isNull() && tempParentAddress == startNode[Common::CRED_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
                 {
                     /* first parent node: previous address should be an empty one */
                     if ((tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != 0))
@@ -1791,7 +1808,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                 while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
                 {
                     /* Get pointer to the child node */
-                    tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, tempVirtualChildAddress);
+                    tempNextChildNodePt = findNodeWithAddressInList(childNodes, tempChildAddress, tempVirtualChildAddress);
 
                     /* Check we could find child pointer */
                     if (!tempNextChildNodePt)
@@ -1889,7 +1906,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
         }
     }
 
-    if (tagData)
+    if (tagData && isCred)
     {
         /** SAME FOR DATA NODES **/
         /* start with start node (duh) */
@@ -2391,14 +2408,14 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     return newNodePt;
 }
 
-bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
+bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qInfo() << "Adding child " << childNodePt->getLogin() << " with parent " << parentNodePt->getService() << " to DB";
     MPNode* tempChildNodePt = nullptr;
     MPNode* tempNextChildNodePt;
 
     /* Detag nodes */
-    detagPointedNodes();
+    detagPointedNodes(addrType);
 
     /* Get first child */
     QByteArray tempChildAddress = parentNodePt->getStartChildAddress();
@@ -2411,21 +2428,22 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
         childNodePt->setPreviousChildAddress(MPNode::EmptyAddress);
         childNodePt->setNextChildAddress(MPNode::EmptyAddress);
         parentNodePt->appendChild(childNodePt);
-        tagPointedNodes(true, false, false);
+        tagPointedNodes(true, false, false, addrType);
         return true;
     }
 
+    NodeList& childNodes = addrType == Common::CRED_ADDR_IDX ? loginChildNodes : webAuthnLoginChildNodes;
     /* browse through all the children to find the right slot */
     while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
     {
         /* Get pointer to the child node */
-        tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, tempVirtualChildAddress);
+        tempNextChildNodePt = findNodeWithAddressInList(childNodes, tempChildAddress, tempVirtualChildAddress);
 
         /* Check we could find child pointer */
         if (!tempNextChildNodePt)
         {
             qCritical() << "Broken child linked list, please run integrity check";
-            tagPointedNodes(true, false, false);
+            tagPointedNodes(true, false, false, addrType);
             return false;
         }
         else
@@ -2434,7 +2452,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
             if (tempNextChildNodePt->getPointedToCheck())
             {
                 qCritical() << "Linked list loop detected, please run integrity check";
-                tagPointedNodes(true, false, false);
+                tagPointedNodes(true, false, false, addrType);
                 return false;
             }
 
@@ -2444,7 +2462,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
             if (tempNextChildNodePt->getLogin().compare(childNodePt->getLogin()) == 0)
             {
                 qCritical() << "Can't add child node that has the exact same name!";
-                tagPointedNodes(true, false, false);
+                tagPointedNodes(true, false, false, addrType);
                 return false;
             }
             else if (tempNextChildNodePt->getLogin().compare(childNodePt->getLogin()) > 0)
@@ -2460,7 +2478,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
                     childNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                     tempNextChildNodePt->setPreviousChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
                     parentNodePt->appendChild(childNodePt);
-                    tagPointedNodes(true, false, false);
+                    tagPointedNodes(true, false, false, addrType);
                     return true;
                 }
                 else
@@ -2471,7 +2489,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
                     childNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                     tempNextChildNodePt->setPreviousChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
                     parentNodePt->appendChild(childNodePt);
-                    tagPointedNodes(true, false, false);
+                    tagPointedNodes(true, false, false, addrType);
                     return true;
                 }
             }
@@ -2491,7 +2509,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
     childNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
     childNodePt->setNextChildAddress(MPNode::EmptyAddress);
     parentNodePt->appendChild(childNodePt);
-    tagPointedNodes(true, false, false);
+    tagPointedNodes(true, false, false, addrType);
     return true;
 }
 
@@ -5537,7 +5555,7 @@ bool MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
 
                         /* Add node to list */
                         childNodes.append(newChildNodePt);
-                        if (!addChildToDB(nodes[j], newChildNodePt))
+                        if (!addChildToDB(nodes[j], newChildNodePt, addrType))
                         {
                             cleanImportedVars();
                             exitMemMgmtMode(false);

@@ -304,20 +304,20 @@ private:
     QByteArray getMemoryFirstNodeAddress(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
-    void detagPointedNodes(void);
+    void detagPointedNodes(Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool tagFavoriteNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
     bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren);
     bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed);
-    bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed);
+    bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
     void readExportNodes(QJsonArray &&nodes, ExportPayloadData id);
     bool readExportPayload(QJsonArray dataArray, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList);
-    bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
+    bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool deleteDataParentChilds(MPNode *parentNodePt);
     MPNode* addNewServiceToDB(const QString &service);
     bool addOrphanChildToDB(MPNode* childNodePt);
