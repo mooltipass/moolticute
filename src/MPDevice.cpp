@@ -2134,14 +2134,14 @@ bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt)
 }
 
 
-bool MPDevice::addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent)
+bool MPDevice::addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     quint32 cur_child_addr_v = parentNodePt->getStartChildVirtualAddress();
     QByteArray cur_child_addr = parentNodePt->getStartChildAddress();
     MPNode* prev_child_pt = nullptr;
 
     /* Tag nodes */
-    tagPointedNodes(!isDataParent, isDataParent, false);
+    tagPointedNodes(!isDataParent, isDataParent, false, addrType);
 
     /* Start following the chain */
     while ((cur_child_addr != MPNode::EmptyAddress) || (cur_child_addr.isNull() && cur_child_addr_v != 0))
@@ -2155,7 +2155,8 @@ bool MPDevice::addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent
         }
         else
         {
-            cur_child_pt = findNodeWithAddressInList(loginChildNodes, cur_child_addr, cur_child_addr_v);
+            NodeList& childNodes = Common::CRED_ADDR_IDX == addrType ? loginChildNodes : webAuthnLoginChildNodes;
+            cur_child_pt = findNodeWithAddressInList(childNodes, cur_child_addr, cur_child_addr_v);
         }
 
         if (!cur_child_pt)
@@ -2207,7 +2208,7 @@ bool MPDevice::addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent
 }
 
 /* Return success status */
-bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren)
+bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     MPNode* prevNodePt = nullptr;
     MPNode* curNodePt = nullptr;
@@ -2215,14 +2216,14 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     QByteArray curNodeAddr;
 
     /* Tag nodes */
-    if (!tagPointedNodes(!isDataParent, isDataParent, false))
+    if (!tagPointedNodes(!isDataParent, isDataParent, false, addrType))
     {
         qCritical() << "Can't add orphan parent to a corrupted DB, please run integrity check";
         return false;
     }
 
     /* Detag them */
-    detagPointedNodes();
+    detagPointedNodes(addrType);
 
     /* Which list do we want to browse ? */
     if (isDataParent)
@@ -2232,7 +2233,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     }
     else
     {
-        curNodeAddr = startNode[Common::CRED_ADDR_IDX];
+        curNodeAddr = startNode[addrType];
         curNodeAddrVirtual = virtualStartNode;
     }
 
@@ -2241,10 +2242,10 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     if (parentNodePt->getPointedToCheck())
     {
         qCritical() << "addParentOrphan: parent node" << parentNodePt->getService() << "is already pointed to";
-        tagPointedNodes(!isDataParent, isDataParent, false);
+        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
         if (addPossibleChildren)
         {
-            addOrphanParentChildsToDB(parentNodePt, isDataParent);
+            addOrphanParentChildsToDB(parentNodePt, isDataParent, addrType);
         }
         return true;
     }
@@ -2261,17 +2262,17 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             }
             else
             {
-                startNode[Common::CRED_ADDR_IDX] = parentNodePt->getAddress();
+                startNode[addrType] = parentNodePt->getAddress();
                 virtualStartNode = parentNodePt->getVirtualAddress();
             }
 
             /* Update prev/next fields */
             parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress, 0);
             parentNodePt->setNextParentAddress(MPNode::EmptyAddress, 0);
-            tagPointedNodes(!isDataParent, isDataParent, false);
+            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
             if (addPossibleChildren)
             {
-                addOrphanParentChildsToDB(parentNodePt, isDataParent);
+                addOrphanParentChildsToDB(parentNodePt, isDataParent, addrType);
             }
             return true;
         }
@@ -2293,7 +2294,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             if (!curNodePt)
             {
                 qCritical() << "Broken parent linked list, please run integrity check";
-                tagPointedNodes(!isDataParent, isDataParent, false);
+                tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                 return false;
             }
             else
@@ -2302,7 +2303,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                 if (curNodePt->getPointedToCheck())
                 {
                     qCritical() << "Linked list loop detected, please run integrity check";
-                    tagPointedNodes(!isDataParent, isDataParent, false);
+                    tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                     return false;
                 }
 
@@ -2327,7 +2328,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                         }
                         else
                         {
-                            startNode[Common::CRED_ADDR_IDX] = parentNodePt->getAddress();
+                            startNode[addrType] = parentNodePt->getAddress();
                             virtualStartNode = parentNodePt->getVirtualAddress();
                         }
                         parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress);
@@ -2342,10 +2343,10 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                     /* Update our next node pointers */
                     curNodePt->setPreviousParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
                     parentNodePt->setNextParentAddress(curNodePt->getAddress(), curNodePt->getVirtualAddress());
-                    tagPointedNodes(!isDataParent, isDataParent, false);
+                    tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                     if (addPossibleChildren)
                     {
-                        addOrphanParentChildsToDB(parentNodePt, isDataParent);
+                        addOrphanParentChildsToDB(parentNodePt, isDataParent, addrType);
                     }
                     return true;
                 }
@@ -2369,10 +2370,10 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
         prevNodePt->setNextParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
         parentNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
         parentNodePt->setNextParentAddress(MPNode::EmptyAddress);
-        tagPointedNodes(!isDataParent, isDataParent, false);
+        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
         if (addPossibleChildren)
         {
-            addOrphanParentChildsToDB(parentNodePt, isDataParent);
+            addOrphanParentChildsToDB(parentNodePt, isDataParent, addrType);
         }
         return true;
     }
@@ -5261,6 +5262,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
         const bool loginImportSuccess = checkImportedLoginNodes(cb, Common::CRED_ADDR_IDX);
         if (!loginImportSuccess)
         {
+            qCritical() << "Login import failed";
             return;
         }
 
@@ -5270,6 +5272,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
             const bool dataImportSuccess = checkImportedDataNodes(cb);
             if (!dataImportSuccess)
             {
+                qCritical() << "Data import failed";
                 return;
             }
         }
@@ -5589,7 +5592,7 @@ bool MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
 
            /* Add node to list */
            nodes.append(newNodePt);
-           if (!addOrphanParentToDB(newNodePt, false, false))
+           if (!addOrphanParentToDB(newNodePt, false, false, addrType))
            {
                cleanImportedVars();
                exitMemMgmtMode(false);
@@ -5625,7 +5628,7 @@ bool MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
 
                /* Add node to list */
                childNodes.append(newChildNodePt);
-               if (!addChildToDB(newNodePt, newChildNodePt))
+               if (!addChildToDB(newNodePt, newChildNodePt, addrType))
                {
                    cleanImportedVars();
                    exitMemMgmtMode(false);
