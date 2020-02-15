@@ -2543,7 +2543,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
     }
     else
     {
-        curNodeAddr = startNode[Common::CRED_ADDR_IDX];
+        curNodeAddr = startNode[addrType];
         curNodeAddrVirtual = virtualStartNode;
     }
 
@@ -2646,22 +2646,9 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                             }
                             else
                             {
-                                startNode[Common::CRED_ADDR_IDX] = MPNode::EmptyAddress;
+                                startNode[addrType] = MPNode::EmptyAddress;
                                 virtualStartNode = 0;
                             }
-
-                            /* Delete object */
-                            if (isDataParent)
-                            {
-                                dataNodes.removeOne(parentNodePt);
-                            }
-                            else
-                            {
-                                nodes.removeOne(parentNodePt);
-                            }
-                            delete parentNodePt;
-                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
-                            return true;
                         }
                         else
                         {
@@ -2673,24 +2660,23 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                             }
                             else
                             {
-                                startNode[Common::CRED_ADDR_IDX] = nextNodePt->getAddress();
+                                startNode[addrType] = nextNodePt->getAddress();
                                 virtualStartNode = nextNodePt->getVirtualAddress();
                             }
                             nextNodePt->setPreviousParentAddress(MPNode::EmptyAddress, 0);
-
-                            /* Delete object */
-                            if (isDataParent)
-                            {
-                                dataNodes.removeOne(parentNodePt);
-                            }
-                            else
-                            {
-                                nodes.removeOne(parentNodePt);
-                            }
-                            delete parentNodePt;
-                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
-                            return true;
                         }
+                        /* Delete object */
+                        if (isDataParent)
+                        {
+                            dataNodes.removeOne(parentNodePt);
+                        }
+                        else
+                        {
+                            nodes.removeOne(parentNodePt);
+                        }
+                        delete parentNodePt;
+                        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
+                        return true;
                     }
                     else
                     {
@@ -2698,39 +2684,25 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                         {
                             /* Linked list ends there */
                             prevNodePt->setNextParentAddress(MPNode::EmptyAddress, 0);
-
-                            /* Delete object */
-                            if (isDataParent)
-                            {
-                                dataNodes.removeOne(parentNodePt);
-                            }
-                            else
-                            {
-                                nodes.removeOne(parentNodePt);
-                            }
-                            delete parentNodePt;
-                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
-                            return true;
                         }
                         else
                         {
                             /* Link the chain together */
                             prevNodePt->setNextParentAddress(nextNodePt->getAddress(), nextNodePt->getVirtualAddress());
                             nextNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
-
-                            /* Delete object */
-                            if (isDataParent)
-                            {
-                                dataNodes.removeOne(parentNodePt);
-                            }
-                            else
-                            {
-                                nodes.removeOne(parentNodePt);
-                            }
-                            delete parentNodePt;
-                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
-                            return true;
                         }
+                        /* Delete object */
+                        if (isDataParent)
+                        {
+                            dataNodes.removeOne(parentNodePt);
+                        }
+                        else
+                        {
+                            nodes.removeOne(parentNodePt);
+                        }
+                        delete parentNodePt;
+                        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
+                        return true;
                     }
                 }
             }
@@ -2813,50 +2785,34 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                     {
                         /* Linked list ends there, only credential */
                         parentNodePt->setStartChildAddress(MPNode::EmptyAddress, 0);
-
-                        if (isCred)
-                        {
-                            /* Delete possible fav */
-                            deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
-                        }
-
-                        /* Delete object */
-                        parentNodePt->removeChild(childNodePt);
-                        if (deleteFromList)
-                        {
-                            childNodes.removeOne(childNodePt);
-                            delete childNodePt;
-                        }
-
-                        /* Remove parent */
-                        if (deleteEmptyParent)
-                        {
-                            removeEmptyParentFromDB(parentNodePt, false, addrType);
-                        }
-
-                        return true;
                     }
                     else
                     {
                         /* Link the chain together */
                         parentNodePt->setStartChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                         tempNextChildNodePt->setPreviousChildAddress(MPNode::EmptyAddress, 0);
-
-                        if (isCred)
-                        {
-                            /* Delete possible fav */
-                            deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
-                        }
-
-                        /* Delete object */
-                        parentNodePt->removeChild(childNodePt);
-                        if (deleteFromList)
-                        {
-                            childNodes.removeOne(childNodePt);
-                            delete childNodePt;
-                        }
-                        return true;
                     }
+
+                    if (isCred)
+                    {
+                        /* Delete possible fav */
+                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                    }
+
+                    /* Delete object */
+                    parentNodePt->removeChild(childNodePt);
+                    if (deleteFromList)
+                    {
+                        childNodes.removeOne(childNodePt);
+                        delete childNodePt;
+                    }
+
+                    /* Remove parent */
+                    if (isLastNode && deleteEmptyParent)
+                    {
+                        removeEmptyParentFromDB(parentNodePt, false, addrType);
+                    }
+                    return true;
                 }
                 else
                 {
@@ -2864,43 +2820,28 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                     {
                         /* Linked list ends there */
                         tempChildNodePt->setNextChildAddress(MPNode::EmptyAddress, 0);
-
-                        if (isCred)
-                        {
-                            /* Delete possible fav */
-                            deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
-                        }
-
-                        /* Delete object */
-                        parentNodePt->removeChild(childNodePt);
-                        if (deleteFromList)
-                        {
-                            loginChildNodes.removeOne(childNodePt);
-                            delete(childNodePt);
-                        }
-                        return true;
                     }
                     else
                     {
                         /* Link the chain together */
                         tempChildNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                         tempNextChildNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
-
-                        if (isCred)
-                        {
-                            /* Delete possible fav */
-                            deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
-                        }
-
-                        /* Delete object */
-                        parentNodePt->removeChild(childNodePt);
-                        if (deleteFromList)
-                        {
-                            loginChildNodes.removeOne(childNodePt);
-                            delete(childNodePt);
-                        }
-                        return true;
                     }
+
+                    if (isCred)
+                    {
+                        /* Delete possible fav */
+                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                    }
+
+                    /* Delete object */
+                    parentNodePt->removeChild(childNodePt);
+                    if (deleteFromList)
+                    {
+                        loginChildNodes.removeOne(childNodePt);
+                        delete childNodePt;
+                    }
+                    return true;
                 }
             }
 
