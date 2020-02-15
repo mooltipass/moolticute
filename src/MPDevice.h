@@ -298,6 +298,7 @@ private:
     MPNode *findNodeWithNameInList(NodeList list, const QString& name, bool isParent);
     void deletePossibleFavorite(QByteArray parentAddr, QByteArray childAddr);
     bool finishImportFileMerging(QString &stringError, bool noDelete);
+    bool finishImportLoginNodes(QString &stringError, Common::AddressType addrType);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service);
@@ -312,11 +313,11 @@ private:
     bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed);
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
-    bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
+    bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
     void readExportNodes(QJsonArray &&nodes, ExportPayloadData id);
     bool readExportPayload(QJsonArray dataArray, QString &errorString);
-    bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList);
+    bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool deleteDataParentChilds(MPNode *parentNodePt);
     MPNode* addNewServiceToDB(const QString &service);

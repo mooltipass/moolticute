@@ -2514,7 +2514,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::A
     return true;
 }
 
-bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
+bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qDebug() << "Removing parent " << parentNodePt->getService() << " from DB, addr: " << parentNodePt->getAddress().toHex();
     MPNode* nextNodePt = nullptr;
@@ -2522,16 +2522,18 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
     MPNode* curNodePt = nullptr;
     quint32 curNodeAddrVirtual;
     QByteArray curNodeAddr;
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
 
     /* Tag nodes */
-    if (!tagPointedNodes(!isDataParent, isDataParent, false))
+    if (!tagPointedNodes(!isDataParent, isDataParent, false, addrType))
     {
         qCritical() << "Can't remove parent to a corrupted DB, please run integrity check";
         return false;
     }
 
     /* Detag them */
-    detagPointedNodes();
+    detagPointedNodes(addrType);
 
     /* Which list do we want to browse ? */
     if (isDataParent)
@@ -2548,7 +2550,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
     if (parentNodePt->getPointedToCheck())
     {
         qCritical() << "addParentOrphan: parent node" << parentNodePt->getService() << "is already pointed to";
-        tagPointedNodes(!isDataParent, isDataParent, false);
+        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
         return true;
     }
     else
@@ -2557,7 +2559,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
         if ((curNodeAddr == MPNode::EmptyAddress) || (curNodeAddr.isNull() && curNodeAddrVirtual == 0))
         {
             qCritical() << "Database is empty!";
-            tagPointedNodes(!isDataParent, isDataParent, false);
+            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
             return false;
         }
 
@@ -2571,14 +2573,14 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
             }
             else
             {
-                curNodePt = findNodeWithAddressInList(loginNodes, curNodeAddr, curNodeAddrVirtual);
+                curNodePt = findNodeWithAddressInList(nodes, curNodeAddr, curNodeAddrVirtual);
             }
 
             /* Check if we could find the parent */
             if (!curNodePt)
             {
                 qCritical() << "Broken parent linked list, please run integrity check";
-                tagPointedNodes(!isDataParent, isDataParent, false);
+                tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                 return false;
             }
             else
@@ -2587,7 +2589,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                 if (curNodePt->getPointedToCheck())
                 {
                     qCritical() << "Linked list loop detected, please run integrity check";
-                    tagPointedNodes(!isDataParent, isDataParent, false);
+                    tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                     return false;
                 }
 
@@ -2601,7 +2603,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                     if ((curNodePt->getStartChildAddress() != MPNode::EmptyAddress) || (curNodePt->getStartChildAddress().isNull() && curNodePt->getStartChildVirtualAddress() != 0))
                     {
                         qCritical() << "Parent actually has a child!";
-                        tagPointedNodes(!isDataParent, isDataParent, false);
+                        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                         return false;
                     }
 
@@ -2618,13 +2620,13 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                         }
                         else
                         {
-                            nextNodePt = findNodeWithAddressInList(loginNodes, parentNodePt->getNextParentAddress(), parentNodePt->getNextParentVirtualAddress());
+                            nextNodePt = findNodeWithAddressInList(nodes, parentNodePt->getNextParentAddress(), parentNodePt->getNextParentVirtualAddress());
                         }
 
                         if (!nextNodePt)
                         {
                             qCritical() << "Broken parent linked list, please run integrity check";
-                            tagPointedNodes(!isDataParent, isDataParent, false);
+                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                             return false;
                         }
                     }
@@ -2655,10 +2657,10 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                loginNodes.removeOne(parentNodePt);
+                                nodes.removeOne(parentNodePt);
                             }
-                            delete(parentNodePt);
-                            tagPointedNodes(!isDataParent, isDataParent, false);
+                            delete parentNodePt;
+                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                             return true;
                         }
                         else
@@ -2683,10 +2685,10 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                loginNodes.removeOne(parentNodePt);
+                                nodes.removeOne(parentNodePt);
                             }
-                            delete(parentNodePt);
-                            tagPointedNodes(!isDataParent, isDataParent, false);
+                            delete parentNodePt;
+                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                             return true;
                         }
                     }
@@ -2704,10 +2706,10 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                loginNodes.removeOne(parentNodePt);
+                                nodes.removeOne(parentNodePt);
                             }
-                            delete(parentNodePt);
-                            tagPointedNodes(!isDataParent, isDataParent, false);
+                            delete parentNodePt;
+                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                             return true;
                         }
                         else
@@ -2723,10 +2725,10 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                loginNodes.removeOne(parentNodePt);
+                                nodes.removeOne(parentNodePt);
                             }
-                            delete(parentNodePt);
-                            tagPointedNodes(!isDataParent, isDataParent, false);
+                            delete parentNodePt;
+                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                             return true;
                         }
                     }
@@ -2743,12 +2745,12 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
 
         /* If we arrived here, it means we didn't find the parent */
         qCritical() << "Broken parent linked list, please run integrity check";
-        tagPointedNodes(!isDataParent, isDataParent, false);
+        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
         return false;
     }
 }
 
-bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList)
+bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     if (deleteFromList)
         qDebug() << "Removing child " << childNodePt->getLogin() << " with parent " << parentNodePt->getService() << " from DB";
@@ -2769,11 +2771,13 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
         return false;
     }
 
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
     /* browse through all the children to find the right child */
     while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
     {
         /* Get pointer to the child node */
-        tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, tempVirtualChildAddress);
+        tempNextChildNodePt = findNodeWithAddressInList(childNodes, tempChildAddress, tempVirtualChildAddress);
 
         /* Check we could find child pointer */
         if (!tempNextChildNodePt)
@@ -2793,7 +2797,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                 if (!isLastNode)
                 {
                     /* Get next node pointer, if it exists */
-                    tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, childNodePt->getNextChildAddress(), childNodePt->getNextChildVirtualAddress());
+                    tempNextChildNodePt = findNodeWithAddressInList(childNodes, childNodePt->getNextChildAddress(), childNodePt->getNextChildVirtualAddress());
 
                     if (!tempNextChildNodePt)
                     {
@@ -2810,21 +2814,24 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                         /* Linked list ends there, only credential */
                         parentNodePt->setStartChildAddress(MPNode::EmptyAddress, 0);
 
-                        /* Delete possible fav */
-                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                        if (isCred)
+                        {
+                            /* Delete possible fav */
+                            deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                        }
 
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
                         if (deleteFromList)
                         {
-                            loginChildNodes.removeOne(childNodePt);
-                            delete(childNodePt);
+                            childNodes.removeOne(childNodePt);
+                            delete childNodePt;
                         }
 
                         /* Remove parent */
                         if (deleteEmptyParent)
                         {
-                            removeEmptyParentFromDB(parentNodePt, false);
+                            removeEmptyParentFromDB(parentNodePt, false, addrType);
                         }
 
                         return true;
@@ -2835,15 +2842,18 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                         parentNodePt->setStartChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                         tempNextChildNodePt->setPreviousChildAddress(MPNode::EmptyAddress, 0);
 
-                        /* Delete possible fav */
-                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                        if (isCred)
+                        {
+                            /* Delete possible fav */
+                            deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                        }
 
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
                         if (deleteFromList)
                         {
-                            loginChildNodes.removeOne(childNodePt);
-                            delete(childNodePt);
+                            childNodes.removeOne(childNodePt);
+                            delete childNodePt;
                         }
                         return true;
                     }
@@ -2855,8 +2865,11 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                         /* Linked list ends there */
                         tempChildNodePt->setNextChildAddress(MPNode::EmptyAddress, 0);
 
-                        /* Delete possible fav */
-                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                        if (isCred)
+                        {
+                            /* Delete possible fav */
+                            deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                        }
 
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
@@ -2873,8 +2886,11 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                         tempChildNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                         tempNextChildNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
 
-                        /* Delete possible fav */
-                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                        if (isCred)
+                        {
+                            /* Delete possible fav */
+                            deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
+                        }
 
                         /* Delete object */
                         parentNodePt->removeChild(childNodePt);
@@ -5882,45 +5898,10 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
 
     if (!noDelete)
     {
-        /* Now we check all our parents and childs for non merge tag */
-        QListIterator<MPNode*> i(loginNodes);
-        while (i.hasNext())
+        const bool loginImportFinished = finishImportLoginNodes(stringError, Common::CRED_ADDR_IDX);
+        if (!loginImportFinished)
         {
-            MPNode* nodeItem = i.next();
-
-            /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
-            QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
-
-            /* Special case: no child */
-            if (curChildNodeAddr == MPNode::EmptyAddress)
-            {
-                /* Remove parent */
-                removeEmptyParentFromDB(nodeItem, false);
-            }
-
-            /* Check every children */
-            while (curChildNodeAddr != MPNode::EmptyAddress)
-            {
-                MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr);
-
-                /* Safety checks */
-                if (!curNode)
-                {
-                    qCritical() << "Couldn't find child node in list (error in algo?)";
-                    stringError = "Moolticute Internal Error: Please Contact The Team (IFM#1)";
-                    cleanImportedVars();
-                    return false;
-                }
-
-                /* Next item */
-                curChildNodeAddr = curNode->getNextChildAddress();
-
-                /* Marked for deletion? */
-                if (!curNode->getMergeTagged())
-                {
-                    removeChildFromDB(nodeItem, curNode, true, true);
-                }
-            }
+            return false;
         }
 
         /* Now we check all our parents and childs for non merge tag */
@@ -6045,6 +6026,54 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
         set_dataDbChangeNumber(importedDataDbChangeNumber);
 
         emit dbChangeNumbersChanged(importedCredentialsDbChangeNumber, importedDataDbChangeNumber);
+    }
+    return true;
+}
+
+bool MPDevice::finishImportLoginNodes(QString &stringError, Common::AddressType addrType)
+{
+    const bool isCred = Common::CRED_ADDR_IDX == addrType;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    /* Now we check all our parents and childs for non merge tag */
+    QListIterator<MPNode*> i(nodes);
+    while (i.hasNext())
+    {
+        MPNode* nodeItem = i.next();
+
+        /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
+        QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
+
+        /* Special case: no child */
+        if (curChildNodeAddr == MPNode::EmptyAddress)
+        {
+            /* Remove parent */
+            removeEmptyParentFromDB(nodeItem, false, addrType);
+        }
+
+        /* Check every children */
+        while (curChildNodeAddr != MPNode::EmptyAddress)
+        {
+            MPNode* curNode = findNodeWithAddressInList(childNodes, curChildNodeAddr);
+
+            /* Safety checks */
+            if (!curNode)
+            {
+                qCritical() << "Couldn't find child node in list (error in algo?)";
+                stringError = "Moolticute Internal Error: Please Contact The Team (IFM#1)";
+                cleanImportedVars();
+                return false;
+            }
+
+            /* Next item */
+            curChildNodeAddr = curNode->getNextChildAddress();
+
+            /* Marked for deletion? */
+            if (!curNode->getMergeTagged())
+            {
+                removeChildFromDB(nodeItem, curNode, true, true);
+            }
+        }
     }
     return true;
 }
