@@ -1566,14 +1566,15 @@ MPNode *MPDevice::findNodeWithAddressWithGivenParentInList(NodeList list,  MPNod
 }
 
 /* Find a node inside the parent list given his service */
-MPNode *MPDevice::findNodeWithServiceInList(const QString &service)
+MPNode *MPDevice::findNodeWithServiceInList(const QString &service, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
-    auto it = std::find_if(loginNodes.begin(), loginNodes.end(), [&service](const MPNode *const node)
+    NodeList& nodes = Common::CRED_ADDR_IDX == addrType ? loginNodes : webAuthnLoginNodes;
+    auto it = std::find_if(nodes.begin(), nodes.end(), [&service](const MPNode *const node)
     {
         return node->getService() == service;
     });
 
-    return it == loginNodes.end()?nullptr:*it;
+    return it == nodes.end()?nullptr:*it;
 }
 
 bool MPDevice::tagFavoriteNodes(void)
@@ -2289,7 +2290,8 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             }
             else
             {
-                curNodePt = findNodeWithAddressInList(loginNodes, curNodeAddr, curNodeAddrVirtual);
+                NodeList& nodes = addrType == Common::CRED_ADDR_IDX ? loginNodes : webAuthnLoginNodes;
+                curNodePt = findNodeWithAddressInList(nodes, curNodeAddr, curNodeAddrVirtual);
             }
 
             /* Check if we could find the parent */
@@ -2381,7 +2383,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     }
 }
 
-MPNode* MPDevice::addNewServiceToDB(const QString &service)
+MPNode* MPDevice::addNewServiceToDB(const QString &service, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     MPNode* tempNodePt;
     MPNode* newNodePt;
@@ -2389,7 +2391,7 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     qDebug() << "Creating new service" << service << "in DB";
 
     /* Does the service actually exist? */
-    tempNodePt = findNodeWithServiceInList(service);
+    tempNodePt = findNodeWithServiceInList(service, addrType);
     if (tempNodePt)
     {
         qCritical() << "Service already exists.... dumbass!";
@@ -2404,9 +2406,10 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     newNodePt->setType(MPNode::NodeParent);
     newNodePt->setService(service);
 
+    NodeList& nodes = addrType == Common::CRED_ADDR_IDX ? loginNodes : webAuthnLoginNodes;
     /* Add node to list */
-    loginNodes.append(newNodePt);
-    addOrphanParentToDB(newNodePt, false, false);
+    nodes.append(newNodePt);
+    addOrphanParentToDB(newNodePt, false, false, addrType);
 
     return newNodePt;
 }
@@ -2861,7 +2864,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
     return false;
 }
 
-bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
+bool MPDevice::addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     QString recovered_service_name = "_recovered_";
     MPNode* tempNodePt;
@@ -2869,15 +2872,15 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
     qInfo() << "Adding orphan child" << childNodePt->getLogin() << "to DB";
 
     /* Create a "_recovered_" service */
-    tempNodePt = findNodeWithServiceInList(recovered_service_name);
+    tempNodePt = findNodeWithServiceInList(recovered_service_name, addrType);
     if (!tempNodePt)
     {
         qInfo() << "No" << recovered_service_name << "service in DB, adding it...";
-        tempNodePt = addNewServiceToDB(recovered_service_name);
+        tempNodePt = addNewServiceToDB(recovered_service_name, addrType);
     }
 
     /* Add child to DB */
-    return addChildToDB(tempNodePt, childNodePt);
+    return addChildToDB(tempNodePt, childNodePt, addrType);
 }
 
 bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed)
@@ -2889,47 +2892,25 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
     /* Tag pointed nodes, also detects DB errors */
     return_bool = tagPointedNodes(checkCredentials, checkData, repairAllowed);
+    //TODO add webauthn check
+    //return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
 
     /* Scan for orphan nodes */
     quint32 nbOrphanParents = 0;
     quint32 nbOrphanChildren = 0;
     quint32 nbOrphanDataParents = 0;
     quint32 nbOrphanDataChildren = 0;
+    quint32 nbWebauthnOrphanParents = 0;
+    quint32 nbWebauthnOrphanChildren = 0;
 
     if (checkCredentials)
     {
-        for (auto &i: loginNodes)
-        {
-            if (!i->getPointedToCheck())
-            {
-                qWarning() << "Orphan parent found:" << i->getService() << "at address:" << i->getAddress().toHex();
-                if (repairAllowed)
-                {
-                    addOrphanParentToDB(i, false, repairAllowed);
-                }
-                nbOrphanParents++;
-            }
-        }
-        for (auto &i: loginChildNodes)
-        {
-            if (!i->getPointedToCheck())
-            {
-                qWarning() << "Orphan child found:" << i->getLogin() << "at address:" << i->getAddress().toHex();
-                if (repairAllowed)
-                {
-                    quint32 append_number = 2;
-                    QString service_name = i->getLogin();
-
-                    /* If the "_recovered_" service already has the same login, append a number */
-                    while(!addOrphanChildToDB(i))
-                    {
-                        i->setLogin(service_name + QString::number(append_number));
-                        append_number++;
-                    }
-                }
-                nbOrphanChildren++;
-            }
-        }
+        checkLoadedLoginNodes(nbOrphanParents, nbOrphanChildren, repairAllowed, Common::CRED_ADDR_IDX);
+        //TODO add webauthn logins check
+//        if (isBLE())
+//        {
+//           checkLoadedLoginNodes(nbWebauthnOrphanParents, nbWebauthnOrphanChildren, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
+//        }
     }
 
     if (checkData)
@@ -2974,6 +2955,11 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     qDebug() << "Number of children orphans:" << nbOrphanChildren;
     qDebug() << "Number of data parent orphans:" << nbOrphanDataParents;
     qDebug() << "Number of data children orphans:" << nbOrphanDataChildren;
+    if (isBLE())
+    {
+        qDebug() << "Number of webauthn parent orphans:" << nbWebauthnOrphanParents;
+        qDebug() << "Number of webauthn children orphans:" << nbWebauthnOrphanChildren;
+    }
 
     if (checkCredentials)
     {
@@ -3038,6 +3024,45 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     }
 
     return return_bool;
+}
+
+void MPDevice::checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::AddressType addrType)
+{
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    for (auto &i: nodes)
+    {
+        if (!i->getPointedToCheck())
+        {
+            qWarning() << "Orphan parent found:" << i->getService() << "at address:" << i->getAddress().toHex();
+            if (repairAllowed)
+            {
+                addOrphanParentToDB(i, false, repairAllowed, addrType);
+            }
+            parentNum++;
+        }
+    }
+    for (auto &i: childNodes)
+    {
+        if (!i->getPointedToCheck())
+        {
+            qWarning() << "Orphan child found:" << i->getLogin() << "at address:" << i->getAddress().toHex();
+            if (repairAllowed)
+            {
+                quint32 append_number = 2;
+                QString service_name = i->getLogin();
+
+                /* If the "_recovered_" service already has the same login, append a number */
+                while(!addOrphanChildToDB(i))
+                {
+                    i->setLogin(service_name + QString::number(append_number));
+                    append_number++;
+                }
+            }
+            childNum++;
+        }
+    }
 }
 
 void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& address, const QByteArray& data, std::function<void(void)> writeCallback)
@@ -5846,6 +5871,16 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
         {
             return false;
         }
+
+        //TODO add finishImportLoginNodes for webauthn
+//        if (isBLE())
+//        {
+//            const bool webauthnImportFinished = finishImportLoginNodes(stringError, Common::WEBAUTHN_ADDR_IDX);
+//            if (!webauthnImportFinished)
+//            {
+//                return false;
+//            }
+//        }
 
         /* Now we check all our parents and childs for non merge tag */
         QListIterator<MPNode*> j(dataNodes);

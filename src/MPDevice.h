@@ -302,7 +302,7 @@ private:
     bool finishImportLoginNodes(QString &stringError, Common::AddressType addrType);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
-    MPNode *findNodeWithServiceInList(const QString &service);
+    MPNode *findNodeWithServiceInList(const QString &service, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     QByteArray getMemoryFirstNodeAddress(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
@@ -312,6 +312,7 @@ private:
     // Functions added by mathieu for MMM : checks & repairs
     bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed);
+    void checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::AddressType addrType);
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
@@ -321,8 +322,8 @@ private:
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool deleteDataParentChilds(MPNode *parentNodePt);
-    MPNode* addNewServiceToDB(const QString &service);
-    bool addOrphanChildToDB(MPNode* childNodePt);
+    MPNode* addNewServiceToDB(const QString &service, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    bool addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     QByteArray generateExportFileData(const QString &encryption = "none");
     void cleanImportedVars(void);
     void cleanMMMVars(void);
