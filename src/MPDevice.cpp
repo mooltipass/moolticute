@@ -108,12 +108,7 @@ void MPDevice::sendInitMessages()
           * so TimerJob has no effect, hence sending
           * it with a lower timeout.
           */
-        QTimer::singleShot(RESET_SEND_DELAY, [this]()
-        {
-            if (AppDaemon::isDebugDev())
-                qDebug() << "Resetting flip bit for BLE";
-            bleImpl->sendResetFlipBit();
-        });
+        QTimer::singleShot(RESET_SEND_DELAY, this, &MPDevice::resetFlipBit);
 
         if (bleImpl->isAfterAuxFlash())
         {
@@ -466,6 +461,13 @@ void MPDevice::runAndDequeueJobs()
     });
 
     currentJobs->start();
+}
+
+void MPDevice::resetFlipBit()
+{
+    if (AppDaemon::isDebugDev())
+        qDebug() << "Resetting flip bit for BLE";
+    bleImpl->sendResetFlipBit();
 }
 
 void MPDevice::addTimerJob(int msec)

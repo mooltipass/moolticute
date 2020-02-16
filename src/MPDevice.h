@@ -251,6 +251,7 @@ private slots:
     void commandFailed();
     void sendDataDequeue(); //execute commands from the command queue
     void runAndDequeueJobs(); //execute AsyncJobs from the jobs queues
+    void resetFlipBit();
 
 
 private:
