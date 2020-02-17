@@ -336,7 +336,7 @@ private:
 
     QByteArray getFreeAddress(quint32 virtualAddr);
     // once we fetched free addresses, this function is called
-    void changeVirtualAddressesToFreeAddresses(void);
+    void changeVirtualAddressesToFreeAddresses();
 
     void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 

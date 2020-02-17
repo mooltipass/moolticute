@@ -2892,8 +2892,7 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
     /* Tag pointed nodes, also detects DB errors */
     return_bool = tagPointedNodes(checkCredentials, checkData, repairAllowed);
-    //TODO add webauthn check
-    //return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
+    return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
 
     /* Scan for orphan nodes */
     quint32 nbOrphanParents = 0;
@@ -2906,11 +2905,10 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     if (checkCredentials)
     {
         checkLoadedLoginNodes(nbOrphanParents, nbOrphanChildren, repairAllowed, Common::CRED_ADDR_IDX);
-        //TODO add webauthn logins check
-//        if (isBLE())
-//        {
-//           checkLoadedLoginNodes(nbWebauthnOrphanParents, nbWebauthnOrphanChildren, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
-//        }
+        if (isBLE())
+        {
+           checkLoadedLoginNodes(nbWebauthnOrphanParents, nbWebauthnOrphanChildren, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
+        }
     }
 
     if (checkData)
@@ -4533,19 +4531,18 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
     runAndDequeueJobs();
 }
 
-void MPDevice::changeVirtualAddressesToFreeAddresses(void)
+void MPDevice::changeVirtualAddressesToFreeAddresses()
 {
     if (virtualStartNode[Common::CRED_ADDR_IDX] != 0)
     {
         qDebug() << "Setting start node to " << getFreeAddress(virtualStartNode[Common::CRED_ADDR_IDX]).toHex();
         startNode[Common::CRED_ADDR_IDX] = getFreeAddress(virtualStartNode[Common::CRED_ADDR_IDX]);
     }
-    //TODO add for webauthn creds
-//    if (isBLE() && virtualStartNode[Common::WEBAUTHN_ADDR_IDX] != 0)
-//    {
-//        qDebug() << "Setting start webauthn node to " << getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]).toHex();
-//        startNode[Common::WEBAUTHN_ADDR_IDX] = getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]);
-//    }
+    if (isBLE() && virtualStartNode[Common::WEBAUTHN_ADDR_IDX] != 0)
+    {
+        qDebug() << "Setting start webauthn node to " << getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]).toHex();
+        startNode[Common::WEBAUTHN_ADDR_IDX] = getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]);
+    }
     if (virtualDataStartNode != 0)
     {
         qDebug() << "Setting data start node to " << getFreeAddress(virtualDataStartNode).toHex();
@@ -4580,25 +4577,25 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
         if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
         if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(getFreeAddress(i->getNextChildVirtualAddress()));
     }
-    //TODO add for webauthn creds
-//    if (isBLE())
-//    {
-//        qDebug() << "Replacing virtual addresses for webauthn login nodes...";
-//        for (auto &i: webAuthnLoginNodes)
-//        {
-//            if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
-//            if (i->getNextParentAddress().isNull()) i->setNextParentAddress(getFreeAddress(i->getNextParentVirtualAddress()));
-//            if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(getFreeAddress(i->getPreviousParentVirtualAddress()));
-//            if (i->getStartChildAddress().isNull()) i->setStartChildAddress(getFreeAddress(i->getStartChildVirtualAddress()));
-//        }
-//        qDebug() << "Replacing virtual addresses for webauthn child nodes...";
-//        for (auto &i: webAuthnLoginChildNodes)
-//        {
-//            if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
-//            if (i->getNextChildAddress().isNull()) i->setNextChildAddress(getFreeAddress(i->getNextChildVirtualAddress()));
-//            if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(getFreeAddress(i->getPreviousChildVirtualAddress()));
-//        }
-//    }
+
+    if (isBLE())
+    {
+        qDebug() << "Replacing virtual addresses for webauthn login nodes...";
+        for (auto &i: webAuthnLoginNodes)
+        {
+            if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+            if (i->getNextParentAddress().isNull()) i->setNextParentAddress(getFreeAddress(i->getNextParentVirtualAddress()));
+            if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(getFreeAddress(i->getPreviousParentVirtualAddress()));
+            if (i->getStartChildAddress().isNull()) i->setStartChildAddress(getFreeAddress(i->getStartChildVirtualAddress()));
+        }
+        qDebug() << "Replacing virtual addresses for webauthn child nodes...";
+        for (auto &i: webAuthnLoginChildNodes)
+        {
+            if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+            if (i->getNextChildAddress().isNull()) i->setNextChildAddress(getFreeAddress(i->getNextChildVirtualAddress()));
+            if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(getFreeAddress(i->getPreviousChildVirtualAddress()));
+        }
+    }
 }
 
 void MPDevice::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
@@ -5268,11 +5265,19 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
             ctrValue = QByteArray(importedCtrValue);
         }
 
-        const bool loginImportSuccess = checkImportedLoginNodes(cb, Common::CRED_ADDR_IDX);
-        if (!loginImportSuccess)
+        if (!checkImportedLoginNodes(cb, Common::CRED_ADDR_IDX))
         {
             qCritical() << "Login import failed";
             return;
+        }
+
+        if (isBLE())
+        {
+            if (!checkImportedLoginNodes(cb, Common::WEBAUTHN_ADDR_IDX))
+            {
+                qCritical() << "Login import failed";
+                return;
+            }
         }
 
         /// Same but for data nodes
@@ -5891,21 +5896,18 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
 
     if (!noDelete)
     {
-        const bool loginImportFinished = finishImportLoginNodes(stringError, Common::CRED_ADDR_IDX);
-        if (!loginImportFinished)
+        if (!finishImportLoginNodes(stringError, Common::CRED_ADDR_IDX))
         {
             return false;
         }
 
-        //TODO add finishImportLoginNodes for webauthn
-//        if (isBLE())
-//        {
-//            const bool webauthnImportFinished = finishImportLoginNodes(stringError, Common::WEBAUTHN_ADDR_IDX);
-//            if (!webauthnImportFinished)
-//            {
-//                return false;
-//            }
-//        }
+        if (isBLE())
+        {
+            if (!finishImportLoginNodes(stringError, Common::WEBAUTHN_ADDR_IDX))
+            {
+                return false;
+            }
+        }
 
         /* Now we check all our parents and childs for non merge tag */
         QListIterator<MPNode*> j(dataNodes);
