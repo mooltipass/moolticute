@@ -1588,7 +1588,7 @@ bool MPDevice::tagFavoriteNodes(void)
 
     /* start with start node (duh) */
     tempParentAddress = startNode[Common::CRED_ADDR_IDX];
-    tempVirtualParentAddress = virtualStartNode;
+    tempVirtualParentAddress = virtualStartNode[Common::CRED_ADDR_IDX];
 
     /* Loop through the parent nodes */
     while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
@@ -1711,7 +1711,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
     {
         /* start with start node (duh) */
         tempParentAddress = startNode[addrType];
-        tempVirtualParentAddress = virtualStartNode;
+        tempVirtualParentAddress = virtualStartNode[addrType];
 
         /* Loop through the parent nodes */
         while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
@@ -1726,11 +1726,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode[addrType]))
                     {
                         /* start node is incorrect */
                         startNode[addrType] = QByteArray(MPNode::EmptyAddress);
-                        virtualStartNode = 0;
+                        virtualStartNode[addrType] = 0;
                     }
                     else
                     {
@@ -1750,11 +1750,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode[addrType]))
                     {
                         /* start node is already tagged... how's that possible? */
                         startNode[addrType] = QByteArray(MPNode::EmptyAddress);
-                        virtualStartNode = 0;
+                        virtualStartNode[addrType] = 0;
                     }
                     else
                     {
@@ -1770,7 +1770,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
             else
             {
                 /* check previous node address */
-                if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode[addrType]))
                 {
                     /* first parent node: previous address should be an empty one */
                     if ((tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != 0))
@@ -2237,7 +2237,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     else
     {
         curNodeAddr = startNode[addrType];
-        curNodeAddrVirtual = virtualStartNode;
+        curNodeAddrVirtual = virtualStartNode[addrType];
     }
 
     qInfo() << "Adding parent node" << parentNodePt->getService();
@@ -2266,7 +2266,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             else
             {
                 startNode[addrType] = parentNodePt->getAddress();
-                virtualStartNode = parentNodePt->getVirtualAddress();
+                virtualStartNode[addrType] = parentNodePt->getVirtualAddress();
             }
 
             /* Update prev/next fields */
@@ -2333,7 +2333,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                         else
                         {
                             startNode[addrType] = parentNodePt->getAddress();
-                            virtualStartNode = parentNodePt->getVirtualAddress();
+                            virtualStartNode[addrType] = parentNodePt->getVirtualAddress();
                         }
                         parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress);
                     }
@@ -2549,7 +2549,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
     else
     {
         curNodeAddr = startNode[addrType];
-        curNodeAddrVirtual = virtualStartNode;
+        curNodeAddrVirtual = virtualStartNode[addrType];
     }
 
     if (parentNodePt->getPointedToCheck())
@@ -2652,7 +2652,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                             else
                             {
                                 startNode[addrType] = MPNode::EmptyAddress;
-                                virtualStartNode = 0;
+                                virtualStartNode[addrType] = 0;
                             }
                         }
                         else
@@ -2666,7 +2666,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                             else
                             {
                                 startNode[addrType] = nextNodePt->getAddress();
-                                virtualStartNode = nextNodePt->getVirtualAddress();
+                                virtualStartNode[addrType] = nextNodePt->getVirtualAddress();
                             }
                             nextNodePt->setPreviousParentAddress(MPNode::EmptyAddress, 0);
                         }
@@ -4535,11 +4535,17 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
 
 void MPDevice::changeVirtualAddressesToFreeAddresses(void)
 {
-    if (virtualStartNode != 0)
+    if (virtualStartNode[Common::CRED_ADDR_IDX] != 0)
     {
-        qDebug() << "Setting start node to " << getFreeAddress(virtualStartNode).toHex();
-        startNode[Common::CRED_ADDR_IDX] = getFreeAddress(virtualStartNode);
+        qDebug() << "Setting start node to " << getFreeAddress(virtualStartNode[Common::CRED_ADDR_IDX]).toHex();
+        startNode[Common::CRED_ADDR_IDX] = getFreeAddress(virtualStartNode[Common::CRED_ADDR_IDX]);
     }
+    //TODO add for webauthn creds
+//    if (isBLE() && virtualStartNode[Common::WEBAUTHN_ADDR_IDX] != 0)
+//    {
+//        qDebug() << "Setting start webauthn node to " << getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]).toHex();
+//        startNode[Common::WEBAUTHN_ADDR_IDX] = getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]);
+//    }
     if (virtualDataStartNode != 0)
     {
         qDebug() << "Setting data start node to " << getFreeAddress(virtualDataStartNode).toHex();
@@ -4574,6 +4580,25 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
         if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
         if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(getFreeAddress(i->getNextChildVirtualAddress()));
     }
+    //TODO add for webauthn creds
+//    if (isBLE())
+//    {
+//        qDebug() << "Replacing virtual addresses for webauthn login nodes...";
+//        for (auto &i: webAuthnLoginNodes)
+//        {
+//            if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+//            if (i->getNextParentAddress().isNull()) i->setNextParentAddress(getFreeAddress(i->getNextParentVirtualAddress()));
+//            if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(getFreeAddress(i->getPreviousParentVirtualAddress()));
+//            if (i->getStartChildAddress().isNull()) i->setStartChildAddress(getFreeAddress(i->getStartChildVirtualAddress()));
+//        }
+//        qDebug() << "Replacing virtual addresses for webauthn child nodes...";
+//        for (auto &i: webAuthnLoginChildNodes)
+//        {
+//            if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+//            if (i->getNextChildAddress().isNull()) i->setNextChildAddress(getFreeAddress(i->getNextChildVirtualAddress()));
+//            if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(getFreeAddress(i->getPreviousChildVirtualAddress()));
+//        }
+//    }
 }
 
 void MPDevice::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
@@ -5137,7 +5162,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 
 void MPDevice::cleanImportedVars(void)
 {
-    virtualStartNode = 0;
+    virtualStartNode = {0, 0};
     virtualDataStartNode = 0;
     newAddressesNeededCounter = 0;
     importedCtrValue.clear();
@@ -5162,7 +5187,7 @@ void MPDevice::cleanImportedVars(void)
 void MPDevice::cleanMMMVars(void)
 {
     /* Cleaning all temp values */
-    virtualStartNode = 0;
+    virtualStartNode = {0, 0};
     virtualDataStartNode = 0;
     ctrValue.clear();
     cpzCtrValue.clear();

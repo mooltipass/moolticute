@@ -374,7 +374,7 @@ private:
     // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
     QVector<QByteArray> startNode = {0};
-    quint32 virtualStartNode = 0;
+    QVector<quint32> virtualStartNode = {0, 0};
     QByteArray startDataNode = MPNode::EmptyAddress;
     quint32 virtualDataStartNode = 0;
     QList<QByteArray> cpzCtrValue;
@@ -408,9 +408,7 @@ private:
     quint32 importedDbMiniSerialNumber;
     QByteArray importedCtrValue;
     QByteArray importedStartNode;
-    quint32 importedVirtualStartNode;
     QByteArray importedStartDataNode;
-    quint32 importedVirtualDataStartNode;
     QList<QByteArray> importedCpzCtrValue;
     QList<QByteArray> importedFavoritesAddrs;
     NodeList importedLoginNodes;         //list of all parent nodes for credentials
