@@ -640,13 +640,12 @@ QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
     return res;
 }
 
-QByteArray MPDeviceBleImpl::getStartAddressToSet(const QByteArray &startNode)
+QByteArray MPDeviceBleImpl::getStartAddressToSet(const QVector<QByteArray>& startNodeArray, Common::AddressType addrType) const
 {
     QByteArray setAddress;
-    // Currently setting data type id to 0
+    setAddress.append(static_cast<char>(addrType));
     setAddress.append(ZERO_BYTE);
-    setAddress.append(ZERO_BYTE);
-    setAddress.append(startNode);
+    setAddress.append(startNodeArray[addrType]);
     return setAddress;
 }
 

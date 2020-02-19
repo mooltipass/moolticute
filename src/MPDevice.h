@@ -333,6 +333,8 @@ private:
 
     // Generate save packets
     bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, const MPDeviceProgressCb &cbProgress);
+    bool checkModifiedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType);
+    bool checkRemovedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType);
 
     QByteArray getFreeAddress(quint32 virtualAddr);
     // once we fetched free addresses, this function is called

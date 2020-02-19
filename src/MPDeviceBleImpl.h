@@ -101,7 +101,7 @@ public:
 
     QList<QByteArray> getFavorites(const QByteArray& data);
 
-    QByteArray getStartAddressToSet(const QByteArray& startNode);
+    QByteArray getStartAddressToSet(const QVector<QByteArray>& startNodeArray, Common::AddressType addrType) const;
 
     void readLanguages();
 

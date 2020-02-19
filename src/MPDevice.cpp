@@ -3123,53 +3123,10 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     /* First pass: check the nodes that changed or were added */
     if (tackleCreds)
     {
-        for (auto &nodelist_iterator: loginNodes)
+        diagSavePacketsGenerated |= checkModifiedSavePacketNodes(jobs, dataWriteProgressCb, Common::CRED_ADDR_IDX);
+        if (isBLE())
         {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(loginNodesClone, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating save packet for new service" << nodelist_iterator->getService();
-                //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-            else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
-            {
-                qDebug() << "Generating save packet for updated service" << nodelist_iterator->getService();
-                //qDebug() << "Prev contents: " << temp_node_pointer->getNodeData().toHex();
-                //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(),dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-        }
-        for (auto &nodelist_iterator: loginChildNodes)
-        {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(loginChildNodesClone, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating save packet for new login" << nodelist_iterator->getLogin();
-                //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-            else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
-            {
-                qDebug() << "Generating save packet for updated login" << nodelist_iterator->getLogin();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-            else
-            {
-                //qDebug() << "Node data match for login" << nodelist_iterator->getLogin();
-            }
+            diagSavePacketsGenerated |= checkModifiedSavePacketNodes(jobs, dataWriteProgressCb, Common::WEBAUTHN_ADDR_IDX);
         }
     }
 
@@ -3222,31 +3179,10 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     /* Second pass: check the nodes that were removed */
     if (tackleCreds)
     {
-        for (auto &nodelist_iterator: loginNodesClone)
+        diagSavePacketsGenerated |= checkRemovedSavePacketNodes(jobs, dataWriteProgressCb, Common::CRED_ADDR_IDX);
+        if (isBLE())
         {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(loginNodes, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getParentNodeSize(), 0xFF), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-        }
-        for (auto &nodelist_iterator: loginChildNodesClone)
-        {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(loginChildNodes, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getChildNodeSize(), 0xFF), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
+            diagSavePacketsGenerated |= checkRemovedSavePacketNodes(jobs, dataWriteProgressCb, Common::WEBAUTHN_ADDR_IDX);
         }
 
         /* Diff favorites */
@@ -3279,12 +3215,20 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             QByteArray setAddress;
             if (isBLE())
             {
-                setAddress = bleImpl->getStartAddressToSet(startNode[Common::CRED_ADDR_IDX]);
+                setAddress = bleImpl->getStartAddressToSet(startNode, Common::CRED_ADDR_IDX);
             }
             else
             {
                 setAddress = startNode[Common::CRED_ADDR_IDX];
             }
+            jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, setAddress, pMesProt->getDefaultFuncDone()));
+        }
+
+        if (isBLE() && startNode[Common::WEBAUTHN_ADDR_IDX] != startNodeClone[Common::WEBAUTHN_ADDR_IDX])
+        {
+            qDebug() << "Updating start node";
+            diagSavePacketsGenerated = true;
+            QByteArray setAddress = bleImpl->getStartAddressToSet(startNode, Common::WEBAUTHN_ADDR_IDX);
             jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, setAddress, pMesProt->getDefaultFuncDone()));
         }
     }
@@ -3365,6 +3309,100 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     }
 
     return diagSavePacketsGenerated;
+}
+
+bool MPDevice::checkModifiedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType)
+{
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& nodesClone = isCred ? loginNodesClone : webAuthnLoginNodesClone;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    NodeList& childNodesClone = isCred? loginChildNodesClone : webAuthnLoginChildNodesClone;
+    MPNode* tmpNodePtr;
+    bool savePacketGenerated = false;
+    for (auto &nodelist_iterator: nodes)
+    {
+        /* See if we can find the same node in the clone list */
+        tmpNodePtr = findNodeWithAddressInList(nodesClone, nodelist_iterator->getAddress(), 0);
+
+        if (!tmpNodePtr)
+        {
+            qDebug() << "Generating save packet for new service" << nodelist_iterator->getService();
+            //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+        else if (nodelist_iterator->getNodeData() != tmpNodePtr->getNodeData())
+        {
+            qDebug() << "Generating save packet for updated service" << nodelist_iterator->getService();
+            //qDebug() << "Prev contents: " << temp_node_pointer->getNodeData().toHex();
+            //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    for (auto &nodelist_iterator: childNodes)
+    {
+        /* See if we can find the same node in the clone list */
+        tmpNodePtr = findNodeWithAddressInList(childNodesClone, nodelist_iterator->getAddress(), 0);
+
+        if (!tmpNodePtr)
+        {
+            qDebug() << "Generating save packet for new login" << nodelist_iterator->getLogin();
+            //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+        else if (nodelist_iterator->getNodeData() != tmpNodePtr->getNodeData())
+        {
+            qDebug() << "Generating save packet for updated login" << nodelist_iterator->getLogin();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    return savePacketGenerated;
+}
+
+bool MPDevice::checkRemovedSavePacketNodes(AsyncJobs *jobs, std::function<void ()> writeCb, Common::AddressType addrType)
+{
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& nodesClone = isCred ? loginNodesClone : webAuthnLoginNodesClone;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    NodeList& childNodesClone = isCred? loginChildNodesClone : webAuthnLoginChildNodesClone;
+    MPNode* tmpNodePtr;
+    bool savePacketGenerated = false;
+    for (auto &nodelist_iterator : nodesClone)
+    {
+        /* See if we can find the same node in the clone list */
+        tmpNodePtr = findNodeWithAddressInList(nodes, nodelist_iterator->getAddress(), 0);
+
+        if (!tmpNodePtr)
+        {
+            qDebug() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getParentNodeSize(), 0xFF), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    for (auto &nodelist_iterator : childNodesClone)
+    {
+        /* See if we can find the same node in the clone list */
+        tmpNodePtr = findNodeWithAddressInList(childNodes, nodelist_iterator->getAddress(), 0);
+
+        if (!tmpNodePtr)
+        {
+            qDebug() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getChildNodeSize(), 0xFF), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    return savePacketGenerated;
 }
 
 QByteArray MPDevice::getFreeAddress(quint32 virtualAddr)
