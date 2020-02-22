@@ -6114,7 +6114,7 @@ bool MPDevice::finishImportLoginNodes(QString &stringError, Common::AddressType 
             /* Marked for deletion? */
             if (!curNode->getMergeTagged())
             {
-                removeChildFromDB(nodeItem, curNode, true, true);
+                removeChildFromDB(nodeItem, curNode, true, true, addrType);
             }
         }
     }
