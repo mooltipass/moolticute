@@ -75,6 +75,8 @@ public:
      */
     bool processReceivedData(const QByteArray& data, QByteArray& dataReceived);
 
+    QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
+
     bool isAfterAuxFlash();
 
     void getUserCategories(const MessageHandlerCbData &cb);
@@ -99,7 +101,14 @@ public:
 
     QList<QByteArray> getFavorites(const QByteArray& data);
 
+    QByteArray getStartAddressToSet(const QVector<QByteArray>& startNodeArray, Common::AddressType addrType) const;
+
     void readLanguages();
+
+    void loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
+    void appendLoginNode(MPNode* loginNode, MPNode* loginNodeClone, Common::AddressType addrType);
+    void appendLoginChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, Common::AddressType addrType);
+    void generateExportData(QJsonArray& exportTopArray);
 
 signals:
     void userSettingsChanged(QJsonObject settings);
@@ -148,6 +157,7 @@ private:
     static constexpr int FIRST_PACKET_PAYLOAD_SIZE = 58;
     static constexpr int INVALID_LAYOUT_LANG_SIZE = 0xFFFF;
     const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
+    const static char ZERO_BYTE = static_cast<char>(0x00);
 };
 
 #endif // MPDEVICEBLEIMPL_H

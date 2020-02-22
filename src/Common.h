@@ -127,6 +127,13 @@ T const& qAsConst(T&t){return t;}
     Class(const Class &&) Q_DECL_EQ_DELETE;\
     Class &operator=(const Class &&) Q_DECL_EQ_DELETE;
 
+template<typename Container>
+void clearAndDelete(Container& cont)
+{
+    qDeleteAll(cont);
+    cont.clear();
+}
+
 class Common
 {
 public:
@@ -234,6 +241,12 @@ public:
     {
         CredentialNumberChanged = 0x01,
         DataNumberChanged = 0x02
+    };
+
+    enum AddressType
+    {
+        CRED_ADDR_IDX = 0,
+        WEBAUTHN_ADDR_IDX = 1
     };
 };
 

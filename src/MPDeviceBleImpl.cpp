@@ -9,7 +9,6 @@ MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     mpDev(dev),
     freeAddressProv(mesProt, dev)
 {
-
 }
 
 bool MPDeviceBleImpl::isFirstPacket(const QByteArray &data)
@@ -392,6 +391,21 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
     return isLast;
 }
 
+ QVector<QByteArray> MPDeviceBleImpl::processReceivedStartNodes(const QByteArray &data) const
+{
+    if (data.size() < 2)
+    {
+        return {0};
+    }
+    QVector<QByteArray> res;
+    for (int i = 0; i < data.size() - 1; i += 2)
+    {
+        res.append(data.mid(i, 2));
+    }
+    qDebug() << "Received starting node: " << res.size();
+    return res;
+}
+
 bool MPDeviceBleImpl::isAfterAuxFlash()
 {
     QSettings s;
@@ -479,7 +493,7 @@ QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categorie
     for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
     {
         QByteArray categoryArr = bleProt->toByteArray(categories["category_" + QString::number(i+1)].toString());
-        Common::fill(categoryArr, USER_CATEGORY_LENGTH - categoryArr.size(), static_cast<char>(0x00));
+        Common::fill(categoryArr, USER_CATEGORY_LENGTH - categoryArr.size(), ZERO_BYTE);
         data.append(categoryArr);
     }
     return data;
@@ -626,6 +640,15 @@ QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
     return res;
 }
 
+QByteArray MPDeviceBleImpl::getStartAddressToSet(const QVector<QByteArray>& startNodeArray, Common::AddressType addrType) const
+{
+    QByteArray setAddress;
+    setAddress.append(static_cast<char>(addrType));
+    setAddress.append(ZERO_BYTE);
+    setAddress.append(startNodeArray[addrType]);
+    return setAddress;
+}
+
 void MPDeviceBleImpl::readLanguages()
 {
     m_deviceLanguages = QJsonObject{};
@@ -707,6 +730,87 @@ void MPDeviceBleImpl::readLanguages()
     ));
 
     mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress)
+{
+    if (mpDev->startNode[Common::WEBAUTHN_ADDR_IDX] != MPNode::EmptyAddress)
+    {
+        qInfo() << "Loading parent nodes...";
+        mpDev->loadLoginNode(jobs, mpDev->startNode[Common::WEBAUTHN_ADDR_IDX], cbProgress, Common::WEBAUTHN_ADDR_IDX);
+    }
+    else
+    {
+        qInfo() << "No parent webauthn nodes to load.";
+    }
+}
+
+void MPDeviceBleImpl::appendLoginNode(MPNode *loginNode, MPNode *loginNodeClone, Common::AddressType addrType)
+{
+    switch(addrType)
+    {
+        case Common::CRED_ADDR_IDX:
+            mpDev->loginNodes.append(loginNode);
+            mpDev->loginNodesClone.append(loginNodeClone);
+            break;
+        case Common::WEBAUTHN_ADDR_IDX:
+            mpDev->webAuthnLoginNodes.append(loginNode);
+            mpDev->webAuthnLoginNodesClone.append(loginNodeClone);
+            break;
+        default:
+            qCritical() << "Invalid address type";
+    }
+}
+
+void MPDeviceBleImpl::appendLoginChildNode(MPNode *loginChildNode, MPNode *loginChildNodeClone, Common::AddressType addrType)
+{
+    switch(addrType)
+    {
+        case Common::CRED_ADDR_IDX:
+            mpDev->loginChildNodes.append(loginChildNode);
+            mpDev->loginChildNodesClone.append(loginChildNodeClone);
+            break;
+        case Common::WEBAUTHN_ADDR_IDX:
+            mpDev->webAuthnLoginChildNodes.append(loginChildNode);
+            mpDev->webAuthnLoginChildNodesClone.append(loginChildNodeClone);
+            break;
+        default:
+            qCritical() << "Invalid address type";
+    }
+}
+
+void MPDeviceBleImpl::generateExportData(QJsonArray &exportTopArray)
+{
+    /* isBle */
+    exportTopArray.append(QJsonValue{true});
+    /* user category names */
+    exportTopArray.append(getUserCategories());
+    /* Webauthn parent nodes */
+    QJsonArray nodeQJsonArray = QJsonArray();
+    auto& login = mpDev->webAuthnLoginNodes;
+    for (qint32 i = 0; i < login.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(login[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(login[i]->getService());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(login[i]->getNodeData()));
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
+
+    /* Webauthn child nodes */
+    nodeQJsonArray = QJsonArray();
+    auto& loginChild = mpDev->webAuthnLoginChildNodes;
+    for (qint32 i = 0; i < loginChild.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(loginChild[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(loginChild[i]->getLogin());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(loginChild[i]->getNodeData()));
+        nodeObject["pointed"] = QJsonValue(false);
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()
@@ -800,7 +904,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
     int byteCounter = BUNBLE_DATA_ADDRESS_SIZE;
     int curAddress = 0;
     QByteArray message;
-    message.fill(static_cast<char>(0), BUNBLE_DATA_ADDRESS_SIZE);
+    message.fill(ZERO_BYTE, BUNBLE_DATA_ADDRESS_SIZE);
     for (const auto byte : blob)
     {
         message.append(byte);
