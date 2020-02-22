@@ -259,7 +259,7 @@ private:
     virtual void platformRead() {}
 
     /* Platform function for writing data, should be implemented in platform class */
-    virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
+    virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data) }
 
     void addTimerJob(int msec);
     void loadLoginNode(AsyncJobs *jobs, const QByteArray &address,
@@ -375,7 +375,7 @@ private:
 
     // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
-    QVector<QByteArray> startNode = {0};
+    QVector<QByteArray> startNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     QVector<quint32> virtualStartNode = {0, 0};
     QByteArray startDataNode = MPNode::EmptyAddress;
     quint32 virtualDataStartNode = 0;
@@ -393,7 +393,7 @@ private:
     quint32 credentialsDbChangeNumberClone;
     quint32 dataDbChangeNumberClone;
     QByteArray ctrValueClone;
-    QVector<QByteArray> startNodeClone = {0};
+    QVector<QByteArray> startNodeClone = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     QByteArray startDataNodeClone = MPNode::EmptyAddress;
     QList<QByteArray> cpzCtrValueClone;
     QList<QByteArray> favoritesAddrsClone;
