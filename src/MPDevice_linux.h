@@ -68,7 +68,6 @@ private:
     QString devPath;
     int devfd = 0; //device fd
     QSocketNotifier *sockNotifRead = nullptr;
-    QSocketNotifier *sockNotifWrite = nullptr;
 
     //Bufferize the data sent by sending 64bytes packet at a time
     QQueue<QByteArray> sendBuffer;

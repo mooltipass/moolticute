@@ -50,18 +50,13 @@ MPDevice_linux::MPDevice_linux(QObject *parent, const MPPlatformDef &platformDef
     else
     {
         sockNotifRead = new QSocketNotifier(devfd, QSocketNotifier::Read);
-        sockNotifRead->setEnabled(true);
         connect(sockNotifRead, &QSocketNotifier::activated, this, &MPDevice_linux::readyRead);
-
-        sockNotifWrite = new QSocketNotifier(devfd, QSocketNotifier::Write);
-        sockNotifWrite->setEnabled(true);
     }
 }
 
 MPDevice_linux::~MPDevice_linux()
 {
     delete sockNotifRead;
-    delete sockNotifWrite;
 
     if (devfd > 0)
     {
