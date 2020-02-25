@@ -95,6 +95,8 @@ public:
     QJsonObject getUserCategories() const { return m_categories; };
     void updateUserCategories(const QJsonObject &categories);
     bool isUserCategoriesChanged(const QJsonObject &categories) const;
+    void setImportUserCategories(const QJsonObject &categories);
+    void importUserCategories();
     void setNodeCategory(MPNode* node, int category);
     void setNodeKeyAfterLogin(MPNode* node, int key);
     void setNodeKeyAfterPwd(MPNode* node, int key);
@@ -142,6 +144,7 @@ private:
 
     MPBLEFreeAddressProvider freeAddressProv;
     QJsonObject m_categories;
+    QJsonObject m_categoriesToImport;
     QJsonObject m_deviceLanguages;
     QJsonObject m_keyboardLayouts;
 

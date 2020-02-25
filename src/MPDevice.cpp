@@ -5188,7 +5188,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             /* Read webauthn child nodes */
             readExportNodes(dataArray[EXPORT_WEBAUTHN_CHILD_NODES_INDEX].toArray(), EXPORT_WEBAUTHN_CHILD_NODES_INDEX);
 
-            bleImpl->updateUserCategories(dataArray[EXPORT_BLE_USER_CATEGORIES_INDEX].toObject());
+            bleImpl->setImportUserCategories(dataArray[EXPORT_BLE_USER_CATEGORIES_INDEX].toObject());
         }
     }
 
@@ -5316,6 +5316,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 qCritical() << "Login import failed";
                 return;
             }
+            bleImpl->importUserCategories();
         }
 
         /// Same but for data nodes

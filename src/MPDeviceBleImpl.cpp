@@ -590,6 +590,22 @@ bool MPDeviceBleImpl::isUserCategoriesChanged(const QJsonObject &categories) con
     return false;
 }
 
+void MPDeviceBleImpl::setImportUserCategories(const QJsonObject &categories)
+{
+    m_categoriesToImport = categories;
+}
+
+void MPDeviceBleImpl::importUserCategories()
+{
+    if (m_categoriesToImport.empty())
+    {
+        qCritical() << "Cannot import empty categories";
+        return;
+    }
+    updateUserCategories(m_categoriesToImport);
+    m_categoriesToImport = QJsonObject();
+}
+
 void MPDeviceBleImpl::setNodeCategory(MPNode* node, int category)
 {
     if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
