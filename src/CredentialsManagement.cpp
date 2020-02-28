@@ -224,9 +224,18 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::statusChanged, this,
              [this](Common::MPStatus status)
                 {
+                    if (!wsClient->isMPBLE())
+                    {
+                        return;
+                    }
+
                     if (Common::MPStatus::Unlocked == status && wsClient->get_advancedMenu())
                     {
                         sendGetUserCategories();
+                    }
+                    else if (Common::MPStatus::NoCardInserted == status)
+                    {
+                        m_pCredModel->setUserCategoryClean(false);
                     }
                 }
     );

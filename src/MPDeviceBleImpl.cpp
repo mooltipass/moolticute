@@ -485,6 +485,22 @@ void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categ
         categories[catName] = defaultCat ? catName : category;
     }
     m_categories = categories;
+    m_categoriesFetched = true;
+}
+
+void MPDeviceBleImpl::fetchCategories()
+{
+    if (!m_categoriesFetched)
+    {
+        getUserCategories([this](bool success, QString, QByteArray data)
+                         {
+                             if (success)
+                             {
+                                QJsonObject ores;
+                                fillGetCategory(data, ores);
+                             }
+                         });
+    }
 }
 
 QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categories)
@@ -588,6 +604,22 @@ bool MPDeviceBleImpl::isUserCategoriesChanged(const QJsonObject &categories) con
         }
     }
     return false;
+}
+
+void MPDeviceBleImpl::setImportUserCategories(const QJsonObject &categories)
+{
+    m_categoriesToImport = categories;
+}
+
+void MPDeviceBleImpl::importUserCategories()
+{
+    if (m_categoriesToImport.empty())
+    {
+        qCritical() << "Cannot import empty categories";
+        return;
+    }
+    updateUserCategories(m_categoriesToImport);
+    m_categoriesToImport = QJsonObject();
 }
 
 void MPDeviceBleImpl::setNodeCategory(MPNode* node, int category)
