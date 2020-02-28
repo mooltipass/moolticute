@@ -117,12 +117,13 @@ static QLocalServer *debugLogServer = nullptr;
 static QList<QLocalSocket *> debugLogClients;
 static Common::GuiLogCallback guiLogCallback = [](const QByteArray &) {};
 static QByteArray startingDaemonBuffer;
+const QString Common::ISODateWithMsFormat = "yyyy-MM-ddTHH:mm:ss.zzz";
 
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QString fname = context.file;
     fname = fname.section('\\', -1, -1);
-    const auto timestamp = QDateTime::currentDateTime().toString(Qt::ISODateWithMs);
+    const auto timestamp = QDateTime::currentDateTime().toString(Common::ISODateWithMsFormat);
     QString s;
     switch (type) {
     default:
