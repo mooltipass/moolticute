@@ -82,6 +82,7 @@ public:
     void getUserCategories(const MessageHandlerCbData &cb);
     void setUserCategories(const QJsonObject &categories, const MessageHandlerCbData &cb);
     void fillGetCategory(const QByteArray& data, QJsonObject &categories);
+    void fetchCategories();
     QByteArray createUserCategoriesMsg(const QJsonObject &categories);
 
     void readUserSettings(const QByteArray& settings);
@@ -92,7 +93,7 @@ public:
 
     void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 
-    QJsonObject getUserCategories() const { return m_categories; };
+    QJsonObject getUserCategories() const { return m_categories; }
     void updateUserCategories(const QJsonObject &categories);
     bool isUserCategoriesChanged(const QJsonObject &categories) const;
     void setImportUserCategories(const QJsonObject &categories);
@@ -145,6 +146,7 @@ private:
     MPBLEFreeAddressProvider freeAddressProv;
     QJsonObject m_categories;
     QJsonObject m_categoriesToImport;
+    bool m_categoriesFetched = false;
     QJsonObject m_deviceLanguages;
     QJsonObject m_keyboardLayouts;
 

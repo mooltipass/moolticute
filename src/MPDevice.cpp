@@ -116,6 +116,8 @@ void MPDevice::sendInitMessages()
             writeCancelRequest();
         }
         bleImpl->getPlatInfo();
+        //Fetch category if it was not requested from Gui
+        QTimer::singleShot(CATEGORY_FETCH_DELAY, [this](){ bleImpl->fetchCategories(); });
     }
 
     exitMemMgmtMode(false);

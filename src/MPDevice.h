@@ -464,6 +464,7 @@ protected:
     static constexpr int RESET_SEND_DELAY = 300;
     static constexpr int INIT_STARTING_DELAY = RESET_SEND_DELAY + 150;
     static constexpr int STATUS_STARTING_DELAY = RESET_SEND_DELAY + 500;
+    static constexpr int CATEGORY_FETCH_DELAY = 5000;
 };
 
 #endif // MPDEVICE_H

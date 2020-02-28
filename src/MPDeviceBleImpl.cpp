@@ -485,6 +485,22 @@ void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categ
         categories[catName] = defaultCat ? catName : category;
     }
     m_categories = categories;
+    m_categoriesFetched = true;
+}
+
+void MPDeviceBleImpl::fetchCategories()
+{
+    if (!m_categoriesFetched)
+    {
+        getUserCategories([this](bool success, QString, QByteArray data)
+                         {
+                             if (success)
+                             {
+                                QJsonObject ores;
+                                fillGetCategory(data, ores);
+                             }
+                         });
+    }
 }
 
 QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categories)
