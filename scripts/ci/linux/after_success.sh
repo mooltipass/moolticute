@@ -16,8 +16,8 @@ fi
 docker exec mc-deb bash /scripts/build_source.sh $VERSION xenial
 docker exec mc-deb bash /scripts/build_source.sh $VERSION bionic
 docker exec mc-deb bash /scripts/build_source.sh $VERSION disco
-#Not workin yet
-#docker exec mc-deb bash /scripts/build_source.sh $VERSION eoan
+#Not workin yet ?
+docker exec mc-deb bash /scripts/build_source.sh $VERSION eoan
 
 #windows and appimage
 docker exec appimgbuilder bash /scripts/package.sh
