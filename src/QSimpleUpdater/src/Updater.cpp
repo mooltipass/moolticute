@@ -427,8 +427,8 @@ void Updater::onReply (QNetworkReply* reply)
             for (const auto &jsonValue: githubReleaseAssets)
             {
                 QJsonObject releaseAsset = jsonValue.toObject();
-                auto r = releaseAsset.value("name").toString();
-                if (r.endsWith(releaseFileSuffix))
+                auto url = releaseAsset.value("browser_download_url").toString();
+                if (url.endsWith(releaseFileSuffix))
                 {
                     found = true;
                     break;
@@ -446,17 +446,15 @@ void Updater::onReply (QNetworkReply* reply)
 
     githubReleaseAssets = latestGithubRelease.value("assets").toArray();
     bool releaseFound = false;
-    QString releaseName;
     QString downloadUrl;
     for (const auto &jsonValue: githubReleaseAssets)
     {
         QJsonObject releaseAsset = jsonValue.toObject();
-        releaseName = releaseAsset.value("name").toString();
+        downloadUrl = releaseAsset.value("browser_download_url").toString();
 
-        if (releaseName.endsWith(releaseFileSuffix))
+        if (downloadUrl.endsWith(releaseFileSuffix))
         {
             releaseFound = true;
-            downloadUrl = releaseAsset.value("browser_download_url").toString();
             break;
         }
     }
