@@ -248,6 +248,8 @@ public:
         CRED_ADDR_IDX = 0,
         WEBAUTHN_ADDR_IDX = 1
     };
+
+    static const QString ISODateWithMsFormat;
 };
 
 enum class DeviceType
