@@ -229,7 +229,7 @@ function create_beta_release_osx()
     >&2 echo -e "Calling lftp..."
 
     lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com \
-        -e "set sftp:auto-confirm yes; \
+        -e "debug 9; set sftp:auto-confirm yes; \
         cd mc_betas; \
         mkdir -p -f $VERSION; \
         cd $VERSION; \
