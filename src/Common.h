@@ -119,6 +119,44 @@ template<class T>
 T const qAsConst(T&&t){return std::forward<T>(t);}
 template<class T>
 T const& qAsConst(T&t){return t;}
+
+//This declares a QOverload implementation if we build with Qt < 5.7
+template <typename... Args>
+struct QNonConstOverload
+{
+    template <typename R, typename T>
+    Q_DECL_CONSTEXPR auto operator()(R (T::*ptr)(Args...)) const noexcept -> decltype(ptr)
+    { return ptr; }
+    template <typename R, typename T>
+    static Q_DECL_CONSTEXPR auto of(R (T::*ptr)(Args...)) noexcept -> decltype(ptr)
+    { return ptr; }
+};
+template <typename... Args>
+struct QConstOverload
+{
+    template <typename R, typename T>
+    Q_DECL_CONSTEXPR auto operator()(R (T::*ptr)(Args...) const) const noexcept -> decltype(ptr)
+    { return ptr; }
+    template <typename R, typename T>
+    static Q_DECL_CONSTEXPR auto of(R (T::*ptr)(Args...) const) noexcept -> decltype(ptr)
+    { return ptr; }
+};
+
+template <typename... Args>
+struct QOverload : QConstOverload<Args...>, QNonConstOverload<Args...>
+{
+    using QConstOverload<Args...>::of;
+    using QConstOverload<Args...>::operator();
+    using QNonConstOverload<Args...>::of;
+    using QNonConstOverload<Args...>::operator();
+    template <typename R>
+    Q_DECL_CONSTEXPR auto operator()(R (*ptr)(Args...)) const noexcept -> decltype(ptr)
+    { return ptr; }
+    template <typename R>
+    static Q_DECL_CONSTEXPR auto of(R (*ptr)(Args...)) noexcept -> decltype(ptr)
+    { return ptr; }
+};
+
 #endif
 
 //Q_DISABLE_COPY_MOVE from Qt 5.15
