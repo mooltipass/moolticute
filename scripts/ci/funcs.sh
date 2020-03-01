@@ -221,9 +221,12 @@ function create_beta_release_osx()
     local DMG_FILE="$(ls build/*.dmg 2> /dev/null | head -n 1)"
 
     >&2 echo -e "Creating (OSX) beta release (tag: $VERSION)"
+    >&2 echo -e "DMG File: $DMG_FILE"
 
     mkdir -p ~/.ssh
     ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
+    
+    >&2 echo -e "Calling lftp..."
 
     lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com \
         -e "set sftp:auto-confirm yes; \
