@@ -117,7 +117,7 @@ void MPDevice::sendInitMessages()
         }
         bleImpl->getPlatInfo();
         //Fetch category if it was not requested from Gui
-        QTimer::singleShot(CATEGORY_FETCH_DELAY, [this](){ bleImpl->fetchCategories(); });
+        QTimer::singleShot(CATEGORY_FETCH_DELAY, bleImpl, &MPDeviceBleImpl::fetchCategories);
     }
 
     exitMemMgmtMode(false);
