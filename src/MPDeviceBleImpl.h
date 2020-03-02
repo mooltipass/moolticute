@@ -82,7 +82,6 @@ public:
     void getUserCategories(const MessageHandlerCbData &cb);
     void setUserCategories(const QJsonObject &categories, const MessageHandlerCbData &cb);
     void fillGetCategory(const QByteArray& data, QJsonObject &categories);
-    void fetchCategories();
     QByteArray createUserCategoriesMsg(const QJsonObject &categories);
 
     void readUserSettings(const QByteArray& settings);
@@ -120,6 +119,9 @@ signals:
 
 private slots:
     void handleLongMessageTimeout();
+
+public slots:
+    void fetchCategories();
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
