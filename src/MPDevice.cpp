@@ -3545,20 +3545,12 @@ void MPDevice::processStatusChange(const QByteArray &data)
 
         if (prevStatus == Common::UnknownStatus)
         {
-            QTimer::singleShot(10, [this]()
-            {
-                /* First start: load parameters */
-                pSettings->loadParameters();
-                setCurrentDate();
-            });
+            QTimer::singleShot(10, this, &MPDevice::sendSetupDeviceMessages);
         }
 
         if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
         {
-            QTimer::singleShot(20, [this]()
-            {
-                getCurrentCardCPZ();
-            });
+            QTimer::singleShot(20, this, &MPDevice::getCurrentCardCPZ);
         }
         else
         {
@@ -3568,18 +3560,7 @@ void MPDevice::processStatusChange(const QByteArray &data)
         if (s == Common::Unlocked)
         {
             /* If v1.2 firmware, query user change number */
-            QTimer::singleShot(50, [this]()
-            {
-                if (isFw12() || isBLE())
-                {
-                    qInfo() << "Requesting change numbers";
-                    getChangeNumbers();
-                }
-                else
-                {
-                    qInfo() << "Firmware below v1.2, do not request change numbers";
-                }
-            });
+            QTimer::singleShot(50, this, &MPDevice::handleDeviceUnlocked);
         }
     }
 }
@@ -3626,6 +3607,26 @@ void MPDevice::getCurrentCardCPZ()
 
     jobsQueue.enqueue(cpzjobs);
     runAndDequeueJobs();
+}
+
+void MPDevice::sendSetupDeviceMessages()
+{
+    /* First start: load parameters */
+    pSettings->loadParameters();
+    setCurrentDate();
+}
+
+void MPDevice::handleDeviceUnlocked()
+{
+    if (isFw12() || isBLE())
+    {
+        qInfo() << "Requesting change numbers";
+        getChangeNumbers();
+    }
+    else
+    {
+        qInfo() << "Firmware below v1.2, do not request change numbers";
+    }
 }
 
 void MPDevice::getChangeNumbers()

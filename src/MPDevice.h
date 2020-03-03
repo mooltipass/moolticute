@@ -116,9 +116,6 @@ public:
     //Get database change numbers
     void getChangeNumbers();
 
-    //Get current card CPZ
-    void getCurrentCardCPZ();
-
     //Ask a password for specified service/login to MP
     void getCredential(QString service, const QString &login, const QString &fallback_service, const QString &reqid,
                        std::function<void(bool success, QString errstr, const QString &_service, const QString &login, const QString &pass, const QString &desc)> cb);
@@ -252,6 +249,11 @@ private slots:
     void sendDataDequeue(); //execute commands from the command queue
     void runAndDequeueJobs(); //execute AsyncJobs from the jobs queues
     void resetFlipBit();
+
+    //Get current card CPZ
+    void getCurrentCardCPZ();
+    void sendSetupDeviceMessages();
+    void handleDeviceUnlocked();
 
 
 private:
