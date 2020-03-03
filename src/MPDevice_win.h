@@ -94,6 +94,7 @@ signals:
 private slots:
     void ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLAPPED *overlapped);
     void writeDataFinished();
+    void openPathRetry();
 
 private:
     virtual void platformRead();
