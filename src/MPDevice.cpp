@@ -116,8 +116,6 @@ void MPDevice::sendInitMessages()
             writeCancelRequest();
         }
         bleImpl->getPlatInfo();
-        //Fetch category if it was not requested from Gui
-        QTimer::singleShot(CATEGORY_FETCH_DELAY, bleImpl, &MPDeviceBleImpl::fetchCategories);
     }
 
     exitMemMgmtMode(false);
@@ -3622,6 +3620,11 @@ void MPDevice::handleDeviceUnlocked()
     {
         qInfo() << "Requesting change numbers";
         getChangeNumbers();
+        if (isBLE() && !bleImpl->areCategoriesFetched())
+        {
+            //Fetch category if it was not requested from Gui
+            QTimer::singleShot(CATEGORY_FETCH_DELAY, bleImpl, &MPDeviceBleImpl::fetchCategories);
+        }
     }
     else
     {

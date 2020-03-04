@@ -94,6 +94,7 @@ public:
 
     QJsonObject getUserCategories() const { return m_categories; }
     void updateUserCategories(const QJsonObject &categories);
+    bool areCategoriesFetched() const { return m_categoriesFetched; }
     bool isUserCategoriesChanged(const QJsonObject &categories) const;
     void setImportUserCategories(const QJsonObject &categories);
     void importUserCategories();
