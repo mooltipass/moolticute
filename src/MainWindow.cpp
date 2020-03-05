@@ -1193,9 +1193,14 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
 #endif
             QFile f(fname);
             if (!f.open(QFile::WriteOnly | QFile::Truncate))
+            {
                 QMessageBox::warning(this, tr("Error"), tr("Unable to write to file %1").arg(fname));
+            }
             else
+            {
                 f.write(d);
+                QMessageBox::information(this, tr("Moolticute"), tr("Successfully exported the database from your device."));
+            }
             f.close();
 
             s.setValue("last_used_path/export_dir", QFileInfo(fname).canonicalPath());
