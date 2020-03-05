@@ -490,7 +490,7 @@ void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categ
 
 void MPDeviceBleImpl::fetchCategories()
 {
-    if (!m_categoriesFetched)
+    if (!m_categoriesFetched && Common::Unlocked == mpDev->get_status())
     {
         getUserCategories([this](bool success, QString, QByteArray data)
                          {
