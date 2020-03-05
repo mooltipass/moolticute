@@ -34,6 +34,7 @@ function make_version()
     echo "#endif" >> $1/src/version.h
 
     echo "version.h created"
+    cp $1/src/version.h $1/src/version.h_$2
     cat $1/src/version.h
 }
 
