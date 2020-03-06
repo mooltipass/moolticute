@@ -50,6 +50,7 @@ void SettingsGuiMini::updateUI()
     ui->labelRemoveCard->show();
     ui->checkBoxFlash->show();
     ui->checkBoxLockDevice->show();
+    ui->checkBoxPinOnBack->hide();
 
     ui->groupBox_BLESettings->hide();
 

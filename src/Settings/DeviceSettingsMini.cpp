@@ -28,5 +28,4 @@ void DeviceSettingsMini::fillParameterMapping()
     m_paramMap.insert(MPParams::MINI_OLED_CONTRAST_CURRENT_PARAM, "screen_brightness");
     m_paramMap.insert(MPParams::MINI_KNOCK_DETECT_ENABLE_PARAM, "knock_enabled");
     m_paramMap.insert(MPParams::HASH_DISPLAY_FEATURE_PARAM, "hash_display");
-    m_paramMap.insert(MPParams::LOCK_UNLOCK_FEATURE_PARAM, "lock_unlock_mode");
 }

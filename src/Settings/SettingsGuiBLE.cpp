@@ -52,6 +52,7 @@ void SettingsGuiBLE::updateUI()
     ui->labelRemoveCard->hide();
     ui->checkBoxFlash->hide();
     ui->checkBoxLockDevice->hide();
+    ui->checkBoxPinOnBack->show();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();
@@ -60,7 +61,7 @@ void SettingsGuiBLE::updateUI()
     ui->settings_inactivity_lock->hide();
     ui->checkBoxScreensaver->hide();
     ui->hashDisplayFeatureCheckBox->hide();
-    ui->settings_advanced_lockunlock->hide();
+    ui->settings_advanced_lockunlock->show();
 }
 
 void SettingsGuiBLE::setupKeyboardLayout()

@@ -16,6 +16,7 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(bool, prompt_animation, false, MPParams::PROMPT_ANIMATION_PARAM)
     QT_SETTINGS_PROPERTY(bool, bool_animation, false, MPParams::BOOT_ANIMATION_PARAM)
     QT_SETTINGS_PROPERTY(bool, device_lock_usb_disc, false, MPParams::DEVICE_LOCK_USB_DISC)
+    QT_SETTINGS_PROPERTY(bool, pin_shown_on_back, false, MPParams::PIN_SHOWN_ON_BACK)
 
 public:
     DeviceSettingsBLE(QObject *parent);
@@ -33,7 +34,9 @@ public:
         DELAY_BETWEEN_KEY_PRESS = 7,
         BOOT_ANIMATION_BYTE = 8,
         DEVICE_LOCK_USB_BYTE = 10,
-        KNOCK_DET_BYTE = 11
+        KNOCK_DET_BYTE = 11,
+        PIN_SHOWN_ON_BACK_BYTE = 14,
+        UNLOCK_FEATURE_BYTE = 15
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;
