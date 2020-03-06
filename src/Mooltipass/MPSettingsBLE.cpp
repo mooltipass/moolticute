@@ -36,6 +36,7 @@ void MPSettingsBLE::loadParameters()
                         const int knockValue = convertBackKnockValue(m_lastDeviceSettings.at(DeviceSettingsBLE::KNOCK_DET_BYTE));
                         set_knock_sensitivity(knockValue);
                         set_lock_unlock_mode(m_lastDeviceSettings.at(DeviceSettingsBLE::UNLOCK_FEATURE_BYTE));
+                        set_pin_shown_on_back(m_lastDeviceSettings.at(DeviceSettingsBLE::PIN_SHOWN_ON_BACK_BYTE) != 0);
                         return true;
                     }
     ));

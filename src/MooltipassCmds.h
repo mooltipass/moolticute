@@ -219,7 +219,8 @@ public:
         USER_LANGUAGE,
         KEYBOARD_USB_LAYOUT,
         KEYBOARD_BT_LAYOUT,
-        DEVICE_LOCK_USB_DISC
+        DEVICE_LOCK_USB_DISC,
+        PIN_SHOWN_ON_BACK
     };
     Q_ENUM(Param)
 };
