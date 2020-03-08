@@ -6383,14 +6383,14 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
         QJsonObject qjobject = creds[i].toObject();
 
         /* Check login size */
-        if (qjobject["login"].toString().length() >= MP_MAX_LOGIN_LENGTH-1)
+        if (qjobject["login"].toString().length() >= pMesProt->getLoginMaxLength()-1)
         {
             cb(false, "Couldn't import CSV file: " + qjobject["login"].toString() + " has longer than supported length");
             return;
         }
 
         /* Check password size */
-        if (qjobject["password"].toString().length() >= MP_MAX_PASSWORD_LENGTH-1)
+        if (qjobject["password"].toString().length() >= pMesProt->getPwdMaxLength()-1)
         {
             cb(false, "Couldn't import CSV file: " + qjobject["password"].toString() + " has longer than supported length");
             return;
@@ -6410,7 +6410,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
 
     connect(jobs, &AsyncJobs::finished, [this, creds, cb, cbProgress](const QByteArray &data)
     {
-        Q_UNUSED(data);
+        Q_UNUSED(data)
 
         /* Tag favorites */
         tagFavoriteNodes();
@@ -6452,6 +6452,14 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
                 /* To reuse setMMCredentials() we add the required fields */
                 qjobject["description"] = "imported from CSV";
                 qjobject["favorite"] = -1;
+
+                if (isBLE())
+                {
+                    qjobject["category"] = 0;
+                    const int DEFAULT_KEY_AFTER = 0xFFFF;
+                    qjobject["key_after_login"] = DEFAULT_KEY_AFTER;
+                    qjobject["key_after_pwd"] = DEFAULT_KEY_AFTER;
+                }
 
                 /* Try to find same service */
                 MPNode* parentPt = findNodeWithServiceInList(qjobject["service"].toString());
@@ -6498,7 +6506,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
 
     connect(jobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
     {
-        Q_UNUSED(failedJob);
+        Q_UNUSED(failedJob)
         qCritical() << "Setting device in MMM failed";
         exitMemMgmtMode(false);
         cb(false, "Couldn't Load Database, Please Approve Prompt On Device");

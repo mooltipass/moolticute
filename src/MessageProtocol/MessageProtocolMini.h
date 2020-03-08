@@ -43,10 +43,15 @@ public:
     uint getMaxFavorite() const override { return MOOLTIPASS_FAV_MAX; }
     int getCredentialPackageSize() const override { return CRED_PACKAGE_SIZE; }
 
+    int getLoginMaxLength() const override { return LOGIN_MAX_LENGTH; }
+    int getPwdMaxLength() const override { return PWD_MAX_LENGTH; }
+
     virtual void fillCommandMapping() override;
 
 private:
     static constexpr uint CRED_PACKAGE_SIZE = 6;
+    static constexpr int PWD_MAX_LENGTH = 32;
+    static constexpr int LOGIN_MAX_LENGTH = 63;
 };
 
 #endif // MESSAGEPROTOCOLMINI_H

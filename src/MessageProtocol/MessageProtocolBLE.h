@@ -50,6 +50,9 @@ public:
 
     int getCredentialPackageSize() const override { return CRED_PACKAGE_SIZE; }
 
+    int getLoginMaxLength() const override { return LOGIN_MAX_LENGTH; }
+    int getPwdMaxLength() const override { return PWD_MAX_LENGTH; }
+
 private:
     virtual void fillCommandMapping() override;
     int getStartingPayloadPosition(const QByteArray &data) const;
@@ -66,6 +69,8 @@ private:
     static constexpr quint8 FIRST_PAYLOAD_BYTE_PACKET = 2;
     static constexpr uint MAX_FAVORITE_NUM = 10;
     static constexpr uint CRED_PACKAGE_SIZE = 9;
+    static constexpr int PWD_MAX_LENGTH = 64;
+    static constexpr int LOGIN_MAX_LENGTH = 64;
 };
 
 #endif // MESSAGEPROTOCOLBLE_H
