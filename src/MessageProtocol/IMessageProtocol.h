@@ -188,6 +188,9 @@ public:
 
     virtual int getCredentialPackageSize() const = 0;
 
+    virtual int getLoginMaxLength() const = 0;
+    virtual int getPwdMaxLength() const = 0;
+
 
     QMap<quint16,quint16> m_commandMapping;
 };
