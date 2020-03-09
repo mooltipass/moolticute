@@ -39,11 +39,6 @@ UDEV_RULES_FILE_PATH="/etc/udev/rules.d/50-mooltipass.rules"
 
 function install_udev_rule()
 {
-    SUDO_BIN="sudo"
-    which kdesudo > /dev/null 2>&1 && SUDO_BIN="kdesudo"
-    which kdesu > /dev/null 2>&1 && SUDO_BIN="kdesu"
-    which gksudo > /dev/null 2>&1 && SUDO_BIN="gksudo"
-
     tmpfile=$(mktemp /tmp/mc-udev.XXXXXX)
     cat > "$tmpfile" <<- EOF
 ## File managed by Appimage, do not change
@@ -63,26 +58,12 @@ SUBSYSTEM=="usb", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="4321", MODE="0660"
 LABEL="mooltipass_end"
 EOF
 
-    chmod +r $tmpfile
-    SUDO_MSG="Allow Mooltipass Udev rules to be applied in your system?"
-    INSTALL_COMMAND="cp $tmpfile $UDEV_RULES_FILE_PATH && udevadm control --reload-rules"
+chmod +r $tmpfile
 
-    FILENAME=$(basename "$SUDO_BIN")
-    case "$FILENAME" in
-        'sudo')
-            echo "$SUDO_MSG"
-            $SUDO_BIN sh -c "$INSTALL_COMMAND"
-        ;;
-        'gksudo')
-            LD_LIBRARY_PATH="" $SUDO_BIN -m "$SUDO_MSG" "sh -c '$INSTALL_COMMAND'"
-        ;;
-        'kdesudo')
-            LD_LIBRARY_PATH="" $SUDO_BIN -i moolticute --comment "$SUDO_MSG" -c "$INSTALL_COMMAND"
-        ;;
-        'kdesu')
-            LD_LIBRARY_PATH="" $SUDO_BIN -c "$INSTALL_COMMAND" --noignorebutton
-        ;;
-    esac
+pkexec env DISPLAY="${DISPLAY}" XAUTHORITY="${XAUTHORITY}" sh << EOF
+cp "$tmpfile" "${UDEV_RULES_FILE_PATH}" && \
+    udevadm control --reload-rules
+EOF
 
     rm "$tmpfile"
 }
