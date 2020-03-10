@@ -36,11 +36,7 @@ Run mc-agent:
 ";
 
 UDEV_RULES_FILE_PATH="/etc/udev/rules.d/50-mooltipass.rules"
-
-function install_udev_rule()
-{
-    tmpfile=$(mktemp /tmp/mc-udev.XXXXXX)
-    cat > "$tmpfile" <<- EOF
+UDEV_RULE=="$(cat <<-EOF
 ## File managed by Appimage, do not change
 #version:2
 # udev rules for allowing console user(s) and hidraw access to Mooltipass Mini devices
@@ -57,6 +53,14 @@ SUBSYSTEM=="usb", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="4321", MODE="0660"
 
 LABEL="mooltipass_end"
 EOF
+)"
+
+function install_udev_rule()
+{
+    tmpfile=$(mktemp /tmp/mc-udev.XXXXXX)
+    cat > "$tmpfile" <<- EOF
+${UDEV_RULE}
+EOF
 
 chmod +r $tmpfile
 
@@ -70,7 +74,11 @@ EOF
 
 function check_udev_installed()
 {
-    grep -q "#version:2" $UDEV_RULES_FILE_PATH
+    if [ -f ${UDEV_RULES_FILE_PATH} ] && [ "x$UDEV_RULE" = "x$(cat ${UDEV_RULES_FILE_PATH})" ]
+    then
+        return 0
+    fi
+    return 1
 }
 
 SINGLE_EXE=""
