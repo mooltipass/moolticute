@@ -220,7 +220,7 @@ function create_beta_release_osx()
 {
     local VERSION="${1:?Release version required.}"
     local DMG_FILE="$(ls build/*.dmg 2> /dev/null | head -n 1)"
-    local MOOLTIPASSBETAIP="$getent ahostsv4 mooltipass-tests.com | awk '{print $1}' | head -1"
+    local MOOLTIPASSBETAIP="$(getent ahostsv4 mooltipass-tests.com | awk '{print $1}' | head -1)"
 
     >&2 echo -e "Creating (OSX) beta release (tag: $VERSION)"
     >&2 echo -e "DMG File: $DMG_FILE"
