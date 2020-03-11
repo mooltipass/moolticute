@@ -3,6 +3,7 @@ set -ev
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/../funcs.sh
+ping mooltipass-tests.com
 
 mkdir build
 pushd build
