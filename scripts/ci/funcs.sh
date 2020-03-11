@@ -226,7 +226,7 @@ function create_beta_release_osx()
 
     mkdir -p ~/.ssh
     ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
-    ssh-keyscan -p 54433 -H mooltipass-tests.com
+    ssh-keyscan -p 54433 -H mooltipass-tests.com -v
     cat ~/.ssh/known_hosts
     
     >&2 echo -e "Calling lftp..."
