@@ -220,7 +220,7 @@ function create_beta_release_osx()
 {
     local VERSION="${1:?Release version required.}"
     local DMG_FILE="$(ls build/*.dmg 2> /dev/null | head -n 1)"
-    local MOOLTIPASSBETAIP="$(dscacheutil -q host -a name mooltipass-tests.com | head -2 | awk '{print $2}' | head -1)"
+    local MOOLTIPASSBETAIP="$(dscacheutil -q host -a name mooltipass-tests.com | sed -n '2p' | awk '{print $2}')"
 
     >&2 echo -e "Creating (OSX) beta release (tag: $VERSION)"
     >&2 echo -e "DMG File: $DMG_FILE"
@@ -228,10 +228,6 @@ function create_beta_release_osx()
 
     mkdir -p ~/.ssh
     ssh-keyscan -p 54433 -H $MOOLTIPASSBETAIP >> ~/.ssh/known_hosts
-    dscacheutil -q host -a name mooltipass-tests.com
-    dscacheutil -q host -a name mooltipass-tests.com | head -2
-    dscacheutil -q host -a name mooltipass-tests.com | head -2 | awk '{print $2}'
-    dscacheutil -q host -a name mooltipass-tests.com | head -2 | awk '{print $2}' | head -1
     ssh-keyscan -p 54433 -H $MOOLTIPASSBETAIP -v
     cat ~/.ssh/known_hosts
     
