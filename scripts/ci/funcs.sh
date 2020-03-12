@@ -227,8 +227,8 @@ function create_beta_release_osx()
     >&2 echo -e "Mooltipass Tests IP: $MOOLTIPASSBETAIP"
 
     mkdir -p ~/.ssh
-    ssh-keyscan -p 54433 -H $MOOLTIPASSBETAIP >> ~/.ssh/known_hosts
-    ssh-keyscan -p 54433 -H $MOOLTIPASSBETAIP -v
+    ssh-keyscan -4 -p 54433 -H $MOOLTIPASSBETAIP >> ~/.ssh/known_hosts
+    ssh-keyscan -4 -p 54433 -H $MOOLTIPASSBETAIP -v
     cat ~/.ssh/known_hosts
     
     >&2 echo -e "Calling lftp..."
