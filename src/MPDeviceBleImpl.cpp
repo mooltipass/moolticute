@@ -658,6 +658,18 @@ void MPDeviceBleImpl::setNodeKeyAfterPwd(MPNode *node, int key)
     }
 }
 
+void MPDeviceBleImpl::setNodePwdBlankFlag(MPNode *node)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Setting password blank flag";
+        }
+        nodeBle->setPwdBlankFlag();
+    }
+}
+
 QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
 {
     QList<QByteArray> res;

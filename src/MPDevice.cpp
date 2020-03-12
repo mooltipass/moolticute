@@ -6616,6 +6616,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     bleImpl->setNodeCategory(newNodePt, category);
                     bleImpl->setNodeKeyAfterLogin(newNodePt, keyAfterLogin);
                     bleImpl->setNodeKeyAfterPwd(newNodePt, keyAfterPwd);
+                    bleImpl->setNodePwdBlankFlag(newNodePt);
                 }
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
