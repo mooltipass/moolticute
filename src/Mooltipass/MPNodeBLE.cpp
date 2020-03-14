@@ -199,6 +199,12 @@ void MPNodeBLE::setKeyAfterPwd(int key)
     }
 }
 
+int MPNodeBLE::getPwdBlankFlag() const
+{
+    if (!isValid()) return 0;
+    return data[PWD_BLANK_FLAG];
+}
+
 void MPNodeBLE::setPwdBlankFlag()
 {
     if (isValid())

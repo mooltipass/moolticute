@@ -33,6 +33,8 @@ public:
     void setkeyAfterLogin(int key);
     int keyAfterPwd() const;
     void setkeyAfterPwd(int key);
+    int pwdBlankFlag() const;
+    void setPwdBlankFlag(int flag);
     TreeItem *child(int iIndex);
     const QVector<TreeItem *> &childs() const;
     int childCount() const;
@@ -62,6 +64,7 @@ protected:
     int m_iCategory;
     int m_iKeyAfterLogin = 0xFFFF;
     int m_iKeyAfterPwd = 0xFFFF;
+    int m_iPwdBlankFlag = 0;
 };
 
 #endif // TREEITEM_H

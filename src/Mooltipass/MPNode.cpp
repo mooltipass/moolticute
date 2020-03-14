@@ -446,6 +446,7 @@ QJsonObject MPNode::toJson() const
             obj["category"] = QString::number(bleNode->getCategory());
             obj["key_after_login"] = QString::number(bleNode->getKeyAfterLogin());
             obj["key_after_pwd"] = QString::number(bleNode->getKeyAfterPwd());
+            obj["pwd_blank_flag"] = QString::number(bleNode->getPwdBlankFlag());
         }
     }
     else if (getType() == NodeChildData)

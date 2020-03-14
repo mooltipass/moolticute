@@ -35,6 +35,7 @@ public:
     void setKeyAfterLogin(int key);
     int getKeyAfterPwd() const;
     void setKeyAfterPwd(int key);
+    int getPwdBlankFlag() const;
     void setPwdBlankFlag();
 
     static constexpr int PARENT_NODE_LENGTH = 264;

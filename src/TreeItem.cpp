@@ -135,6 +135,16 @@ void TreeItem::setkeyAfterPwd(int key)
     m_iKeyAfterPwd = key;
 }
 
+int TreeItem::pwdBlankFlag() const
+{
+    return m_iPwdBlankFlag;
+}
+
+void TreeItem::setPwdBlankFlag(int flag)
+{
+    m_iPwdBlankFlag = flag;
+}
+
 const QVector<TreeItem *> &TreeItem::childs() const
 {
     return m_vChilds;
