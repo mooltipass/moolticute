@@ -664,6 +664,11 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
                 ui->pushButtonCancel->hide();
                 ui->pushButtonConfirm->hide();
 
+                if (wsClient->isMPBLE() && 0x00 != pLoginItem->pwdBlankFlag() && "" != pLoginItem->password())
+                {
+                    pLoginItem->setPwdBlankFlag(0);
+                }
+
                 enableNonCredentialEditWidgets();
             }
         }
@@ -840,6 +845,7 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
             ui->credDisplayPasswordInput->setLocked(pLoginItem->passwordLocked());
             if (wsClient->isMPBLE())
             {
+                ui->credDisplayPasswordInput->checkPwdBlankFlag(pLoginItem->pwdBlankFlag());
                 ui->credDisplayCategoryInput->setCurrentIndex(pLoginItem->category());
                 auto keyAfterLoginIdx = ui->credDisplayKeyAfterLoginInput->findData(pLoginItem->keyAfterLogin());
                 ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
