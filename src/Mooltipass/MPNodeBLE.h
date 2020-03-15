@@ -35,6 +35,8 @@ public:
     void setKeyAfterLogin(int key);
     int getKeyAfterPwd() const;
     void setKeyAfterPwd(int key);
+    int getPwdBlankFlag() const;
+    void setPwdBlankFlag();
 
     static constexpr int PARENT_NODE_LENGTH = 264;
     static constexpr int CHILD_NODE_LENGTH = 528;
@@ -53,7 +55,9 @@ protected:
     static constexpr int DATE_LASTUSED_ADDR_START = 10;
     static constexpr int KEY_AFTER_LOGIN_ADDR_START = 260;
     static constexpr int KEY_AFTER_PWD_ADDR_START = 262;
+    static constexpr int PWD_BLANK_FLAG = 266;
     static constexpr int KEY_AFTER_LENGTH = 2;
+    static constexpr char BLANK_CHAR = 0x01;
 };
 
 #endif // MPNODEBLE_H

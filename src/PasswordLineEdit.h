@@ -97,6 +97,7 @@ class LockedPasswordLineEdit : public PasswordLineEdit
 public:
     LockedPasswordLineEdit(QWidget* parent = nullptr);
     void setLocked(bool);
+    void checkPwdBlankFlag(int flag);
 
 Q_SIGNALS:
     void unlockRequested();

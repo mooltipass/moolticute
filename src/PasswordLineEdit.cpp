@@ -317,6 +317,18 @@ void LockedPasswordLineEdit::setLocked(bool locked)
     this->setReadOnly(m_locked);
 }
 
+void LockedPasswordLineEdit::checkPwdBlankFlag(int flag)
+{
+    if (0x00 != flag)
+    {
+        m_locked = false;
+        setText("");
+        setPlaceholderText(tr("Non-initialized password"));
+        setPasswordVisible(true);
+        setReadOnly(m_locked);
+    }
+}
+
 
 void PasswordOptionsPopup::generatePassword()
 {

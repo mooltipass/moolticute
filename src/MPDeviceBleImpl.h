@@ -101,6 +101,7 @@ public:
     void setNodeCategory(MPNode* node, int category);
     void setNodeKeyAfterLogin(MPNode* node, int key);
     void setNodeKeyAfterPwd(MPNode* node, int key);
+    void setNodePwdBlankFlag(MPNode* node);
 
     QList<QByteArray> getFavorites(const QByteArray& data);
 

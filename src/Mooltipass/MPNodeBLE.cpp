@@ -198,3 +198,17 @@ void MPNodeBLE::setKeyAfterPwd(int key)
         data[KEY_AFTER_PWD_ADDR_START+1] = keyArray[1];
     }
 }
+
+int MPNodeBLE::getPwdBlankFlag() const
+{
+    if (!isValid()) return 0;
+    return data[PWD_BLANK_FLAG];
+}
+
+void MPNodeBLE::setPwdBlankFlag()
+{
+    if (isValid())
+    {
+        data[PWD_BLANK_FLAG] = static_cast<char>(BLANK_CHAR);
+    }
+}

@@ -223,6 +223,7 @@ void CredentialModel::load(const QJsonArray &json)
                 pLoginItem->setCategory(cnode["category"].toVariant().toInt());
                 pLoginItem->setkeyAfterLogin(cnode["key_after_login"].toVariant().toInt());
                 pLoginItem->setkeyAfterPwd(cnode["key_after_pwd"].toVariant().toInt());
+                pLoginItem->setPwdBlankFlag(cnode["pwd_blank_flag"].toVariant().toInt());
             }
 
             QJsonArray a = cnode["address"].toArray();

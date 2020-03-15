@@ -97,6 +97,11 @@ bool LoginItem::passwordLocked() const
     return m_bPasswordLocked;
 }
 
+bool LoginItem::hasBlankPwdChanged() const
+{
+    return 0x00 != m_iPwdBlankFlag && !m_sPassword.isEmpty();
+}
+
 TreeItem::TreeType LoginItem::treeType() const
 {
     return Login;
