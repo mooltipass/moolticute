@@ -304,7 +304,11 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPa
     LoginItem *pLoginItem = getLoginItemByIndex(idx);
     if (pLoginItem != nullptr)
     {
-        updateLoginItem(idx, PasswordRole, sPassword);
+        if (!sPassword.isEmpty())
+        {
+            // Only update, when password is not empty (locked)
+            updateLoginItem(idx, PasswordRole, sPassword);
+        }
         updateLoginItem(idx, DescriptionRole, sDescription);
         updateLoginItem(idx, ItemNameRole, sName);
         if (DeviceDetector::instance().isBle())
