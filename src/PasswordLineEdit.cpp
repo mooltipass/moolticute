@@ -323,7 +323,7 @@ void LockedPasswordLineEdit::checkPwdBlankFlag(int flag)
     {
         m_locked = false;
         setText("");
-        setPlaceholderText("Non-initialized password");
+        setPlaceholderText(tr("Non-initialized password"));
         setPasswordVisible(true);
         setReadOnly(m_locked);
     }

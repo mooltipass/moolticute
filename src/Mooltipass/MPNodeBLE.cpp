@@ -209,6 +209,6 @@ void MPNodeBLE::setPwdBlankFlag()
 {
     if (isValid())
     {
-        data[PWD_BLANK_FLAG] = static_cast<char>(0x01);
+        data[PWD_BLANK_FLAG] = static_cast<char>(BLANK_CHAR);
     }
 }

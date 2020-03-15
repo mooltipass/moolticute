@@ -57,6 +57,7 @@ protected:
     static constexpr int KEY_AFTER_PWD_ADDR_START = 262;
     static constexpr int PWD_BLANK_FLAG = 266;
     static constexpr int KEY_AFTER_LENGTH = 2;
+    static constexpr char BLANK_CHAR = 0x01;
 };
 
 #endif // MPNODEBLE_H
