@@ -526,11 +526,13 @@ void AppGui::searchDaemonTick()
 #endif
     if (foundDaemon)
     {
+#ifndef Q_OS_UNIX
         //Force reopen connection, this prevents waiting for a timeout
         //before retrying the connection. On macOS the timeout being too long
         //the gui waits too much before reconnecting
         wsClient->closeWebsocket();
         wsClient->openWebsocket();
+#endif
 
         delete logSocket;
         logSocket = new QLocalSocket(this);
