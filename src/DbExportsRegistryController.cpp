@@ -146,8 +146,10 @@ void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool
 
 void DbExportsRegistryController::handleDeviceStatusChanged(const Common::MPStatus &status)
 {
-    if (status != Common::Unlocked)
+    if (status != Common::Unlocked && status != Common::MMMMode)
+    {
         handleCardIdChanged(QString(), -1, -1);
+    }
 }
 
 void DbExportsRegistryController::handleDeviceConnectedChanged(const bool &)

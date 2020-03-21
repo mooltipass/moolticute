@@ -12,9 +12,9 @@ DbExportsRegistry::DbExportsRegistry(const QString &settingsPath, QObject *paren
 
 void DbExportsRegistry::setCurrentCardDbMetadata(QString cardId, int credentialsDbChangeNumber, int dataDbChangeNumber)
 {
-    DbExportsRegistry::cardId = cardId;
-    DbExportsRegistry::credentialsDbChangeNumber = credentialsDbChangeNumber;
-    DbExportsRegistry::dataDbChangeNumber = dataDbChangeNumber;
+    this->cardId = cardId;
+    this->credentialsDbChangeNumber = credentialsDbChangeNumber;
+    this->dataDbChangeNumber = dataDbChangeNumber;
 
     checkIfDbMustBeExported();
 }
