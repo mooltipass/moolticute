@@ -5135,7 +5135,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     bool cpzFound = false;
     for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
     {
-        if (importedCpzCtrValue[i].mid(0, 8) == get_cardCPZ())
+        if (pMesProt->getCpzValue(importedCpzCtrValue[i]) == get_cardCPZ())
         {
             qDebug() << "Import file is a backup for current user";
             unknownCardAddPayload = importedCpzCtrValue[i];

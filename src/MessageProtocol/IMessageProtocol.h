@@ -191,8 +191,12 @@ public:
     virtual int getLoginMaxLength() const = 0;
     virtual int getPwdMaxLength() const = 0;
 
+    virtual QByteArray getCpzValue(const QByteArray &cpzCtr) const = 0;
+
 
     QMap<quint16,quint16> m_commandMapping;
+
+    static constexpr int CPZ_LENGTH = 8;
 };
 
 
