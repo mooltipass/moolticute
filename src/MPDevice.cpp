@@ -5195,6 +5195,11 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             readExportNodes(dataArray[EXPORT_WEBAUTHN_CHILD_NODES_INDEX].toArray(), EXPORT_WEBAUTHN_CHILD_NODES_INDEX);
 
             bleImpl->setImportUserCategories(dataArray[EXPORT_BLE_USER_CATEGORIES_INDEX].toObject());
+            qDebug() << "User security settings" << dataArray[EXPORT_SECURITY_SETTINGS_INDEX].toInt();
+            qDebug() << "User language: " << dataArray[EXPORT_USER_LANG_INDEX].toInt();
+            qDebug() << "Device language: " << dataArray[EXPORT_DEVICE_LANG_INDEX].toInt();
+            qDebug() << "BT layout: " << dataArray[EXPORT_BT_LAYOUT_INDEX].toInt();
+            qDebug() << "USB layout: " << dataArray[EXPORT_USB_LAYOUT_INDEX].toInt();
         }
     }
 
