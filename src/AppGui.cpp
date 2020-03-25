@@ -187,7 +187,7 @@ bool AppGui::initialize()
     connect(wsClient, &WSClient::statusChanged, this, &AppGui::updateSystrayTooltip);
     connect(wsClient, &WSClient::statusChanged, [this]()
     {
-        if (wsClient->get_status() == Common::UnkownSmartcad)
+        if (wsClient->get_status() == Common::UnknownSmartcard)
            mainWindowShow();
     });
 

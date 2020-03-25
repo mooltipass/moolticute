@@ -3546,7 +3546,7 @@ void MPDevice::processStatusChange(const QByteArray &data)
             QTimer::singleShot(10, this, &MPDevice::sendSetupDeviceMessages);
         }
 
-        if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
+        if ((s == Common::Unlocked) || (s == Common::UnknownSmartcard))
         {
             QTimer::singleShot(20, this, &MPDevice::getCurrentCardCPZ);
         }
@@ -7078,7 +7078,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
         /// We are here because the card is known by the export file and the export file is valid
 
         /* If we don't know this card, we need to add the CPZ CTR */
-        if (get_status() == Common::UnkownSmartcad)
+        if (get_status() == Common::UnknownSmartcard)
         {
             AsyncJobs* addcpzjobs = new AsyncJobs("Adding CPZ/CTR...", this);
 

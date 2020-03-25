@@ -74,7 +74,7 @@ QHash<Common::MPStatus, QString> Common::MPStatusUserString = {
     { Common::Error6, QObject::tr("Error 6 (should not happen)") },
     { Common::Error7, QObject::tr("Error 7 (should not happen)") },
     { Common::Error8, QObject::tr("Error 8 (should not happen)") },
-    { Common::UnkownSmartcad, QObject::tr("Unknown smartcard inserted") },
+    { Common::UnknownSmartcard, QObject::tr("Unknown smartcard inserted") },
     { Common::MMMMode, QObject::tr("Device in management mode") }
 };
 
@@ -89,7 +89,7 @@ QHash<Common::MPStatus, QString> Common::MPStatusString = {
     { Common::Error6, "Error6" },
     { Common::Error7, "Error7" },
     { Common::Error8, "Error8" },
-    { Common::UnkownSmartcad, "UnkownSmartcad" },
+    { Common::UnknownSmartcard, "UnknownSmartcard" },
     { Common::MMMMode, "MMMMode" }
 };
 

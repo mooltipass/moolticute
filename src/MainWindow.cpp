@@ -171,7 +171,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::statusChanged, [this](Common::MPStatus status)
     {
-        if (status == Common::UnkownSmartcad)
+        if (status == Common::UnknownSmartcard)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
 
         if (wsClient->isMPBLE())
@@ -603,7 +603,7 @@ void MainWindow::updateBackupControlsVisibility(bool visible)
 
 void MainWindow::updatePage()
 {
-    bool isCardUnknown = wsClient->get_status() == Common::UnkownSmartcad;
+    bool isCardUnknown = wsClient->get_status() == Common::UnknownSmartcard;
 
     ui->label_13->setVisible(!isCardUnknown);
     ui->label_14->setVisible(!isCardUnknown);
@@ -1332,7 +1332,7 @@ void MainWindow::updateTabButtons()
         setEnabledToAllTabButtons(false);
 
     // Enable or Disable tabs according to the device status
-    if (wsClient->get_status() == Common::UnkownSmartcad)
+    if (wsClient->get_status() == Common::UnknownSmartcard)
     {
         // Enable all tab buttons
         setEnabledToAllTabButtons(true);
