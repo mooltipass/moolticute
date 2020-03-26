@@ -316,7 +316,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::GET_STARTING_PARENT   , 0x0100},
         {MPCmd::SET_STARTING_PARENT   , 0x0105},
         {MPCmd::GET_CTRVALUE          , 0x0109},
-        {MPCmd::SET_CTRVALUE          , 0xCC},
+        {MPCmd::SET_CTRVALUE          , 0x010A},
         {MPCmd::ADD_CARD_CPZ_CTR      , 0xCD},
         {MPCmd::GET_CARD_CPZ_CTR      , 0x010E},
         {MPCmd::CARD_CPZ_CTR_PACKET   , 0xCF},

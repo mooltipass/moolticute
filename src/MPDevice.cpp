@@ -5144,6 +5144,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     }
 
     bool needToAddExistingUser = isBleExport && dataArray.size() >= EXPORT_USB_LAYOUT_INDEX && Common::UnknownSmartcard == get_status();
+    //Check export file if contains user datas
     if (needToAddExistingUser)
     {
         cpzFound = true;
@@ -7088,7 +7089,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
         /// We are here because the card is known by the export file and the export file is valid
 
         /* If we don't know this card, we need to add the CPZ CTR */
-        if (get_status() == Common::UnknownSmartcard)
+        if (get_status() == Common::UnknownSmartcard && !unknownCardAddPayload.isEmpty())
         {
             AsyncJobs* addcpzjobs = new AsyncJobs("Adding CPZ/CTR...", this);
 
