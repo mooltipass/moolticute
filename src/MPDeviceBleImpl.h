@@ -114,6 +114,8 @@ public:
     void appendLoginChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, Common::AddressType addrType);
     void generateExportData(QJsonArray& exportTopArray);
 
+    void fillAddUnknownCard(const QJsonArray& dataArray);
+
 signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);
