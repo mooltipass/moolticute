@@ -350,9 +350,11 @@ private:
     void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 
     // Crypto
+    quint64 getUInt64EncryptionKey(const QString &encryption);
     quint64 getUInt64EncryptionKey();
-    QString encryptSimpleCrypt(const QByteArray &data);
-    QByteArray decryptSimpleCrypt(const QString &payload);
+    quint64 getUInt64EncryptionKeyOld();
+    QString encryptSimpleCrypt(const QByteArray &data, const QString &encryption);
+    QByteArray decryptSimpleCrypt(const QString &payload, const QString &encryption);
 
     // Last page scanned
     quint16 lastFlashPageScanned = 0;

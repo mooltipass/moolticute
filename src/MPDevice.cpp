@@ -4656,28 +4656,51 @@ void MPDevice::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
     jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
 }
 
+quint64 MPDevice::getUInt64EncryptionKey(const QString &encryption)
+{
+    if (Common::SIMPLE_CRYPT_V2 == encryption)
+    {
+        return getUInt64EncryptionKey();
+    }
+
+    return getUInt64EncryptionKeyOld();
+}
+
 quint64 MPDevice::getUInt64EncryptionKey()
 {
-    qint64 key = 0;
+    quint64 key = 0;
     for (int i = 0; i < std::min(8, m_cardCPZ.size()) ; i ++)
-        key += (static_cast<unsigned int>(m_cardCPZ[i]) & 0xFF) << (i*8);
+    {
+        key += ((static_cast<quint64>(m_cardCPZ[i]) & 0xFF) << (i*8));
+    }
 
     return key;
 }
 
-QString MPDevice::encryptSimpleCrypt(const QByteArray &data)
+quint64 MPDevice::getUInt64EncryptionKeyOld()
+{
+    qint64 key = 0;
+    for (int i = 0; i < std::min(8, m_cardCPZ.size()) ; i ++)
+    {
+        key += (static_cast<unsigned int>(m_cardCPZ[i]) & 0xFF) << (i*8);
+    }
+
+    return key;
+}
+
+QString MPDevice::encryptSimpleCrypt(const QByteArray &data, const QString &encryption)
 {
     /* Encrypt payload */
     SimpleCrypt simpleCrypt;
-    simpleCrypt.setKey(getUInt64EncryptionKey());
+    simpleCrypt.setKey(getUInt64EncryptionKey(encryption));
 
     return simpleCrypt.encryptToString(data);
 }
 
-QByteArray MPDevice::decryptSimpleCrypt(const QString &payload)
+QByteArray MPDevice::decryptSimpleCrypt(const QString &payload, const QString &encryption)
 {
     SimpleCrypt simpleCrypt;
-    simpleCrypt.setKey(getUInt64EncryptionKey());
+    simpleCrypt.setKey(getUInt64EncryptionKey(encryption));
 
     return simpleCrypt.decryptToByteArray(payload);
 }
@@ -4952,13 +4975,20 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     /* Export file content */
     QJsonObject exportTopObject;
 
-    if (encryption == "SimpleCrypt") {
-        exportTopObject.insert("encryption", "SimpleCrypt");
-        exportTopObject.insert("payload", encryptSimpleCrypt(payload));
+    QString enc = encryption;
+    if (enc == Common::SIMPLE_CRYPT || enc == Common::SIMPLE_CRYPT_V2)
+    {
+        if (isBLE())
+        {
+            // For BLE using the new encryption
+            enc = Common::SIMPLE_CRYPT_V2;
+        }
+        exportTopObject.insert("encryption", enc);
+        exportTopObject.insert("payload", encryptSimpleCrypt(payload, enc));
     } else
     {
         // Fallback in case of an unknown encryption method where specified
-        qWarning() << "DB export: Unknown encryption " << encryption << "is asked, fallback to 'none'";
+        qWarning() << "DB export: Unknown encryption " << enc << "is asked, fallback to 'none'";
         exportTopObject.insert("encryption", "none");
         exportTopObject.insert("payload", QString(payload));
     }
@@ -5015,10 +5045,10 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
         if ( importFile.contains("encryption") && importFile.contains("payload") )
         {
             auto encryptionMethod = importFile.value("encryption").toString();
-            if ( encryptionMethod == "SimpleCrypt")
+            if ( encryptionMethod == Common::SIMPLE_CRYPT || encryptionMethod == Common::SIMPLE_CRYPT_V2 )
             {
                 QString payload = importFile.value("payload").toString();
-                auto decryptedData = decryptSimpleCrypt(payload);
+                auto decryptedData = decryptSimpleCrypt(payload, encryptionMethod);
 
                 QJsonDocument decryptedDocument = QJsonDocument::fromJson(decryptedData);
                 if (decryptedDocument.isArray())
@@ -5151,6 +5181,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     }
     else if (isBleExport)
     {
+        // Prevent ADD_UNKNOWN_CARD message
         unknownCardAddPayload.clear();
     }
 

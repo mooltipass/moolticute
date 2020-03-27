@@ -118,6 +118,8 @@ static QList<QLocalSocket *> debugLogClients;
 static Common::GuiLogCallback guiLogCallback = [](const QByteArray &) {};
 static QByteArray startingDaemonBuffer;
 const QString Common::ISODateWithMsFormat = "yyyy-MM-ddTHH:mm:ss.zzz";
+const QString Common::SIMPLE_CRYPT = "SimpleCrypt";
+const QString Common::SIMPLE_CRYPT_V2 = "SimpleCryptV2";
 
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {

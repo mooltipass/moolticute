@@ -1129,7 +1129,7 @@ void MainWindow::on_pushButtonExportFile_clicked()
     if (ui->checkBoxExport->isChecked())
         wsClient->exportDbFile("none");
     else
-        wsClient->exportDbFile("SimpleCrypt");
+        wsClient->exportDbFile(Common::SIMPLE_CRYPT);
 
     // one-time connection, must be disconected immediately in the slot
     connect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);

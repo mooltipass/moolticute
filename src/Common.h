@@ -288,6 +288,8 @@ public:
     };
 
     static const QString ISODateWithMsFormat;
+    static const QString SIMPLE_CRYPT;
+    static const QString SIMPLE_CRYPT_V2;
 };
 
 enum class DeviceType
