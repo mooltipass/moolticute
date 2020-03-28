@@ -233,9 +233,8 @@ protected:
         EXPORT_WEBAUTHN_CHILD_NODES_INDEX = 17,
         EXPORT_SECURITY_SETTINGS_INDEX = 18,
         EXPORT_USER_LANG_INDEX = 19,
-        EXPORT_DEVICE_LANG_INDEX = 20,
-        EXPORT_BT_LAYOUT_INDEX = 21,
-        EXPORT_USB_LAYOUT_INDEX = 22
+        EXPORT_BT_LAYOUT_INDEX = 20,
+        EXPORT_USB_LAYOUT_INDEX = 21
     };
 
 signals:
@@ -468,7 +467,7 @@ protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
     static constexpr int MP_EXPORT_FIELD_NUM = 10;
     static constexpr int MC_EXPORT_FIELD_NUM = 14;
-    static constexpr int BLE_EXPORT_FIELD_NUM = 23;
+    static constexpr int BLE_EXPORT_FIELD_MIN_NUM = 18;
 
     static constexpr int RESET_SEND_DELAY = 300;
     static constexpr int INIT_STARTING_DELAY = RESET_SEND_DELAY + 150;

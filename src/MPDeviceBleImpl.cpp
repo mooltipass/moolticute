@@ -859,7 +859,6 @@ void MPDeviceBleImpl::generateExportData(QJsonArray &exportTopArray)
     exportTopArray.append(QJsonValue(m_currentUserSettings));
     auto* bleSettings = static_cast<DeviceSettingsBLE*>(mpDev->settings());
     exportTopArray.append(QJsonValue(bleSettings->get_user_language()));
-    exportTopArray.append(QJsonValue(bleSettings->get_device_language()));
     exportTopArray.append(QJsonValue(bleSettings->get_keyboard_bt_layout()));
     exportTopArray.append(QJsonValue(bleSettings->get_keyboard_usb_layout()));
 }
