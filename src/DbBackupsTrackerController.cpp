@@ -160,7 +160,7 @@ void DbBackupsTrackerController::askForExportBackup()
 
 void DbBackupsTrackerController::exportDbBackup()
 {
-    QString format = "SimpleCrypt";
+    QString format = Common::SIMPLE_CRYPT;
 
     window->wantExportDatabase();
 

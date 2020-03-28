@@ -864,17 +864,18 @@ void MPDeviceBleImpl::generateExportData(QJsonArray &exportTopArray)
     exportTopArray.append(QJsonValue(bleSettings->get_keyboard_usb_layout()));
 }
 
+void MPDeviceBleImpl::addUnknownCardPayload(const QJsonValue &val)
+{
+    mpDev->unknownCardAddPayload.append(toChar(val));
+    mpDev->unknownCardAddPayload.append(ZERO_BYTE);
+}
+
 void MPDeviceBleImpl::fillAddUnknownCard(const QJsonArray &dataArray)
 {
-    auto toChar = [](QJsonValue val) { return static_cast<char>(val.toInt()); };
-    mpDev->unknownCardAddPayload.append(toChar(dataArray[MPDevice::EXPORT_SECURITY_SETTINGS_INDEX]));
-    mpDev->unknownCardAddPayload.append(ZERO_BYTE);
-    mpDev->unknownCardAddPayload.append(toChar(dataArray[MPDevice::EXPORT_USER_LANG_INDEX]));
-    mpDev->unknownCardAddPayload.append(ZERO_BYTE);
-    mpDev->unknownCardAddPayload.append(toChar(dataArray[MPDevice::EXPORT_BT_LAYOUT_INDEX]));
-    mpDev->unknownCardAddPayload.append(ZERO_BYTE);
-    mpDev->unknownCardAddPayload.append(toChar(dataArray[MPDevice::EXPORT_USB_LAYOUT_INDEX]));
-    mpDev->unknownCardAddPayload.append(ZERO_BYTE);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_SECURITY_SETTINGS_INDEX]);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_USER_LANG_INDEX]);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_BT_LAYOUT_INDEX]);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_USB_LAYOUT_INDEX]);
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()

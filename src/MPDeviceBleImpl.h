@@ -114,6 +114,8 @@ public:
     void appendLoginChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, Common::AddressType addrType);
     void generateExportData(QJsonArray& exportTopArray);
 
+    static char toChar(const QJsonValue &val) { return static_cast<char>(val.toInt()); }
+    void addUnknownCardPayload(const QJsonValue &val);
     void fillAddUnknownCard(const QJsonArray& dataArray);
 
 signals:
