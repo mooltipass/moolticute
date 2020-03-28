@@ -194,7 +194,7 @@ public:
         Error6 = 6,
         Error7 = 7,
         Error8 = 8,
-        UnkownSmartcad = 9,
+        UnknownSmartcard = 9,
         MMMMode = 21
     } MPStatus;
     static QHash<MPStatus, QString> MPStatusUserString, MPStatusString;
@@ -288,6 +288,8 @@ public:
     };
 
     static const QString ISODateWithMsFormat;
+    static const QString SIMPLE_CRYPT;
+    static const QString SIMPLE_CRYPT_V2;
 };
 
 enum class DeviceType

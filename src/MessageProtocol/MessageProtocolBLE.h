@@ -53,6 +53,8 @@ public:
     int getLoginMaxLength() const override { return LOGIN_MAX_LENGTH; }
     int getPwdMaxLength() const override { return PWD_MAX_LENGTH; }
 
+    QByteArray getCpzValue(const QByteArray &cpzCtr) const override { return cpzCtr.mid(CPZ_START, CPZ_LENGTH); }
+
 private:
     virtual void fillCommandMapping() override;
     int getStartingPayloadPosition(const QByteArray &data) const;
@@ -71,6 +73,7 @@ private:
     static constexpr uint CRED_PACKAGE_SIZE = 9;
     static constexpr int PWD_MAX_LENGTH = 64;
     static constexpr int LOGIN_MAX_LENGTH = 64;
+    static constexpr int CPZ_START = 2;
 };
 
 #endif // MESSAGEPROTOCOLBLE_H

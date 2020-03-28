@@ -3,6 +3,7 @@
 #include "MessageProtocolBLE.h"
 #include "MPNodeBLE.h"
 #include "AppDaemon.h"
+#include "DeviceSettingsBLE.h"
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),
@@ -855,6 +856,25 @@ void MPDeviceBleImpl::generateExportData(QJsonArray &exportTopArray)
         nodeQJsonArray.append(QJsonValue(nodeObject));
     }
     exportTopArray.append(QJsonValue(nodeQJsonArray));
+    exportTopArray.append(QJsonValue(m_currentUserSettings));
+    auto* bleSettings = static_cast<DeviceSettingsBLE*>(mpDev->settings());
+    exportTopArray.append(QJsonValue(bleSettings->get_user_language()));
+    exportTopArray.append(QJsonValue(bleSettings->get_keyboard_bt_layout()));
+    exportTopArray.append(QJsonValue(bleSettings->get_keyboard_usb_layout()));
+}
+
+void MPDeviceBleImpl::addUnknownCardPayload(const QJsonValue &val)
+{
+    mpDev->unknownCardAddPayload.append(toChar(val));
+    mpDev->unknownCardAddPayload.append(ZERO_BYTE);
+}
+
+void MPDeviceBleImpl::fillAddUnknownCard(const QJsonArray &dataArray)
+{
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_SECURITY_SETTINGS_INDEX]);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_USER_LANG_INDEX]);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_BT_LAYOUT_INDEX]);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_USB_LAYOUT_INDEX]);
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()
