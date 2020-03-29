@@ -164,6 +164,7 @@ void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
 
 void MPManager::usbDeviceRemoved(QString path)
 {
+    bool isMpDisconnected = false;
     auto it = devices.find(path);
     if (it != devices.end())
     {
@@ -171,12 +172,18 @@ void MPManager::usbDeviceRemoved(QString path)
         emit mpDisconnected(it.value());
         delete it.value();
         devices.remove(path);
+        isMpDisconnected = true;
     }
     else
     {
         qDebug() << path << " is not connected.";
     }
-    checkUsbDevices();
+
+    if (isMpDisconnected && devices.isEmpty())
+    {
+        qDebug() << "Check if other MP device is connected ";
+        checkUsbDevices();
+    }
 }
 
 MPDevice* MPManager::getDevice(int at)
