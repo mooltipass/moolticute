@@ -3528,7 +3528,7 @@ void MPDevice::processStatusChange(const QByteArray &data)
     Common::MPStatus s = pMesProt->getStatus(data);
     Common::MPStatus prevStatus = get_status();
 
-    if (isBLE())
+    if (isBLE() && pMesProt->getMessageSize(data) >= 4)
     {
         bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
     }

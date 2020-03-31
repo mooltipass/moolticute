@@ -57,6 +57,7 @@ mac {
 
 SOURCES += src/main_daemon.cpp \
     src/MPDevice.cpp \
+    src/MPDevice_localSocket.cpp \
     src/MPManager.cpp \
     src/Common.cpp \
     src/WSServer.cpp \
@@ -88,6 +89,7 @@ SOURCES += src/main_daemon.cpp \
 HEADERS  += \
     src/Common.h \
     src/MPDevice.h \
+    src/MPDevice_localSocket.h \
     src/MPManager.h \
     src/MooltipassCmds.h \
     src/QtHelper.h \
