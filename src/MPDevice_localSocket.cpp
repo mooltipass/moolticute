@@ -77,7 +77,6 @@ MPDevice_localSocket::MPDevice_localSocket(QObject *parent, const MPLocalDef & d
         connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
 
     setupMessageProtocol();
-    sendInitMessages();
 }
 
 MPDevice_localSocket::~MPDevice_localSocket()

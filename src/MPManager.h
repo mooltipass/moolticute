@@ -64,6 +64,8 @@ private:
     MPManager();
 
     void checkUsbDevices();
+    void checkLocalSocketDevice();
+    bool isLocalSocketDeviceConnected();
     bool isBLEConnectedWithUsb();
 
     QHash<QString, MPDevice *> devices;

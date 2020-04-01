@@ -215,6 +215,10 @@ void MPManager::checkUsbDevices()
 
     if (devlist.isEmpty() && !AppDaemon::isEmulationMode())
     {
+        if (isLocalSocketDeviceConnected())
+        {
+            return;
+        }
         //No USB devices found, means all MPs are gone disconnected
         qDebug() << "Disconnecting devices";
         auto it = devices.begin();
@@ -225,6 +229,8 @@ void MPManager::checkUsbDevices()
             it++;
         }
         devices.clear();
+        checkLocalSocketDevice();
+        return;
     }
 
 #if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
@@ -275,24 +281,6 @@ void MPManager::checkUsbDevices()
             }
             detectedDevs.append(def.id);
         }
-
-        QList<MPLocalDef> local_devlist = MPDevice_localSocket::enumerateDevices();
-        for (const MPLocalDef &def : local_devlist)
-        {
-            //This is a new connected mooltipass
-            if (!devices.contains(def.id))
-            {
-                MPDevice *device = new MPDevice_localSocket(this, def);
-
-                devices[def.id] = device;
-                emit mpConnected(device);
-            }
-            else
-            {
-                qDebug() << "Device is already connected: " << def.id;
-            }
-            detectedDevs.append(def.id);
-        }
     }
     //Clear disconnected devices
     auto it = devices.begin();
@@ -308,6 +296,40 @@ void MPManager::checkUsbDevices()
         else
             it++;
     }
+}
+
+void MPManager::checkLocalSocketDevice()
+{
+    QList<MPLocalDef> local_devlist = MPDevice_localSocket::enumerateDevices();
+    for (const MPLocalDef &def : local_devlist)
+    {
+        //This is a new connected mooltipass
+        if (!devices.contains(def.id))
+        {
+            MPDevice *device = new MPDevice_localSocket(this, def);
+
+            devices[def.id] = device;
+            emit mpConnected(device);
+        }
+        else
+        {
+            qDebug() << "Device is already connected: " << def.id;
+        }
+    }
+}
+
+bool MPManager::isLocalSocketDeviceConnected()
+{
+    auto it = std::find_if(devices.begin(), devices.end(),
+         [](MPDevice *dev)
+        {
+            if (dynamic_cast<MPDevice_localSocket*>(dev))
+            {
+                return true;
+            }
+            return false;
+        });
+    return it != devices.end();
 }
 
 bool MPManager::isBLEConnectedWithUsb()
