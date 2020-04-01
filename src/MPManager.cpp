@@ -141,6 +141,12 @@ void MPManager::usbDeviceAdded(QString path)
 #if defined(Q_OS_LINUX)
 void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
 {
+    if (isBLE && isLocalSocketDeviceConnected())
+    {
+        qDebug() << "BLE device is connected, emulator disconnecting";
+        disconnectingDevices();
+    }
+
     if (devices.empty())
     {
         if (isBLE && isBLEConnectedWithUsb())
@@ -220,15 +226,7 @@ void MPManager::checkUsbDevices()
             return;
         }
         //No USB devices found, means all MPs are gone disconnected
-        qDebug() << "Disconnecting devices";
-        auto it = devices.begin();
-        while (it != devices.end())
-        {
-            emit mpDisconnected(it.value());
-            delete it.value();
-            it++;
-        }
-        devices.clear();
+        disconnectingDevices();
         checkLocalSocketDevice();
         return;
     }
@@ -336,5 +334,18 @@ bool MPManager::isBLEConnectedWithUsb()
 {
     return std::find_if(devices.begin(), devices.end(),
               [](MPDevice * dev){ return dev->isBLE();})
-            != devices.end();
+    != devices.end();
+}
+
+void MPManager::disconnectingDevices()
+{
+    qDebug() << "Disconnecting devices";
+    auto it = devices.begin();
+    while (it != devices.end())
+    {
+        emit mpDisconnected(it.value());
+        delete it.value();
+        it++;
+    }
+    devices.clear();
 }
