@@ -37,6 +37,7 @@ void MPDeviceLocalMonitor::acceptIncomingConnection()
         QString id = QString::number(++nextId);
         connect(newSocket, SIGNAL(disconnected()), this, SLOT(connectionLost()));
         sockets[id] = newSocket;
+        emulatorRunning = true;
         emit localDeviceAdded(id);
     }
 }
@@ -44,6 +45,7 @@ void MPDeviceLocalMonitor::acceptIncomingConnection()
 void MPDeviceLocalMonitor::connectionLost()
 {
     auto socket = static_cast<QLocalSocket*>(sender());
+    emulatorRunning = false;
 
     // this is not the greatest way to search for the socket, but realistically this map will only have one entry
     for(auto it = sockets.begin(); it != sockets.end(); ++it) {

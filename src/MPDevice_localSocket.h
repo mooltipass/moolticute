@@ -48,6 +48,7 @@ private:
     QMap<QString, QLocalSocket *> sockets;
 
     int nextId = 0;
+    bool emulatorRunning = false;
 };
 
 class MPDevice_localSocket: public MPDevice
@@ -66,6 +67,8 @@ public:
     static QList<MPLocalDef> enumerateDevices() {
         return MonitorInstance()->enumerateDevices();
     }
+
+    bool isEmulatorRunning() const { return MonitorInstance()->emulatorRunning; }
 
 private slots:
     void readData();

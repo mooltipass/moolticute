@@ -322,7 +322,8 @@ bool MPManager::isLocalSocketDeviceConnected()
     auto it = std::find_if(devices.begin(), devices.end(),
          [](MPDevice *dev)
         {
-            if (dynamic_cast<MPDevice_localSocket*>(dev))
+            auto* localDev = dynamic_cast<MPDevice_localSocket*>(dev);
+            if (localDev && localDev->isEmulatorRunning())
             {
                 return true;
             }
