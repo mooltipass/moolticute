@@ -57,6 +57,7 @@ private slots:
     void mpRemoved(MPDevice *device);
 
     void originAuthenticationRequired(QWebSocketCorsAuthenticator *authenticator);
+    void sendNotification(QString message);
 
 private:
     WSServer();

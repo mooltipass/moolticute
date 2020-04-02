@@ -50,6 +50,7 @@ public:
 signals:
     void mpConnected(MPDevice *device);
     void mpDisconnected(MPDevice *device);
+    void sendNotification(QString message);
 
 private slots:
     void usbDeviceAdded();

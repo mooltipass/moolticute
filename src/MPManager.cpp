@@ -144,6 +144,7 @@ void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
     if (isBLE && isLocalSocketDeviceConnected())
     {
         qDebug() << "BLE device is connected, emulator disconnecting";
+        emit sendNotification("show_emulator_disconnect");
         disconnectingDevices();
     }
 
