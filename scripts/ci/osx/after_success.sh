@@ -12,7 +12,7 @@ source $SCRIPTDIR/../funcs.sh
 VERSION="$(get_version .)"
 
 #Only build if the commit we are building is for the last tag
-if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
+if [ "$(git rev-list -n 1 $VERSION)" != "$(git rev-parse HEAD)"  ]; then
     echo "Not uploading package"
     exit 0
 fi
@@ -80,9 +80,20 @@ echo "Verifying code signed app"
 codesign --verify --verbose=4 build/$APP.app
 spctl --assess --verbose=4 --raw build/$APP.app
 
-#install https://github.com/al45tair/dmgbuild
-pip install dmgbuild
-dmgbuild -s mac/settings.py "Moolticute" build/$APP-$VERSION.dmg
+#install https://github.com/andreyvit/create-dmg
+brew install create-dmg
+
+create-dmg \
+    --volname "$APP" \
+    --volicon "img/AppIcon.icns" \
+    --background "img/dmg_background.png" \
+    --window-pos 100 100 \
+    --window-size 640 480 \
+    --icon-size 128 \
+    --icon "$APP.app" 192 344 \
+    --app-drop-link 448 344 \
+    build/$APP-$VERSION.dmg \
+    build/$APP.app
 
 #sign dmg
 codesign --force --verify --verbose --sign "$ID" build/$APP-$VERSION.dmg

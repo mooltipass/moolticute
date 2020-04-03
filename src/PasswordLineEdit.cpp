@@ -84,12 +84,30 @@ void PasswordLineEdit::setPasswordProfilesModel(PasswordProfilesModel *passwordP
         m_passwordOptionsPopup->setPasswordProfilesModel(passwordProfilesModel);
 }
 
+void PasswordLineEdit::setMaxPasswordLength(int length)
+{
+    setMaxLength(length);
+    if(m_passwordOptionsPopup)
+    {
+        m_passwordOptionsPopup->setMaxPasswordLength(length);
+        m_passwordMaxLength = INVALID_LENGTH;
+    }
+    else
+    {
+        m_passwordMaxLength = length;
+    }
+}
+
 void PasswordLineEdit::showPasswordOptions()
 {
     if (!m_passwordOptionsPopup)
     {
         m_passwordOptionsPopup = new PasswordOptionsPopup(this);
         m_passwordOptionsPopup->setPasswordProfilesModel(m_passwordProfilesModel);
+        if (INVALID_LENGTH != m_passwordMaxLength)
+        {
+            m_passwordOptionsPopup->setMaxPasswordLength(m_passwordMaxLength);
+        }
         connect(m_passwordOptionsPopup, &PasswordOptionsPopup::passwordGenerated,
                 this, &QLineEdit::setText);
         connect(m_passwordOptionsPopup, &PasswordOptionsPopup::passwordGenerated,
@@ -237,6 +255,11 @@ void PasswordOptionsPopup::setPasswordProfilesModel(PasswordProfilesModel *passw
     m_passwordProfileCMB->setModel(passwordProfilesModel);
 }
 
+void PasswordOptionsPopup::setMaxPasswordLength(int length)
+{
+    m_lengthSlider->setMaximum(length);
+}
+
 void PasswordOptionsPopup::updatePasswordLength(int length)
 {
     m_sliderLengthLabel->setText(tr("Length: %1 ").arg(length));
@@ -292,6 +315,18 @@ void LockedPasswordLineEdit::setLocked(bool locked)
     else
         setPasswordVisible(true);
     this->setReadOnly(m_locked);
+}
+
+void LockedPasswordLineEdit::checkPwdBlankFlag(int flag)
+{
+    if (0x00 != flag)
+    {
+        m_locked = false;
+        setText("");
+        setPlaceholderText(tr("Non-initialized password"));
+        setPasswordVisible(true);
+        setReadOnly(m_locked);
+    }
 }
 
 

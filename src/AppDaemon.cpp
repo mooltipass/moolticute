@@ -32,6 +32,7 @@ AppDaemon::AppDaemon(int &argc, char **argv):
     QAPP(argc, argv),
     sharedMem("moolticute")
 {
+    Common::setIsDaemon(true);
 }
 
 bool AppDaemon::initialize()
@@ -46,9 +47,10 @@ bool AppDaemon::initialize()
     QCoreApplication::setOrganizationDomain("themooltipass.com");
     QCoreApplication::setApplicationName("moolticute");
 
+    qInfo() << "------------------------------------";
     qInfo() << "Moolticute Daemon version: " << APP_VERSION;
-    qInfo() << "(c) 2016 Raoul Hecky";
-    qInfo() << "https://github.com/raoulh/moolticute";
+    qInfo() << "(c) The Mooltipass Team";
+    qInfo() << "https://github.com/mooltipass/moolticute";
     qInfo() << "------------------------------------";
 
 #ifdef Q_OS_MAC
@@ -108,6 +110,10 @@ bool AppDaemon::initialize()
                                        QCoreApplication::translate("main", "port"));
     parser.addOption(debugHttpServer);
 
+    QCommandLineOption debugDevOption(QStringList() << "l" << "debug-log",
+                                      QCoreApplication::translate("main", "Enable full dev debug log"));
+    parser.addOption(debugDevOption);
+
     parser.process(qApp->arguments());
 
     emulationMode = parser.isSet(emulMode);
@@ -127,6 +133,9 @@ bool AppDaemon::initialize()
             return false;
         }
     }
+
+    if (parser.isSet(debugDevOption))
+        debugDevEnabled = true;
 
     //Install and start mp manager instance and ws server
     if (!WSServer::Instance()->initialize())
@@ -161,4 +170,10 @@ QHostAddress AppDaemon::getListenAddress()
         return QHostAddress::Any;
 
     return QHostAddress::LocalHost;
+}
+
+bool AppDaemon::isDebugDev()
+{
+    auto daemon = dynamic_cast<AppDaemon *>(qApp);
+    return daemon->debugDevEnabled;
 }

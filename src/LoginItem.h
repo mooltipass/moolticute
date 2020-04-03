@@ -24,6 +24,7 @@ public:
     QJsonObject toJson() const;
     void setPasswordLocked(bool bVisible);
     bool passwordLocked() const;
+    bool hasBlankPwdChanged() const;
     virtual TreeType treeType()  const Q_DECL_OVERRIDE;
 private:    
     QByteArray m_bAddress;

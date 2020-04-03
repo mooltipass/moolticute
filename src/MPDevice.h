@@ -31,6 +31,7 @@
 
 using MPCommandCb = std::function<void(bool success, const QByteArray &data, bool &done)>;
 using MPDeviceProgressCb = std::function<void(const QVariantMap &data)>;
+using NodeList = QList<MPNode *>;
 /* Example usage of the above function
  * MPDeviceProgressCb cb;
  * QVariantMap progressData = { {"total", 100},
@@ -98,6 +99,8 @@ public:
 
     void getUID(const QByteArray & key);
 
+    void processStatusChange(const QByteArray &data);
+
     //mem mgmt mode
     //cbFailure is used to propagate an error to clients when entering mmm
     void startMemMgmtMode(bool wantData,
@@ -112,9 +115,6 @@ public:
 
     //Get database change numbers
     void getChangeNumbers();
-
-    //Get current card CPZ
-    void getCurrentCardCPZ();
 
     //Ask a password for specified service/login to MP
     void getCredential(QString service, const QString &login, const QString &fallback_service, const QString &reqid,
@@ -187,8 +187,8 @@ public:
     IMessageProtocol* getMesProt() const;
 
     //After successfull mem mgmt mode, clients can query data
-    QList<MPNode *> &getLoginNodes() { return loginNodes; }
-    QList<MPNode *> &getDataNodes() { return dataNodes; }
+    NodeList &getLoginNodes() { return loginNodes; }
+    NodeList &getDataNodes() { return dataNodes; }
 
     //true if device is a mini
     inline bool isMini() const { return DeviceType::MINI == deviceType; }
@@ -208,6 +208,35 @@ public:
     void updateFileInCache(QString fileName, int size);
     void removeFileFromCache(QString fileName);
 
+    void loadParams() { pSettings->loadParameters(); }
+
+protected:
+    enum ExportPayloadData
+    {
+        EXPORT_CTR_INDEX = 0,
+        EXPORT_CPZ_CTR_INDEX = 1,
+        EXPORT_STARTING_PARENT_INDEX = 2,
+        EXPORT_DATA_STARTING_PARENT_INDEX = 3,
+        EXPORT_FAVORITES_INDEX = 4,
+        EXPORT_SERVICE_NODES_INDEX = 5,
+        EXPORT_SERVICE_CHILD_NODES_INDEX = 6,
+        EXPORT_MC_SERVICE_NODES_INDEX = 7,
+        EXPORT_MC_SERVICE_CHILD_NODES_INDEX = 8,
+        EXPORT_DEVICE_VERSION_INDEX = 9,
+        EXPORT_BUNDLE_VERSION_INDEX = 10,
+        EXPORT_CRED_CHANGE_NUMBER_INDEX = 11,
+        EXPORT_DATA_CHANGE_NUMBER_INDEX = 12,
+        EXPORT_DB_MINI_SERIAL_NUM_INDEX = 13,
+        EXPORT_IS_BLE_INDEX = 14,
+        EXPORT_BLE_USER_CATEGORIES_INDEX = 15,
+        EXPORT_WEBAUTHN_NODES_INDEX = 16,
+        EXPORT_WEBAUTHN_CHILD_NODES_INDEX = 17,
+        EXPORT_SECURITY_SETTINGS_INDEX = 18,
+        EXPORT_USER_LANG_INDEX = 19,
+        EXPORT_BT_LAYOUT_INDEX = 20,
+        EXPORT_USB_LAYOUT_INDEX = 21
+    };
+
 signals:
     /* Signal emited by platform code when new data comes from MP */
     /* A signal is used for platform code that uses a dedicated thread */
@@ -223,6 +252,12 @@ private slots:
     void commandFailed();
     void sendDataDequeue(); //execute commands from the command queue
     void runAndDequeueJobs(); //execute AsyncJobs from the jobs queues
+    void resetFlipBit();
+
+    //Get current card CPZ
+    void getCurrentCardCPZ();
+    void sendSetupDeviceMessages();
+    void handleDeviceUnlocked();
 
 
 private:
@@ -230,11 +265,13 @@ private:
     virtual void platformRead() {}
 
     /* Platform function for writing data, should be implemented in platform class */
-    virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data); }
+    virtual void platformWrite(const QByteArray &data) { Q_UNUSED(data) }
 
+    void addTimerJob(int msec);
     void loadLoginNode(AsyncJobs *jobs, const QByteArray &address,
-                       const MPDeviceProgressCb &cbProgress);
-    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address);
+                       const MPDeviceProgressCb &cbProgress, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone,
+                            const QByteArray &address, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
                       const MPDeviceProgressCb &cbProgress);
     void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress, quint32 nbBytesFetched);
@@ -255,39 +292,44 @@ private:
 
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds);
-    MPNode *findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr = 0);
+    MPNode *findNodeWithAddressInList(NodeList list, const QByteArray &address, const quint32 virt_addr = 0);
     MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
     void startImportFileMerging(const MPDeviceProgressCb &progressCb, MessageHandlerCb cb, bool noDelete);
+    bool checkImportedLoginNodes(const MessageHandlerCb &cb, Common::AddressType addrType);
+    bool checkImportedDataNodes(const MessageHandlerCb &cb);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress);
     void incrementNeededAddresses(MPNode::NodeType type);
-    MPNode *findNodeWithAddressWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr);
-    MPNode *findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QString& name);
-    MPNode *findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent);
+    MPNode *findNodeWithAddressWithGivenParentInList(NodeList list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr);
+    MPNode *findNodeWithLoginWithGivenParentInList(NodeList list,  MPNode *parent, const QString& name);
+    MPNode *findNodeWithNameInList(NodeList list, const QString& name, bool isParent);
     void deletePossibleFavorite(QByteArray parentAddr, QByteArray childAddr);
     bool finishImportFileMerging(QString &stringError, bool noDelete);
+    bool finishImportLoginNodes(QString &stringError, Common::AddressType addrType);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
-    MPNode *findNodeWithServiceInList(const QString &service);
+    MPNode *findNodeWithServiceInList(const QString &service, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     QByteArray getMemoryFirstNodeAddress(void);
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
-    void detagPointedNodes(void);
+    void detagPointedNodes(Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool tagFavoriteNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
-    bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren);
+    bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed);
-    bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed);
-    bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent);
-    bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent);
+    void checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::AddressType addrType);
+    bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
+    void readExportNodes(QJsonArray &&nodes, ExportPayloadData id);
     bool readExportPayload(QJsonArray dataArray, QString &errorString);
-    bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList);
-    bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt);
+    bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool deleteDataParentChilds(MPNode *parentNodePt);
-    MPNode* addNewServiceToDB(const QString &service);
-    bool addOrphanChildToDB(MPNode* childNodePt);
+    MPNode* addNewServiceToDB(const QString &service, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    bool addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     QByteArray generateExportFileData(const QString &encryption = "none");
     void cleanImportedVars(void);
     void cleanMMMVars(void);
@@ -297,17 +339,21 @@ private:
 
     // Generate save packets
     bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, const MPDeviceProgressCb &cbProgress);
+    bool checkModifiedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType);
+    bool checkRemovedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType);
 
     QByteArray getFreeAddress(quint32 virtualAddr);
     // once we fetched free addresses, this function is called
-    void changeVirtualAddressesToFreeAddresses(void);
+    void changeVirtualAddressesToFreeAddresses();
 
     void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 
     // Crypto
+    quint64 getUInt64EncryptionKey(const QString &encryption);
     quint64 getUInt64EncryptionKey();
-    QString encryptSimpleCrypt(const QByteArray &data);
-    QByteArray decryptSimpleCrypt(const QString &payload);
+    quint64 getUInt64EncryptionKeyOld();
+    QString encryptSimpleCrypt(const QByteArray &data, const QString &encryption);
+    QByteArray decryptSimpleCrypt(const QString &payload, const QString &encryption);
 
     // Last page scanned
     quint16 lastFlashPageScanned = 0;
@@ -337,16 +383,16 @@ private:
 
     // Values loaded when needed (e.g. mem mgmt mode)
     QByteArray ctrValue;
-    QByteArray startNode;
-    quint32 virtualStartNode = 0;
+    QVector<QByteArray> startNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
+    QVector<quint32> virtualStartNode = {0, 0};
     QByteArray startDataNode = MPNode::EmptyAddress;
     quint32 virtualDataStartNode = 0;
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
-    QList<MPNode *> loginNodes;         //list of all parent nodes for credentials
-    QList<MPNode *> loginChildNodes;    //list of all parent nodes for credentials
-    QList<MPNode *> dataNodes;          //list of all parent nodes for data nodes
-    QList<MPNode *> dataChildNodes;     //list of all parent nodes for data nodes
+    NodeList loginNodes;         //list of all parent nodes for credentials
+    NodeList loginChildNodes;    //list of all parent nodes for credentials
+    NodeList dataNodes;          //list of all parent nodes for data nodes
+    NodeList dataChildNodes;     //list of all parent nodes for data nodes
 
     // Payload to send when we need to add an unknown card
     QByteArray unknownCardAddPayload;
@@ -355,14 +401,14 @@ private:
     quint32 credentialsDbChangeNumberClone;
     quint32 dataDbChangeNumberClone;
     QByteArray ctrValueClone;
-    QByteArray startNodeClone;
+    QVector<QByteArray> startNodeClone = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     QByteArray startDataNodeClone = MPNode::EmptyAddress;
     QList<QByteArray> cpzCtrValueClone;
     QList<QByteArray> favoritesAddrsClone;
-    QList<MPNode *> loginNodesClone;         //list of all parent nodes for credentials
-    QList<MPNode *> loginChildNodesClone;    //list of all parent nodes for credentials
-    QList<MPNode *> dataNodesClone;          //list of all parent nodes for data nodes
-    QList<MPNode *> dataChildNodesClone;     //list of all parent nodes for data nodes
+    NodeList loginNodesClone;         //list of all parent nodes for credentials
+    NodeList loginChildNodesClone;    //list of all parent nodes for credentials
+    NodeList dataNodesClone;          //list of all parent nodes for data nodes
+    NodeList dataChildNodesClone;     //list of all parent nodes for data nodes
 
     // Imported values
     bool isMooltiAppImportFile;
@@ -372,15 +418,23 @@ private:
     quint32 importedDbMiniSerialNumber;
     QByteArray importedCtrValue;
     QByteArray importedStartNode;
-    quint32 importedVirtualStartNode;
     QByteArray importedStartDataNode;
-    quint32 importedVirtualDataStartNode;
     QList<QByteArray> importedCpzCtrValue;
     QList<QByteArray> importedFavoritesAddrs;
-    QList<MPNode *> importedLoginNodes;         //list of all parent nodes for credentials
-    QList<MPNode *> importedLoginChildNodes;    //list of all parent nodes for credentials
-    QList<MPNode *> importedDataNodes;          //list of all parent nodes for data nodes
-    QList<MPNode *> importedDataChildNodes;     //list of all parent nodes for data nodes
+    NodeList importedLoginNodes;         //list of all parent nodes for credentials
+    NodeList importedLoginChildNodes;    //list of all parent nodes for credentials
+    NodeList importedDataNodes;          //list of all parent nodes for data nodes
+    NodeList importedDataChildNodes;     //list of all parent nodes for data nodes
+    NodeList importedWebauthnLoginNodes;         //list of all parent nodes for credentials
+    NodeList importedWebauthnLoginChildNodes;    //list of all parent nodes for credentials
+    QMap<ExportPayloadData, NodeList*> importNodeMap;
+
+    //WebAuthn datas
+    NodeList webAuthnLoginNodes;
+    NodeList webAuthnLoginNodesClone;
+    NodeList webAuthnLoginChildNodes;
+    NodeList webAuthnLoginChildNodesClone;
+
 
     bool isFw12Flag = false;            // true if fw is at least v1.2
 
@@ -413,26 +467,12 @@ protected:
     DeviceType deviceType = DeviceType::MOOLTIPASS;
     static constexpr int MP_EXPORT_FIELD_NUM = 10;
     static constexpr int MC_EXPORT_FIELD_NUM = 14;
-    static constexpr int BLE_EXPORT_FIELD_NUM = 16;
-    enum ExportPayloadData
-    {
-        EXPORT_CTR_INDEX = 0,
-        EXPORT_CPZ_CTR_INDEX = 1,
-        EXPORT_STARTING_PARENT_INDEX = 2,
-        EXPORT_DATA_STARTING_PARENT_INDEX = 3,
-        EXPORT_FAVORITES_INDEX = 4,
-        EXPORT_SERVICE_NODES_INDEX = 5,
-        EXPORT_SERVICE_CHILD_NODES_INDEX = 6,
-        EXPORT_MC_SERVICE_NODES_INDEX = 7,
-        EXPORT_MC_SERVICE_CHILD_NODES_INDEX = 8,
-        EXPORT_DEVICE_VERSION_INDEX = 9,
-        EXPORT_BUNDLE_VERSION_INDEX = 10,
-        EXPORT_CRED_CHANGE_NUMBER_INDEX = 11,
-        EXPORT_DATA_CHANGE_NUMBER_INDEX = 12,
-        EXPORT_DB_MINI_SERIAL_NUM_INDEX = 13,
-        EXPORT_IS_BLE_INDEX = 14,
-        EXPORT_BLE_USER_CATEGORIES_INDEX = 15
-    };
+    static constexpr int BLE_EXPORT_FIELD_MIN_NUM = 18;
+
+    static constexpr int RESET_SEND_DELAY = 300;
+    static constexpr int INIT_STARTING_DELAY = RESET_SEND_DELAY + 150;
+    static constexpr int STATUS_STARTING_DELAY = RESET_SEND_DELAY + 500;
+    static constexpr int CATEGORY_FETCH_DELAY = 5000;
 };
 
 #endif // MPDEVICE_H

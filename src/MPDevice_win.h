@@ -94,6 +94,7 @@ signals:
 private slots:
     void ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLAPPED *overlapped);
     void writeDataFinished();
+    void openPathRetry();
 
 private:
     virtual void platformRead();
@@ -114,9 +115,11 @@ private:
     OVERLAPPED readOverlapped;
     QWinOverlappedIoNotifier *oNotifier;
 	
-	QQueue<QByteArray> m_writeQueue;
+    QQueue<QByteArray> m_writeQueue;
+    QQueue<char*> m_writeBufferQueue;
 
     const static QString BT_GATT_SERVICE_GUID;
+    const static QString MC_COMMS_ID;
     const static char ZERO_BYTE = static_cast<char>(0x00);
 };
 

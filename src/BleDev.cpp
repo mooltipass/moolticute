@@ -9,7 +9,6 @@ BleDev::BleDev(QWidget *parent) :
     ui(new Ui::BleDev)
 {
     ui->setupUi(this);
-    ui->label_bundleText->setMaximumWidth(ui->label_bundleText->sizeHint().width());
     QVariantMap whiteButtons = {{ "color", QColor(Qt::white) },
                                 { "color-selected", QColor(Qt::white) },
                                 { "color-active", QColor(Qt::white) }};
@@ -22,7 +21,11 @@ BleDev::BleDev(QWidget *parent) :
     ui->progressBarUpload->hide();
     ui->label_UploadProgress->hide();
 
+#ifdef Q_OS_WIN
+    ui->btnFileBrowser->setMinimumWidth(140);
+#endif
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
+    ui->btnUpdatePlatform->setIcon(AppGui::qtAwesome()->icon(fa::upload, whiteButtons));
     ui->btnFetchDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
     ui->progressBarFetchData->setVisible(false);
     ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
@@ -62,13 +65,6 @@ void BleDev::initUITexts()
     ui->label_BLEDesc->setText(tr("BLE description"));
 
     ui->groupBoxUploadBundle->setTitle(tr("Bundle Settings"));
-    ui->label_bundleText->setText(tr("Select Bundle File:"));
-    ui->btnFileBrowser->setText(browseText);
-    const auto flashText = tr("Flash");
-    ui->label_ReflashAuxMCU->setText(tr("Flash Aux MCU:"));
-    ui->btnReflashAuxMCU->setText(flashText);
-    ui->label_FlashMainMCU->setText(tr("Flash Main MCU:"));
-    ui->btnFlashMainMCU->setText(flashText);
 
     ui->groupBoxPlatInfo->setTitle(tr("Platform informations"));
     ui->label_AuxMCUMaj->setText(tr("Aux MCU major:"));
@@ -180,15 +176,7 @@ void BleDev::displayUploadBundleResultReceived(bool success)
     }
 }
 
-void BleDev::on_btnReflashAuxMCU_clicked()
-{
-    wsClient->sendFlashMCU("aux");
-}
 
-void BleDev::on_btnFlashMainMCU_clicked()
-{
-    wsClient->sendFlashMCU("main");
-}
 
 void BleDev::updateProgress(int total, int curr, QString msg)
 {
@@ -234,4 +222,9 @@ void BleDev::on_btnFetchAccData_clicked()
 void BleDev::on_btnFetchRandomData_clicked()
 {
     fetchData(Common::FetchType::RANDOM_BYTES);
+}
+
+void BleDev::on_btnUpdatePlatform_clicked()
+{
+    wsClient->sendFlashMCU();
 }

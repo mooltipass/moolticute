@@ -22,6 +22,7 @@
 #include "DbMasterController.h"
 #include "PromptWidget.h"
 #include "SystemNotifications/SystemNotification.h"
+#include "DeviceDetector.h"
 
 #ifdef Q_OS_WIN
 #include "SystemNotifications/SystemNotificationWindows.h"
@@ -73,6 +74,12 @@ bool AppGui::initialize()
         }
     });
 
+    qInfo() << "------------------------------------";
+    qInfo() << "Moolticute Gui version: " << APP_VERSION;
+    qInfo() << "(c) The Mooltipass Team";
+    qInfo() << "https://github.com/mooltipass/moolticute";
+    qInfo() << "------------------------------------";
+
     setupLanguage();
 
     QSimpleUpdater::getInstance();
@@ -80,6 +87,7 @@ bool AppGui::initialize()
 #ifdef Q_OS_WIN
     SystemNotification::instance();
 #endif
+    DeviceDetector::instance();
 
     setQuitOnLastWindowClosed(false);
 
@@ -168,6 +176,9 @@ bool AppGui::initialize()
 #else
         Q_UNUSED(this)
         Q_UNUSED(reason)
+#if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
+        mainWindowShow();
+#endif
 #endif
     });
 
@@ -176,9 +187,13 @@ bool AppGui::initialize()
     connect(wsClient, &WSClient::statusChanged, this, &AppGui::updateSystrayTooltip);
     connect(wsClient, &WSClient::statusChanged, [this]()
     {
-        if (wsClient->get_status() == Common::UnkownSmartcad)
+        if (wsClient->get_status() == Common::UnknownSmartcard)
            mainWindowShow();
     });
+
+    resetLastNotificationStatus();
+    connect(wsClient, &WSClient::statusChanged, this, &AppGui::resetLastNotificationStatus);
+    connect(wsClient, &WSClient::connectedChanged, this, &AppGui::resetLastNotificationStatus);
 
     connect(wsClient, &WSClient::displayStatusWarning, this, &AppGui::displayStatusWarningNotification);
 
@@ -197,8 +212,12 @@ bool AppGui::initialize()
     daemonProcess = new QProcess(this);
     QString program = QCoreApplication::applicationDirPath () + "/moolticuted";
     QStringList arguments;
-    // TODO handle Debug arguments
-    //arguments << "-e" <<  "-s 8080";
+
+    if (s.value("settings/enable_dev_log").toBool())
+        arguments << "-l";
+    if (s.value("settings/http_dev_server").toBool())
+        arguments << "-s 8484";
+
     qInfo() << "Running " << program << " " << arguments;
 
     connect(daemonProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
@@ -215,9 +234,7 @@ bool AppGui::initialize()
         {
             QTimer::singleShot(1500, [=]()
             {
-                QStringList args = arguments;
-                args << "-s 8484";
-                daemonProcess->start(program, args);
+                daemonProcess->start(program, arguments);
             });
             needRestart = false;
         }
@@ -359,6 +376,7 @@ void AppGui::connectedChanged()
         icon.setIsMask(true);
 #endif
         systray->setIcon(icon);
+        updateSystrayTooltip();
     }
 }
 
@@ -508,11 +526,13 @@ void AppGui::searchDaemonTick()
 #endif
     if (foundDaemon)
     {
+#ifndef Q_OS_UNIX
         //Force reopen connection, this prevents waiting for a timeout
         //before retrying the connection. On macOS the timeout being too long
         //the gui waits too much before reconnecting
         wsClient->closeWebsocket();
         wsClient->openWebsocket();
+#endif
 
         delete logSocket;
         logSocket = new QLocalSocket(this);
@@ -628,12 +648,10 @@ void AppGui::updateAvailableReceived(QString version, QString changesetURL)
 void AppGui::displayStatusWarningNotification()
 {
     const auto actStatus = wsClient->get_status();
-    //Init with Error8, because it is not used
-    static Common::MPStatus lastStatus = Common::Error8;
 
-    if (actStatus != lastStatus)
+    if (actStatus != m_lastNotificationStatus)
     {
-        lastStatus = actStatus;
+        m_lastNotificationStatus = actStatus;
         QString title, message;
         if (actStatus == Common::UnknownStatus)
         {
@@ -663,6 +681,12 @@ void AppGui::displayStatusWarningNotification()
     }
 }
 
+void AppGui::resetLastNotificationStatus()
+{
+    //Reset with Error8, because it is not used
+    m_lastNotificationStatus = Common::Error8;
+}
+
 QtAwesome *AppGui::qtAwesome()
 {
     static QtAwesome *a = new QtAwesome(qApp);
@@ -689,7 +713,6 @@ void AppGui::restartDaemon()
         QTimer::singleShot(1500, [=]()
         {
             QStringList args = daemonProcess->arguments();
-            args << "-s 8484";
             daemonProcess->start(daemonProcess->program(), args);
         });
     }

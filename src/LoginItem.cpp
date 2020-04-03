@@ -5,6 +5,7 @@
 // Application
 #include "LoginItem.h"
 #include "ServiceItem.h"
+#include "DeviceDetector.h"
 
 LoginItem::LoginItem(const QString &sLoginName) : TreeItem(sLoginName),
     m_iFavorite(-1), m_sPassword(""), m_sPasswordOrig(""), m_bPasswordLocked(true)
@@ -69,12 +70,21 @@ QJsonObject LoginItem::toJson() const
     }
 
     QString service = (m_pParentItem != nullptr) ? m_pParentItem->name() : "";
-    return {{ "service", service },
-            { "login", m_sName },
-            { "password", p },
-            { "description", m_sDescription },
-            { "address", addr },
-            { "favorite", m_iFavorite }};
+    QJsonObject ret = {{ "service", service },
+                       { "login", m_sName },
+                       { "password", p },
+                       { "description", m_sDescription },
+                       { "address", addr },
+                       { "favorite", m_iFavorite }
+               };
+
+    if (DeviceDetector::instance().isBle())
+    {
+        ret.insert("category", m_iCategory);
+        ret.insert("key_after_login", m_iKeyAfterLogin);
+        ret.insert("key_after_pwd", m_iKeyAfterPwd);
+    }
+    return ret;
 }
 
 void LoginItem::setPasswordLocked(bool bLocked)
@@ -85,6 +95,11 @@ void LoginItem::setPasswordLocked(bool bLocked)
 bool LoginItem::passwordLocked() const
 {
     return m_bPasswordLocked;
+}
+
+bool LoginItem::hasBlankPwdChanged() const
+{
+    return 0x00 != m_iPwdBlankFlag && !m_sPassword.isEmpty();
 }
 
 TreeItem::TreeType LoginItem::treeType() const

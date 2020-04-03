@@ -26,9 +26,16 @@
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
 #include "SettingsGuiHelper.h"
+#include "DeviceDetector.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
+
+const QString MainWindow::NONE_STRING = tr("None");
+const QString MainWindow::TAB_STRING = tr("Tab");
+const QString MainWindow::ENTER_STRING = tr("Enter");
+const QString MainWindow::SPACE_STRING = tr("Space");
+const QString MainWindow::DEFAULT_KEY_STRING = tr("Default Key");
 
 void MainWindow::initHelpLabels()
 {
@@ -152,7 +159,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::wsDisconnected, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::connectedChanged, this, &MainWindow::updatePage);
     connect(wsClient, &WSClient::statusChanged, this, &MainWindow::updatePage);
-    connect(wsClient, &WSClient::deviceConnacted, this, &MainWindow::onDeviceConnected);
+    connect(wsClient, &WSClient::deviceConnected, this, &MainWindow::onDeviceConnected);
     connect(wsClient, &WSClient::deviceDisconnected, this, &MainWindow::onDeviceDisconnected);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &MainWindow::enableCredentialsManagement);
@@ -162,11 +169,35 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->widgetFiles, &FilesManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
 
-    connect(wsClient, &WSClient::statusChanged, [this]()
+    connect(wsClient, &WSClient::statusChanged, [this](Common::MPStatus status)
     {
-        this->enableKnockSettings(wsClient->get_status() == Common::NoCardInserted);
-        if (wsClient->get_status() == Common::UnkownSmartcad)
+        if (status == Common::UnknownSmartcard)
             ui->stackedWidget->setCurrentWidget(ui->pageSync);
+
+        if (wsClient->isMPBLE())
+        {
+            if (Common::Unlocked == status)
+            {
+                ui->settings_user_language->show();
+                ui->settings_bt_layout->show();
+                ui->settings_usb_layout->show();
+                wsClient->sendLoadParams();
+            }
+            else
+            {
+                ui->settings_user_language->hide();
+                ui->settings_bt_layout->hide();
+                ui->settings_usb_layout->hide();
+            }
+        }
+        else
+        {
+            enableKnockSettings(status == Common::NoCardInserted);
+            if (Common::Unlocked == status)
+            {
+                wsClient->settingsHelper()->resetSettings();
+            }
+        }
     });
 
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
@@ -253,12 +284,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxKnock->addItem(tr("Low"), 1);
     ui->comboBoxKnock->addItem(tr("Medium"), 2);
     ui->comboBoxKnock->addItem(tr("High"), 3);
-    ui->comboBoxLoginOutput->addItem(tr("Tab"), 43);
-    ui->comboBoxLoginOutput->addItem(tr("Enter"), 40);
-    ui->comboBoxLoginOutput->addItem(tr("Space"), 44);
-    ui->comboBoxPasswordOutput->addItem(tr("Tab"), 43);
-    ui->comboBoxPasswordOutput->addItem(tr("Enter"), 40);
-    ui->comboBoxPasswordOutput->addItem(tr("Space"), 44);
 
     // Close behavior
 #ifdef Q_OS_MAC
@@ -330,7 +355,12 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->cbStoragePrompt->setDisabled(true);
     ui->cbAdvancedMenu->setDisabled(true);
     ui->cbBluetoothEnabled->setDisabled(true);
-    ui->cbCredentialPrompt->setDisabled(true);
+    ui->cbKnockDisabled->setDisabled(true);
+
+    connect(wsClient, &WSClient::advancedMenuChanged,
+            &DeviceDetector::instance(), &DeviceDetector::onAdvancedModeChanged);
+    connect(wsClient, &WSClient::advancedMenuChanged, this, &MainWindow::handleAdvancedModeChange);
+    handleAdvancedModeChange(wsClient->get_advancedMenu());
 
     connect(wsClient, &WSClient::updateUserSettingsOnUI,
             [this](const QJsonObject& settings)
@@ -342,8 +372,31 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->cbAdvancedMenu->setChecked(advancedMenu);
                 wsClient->set_advancedMenu(advancedMenu);
                 ui->cbBluetoothEnabled->setChecked(settings["bluetooth_enabled"].toBool());
-                ui->cbCredentialPrompt->setChecked(settings["storage_prompt"].toBool());
+                ui->cbKnockDisabled->setChecked(settings["knock_disabled"].toBool());
             });
+
+    connect(wsClient, &WSClient::updateBLEDeviceLanguage,
+            [this](const QJsonObject& langs)
+            {
+                if (shouldUpdateItems(m_languagesCache, langs))
+                {
+                    updateBLEComboboxItems(ui->comboBoxDeviceLang, langs);
+                    updateBLEComboboxItems(ui->comboBoxUserLanguage, langs);
+                }
+            }
+    );
+    connect(wsClient, &WSClient::updateBLEKeyboardLayout,
+            [this](const QJsonObject& layouts)
+            {
+                if (shouldUpdateItems(m_keyboardLayoutCache, layouts))
+                {
+                    updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
+                    updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
+                }
+                wsClient->settingsHelper()->resetSettings();
+            }
+    );
+
 
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
@@ -355,7 +408,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         {
             ui->groupBox_Information->hide();
         }
-        onDeviceConnected();
+        updateDeviceDependentUI();
     });
 
     connect(wsClient, &WSClient::fwVersionChanged, wsClient->settingsHelper(), &SettingsGuiHelper::checkKeyboardLayout);
@@ -433,6 +486,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
     wsClient->settingsHelper()->setMainWindow(this);
+#ifdef Q_OS_WIN
+    const auto keyboardLayoutWidth = 150;
+    ui->comboBoxBtLayout->setMinimumWidth(keyboardLayoutWidth);
+    ui->comboBoxUsbLayout->setMinimumWidth(keyboardLayoutWidth);
+#endif
 
     //Setup the confirm view
     ui->widgetSpin->setPixmap(AppGui::qtAwesome()->icon(fa::circleonotch).pixmap(QSize(80, 80)));
@@ -462,6 +520,12 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     // Restore geometry and state from last session.
     restoreGeometry(s.value("MainWindow/geometry").toByteArray());
     restoreState(s.value("MainWindow/windowState").toByteArray());
+
+    ui->checkBoxDebugHttp->setChecked(s.value("settings/http_dev_server").toBool());
+    ui->checkBoxDebugLog->setChecked(s.value("settings/enable_dev_log").toBool());
+#ifdef Q_OS_MAC
+    resize(width(), MAC_DEFAULT_HEIGHT);
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -509,6 +573,24 @@ void MainWindow::changeEvent(QEvent *event)
     QMainWindow::changeEvent(event);
 }
 
+void MainWindow::updateDeviceDependentUI()
+{
+    wsClient->settingsHelper()->createSettingUIMapping();
+    if (wsClient->isMPBLE())
+    {
+        if (wsClient->get_advancedMenu())
+        {
+            ui->groupBox_UserSettings->show();
+        }
+        ui->pushButtonFiles->hide();
+    }
+    else
+    {
+        ui->groupBox_UserSettings->hide();
+        ui->pushButtonFiles->show();
+    }
+}
+
 void MainWindow::updateBackupControlsVisibility(bool visible)
 {
     ui->label_backupControlsTitle->setVisible(visible);
@@ -521,7 +603,7 @@ void MainWindow::updateBackupControlsVisibility(bool visible)
 
 void MainWindow::updatePage()
 {
-    bool isCardUnknown = wsClient->get_status() == Common::UnkownSmartcad;
+    bool isCardUnknown = wsClient->get_status() == Common::UnknownSmartcard;
 
     ui->label_13->setVisible(!isCardUnknown);
     ui->label_14->setVisible(!isCardUnknown);
@@ -530,10 +612,11 @@ void MainWindow::updatePage()
     ui->label_exportDBHelp->setVisible(!isCardUnknown);
     ui->label_MooltiAppHelp->setVisible(!isCardUnknown);
 
-    ui->label_27->setVisible(!isCardUnknown);
-    ui->label_29->setVisible(!isCardUnknown);
-    ui->pushButtonIntegrity->setVisible(!isCardUnknown);
-    ui->label_integrityCheckHelp->setVisible(!isCardUnknown);
+    const bool integrityVisible = !isCardUnknown&& !wsClient->isMPBLE();
+    ui->label_integrityCheck->setVisible(integrityVisible);
+    ui->label_integrityCheckDesc->setVisible(integrityVisible);
+    ui->pushButtonIntegrity->setVisible(integrityVisible);
+    ui->label_integrityCheckHelp->setVisible(integrityVisible);
 
     ui->groupBox_ResetCard->setVisible(isCardUnknown);
 
@@ -1030,6 +1113,11 @@ bool MainWindow::isHttpDebugChecked()
     return ui->checkBoxDebugHttp->isChecked();
 }
 
+bool MainWindow::isDebugLogChecked()
+{
+    return ui->checkBoxDebugLog->isChecked();
+}
+
 void MainWindow::on_checkBoxSSHAgent_stateChanged(int)
 {
     QSettings s;
@@ -1041,7 +1129,7 @@ void MainWindow::on_pushButtonExportFile_clicked()
     if (ui->checkBoxExport->isChecked())
         wsClient->exportDbFile("none");
     else
-        wsClient->exportDbFile("SimpleCrypt");
+        wsClient->exportDbFile(Common::SIMPLE_CRYPT);
 
     // one-time connection, must be disconected immediately in the slot
     connect(wsClient, &WSClient::dbExported, this, &MainWindow::dbExported);
@@ -1105,9 +1193,14 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
 #endif
             QFile f(fname);
             if (!f.open(QFile::WriteOnly | QFile::Truncate))
+            {
                 QMessageBox::warning(this, tr("Error"), tr("Unable to write to file %1").arg(fname));
+            }
             else
+            {
                 f.write(d);
+                QMessageBox::information(this, tr("Moolticute"), tr("Successfully exported the database from your device."));
+            }
             f.close();
 
             s.setValue("last_used_path/export_dir", QFileInfo(fname).canonicalPath());
@@ -1239,7 +1332,7 @@ void MainWindow::updateTabButtons()
         setEnabledToAllTabButtons(false);
 
     // Enable or Disable tabs according to the device status
-    if (wsClient->get_status() == Common::UnkownSmartcad)
+    if (wsClient->get_status() == Common::UnknownSmartcard)
     {
         // Enable all tab buttons
         setEnabledToAllTabButtons(true);
@@ -1364,6 +1457,31 @@ void MainWindow::displayMCUVersion(bool visible)
     ui->labelAboutMainMCU->setVisible(visible);
     ui->labelAboutMainMCUValue->setVisible(visible);
     ui->labelAboutMainMCUValue->setText(wsClient->get_mainMCUVersion());
+}
+
+void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)
+{
+    cb->clear();
+    for (auto it = items.begin(); it != items.end(); ++it)
+    {
+        cb->addItem(it.key(), it.value().toInt());
+    }
+    QSortFilterProxyModel* proxy = new QSortFilterProxyModel(cb);
+    proxy->setSourceModel( cb->model());
+    cb->model()->setParent(proxy);
+    cb->setModel(proxy);
+    cb->model()->sort(0);
+}
+
+bool MainWindow::shouldUpdateItems(QJsonObject &cache, const QJsonObject &received)
+{
+    if (cache == received)
+    {
+        return false;
+    }
+
+    cache = received;
+    return true;
 }
 
 void MainWindow::on_toolButton_clearBackupFilePath_released()
@@ -1576,19 +1694,40 @@ void MainWindow::on_pushButtonGetAvailableUsers_clicked()
 
 void MainWindow::onDeviceConnected()
 {
-    wsClient->settingsHelper()->createSettingUIMapping();
     if (wsClient->isMPBLE())
     {
         wsClient->sendUserSettingsRequest();
+    }
+    updateDeviceDependentUI();
+}
+
+void MainWindow::onDeviceDisconnected()
+{
+    ui->groupBox_UserSettings->hide();
+    wsClient->set_cardId("");
+    ui->lineEdit_dbBackupFilePath->setText("");
+}
+
+void MainWindow::on_checkBoxDebugHttp_stateChanged(int)
+{
+    QSettings s;
+    s.setValue("settings/http_dev_server", isHttpDebugChecked());
+}
+
+void MainWindow::on_checkBoxDebugLog_stateChanged(int)
+{
+    QSettings s;
+    s.setValue("settings/enable_dev_log", isDebugLogChecked());
+}
+
+void MainWindow::handleAdvancedModeChange(bool isEnabled)
+{
+    if (isEnabled)
+    {
         ui->groupBox_UserSettings->show();
     }
     else
     {
         ui->groupBox_UserSettings->hide();
     }
-}
-
-void MainWindow::onDeviceDisconnected()
-{
-    ui->groupBox_UserSettings->hide();
 }

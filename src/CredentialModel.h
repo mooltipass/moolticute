@@ -27,7 +27,10 @@ public:
         DescriptionRole,
         DateUpdatedRole,
         DateAccessedRole,
-        FavoriteRole
+        FavoriteRole,
+        CategoryRole,
+        KeyAfterLoginRole,
+        KeyAfterPwdRole
     };
 
     CredentialModel(QObject *parent=nullptr);
@@ -45,18 +48,24 @@ public:
     void addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription="");
     bool removeCredential(const QModelIndex &idx);
     TreeItem *getItemByIndex(const QModelIndex &idx) const;
-    void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName);
+    void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat, int iLoginKey, int iPwdKey);
     void updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue);
     void clear();
     QModelIndex getServiceIndexByName(const QString &sServiceName, int column = 0) const;
     LoginItem *getLoginItemByIndex(const QModelIndex &idx) const;
     ServiceItem *getServiceItemByIndex(const QModelIndex &idx) const;
+    QString getCategoryName(int catId) const;
+    void updateCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
+    bool isUserCategoryClean() const { return m_categoryClean; }
+    void setUserCategoryClean(bool clean) { m_categoryClean = clean; }
 
 private:
     ServiceItem *addService(const QString &sServiceName);
 
 private:
     RootItem *m_pRootItem;
+    QList<QString> m_categories{tr("Default category"), "", "", "", ""};
+    bool m_categoryClean = false;
 
 signals:
     void modelLoaded(bool bClearLoginDescription);

@@ -74,7 +74,8 @@ QHash<Common::MPStatus, QString> Common::MPStatusUserString = {
     { Common::Error6, QObject::tr("Error 6 (should not happen)") },
     { Common::Error7, QObject::tr("Error 7 (should not happen)") },
     { Common::Error8, QObject::tr("Error 8 (should not happen)") },
-    { Common::UnkownSmartcad, QObject::tr("Unknown smartcard inserted") }
+    { Common::UnknownSmartcard, QObject::tr("Unknown smartcard inserted") },
+    { Common::MMMMode, QObject::tr("Device in management mode") }
 };
 
 QHash<Common::MPStatus, QString> Common::MPStatusString = {
@@ -88,7 +89,16 @@ QHash<Common::MPStatus, QString> Common::MPStatusString = {
     { Common::Error6, "Error6" },
     { Common::Error7, "Error7" },
     { Common::Error8, "Error8" },
-    { Common::UnkownSmartcad, "UnkownSmartcad" }
+    { Common::UnknownSmartcard, "UnknownSmartcard" },
+    { Common::MMMMode, "MMMMode" }
+};
+
+QMap<int, QString> Common::BLE_CATEGORY_COLOR = {
+    {0, "black"},
+    {1, "red"},
+    {2, "blue"},
+    {3, "green"},
+    {4, "orange"}
 };
 
 Common::MPStatus Common::statusFromString(const QString &st)
@@ -106,37 +116,42 @@ Common::MPStatus Common::statusFromString(const QString &st)
 static QLocalServer *debugLogServer = nullptr;
 static QList<QLocalSocket *> debugLogClients;
 static Common::GuiLogCallback guiLogCallback = [](const QByteArray &) {};
+static QByteArray startingDaemonBuffer;
+const QString Common::ISODateWithMsFormat = "yyyy-MM-ddTHH:mm:ss.zzz";
+const QString Common::SIMPLE_CRYPT = "SimpleCrypt";
+const QString Common::SIMPLE_CRYPT_V2 = "SimpleCryptV2";
+
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QString fname = context.file;
     fname = fname.section('\\', -1, -1);
-
+    const auto timestamp = QDateTime::currentDateTime().toString(Common::ISODateWithMsFormat);
     QString s;
     switch (type) {
     default:
     case QtDebugMsg:
     {
-        s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_CYAN "DEBUG" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtInfoMsg:
     {
-        s = QString(COLOR_GREEN "INFO" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_GREEN "INFO" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtWarningMsg:
     {
-        s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_YELLOW "WARNING" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtCriticalMsg:
     {
-        s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_ORANGE "CRITICAL" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     case QtFatalMsg:
     {
-        s = QString(COLOR_RED "FATAL" COLOR_RESET ": %1:%2 - %3\n").arg(fname).arg(context.line).arg(msg);
+        s = QString(COLOR_RED "FATAL" COLOR_RESET ": (%0) %1:%2 - %3\n").arg(timestamp).arg(fname).arg(context.line).arg(msg);
         break;
     }
     }
@@ -154,12 +169,28 @@ static void _messageOutput(QtMsgType type, const QMessageLogContext &context, co
             type == QtInfoMsg)
             guiLogCallback(s.toUtf8());
 
+        if (Common::isDaemon() && debugLogClients.isEmpty())
+        {
+            startingDaemonBuffer.append(s.toUtf8());
+        }
+
         for (QLocalSocket *sock: debugLogClients)
         {
             sock->write(s.toUtf8());
             sock->flush();
         }
     }
+}
+
+static bool is_daemon = false;
+void Common::setIsDaemon(bool en)
+{
+    is_daemon = en;
+}
+
+bool Common::isDaemon()
+{
+    return is_daemon;
 }
 
 void Common::installMessageOutputHandler(QLocalServer *logServer, GuiLogCallback guicb)
@@ -177,6 +208,14 @@ void Common::installMessageOutputHandler(QLocalServer *logServer, GuiLogCallback
             //New clients gets added to the list
             //and logs will be forwarded to them
             debugLogClients.append(s);
+
+            //Send first bytes before client connects
+            if (!startingDaemonBuffer.isEmpty())
+            {
+                s->write(startingDaemonBuffer);
+                s->flush();
+                startingDaemonBuffer.clear();
+            }
 
             QObject::connect(s, &QLocalSocket::disconnected, [s]()
             {

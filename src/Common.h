@@ -41,6 +41,8 @@
 #define MP_NODE_SIZE            132
 #define MP_NODE_DATA_ENC_SIZE   128
 
+#define MAX_BLE_CAT_NUM 10
+
 #define MOOLTIPASS_BLOCK_SIZE   32
 #define MOOLTIPASS_DESC_SIZE    23 //max size allowed for description
 
@@ -117,13 +119,66 @@ template<class T>
 T const qAsConst(T&&t){return std::forward<T>(t);}
 template<class T>
 T const& qAsConst(T&t){return t;}
+
+//This declares a QOverload implementation if we build with Qt < 5.7
+template <typename... Args>
+struct QNonConstOverload
+{
+    template <typename R, typename T>
+    Q_DECL_CONSTEXPR auto operator()(R (T::*ptr)(Args...)) const noexcept -> decltype(ptr)
+    { return ptr; }
+    template <typename R, typename T>
+    static Q_DECL_CONSTEXPR auto of(R (T::*ptr)(Args...)) noexcept -> decltype(ptr)
+    { return ptr; }
+};
+template <typename... Args>
+struct QConstOverload
+{
+    template <typename R, typename T>
+    Q_DECL_CONSTEXPR auto operator()(R (T::*ptr)(Args...) const) const noexcept -> decltype(ptr)
+    { return ptr; }
+    template <typename R, typename T>
+    static Q_DECL_CONSTEXPR auto of(R (T::*ptr)(Args...) const) noexcept -> decltype(ptr)
+    { return ptr; }
+};
+
+template <typename... Args>
+struct QOverload : QConstOverload<Args...>, QNonConstOverload<Args...>
+{
+    using QConstOverload<Args...>::of;
+    using QConstOverload<Args...>::operator();
+    using QNonConstOverload<Args...>::of;
+    using QNonConstOverload<Args...>::operator();
+    template <typename R>
+    Q_DECL_CONSTEXPR auto operator()(R (*ptr)(Args...)) const noexcept -> decltype(ptr)
+    { return ptr; }
+    template <typename R>
+    static Q_DECL_CONSTEXPR auto of(R (*ptr)(Args...)) noexcept -> decltype(ptr)
+    { return ptr; }
+};
+
 #endif
+
+//Q_DISABLE_COPY_MOVE from Qt 5.15
+#define DISABLE_COPY_MOVE(Class) \
+    Q_DISABLE_COPY(Class) \
+    Class(const Class &&) Q_DECL_EQ_DELETE;\
+    Class &operator=(const Class &&) Q_DECL_EQ_DELETE;
+
+template<typename Container>
+void clearAndDelete(Container& cont)
+{
+    qDeleteAll(cont);
+    cont.clear();
+}
 
 class Common
 {
 public:
     typedef std::function<void(const QByteArray &)> GuiLogCallback;
 
+    static void setIsDaemon(bool en);
+    static bool isDaemon();
     static void installMessageOutputHandler(QLocalServer *logServer = nullptr, GuiLogCallback guicb = [](const QByteArray &){});
 
     Q_ENUMS(MPStatus)
@@ -139,9 +194,11 @@ public:
         Error6 = 6,
         Error7 = 7,
         Error8 = 8,
-        UnkownSmartcad = 9,
+        UnknownSmartcard = 9,
+        MMMMode = 21
     } MPStatus;
     static QHash<MPStatus, QString> MPStatusUserString, MPStatusString;
+    static QMap<int, QString> BLE_CATEGORY_COLOR;
 
     static Common::MPStatus statusFromString(const QString &st);
 
@@ -223,6 +280,16 @@ public:
         CredentialNumberChanged = 0x01,
         DataNumberChanged = 0x02
     };
+
+    enum AddressType
+    {
+        CRED_ADDR_IDX = 0,
+        WEBAUTHN_ADDR_IDX = 1
+    };
+
+    static const QString ISODateWithMsFormat;
+    static const QString SIMPLE_CRYPT;
+    static const QString SIMPLE_CRYPT_V2;
 };
 
 enum class DeviceType
@@ -275,6 +342,10 @@ Q_DECLARE_METATYPE(Common::MPHwVersion)
                                 "padding-left: 4px;"\
                                 "border: 1px solid #FcFcFc;"\
                             "}"
+
+#define CSS_CREDVIEW_SELECTION "QTreeView::item:selected {" \
+                                    "background-color: rgba( 128, 128, 128, 100);" \
+                               "}"
 
 enum class CloseBehavior
 {

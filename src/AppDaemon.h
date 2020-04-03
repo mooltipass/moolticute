@@ -48,6 +48,8 @@ public:
     static bool isEmulationMode();
     static QHostAddress getListenAddress();
 
+    static bool isDebugDev();
+
 private:
     HttpServer *httpServer = nullptr;
 
@@ -56,6 +58,8 @@ private:
 
     //this is to send out logs to gui app
     QLocalServer *localLogServer = nullptr;
+
+    bool debugDevEnabled = false;
 
     static bool emulationMode;
     static bool anyAddress;

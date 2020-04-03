@@ -31,7 +31,7 @@ private slots:
     void sendParams(int value, int param);
 
 private:
-    void setupKeyboardLayout();
+    void initKnockSetting();
 
     WSClient* m_wsClient = nullptr;
     DeviceSettings* m_settings = nullptr;

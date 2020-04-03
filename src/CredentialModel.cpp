@@ -13,6 +13,7 @@
 #include "LoginItem.h"
 #include "TreeItem.h"
 #include "ParseDomain.h"
+#include "DeviceDetector.h"
 
 CredentialModel::CredentialModel(QObject *parent) : QAbstractItemModel(parent)
 {
@@ -216,6 +217,15 @@ void CredentialModel::load(const QJsonArray &json)
             QDate dUpdatedDate = QDate::fromString(cnode["date_last_used"].toString(), Qt::ISODate);
             pLoginItem->setAccessedDate(dUpdatedDate);
 
+            // Update login item category
+            if (DeviceDetector::instance().isBle())
+            {
+                pLoginItem->setCategory(cnode["category"].toVariant().toInt());
+                pLoginItem->setkeyAfterLogin(cnode["key_after_login"].toVariant().toInt());
+                pLoginItem->setkeyAfterPwd(cnode["key_after_pwd"].toVariant().toInt());
+                pLoginItem->setPwdBlankFlag(cnode["pwd_blank_flag"].toVariant().toInt());
+            }
+
             QJsonArray a = cnode["address"].toArray();
             if (a.size() < 2)
             {
@@ -257,7 +267,7 @@ ServiceItem *CredentialModel::addService(const QString &sServiceName)
 
 QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName, int column) const
 {
-    QModelIndexList lMatches = match(index(0, column, QModelIndex()), Qt::DisplayRole, sServiceName, 1);
+    QModelIndexList lMatches = match(index(0, column, QModelIndex()), Qt::DisplayRole, sServiceName, 1, Qt::MatchExactly);
     if (!lMatches.isEmpty())
         return lMatches.first();
 
@@ -274,15 +284,39 @@ ServiceItem *CredentialModel::getServiceItemByIndex(const QModelIndex &idx) cons
     return dynamic_cast<ServiceItem *>(getItemByIndex(idx));
 }
 
-void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName)
+QString CredentialModel::getCategoryName(int catId) const
+{
+    return m_categories[catId];
+}
+
+void CredentialModel::updateCategories(const QString &cat1, const QString &cat2, const QString &cat3, const QString &cat4)
+{
+    m_categories[1] = cat1;
+    m_categories[2] = cat2;
+    m_categories[3] = cat3;
+    m_categories[4] = cat4;
+    m_categoryClean = true;
+}
+
+void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat, int iLoginKey, int iPwdKey)
 {
     // Retrieve item
     LoginItem *pLoginItem = getLoginItemByIndex(idx);
     if (pLoginItem != nullptr)
     {
-        updateLoginItem(idx, PasswordRole, sPassword);
+        if (!sPassword.isEmpty())
+        {
+            // Only update, when password is not empty (locked)
+            updateLoginItem(idx, PasswordRole, sPassword);
+        }
         updateLoginItem(idx, DescriptionRole, sDescription);
         updateLoginItem(idx, ItemNameRole, sName);
+        if (DeviceDetector::instance().isBle())
+        {
+            updateLoginItem(idx, CategoryRole, iCat);
+            updateLoginItem(idx, KeyAfterLoginRole, iLoginKey);
+            updateLoginItem(idx, KeyAfterPwdRole, iPwdKey);
+        }
     }
 }
 
@@ -350,6 +384,41 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &ro
         if (iFavorite != pLoginItem->favorite())
         {
             pLoginItem->setFavorite(iFavorite);
+            bChanged = true;
+        }
+        break;
+    }
+    case CategoryRole:
+    {
+        int iCat = vValue.toInt();
+        if (iCat != pLoginItem->category())
+        {
+            pLoginItem->setCategory(iCat);
+            // When category changed reset favorite
+            if (pLoginItem->favorite() > Common::FAV_NOT_SET)
+            {
+                pLoginItem->setFavorite(Common::FAV_NOT_SET);
+            }
+            bChanged = true;
+        }
+        break;
+    }
+    case KeyAfterLoginRole:
+    {
+        int key = vValue.toInt();
+        if (key != pLoginItem->keyAfterLogin())
+        {
+            pLoginItem->setkeyAfterLogin(key);
+            bChanged = true;
+        }
+        break;
+    }
+    case KeyAfterPwdRole:
+    {
+        int key = vValue.toInt();
+        if (key != pLoginItem->keyAfterPwd())
+        {
+            pLoginItem->setkeyAfterPwd(key);
             bChanged = true;
         }
         break;
@@ -429,6 +498,7 @@ void CredentialModel::addCredential(QString sServiceName, const QString &sLoginN
                 pAddedLoginItem->setPasswordLocked(false);
                 pAddedLoginItem->setPassword(sPassword);
                 pAddedLoginItem->setDescription(sDescription);
+                pAddedLoginItem->setCategory(0);
                 endInsertRows();
             }
         }
@@ -448,6 +518,7 @@ void CredentialModel::addCredential(QString sServiceName, const QString &sLoginN
             pAddedLoginItem->setPasswordLocked(false);
             pAddedLoginItem->setPassword(sPassword);
             pAddedLoginItem->setDescription(sDescription);
+            pAddedLoginItem->setCategory(0);
             endInsertRows();
         }
     }

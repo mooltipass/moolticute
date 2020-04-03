@@ -56,6 +56,8 @@ private slots:
     void mpAdded(MPDevice *device);
     void mpRemoved(MPDevice *device);
 
+    void originAuthenticationRequired(QWebSocketCorsAuthenticator *authenticator);
+
 private:
     WSServer();
     QWebSocketServer *wsServer = nullptr;

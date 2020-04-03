@@ -34,6 +34,7 @@ function make_version()
     echo "#endif" >> $1/src/version.h
 
     echo "version.h created"
+    cp $1/src/version.h $1/src/version.h_$2
     cat $1/src/version.h
 }
 
@@ -219,14 +220,21 @@ function create_beta_release_osx()
 {
     local VERSION="${1:?Release version required.}"
     local DMG_FILE="$(ls build/*.dmg 2> /dev/null | head -n 1)"
+    local MOOLTIPASSBETAIP="$(dscacheutil -q host -a name mooltipass-tests.com | sed -n '2p' | awk '{print $2}')"
 
     >&2 echo -e "Creating (OSX) beta release (tag: $VERSION)"
+    >&2 echo -e "DMG File: $DMG_FILE"
+    >&2 echo -e "Mooltipass Tests IP: $MOOLTIPASSBETAIP"
 
     mkdir -p ~/.ssh
-    ssh-keyscan -p 54433 -H mooltipass-tests.com >> ~/.ssh/known_hosts
+    ssh-keyscan -4 -p 54433 -H $MOOLTIPASSBETAIP >> ~/.ssh/known_hosts
+    ssh-keyscan -4 -p 54433 -H $MOOLTIPASSBETAIP -v
+    cat ~/.ssh/known_hosts
+    
+    >&2 echo -e "Calling lftp..."
 
-    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@mooltipass-tests.com \
-        -e "set sftp:auto-confirm yes; \
+    lftp -p 54433 sftp://${SFTP_USER}:${SFTP_PASS}@$MOOLTIPASSBETAIP \
+        -e "debug 9; set sftp:auto-confirm yes; \
         cd mc_betas; \
         mkdir -p -f $VERSION; \
         cd $VERSION; \

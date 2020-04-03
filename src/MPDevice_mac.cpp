@@ -52,13 +52,14 @@ MPDevice_mac::MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef):
         deviceType = DeviceType::BLE;
         isBluetooth = platformDef.isBluetooth;
     }
-    setupMessageProtocol();
     /**
       * With only one thread for the threadpool
       * the writes will keep the original order.
       */
     usbWriteThreadPool = new QThreadPool(this);
     usbWriteThreadPool->setMaxThreadCount(1);
+
+    setupMessageProtocol();
 
     IOReturn ret = IOHIDDeviceOpen(hidref, kIOHIDOptionsTypeSeizeDevice);
     if (ret != kIOReturnSuccess)

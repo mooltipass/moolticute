@@ -67,7 +67,8 @@ SOURCES += src/main_gui.cpp \
     src/Settings/DeviceSettingsMini.cpp \
     src/Settings/SettingsGuiHelper.cpp \
     src/Settings/SettingsGuiMini.cpp \
-    src/Settings/SettingsGuiBLE.cpp
+    src/Settings/SettingsGuiBLE.cpp \
+    src/DeviceDetector.cpp
 
 HEADERS  += src/MainWindow.h \
     src/ParseDomain.h \
@@ -119,7 +120,8 @@ HEADERS  += src/MainWindow.h \
     src/Settings/SettingsGuiHelper.h \
     src/Settings/SettingsGuiMini.h \
     src/Settings/SettingsGuiBLE.h \
-    src/Settings/ISettingsGui.h
+    src/Settings/ISettingsGui.h \
+    src/DeviceDetector.h
 
 mac {
     HEADERS += src/MacUtils.h \

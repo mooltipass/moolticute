@@ -63,6 +63,7 @@ private slots:
     void daemonLogRead();
     void updateAvailableReceived(QString version, QString changesetURL);
     void displayStatusWarningNotification();
+    void resetLastNotificationStatus();
 
 private:
      MainWindow *win = nullptr;
@@ -97,6 +98,8 @@ private:
 
      //Buffer for storing log from daemon when mainwindow is not created
      QByteArray logBuffer;
+
+     Common::MPStatus m_lastNotificationStatus;
 
      bool createSingleApplication();
      void startSSHAgent();

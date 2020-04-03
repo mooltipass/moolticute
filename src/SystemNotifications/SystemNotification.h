@@ -3,16 +3,14 @@
 
 #include <QObject>
 #include "ISystemNotification.h"
+#include "Common.h"
 
 class SystemNotification : QObject
 {
     Q_OBJECT
+    DISABLE_COPY_MOVE(SystemNotification)
 private:
     explicit SystemNotification(QObject *parent = nullptr);
-    SystemNotification(const SystemNotification&) = delete;
-    SystemNotification(const SystemNotification&&) = delete;
-    SystemNotification& operator=(const SystemNotification& other) = delete;
-    SystemNotification& operator=(const SystemNotification&& other) = delete;
 
     ISystemNotification *m_notification = nullptr;
 

@@ -502,8 +502,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1093</width>
-             <height>849</height>
+             <width>720</width>
+             <height>882</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -520,11 +520,113 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              <number>150</number>
             </property>
             <item>
-             <widget class="QGroupBox" name="groupBox">
+             <widget class="QGroupBox" name="groupBox_keyboard">
               <property name="title">
                <string>Keyboard Output</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_14">
+               <item>
+                <widget class="QWidget" name="settings_device_language" native="true">
+                 <property name="toolTip">
+                  <string>Default language for your device</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_52">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_deviceLang">
+                    <property name="text">
+                     <string>Device Default Language</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxDeviceLang">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_48">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="settings_user_language" native="true">
+                 <property name="toolTip">
+                  <string>Language used for your user profile</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_51">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_userLanguage">
+                    <property name="text">
+                     <string>Current User Language</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxUserLanguage">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_49">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
                <item>
                 <widget class="QWidget" name="settings_keyboard_layout" native="true">
                  <property name="toolTip">
@@ -558,10 +660,118 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>0</height>
+                     </size>
+                    </property>
                    </widget>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_27">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="settings_bt_layout" native="true">
+                 <property name="toolTip">
+                  <string>Keyboard layout used when typing characters over the Bluetooth interface</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_53">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_btLayout">
+                    <property name="text">
+                     <string>Bluetooth Keyboard Layout</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxBtLayout">
+                    <property name="minimumSize">
+                     <size>
+                      <width>200</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_51">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="settings_usb_layout" native="true">
+                 <property name="toolTip">
+                  <string>Keyboard layout used when typing characters over the USB interface</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_54">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_usbLayout">
+                    <property name="text">
+                     <string>USB Keyboard Layout</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxUsbLayout">
+                    <property name="minimumSize">
+                     <size>
+                      <width>200</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_50">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
@@ -596,6 +806,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   </property>
                   <item>
                    <widget class="QCheckBox" name="checkBoxSlowHost">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_keyPressDelay">
                     <property name="text">
                      <string>For slow computers: wait</string>
                     </property>
@@ -661,7 +878,14 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QCheckBox" name="checkBoxSendAfterLogin">
                     <property name="text">
-                     <string>Send</string>
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_sendLoginChar">
+                    <property name="text">
+                     <string>By default, send</string>
                     </property>
                    </widget>
                   </item>
@@ -719,7 +943,14 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QCheckBox" name="checkBoxSendAfterPassword">
                     <property name="text">
-                     <string>Send</string>
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_sendPwdChar">
+                    <property name="text">
+                     <string>By default, send</string>
                     </property>
                    </widget>
                   </item>
@@ -901,7 +1132,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_3">
+             <widget class="QGroupBox" name="groupBox_miscellaneous">
               <property name="title">
                <string>Miscellaneous</string>
               </property>
@@ -1007,12 +1238,30 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QCheckBox" name="checkBoxKnock">
                     <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_KnockEnable">
+                    <property name="text">
                      <string>Enable knock detection with</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxKnock"/>
+                   <widget class="QLabel" name="label_KnockSensitivity">
+                    <property name="text">
+                     <string>Knock detection sensitivity:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxKnock">
+                    <property name="toolTip">
+                     <string>How sensitive to vibration your device should be</string>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <widget class="QLabel" name="knockSettingsSuffixLabel">
@@ -1064,6 +1313,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxPinOnBack">
+                 <property name="toolTip">
+                  <string>Do not erase characters when going back in the pin entering screen</string>
+                 </property>
+                 <property name="text">
+                  <string>Display pin on back pressed</string>
                  </property>
                 </widget>
                </item>
@@ -1159,7 +1418,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
             <item>
              <widget class="QGroupBox" name="groupBox_BLESettings">
               <property name="title">
-               <string>BLE Settings</string>
+               <string>General Settings</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_31">
                <item>
@@ -1171,8 +1430,31 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxPromptAnim">
+                 <property name="toolTip">
+                  <string>Display an animation when an action is required</string>
+                 </property>
                  <property name="text">
                   <string>Prompt Animation</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxBootAnim">
+                 <property name="toolTip">
+                  <string>Animation at device boot</string>
+                 </property>
+                 <property name="text">
+                  <string>Boot Animation</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxDeviceLockUSBDisc">
+                 <property name="toolTip">
+                  <string>Automatically lock the device when it is disconnected from USB</string>
+                 </property>
+                 <property name="text">
+                  <string>Device Lock on USB Disconnection</string>
                  </property>
                 </widget>
                </item>
@@ -1231,17 +1513,17 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <string>Use Bluetooth Menu to enable/disable the Mooltipass Bluetooth interface</string>
                  </property>
                  <property name="text">
-                  <string>Bluetooth Status</string>
+                  <string>Bluetooth Enabled</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="cbCredentialPrompt">
+                <widget class="QCheckBox" name="cbKnockDisabled">
                  <property name="toolTip">
-                  <string>Require approval when modifying credentials in management mode. Control this setting in the settings menu of the advanced menu</string>
+                  <string>Knock detection can be enabled/disabled on the device.</string>
                  </property>
                  <property name="text">
-                  <string>Prompts for Credentials Save in Management Mode</string>
+                  <string>Knock Detection Disabled</string>
                  </property>
                 </widget>
                </item>
@@ -1262,8 +1544,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </spacer>
             </item>
            </layout>
-           <zorder>groupBox_3</zorder>
-           <zorder>groupBox</zorder>
+           <zorder>groupBox_miscellaneous</zorder>
+           <zorder>groupBox_keyboard</zorder>
            <zorder>groupBox_2</zorder>
            <zorder>advancedSettingsGB</zorder>
            <zorder>groupBox_UserSettings</zorder>
@@ -1534,7 +1816,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_35">
                   <item>
-                   <widget class="QLabel" name="label_27">
+                   <widget class="QLabel" name="label_integrityCheck">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                       <horstretch>0</horstretch>
@@ -1591,7 +1873,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </layout>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_29">
+                 <widget class="QLabel" name="label_integrityCheckDesc">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                     <horstretch>0</horstretch>
@@ -2310,7 +2592,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
            </font>
           </property>
           <property name="text">
-           <string>Moolticute (c) Raoul Hecky</string>
+           <string>Moolticute (c) The Mooltipass Team</string>
           </property>
          </widget>
         </item>
@@ -3222,6 +3504,55 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </property>
                 <property name="text">
                  <string>Change</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_50">
+              <item>
+               <widget class="QLabel" name="label_45">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Enable full developer log</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_46">
+                <property name="font">
+                 <font>
+                  <italic>true</italic>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>(Restart Needed)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_47">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxDebugLog">
+                <property name="text">
+                 <string>Enable Debug Log</string>
                 </property>
                </widget>
               </item>

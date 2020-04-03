@@ -160,7 +160,7 @@ void DbBackupsTrackerController::askForExportBackup()
 
 void DbBackupsTrackerController::exportDbBackup()
 {
-    QString format = "SimpleCrypt";
+    QString format = Common::SIMPLE_CRYPT;
 
     window->wantExportDatabase();
 
@@ -246,7 +246,7 @@ void DbBackupsTrackerController::handleDeviceConnectedChanged(const bool &)
 
 void DbBackupsTrackerController::handleFirmwareVersionChange(const QString &)
 {
-    if (wsClient->isFw12())
+    if (wsClient->isFw12() || wsClient->isMPBLE())
     {
         qDebug() << "Setup db tracking";
         window->showDbBackTrackingControls(true);

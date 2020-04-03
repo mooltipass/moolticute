@@ -18,10 +18,13 @@
  ******************************************************************************/
 #include "MPDevice_win.h"
 #include "HIDLoader.h"
+#include "AppDaemon.h"
+#include <cstring>
 
 // Windows GUID object
 static GUID IClassGuid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30} };
 const QString MPDevice_win::BT_GATT_SERVICE_GUID = "00001812-0000-1000-8000-00805f9b34fb";
+const QString MPDevice_win::MC_COMMS_ID = "mi_00";
 
 MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
     MPDevice(parent),
@@ -46,18 +49,7 @@ MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
     if (!openPath())
     {
         qWarning() << "Error opening device";
-        QTimer::singleShot(50, [this]()
-        {
-            if (openPath())
-            {
-                platformRead();
-                sendInitMessages();
-            }
-            else
-            {
-                qCritical() << "Device open failed after retry.";
-            }
-        });
+        QTimer::singleShot(50, this, &MPDevice_win::openPathRetry);
     }
     else
     {
@@ -160,10 +152,13 @@ bool MPDevice_win::openPath()
 
 void MPDevice_win::platformWrite(const QByteArray &data)
 {
-
     if (m_writeQueue.isEmpty())
     {
         platformWriteToDevice(data);
+    }
+    else if (AppDaemon::isDebugDev())
+    {
+        qDebug() << "Write queue is not empty";
     }
     m_writeQueue.append(data);
 }
@@ -187,9 +182,19 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
 
     ::ZeroMemory(&writeOverlapped, sizeof(writeOverlapped));
 
+    /**
+     * Need to copy the local buffer, because WriteFile is
+     * async and it is possible using the buffer after this
+     * function returned and QByteArray was deallocated.
+     */
+    const auto bufferSize = static_cast<size_t>(ba.size());
+    char* buffer = new char[bufferSize];
+    std::memcpy(buffer, ba.constData(), bufferSize);
+    m_writeBufferQueue.enqueue(buffer);
+
     bool ret = WriteFile(platformDef.devHandle,
-                         ba.constData(),
-                         ba.size(),
+                         buffer,
+                         bufferSize,
                          nullptr,
                          &writeOverlapped);
 
@@ -259,8 +264,19 @@ QList<MPPlatformDef> MPDevice_win::enumerateDevices()
                                                     &required_size,
                                                     nullptr);
 
+        if (0 == required_size)
+        {
+            qCritical() << "Invalid DeviceInterfaceDetailData buffer size";
+            continue;
+        }
+
         //alloc data
         dev_detail_data = (SP_DEVICE_INTERFACE_DETAIL_DATA_A*) malloc(required_size);
+        if (!dev_detail_data)
+        {
+            qCritical() << "Allocating SP_DEVICE_INTERFACE_DETAIL_DATA_A data failed.";
+            break;
+        }
         dev_detail_data->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA_A);
 
         //Get device info now
@@ -320,10 +336,17 @@ bool MPDevice_win::checkDevice(QString path, bool &isBLE /* out */, bool &isBlue
     }
 
     isBLE = attrib.VendorID == MOOLTIPASS_BLE_VENDORID;
-    if (isBLE && path.contains(BT_GATT_SERVICE_GUID))
+    if (isBLE)
     {
-        qDebug() << "BT HID connected";
-        isBluetooth = true;
+        if (path.contains(BT_GATT_SERVICE_GUID))
+        {
+            qDebug() << "BT HID connected";
+            isBluetooth = true;
+        }
+        else if (!path.contains(MC_COMMS_ID))
+        {
+            return false;
+        }
     }
     return true;
 }
@@ -344,9 +367,7 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
     //we can then compare which OVERLAPPED this operation is
 
     bool fail = true;
-    if (errorCode == ERROR_SUCCESS ||
-        errorCode == ERROR_MORE_DATA ||
-        errorCode == ERROR_IO_PENDING)
+    if (errorCode == ERROR_SUCCESS)
         fail = false;
 
     if (overlapped == &writeOverlapped) //write op
@@ -378,9 +399,14 @@ void MPDevice_win::ovlpNotified(quint32 numberOfBytes, quint32 errorCode, OVERLA
 
 void MPDevice_win::writeDataFinished()
 {
+    delete[] m_writeBufferQueue.dequeue();
     if (m_writeQueue.isEmpty())
     {
         // WriteQueue is empty, platformWrite was called directly
+        if (AppDaemon::isDebugDev())
+        {
+            qWarning() << "writeDataFinished, but commandqueue was empty";
+        }
         return;
     }
     m_writeQueue.dequeue();
@@ -388,5 +414,18 @@ void MPDevice_win::writeDataFinished()
     {
         // If there are more data to write in the queue, write the next one
         platformWriteToDevice(m_writeQueue.head());
+    }
+}
+
+void MPDevice_win::openPathRetry()
+{
+    if (openPath())
+    {
+        platformRead();
+        sendInitMessages();
+    }
+    else
+    {
+        qCritical() << "Device open failed after retry.";
     }
 }

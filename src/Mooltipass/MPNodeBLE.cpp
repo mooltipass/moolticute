@@ -121,3 +121,94 @@ QDate MPNodeBLE::getDateLastUsed() const
     if (!isValid()) return QDate();
     return Common::bytesToDate(data.mid(DATE_LASTUSED_ADDR_START, ADDRESS_LENGTH));
 }
+
+int MPNodeBLE::getCategory() const
+{
+    if (!isValid())
+    {
+        return 0;
+    }
+
+    /**
+     * Category bitfield is the first 4 bit of
+     * the 2 Bytes Long Flags in the child node
+     * 0000 is category 0, 0001 is category 1,
+     * 0010 is category 2
+     */
+    int categoryBit = data[0]&0xF;
+    if (categoryBit < 4)
+    {
+        return categoryBit;
+    }
+
+    // 0100 is category 3
+    if (0b100 == categoryBit)
+    {
+        return 3;
+    }
+
+    // 1000 is category 4
+    if (0b1000 == categoryBit)
+    {
+        return 4;
+    }
+
+    qCritical() << "Invalid bitfield for category";
+    return 0;
+}
+
+void MPNodeBLE::setCategory(int category)
+{
+    quint8 categoryBit = data[0]&0x0F0;
+    if (category > 0)
+    {
+        categoryBit |= (0b1 << (category - 1));
+    }
+    data[0] = static_cast<char>(categoryBit);
+}
+
+int MPNodeBLE::getKeyAfterLogin() const
+{
+    if (!isValid()) return 0;
+    return pMesProt->toIntFromLittleEndian(data[KEY_AFTER_LOGIN_ADDR_START], data[KEY_AFTER_LOGIN_ADDR_START+1]);
+}
+
+void MPNodeBLE::setKeyAfterLogin(int key)
+{
+    if (isValid())
+    {
+        const auto keyArray = pMesProt->toLittleEndianFromInt(key);
+        data[KEY_AFTER_LOGIN_ADDR_START] = keyArray[0];
+        data[KEY_AFTER_LOGIN_ADDR_START+1] = keyArray[1];
+    }
+}
+
+int MPNodeBLE::getKeyAfterPwd() const
+{
+    if (!isValid()) return 0;
+    return pMesProt->toIntFromLittleEndian(data[KEY_AFTER_PWD_ADDR_START], data[KEY_AFTER_PWD_ADDR_START+1]);
+}
+
+void MPNodeBLE::setKeyAfterPwd(int key)
+{
+    if (isValid())
+    {
+        const auto keyArray = pMesProt->toLittleEndianFromInt(key);
+        data[KEY_AFTER_PWD_ADDR_START] = keyArray[0];
+        data[KEY_AFTER_PWD_ADDR_START+1] = keyArray[1];
+    }
+}
+
+int MPNodeBLE::getPwdBlankFlag() const
+{
+    if (!isValid()) return 0;
+    return data[PWD_BLANK_FLAG];
+}
+
+void MPNodeBLE::setPwdBlankFlag()
+{
+    if (isValid())
+    {
+        data[PWD_BLANK_FLAG] = static_cast<char>(BLANK_CHAR);
+    }
+}

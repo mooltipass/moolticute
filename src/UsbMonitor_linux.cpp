@@ -36,7 +36,6 @@ UsbMonitor_linux::UsbMonitor_linux()
     int fd = udev_monitor_get_fd(mon);
 
     sockMonitor = new QSocketNotifier(fd, QSocketNotifier::Read);
-    sockMonitor->setEnabled(true);
     connect(sockMonitor, &QSocketNotifier::activated, this, &UsbMonitor_linux::monitorUSB);
 }
 

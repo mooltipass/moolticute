@@ -107,7 +107,7 @@ void MPManager::usbDeviceAdded(QString path)
     Q_UNUSED(path);
     return;
 #endif
-    if (!devices.contains(path))
+    if (devices.empty())
     {
         MPDevice *device = nullptr;
 #if defined(Q_OS_WIN)
@@ -142,7 +142,7 @@ void MPManager::usbDeviceAdded(QString path)
 #if defined(Q_OS_LINUX)
 void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
 {
-    if (!devices.contains(path))
+    if (devices.empty())
     {
         if (isBLE && isBLEConnectedWithUsb())
         {
@@ -170,6 +170,7 @@ void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
 
 void MPManager::usbDeviceRemoved(QString path)
 {
+    bool isMpDisconnected = false;
     auto it = devices.find(path);
     if (it != devices.end())
     {
@@ -177,10 +178,17 @@ void MPManager::usbDeviceRemoved(QString path)
         emit mpDisconnected(it.value());
         delete it.value();
         devices.remove(path);
+        isMpDisconnected = true;
     }
     else
     {
         qDebug() << path << " is not connected.";
+    }
+
+    if (isMpDisconnected && devices.isEmpty())
+    {
+        qDebug() << "Check if other MP device is connected ";
+        checkUsbDevices();
     }
 }
 
@@ -217,8 +225,12 @@ void MPManager::checkUsbDevices()
     //Remove bt connection if usb is connected too
     if (devlist.size() > 1)
     {
-        devlist.erase(std::remove_if(devlist.begin(), devlist.end(),
-                       [](MPPlatformDef def){return def.isBluetooth;}));
+        auto it = std::remove_if(devlist.begin(), devlist.end(),
+                               [](MPPlatformDef def){return def.isBluetooth;});
+        if (it != devlist.end())
+        {
+            devlist.erase(it);
+        }
     }
 #endif
 

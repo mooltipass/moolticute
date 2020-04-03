@@ -59,12 +59,16 @@ private slots:
     void sendDeviceUID();
     void sendFilesCache();
 
+    void sendDeviceLanguage(const QJsonObject& langs);
+    void sendKeyboardLayout(const QJsonObject& layouts);
+
     void sendCardDbMetadata();
 
     void sendHibpNotification(QString credInfo, QString pwnedNum);
     void sendUserSettings(QJsonObject settings);
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
+    bool processSetCredential(QJsonObject &root, QJsonObject &o);
 
     QWebSocket *wsClient;
 

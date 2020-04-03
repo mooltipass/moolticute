@@ -24,6 +24,8 @@
 #include "MPDeviceBleImpl.h"
 #include "BleCommon.h"
 #include "MPSettingsBLE.h"
+#include "MPNodeBLE.h"
+#include "AppDaemon.h"
 
 MPDevice::MPDevice(QObject *parent):
     QObject(parent)
@@ -43,63 +45,12 @@ MPDevice::MPDevice(QObject *parent):
             if (!success)
                 return;
 
-            /* Map status from received val */
-            Common::MPStatus s = pMesProt->getStatus(data);
-            Common::MPStatus prevStatus = get_status();
-
             if (isBLE())
             {
-                if(pMesProt->getMessageSize(data) >= 4) // these settings are sent only when user is logged in
-                    bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
+                //Only send status message request at ble connection
+                statusTimer->stop();
             }
-
-            /* Trigger on status change */
-            if (s != prevStatus)
-            {
-                qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
-
-                /* Update status */
-                set_status(s);
-
-                if (prevStatus == Common::UnknownStatus)
-                {
-                    QTimer::singleShot(10, [this]()
-                    {
-                        /* First start: load parameters */
-                        pSettings->loadParameters();
-                        setCurrentDate();
-                    });
-                }
-
-                if ((s == Common::Unlocked) || (s == Common::UnkownSmartcad))
-                {
-                    QTimer::singleShot(20, [this]()
-                    {
-                        getCurrentCardCPZ();
-                    });
-                }
-                else
-                {
-                    filesCache.resetState();
-                }
-
-                if (s == Common::Unlocked)
-                {
-                    /* If v1.2 firmware, query user change number */
-                    QTimer::singleShot(50, [this]()
-                    {
-                        if (isFw12() || isBLE())
-                        {
-                            qInfo() << "Requesting change numbers";
-                            getChangeNumbers();
-                        }
-                        else
-                        {
-                            qInfo() << "Firmware below v1.2, do not request change numbers";
-                        }
-                    });
-                }
-            }
+            processStatusChange(data);
         });
     });
 
@@ -131,6 +82,15 @@ void MPDevice::setupMessageProtocol()
         qDebug() << "Mooltipass Mini is connected";
     }
 
+    importNodeMap = {
+        {EXPORT_SERVICE_NODES_INDEX, &importedLoginNodes},
+        {EXPORT_SERVICE_CHILD_NODES_INDEX, &importedLoginChildNodes},
+        {EXPORT_WEBAUTHN_NODES_INDEX, &importedWebauthnLoginNodes},
+        {EXPORT_WEBAUTHN_CHILD_NODES_INDEX, &importedWebauthnLoginChildNodes},
+        {EXPORT_MC_SERVICE_NODES_INDEX, &importedDataNodes},
+        {EXPORT_MC_SERVICE_CHILD_NODES_INDEX, &importedDataChildNodes},
+    };
+
 
 #ifndef Q_OS_WIN
     sendInitMessages();
@@ -139,34 +99,26 @@ void MPDevice::setupMessageProtocol()
 
 void MPDevice::sendInitMessages()
 {
-    statusTimer->start(500);
-    QTimer::singleShot(100, [this]() {
-        if (isBLE())
-        {
-#ifdef DEV_DEBUG
-            qDebug() << "Resetting flip bit for BLE";
-#endif
-            bleImpl->sendResetFlipBit();
-            if (bleImpl->isAfterAuxFlash())
-            {
-                qDebug() << "Fixing communication with device after Aux Flash";
-                writeCancelRequest();
-            }
-            bleImpl->getPlatInfo();
-        }
-
-        exitMemMgmtMode(false);
-        //TODO Remove when GET_MOOLTIPASS_PARM implemented for BLE
+    statusTimer->start(STATUS_STARTING_DELAY);
+    addTimerJob(INIT_STARTING_DELAY);
+    if (isBLE())
+    {
         /**
-          * Temporary solution until GET_MOOLTIPASS_PARM
-          * is not implemented for the ble device we do not
-          * get if BLE is detected.
+          * Reset Flip Bit is written directly to device
+          * so TimerJob has no effect, hence sending
+          * it with a lower timeout.
           */
-        if (isBLE())
+        QTimer::singleShot(RESET_SEND_DELAY, this, &MPDevice::resetFlipBit);
+
+        if (bleImpl->isAfterAuxFlash())
         {
-            flashMbSizeChanged(0);
+            qDebug() << "Fixing communication with device after Aux Flash";
+            writeCancelRequest();
         }
-    });
+        bleImpl->getPlatInfo();
+    }
+
+    exitMemMgmtMode(false);
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
@@ -298,6 +250,12 @@ void MPDevice::newDataRead(const QByteArray &data)
 
     if (commandQueue.isEmpty())
     {
+        if (isBLE() && MPCmd::MOOLTIPASS_STATUS == pMesProt->getCommand(data))
+        {
+            qDebug() << "Received status: " << data.toHex();
+            processStatusChange(data);
+            return;
+        }
         qWarning() << "Command queue is empty!";
         qWarning() << "Packet data " << " size:" << pMesProt->getMessageSize(data) << " data:" << data.toHex();
         return;
@@ -367,27 +325,34 @@ void MPDevice::newDataRead(const QByteArray &data)
     if (currentCmd.checkReturn &&
         dataCommand != currentCommand)
     {
+        if (isBLE() && MPCmd::MOOLTIPASS_STATUS == dataCommand)
+        {
+            qDebug() << "Received status: " << data.toHex();
+            processStatusChange(data);
+            return;
+        }
         qWarning() << "Wrong answer received: " << pMesProt->printCmd(dataCommand)
                    << " for command: " << pMesProt->printCmd(currentCommand);
-#ifdef DEV_DEBUG
-        qWarning() << "Full response: " << data.toHex();
-#endif
+        if (AppDaemon::isDebugDev())
+            qWarning() << "Full response: " << data.toHex();
+
         return;
     }
 
-#ifdef DEV_DEBUG
-    QString resMsg = "Received answer: ";
-    if (isBLE() && !bleImpl->isFirstPacket(data))
+    if (AppDaemon::isDebugDev())
     {
-        resMsg += pMesProt->printCmd(pMesProt->getCommand(currentCmd.data[0]));
+        QString resMsg = "Received answer: ";
+        if (isBLE() && !bleImpl->isFirstPacket(data))
+        {
+            resMsg += pMesProt->printCmd(pMesProt->getCommand(currentCmd.data[0]));
+        }
+        else
+        {
+            qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
+            resMsg += pMesProt->printCmd(dataCommand);
+        }
+        qDebug() << resMsg << " Full packet:" << data.toHex();
     }
-    else
-    {
-        qDebug() << "Message payload length:" << pMesProt->getMessageSize(data);
-        resMsg += pMesProt->printCmd(dataCommand);
-    }
-    qDebug() << resMsg << " Full packet:" << data.toHex();
-#endif
 
     /**
       * For BLE it is waiting while every packet is received,
@@ -399,37 +364,9 @@ void MPDevice::newDataRead(const QByteArray &data)
       */
     if (isBLE())
     {
-        bool isFirst = bleImpl->isFirstPacket(data);
-        if (isFirst)
+        if (!bleImpl->processReceivedData(data, dataReceived))
         {
-            commandQueue.head().responseSize = pMesProt->getMessageSize(data);
-            commandQueue.head().response.append(data);
-        }
-
-        if (bleImpl->isLastPacket(data))
-        {
-            if (!isFirst)
-            {
-                /**
-                 * @brief EXTRA_INFO_SIZE
-                 * Extra bytes of the first packet.
-                 * In the last package only the remaining bytes
-                 * of payload is appended.
-                 */
-                constexpr int EXTRA_INFO_SIZE = 6;
-                int fullResponseSize = commandQueue.head().responseSize + EXTRA_INFO_SIZE;
-                QByteArray responseData = commandQueue.head().response;
-                responseData.append(pMesProt->getFullPayload(data).left(fullResponseSize - responseData.size()));
-                dataReceived = responseData;
-            }
-        }
-        else
-        {
-            if (!isFirst)
-            {
-                commandQueue.head().response.append(pMesProt->getFullPayload(data));
-            }
-            commandQueue.head().checkReturn = false;
+            //Expecting more packet
             return;
         }
     }
@@ -458,10 +395,10 @@ void MPDevice::sendDataDequeue()
     MPCommand &currentCmd = commandQueue.head();
     currentCmd.running = true;
 
-#ifdef DEV_DEBUG
     int i = 0;
-    qDebug() << "Platform send command: " << pMesProt->printCmd(currentCmd.data[0]);
-#endif
+    if (AppDaemon::isDebugDev())
+        qDebug() << "Platform send command: " << pMesProt->printCmd(currentCmd.data[0]);
+
     if (isBLE())
     {
         bleImpl->flipMessageBit(currentCmd.data);
@@ -469,18 +406,19 @@ void MPDevice::sendDataDequeue()
     // send data with platform code
     for (const auto &data : currentCmd.data)
     {
-#ifdef DEV_DEBUG
-        auto toHex = [](quint16 b) -> QString { return QString("0x%1").arg((quint16)b, 2, 16, QChar('0')); };
-        QString a = "[";
-        for (int i = 0;i < data.size();i++)
+        if (AppDaemon::isDebugDev())
         {
-            a += toHex((quint8)data.at(i));
-            if (i < data.size() - 1) a += ", ";
-        }
-        a += "]";
+            auto toHex = [](quint16 b) -> QString { return QString("0x%1").arg((quint16)b, 2, 16, QChar('0')); };
+            QString a = "[";
+            for (int i = 0;i < data.size();i++)
+            {
+                a += toHex((quint8)data.at(i));
+                if (i < data.size() - 1) a += ", ";
+            }
+            a += "]";
 
-        qDebug() << "Full packet#" << i++ << ": " << a;
-#endif
+            qDebug() << "Full packet#" << i++ << ": " << a;
+        }
 
         platformWrite(data);
     }
@@ -523,6 +461,21 @@ void MPDevice::runAndDequeueJobs()
     });
 
     currentJobs->start();
+}
+
+void MPDevice::resetFlipBit()
+{
+    if (AppDaemon::isDebugDev())
+        qDebug() << "Resetting flip bit for BLE";
+    bleImpl->sendResetFlipBit();
+}
+
+void MPDevice::addTimerJob(int msec)
+{
+    auto *waitingJob = new AsyncJobs(QString("Waiting job"), this);
+    waitingJob->append(new TimerJob{msec});
+    jobsQueue.enqueue(waitingJob);
+    runAndDequeueJobs();
 }
 
 void MPDevice::updateFilesCache()
@@ -686,9 +639,40 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     jobs->append(cpzJob);
 
     /* Get favorites */
-    if (!isBLE()) //TODO: favourite is not implemented yet for BLE
+    if (isBLE())
     {
-        for (uint i = 0; i<MOOLTIPASS_FAV_MAX; i++)
+        jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITES,
+                                  [this, jobs, cbProgress](const QByteArray &data, bool &)
+                    {
+                        if (pMesProt->getMessageSize(data) == 1)
+                        {
+                            /* Received one byte as answer: command fail */
+                            jobs->setCurrentJobError("Mooltipass refused to send us favorites");
+                            qCritical() << "Get favorite: couldn't get answer";
+                            return false;
+                        }
+                        if (AppDaemon::isDebugDev())
+                        {
+                            qDebug() << "Received favorites: " << data.toHex();
+                        }
+                        /* Append favorite to list */
+                        favoritesAddrs = bleImpl->getFavorites(data);
+                        favoritesAddrsClone = favoritesAddrs;
+
+                        progressCurrent++;
+                        QVariantMap cbData = {
+                            {"total", 1},
+                            {"current", 1},
+                            {"msg", "Favorite are loaded"}
+                        };
+                        cbProgress(cbData);
+                        return true;
+                    })
+        );
+    }
+    else
+    {
+        for (uint i = 0; i < pMesProt->getMaxFavorite(); ++i)
         {
             jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITE,
                                           QByteArray(1, static_cast<quint8>(i)),
@@ -737,6 +721,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         }
     }
 
+
     if (getCreds)
     {
         /* Get parent node start address */
@@ -752,20 +737,26 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             else
             {
-                const auto node = isBLE() ? pMesProt->getPayloadBytes(data, 0, 2) :
-                                            pMesProt->getFullPayload(data);
-                startNode = node;
-                startNodeClone = node;
-                qDebug() << "Start node addr:" << startNode.toHex();
+                if (isBLE())
+                {
+                    startNode = bleImpl->processReceivedStartNodes(pMesProt->getFullPayload(data));
+                    startNodeClone = startNode;
+                }
+                else
+                {
+                    startNode[Common::CRED_ADDR_IDX] = pMesProt->getFullPayload(data);
+                    startNodeClone[Common::CRED_ADDR_IDX] = startNode[Common::CRED_ADDR_IDX];
+                }
+                qDebug() << "Start node addr:" << startNode[Common::CRED_ADDR_IDX].toHex();
 
                 //if parent address is not null, load nodes
-                if (startNode != MPNode::EmptyAddress)
+                if (startNode[Common::CRED_ADDR_IDX] != MPNode::EmptyAddress)
                 {
                     qInfo() << "Loading parent nodes...";
                     if (!fullScan)
                     {
                         /* Traverse the flash by following the linked list */
-                        loadLoginNode(jobs, startNode, cbProgress);
+                        loadLoginNode(jobs, startNode[Common::CRED_ADDR_IDX], cbProgress);
                     }
                     else
                     {
@@ -775,6 +766,11 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                 else
                 {
                     qInfo() << "No parent nodes to load.";
+                }
+
+                if (isBLE())
+                {
+                    bleImpl->loadWebAuthnNodes(jobs, cbProgress);
                 }
 
                 return true;
@@ -1097,20 +1093,27 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
-void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress)
+void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qDebug() << "Loading cred parent node at address: " << address.toHex();
 
     /* Create new parent node, append to list */
     MPNode *pnode = pMesProt->createMPNode(this, address);
-    loginNodes.append(pnode);
     MPNode *pnodeClone = pMesProt->createMPNode(this, address);
-    loginNodesClone.append(pnodeClone);
+    if (isBLE())
+    {
+        bleImpl->appendLoginNode(pnode, pnodeClone, addrType);
+    }
+    else
+    {
+        loginNodes.append(pnode);
+        loginNodesClone.append(pnodeClone);
+    }
 
     /* Send read node command, expecting 3 packets */
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, jobs, pnode, pnodeClone, address, cbProgress](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnode, pnodeClone, address, cbProgress, addrType](const QByteArray &data, bool &done) -> bool
     {
         if (pMesProt->getMessageSize(data) == 1)
         {
@@ -1159,7 +1162,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
                 if (pnode->getStartChildAddress() != MPNode::EmptyAddress)
                 {
                     qDebug() << srv << ": loading child nodes...";
-                    loadLoginChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress());
+                    loadLoginChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress(), addrType);
                 }
                 else
                 {
@@ -1169,7 +1172,7 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
                 //Load next parent
                 if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
                 {
-                    loadLoginNode(jobs, pnode->getNextParentAddress(), cbProgress);
+                    loadLoginNode(jobs, pnode->getNextParentAddress(), cbProgress, addrType);
                 }
             }
 
@@ -1178,22 +1181,29 @@ void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const M
     }));
 }
 
-void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address)
+void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qDebug() << "Loading cred child node at address:" << address.toHex();
 
     /* Create empty child node and add it to the list */
     MPNode *cnode = pMesProt->createMPNode(this, address);
-    loginChildNodes.append(cnode);
     parent->appendChild(cnode);
     MPNode *cnodeClone = pMesProt->createMPNode(this, address);
-    loginChildNodesClone.append(cnodeClone);
     parentClone->appendChild(cnodeClone);
+    if (isBLE())
+    {
+        bleImpl->appendLoginChildNode(cnode, cnodeClone, addrType);
+    }
+    else
+    {
+        loginChildNodes.append(cnode);
+        loginChildNodesClone.append(cnodeClone);
+    }
 
     /* Query node */
     jobs->prepend(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, jobs, cnode, cnodeClone, address, parent, parentClone](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, cnode, cnodeClone, address, parent, parentClone, addrType](const QByteArray &data, bool &done) -> bool
     {
         if (pMesProt->getMessageSize(data) == 1)
         {
@@ -1222,7 +1232,7 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
                 //Load next child
                 if (cnode->getNextChildAddress() != MPNode::EmptyAddress)
                 {
-                    loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress());
+                    loadLoginChildNode(jobs, parent, parentClone, cnode->getNextChildAddress(), addrType);
                 }
             }
 
@@ -1433,7 +1443,7 @@ void MPDevice::deletePossibleFavorite(QByteArray parentAddr, QByteArray childAdd
 }
 
 /* Find a node inside a given list given his address */
-MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArray &address, const quint32 virt_addr)
+MPNode *MPDevice::findNodeWithAddressInList(NodeList list, const QByteArray &address, const quint32 virt_addr)
 {
     auto it = std::find_if(list.begin(), list.end(), [&address, virt_addr](const MPNode *const node)
     {
@@ -1451,7 +1461,7 @@ MPNode *MPDevice::findNodeWithAddressInList(QList<MPNode *> list, const QByteArr
 }
 
 /* Find a node inside a given list given his address */
-MPNode *MPDevice::findNodeWithNameInList(QList<MPNode *> list, const QString& name, bool isParent)
+MPNode *MPDevice::findNodeWithNameInList(NodeList list, const QString& name, bool isParent)
 {
     auto it = std::find_if(list.begin(), list.end(), [&name, isParent](const MPNode *const node)
     {
@@ -1469,7 +1479,7 @@ MPNode *MPDevice::findNodeWithNameInList(QList<MPNode *> list, const QString& na
 }
 
 /* Find a node inside a given list given his address */
-MPNode *MPDevice::findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QString& name)
+MPNode *MPDevice::findNodeWithLoginWithGivenParentInList(NodeList list,  MPNode *parent, const QString& name)
 {
     /* get first child */
     MPNode* tempChildNodePt;
@@ -1508,7 +1518,7 @@ MPNode *MPDevice::findNodeWithLoginWithGivenParentInList(QList<MPNode *> list,  
 
 
 /* Find a node inside a given list given his address */
-MPNode *MPDevice::findNodeWithAddressWithGivenParentInList(QList<MPNode *> list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr)
+MPNode *MPDevice::findNodeWithAddressWithGivenParentInList(NodeList list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr)
 {
     /* get first child */
     MPNode* tempChildNodePt;
@@ -1556,14 +1566,15 @@ MPNode *MPDevice::findNodeWithAddressWithGivenParentInList(QList<MPNode *> list,
 }
 
 /* Find a node inside the parent list given his service */
-MPNode *MPDevice::findNodeWithServiceInList(const QString &service)
+MPNode *MPDevice::findNodeWithServiceInList(const QString &service, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
-    auto it = std::find_if(loginNodes.begin(), loginNodes.end(), [&service](const MPNode *const node)
+    NodeList& nodes = Common::CRED_ADDR_IDX == addrType ? loginNodes : webAuthnLoginNodes;
+    auto it = std::find_if(nodes.begin(), nodes.end(), [&service](const MPNode *const node)
     {
         return node->getService() == service;
     });
 
-    return it == loginNodes.end()?nullptr:*it;
+    return it == nodes.end()?nullptr:*it;
 }
 
 bool MPDevice::tagFavoriteNodes(void)
@@ -1576,8 +1587,8 @@ bool MPDevice::tagFavoriteNodes(void)
     MPNode* tempChildNodePt = nullptr;
 
     /* start with start node (duh) */
-    tempParentAddress = startNode;
-    tempVirtualParentAddress = virtualStartNode;
+    tempParentAddress = startNode[Common::CRED_ADDR_IDX];
+    tempVirtualParentAddress = virtualStartNode[Common::CRED_ADDR_IDX];
 
     /* Loop through the parent nodes */
     while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
@@ -1643,28 +1654,42 @@ bool MPDevice::tagFavoriteNodes(void)
     return true;
 }
 
-void MPDevice::detagPointedNodes(void)
+void MPDevice::detagPointedNodes(Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
-    for (auto &i: loginNodes)
+    if (Common::CRED_ADDR_IDX == addrType)
     {
-        i->removePointedToCheck();
+        for (auto &i: loginNodes)
+        {
+            i->removePointedToCheck();
+        }
+        for (auto &i: loginChildNodes)
+        {
+            i->removePointedToCheck();
+        }
+        for (auto &i: dataNodes)
+        {
+            i->removePointedToCheck();
+        }
+        for (auto &i: dataChildNodes)
+        {
+            i->removePointedToCheck();
+        }
     }
-    for (auto &i: loginChildNodes)
+    else
     {
-        i->removePointedToCheck();
-    }
-    for (auto &i: dataNodes)
-    {
-        i->removePointedToCheck();
-    }
-    for (auto &i: dataChildNodes)
-    {
-        i->removePointedToCheck();
+        for (auto &i: webAuthnLoginNodes)
+        {
+            i->removePointedToCheck();
+        }
+        for (auto &i: webAuthnLoginChildNodes)
+        {
+            i->removePointedToCheck();
+        }
     }
 }
 
 /* Follow the chain to tag pointed nodes (useful when doing integrity check when we are getting everything we can) */
-bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed)
+bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     quint32 tempVirtualParentAddress;
     QByteArray tempParentAddress;
@@ -1675,21 +1700,24 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
     MPNode* tempNextChildNodePt = nullptr;
     MPNode* tempChildNodePt = nullptr;
     bool return_bool = true;
+    const bool isCred = Common::CRED_ADDR_IDX == addrType;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
 
     /* first, detag all nodes */
-    detagPointedNodes();
+    detagPointedNodes(addrType);
 
     if (tagCredentials)
     {
         /* start with start node (duh) */
-        tempParentAddress = startNode;
-        tempVirtualParentAddress = virtualStartNode;
+        tempParentAddress = startNode[addrType];
+        tempVirtualParentAddress = virtualStartNode[addrType];
 
         /* Loop through the parent nodes */
         while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
         {
             /* Get pointer to next parent node */
-            tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress, tempVirtualParentAddress);
+            tempNextParentNodePt = findNodeWithAddressInList(nodes, tempParentAddress, tempVirtualParentAddress);
 
             /* Check that we could actually find it */
             if (!tempNextParentNodePt)
@@ -1698,11 +1726,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode[addrType]))
                     {
                         /* start node is incorrect */
-                        startNode = QByteArray(MPNode::EmptyAddress);
-                        virtualStartNode = 0;
+                        startNode[addrType] = QByteArray(MPNode::EmptyAddress);
+                        virtualStartNode[addrType] = 0;
                     }
                     else
                     {
@@ -1722,11 +1750,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode[addrType]))
                     {
                         /* start node is already tagged... how's that possible? */
-                        startNode = QByteArray(MPNode::EmptyAddress);
-                        virtualStartNode = 0;
+                        startNode[addrType] = QByteArray(MPNode::EmptyAddress);
+                        virtualStartNode[addrType] = 0;
                     }
                     else
                     {
@@ -1742,7 +1770,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
             else
             {
                 /* check previous node address */
-                if ((!tempParentAddress.isNull() && tempParentAddress == startNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode))
+                if ((!tempParentAddress.isNull() && tempParentAddress == startNode[addrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualStartNode[addrType]))
                 {
                     /* first parent node: previous address should be an empty one */
                     if ((tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != 0))
@@ -1783,7 +1811,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                 while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
                 {
                     /* Get pointer to the child node */
-                    tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, tempVirtualChildAddress);
+                    tempNextChildNodePt = findNodeWithAddressInList(childNodes, tempChildAddress, tempVirtualChildAddress);
 
                     /* Check we could find child pointer */
                     if (!tempNextChildNodePt)
@@ -1881,7 +1909,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
         }
     }
 
-    if (tagData)
+    if (tagData && isCred)
     {
         /** SAME FOR DATA NODES **/
         /* start with start node (duh) */
@@ -2109,14 +2137,14 @@ bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt)
 }
 
 
-bool MPDevice::addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent)
+bool MPDevice::addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     quint32 cur_child_addr_v = parentNodePt->getStartChildVirtualAddress();
     QByteArray cur_child_addr = parentNodePt->getStartChildAddress();
     MPNode* prev_child_pt = nullptr;
 
     /* Tag nodes */
-    tagPointedNodes(!isDataParent, isDataParent, false);
+    tagPointedNodes(!isDataParent, isDataParent, false, addrType);
 
     /* Start following the chain */
     while ((cur_child_addr != MPNode::EmptyAddress) || (cur_child_addr.isNull() && cur_child_addr_v != 0))
@@ -2130,7 +2158,8 @@ bool MPDevice::addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent
         }
         else
         {
-            cur_child_pt = findNodeWithAddressInList(loginChildNodes, cur_child_addr, cur_child_addr_v);
+            NodeList& childNodes = Common::CRED_ADDR_IDX == addrType ? loginChildNodes : webAuthnLoginChildNodes;
+            cur_child_pt = findNodeWithAddressInList(childNodes, cur_child_addr, cur_child_addr_v);
         }
 
         if (!cur_child_pt)
@@ -2182,7 +2211,7 @@ bool MPDevice::addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent
 }
 
 /* Return success status */
-bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren)
+bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     MPNode* prevNodePt = nullptr;
     MPNode* curNodePt = nullptr;
@@ -2190,14 +2219,14 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     QByteArray curNodeAddr;
 
     /* Tag nodes */
-    if (!tagPointedNodes(!isDataParent, isDataParent, false))
+    if (!tagPointedNodes(!isDataParent, isDataParent, false, addrType))
     {
         qCritical() << "Can't add orphan parent to a corrupted DB, please run integrity check";
         return false;
     }
 
     /* Detag them */
-    detagPointedNodes();
+    detagPointedNodes(addrType);
 
     /* Which list do we want to browse ? */
     if (isDataParent)
@@ -2207,8 +2236,8 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     }
     else
     {
-        curNodeAddr = startNode;
-        curNodeAddrVirtual = virtualStartNode;
+        curNodeAddr = startNode[addrType];
+        curNodeAddrVirtual = virtualStartNode[addrType];
     }
 
     qInfo() << "Adding parent node" << parentNodePt->getService();
@@ -2216,10 +2245,10 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     if (parentNodePt->getPointedToCheck())
     {
         qCritical() << "addParentOrphan: parent node" << parentNodePt->getService() << "is already pointed to";
-        tagPointedNodes(!isDataParent, isDataParent, false);
+        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
         if (addPossibleChildren)
         {
-            addOrphanParentChildsToDB(parentNodePt, isDataParent);
+            addOrphanParentChildsToDB(parentNodePt, isDataParent, addrType);
         }
         return true;
     }
@@ -2236,17 +2265,17 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             }
             else
             {
-                startNode = parentNodePt->getAddress();
-                virtualStartNode = parentNodePt->getVirtualAddress();
+                startNode[addrType] = parentNodePt->getAddress();
+                virtualStartNode[addrType] = parentNodePt->getVirtualAddress();
             }
 
             /* Update prev/next fields */
             parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress, 0);
             parentNodePt->setNextParentAddress(MPNode::EmptyAddress, 0);
-            tagPointedNodes(!isDataParent, isDataParent, false);
+            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
             if (addPossibleChildren)
             {
-                addOrphanParentChildsToDB(parentNodePt, isDataParent);
+                addOrphanParentChildsToDB(parentNodePt, isDataParent, addrType);
             }
             return true;
         }
@@ -2261,14 +2290,15 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             }
             else
             {
-                curNodePt = findNodeWithAddressInList(loginNodes, curNodeAddr, curNodeAddrVirtual);
+                NodeList& nodes = addrType == Common::CRED_ADDR_IDX ? loginNodes : webAuthnLoginNodes;
+                curNodePt = findNodeWithAddressInList(nodes, curNodeAddr, curNodeAddrVirtual);
             }
 
             /* Check if we could find the parent */
             if (!curNodePt)
             {
                 qCritical() << "Broken parent linked list, please run integrity check";
-                tagPointedNodes(!isDataParent, isDataParent, false);
+                tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                 return false;
             }
             else
@@ -2277,7 +2307,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                 if (curNodePt->getPointedToCheck())
                 {
                     qCritical() << "Linked list loop detected, please run integrity check";
-                    tagPointedNodes(!isDataParent, isDataParent, false);
+                    tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                     return false;
                 }
 
@@ -2302,8 +2332,8 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                         }
                         else
                         {
-                            startNode = parentNodePt->getAddress();
-                            virtualStartNode = parentNodePt->getVirtualAddress();
+                            startNode[addrType] = parentNodePt->getAddress();
+                            virtualStartNode[addrType] = parentNodePt->getVirtualAddress();
                         }
                         parentNodePt->setPreviousParentAddress(MPNode::EmptyAddress);
                     }
@@ -2317,10 +2347,10 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                     /* Update our next node pointers */
                     curNodePt->setPreviousParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
                     parentNodePt->setNextParentAddress(curNodePt->getAddress(), curNodePt->getVirtualAddress());
-                    tagPointedNodes(!isDataParent, isDataParent, false);
+                    tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                     if (addPossibleChildren)
                     {
-                        addOrphanParentChildsToDB(parentNodePt, isDataParent);
+                        addOrphanParentChildsToDB(parentNodePt, isDataParent, addrType);
                     }
                     return true;
                 }
@@ -2344,16 +2374,16 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
         prevNodePt->setNextParentAddress(parentNodePt->getAddress(), parentNodePt->getVirtualAddress());
         parentNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
         parentNodePt->setNextParentAddress(MPNode::EmptyAddress);
-        tagPointedNodes(!isDataParent, isDataParent, false);
+        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
         if (addPossibleChildren)
         {
-            addOrphanParentChildsToDB(parentNodePt, isDataParent);
+            addOrphanParentChildsToDB(parentNodePt, isDataParent, addrType);
         }
         return true;
     }
 }
 
-MPNode* MPDevice::addNewServiceToDB(const QString &service)
+MPNode* MPDevice::addNewServiceToDB(const QString &service, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     MPNode* tempNodePt;
     MPNode* newNodePt;
@@ -2361,7 +2391,7 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     qDebug() << "Creating new service" << service << "in DB";
 
     /* Does the service actually exist? */
-    tempNodePt = findNodeWithServiceInList(service);
+    tempNodePt = findNodeWithServiceInList(service, addrType);
     if (tempNodePt)
     {
         qCritical() << "Service already exists.... dumbass!";
@@ -2376,21 +2406,22 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service)
     newNodePt->setType(MPNode::NodeParent);
     newNodePt->setService(service);
 
+    NodeList& nodes = addrType == Common::CRED_ADDR_IDX ? loginNodes : webAuthnLoginNodes;
     /* Add node to list */
-    loginNodes.append(newNodePt);
-    addOrphanParentToDB(newNodePt, false, false);
+    nodes.append(newNodePt);
+    addOrphanParentToDB(newNodePt, false, false, addrType);
 
     return newNodePt;
 }
 
-bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
+bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qInfo() << "Adding child " << childNodePt->getLogin() << " with parent " << parentNodePt->getService() << " to DB";
     MPNode* tempChildNodePt = nullptr;
     MPNode* tempNextChildNodePt;
 
     /* Detag nodes */
-    detagPointedNodes();
+    detagPointedNodes(addrType);
 
     /* Get first child */
     QByteArray tempChildAddress = parentNodePt->getStartChildAddress();
@@ -2403,21 +2434,22 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
         childNodePt->setPreviousChildAddress(MPNode::EmptyAddress);
         childNodePt->setNextChildAddress(MPNode::EmptyAddress);
         parentNodePt->appendChild(childNodePt);
-        tagPointedNodes(true, false, false);
+        tagPointedNodes(true, false, false, addrType);
         return true;
     }
 
+    NodeList& childNodes = addrType == Common::CRED_ADDR_IDX ? loginChildNodes : webAuthnLoginChildNodes;
     /* browse through all the children to find the right slot */
     while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
     {
         /* Get pointer to the child node */
-        tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, tempVirtualChildAddress);
+        tempNextChildNodePt = findNodeWithAddressInList(childNodes, tempChildAddress, tempVirtualChildAddress);
 
         /* Check we could find child pointer */
         if (!tempNextChildNodePt)
         {
             qCritical() << "Broken child linked list, please run integrity check";
-            tagPointedNodes(true, false, false);
+            tagPointedNodes(true, false, false, addrType);
             return false;
         }
         else
@@ -2426,7 +2458,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
             if (tempNextChildNodePt->getPointedToCheck())
             {
                 qCritical() << "Linked list loop detected, please run integrity check";
-                tagPointedNodes(true, false, false);
+                tagPointedNodes(true, false, false, addrType);
                 return false;
             }
 
@@ -2436,7 +2468,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
             if (tempNextChildNodePt->getLogin().compare(childNodePt->getLogin()) == 0)
             {
                 qCritical() << "Can't add child node that has the exact same name!";
-                tagPointedNodes(true, false, false);
+                tagPointedNodes(true, false, false, addrType);
                 return false;
             }
             else if (tempNextChildNodePt->getLogin().compare(childNodePt->getLogin()) > 0)
@@ -2452,7 +2484,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
                     childNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                     tempNextChildNodePt->setPreviousChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
                     parentNodePt->appendChild(childNodePt);
-                    tagPointedNodes(true, false, false);
+                    tagPointedNodes(true, false, false, addrType);
                     return true;
                 }
                 else
@@ -2463,7 +2495,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
                     childNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                     tempNextChildNodePt->setPreviousChildAddress(childNodePt->getAddress(), childNodePt->getVirtualAddress());
                     parentNodePt->appendChild(childNodePt);
-                    tagPointedNodes(true, false, false);
+                    tagPointedNodes(true, false, false, addrType);
                     return true;
                 }
             }
@@ -2483,11 +2515,11 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt)
     childNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
     childNodePt->setNextChildAddress(MPNode::EmptyAddress);
     parentNodePt->appendChild(childNodePt);
-    tagPointedNodes(true, false, false);
+    tagPointedNodes(true, false, false, addrType);
     return true;
 }
 
-bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
+bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qDebug() << "Removing parent " << parentNodePt->getService() << " from DB, addr: " << parentNodePt->getAddress().toHex();
     MPNode* nextNodePt = nullptr;
@@ -2495,16 +2527,18 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
     MPNode* curNodePt = nullptr;
     quint32 curNodeAddrVirtual;
     QByteArray curNodeAddr;
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
 
     /* Tag nodes */
-    if (!tagPointedNodes(!isDataParent, isDataParent, false))
+    if (!tagPointedNodes(!isDataParent, isDataParent, false, addrType))
     {
         qCritical() << "Can't remove parent to a corrupted DB, please run integrity check";
         return false;
     }
 
     /* Detag them */
-    detagPointedNodes();
+    detagPointedNodes(addrType);
 
     /* Which list do we want to browse ? */
     if (isDataParent)
@@ -2514,14 +2548,14 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
     }
     else
     {
-        curNodeAddr = startNode;
-        curNodeAddrVirtual = virtualStartNode;
+        curNodeAddr = startNode[addrType];
+        curNodeAddrVirtual = virtualStartNode[addrType];
     }
 
     if (parentNodePt->getPointedToCheck())
     {
         qCritical() << "addParentOrphan: parent node" << parentNodePt->getService() << "is already pointed to";
-        tagPointedNodes(!isDataParent, isDataParent, false);
+        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
         return true;
     }
     else
@@ -2530,7 +2564,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
         if ((curNodeAddr == MPNode::EmptyAddress) || (curNodeAddr.isNull() && curNodeAddrVirtual == 0))
         {
             qCritical() << "Database is empty!";
-            tagPointedNodes(!isDataParent, isDataParent, false);
+            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
             return false;
         }
 
@@ -2544,14 +2578,14 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
             }
             else
             {
-                curNodePt = findNodeWithAddressInList(loginNodes, curNodeAddr, curNodeAddrVirtual);
+                curNodePt = findNodeWithAddressInList(nodes, curNodeAddr, curNodeAddrVirtual);
             }
 
             /* Check if we could find the parent */
             if (!curNodePt)
             {
                 qCritical() << "Broken parent linked list, please run integrity check";
-                tagPointedNodes(!isDataParent, isDataParent, false);
+                tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                 return false;
             }
             else
@@ -2560,7 +2594,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                 if (curNodePt->getPointedToCheck())
                 {
                     qCritical() << "Linked list loop detected, please run integrity check";
-                    tagPointedNodes(!isDataParent, isDataParent, false);
+                    tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                     return false;
                 }
 
@@ -2574,7 +2608,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                     if ((curNodePt->getStartChildAddress() != MPNode::EmptyAddress) || (curNodePt->getStartChildAddress().isNull() && curNodePt->getStartChildVirtualAddress() != 0))
                     {
                         qCritical() << "Parent actually has a child!";
-                        tagPointedNodes(!isDataParent, isDataParent, false);
+                        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                         return false;
                     }
 
@@ -2591,13 +2625,13 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                         }
                         else
                         {
-                            nextNodePt = findNodeWithAddressInList(loginNodes, parentNodePt->getNextParentAddress(), parentNodePt->getNextParentVirtualAddress());
+                            nextNodePt = findNodeWithAddressInList(nodes, parentNodePt->getNextParentAddress(), parentNodePt->getNextParentVirtualAddress());
                         }
 
                         if (!nextNodePt)
                         {
                             qCritical() << "Broken parent linked list, please run integrity check";
-                            tagPointedNodes(!isDataParent, isDataParent, false);
+                            tagPointedNodes(!isDataParent, isDataParent, false, addrType);
                             return false;
                         }
                     }
@@ -2617,22 +2651,9 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                startNode = MPNode::EmptyAddress;
-                                virtualStartNode = 0;
+                                startNode[addrType] = MPNode::EmptyAddress;
+                                virtualStartNode[addrType] = 0;
                             }
-
-                            /* Delete object */
-                            if (isDataParent)
-                            {
-                                dataNodes.removeOne(parentNodePt);
-                            }
-                            else
-                            {
-                                loginNodes.removeOne(parentNodePt);
-                            }
-                            delete(parentNodePt);
-                            tagPointedNodes(!isDataParent, isDataParent, false);
-                            return true;
                         }
                         else
                         {
@@ -2644,24 +2665,23 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                             }
                             else
                             {
-                                startNode = nextNodePt->getAddress();
-                                virtualStartNode = nextNodePt->getVirtualAddress();
+                                startNode[addrType] = nextNodePt->getAddress();
+                                virtualStartNode[addrType] = nextNodePt->getVirtualAddress();
                             }
                             nextNodePt->setPreviousParentAddress(MPNode::EmptyAddress, 0);
-
-                            /* Delete object */
-                            if (isDataParent)
-                            {
-                                dataNodes.removeOne(parentNodePt);
-                            }
-                            else
-                            {
-                                loginNodes.removeOne(parentNodePt);
-                            }
-                            delete(parentNodePt);
-                            tagPointedNodes(!isDataParent, isDataParent, false);
-                            return true;
                         }
+                        /* Delete object */
+                        if (isDataParent)
+                        {
+                            dataNodes.removeOne(parentNodePt);
+                        }
+                        else
+                        {
+                            nodes.removeOne(parentNodePt);
+                        }
+                        delete parentNodePt;
+                        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
+                        return true;
                     }
                     else
                     {
@@ -2669,39 +2689,25 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
                         {
                             /* Linked list ends there */
                             prevNodePt->setNextParentAddress(MPNode::EmptyAddress, 0);
-
-                            /* Delete object */
-                            if (isDataParent)
-                            {
-                                dataNodes.removeOne(parentNodePt);
-                            }
-                            else
-                            {
-                                loginNodes.removeOne(parentNodePt);
-                            }
-                            delete(parentNodePt);
-                            tagPointedNodes(!isDataParent, isDataParent, false);
-                            return true;
                         }
                         else
                         {
                             /* Link the chain together */
                             prevNodePt->setNextParentAddress(nextNodePt->getAddress(), nextNodePt->getVirtualAddress());
                             nextNodePt->setPreviousParentAddress(prevNodePt->getAddress(), prevNodePt->getVirtualAddress());
-
-                            /* Delete object */
-                            if (isDataParent)
-                            {
-                                dataNodes.removeOne(parentNodePt);
-                            }
-                            else
-                            {
-                                loginNodes.removeOne(parentNodePt);
-                            }
-                            delete(parentNodePt);
-                            tagPointedNodes(!isDataParent, isDataParent, false);
-                            return true;
                         }
+                        /* Delete object */
+                        if (isDataParent)
+                        {
+                            dataNodes.removeOne(parentNodePt);
+                        }
+                        else
+                        {
+                            nodes.removeOne(parentNodePt);
+                        }
+                        delete parentNodePt;
+                        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
+                        return true;
                     }
                 }
             }
@@ -2716,12 +2722,12 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent)
 
         /* If we arrived here, it means we didn't find the parent */
         qCritical() << "Broken parent linked list, please run integrity check";
-        tagPointedNodes(!isDataParent, isDataParent, false);
+        tagPointedNodes(!isDataParent, isDataParent, false, addrType);
         return false;
     }
 }
 
-bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList)
+bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     if (deleteFromList)
         qDebug() << "Removing child " << childNodePt->getLogin() << " with parent " << parentNodePt->getService() << " from DB";
@@ -2742,11 +2748,13 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
         return false;
     }
 
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
     /* browse through all the children to find the right child */
     while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
     {
         /* Get pointer to the child node */
-        tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, tempChildAddress, tempVirtualChildAddress);
+        tempNextChildNodePt = findNodeWithAddressInList(childNodes, tempChildAddress, tempVirtualChildAddress);
 
         /* Check we could find child pointer */
         if (!tempNextChildNodePt)
@@ -2766,7 +2774,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                 if (!isLastNode)
                 {
                     /* Get next node pointer, if it exists */
-                    tempNextChildNodePt = findNodeWithAddressInList(loginChildNodes, childNodePt->getNextChildAddress(), childNodePt->getNextChildVirtualAddress());
+                    tempNextChildNodePt = findNodeWithAddressInList(childNodes, childNodePt->getNextChildAddress(), childNodePt->getNextChildVirtualAddress());
 
                     if (!tempNextChildNodePt)
                     {
@@ -2782,44 +2790,34 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                     {
                         /* Linked list ends there, only credential */
                         parentNodePt->setStartChildAddress(MPNode::EmptyAddress, 0);
-
-                        /* Delete possible fav */
-                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
-
-                        /* Delete object */
-                        parentNodePt->removeChild(childNodePt);
-                        if (deleteFromList)
-                        {
-                            loginChildNodes.removeOne(childNodePt);
-                            delete(childNodePt);
-                        }
-
-                        /* Remove parent */
-                        if (deleteEmptyParent)
-                        {
-                            removeEmptyParentFromDB(parentNodePt, false);
-                        }
-
-                        return true;
                     }
                     else
                     {
                         /* Link the chain together */
                         parentNodePt->setStartChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                         tempNextChildNodePt->setPreviousChildAddress(MPNode::EmptyAddress, 0);
+                    }
 
+                    if (isCred)
+                    {
                         /* Delete possible fav */
                         deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
-
-                        /* Delete object */
-                        parentNodePt->removeChild(childNodePt);
-                        if (deleteFromList)
-                        {
-                            loginChildNodes.removeOne(childNodePt);
-                            delete(childNodePt);
-                        }
-                        return true;
                     }
+
+                    /* Delete object */
+                    parentNodePt->removeChild(childNodePt);
+                    if (deleteFromList)
+                    {
+                        childNodes.removeOne(childNodePt);
+                        delete childNodePt;
+                    }
+
+                    /* Remove parent */
+                    if (isLastNode && deleteEmptyParent)
+                    {
+                        removeEmptyParentFromDB(parentNodePt, false, addrType);
+                    }
+                    return true;
                 }
                 else
                 {
@@ -2827,37 +2825,28 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                     {
                         /* Linked list ends there */
                         tempChildNodePt->setNextChildAddress(MPNode::EmptyAddress, 0);
-
-                        /* Delete possible fav */
-                        deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
-
-                        /* Delete object */
-                        parentNodePt->removeChild(childNodePt);
-                        if (deleteFromList)
-                        {
-                            loginChildNodes.removeOne(childNodePt);
-                            delete(childNodePt);
-                        }
-                        return true;
                     }
                     else
                     {
                         /* Link the chain together */
                         tempChildNodePt->setNextChildAddress(tempNextChildNodePt->getAddress(), tempNextChildNodePt->getVirtualAddress());
                         tempNextChildNodePt->setPreviousChildAddress(tempChildNodePt->getAddress(), tempChildNodePt->getVirtualAddress());
+                    }
 
+                    if (isCred)
+                    {
                         /* Delete possible fav */
                         deletePossibleFavorite(parentNodePt->getAddress(), childNodePt->getAddress());
-
-                        /* Delete object */
-                        parentNodePt->removeChild(childNodePt);
-                        if (deleteFromList)
-                        {
-                            loginChildNodes.removeOne(childNodePt);
-                            delete(childNodePt);
-                        }
-                        return true;
                     }
+
+                    /* Delete object */
+                    parentNodePt->removeChild(childNodePt);
+                    if (deleteFromList)
+                    {
+                        loginChildNodes.removeOne(childNodePt);
+                        delete childNodePt;
+                    }
+                    return true;
                 }
             }
 
@@ -2875,7 +2864,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
     return false;
 }
 
-bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
+bool MPDevice::addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     QString recovered_service_name = "_recovered_";
     MPNode* tempNodePt;
@@ -2883,15 +2872,15 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt)
     qInfo() << "Adding orphan child" << childNodePt->getLogin() << "to DB";
 
     /* Create a "_recovered_" service */
-    tempNodePt = findNodeWithServiceInList(recovered_service_name);
+    tempNodePt = findNodeWithServiceInList(recovered_service_name, addrType);
     if (!tempNodePt)
     {
         qInfo() << "No" << recovered_service_name << "service in DB, adding it...";
-        tempNodePt = addNewServiceToDB(recovered_service_name);
+        tempNodePt = addNewServiceToDB(recovered_service_name, addrType);
     }
 
     /* Add child to DB */
-    return addChildToDB(tempNodePt, childNodePt);
+    return addChildToDB(tempNodePt, childNodePt, addrType);
 }
 
 bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed)
@@ -2903,46 +2892,22 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
     /* Tag pointed nodes, also detects DB errors */
     return_bool = tagPointedNodes(checkCredentials, checkData, repairAllowed);
+    return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
 
     /* Scan for orphan nodes */
     quint32 nbOrphanParents = 0;
     quint32 nbOrphanChildren = 0;
     quint32 nbOrphanDataParents = 0;
     quint32 nbOrphanDataChildren = 0;
+    quint32 nbWebauthnOrphanParents = 0;
+    quint32 nbWebauthnOrphanChildren = 0;
 
     if (checkCredentials)
     {
-        for (auto &i: loginNodes)
+        checkLoadedLoginNodes(nbOrphanParents, nbOrphanChildren, repairAllowed, Common::CRED_ADDR_IDX);
+        if (isBLE())
         {
-            if (!i->getPointedToCheck())
-            {
-                qWarning() << "Orphan parent found:" << i->getService() << "at address:" << i->getAddress().toHex();
-                if (repairAllowed)
-                {
-                    addOrphanParentToDB(i, false, repairAllowed);
-                }
-                nbOrphanParents++;
-            }
-        }
-        for (auto &i: loginChildNodes)
-        {
-            if (!i->getPointedToCheck())
-            {
-                qWarning() << "Orphan child found:" << i->getLogin() << "at address:" << i->getAddress().toHex();
-                if (repairAllowed)
-                {
-                    quint32 append_number = 2;
-                    QString service_name = i->getLogin();
-
-                    /* If the "_recovered_" service already has the same login, append a number */
-                    while(!addOrphanChildToDB(i))
-                    {
-                        i->setLogin(service_name + QString::number(append_number));
-                        append_number++;
-                    }
-                }
-                nbOrphanChildren++;
-            }
+           checkLoadedLoginNodes(nbWebauthnOrphanParents, nbWebauthnOrphanChildren, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
         }
     }
 
@@ -2988,6 +2953,11 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     qDebug() << "Number of children orphans:" << nbOrphanChildren;
     qDebug() << "Number of data parent orphans:" << nbOrphanDataParents;
     qDebug() << "Number of data children orphans:" << nbOrphanDataChildren;
+    if (isBLE())
+    {
+        qDebug() << "Number of webauthn parent orphans:" << nbWebauthnOrphanParents;
+        qDebug() << "Number of webauthn children orphans:" << nbWebauthnOrphanChildren;
+    }
 
     if (checkCredentials)
     {
@@ -2999,7 +2969,7 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
             temp_cnode_address = i.mid(2, 2);
 
             /* Check if favorite is set */
-            if ((temp_pnode_address != MPNode::EmptyAddress) || (temp_pnode_address != MPNode::EmptyAddress))
+            if (temp_pnode_address != MPNode::EmptyAddress)
             {
                 /* Find the nodes in memory */
                 MPNode *temp_cnode_pointer = nullptr;
@@ -3054,6 +3024,45 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     return return_bool;
 }
 
+void MPDevice::checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::AddressType addrType)
+{
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    for (auto &i: nodes)
+    {
+        if (!i->getPointedToCheck())
+        {
+            qWarning() << "Orphan parent found:" << i->getService() << "at address:" << i->getAddress().toHex();
+            if (repairAllowed)
+            {
+                addOrphanParentToDB(i, false, repairAllowed, addrType);
+            }
+            parentNum++;
+        }
+    }
+    for (auto &i: childNodes)
+    {
+        if (!i->getPointedToCheck())
+        {
+            qWarning() << "Orphan child found:" << i->getLogin() << "at address:" << i->getAddress().toHex();
+            if (repairAllowed)
+            {
+                quint32 append_number = 2;
+                QString service_name = i->getLogin();
+
+                /* If the "_recovered_" service already has the same login, append a number */
+                while(!addOrphanChildToDB(i))
+                {
+                    i->setLogin(service_name + QString::number(append_number));
+                    append_number++;
+                }
+            }
+            childNum++;
+        }
+    }
+}
+
 void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& address, const QByteArray& data, std::function<void(void)> writeCallback)
 {
     for (auto packet : pMesProt->createWriteNodePackets(data, address))
@@ -3072,9 +3081,9 @@ void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& addres
                 return true;
             }
         }));
-#ifdef DEV_DEBUG
-        qDebug() << "Write node packet #" << static_cast<quint8>(packet[2]) << " : " << packet.toHex();
-#endif
+
+        if (AppDaemon::isDebugDev())
+            qDebug() << "Write node packet #" << static_cast<quint8>(packet[2]) << " : " << packet.toHex();
     }
 }
 
@@ -3114,53 +3123,10 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     /* First pass: check the nodes that changed or were added */
     if (tackleCreds)
     {
-        for (auto &nodelist_iterator: loginNodes)
+        diagSavePacketsGenerated |= checkModifiedSavePacketNodes(jobs, dataWriteProgressCb, Common::CRED_ADDR_IDX);
+        if (isBLE())
         {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(loginNodesClone, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating save packet for new service" << nodelist_iterator->getService();
-                //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-            else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
-            {
-                qDebug() << "Generating save packet for updated service" << nodelist_iterator->getService();
-                //qDebug() << "Prev contents: " << temp_node_pointer->getNodeData().toHex();
-                //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(),dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-        }
-        for (auto &nodelist_iterator: loginChildNodes)
-        {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(loginChildNodesClone, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating save packet for new login" << nodelist_iterator->getLogin();
-                //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-            else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
-            {
-                qDebug() << "Generating save packet for updated login" << nodelist_iterator->getLogin();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-            else
-            {
-                //qDebug() << "Node data match for login" << nodelist_iterator->getLogin();
-            }
+            diagSavePacketsGenerated |= checkModifiedSavePacketNodes(jobs, dataWriteProgressCb, Common::WEBAUTHN_ADDR_IDX);
         }
     }
 
@@ -3213,31 +3179,10 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     /* Second pass: check the nodes that were removed */
     if (tackleCreds)
     {
-        for (auto &nodelist_iterator: loginNodesClone)
+        diagSavePacketsGenerated |= checkRemovedSavePacketNodes(jobs, dataWriteProgressCb, Common::CRED_ADDR_IDX);
+        if (isBLE())
         {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(loginNodes, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getParentNodeSize(), 0xFF), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-        }
-        for (auto &nodelist_iterator: loginChildNodesClone)
-        {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(loginChildNodes, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getChildNodeSize(), 0xFF), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
+            diagSavePacketsGenerated |= checkRemovedSavePacketNodes(jobs, dataWriteProgressCb, Common::WEBAUTHN_ADDR_IDX);
         }
 
         /* Diff favorites */
@@ -3247,19 +3192,44 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             {
                 qDebug() << "Generating favorite" << i << "update packet";
                 diagSavePacketsGenerated = true;
-                QByteArray updateFavPacket = QByteArray();
-                updateFavPacket.append(i);
+                QByteArray updateFavPacket;
+                if (isBLE())
+                {
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i/MAX_BLE_CAT_NUM));
+                    updateFavPacket.append(pMesProt->toLittleEndianFromInt(i%MAX_BLE_CAT_NUM));
+                }
+                else
+                {
+                    updateFavPacket.append(i);
+                }
                 updateFavPacket.append(favoritesAddrs[i]);
                 jobs->append(new MPCommandJob(this, MPCmd::SET_FAVORITE, updateFavPacket, pMesProt->getDefaultFuncDone()));
             }
         }
 
         /* Diff start node */
-        if (startNode != startNodeClone)
+        if (startNode[Common::CRED_ADDR_IDX] != startNodeClone[Common::CRED_ADDR_IDX])
         {
             qDebug() << "Updating start node";
             diagSavePacketsGenerated = true;
-            jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, startNode, pMesProt->getDefaultFuncDone()));
+            QByteArray setAddress;
+            if (isBLE())
+            {
+                setAddress = bleImpl->getStartAddressToSet(startNode, Common::CRED_ADDR_IDX);
+            }
+            else
+            {
+                setAddress = startNode[Common::CRED_ADDR_IDX];
+            }
+            jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, setAddress, pMesProt->getDefaultFuncDone()));
+        }
+
+        if (isBLE() && startNode[Common::WEBAUTHN_ADDR_IDX] != startNodeClone[Common::WEBAUTHN_ADDR_IDX])
+        {
+            qDebug() << "Updating start node";
+            diagSavePacketsGenerated = true;
+            QByteArray setAddress = bleImpl->getStartAddressToSet(startNode, Common::WEBAUTHN_ADDR_IDX);
+            jobs->append(new MPCommandJob(this, MPCmd::SET_STARTING_PARENT, setAddress, pMesProt->getDefaultFuncDone()));
         }
     }
     if (tackleData)
@@ -3339,6 +3309,100 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     }
 
     return diagSavePacketsGenerated;
+}
+
+bool MPDevice::checkModifiedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType)
+{
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& nodesClone = isCred ? loginNodesClone : webAuthnLoginNodesClone;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    NodeList& childNodesClone = isCred? loginChildNodesClone : webAuthnLoginChildNodesClone;
+    MPNode* tmpNodePtr;
+    bool savePacketGenerated = false;
+    for (auto &nodelist_iterator: nodes)
+    {
+        /* See if we can find the same node in the clone list */
+        tmpNodePtr = findNodeWithAddressInList(nodesClone, nodelist_iterator->getAddress(), 0);
+
+        if (!tmpNodePtr)
+        {
+            qDebug() << "Generating save packet for new service" << nodelist_iterator->getService();
+            //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+        else if (nodelist_iterator->getNodeData() != tmpNodePtr->getNodeData())
+        {
+            qDebug() << "Generating save packet for updated service" << nodelist_iterator->getService();
+            //qDebug() << "Prev contents: " << temp_node_pointer->getNodeData().toHex();
+            //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    for (auto &nodelist_iterator: childNodes)
+    {
+        /* See if we can find the same node in the clone list */
+        tmpNodePtr = findNodeWithAddressInList(childNodesClone, nodelist_iterator->getAddress(), 0);
+
+        if (!tmpNodePtr)
+        {
+            qDebug() << "Generating save packet for new login" << nodelist_iterator->getLogin();
+            //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+        else if (nodelist_iterator->getNodeData() != tmpNodePtr->getNodeData())
+        {
+            qDebug() << "Generating save packet for updated login" << nodelist_iterator->getLogin();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    return savePacketGenerated;
+}
+
+bool MPDevice::checkRemovedSavePacketNodes(AsyncJobs *jobs, std::function<void ()> writeCb, Common::AddressType addrType)
+{
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& nodesClone = isCred ? loginNodesClone : webAuthnLoginNodesClone;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    NodeList& childNodesClone = isCred? loginChildNodesClone : webAuthnLoginChildNodesClone;
+    MPNode* tmpNodePtr;
+    bool savePacketGenerated = false;
+    for (auto &nodelist_iterator : nodesClone)
+    {
+        /* See if we can find the same node in the clone list */
+        tmpNodePtr = findNodeWithAddressInList(nodes, nodelist_iterator->getAddress(), 0);
+
+        if (!tmpNodePtr)
+        {
+            qDebug() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getParentNodeSize(), 0xFF), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    for (auto &nodelist_iterator : childNodesClone)
+    {
+        /* See if we can find the same node in the clone list */
+        tmpNodePtr = findNodeWithAddressInList(childNodes, nodelist_iterator->getAddress(), 0);
+
+        if (!tmpNodePtr)
+        {
+            qDebug() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getChildNodeSize(), 0xFF), writeCb);
+            savePacketGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    return savePacketGenerated;
 }
 
 QByteArray MPDevice::getFreeAddress(quint32 virtualAddr)
@@ -3458,6 +3522,48 @@ void MPDevice::getUID(const QByteArray & key)
     runAndDequeueJobs();
 }
 
+void MPDevice::processStatusChange(const QByteArray &data)
+{
+    /* Map status from received val */
+    Common::MPStatus s = pMesProt->getStatus(data);
+    Common::MPStatus prevStatus = get_status();
+
+    if (isBLE())
+    {
+        if(pMesProt->getMessageSize(data) >= 4) // these settings are sent only when user is logged in
+            bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
+    }
+
+    /* Trigger on status change */
+    if (s != prevStatus)
+    {
+        qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
+
+        /* Update status */
+        set_status(s);
+
+        if (prevStatus == Common::UnknownStatus)
+        {
+            QTimer::singleShot(10, this, &MPDevice::sendSetupDeviceMessages);
+        }
+
+        if ((s == Common::Unlocked) || (s == Common::UnknownSmartcard))
+        {
+            QTimer::singleShot(20, this, &MPDevice::getCurrentCardCPZ);
+        }
+        else
+        {
+            filesCache.resetState();
+        }
+
+        if (s == Common::Unlocked)
+        {
+            /* If v1.2 firmware, query user change number */
+            QTimer::singleShot(50, this, &MPDevice::handleDeviceUnlocked);
+        }
+    }
+}
+
 void MPDevice::getCurrentCardCPZ()
 {
     AsyncJobs* cpzjobs = new AsyncJobs("Loading device card CPZ", this);
@@ -3500,6 +3606,31 @@ void MPDevice::getCurrentCardCPZ()
 
     jobsQueue.enqueue(cpzjobs);
     runAndDequeueJobs();
+}
+
+void MPDevice::sendSetupDeviceMessages()
+{
+    /* First start: load parameters */
+    pSettings->loadParameters();
+    setCurrentDate();
+}
+
+void MPDevice::handleDeviceUnlocked()
+{
+    if (isFw12() || isBLE())
+    {
+        qInfo() << "Requesting change numbers";
+        getChangeNumbers();
+        if (isBLE() && !bleImpl->areCategoriesFetched())
+        {
+            //Fetch category if it was not requested from Gui
+            QTimer::singleShot(CATEGORY_FETCH_DELAY, bleImpl, &MPDeviceBleImpl::fetchCategories);
+        }
+    }
+    else
+    {
+        qInfo() << "Firmware below v1.2, do not request change numbers";
+    }
 }
 
 void MPDevice::getChangeNumbers()
@@ -3595,9 +3726,10 @@ void MPDevice::writeCancelRequest()
     ba.append(pMesProt->createPackets(QByteArray{}, cancelRequestCmd)[0]);
 
     qDebug() << "Platform send command: " << pMesProt->printCmd(cancelRequestCmd);
-#ifdef DEV_DEBUG
-    qDebug() << "Message:" << ba.toHex();
-#endif
+
+    if (AppDaemon::isDebugDev())
+        qDebug() << "Message:" << ba.toHex();
+
     qDebug() << "Platform send command: " << QString("0x%1").arg(static_cast<quint8>(ba[1]), 2, 16, QChar('0'));
     if (isBLE())
     {
@@ -4444,12 +4576,17 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
     runAndDequeueJobs();
 }
 
-void MPDevice::changeVirtualAddressesToFreeAddresses(void)
+void MPDevice::changeVirtualAddressesToFreeAddresses()
 {
-    if (virtualStartNode != 0)
+    if (virtualStartNode[Common::CRED_ADDR_IDX] != 0)
     {
-        qDebug() << "Setting start node to " << getFreeAddress(virtualStartNode).toHex();
-        startNode = getFreeAddress(virtualStartNode);
+        qDebug() << "Setting start node to " << getFreeAddress(virtualStartNode[Common::CRED_ADDR_IDX]).toHex();
+        startNode[Common::CRED_ADDR_IDX] = getFreeAddress(virtualStartNode[Common::CRED_ADDR_IDX]);
+    }
+    if (isBLE() && virtualStartNode[Common::WEBAUTHN_ADDR_IDX] != 0)
+    {
+        qDebug() << "Setting start webauthn node to " << getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]).toHex();
+        startNode[Common::WEBAUTHN_ADDR_IDX] = getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]);
     }
     if (virtualDataStartNode != 0)
     {
@@ -4485,6 +4622,25 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(void)
         if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
         if (i->getNextChildDataAddress().isNull()) i->setNextChildDataAddress(getFreeAddress(i->getNextChildVirtualAddress()));
     }
+
+    if (isBLE())
+    {
+        qDebug() << "Replacing virtual addresses for webauthn login nodes...";
+        for (auto &i: webAuthnLoginNodes)
+        {
+            if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+            if (i->getNextParentAddress().isNull()) i->setNextParentAddress(getFreeAddress(i->getNextParentVirtualAddress()));
+            if (i->getPreviousParentAddress().isNull()) i->setPreviousParentAddress(getFreeAddress(i->getPreviousParentVirtualAddress()));
+            if (i->getStartChildAddress().isNull()) i->setStartChildAddress(getFreeAddress(i->getStartChildVirtualAddress()));
+        }
+        qDebug() << "Replacing virtual addresses for webauthn child nodes...";
+        for (auto &i: webAuthnLoginChildNodes)
+        {
+            if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+            if (i->getNextChildAddress().isNull()) i->setNextChildAddress(getFreeAddress(i->getNextChildVirtualAddress()));
+            if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(getFreeAddress(i->getPreviousChildVirtualAddress()));
+        }
+    }
 }
 
 void MPDevice::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
@@ -4501,28 +4657,51 @@ void MPDevice::updateChangeNumbers(AsyncJobs *jobs, quint8 flags)
     jobs->append(new MPCommandJob(this, MPCmd::SET_USER_CHANGE_NB, updateChangeNumbersPacket, pMesProt->getDefaultFuncDone()));
 }
 
+quint64 MPDevice::getUInt64EncryptionKey(const QString &encryption)
+{
+    if (Common::SIMPLE_CRYPT_V2 == encryption)
+    {
+        return getUInt64EncryptionKey();
+    }
+
+    return getUInt64EncryptionKeyOld();
+}
+
 quint64 MPDevice::getUInt64EncryptionKey()
 {
-    qint64 key = 0;
+    quint64 key = 0;
     for (int i = 0; i < std::min(8, m_cardCPZ.size()) ; i ++)
-        key += (static_cast<unsigned int>(m_cardCPZ[i]) & 0xFF) << (i*8);
+    {
+        key += ((static_cast<quint64>(m_cardCPZ[i]) & 0xFF) << (i*8));
+    }
 
     return key;
 }
 
-QString MPDevice::encryptSimpleCrypt(const QByteArray &data)
+quint64 MPDevice::getUInt64EncryptionKeyOld()
+{
+    qint64 key = 0;
+    for (int i = 0; i < std::min(8, m_cardCPZ.size()) ; i ++)
+    {
+        key += (static_cast<unsigned int>(m_cardCPZ[i]) & 0xFF) << (i*8);
+    }
+
+    return key;
+}
+
+QString MPDevice::encryptSimpleCrypt(const QByteArray &data, const QString &encryption)
 {
     /* Encrypt payload */
     SimpleCrypt simpleCrypt;
-    simpleCrypt.setKey(getUInt64EncryptionKey());
+    simpleCrypt.setKey(getUInt64EncryptionKey(encryption));
 
     return simpleCrypt.encryptToString(data);
 }
 
-QByteArray MPDevice::decryptSimpleCrypt(const QString &payload)
+QByteArray MPDevice::decryptSimpleCrypt(const QString &payload, const QString &encryption)
 {
     SimpleCrypt simpleCrypt;
-    simpleCrypt.setKey(getUInt64EncryptionKey());
+    simpleCrypt.setKey(getUInt64EncryptionKey(encryption));
 
     return simpleCrypt.decryptToByteArray(payload);
 }
@@ -4551,7 +4730,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping one parent node link in chain: test failed!";return false;} else qInfo() << "Skipping one parent node link in chain: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping first parent node";
-    startNode = loginNodes[1]->getAddress();
+    startNode[Common::CRED_ADDR_IDX] = loginNodes[1]->getAddress();
     loginNodes[1]->setPreviousParentAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true, true, true);
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping first parent node: test failed!";return false;} else qInfo() << "Skipping first parent node: passed!";
@@ -4562,7 +4741,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping last parent node: test failed!";return false;} else qInfo() << "Skipping last parent node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Setting invalid startNode";
-    startNode = invalidAddress;
+    startNode[Common::CRED_ADDR_IDX] = invalidAddress;
     checkLoadedNodes(true, true, true);
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Setting invalid startNode: test failed!";return false;} else qInfo() << "Setting invalid startNode: passed!";
 
@@ -4703,7 +4882,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     exportTopArray.append(QJsonValue(cpzCtrQJsonArray));
 
     /* Starting parent */
-    exportTopArray.append(QJsonValue(Common::bytesToJson(startNode)));
+    exportTopArray.append(QJsonValue(Common::bytesToJson(startNode[Common::CRED_ADDR_IDX])));
 
     /* Data starting parent */
     exportTopArray.append(QJsonValue(Common::bytesToJson(startDataNode)));
@@ -4782,10 +4961,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
 
     if (isBLE())
     {
-        /* isBle */
-        exportTopArray.append(QJsonValue{true});
-        /* user category names */
-        exportTopArray.append(bleImpl->getUserCategories());
+        bleImpl->generateExportData(exportTopArray);
     }
 
     /* Generate file payload */
@@ -4800,13 +4976,20 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     /* Export file content */
     QJsonObject exportTopObject;
 
-    if (encryption == "SimpleCrypt") {
-        exportTopObject.insert("encryption", "SimpleCrypt");
-        exportTopObject.insert("payload", encryptSimpleCrypt(payload));
+    QString enc = encryption;
+    if (enc == Common::SIMPLE_CRYPT || enc == Common::SIMPLE_CRYPT_V2)
+    {
+        if (isBLE())
+        {
+            // For BLE using the new encryption
+            enc = Common::SIMPLE_CRYPT_V2;
+        }
+        exportTopObject.insert("encryption", enc);
+        exportTopObject.insert("payload", encryptSimpleCrypt(payload, enc));
     } else
     {
         // Fallback in case of an unknown encryption method where specified
-        qWarning() << "DB export: Unknown encryption " << encryption << "is asked, fallback to 'none'";
+        qWarning() << "DB export: Unknown encryption " << enc << "is asked, fallback to 'none'";
         exportTopObject.insert("encryption", "none");
         exportTopObject.insert("payload", QString(payload));
     }
@@ -4863,10 +5046,10 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
         if ( importFile.contains("encryption") && importFile.contains("payload") )
         {
             auto encryptionMethod = importFile.value("encryption").toString();
-            if ( encryptionMethod == "SimpleCrypt")
+            if ( encryptionMethod == Common::SIMPLE_CRYPT || encryptionMethod == Common::SIMPLE_CRYPT_V2 )
             {
                 QString payload = importFile.value("payload").toString();
-                auto decryptedData = decryptSimpleCrypt(payload);
+                auto decryptedData = decryptSimpleCrypt(payload, encryptionMethod);
 
                 QJsonDocument decryptedDocument = QJsonDocument::fromJson(decryptedData);
                 if (decryptedDocument.isArray())
@@ -4906,12 +5089,34 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
     }
 }
 
+void MPDevice::readExportNodes(QJsonArray &&nodes, ExportPayloadData id)
+{
+    for (qint32 i = 0; i < nodes.size(); i++)
+    {
+        QJsonObject qjobject = nodes[i].toObject();
+
+        /* Fetch address */
+        QJsonArray serviceAddrArr = qjobject["address"].toArray();
+        QByteArray serviceAddr = QByteArray();
+        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
+
+        /* Fetch core data */
+        QJsonObject dataObj = qjobject["data"].toObject();
+        QByteArray dataCore = QByteArray();
+        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
+
+        /* Recreate node and add it to the list of imported nodes */
+        MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
+        importNodeMap[id]->append(importedNode);
+    }
+}
+
 bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 {
     /** Mooltiapp / Chrome App save file **/
 
     const auto dataSize = dataArray.size();
-    const bool isBleExport = BLE_EXPORT_FIELD_NUM == dataArray.size() && dataArray[EXPORT_IS_BLE_INDEX].toBool();
+    const bool isBleExport = dataArray[EXPORT_IS_BLE_INDEX].toBool() && dataArray.size() >= BLE_EXPORT_FIELD_MIN_NUM;
     const QString deviceVersion = dataArray[EXPORT_DEVICE_VERSION_INDEX].toString();
     /* Checks */
     if (!((deviceVersion == "mooltipass" && dataSize == MP_EXPORT_FIELD_NUM)
@@ -4961,13 +5166,26 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     bool cpzFound = false;
     for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
     {
-        if (importedCpzCtrValue[i].mid(0, 8) == get_cardCPZ())
+        if (pMesProt->getCpzValue(importedCpzCtrValue[i]) == get_cardCPZ())
         {
             qDebug() << "Import file is a backup for current user";
             unknownCardAddPayload = importedCpzCtrValue[i];
             cpzFound = true;
         }
     }
+
+    bool needToAddExistingUser = isBleExport && dataArray.size() >= EXPORT_USB_LAYOUT_INDEX && Common::UnknownSmartcard == get_status();
+    //Check export file if contains user datas
+    if (needToAddExistingUser)
+    {
+        cpzFound = true;
+    }
+    else if (isBleExport)
+    {
+        // Prevent ADD_UNKNOWN_CARD message
+        unknownCardAddPayload.clear();
+    }
+
     if (!cpzFound)
     {
         qWarning() << "Import file is not a backup for current user";
@@ -4999,98 +5217,32 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     }
 
     /* Read service nodes */
-    qjarray = dataArray[EXPORT_SERVICE_NODES_INDEX].toArray();
-    for (qint32 i = 0; i < qjarray.size(); i++)
-    {
-        qjobject = qjarray[i].toObject();
-
-        /* Fetch address */
-        QJsonArray serviceAddrArr = qjobject["address"].toArray();
-        QByteArray serviceAddr = QByteArray();
-        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-        /* Fetch core data */
-        QJsonObject dataObj = qjobject["data"].toObject();
-        QByteArray dataCore = QByteArray();
-        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-        /* Recreate node and add it to the list of imported nodes */
-        MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
-        importedLoginNodes.append(importedNode);
-        //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
-    }
+    readExportNodes(dataArray[EXPORT_SERVICE_NODES_INDEX].toArray(), EXPORT_SERVICE_NODES_INDEX);
 
     /* Read service child nodes */
-    qjarray = dataArray[EXPORT_SERVICE_CHILD_NODES_INDEX].toArray();
-    for (qint32 i = 0; i < qjarray.size(); i++)
-    {
-        qjobject = qjarray[i].toObject();
-
-        /* Fetch address */
-        QJsonArray serviceAddrArr = qjobject["address"].toArray();
-        QByteArray serviceAddr = QByteArray();
-        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-        /* Fetch core data */
-        QJsonObject dataObj = qjobject["data"].toObject();
-        QByteArray dataCore = QByteArray();
-        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-        /* Recreate node and add it to the list of imported nodes */
-        MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
-        importedLoginChildNodes.append(importedNode);
-        //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
-    }
+    readExportNodes(dataArray[EXPORT_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_SERVICE_CHILD_NODES_INDEX);
 
     if (!isMooltiAppImportFile)
     {
         /* Read service nodes */
-        qjarray = dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++)
-        {
-            qjobject = qjarray[i].toObject();
-
-            /* Fetch address */
-            QJsonArray serviceAddrArr = qjobject["address"].toArray();
-            QByteArray serviceAddr = QByteArray();
-            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-            /* Fetch core data */
-            QJsonObject dataObj = qjobject["data"].toObject();
-            QByteArray dataCore = QByteArray();
-            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-            /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
-            importedDataNodes.append(importedNode);
-            //qDebug() << "Parent nodes: imported " << qjobject["name"].toString();
-        }
+        readExportNodes(dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_NODES_INDEX);
 
         /* Read service child nodes */
-        qjarray = dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray();
-        for (qint32 i = 0; i < qjarray.size(); i++)
-        {
-            qjobject = qjarray[i].toObject();
-
-            /* Fetch address */
-            QJsonArray serviceAddrArr = qjobject["address"].toArray();
-            QByteArray serviceAddr = QByteArray();
-            for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
-
-            /* Fetch core data */
-            QJsonObject dataObj = qjobject["data"].toObject();
-            QByteArray dataCore = QByteArray();
-            for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
-
-            /* Recreate node and add it to the list of imported nodes */
-            MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
-            importedDataChildNodes.append(importedNode);
-            //qDebug() << "Child nodes: imported " << qjobject["name"].toString();
-        }
+        readExportNodes(dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_CHILD_NODES_INDEX);
 
         if (isBleExport)
         {
-            bleImpl->updateUserCategories(dataArray[EXPORT_BLE_USER_CATEGORIES_INDEX].toObject());
+            /* Read webauthn nodes */
+            readExportNodes(dataArray[EXPORT_WEBAUTHN_NODES_INDEX].toArray(), EXPORT_WEBAUTHN_NODES_INDEX);
+
+            /* Read webauthn child nodes */
+            readExportNodes(dataArray[EXPORT_WEBAUTHN_CHILD_NODES_INDEX].toArray(), EXPORT_WEBAUTHN_CHILD_NODES_INDEX);
+
+            bleImpl->setImportUserCategories(dataArray[EXPORT_BLE_USER_CATEGORIES_INDEX].toObject());
+            if (needToAddExistingUser)
+            {
+                bleImpl->fillAddUnknownCard(dataArray);
+            }
         }
     }
 
@@ -5099,7 +5251,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 
 void MPDevice::cleanImportedVars(void)
 {
-    virtualStartNode = 0;
+    virtualStartNode = {0, 0};
     virtualDataStartNode = 0;
     newAddressesNeededCounter = 0;
     importedCtrValue.clear();
@@ -5111,39 +5263,43 @@ void MPDevice::cleanImportedVars(void)
     qDeleteAll(importedLoginChildNodes);
     qDeleteAll(importedDataNodes);
     qDeleteAll(importedDataChildNodes);
+    qDeleteAll(importedWebauthnLoginNodes);
+    qDeleteAll(importedWebauthnLoginChildNodes);
     importedLoginNodes.clear();
     importedLoginChildNodes.clear();
     importedDataNodes.clear();
     importedDataChildNodes.clear();
+    importedWebauthnLoginNodes.clear();
+    importedWebauthnLoginChildNodes.clear();
 }
 
 void MPDevice::cleanMMMVars(void)
 {
     /* Cleaning all temp values */
-    virtualStartNode = 0;
+    virtualStartNode = {0, 0};
     virtualDataStartNode = 0;
     ctrValue.clear();
     cpzCtrValue.clear();
-    qDeleteAll(loginNodes);
-    loginNodes.clear();
-    qDeleteAll(dataNodes);
-    dataNodes.clear();
+    clearAndDelete(loginChildNodes);
+    clearAndDelete(dataChildNodes);
+    clearAndDelete(loginNodes);
+    clearAndDelete(dataNodes);
     favoritesAddrs.clear();
-    loginChildNodes.clear();
-    dataChildNodes.clear();
     /* Cleaning the clones as well */
     ctrValueClone.clear();
     cpzCtrValueClone.clear();
-    qDeleteAll(loginNodesClone);
-    loginNodesClone.clear();
-    qDeleteAll(dataNodesClone);
-    dataNodesClone.clear();
+    clearAndDelete(loginChildNodesClone);
+    clearAndDelete(dataChildNodesClone);
+    clearAndDelete(loginNodesClone);
+    clearAndDelete(dataNodesClone);
     favoritesAddrsClone.clear();
-    loginChildNodesClone.clear();
-    dataChildNodesClone.clear();
     freeAddresses.clear();
     if (isBLE())
     {
+        clearAndDelete(webAuthnLoginChildNodes);
+        clearAndDelete(webAuthnLoginChildNodesClone);
+        clearAndDelete(webAuthnLoginNodes);
+        clearAndDelete(webAuthnLoginNodesClone);
         bleImpl->getFreeAddressProvider().cleanFreeAddresses();
     }
 }
@@ -5201,427 +5357,30 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
             ctrValue = QByteArray(importedCtrValue);
         }
 
-        /// Find the nodes we don't have in memory or that have been changed
-        for (qint32 i = 0; i < importedLoginNodes.size(); i++)
+        if (!checkImportedLoginNodes(cb, Common::CRED_ADDR_IDX))
         {
-            bool service_node_found = false;
+            qCritical() << "Login import failed";
+            return;
+        }
 
-            // Loop in the memory nodes to compare data
-            for (qint32 j = 0; j < loginNodes.size(); j++)
+        if (isBLE())
+        {
+            if (!checkImportedLoginNodes(cb, Common::WEBAUTHN_ADDR_IDX))
             {
-                if (importedLoginNodes[i]->getLoginNodeData() == loginNodes[j]->getLoginNodeData())
-                {
-                    // We found a parent node that has the same core data (doesn't mean the same prev / next node though!)
-                    //qDebug() << "Parent node core data match for " << importedLoginNodes[i]->getService();
-                    loginNodes[j]->setMergeTagged();
-                    service_node_found = true;
-
-                    // Next step is to check if the children are the same
-                    quint32 cur_import_child_node_addr_v = importedLoginNodes[i]->getStartChildVirtualAddress();
-                    QByteArray cur_import_child_node_addr = importedLoginNodes[i]->getStartChildAddress();
-                    quint32 matched_parent_first_child_v = loginNodes[j]->getStartChildVirtualAddress();
-                    QByteArray matched_parent_first_child = loginNodes[j]->getStartChildAddress();
-
-                    /* Special case: parent doesn't have children but we do */
-                    if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((matched_parent_first_child != MPNode::EmptyAddress) || (matched_parent_first_child.isNull() && matched_parent_first_child_v != 0)))
-                    {
-                        loginNodes[j]->setStartChildAddress(MPNode::EmptyAddress);
-                    }
-
-                    //qDebug() << "First child address for imported node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
-                    while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
-                    {
-                        // Find the imported child node in our list
-                        MPNode* imported_child_node = findNodeWithAddressInList(importedLoginChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
-
-                        // Check if we actually found the node
-                        if (!imported_child_node)
-                        {
-                            cleanImportedVars();
-                            exitMemMgmtMode(false);
-                            cb(false, "Couldn't Import Database: Corrupted Export File");
-                            qCritical() << "Couldn't find imported child node in our list (corrupted import file?)";
-                            return;
-                        }
-
-                        // We found the imported child, now we need to find the one that matches
-                        //qDebug() << "Looking for child " + imported_child_node->getLogin() + " in the Mooltipass";
-
-                        // Try to find the match between the child nodes of the matched parent
-                        bool matched_login_found = false;
-                        QByteArray matched_parent_next_child = QByteArray(matched_parent_first_child);
-                        quint32 matched_parent_next_child_v = matched_parent_first_child_v;
-                        while (((matched_parent_next_child != MPNode::EmptyAddress) || (matched_parent_next_child.isNull() && matched_parent_next_child_v != 0)) && (matched_login_found == false))
-                        {
-                            // Find the child node at this address
-                            MPNode* cur_child_node = findNodeWithAddressInList(loginChildNodes, matched_parent_next_child, matched_parent_next_child_v);
-
-                            if (!cur_child_node)
-                            {
-                                cleanImportedVars();
-                                exitMemMgmtMode(false);
-                                cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                                qCritical() << "Couldn't find child node in our list (bad node reading?)";
-                                return;
-                            }
-
-                            // We found the child, now we can compare the login name
-                            if (cur_child_node->getLogin() == imported_child_node->getLogin())
-                            {
-                                // We have a match between imported login node & current login node
-                                //qDebug() << "Child found in the mooltipass, comparing rest of the data";
-                                cur_child_node->setMergeTagged();
-                                matched_login_found = true;
-
-                                if (cur_child_node->getLoginChildNodeData() == imported_child_node->getLoginChildNodeData())
-                                {
-                                    //qDebug() << importedLoginNodes[i]->getService() << " : child core data match for child " << imported_child_node->getLogin() << " , nothing to do";
-                                }
-                                else
-                                {
-                                    // Data mismatch, overwrite the important part
-                                    qDebug() << importedLoginNodes[i]->getService() << " : child core data mismatch for child " << imported_child_node->getLogin() << " , updating...";
-                                    cur_child_node->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
-                                }
-                                break;
-                            }
-                            else
-                            {
-                                // Not a match, load next child address in var
-                                matched_parent_next_child = cur_child_node->getNextChildAddress();
-                                matched_parent_next_child_v = cur_child_node->getNextChildVirtualAddress();
-                            }
-                        }
-
-                        // If we couldn't find the child node, we have to add it
-                        if(matched_login_found == false)
-                        {
-                            qDebug() << importedLoginNodes[i]->getService() << " : adding new child " << imported_child_node->getLogin() << " in the mooltipass...";
-
-                            /* Increment new addresses counter */
-                            incrementNeededAddresses(MPNode::NodeChild);
-
-                            /* Create new node with null address and virtual address set to our counter value */
-                            MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
-                            newChildNodePt->setType(MPNode::NodeChild);
-                            newChildNodePt->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
-                            newChildNodePt->setMergeTagged();
-
-                            /* Add node to list */
-                            loginChildNodes.append(newChildNodePt);
-                            if (!addChildToDB(loginNodes[j], newChildNodePt))
-                            {
-                                cleanImportedVars();
-                                exitMemMgmtMode(false);
-                                cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                                qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
-                                return;
-                            }
-                        }
-
-                        // Process the next imported child node
-                        cur_import_child_node_addr = imported_child_node->getNextChildAddress();
-                        cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
-                    }
-
-                    // Jump to next service node
-                    break;
-                }
+                qCritical() << "Login import failed";
+                return;
             }
-
-            // Did we find the service core data?
-            if(service_node_found == false)
-            {
-               /* Increment new addresses counter */
-               incrementNeededAddresses(MPNode::NodeParent);
-
-               /* Create new node with null address and virtual address set to our counter value */
-               MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
-               newNodePt->setType(MPNode::NodeParent);
-               newNodePt->setLoginNodeData(importedLoginNodes[i]->getNodeFlags(), importedLoginNodes[i]->getLoginNodeData());
-               newNodePt->setMergeTagged();
-
-               /* Add node to list */
-               loginNodes.append(newNodePt);
-               if (!addOrphanParentToDB(newNodePt, false, false))
-               {
-                   cleanImportedVars();
-                   exitMemMgmtMode(false);
-                   qCritical() << "Couldn't add parent to DB (corrupted DB?)";
-                   cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                   return;
-               }
-
-               /* Next step is to follow the children */
-               QByteArray curImportChildAddr = importedLoginNodes[i]->getStartChildAddress();
-               while (curImportChildAddr != MPNode::EmptyAddress)
-               {
-                   /* Find node in list */
-                   MPNode* curImportChildPt = findNodeWithAddressInList(importedLoginChildNodes, curImportChildAddr);
-
-                   if (!curImportChildPt)
-                   {
-                       cleanImportedVars();
-                       exitMemMgmtMode(false);
-                       cb(false, "Couldn't Import Database: Corrupted Import File");
-                       qCritical() << "Couldn't find import child (import file problem?)";
-                       return;
-                   }
-
-                   /* Increment new addresses counter */
-                   incrementNeededAddresses(MPNode::NodeChild);
-
-                   /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
-                   newChildNodePt->setType(MPNode::NodeChild);
-                   newChildNodePt->setLoginChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getLoginChildNodeData());
-                   newChildNodePt->setMergeTagged();
-
-                   /* Add node to list */
-                   loginChildNodes.append(newChildNodePt);
-                   if (!addChildToDB(newNodePt, newChildNodePt))
-                   {
-                       cleanImportedVars();
-                       exitMemMgmtMode(false);
-                       cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                       qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
-                       return;
-                   }
-
-                   /* Go to the next child */
-                   curImportChildAddr = curImportChildPt->getNextChildAddress();
-               }
-            }
+            bleImpl->importUserCategories();
         }
 
         /// Same but for data nodes
         if (!isMooltiAppImportFile)
         {
-            /// Find the data nodes we don't have in memory or that have been changed
-            for (qint32 i = 0; i < importedDataNodes.size(); i++)
+            const bool dataImportSuccess = checkImportedDataNodes(cb);
+            if (!dataImportSuccess)
             {
-                bool service_node_found = false;
-                quint32 encDataSize = 0;
-
-                // Loop in the memory nodes to compare data
-                for (qint32 j = 0; j < dataNodes.size(); j++)
-                {
-                    if ((importedDataNodes[i]->getService() == dataNodes[j]->getService()) && (importedDataNodes[i]->getStartDataCtr() == dataNodes[j]->getStartDataCtr()))
-                    {
-                        // We found a parent data node that has the same core data (doesn't mean the same prev / next node though!)
-                        qDebug() << "Data parent node core data match for " << importedDataNodes[i]->getService();
-                        dataNodes[j]->setMergeTagged();
-                        service_node_found = true;
-
-                        // Next step is to check if the children are the same
-                        quint32 cur_import_child_node_addr_v = importedDataNodes[i]->getStartChildVirtualAddress();
-                        QByteArray cur_import_child_node_addr = importedDataNodes[i]->getStartChildAddress();
-                        quint32 cur_matched_child_node_addr_v = dataNodes[j]->getStartChildVirtualAddress();
-                        QByteArray cur_matched_child_node_addr = dataNodes[j]->getStartChildAddress();
-                        MPNode* prev_matched_child_node = nullptr;
-                        MPNode* matched_child_node = nullptr;
-                        bool data_match_ongoing = true;
-
-                        /* Special case: parent doesn't have children but we do */
-                        if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0)))
-                        {
-                            dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress);
-                        }
-
-                        //qDebug() << "First child address for imported data node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
-                        while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
-                        {
-                            // Find the imported child node in our list
-                            MPNode* imported_child_node = findNodeWithAddressInList(importedDataChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
-                            encDataSize += MP_NODE_DATA_ENC_SIZE;
-
-                            // Check if we actually found the node
-                            if (!imported_child_node)
-                            {
-                                cleanImportedVars();
-                                exitMemMgmtMode(false);
-                                cb(false, "Couldn't Import Database: Corrupted Import File");
-                                qCritical() << "Couldn't find imported data child node in our list (corrupted import file?)";
-                                return;
-                            }
-
-                            // If we are still matching, check that we still can
-                            if (data_match_ongoing)
-                            {
-                                if ((cur_matched_child_node_addr == MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v == 0))
-                                {
-                                    /* No next node */
-                                    qDebug() << "Matched imported data child node chain is longer than what we have";
-                                    data_match_ongoing = false;
-                                }
-                                else
-                                {
-                                    matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
-
-                                    // Check if we actually found the node
-                                    if (!matched_child_node)
-                                    {
-                                        cleanImportedVars();
-                                        exitMemMgmtMode(false);
-                                        cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                                        qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
-                                        return;
-                                    }
-
-                                    // Check for data match
-                                    if (matched_child_node->getDataChildNodeData() != imported_child_node->getDataChildNodeData())
-                                    {
-                                        qDebug() << "Data child node mismatch for " << importedDataNodes[i]->getService();
-                                        data_match_ongoing = false;
-
-                                        /* Chain broken, delete all following data blocks */
-                                        while ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0))
-                                        {
-                                            matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
-
-                                            // Check if we actually found the node
-                                            if (!matched_child_node)
-                                            {
-                                                cleanImportedVars();
-                                                exitMemMgmtMode(false);
-                                                cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                                                qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
-                                                return;
-                                            }
-
-                                            /* Next item */
-                                            cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
-                                            cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
-
-                                            /* Delete current block */
-                                            dataChildNodes.removeOne(matched_child_node);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        matched_child_node->setMergeTagged();
-                                    }
-                                }
-                            }
-
-                            // If we stopped matching the child nodes, add child node data
-                            if (!data_match_ongoing)
-                            {
-                                qDebug() << importedDataNodes[i]->getService() << " : appending child data in the mooltipass...";
-
-                                /* Increment new addresses counter */
-                                incrementNeededAddresses(MPNode::NodeChild);
-
-                                /* Create new node with null address and virtual address set to our counter value */
-                                MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
-                                newDataChildNodePt->setType(MPNode::NodeChild);
-                                newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
-                                newDataChildNodePt->setMergeTagged();
-
-                                /* Add node to list */
-                                dataChildNodes.append(newDataChildNodePt);
-                                if (!prev_matched_child_node)
-                                {
-                                    /* First node */
-                                    dataNodes[j]->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
-                                }
-                                else
-                                {
-                                    prev_matched_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
-                                }
-
-                                /* Update prev matched child node */
-                                prev_matched_child_node = newDataChildNodePt;
-                            }
-
-                            // Fetch next matched child if comparison is still ongoing
-                            if (data_match_ongoing)
-                            {
-                                prev_matched_child_node = matched_child_node;
-                                matched_child_node->setMergeTagged();
-                                cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
-                                cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
-                            }
-
-                            cur_import_child_node_addr = imported_child_node->getNextChildDataAddress();
-                            cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
-                        }
-
-                        // Jump to next service node
-                        break;
-                    }
-                }
-
-                // Did we find the service core data?
-                if(service_node_found == false)
-                {
-                   /* Increment new addresses counter */
-                   incrementNeededAddresses(MPNode::NodeParent);
-
-                   /* Create new node with null address and virtual address set to our counter value */
-                   MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
-                   newNodePt->setType(MPNode::NodeParent);
-                   newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
-                   newNodePt->setMergeTagged();
-
-                   /* Add node to list */
-                   dataNodes.append(newNodePt);
-                   if (!addOrphanParentToDB(newNodePt, true, false))
-                   {
-                       cleanImportedVars();
-                       exitMemMgmtMode(false);
-                       qCritical() << "Couldn't add data parent to DB (corrupted DB?)";
-                       cb(false, "Couldn't Import Database: Please Run Integrity Check");
-                       return;
-                   }
-
-                   /* Next step is to follow the children */
-                   QByteArray curImportChildAddr = importedDataNodes[i]->getStartChildAddress();
-                   MPNode* prev_added_child_node = nullptr;
-                   while (curImportChildAddr != MPNode::EmptyAddress)
-                   {
-                       /* Find node in list */
-                       MPNode* curImportChildPt = findNodeWithAddressInList(importedDataChildNodes, curImportChildAddr);
-                       encDataSize += MP_NODE_DATA_ENC_SIZE;
-
-                       if (!curImportChildPt)
-                       {
-                           cleanImportedVars();
-                           exitMemMgmtMode(false);
-                           cb(false, "Couldn't Import Database: Corrupted Database File");
-                           qCritical() << "Couldn't find import child (import file problem?)";
-                           return;
-                       }
-
-                       /* Increment new addresses counter */
-                       incrementNeededAddresses(MPNode::NodeChild);
-
-                       /* Create new node with null address and virtual address set to our counter value */
-                       MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
-                       newDataChildNodePt->setType(MPNode::NodeChild);
-                       newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
-                       newDataChildNodePt->setMergeTagged();
-
-                       /* Add node to list */
-                       dataChildNodes.append(newDataChildNodePt);
-                       if (!prev_added_child_node)
-                       {
-                           /* First node */
-                           newNodePt->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
-                       }
-                       else
-                       {
-                           prev_added_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
-                       }
-
-                       /* Go to the next child */
-                       curImportChildAddr = curImportChildPt->getNextChildDataAddress();
-                       prev_added_child_node = newDataChildNodePt;
-                   }
-
-                   /* Update data size property */
-                   newNodePt->setEncDataSize(encDataSize);
-                }
+                qCritical() << "Data import failed";
+                return;
             }
         }
 
@@ -5791,50 +5550,455 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
     runAndDequeueJobs();
 }
 
+bool MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::AddressType addrType)
+{
+    const bool isCred = addrType == Common::CRED_ADDR_IDX;
+    NodeList& importNodes = isCred ? importedLoginNodes : importedWebauthnLoginNodes;
+    NodeList& importChildNodes = isCred ? importedLoginChildNodes : importedWebauthnLoginChildNodes;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    /// Find the nodes we don't have in memory or that have been changed
+    for (qint32 i = 0; i < importNodes.size(); i++)
+    {
+        bool service_node_found = false;
+
+        // Loop in the memory nodes to compare data
+        for (qint32 j = 0; j < nodes.size(); j++)
+        {
+            if (importNodes[i]->getLoginNodeData() == nodes[j]->getLoginNodeData())
+            {
+                // We found a parent node that has the same core data (doesn't mean the same prev / next node though!)
+                //qDebug() << "Parent node core data match for " << importNodes[i]->getService();
+                nodes[j]->setMergeTagged();
+                service_node_found = true;
+
+                // Next step is to check if the children are the same
+                quint32 cur_import_child_node_addr_v = importNodes[i]->getStartChildVirtualAddress();
+                QByteArray cur_import_child_node_addr = importNodes[i]->getStartChildAddress();
+                quint32 matched_parent_first_child_v = nodes[j]->getStartChildVirtualAddress();
+                QByteArray matched_parent_first_child = nodes[j]->getStartChildAddress();
+
+                /* Special case: parent doesn't have children but we do */
+                if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((matched_parent_first_child != MPNode::EmptyAddress) || (matched_parent_first_child.isNull() && matched_parent_first_child_v != 0)))
+                {
+                    nodes[j]->setStartChildAddress(MPNode::EmptyAddress);
+                }
+
+                //qDebug() << "First child address for imported node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
+                while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
+                {
+                    // Find the imported child node in our list
+                    MPNode* imported_child_node = findNodeWithAddressInList(importChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
+
+                    // Check if we actually found the node
+                    if (!imported_child_node)
+                    {
+                        cleanImportedVars();
+                        exitMemMgmtMode(false);
+                        cb(false, "Couldn't Import Database: Corrupted Export File");
+                        qCritical() << "Couldn't find imported child node in our list (corrupted import file?)";
+                        return false;
+                    }
+
+                    // We found the imported child, now we need to find the one that matches
+                    //qDebug() << "Looking for child " + imported_child_node->getLogin() + " in the Mooltipass";
+
+                    // Try to find the match between the child nodes of the matched parent
+                    bool matched_login_found = false;
+                    QByteArray matched_parent_next_child = QByteArray(matched_parent_first_child);
+                    quint32 matched_parent_next_child_v = matched_parent_first_child_v;
+                    while (((matched_parent_next_child != MPNode::EmptyAddress) || (matched_parent_next_child.isNull() && matched_parent_next_child_v != 0)) && (matched_login_found == false))
+                    {
+                        // Find the child node at this address
+                        MPNode* cur_child_node = findNodeWithAddressInList(childNodes, matched_parent_next_child, matched_parent_next_child_v);
+
+                        if (!cur_child_node)
+                        {
+                            cleanImportedVars();
+                            exitMemMgmtMode(false);
+                            cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                            qCritical() << "Couldn't find child node in our list (bad node reading?)";
+                            return false;
+                        }
+
+                        // We found the child, now we can compare the login name
+                        if (cur_child_node->getLogin() == imported_child_node->getLogin())
+                        {
+                            // We have a match between imported login node & current login node
+                            //qDebug() << "Child found in the mooltipass, comparing rest of the data";
+                            cur_child_node->setMergeTagged();
+                            matched_login_found = true;
+
+                            if (cur_child_node->getLoginChildNodeData() == imported_child_node->getLoginChildNodeData())
+                            {
+                                //qDebug() << importNodes[i]->getService() << " : child core data match for child " << imported_child_node->getLogin() << " , nothing to do";
+                            }
+                            else
+                            {
+                                // Data mismatch, overwrite the important part
+                                qDebug() << importNodes[i]->getService() << " : child core data mismatch for child " << imported_child_node->getLogin() << " , updating...";
+                                cur_child_node->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            // Not a match, load next child address in var
+                            matched_parent_next_child = cur_child_node->getNextChildAddress();
+                            matched_parent_next_child_v = cur_child_node->getNextChildVirtualAddress();
+                        }
+                    }
+
+                    // If we couldn't find the child node, we have to add it
+                    if(matched_login_found == false)
+                    {
+                        qDebug() << importNodes[i]->getService() << " : adding new child " << imported_child_node->getLogin() << " in the mooltipass...";
+
+                        /* Increment new addresses counter */
+                        incrementNeededAddresses(MPNode::NodeChild);
+
+                        /* Create new node with null address and virtual address set to our counter value */
+                        MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+                        newChildNodePt->setType(MPNode::NodeChild);
+                        newChildNodePt->setLoginChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getLoginChildNodeData());
+                        newChildNodePt->setMergeTagged();
+
+                        /* Add node to list */
+                        childNodes.append(newChildNodePt);
+                        if (!addChildToDB(nodes[j], newChildNodePt, addrType))
+                        {
+                            cleanImportedVars();
+                            exitMemMgmtMode(false);
+                            cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                            qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                            return false;
+                        }
+                    }
+
+                    // Process the next imported child node
+                    cur_import_child_node_addr = imported_child_node->getNextChildAddress();
+                    cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
+                }
+
+                // Jump to next service node
+                break;
+            }
+        }
+
+        // Did we find the service core data?
+        if(service_node_found == false)
+        {
+           /* Increment new addresses counter */
+           incrementNeededAddresses(MPNode::NodeParent);
+
+           /* Create new node with null address and virtual address set to our counter value */
+           MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+           newNodePt->setType(MPNode::NodeParent);
+           newNodePt->setLoginNodeData(importNodes[i]->getNodeFlags(), importNodes[i]->getLoginNodeData());
+           newNodePt->setMergeTagged();
+
+           /* Add node to list */
+           nodes.append(newNodePt);
+           if (!addOrphanParentToDB(newNodePt, false, false, addrType))
+           {
+               cleanImportedVars();
+               exitMemMgmtMode(false);
+               qCritical() << "Couldn't add parent to DB (corrupted DB?)";
+               cb(false, "Couldn't Import Database: Please Run Integrity Check");
+               return false;
+           }
+
+           /* Next step is to follow the children */
+           QByteArray curImportChildAddr = importNodes[i]->getStartChildAddress();
+           while (curImportChildAddr != MPNode::EmptyAddress)
+           {
+               /* Find node in list */
+               MPNode* curImportChildPt = findNodeWithAddressInList(importChildNodes, curImportChildAddr);
+
+               if (!curImportChildPt)
+               {
+                   cleanImportedVars();
+                   exitMemMgmtMode(false);
+                   cb(false, "Couldn't Import Database: Corrupted Import File");
+                   qCritical() << "Couldn't find import child (import file problem?)";
+                   return false;
+               }
+
+               /* Increment new addresses counter */
+               incrementNeededAddresses(MPNode::NodeChild);
+
+               /* Create new node with null address and virtual address set to our counter value */
+               MPNode* newChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+               newChildNodePt->setType(MPNode::NodeChild);
+               newChildNodePt->setLoginChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getLoginChildNodeData());
+               newChildNodePt->setMergeTagged();
+
+               /* Add node to list */
+               childNodes.append(newChildNodePt);
+               if (!addChildToDB(newNodePt, newChildNodePt, addrType))
+               {
+                   cleanImportedVars();
+                   exitMemMgmtMode(false);
+                   cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                   qCritical() << "Couldn't add new child node to DB (corrupted DB?)";
+                   return false;
+               }
+
+               /* Go to the next child */
+               curImportChildAddr = curImportChildPt->getNextChildAddress();
+           }
+        }
+    }
+    return true;
+}
+
+bool MPDevice::checkImportedDataNodes(const MessageHandlerCb &cb)
+{
+    /// Find the data nodes we don't have in memory or that have been changed
+    for (qint32 i = 0; i < importedDataNodes.size(); i++)
+    {
+        bool service_node_found = false;
+        quint32 encDataSize = 0;
+
+        // Loop in the memory nodes to compare data
+        for (qint32 j = 0; j < dataNodes.size(); j++)
+        {
+            if ((importedDataNodes[i]->getService() == dataNodes[j]->getService()) && (importedDataNodes[i]->getStartDataCtr() == dataNodes[j]->getStartDataCtr()))
+            {
+                // We found a parent data node that has the same core data (doesn't mean the same prev / next node though!)
+                qDebug() << "Data parent node core data match for " << importedDataNodes[i]->getService();
+                dataNodes[j]->setMergeTagged();
+                service_node_found = true;
+
+                // Next step is to check if the children are the same
+                quint32 cur_import_child_node_addr_v = importedDataNodes[i]->getStartChildVirtualAddress();
+                QByteArray cur_import_child_node_addr = importedDataNodes[i]->getStartChildAddress();
+                quint32 cur_matched_child_node_addr_v = dataNodes[j]->getStartChildVirtualAddress();
+                QByteArray cur_matched_child_node_addr = dataNodes[j]->getStartChildAddress();
+                MPNode* prev_matched_child_node = nullptr;
+                MPNode* matched_child_node = nullptr;
+                bool data_match_ongoing = true;
+
+                /* Special case: parent doesn't have children but we do */
+                if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0)))
+                {
+                    dataNodes[j]->setStartChildAddress(MPNode::EmptyAddress);
+                }
+
+                //qDebug() << "First child address for imported data node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
+                while ((cur_import_child_node_addr != MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v != 0))
+                {
+                    // Find the imported child node in our list
+                    MPNode* imported_child_node = findNodeWithAddressInList(importedDataChildNodes, cur_import_child_node_addr, cur_import_child_node_addr_v);
+                    encDataSize += MP_NODE_DATA_ENC_SIZE;
+
+                    // Check if we actually found the node
+                    if (!imported_child_node)
+                    {
+                        cleanImportedVars();
+                        exitMemMgmtMode(false);
+                        cb(false, "Couldn't Import Database: Corrupted Import File");
+                        qCritical() << "Couldn't find imported data child node in our list (corrupted import file?)";
+                        return false;
+                    }
+
+                    // If we are still matching, check that we still can
+                    if (data_match_ongoing)
+                    {
+                        if ((cur_matched_child_node_addr == MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v == 0))
+                        {
+                            /* No next node */
+                            qDebug() << "Matched imported data child node chain is longer than what we have";
+                            data_match_ongoing = false;
+                        }
+                        else
+                        {
+                            matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
+
+                            // Check if we actually found the node
+                            if (!matched_child_node)
+                            {
+                                cleanImportedVars();
+                                exitMemMgmtMode(false);
+                                cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                                qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
+                                return false;
+                            }
+
+                            // Check for data match
+                            if (matched_child_node->getDataChildNodeData() != imported_child_node->getDataChildNodeData())
+                            {
+                                qDebug() << "Data child node mismatch for " << importedDataNodes[i]->getService();
+                                data_match_ongoing = false;
+
+                                /* Chain broken, delete all following data blocks */
+                                while ((cur_matched_child_node_addr != MPNode::EmptyAddress) || (cur_matched_child_node_addr.isNull() && cur_matched_child_node_addr_v != 0))
+                                {
+                                    matched_child_node = findNodeWithAddressInList(dataChildNodes, cur_matched_child_node_addr, cur_matched_child_node_addr_v);
+
+                                    // Check if we actually found the node
+                                    if (!matched_child_node)
+                                    {
+                                        cleanImportedVars();
+                                        exitMemMgmtMode(false);
+                                        cb(false, "Couldn't Import Database: Please Run Integrity Check");
+                                        qCritical() << "Couldn't find imported data child node in our list (corrupted DB?)";
+                                        return false;
+                                    }
+
+                                    /* Next item */
+                                    cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
+                                    cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
+
+                                    /* Delete current block */
+                                    dataChildNodes.removeOne(matched_child_node);
+                                }
+                            }
+                            else
+                            {
+                                matched_child_node->setMergeTagged();
+                            }
+                        }
+                    }
+
+                    // If we stopped matching the child nodes, add child node data
+                    if (!data_match_ongoing)
+                    {
+                        qDebug() << importedDataNodes[i]->getService() << " : appending child data in the mooltipass...";
+
+                        /* Increment new addresses counter */
+                        incrementNeededAddresses(MPNode::NodeChild);
+
+                        /* Create new node with null address and virtual address set to our counter value */
+                        MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+                        newDataChildNodePt->setType(MPNode::NodeChild);
+                        newDataChildNodePt->setDataChildNodeData(imported_child_node->getNodeFlags(), imported_child_node->getDataChildNodeData());
+                        newDataChildNodePt->setMergeTagged();
+
+                        /* Add node to list */
+                        dataChildNodes.append(newDataChildNodePt);
+                        if (!prev_matched_child_node)
+                        {
+                            /* First node */
+                            dataNodes[j]->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
+                        }
+                        else
+                        {
+                            prev_matched_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
+                        }
+
+                        /* Update prev matched child node */
+                        prev_matched_child_node = newDataChildNodePt;
+                    }
+
+                    // Fetch next matched child if comparison is still ongoing
+                    if (data_match_ongoing)
+                    {
+                        prev_matched_child_node = matched_child_node;
+                        matched_child_node->setMergeTagged();
+                        cur_matched_child_node_addr = matched_child_node->getNextChildDataAddress();
+                        cur_matched_child_node_addr_v = matched_child_node->getNextChildVirtualAddress();
+                    }
+
+                    cur_import_child_node_addr = imported_child_node->getNextChildDataAddress();
+                    cur_import_child_node_addr_v = imported_child_node->getNextChildVirtualAddress();
+                }
+
+                // Jump to next service node
+                break;
+            }
+        }
+
+        // Did we find the service core data?
+        if(service_node_found == false)
+        {
+           /* Increment new addresses counter */
+           incrementNeededAddresses(MPNode::NodeParent);
+
+           /* Create new node with null address and virtual address set to our counter value */
+           MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+           newNodePt->setType(MPNode::NodeParent);
+           newNodePt->setLoginNodeData(importedDataNodes[i]->getNodeFlags(), importedDataNodes[i]->getLoginNodeData());
+           newNodePt->setMergeTagged();
+
+           /* Add node to list */
+           dataNodes.append(newNodePt);
+           if (!addOrphanParentToDB(newNodePt, true, false))
+           {
+               cleanImportedVars();
+               exitMemMgmtMode(false);
+               qCritical() << "Couldn't add data parent to DB (corrupted DB?)";
+               cb(false, "Couldn't Import Database: Please Run Integrity Check");
+               return false;
+           }
+
+           /* Next step is to follow the children */
+           QByteArray curImportChildAddr = importedDataNodes[i]->getStartChildAddress();
+           MPNode* prev_added_child_node = nullptr;
+           while (curImportChildAddr != MPNode::EmptyAddress)
+           {
+               /* Find node in list */
+               MPNode* curImportChildPt = findNodeWithAddressInList(importedDataChildNodes, curImportChildAddr);
+               encDataSize += MP_NODE_DATA_ENC_SIZE;
+
+               if (!curImportChildPt)
+               {
+                   cleanImportedVars();
+                   exitMemMgmtMode(false);
+                   cb(false, "Couldn't Import Database: Corrupted Database File");
+                   qCritical() << "Couldn't find import child (import file problem?)";
+                   return false;
+               }
+
+               /* Increment new addresses counter */
+               incrementNeededAddresses(MPNode::NodeChild);
+
+               /* Create new node with null address and virtual address set to our counter value */
+               MPNode* newDataChildNodePt = pMesProt->createMPNode(QByteArray(getChildNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
+               newDataChildNodePt->setType(MPNode::NodeChild);
+               newDataChildNodePt->setDataChildNodeData(curImportChildPt->getNodeFlags(), curImportChildPt->getDataChildNodeData());
+               newDataChildNodePt->setMergeTagged();
+
+               /* Add node to list */
+               dataChildNodes.append(newDataChildNodePt);
+               if (!prev_added_child_node)
+               {
+                   /* First node */
+                   newNodePt->setStartChildAddress(QByteArray(), newAddressesNeededCounter);
+               }
+               else
+               {
+                   prev_added_child_node->setNextChildDataAddress(QByteArray(), newAddressesNeededCounter);
+               }
+
+               /* Go to the next child */
+               curImportChildAddr = curImportChildPt->getNextChildDataAddress();
+               prev_added_child_node = newDataChildNodePt;
+           }
+
+           /* Update data size property */
+           newNodePt->setEncDataSize(encDataSize);
+        }
+    }
+    return true;
+}
+
 bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
 {
     qInfo() << "Finishing Import File Merging...";
 
     if (!noDelete)
     {
-        /* Now we check all our parents and childs for non merge tag */
-        QListIterator<MPNode*> i(loginNodes);
-        while (i.hasNext())
+        if (!finishImportLoginNodes(stringError, Common::CRED_ADDR_IDX))
         {
-            MPNode* nodeItem = i.next();
+            return false;
+        }
 
-            /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
-            QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
-
-            /* Special case: no child */
-            if (curChildNodeAddr == MPNode::EmptyAddress)
+        if (isBLE())
+        {
+            if (!finishImportLoginNodes(stringError, Common::WEBAUTHN_ADDR_IDX))
             {
-                /* Remove parent */
-                removeEmptyParentFromDB(nodeItem, false);
-            }
-
-            /* Check every children */
-            while (curChildNodeAddr != MPNode::EmptyAddress)
-            {
-                MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr);
-
-                /* Safety checks */
-                if (!curNode)
-                {
-                    qCritical() << "Couldn't find child node in list (error in algo?)";
-                    stringError = "Moolticute Internal Error: Please Contact The Team (IFM#1)";
-                    cleanImportedVars();
-                    return false;
-                }
-
-                /* Next item */
-                curChildNodeAddr = curNode->getNextChildAddress();
-
-                /* Marked for deletion? */
-                if (!curNode->getMergeTagged())
-                {
-                    removeChildFromDB(nodeItem, curNode, true, true);
-                }
+                return false;
             }
         }
 
@@ -5964,6 +6128,54 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
     return true;
 }
 
+bool MPDevice::finishImportLoginNodes(QString &stringError, Common::AddressType addrType)
+{
+    const bool isCred = Common::CRED_ADDR_IDX == addrType;
+    NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    /* Now we check all our parents and childs for non merge tag */
+    QListIterator<MPNode*> i(nodes);
+    while (i.hasNext())
+    {
+        MPNode* nodeItem = i.next();
+
+        /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
+        QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
+
+        /* Special case: no child */
+        if (curChildNodeAddr == MPNode::EmptyAddress)
+        {
+            /* Remove parent */
+            removeEmptyParentFromDB(nodeItem, false, addrType);
+        }
+
+        /* Check every children */
+        while (curChildNodeAddr != MPNode::EmptyAddress)
+        {
+            MPNode* curNode = findNodeWithAddressInList(childNodes, curChildNodeAddr);
+
+            /* Safety checks */
+            if (!curNode)
+            {
+                qCritical() << "Couldn't find child node in list (error in algo?)";
+                stringError = "Moolticute Internal Error: Please Contact The Team (IFM#1)";
+                cleanImportedVars();
+                return false;
+            }
+
+            /* Next item */
+            curChildNodeAddr = curNode->getNextChildAddress();
+
+            /* Marked for deletion? */
+            if (!curNode->getMergeTagged())
+            {
+                removeChildFromDB(nodeItem, curNode, true, true, addrType);
+            }
+        }
+    }
+    return true;
+}
+
 void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress)
 {
     qDebug() << "Loading free addresses from address:" << addressFrom.toHex();
@@ -6007,16 +6219,16 @@ void MPDevice::loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom,
                 if (discardFirstAddr)
                 {
                     freeAddresses.append(pMesProt->getPayloadBytes(data, 2 + i*2, 2));
-#ifdef DEV_DEBUG
-                    qDebug() << "Received free address " << pMesProt->getPayloadBytes(data, 2 + i*2, 2).toHex();
-#endif
+
+                    if (AppDaemon::isDebugDev())
+                        qDebug() << "Received free address " << pMesProt->getPayloadBytes(data, 2 + i*2, 2).toHex();
                 }
                 else
                 {
                     freeAddresses.append(pMesProt->getPayloadBytes(data,i*2, 2));
-#ifdef DEV_DEBUG
-                    qDebug() << "Received free address " << pMesProt->getPayloadBytes(data,i*2, 2).toHex();
-#endif
+
+                    if (AppDaemon::isDebugDev())
+                        qDebug() << "Received free address " << pMesProt->getPayloadBytes(data,i*2, 2).toHex();
                 }
             }
 
@@ -6219,14 +6431,14 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
         QJsonObject qjobject = creds[i].toObject();
 
         /* Check login size */
-        if (qjobject["login"].toString().length() >= MP_MAX_LOGIN_LENGTH-1)
+        if (qjobject["login"].toString().length() >= pMesProt->getLoginMaxLength()-1)
         {
             cb(false, "Couldn't import CSV file: " + qjobject["login"].toString() + " has longer than supported length");
             return;
         }
 
         /* Check password size */
-        if (qjobject["password"].toString().length() >= MP_MAX_PASSWORD_LENGTH-1)
+        if (qjobject["password"].toString().length() >= pMesProt->getPwdMaxLength()-1)
         {
             cb(false, "Couldn't import CSV file: " + qjobject["password"].toString() + " has longer than supported length");
             return;
@@ -6246,7 +6458,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
 
     connect(jobs, &AsyncJobs::finished, [this, creds, cb, cbProgress](const QByteArray &data)
     {
-        Q_UNUSED(data);
+        Q_UNUSED(data)
 
         /* Tag favorites */
         tagFavoriteNodes();
@@ -6288,6 +6500,14 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
                 /* To reuse setMMCredentials() we add the required fields */
                 qjobject["description"] = "imported from CSV";
                 qjobject["favorite"] = -1;
+
+                if (isBLE())
+                {
+                    qjobject["category"] = 0;
+                    const int DEFAULT_KEY_AFTER = 0xFFFF;
+                    qjobject["key_after_login"] = DEFAULT_KEY_AFTER;
+                    qjobject["key_after_pwd"] = DEFAULT_KEY_AFTER;
+                }
 
                 /* Try to find same service */
                 MPNode* parentPt = findNodeWithServiceInList(qjobject["service"].toString());
@@ -6334,7 +6554,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
 
     connect(jobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
     {
-        Q_UNUSED(failedJob);
+        Q_UNUSED(failedJob)
         qCritical() << "Setting device in MMM failed";
         exitMemMgmtMode(false);
         cb(false, "Couldn't Load Database, Please Approve Prompt On Device");
@@ -6362,7 +6582,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         QJsonObject qjobject = creds[i].toObject();
 
         /* Check format */
-        if (qjobject.size() != 6)
+        if (qjobject.size() != pMesProt->getCredentialPackageSize())
         {
             qCritical() << "Unknown JSON return format:" << qjobject;
             cb(false, "Wrong JSON formated credential list");
@@ -6378,6 +6598,15 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             QString password = qjobject["password"].toString();
             QString description = qjobject["description"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
+            int category = 0;
+            int keyAfterLogin = 0;
+            int keyAfterPwd = 0;
+            if (isBLE())
+            {
+                category = qjobject["category"].toInt();
+                keyAfterLogin = qjobject["key_after_login"].toInt();
+                keyAfterPwd = qjobject["key_after_pwd"].toInt();
+            }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
 
@@ -6430,6 +6659,13 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 newNodePt->setNotDeletedTagged();
                 newNodePt->setLogin(login);
                 newNodePt->setDescription(description);
+                if (isBLE())
+                {
+                    bleImpl->setNodeCategory(newNodePt, category);
+                    bleImpl->setNodeKeyAfterLogin(newNodePt, keyAfterLogin);
+                    bleImpl->setNodeKeyAfterPwd(newNodePt, keyAfterPwd);
+                    bleImpl->setNodePwdBlankFlag(newNodePt);
+                }
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
 
@@ -6471,6 +6707,12 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 nodePtr->setLogin(login);
                 nodePtr->setDescription(description);
                 nodePtr->setFavoriteProperty(favorite);
+                if (isBLE())
+                {
+                    bleImpl->setNodeCategory(nodePtr, category);
+                    bleImpl->setNodeKeyAfterLogin(nodePtr, keyAfterLogin);
+                    bleImpl->setNodeKeyAfterPwd(nodePtr, keyAfterPwd);
+                }
                 addChildToDB(parentPtr, nodePtr);
 
                 /* Check for changed password */
@@ -6507,6 +6749,26 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     qDebug() << "Detected description change";
                     nodePtr->setDescription(description);
                     packet_send_needed = true;
+                }
+
+                if (isBLE())
+                {
+                    auto* nodeBle = dynamic_cast<MPNodeBLE*>(nodePtr);
+                    if (category != nodeBle->getCategory())
+                    {
+                        nodeBle->setCategory(category);
+                        packet_send_needed = true;
+                    }
+                    if (keyAfterLogin != nodeBle->getKeyAfterLogin())
+                    {
+                        nodeBle->setKeyAfterLogin(keyAfterLogin);
+                        packet_send_needed = true;
+                    }
+                    if (keyAfterPwd != nodeBle->getKeyAfterPwd())
+                    {
+                        nodeBle->setKeyAfterPwd(keyAfterPwd);
+                        packet_send_needed = true;
+                    }
                 }
 
                 /* Check for changed login */
@@ -6859,7 +7121,7 @@ void MPDevice::importDatabase(const QByteArray &fileData, bool noDelete,
         /// We are here because the card is known by the export file and the export file is valid
 
         /* If we don't know this card, we need to add the CPZ CTR */
-        if (get_status() == Common::UnkownSmartcad)
+        if (get_status() == Common::UnknownSmartcard && !unknownCardAddPayload.isEmpty())
         {
             AsyncJobs* addcpzjobs = new AsyncJobs("Adding CPZ/CTR...", this);
 

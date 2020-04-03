@@ -105,6 +105,46 @@ void TreeItem::setDescription(const QString &sDescription)
     m_sDescription = sDescription;
 }
 
+int TreeItem::category() const
+{
+    return m_iCategory;
+}
+
+void TreeItem::setCategory(int iCategory)
+{
+    m_iCategory = iCategory;
+}
+
+int TreeItem::keyAfterLogin() const
+{
+    return m_iKeyAfterLogin;
+}
+
+void TreeItem::setkeyAfterLogin(int key)
+{
+    m_iKeyAfterLogin = key;
+}
+
+int TreeItem::keyAfterPwd() const
+{
+    return m_iKeyAfterPwd;
+}
+
+void TreeItem::setkeyAfterPwd(int key)
+{
+    m_iKeyAfterPwd = key;
+}
+
+int TreeItem::pwdBlankFlag() const
+{
+    return m_iPwdBlankFlag;
+}
+
+void TreeItem::setPwdBlankFlag(int flag)
+{
+    m_iPwdBlankFlag = flag;
+}
+
 const QVector<TreeItem *> &TreeItem::childs() const
 {
     return m_vChilds;

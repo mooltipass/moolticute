@@ -56,8 +56,16 @@ public:
     void daemonLogAppend(const QByteArray &logdata);
 
     bool isHttpDebugChecked();
+    bool isDebugLogChecked();
 
     void updateBackupControlsVisibility(bool visible);
+
+
+    const static QString NONE_STRING;
+    const static QString TAB_STRING;
+    const static QString ENTER_STRING;
+    const static QString SPACE_STRING;
+    const static QString DEFAULT_KEY_STRING;
 
     friend class SettingsGuiHelper;
     friend class SettingsGuiMini;
@@ -149,11 +157,19 @@ private slots:
     void onDeviceConnected();
     void onDeviceDisconnected();
 
+    void on_checkBoxDebugHttp_stateChanged(int arg1);
+
+    void on_checkBoxDebugLog_stateChanged(int arg1);
+
+    void handleAdvancedModeChange(bool isEnabled);
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
     virtual void closeEvent(QCloseEvent *event);
     virtual void changeEvent(QEvent *event);
+
+    void updateDeviceDependentUI();
 
     void checkAutoStart();
     
@@ -168,6 +184,10 @@ private:
     void retranslateUi();
 
     void displayMCUVersion(bool visible = true);
+
+    void updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items);
+
+    bool shouldUpdateItems(QJsonObject& cache, const QJsonObject& received);
 
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
@@ -197,8 +217,13 @@ private:
 
     SystemEventHandler eventHandler;
 
+    QJsonObject m_keyboardLayoutCache;
+    QJsonObject m_languagesCache;
+
     const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
-    const QString NONE_STRING = tr("None");
+#ifdef Q_OS_MAC
+    static constexpr int MAC_DEFAULT_HEIGHT = 500;
+#endif
 };
 
 #endif // MAINWINDOW_H

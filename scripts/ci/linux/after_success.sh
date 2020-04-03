@@ -7,7 +7,7 @@ source $SCRIPTDIR/../funcs.sh
 VERSION="$(get_version .)"
 
 #Only build if the commit we are building is for the last tag
-if [ "$(git rev-list -n 1 $VERSION)" != "$(cat .git/HEAD)"  ]; then
+if [ "$(git rev-list -n 1 $VERSION)" != "$(git rev-parse HEAD)"  ]; then
     echo "Not uploading package"
     exit 0
 fi
@@ -16,6 +16,7 @@ fi
 docker exec mc-deb bash /scripts/build_source.sh $VERSION xenial
 docker exec mc-deb bash /scripts/build_source.sh $VERSION bionic
 docker exec mc-deb bash /scripts/build_source.sh $VERSION disco
+docker exec mc-deb bash /scripts/build_source.sh $VERSION eoan
 
 #windows and appimage
 docker exec appimgbuilder bash /scripts/package.sh

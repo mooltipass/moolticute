@@ -97,16 +97,19 @@ public:
     void sendRefreshFilesCacheRequest();
 
     void sendPlatInfoRequest();
-    void sendFlashMCU(QString type);
+    void sendFlashMCU();
     void sendUploadBundle(QString bundleFilePath);
     void sendFetchData(QString fileName, Common::FetchType fetchType);
     void sendStopFetchData();
     void sendGetUserCategories();
     void sendSetUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
     void sendUserSettingsRequest();
+    void sendLoadParams();
 
     inline bool isFw12() const { return isFwVersion(12); }
     inline bool isFw13() const { return isFwVersion(13); }
+
+    void requestBleKeyboardLayout();
 
     void sendLockDevice();
     SettingsGuiHelper* settingsHelper();
@@ -137,9 +140,11 @@ signals:
     void displayAvailableUsers(const QString& num);
     void displayUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
     void updateUserSettingsOnUI(const QJsonObject& userSettings);
-    void deviceConnacted();
+    void deviceConnected();
     void deviceDisconnected();
     void deleteDataNodesFinished();
+    void updateBLEDeviceLanguage(const QJsonObject& langs);
+    void updateBLEKeyboardLayout(const QJsonObject& layouts);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

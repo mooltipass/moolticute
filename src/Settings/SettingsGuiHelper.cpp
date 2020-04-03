@@ -44,9 +44,15 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::HASH_DISPLAY_FEATURE_PARAM, ui->hashDisplayFeatureCheckBox},
         {MPParams::LOCK_UNLOCK_FEATURE_PARAM, ui->lockUnlockModeComboBox},
         {MPParams::RESERVED_BLE, ui->checkBoxBLEReserved},
-        {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxPromptAnim}
+        {MPParams::PROMPT_ANIMATION_PARAM, ui->checkBoxPromptAnim},
+        {MPParams::DEVICE_LANGUAGE, ui->comboBoxDeviceLang},
+        {MPParams::USER_LANGUAGE, ui->comboBoxUserLanguage},
+        {MPParams::KEYBOARD_USB_LAYOUT, ui->comboBoxUsbLayout},
+        {MPParams::KEYBOARD_BT_LAYOUT, ui->comboBoxBtLayout},
+        {MPParams::BOOT_ANIMATION_PARAM, ui->checkBoxBootAnim},
+        {MPParams::DEVICE_LOCK_USB_DISC, ui->checkBoxDeviceLockUSBDisc},
+        {MPParams::PIN_SHOWN_ON_BACK, ui->checkBoxPinOnBack}
     };
-    setupKeyboardLayout();
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)
     {
@@ -72,6 +78,11 @@ void SettingsGuiHelper::createSettingUIMapping()
     {
         delete m_settings;
     }
+    else if (m_settings)
+    {
+        // If type is not different do not recreate m_settings
+        return;
+    }
     m_deviceType = type;
     if (m_deviceType == Common::MP_BLE)
     {
@@ -86,8 +97,10 @@ void SettingsGuiHelper::createSettingUIMapping()
         return;
     }
 
+    m_settings->setupKeyboardLayout();
     m_settings->connectSendParams(this);
     dynamic_cast<ISettingsGui*>(m_settings)->updateUI();
+    initKnockSetting();
 }
 
 bool SettingsGuiHelper::checkSettingsChanged()
@@ -234,8 +247,24 @@ void SettingsGuiHelper::sendParams(int value, int param)
     m_mw->checkSettingsChanged();
 }
 
+void SettingsGuiHelper::initKnockSetting()
+{
+    if (m_wsClient->isMPBLE())
+    {
+        m_mw->enableKnockSettings(true);
+    }
+    else
+    {
+        m_mw->enableKnockSettings(m_wsClient->get_status() == Common::NoCardInserted);
+    }
+}
+
 void SettingsGuiHelper::checkKeyboardLayout()
 {
+    if (m_wsClient->isMPBLE())
+    {
+        return;
+    }
     const auto containsFw13LangLayouts = ui->comboBoxLang->findText(m_fw13LangMap.firstKey()) != -1;
     const bool isFw13 = m_wsClient->isFw13();
     if (!containsFw13LangLayouts && isFw13)
@@ -253,45 +282,4 @@ void SettingsGuiHelper::checkKeyboardLayout()
             ui->comboBoxLang->removeItem(ui->comboBoxLang->findText(lang));
         }
     }
-}
-
-void SettingsGuiHelper::setupKeyboardLayout()
-{
-    //Add languages to combobox
-    auto* langCb = ui->comboBoxLang;
-    langCb->addItem("en_US", ID_KEYB_EN_US_LUT);
-    langCb->addItem("fr_FR", ID_KEYB_FR_FR_LUT);
-    langCb->addItem("es_ES", ID_KEYB_ES_ES_LUT);
-    langCb->addItem("de_DE", ID_KEYB_DE_DE_LUT);
-    langCb->addItem("es_AR", ID_KEYB_ES_AR_LUT);
-    langCb->addItem("en_AU", ID_KEYB_EN_AU_LUT);
-    langCb->addItem("fr_BE", ID_KEYB_FR_BE_LUT);
-    langCb->addItem("po_BR", ID_KEYB_PO_BR_LUT);
-    langCb->addItem("en_CA", ID_KEYB_EN_CA_LUT);
-    langCb->addItem("cz_CZ", ID_KEYB_CZ_CZ_LUT);
-    langCb->addItem("da_DK", ID_KEYB_DA_DK_LUT);
-    langCb->addItem("fi_FI", ID_KEYB_FI_FI_LUT);
-    langCb->addItem("hu_HU", ID_KEYB_HU_HU_LUT);
-    langCb->addItem("is_IS", ID_KEYB_IS_IS_LUT);
-    langCb->addItem("it_IT", ID_KEYB_IT_IT_LUT);
-    langCb->addItem("nl_NL", ID_KEYB_NL_NL_LUT);
-    langCb->addItem("no_NO", ID_KEYB_NO_NO_LUT);
-    langCb->addItem("po_PO", ID_KEYB_PO_PO_LUT);
-    langCb->addItem("ro_RO", ID_KEYB_RO_RO_LUT);
-    langCb->addItem("sl_SL", ID_KEYB_SL_SL_LUT);
-    langCb->addItem("frde_CH", ID_KEYB_FRDE_CH_LUT);
-    langCb->addItem("en_UK", ID_KEYB_EN_UK_LUT);
-    langCb->addItem("cs_QWERTY", ID_KEYB_CZ_QWERTY_LUT);
-    langCb->addItem("en_DV", ID_KEYB_EN_DV_LUT);
-    langCb->addItem("fr_MAC", ID_KEYB_FR_MAC_LUT);
-    langCb->addItem("fr_CH_MAC", ID_KEYB_FR_CH_MAC_LUT);
-    langCb->addItem("de_CH_MAC", ID_KEYB_DE_CH_MAC_LUT);
-    langCb->addItem("de_MAC", ID_KEYB_DE_MAC_LUT);
-    langCb->addItem("us_MAC", ID_KEYB_US_MAC_LUT);
-
-    QSortFilterProxyModel* proxy = new QSortFilterProxyModel(langCb);
-    proxy->setSourceModel( langCb->model());
-    langCb->model()->setParent(proxy);
-    langCb->setModel(proxy);
-    langCb->model()->sort(0);
 }

@@ -1,13 +1,15 @@
 #include "MPDeviceBleImpl.h"
 #include "AsyncJobs.h"
 #include "MessageProtocolBLE.h"
+#include "MPNodeBLE.h"
+#include "AppDaemon.h"
+#include "DeviceSettingsBLE.h"
 
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),
     mpDev(dev),
     freeAddressProv(mesProt, dev)
 {
-
 }
 
 bool MPDeviceBleImpl::isFirstPacket(const QByteArray &data)
@@ -76,76 +78,49 @@ QVector<int> MPDeviceBleImpl::calcDebugPlatInfo(const QByteArray &platInfo)
     return platInfos;
 }
 
-void MPDeviceBleImpl::flashMCU(QString type, const MessageHandlerCb &cb)
+void MPDeviceBleImpl::flashMCU(const MessageHandlerCb &cb)
 {
     /**
      * Stoping statusTimer to avoid sending
      * MOOLTIPASS_STATUS message during flash.
      */
     mpDev->statusTimer->stop();
-    if (type != "aux" && type != "main")
-    {
-        qCritical() << "Flashing called for an invalid type of " << type;
-        cb(false, "Failed flash.");
-        return;
-    }
-    auto *jobs = new AsyncJobs(QString("Flashing %1 MCU").arg(type), this);
-    const bool isAuxFlash = type == "aux";
-    const quint8 cmd = isAuxFlash ? MPCmd::CMD_DBG_FLASH_AUX_MCU : MPCmd::CMD_DBG_REBOOT_TO_BOOTLOADER;
-    auto flashJob = new MPCommandJob(mpDev, cmd, bleProt->getDefaultFuncDone());
+    auto *jobs = new AsyncJobs("Flashing Aux and Main MCU", this);
+    auto flashJob = new MPCommandJob(mpDev, MPCmd::CMD_DBG_UPDATE_MAIN_AUX, bleProt->getDefaultFuncDone());
     flashJob->setReturnCheck(false);
     jobs->append(flashJob);
-    if (isAuxFlash)
-    {
-        QSettings s;
-        s.setValue(AFTER_AUX_FLASH_SETTING, true);
-    }
+    QSettings s;
+    s.setValue(AFTER_AUX_FLASH_SETTING, true);
 
-    connect(jobs, &AsyncJobs::failed, [cb, isAuxFlash](AsyncJob *failedJob)
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
-        if (isAuxFlash)
-        {
-            cb(false, "Failed to flash Aux MCU!");
-        }
-        else
-        {
-            cb(true, "");
-        }
+        cb(false, "Failed to flash Aux and Main MCU!");
     });
 
-    mpDev->jobsQueue.enqueue(jobs);
-
-    if (!isAuxFlash)
-    {
-        /**
-          * Main MCU flash does not cause a reconnect of the device,
-          * so daemon keeps sending messages to the device, which
-          * is causing failure in the communication, this is why
-          * this sleep is added.*/
-
-        auto *waitingJob = new AsyncJobs(QString("Waiting job for Main MCU flash"), this);
-        qDebug() << "Waiting for device to start after Main MCU flash";
-        const auto flashTimeout = 5000;
-        waitingJob->append(new TimerJob{flashTimeout});
-        /**
-          * Restart statusTimer after Main MCU flash
-          */
-        QTimer::singleShot(flashTimeout, [this]() {mpDev->statusTimer->start();});
-        mpDev->jobsQueue.enqueue(waitingJob);
-    }
-
-    mpDev->runAndDequeueJobs();
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress)
 {
+    if (!isBundleFileReadable(filePath))
+    {
+        qCritical() << "Error opening bundle file: " << filePath;
+        cb(false, "Bundle file is not readable");
+        return;
+    }
     QElapsedTimer *timer = new QElapsedTimer{};
     timer->start();
     auto *jobs = new AsyncJobs(QString("Upload bundle file"), this);
     jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_ERASE_DATA_FLASH,
-                      [cbProgress] (const QByteArray &, bool &) -> bool
+                      [cbProgress, this] (const QByteArray &data, bool &) -> bool
                     {
+                        if (MSG_SUCCESS != bleProt->getFirstPayloadByte(data))
+                        {
+                            qWarning() << "Erase data flash failed";
+                            return false;
+                        }
                         QVariantMap progress = {
                             {"total", 0},
                             {"current", 0},
@@ -233,7 +208,7 @@ void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerC
     mpDev->enqueueAndRunJob(jobs);
 }
 
-void MPDeviceBleImpl::getCredential(const QString& service, const QString& login, const QString& reqid, const MessageHandlerCbData &cb)
+void MPDeviceBleImpl::getCredential(const QString& service, const QString& login, const QString& reqid, const QString& fallbackService, const MessageHandlerCbData &cb)
 {
     AsyncJobs *jobs;
     const QString getCred = "Get Credential";
@@ -247,18 +222,23 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
     }
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
-                            [this, service, login, cb](const QByteArray &data, bool &)
+                            [this, service, login, cb, fallbackService, jobs](const QByteArray &data, bool &)
                             {
                                 if (MSG_FAILED == bleProt->getMessageSize(data))
                                 {
-                                    qWarning() << "Credential get failed";
-                                    cb(false, "Get credential failed", QByteArray{});
+                                    if (fallbackService.isEmpty())
+                                    {
+                                        qWarning() << "Credential get failed";
+                                        cb(false, "Get credential failed", QByteArray{});
+                                    }
+                                    getFallbackServiceCredential(jobs, fallbackService, login, cb);
                                     return true;
                                 }
                                 qDebug() << "Credential got successfully";
-#ifdef DEV_DEBUG
-                                qDebug() << data.toHex();
-#endif
+
+                                if (AppDaemon::isDebugDev())
+                                    qDebug() << data.toHex();
+
                                 cb(true, "", bleProt->getFullPayload(data));
                                 return true;
                             }));
@@ -270,6 +250,22 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
     });
 
     mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::getFallbackServiceCredential(AsyncJobs *jobs, const QString &fallbackService, const QString &login, const MessageHandlerCbData &cb)
+{
+    jobs->prepend(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(fallbackService, login),
+    [this, cb](const QByteArray &data, bool &)
+    {
+        if (MSG_FAILED == bleProt->getMessageSize(data))
+        {
+            qWarning() << "Credential get for fallback service failed";
+            cb(false, "Get credential failed", QByteArray{});
+        }
+        qDebug() << "Credential for fallback service got successfully";
+        cb(true, "", bleProt->getFullPayload(data));
+        return true;
+    }));
 }
 
 BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const
@@ -298,9 +294,7 @@ BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray respons
         {
             cred.set(attr, attrVal);
         }
-#ifdef DEV_DEBUG
-        qDebug() << "nextIndex: " << index << " attrName: " << attrVal;
-#endif
+
         lastIndex = index;
         attr = static_cast<BleCredential::CredAttr>(static_cast<int>(attr) + 1);
     }
@@ -344,6 +338,73 @@ void MPDeviceBleImpl::flipMessageBit(QByteArray &msg)
 {
     setCurrentFlipBit(msg);
     flipBit();
+}
+
+bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &dataReceived)
+{
+    const bool isFirst = isFirstPacket(data);
+    auto& cmd = mpDev->commandQueue.head();
+    if (isFirst)
+    {
+        cmd.responseSize = bleProt->getMessageSize(data);
+        cmd.response.append(data);
+        /*
+         *  When multiple packet from the device expected
+         *  start a timer with 2 sec to detect resets and
+         *  clean the command queue if it occurs.
+         */
+        if (cmd.responseSize > FIRST_PACKET_PAYLOAD_SIZE)
+        {
+            cmd.timerTimeout = new QTimer(this);
+            connect(cmd.timerTimeout, &QTimer::timeout, this, &MPDeviceBleImpl::handleLongMessageTimeout);
+            cmd.timerTimeout->setInterval(LONG_MESSAGE_TIMEOUT_MS);
+            cmd.timerTimeout->start();
+        }
+    }
+
+    const bool isLast = isLastPacket(data);
+    if (isLast)
+    {
+        if (!isFirst)
+        {
+            cmd.timerTimeout->stop();
+            /**
+             * @brief EXTRA_INFO_SIZE
+             * Extra bytes of the first packet.
+             * In the last package only the remaining bytes
+             * of payload is appended.
+             */
+            constexpr int EXTRA_INFO_SIZE = 6;
+            int fullResponseSize = cmd.responseSize + EXTRA_INFO_SIZE;
+            QByteArray responseData = cmd.response;
+            responseData.append(bleProt->getFullPayload(data).left(fullResponseSize - responseData.size()));
+            dataReceived = responseData;
+        }
+    }
+    else
+    {
+        if (!isFirst)
+        {
+            cmd.response.append(bleProt->getFullPayload(data));
+        }
+        cmd.checkReturn = false;
+    }
+    return isLast;
+}
+
+ QVector<QByteArray> MPDeviceBleImpl::processReceivedStartNodes(const QByteArray &data) const
+{
+    if (data.size() < 2)
+    {
+        return {0};
+    }
+    QVector<QByteArray> res;
+    for (int i = 0; i < data.size() - 1; i += 2)
+    {
+        res.append(data.mid(i, 2));
+    }
+    qDebug() << "Received starting node: " << res.size();
+    return res;
 }
 
 bool MPDeviceBleImpl::isAfterAuxFlash()
@@ -422,9 +483,25 @@ void MPDeviceBleImpl::fillGetCategory(const QByteArray& data, QJsonObject &categ
         QString category = bleProt->toQString(data.mid(i*USER_CATEGORY_LENGTH, (i+1)*USER_CATEGORY_LENGTH));
         bool defaultCat = std::all_of(std::begin(category), std::end(category),
                                    [](const QChar& c) { return c == QChar{0xFFFF};});
-        categories[catName] = defaultCat ? "" : category;
+        categories[catName] = defaultCat ? catName : category;
     }
     m_categories = categories;
+    m_categoriesFetched = true;
+}
+
+void MPDeviceBleImpl::fetchCategories()
+{
+    if (!m_categoriesFetched && Common::Unlocked == mpDev->get_status())
+    {
+        getUserCategories([this](bool success, QString, QByteArray data)
+                         {
+                             if (success)
+                             {
+                                QJsonObject ores;
+                                fillGetCategory(data, ores);
+                             }
+                         });
+    }
 }
 
 QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categories)
@@ -433,7 +510,7 @@ QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categorie
     for (int i = 0; i < USER_CATEGORY_COUNT; ++i)
     {
         QByteArray categoryArr = bleProt->toByteArray(categories["category_" + QString::number(i+1)].toString());
-        Common::fill(categoryArr, USER_CATEGORY_LENGTH - categoryArr.size(), static_cast<char>(0x00));
+        Common::fill(categoryArr, USER_CATEGORY_LENGTH - categoryArr.size(), ZERO_BYTE);
         data.append(categoryArr);
     }
     return data;
@@ -449,7 +526,7 @@ void MPDeviceBleImpl::readUserSettings(const QByteArray& settings)
         set_storagePrompt(d&STORAGE_PROMPT);
         set_advancedMenu(d&ADVANCED_MENU);
         set_bluetoothEnabled(d&BLUETOOTH_ENABLED);
-        set_credentialDisplayPrompt(d&CREDENTIAL_PROMPT);
+        set_knockDisabled(d&KNOCK_DISABLED);
         m_currentUserSettings = d;
         sendUserSettings();
     }
@@ -463,7 +540,7 @@ void MPDeviceBleImpl::sendUserSettings()
     settingJson["storage_prompt"] = get_storagePrompt();
     settingJson["advanced_menu"] = get_advancedMenu();
     settingJson["bluetooth_enabled"] = get_bluetoothEnabled();
-    settingJson["credential_prompt"] = get_credentialDisplayPrompt();
+    settingJson["knock_disabled"] = get_knockDisabled();
     emit userSettingsChanged(settingJson);
 }
 
@@ -528,6 +605,288 @@ bool MPDeviceBleImpl::isUserCategoriesChanged(const QJsonObject &categories) con
         }
     }
     return false;
+}
+
+void MPDeviceBleImpl::setImportUserCategories(const QJsonObject &categories)
+{
+    m_categoriesToImport = categories;
+}
+
+void MPDeviceBleImpl::importUserCategories()
+{
+    if (m_categoriesToImport.empty())
+    {
+        qCritical() << "Cannot import empty categories";
+        return;
+    }
+    updateUserCategories(m_categoriesToImport);
+    m_categoriesToImport = QJsonObject();
+}
+
+void MPDeviceBleImpl::setNodeCategory(MPNode* node, int category)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Setting category to: " << category;
+        }
+        nodeBle->setCategory(category);
+    }
+}
+
+void MPDeviceBleImpl::setNodeKeyAfterLogin(MPNode *node, int key)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Setting keyAfterLogin to: " << key;
+        }
+        nodeBle->setKeyAfterLogin(key);
+    }
+}
+
+void MPDeviceBleImpl::setNodeKeyAfterPwd(MPNode *node, int key)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Setting keyAfterPwd to: " << key;
+        }
+        nodeBle->setKeyAfterPwd(key);
+    }
+}
+
+void MPDeviceBleImpl::setNodePwdBlankFlag(MPNode *node)
+{
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Setting password blank flag";
+        }
+        nodeBle->setPwdBlankFlag();
+    }
+}
+
+QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
+{
+    QList<QByteArray> res;
+    int start = 0;
+    int end = FAV_DATA_SIZE;
+    while (res.size() < FAV_NUMBER)
+    {
+        res.append(bleProt->getPayloadBytes(data, start, end));
+        start = end;
+        end += FAV_DATA_SIZE;
+    }
+    return res;
+}
+
+QByteArray MPDeviceBleImpl::getStartAddressToSet(const QVector<QByteArray>& startNodeArray, Common::AddressType addrType) const
+{
+    QByteArray setAddress;
+    setAddress.append(static_cast<char>(addrType));
+    setAddress.append(ZERO_BYTE);
+    setAddress.append(startNodeArray[addrType]);
+    return setAddress;
+}
+
+void MPDeviceBleImpl::readLanguages()
+{
+    m_deviceLanguages = QJsonObject{};
+    m_keyboardLayouts = QJsonObject{};
+    AsyncJobs *jobs = new AsyncJobs(
+                          "Read languages",
+                          this);
+    jobs->append(new MPCommandJob(mpDev,
+                   MPCmd::GET_LANG_NUM,
+                   [this, jobs] (const QByteArray &data, bool &)
+                    {
+                        const auto payload = bleProt->getFullPayload(data);
+                        const int langNum = bleProt->toIntFromLittleEndian(payload[0], payload[1]);
+                        qDebug() << "Language number: " << langNum;
+                        if (INVALID_LAYOUT_LANG_SIZE == langNum)
+                        {
+                            qCritical() << "Invalid number of languages";
+                            return false;
+                        }
+                        for (int i = 0; i < langNum; ++i)
+                        {
+                            jobs->append(new MPCommandJob(mpDev,
+                                           MPCmd::GET_LANG_DESC,
+                                           QByteArray(1, static_cast<char>(i)),
+                                           [this, i, langNum] (const QByteArray &data, bool &)
+                                            {
+                                                const QString lang = bleProt->toQString(bleProt->getFullPayload(data));
+                                                if (AppDaemon::isDebugDev())
+                                                {
+                                                    qDebug() << i << " lang desc: " << lang;
+                                                }
+                                                m_deviceLanguages[lang] = i;
+                                                if (i == (langNum - 1))
+                                                {
+                                                    emit bleDeviceLanguage(m_deviceLanguages);
+                                                }
+                                                return true;
+                                            }
+                            ));
+                        }
+                        return true;
+                    }
+    ));
+    jobs->append(new MPCommandJob(mpDev,
+                   MPCmd::GET_KEYB_LAYOUT_NUM,
+                   [this, jobs] (const QByteArray &data, bool &)
+                    {
+                        const auto payload = bleProt->getFullPayload(data);
+                        const auto layoutNum = bleProt->toIntFromLittleEndian(payload[0], payload[1]);
+                        qDebug() << "Keyboard layout number: " << layoutNum;
+                        if (INVALID_LAYOUT_LANG_SIZE == layoutNum)
+                        {
+                            qCritical() << "Invalid number of keyboard layouts";
+                            return false;
+                        }
+                        for (int i = 0; i < layoutNum; ++i)
+                        {
+                            jobs->append(new MPCommandJob(mpDev,
+                                           MPCmd::GET_LAYOUT_DESC,
+                                           QByteArray(1, static_cast<char>(i)),
+                                           [this, i, layoutNum] (const QByteArray &data, bool &)
+                                            {
+                                                const QString layout = bleProt->toQString(bleProt->getFullPayload(data));
+                                                if (AppDaemon::isDebugDev())
+                                                {
+                                                    qDebug() << i << " layout desc: " << layout;
+                                                }
+                                                m_keyboardLayouts[layout] = i;
+                                                if (i == (layoutNum - 1))
+                                                {
+                                                    emit bleKeyboardLayout(m_keyboardLayouts);
+                                                }
+                                                return true;
+                                            }
+                            ));
+                        }
+                        return true;
+                    }
+    ));
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress)
+{
+    if (mpDev->startNode[Common::WEBAUTHN_ADDR_IDX] != MPNode::EmptyAddress)
+    {
+        qInfo() << "Loading parent nodes...";
+        mpDev->loadLoginNode(jobs, mpDev->startNode[Common::WEBAUTHN_ADDR_IDX], cbProgress, Common::WEBAUTHN_ADDR_IDX);
+    }
+    else
+    {
+        qInfo() << "No parent webauthn nodes to load.";
+    }
+}
+
+void MPDeviceBleImpl::appendLoginNode(MPNode *loginNode, MPNode *loginNodeClone, Common::AddressType addrType)
+{
+    switch(addrType)
+    {
+        case Common::CRED_ADDR_IDX:
+            mpDev->loginNodes.append(loginNode);
+            mpDev->loginNodesClone.append(loginNodeClone);
+            break;
+        case Common::WEBAUTHN_ADDR_IDX:
+            mpDev->webAuthnLoginNodes.append(loginNode);
+            mpDev->webAuthnLoginNodesClone.append(loginNodeClone);
+            break;
+        default:
+            qCritical() << "Invalid address type";
+    }
+}
+
+void MPDeviceBleImpl::appendLoginChildNode(MPNode *loginChildNode, MPNode *loginChildNodeClone, Common::AddressType addrType)
+{
+    switch(addrType)
+    {
+        case Common::CRED_ADDR_IDX:
+            mpDev->loginChildNodes.append(loginChildNode);
+            mpDev->loginChildNodesClone.append(loginChildNodeClone);
+            break;
+        case Common::WEBAUTHN_ADDR_IDX:
+            mpDev->webAuthnLoginChildNodes.append(loginChildNode);
+            mpDev->webAuthnLoginChildNodesClone.append(loginChildNodeClone);
+            break;
+        default:
+            qCritical() << "Invalid address type";
+    }
+}
+
+void MPDeviceBleImpl::generateExportData(QJsonArray &exportTopArray)
+{
+    /* isBle */
+    exportTopArray.append(QJsonValue{true});
+    /* user category names */
+    exportTopArray.append(getUserCategories());
+    /* Webauthn parent nodes */
+    QJsonArray nodeQJsonArray = QJsonArray();
+    auto& login = mpDev->webAuthnLoginNodes;
+    for (qint32 i = 0; i < login.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(login[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(login[i]->getService());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(login[i]->getNodeData()));
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
+
+    /* Webauthn child nodes */
+    nodeQJsonArray = QJsonArray();
+    auto& loginChild = mpDev->webAuthnLoginChildNodes;
+    for (qint32 i = 0; i < loginChild.size(); i++)
+    {
+        QJsonObject nodeObject = QJsonObject();
+        nodeObject["address"] = QJsonValue(Common::bytesToJson(loginChild[i]->getAddress()));
+        nodeObject["name"] = QJsonValue(loginChild[i]->getLogin());
+        nodeObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(loginChild[i]->getNodeData()));
+        nodeObject["pointed"] = QJsonValue(false);
+        nodeQJsonArray.append(QJsonValue(nodeObject));
+    }
+    exportTopArray.append(QJsonValue(nodeQJsonArray));
+    exportTopArray.append(QJsonValue(m_currentUserSettings));
+    auto* bleSettings = static_cast<DeviceSettingsBLE*>(mpDev->settings());
+    exportTopArray.append(QJsonValue(bleSettings->get_user_language()));
+    exportTopArray.append(QJsonValue(bleSettings->get_keyboard_bt_layout()));
+    exportTopArray.append(QJsonValue(bleSettings->get_keyboard_usb_layout()));
+}
+
+void MPDeviceBleImpl::addUnknownCardPayload(const QJsonValue &val)
+{
+    mpDev->unknownCardAddPayload.append(toChar(val));
+    mpDev->unknownCardAddPayload.append(ZERO_BYTE);
+}
+
+void MPDeviceBleImpl::fillAddUnknownCard(const QJsonArray &dataArray)
+{
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_SECURITY_SETTINGS_INDEX]);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_USER_LANG_INDEX]);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_BT_LAYOUT_INDEX]);
+    addUnknownCardPayload(dataArray[MPDevice::EXPORT_USB_LAYOUT_INDEX]);
+}
+
+void MPDeviceBleImpl::handleLongMessageTimeout()
+{
+    qWarning() << "Timout for multiple packet expired";
+    auto& cmd = mpDev->commandQueue.head();
+    delete cmd.timerTimeout;
+    cmd.timerTimeout = nullptr;
+    bool done = true;
+    cmd.cb(false, QByteArray{}, done);
+    mpDev->commandQueue.dequeue();
+    mpDev->sendDataDequeue();
 }
 
 QByteArray MPDeviceBleImpl::createStoreCredMessage(const BleCredential &cred)
@@ -609,7 +968,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
     int byteCounter = BUNBLE_DATA_ADDRESS_SIZE;
     int curAddress = 0;
     QByteArray message;
-    message.fill(static_cast<char>(0), BUNBLE_DATA_ADDRESS_SIZE);
+    message.fill(ZERO_BYTE, BUNBLE_DATA_ADDRESS_SIZE);
     for (const auto byte : blob)
     {
         message.append(byte);
@@ -626,9 +985,10 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
                                           {"msg", "Writing bundle data to device..." }
                                       };
                                       cbProgress(progress);
-#ifdef DEV_DEBUG
-                                      qDebug() << "Sending message to address #" << curAddress;
-#endif
+
+                                      if (AppDaemon::isDebugDev())
+                                          qDebug() << "Sending message to address #" << curAddress;
+
                                       return true;
                                   }));
             curAddress += BUNBLE_DATA_WRITE_SIZE;
@@ -669,4 +1029,9 @@ void MPDeviceBleImpl::writeFetchData(QFile *file, MPCmd::Command cmd)
                         }
                         return true;
     });
+}
+
+bool MPDeviceBleImpl::isBundleFileReadable(const QString &filePath)
+{
+    return QFile{filePath}.open(QIODevice::ReadOnly);
 }

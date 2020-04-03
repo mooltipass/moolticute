@@ -19,6 +19,7 @@
 #include "WSClient.h"
 #include "SystemNotifications/SystemNotification.h"
 #include "SettingsGuiHelper.h"
+#include "DeviceDetector.h"
 
 #define WS_URI                      "ws://localhost"
 #define QUERY_RANDOM_NUMBER_TIME    10 * 60 * 1000 //10 min
@@ -147,7 +148,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     if (rootobj["msg"] == "mp_connected")
     {
         set_connected(true);
-        emit deviceConnacted();
+        emit deviceConnected();
     }
     else if (rootobj["msg"] == "mp_disconnected")
     {
@@ -199,6 +200,7 @@ void WSClient::onTextMessageReceived(const QString &message)
         {
             set_mpHwVersion(Common::MP_Classic);
         }
+        DeviceDetector::instance().setDeviceType(get_mpHwVersion());
         set_fwVersion(o["hw_version"].toString());
         set_hwSerial(o["hw_serial"].toInt());
         set_hwMemory(o["flash_size"].toInt());
@@ -476,6 +478,14 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit updateUserSettingsOnUI(o);
     }
+    else if (rootobj["msg"] == "device_languages")
+    {
+        emit updateBLEDeviceLanguage(rootobj["data"].toObject());
+    }
+    else if (rootobj["msg"] == "keyboard_layouts")
+    {
+        emit updateBLEKeyboardLayout(rootobj["data"].toObject());
+    }
 }
 
 bool WSClient::isFwVersion(int version) const
@@ -650,12 +660,9 @@ void WSClient::sendPlatInfoRequest()
     sendJsonData({{ "msg", "get_debug_platinfo" }});
 }
 
-void WSClient::sendFlashMCU(QString type)
+void WSClient::sendFlashMCU()
 {
-    QJsonObject o;
-    o["type"] = type;
-    sendJsonData({{ "msg", "flash_mcu" },
-                  {"data", o}});
+    sendJsonData({{ "msg", "flash_mcu" }});
 }
 
 void WSClient::sendUploadBundle(QString bundleFilePath)
@@ -699,6 +706,16 @@ void WSClient::sendSetUserCategories(const QString &cat1, const QString &cat2, c
 void WSClient::sendUserSettingsRequest()
 {
     sendJsonData({{ "msg", "get_user_settings" }});
+}
+
+void WSClient::sendLoadParams()
+{
+    sendJsonData({{ "msg", "load_params" }});
+}
+
+void WSClient::requestBleKeyboardLayout()
+{
+    sendJsonData({{ "msg", "request_keyboard_layout" }});
 }
 
 void WSClient::sendLockDevice()
