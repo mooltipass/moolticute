@@ -67,6 +67,7 @@ private:
     void checkUsbDevices();
     void checkLocalSocketDevice();
     bool isLocalSocketDeviceConnected();
+    void disconnectLocalSocketDevice();
     bool isBLEConnectedWithUsb();
     void disconnectingDevices();
 
