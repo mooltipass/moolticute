@@ -50,6 +50,7 @@ public:
 signals:
     void mpConnected(MPDevice *device);
     void mpDisconnected(MPDevice *device);
+    void sendNotification(QString message);
 
 private slots:
     void usbDeviceAdded();
@@ -64,7 +65,11 @@ private:
     MPManager();
 
     void checkUsbDevices();
+    void checkLocalSocketDevice();
+    bool isLocalSocketDeviceConnected();
+    void disconnectLocalSocketDevice();
     bool isBLEConnectedWithUsb();
+    void disconnectingDevices();
 
     QHash<QString, MPDevice *> devices;
 };

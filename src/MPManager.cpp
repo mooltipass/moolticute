@@ -26,6 +26,7 @@
 #elif defined(Q_OS_MAC)
 #include "UsbMonitor_mac.h"
 #endif
+#include "MPDevice_localSocket.h"
 
 MPManager::MPManager():
     QObject(nullptr)
@@ -51,6 +52,10 @@ bool MPManager::initialize()
         connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved(QString)), Qt::QueuedConnection);
 #endif
     }
+
+    // no localSocket devices will ever be connected at startup
+    connect(MPDevice_localSocket::MonitorInstance(), SIGNAL(localDeviceAdded(QString)), this, SLOT(usbDeviceAdded()));
+    connect(MPDevice_localSocket::MonitorInstance(), SIGNAL(localDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved(QString)));
 
     bool startUsbCheck = true;
 #if defined(Q_OS_MAC)
@@ -101,6 +106,9 @@ void MPManager::usbDeviceAdded(QString path)
     Q_UNUSED(path);
     return;
 #endif
+
+    disconnectLocalSocketDevice();
+
     if (devices.empty())
     {
         MPDevice *device = nullptr;
@@ -136,6 +144,8 @@ void MPManager::usbDeviceAdded(QString path)
 #if defined(Q_OS_LINUX)
 void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
 {
+    disconnectLocalSocketDevice();
+
     if (devices.empty())
     {
         if (isBLE && isBLEConnectedWithUsb())
@@ -217,16 +227,17 @@ void MPManager::checkUsbDevices()
 
     if (devlist.isEmpty() && !AppDaemon::isEmulationMode())
     {
-        //No USB devices found, means all MPs are gone disconnected
-        qDebug() << "Disconnecting devices";
-        auto it = devices.begin();
-        while (it != devices.end())
+        if (isLocalSocketDeviceConnected()
+        #ifndef Q_OS_UNIX
+                || !devices.isEmpty()
+        #endif
+           )
         {
-            emit mpDisconnected(it.value());
-            delete it.value();
-            it++;
+            return;
         }
-        devices.clear();
+        //No USB devices found, means all MPs are gone disconnected
+        disconnectingDevices();
+        checkLocalSocketDevice();
         return;
     }
 
@@ -295,9 +306,67 @@ void MPManager::checkUsbDevices()
     }
 }
 
+void MPManager::checkLocalSocketDevice()
+{
+    QList<MPLocalDef> local_devlist = MPDevice_localSocket::enumerateDevices();
+    for (const MPLocalDef &def : local_devlist)
+    {
+        //This is a new connected mooltipass
+        if (!devices.contains(def.id))
+        {
+            MPDevice *device = new MPDevice_localSocket(this, def);
+
+            devices[def.id] = device;
+            emit mpConnected(device);
+        }
+        else
+        {
+            qDebug() << "Device is already connected: " << def.id;
+        }
+    }
+}
+
+bool MPManager::isLocalSocketDeviceConnected()
+{
+    auto it = std::find_if(devices.begin(), devices.end(),
+         [](MPDevice *dev)
+        {
+            auto* localDev = dynamic_cast<MPDevice_localSocket*>(dev);
+            if (localDev && localDev->isEmulatorRunning())
+            {
+                return true;
+            }
+            return false;
+        });
+    return it != devices.end();
+}
+
+void MPManager::disconnectLocalSocketDevice()
+{
+    if (isLocalSocketDeviceConnected())
+    {
+        qDebug() << "Device is connected, emulator disconnecting";
+        emit sendNotification("show_emulator_disconnect");
+        disconnectingDevices();
+    }
+}
+
 bool MPManager::isBLEConnectedWithUsb()
 {
     return std::find_if(devices.begin(), devices.end(),
               [](MPDevice * dev){ return dev->isBLE();})
-            != devices.end();
+    != devices.end();
+}
+
+void MPManager::disconnectingDevices()
+{
+    qDebug() << "Disconnecting devices";
+    auto it = devices.begin();
+    while (it != devices.end())
+    {
+        emit mpDisconnected(it.value());
+        delete it.value();
+        it++;
+    }
+    devices.clear();
 }

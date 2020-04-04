@@ -46,6 +46,7 @@ bool WSServer::initialize()
 
     connect(MPManager::Instance(), SIGNAL(mpConnected(MPDevice*)), this, SLOT(mpAdded(MPDevice*)));
     connect(MPManager::Instance(), SIGNAL(mpDisconnected(MPDevice*)), this, SLOT(mpRemoved(MPDevice*)));
+    connect(MPManager::Instance(), SIGNAL(sendNotification(QString)), this, SLOT(sendNotification(QString)));
 
     if (MPManager::Instance()->getDeviceCount() > 0)
         mpAdded(MPManager::Instance()->getDevice(0));
@@ -179,6 +180,18 @@ void WSServer::originAuthenticationRequired(QWebSocketCorsAuthenticator *authent
     authenticator->setAllowed(match.hasMatch());
 
     qDebug() << "QWebSocket origin header: " << (authenticator->allowed()? "Accepted": "Denied");
+}
+
+void WSServer::sendNotification(QString message)
+{
+    bool isGuiRunning = false;
+    QJsonObject msg = {{"msg", message}};
+    QJsonDocument doc(msg);
+    notifyGUI(doc.toJson(), isGuiRunning);
+    if (!isGuiRunning)
+    {
+        qCritical() << "Cannot send notification, gui is not running";
+    }
 }
 
 bool WSServer::checkClientExists(WSServerCon *wscon)

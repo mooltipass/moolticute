@@ -429,6 +429,10 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         emit displayStatusWarning();
     }
+    else if (rootobj["msg"] == "show_emulator_disconnect")
+    {
+        SystemNotification::instance().createNotification(tr("Device connected"), tr("Disconnecting emulator from Moolticute"));
+    }
     else if (rootobj["msg"] == "delete_data_nodes")
     {
         emit deleteDataNodesFinished();
