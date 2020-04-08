@@ -323,7 +323,8 @@ private:
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
-    void readExportNodes(QJsonArray &&nodes, ExportPayloadData id);
+    void readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle = false);
+    void convertMiniExportToBle(QByteArray &dataArray);
     bool readExportPayload(QJsonArray dataArray, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
