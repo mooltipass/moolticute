@@ -5120,10 +5120,40 @@ void MPDevice::convertMiniExportToBle(QByteArray &dataArray)
 
     if (childNode)
     {
-        dataArray[0] = dataArray[0]|0x08; // Setting ascii flag for child node
+        convertMiniChildNodeToBle(dataArray);
     }
+    else
+    {
+        convertMiniParentNodeToBle(dataArray);
+    }
+}
 
+QByteArray MPDevice::convertMiniParentNodeToBle(const QByteArray& dataArray)
+{
+    const char ZERO_BYTE = static_cast<char>(0x00);
+    // Flags, prev, next parent, first child
+    QByteArray bleArray = dataArray.left(8);
+    // Converting service name to ascii
+    for (int i = 8; i <= 128; ++i)
+    {
+        bleArray.append(dataArray[i]);
+        bleArray.append(ZERO_BYTE);
+    }
+    // Fill remaining service name
+    bleArray.append(10, ZERO_BYTE);
+    // Reserved
+    bleArray.append(ZERO_BYTE);
+    // CTR value
+    bleArray.append(dataArray.right(3));
+    return bleArray;
+}
+
+QByteArray MPDevice::convertMiniChildNodeToBle(const QByteArray& dataArray)
+{
+    QByteArray bleArray;
+    bleArray.append(dataArray[0]|0x08); // Setting ascii flag for child node
     //TODO implement
+    return bleArray;
 }
 
 bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)

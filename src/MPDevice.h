@@ -325,6 +325,8 @@ private:
     bool readExportFile(const QByteArray &fileData, QString &errorString);
     void readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle = false);
     void convertMiniExportToBle(QByteArray &dataArray);
+    QByteArray convertMiniParentNodeToBle(const QByteArray &dataArray);
+    QByteArray convertMiniChildNodeToBle(const QByteArray &dataArray);
     bool readExportPayload(QJsonArray dataArray, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
