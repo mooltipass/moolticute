@@ -5115,7 +5115,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     /** Mooltiapp / Chrome App save file **/
 
     const auto dataSize = dataArray.size();
-    const bool isBleExport = dataArray[EXPORT_IS_BLE_INDEX].toBool() && dataArray.size() >= BLE_EXPORT_FIELD_MIN_NUM;
+    const bool isBleExport = dataSize >= BLE_EXPORT_FIELD_MIN_NUM && dataArray[EXPORT_IS_BLE_INDEX].toBool();
     const QString deviceVersion = dataArray[EXPORT_DEVICE_VERSION_INDEX].toString();
     /* Checks */
     if (!((deviceVersion == "mooltipass" && dataSize == MP_EXPORT_FIELD_NUM)
