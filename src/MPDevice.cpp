@@ -5150,9 +5150,48 @@ QByteArray MPDevice::convertMiniParentNodeToBle(const QByteArray& dataArray)
 
 QByteArray MPDevice::convertMiniChildNodeToBle(const QByteArray& dataArray)
 {
-    QByteArray bleArray;
-    bleArray.append(dataArray[0]|0x08); // Setting ascii flag for child node
-    //TODO implement
+    const char ZERO_BYTE = static_cast<char>(0x00);
+    // Flags, prev, next parent, first child
+    QByteArray bleArray = dataArray.left(6);
+    bleArray[0] = dataArray[0]|0x08; // Setting ascii flag for child node
+    // Pointed to child ?
+    bleArray.append(2, ZERO_BYTE);
+    // Last modified/used day
+    bleArray.append(dataArray.mid(30,4));
+    // Convert login to ascii
+    for (int i = 37; i < 100; ++i)
+    {
+        bleArray.append(dataArray[i]);
+        bleArray.append(ZERO_BYTE);
+    }
+    // Fill remaining login
+    bleArray.append(2, ZERO_BYTE);
+    // Convert description to ascii
+    for (int i = 6; i < 30; ++i)
+    {
+        bleArray.append(dataArray[i]);
+        bleArray.append(ZERO_BYTE);
+    }
+    // Fill arbitrary third field
+    bleArray.append(72, ZERO_BYTE);
+    // Key pressed
+    const char DEFAULT_CHAR = static_cast<char>(0xFF);
+    bleArray.append(4, DEFAULT_CHAR);
+    // same as flags, but with bit 5 set to 1
+    bleArray.append(bleArray.left(2));
+    bleArray[264] = bleArray[264]|(1<<5);
+    // reserved
+    bleArray.append(ZERO_BYTE);
+    // CTR value
+    bleArray.append(dataArray.mid(34, 3));
+    // Encrypted password
+    bleArray.append(dataArray.mid(100, 32));
+    bleArray.append(96, ZERO_BYTE);
+    // password terminating 0
+    bleArray.append(2, ZERO_BYTE);
+    // TBD
+    bleArray.append(128, ZERO_BYTE);
+
     return bleArray;
 }
 
