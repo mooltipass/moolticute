@@ -5263,6 +5263,10 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         {
             qDebug() << "Import file is a backup for current user";
             unknownCardAddPayload = importedCpzCtrValue[i];
+            if (miniExportToBle)
+            {
+                Common::fill(unknownCardAddPayload, 72 - unknownCardAddPayload.size(), static_cast<char>(0x00));
+            }
             cpzFound = true;
         }
     }
