@@ -5330,23 +5330,26 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
         /* We arrive here knowing that the CPZ is in the CPZ/CTR list */
         qInfo() << "Starting File Merging...";
 
-        /// Know if we need to add CPZ CTR packets (additive process)
-        for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
+        if (!isBLE())
         {
-            bool cpzFound = false;
-            for (qint32 j = 0; j < cpzCtrValue.size(); j++)
+            /// Know if we need to add CPZ CTR packets (additive process)
+            for (qint32 i = 0; i < importedCpzCtrValue.size(); i++)
             {
-                if (cpzCtrValue[j] == importedCpzCtrValue[i])
+                bool cpzFound = false;
+                for (qint32 j = 0; j < cpzCtrValue.size(); j++)
                 {
-                    cpzFound = true;
-                    break;
+                    if (cpzCtrValue[j] == importedCpzCtrValue[i])
+                    {
+                        cpzFound = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!cpzFound)
-            {
-                qDebug() << "CPZ CTR not in our DB: " << importedCpzCtrValue[i].toHex();
-                cpzCtrValue.append(importedCpzCtrValue[i]);
+                if (!cpzFound)
+                {
+                    qDebug() << "CPZ CTR not in our DB: " << importedCpzCtrValue[i].toHex();
+                    cpzCtrValue.append(importedCpzCtrValue[i]);
+                }
             }
         }
 
