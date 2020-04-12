@@ -3280,22 +3280,25 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
 
     /* We need to diff cpz ctr values for firmwares running < v1.2 */
     /* Diff: cpzctr values can only be added by design */
-    for (qint32 i = 0; i < cpzCtrValue.length(); i++)
+    if (!isBLE())
     {
-        bool cpzCtrFound = false;
-        for (qint32 j = 0; j < cpzCtrValueClone.length(); j++)
+        for (qint32 i = 0; i < cpzCtrValue.length(); i++)
         {
-            if (cpzCtrValue[i] == cpzCtrValueClone[j])
+            bool cpzCtrFound = false;
+            for (qint32 j = 0; j < cpzCtrValueClone.length(); j++)
             {
-                cpzCtrFound = true;
-                break;
+                if (cpzCtrValue[i] == cpzCtrValueClone[j])
+                {
+                    cpzCtrFound = true;
+                    break;
+                }
             }
-        }
-        if (!cpzCtrFound)
-        {
-            qDebug() << "Adding missing cpzctr";
-            diagSavePacketsGenerated = true;
-            jobs->append(new MPCommandJob(this, MPCmd::ADD_CARD_CPZ_CTR, cpzCtrValue[i], pMesProt->getDefaultFuncDone()));
+            if (!cpzCtrFound)
+            {
+                qDebug() << "Adding missing cpzctr";
+                diagSavePacketsGenerated = true;
+                jobs->append(new MPCommandJob(this, MPCmd::ADD_CARD_CPZ_CTR, cpzCtrValue[i], pMesProt->getDefaultFuncDone()));
+            }
         }
     }
 
