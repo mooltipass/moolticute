@@ -5156,7 +5156,7 @@ QByteArray MPDevice::convertMiniChildNodeToBle(const QByteArray& dataArray)
     const char ZERO_BYTE = static_cast<char>(0x00);
     // Flags, prev, next parent, first child
     QByteArray bleArray = dataArray.left(6);
-    bleArray[0] = dataArray[0]|0x08; // Setting ascii flag for child node
+    bleArray[0] = dataArray[0]|(1<<5); // Setting ascii flag for child node
     // Pointed to child ?
     bleArray.append(2, ZERO_BYTE);
     // Last modified/used day
@@ -5182,7 +5182,7 @@ QByteArray MPDevice::convertMiniChildNodeToBle(const QByteArray& dataArray)
     bleArray.append(4, DEFAULT_CHAR);
     // same as flags, but with bit 5 set to 1
     bleArray.append(bleArray.left(2));
-    bleArray[264] = bleArray[264]|(1<<5);
+    bleArray[264] = bleArray[264]|(1<<6);
     // reserved
     bleArray.append(ZERO_BYTE);
     // CTR value
