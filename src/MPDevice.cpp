@@ -5250,8 +5250,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         if (miniExportToBle)
         {
             //Add userid placeholder to BLE cpz lut entry
-            qbarray.append(static_cast<char>(0x00));
-            qbarray.append(static_cast<char>(0x00));
+            bleImpl->addUserIdPlaceholder(qbarray);
         }
         for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(qjobject[QString::number(j)].toInt());}
         qDebug() << "Imported CPZ/CTR value : " << qbarray.toHex();
@@ -5268,7 +5267,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
             unknownCardAddPayload = importedCpzCtrValue[i];
             if (miniExportToBle)
             {
-                Common::fill(unknownCardAddPayload, 72 - unknownCardAddPayload.size(), static_cast<char>(0x00));
+                bleImpl->fillMiniExportPayload(unknownCardAddPayload);
             }
             cpzFound = true;
         }

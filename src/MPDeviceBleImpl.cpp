@@ -877,6 +877,21 @@ void MPDeviceBleImpl::fillAddUnknownCard(const QJsonArray &dataArray)
     addUnknownCardPayload(dataArray[MPDevice::EXPORT_USB_LAYOUT_INDEX]);
 }
 
+void MPDeviceBleImpl::addUserIdPlaceholder(QByteArray &array)
+{
+    array.append(2, ZERO_BYTE);
+}
+
+void MPDeviceBleImpl::fillMiniExportPayload(QByteArray &unknownCardPayload)
+{
+    const auto payloadSize = unknownCardPayload.size();
+    if (payloadSize >= UNKNOWN_CARD_PAYLOAD_SIZE)
+    {
+        return;
+    }
+    Common::fill(unknownCardPayload, UNKNOWN_CARD_PAYLOAD_SIZE - payloadSize, ZERO_BYTE);
+}
+
 void MPDeviceBleImpl::handleLongMessageTimeout()
 {
     qWarning() << "Timout for multiple packet expired";
