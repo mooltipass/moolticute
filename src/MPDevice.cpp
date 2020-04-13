@@ -5123,11 +5123,11 @@ void MPDevice::convertMiniExportToBle(QByteArray &dataArray)
 
     if (childNode)
     {
-        convertMiniChildNodeToBle(dataArray);
+        dataArray = convertMiniChildNodeToBle(dataArray);
     }
     else
     {
-        convertMiniParentNodeToBle(dataArray);
+        dataArray = convertMiniParentNodeToBle(dataArray);
     }
 }
 
