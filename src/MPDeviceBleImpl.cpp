@@ -892,6 +892,11 @@ void MPDeviceBleImpl::fillMiniExportPayload(QByteArray &unknownCardPayload)
     Common::fill(unknownCardPayload, UNKNOWN_CARD_PAYLOAD_SIZE - payloadSize, ZERO_BYTE);
 }
 
+void MPDeviceBleImpl::convertMiniToBleNode(QByteArray &array)
+{
+    m_bleNodeConverter.convert(array);
+}
+
 void MPDeviceBleImpl::handleLongMessageTimeout()
 {
     qWarning() << "Timout for multiple packet expired";

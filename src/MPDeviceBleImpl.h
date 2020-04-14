@@ -4,6 +4,7 @@
 #include "MPDevice.h"
 #include "BleCommon.h"
 #include "MPBLEFreeAddressProvider.h"
+#include "MPMiniToBleNodeConverter.h"
 
 class MessageProtocolBLE;
 
@@ -120,6 +121,8 @@ public:
     void addUserIdPlaceholder(QByteArray &array);
     void fillMiniExportPayload(QByteArray &unknownCardPayload);
 
+    void convertMiniToBleNode(QByteArray &array);
+
 signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);
@@ -159,6 +162,7 @@ private:
     bool m_categoriesFetched = false;
     QJsonObject m_deviceLanguages;
     QJsonObject m_keyboardLayouts;
+    MPMiniToBleNodeConverter m_bleNodeConverter;
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;

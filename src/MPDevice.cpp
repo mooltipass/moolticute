@@ -5108,94 +5108,13 @@ void MPDevice::readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fr
         for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
         if (fromMiniToBle)
         {
-            convertMiniExportToBle(dataCore);
+            bleImpl->convertMiniToBleNode(dataCore);
         }
 
         /* Recreate node and add it to the list of imported nodes */
         MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
         importNodeMap[id]->append(importedNode);
     }
-}
-
-void MPDevice::convertMiniExportToBle(QByteArray &dataArray)
-{
-    const bool childNode = dataArray[1]&0x40;
-
-    if (childNode)
-    {
-        dataArray = convertMiniChildNodeToBle(dataArray);
-    }
-    else
-    {
-        dataArray = convertMiniParentNodeToBle(dataArray);
-    }
-}
-
-QByteArray MPDevice::convertMiniParentNodeToBle(const QByteArray& dataArray)
-{
-    const char ZERO_BYTE = static_cast<char>(0x00);
-    // Flags, prev, next parent, first child
-    QByteArray bleArray = dataArray.left(8);
-    // Converting service name to ascii
-    for (int i = 8; i <= 128; ++i)
-    {
-        bleArray.append(dataArray[i]);
-        bleArray.append(ZERO_BYTE);
-    }
-    // Fill remaining service name
-    bleArray.append(10, ZERO_BYTE);
-    // Reserved
-    bleArray.append(ZERO_BYTE);
-    // CTR value
-    bleArray.append(dataArray.right(3));
-    return bleArray;
-}
-
-QByteArray MPDevice::convertMiniChildNodeToBle(const QByteArray& dataArray)
-{
-    const char ZERO_BYTE = static_cast<char>(0x00);
-    // Flags, prev, next parent, first child
-    QByteArray bleArray = dataArray.left(6);
-    bleArray[0] = dataArray[0]|(1<<5); // Setting ascii flag for child node
-    // Pointed to child ?
-    bleArray.append(2, ZERO_BYTE);
-    // Last modified/used day
-    bleArray.append(dataArray.mid(30,4));
-    // Convert login to ascii
-    for (int i = 37; i < 100; ++i)
-    {
-        bleArray.append(dataArray[i]);
-        bleArray.append(ZERO_BYTE);
-    }
-    // Fill remaining login
-    bleArray.append(2, ZERO_BYTE);
-    // Convert description to ascii
-    for (int i = 6; i < 30; ++i)
-    {
-        bleArray.append(dataArray[i]);
-        bleArray.append(ZERO_BYTE);
-    }
-    // Fill arbitrary third field
-    bleArray.append(72, ZERO_BYTE);
-    // Key pressed
-    const char DEFAULT_CHAR = static_cast<char>(0xFF);
-    bleArray.append(4, DEFAULT_CHAR);
-    // same as flags, but with bit 5 set to 1
-    bleArray.append(bleArray.left(2));
-    bleArray[264] = bleArray[264]|(1<<6);
-    // reserved
-    bleArray.append(ZERO_BYTE);
-    // CTR value
-    bleArray.append(dataArray.mid(34, 3));
-    // Encrypted password
-    bleArray.append(dataArray.mid(100, 32));
-    bleArray.append(96, ZERO_BYTE);
-    // password terminating 0
-    bleArray.append(2, ZERO_BYTE);
-    // TBD
-    bleArray.append(128, ZERO_BYTE);
-
-    return bleArray;
 }
 
 bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
