@@ -60,6 +60,7 @@ SOURCES += src/main_daemon.cpp \
     src/MPDevice_localSocket.cpp \
     src/MPManager.cpp \
     src/Common.cpp \
+    src/Mooltipass/MPMiniToBleNodeConverter.cpp \
     src/WSServer.cpp \
     src/AppDaemon.cpp \
     src/AsyncJobs.cpp \
@@ -91,6 +92,7 @@ HEADERS  += \
     src/MPDevice.h \
     src/MPDevice_localSocket.h \
     src/MPManager.h \
+    src/Mooltipass/MPMiniToBleNodeConverter.h \
     src/MooltipassCmds.h \
     src/QtHelper.h \
     src/WSServer.h \

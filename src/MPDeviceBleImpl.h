@@ -4,6 +4,7 @@
 #include "MPDevice.h"
 #include "BleCommon.h"
 #include "MPBLEFreeAddressProvider.h"
+#include "MPMiniToBleNodeConverter.h"
 
 class MessageProtocolBLE;
 
@@ -117,6 +118,10 @@ public:
     static char toChar(const QJsonValue &val) { return static_cast<char>(val.toInt()); }
     void addUnknownCardPayload(const QJsonValue &val);
     void fillAddUnknownCard(const QJsonArray& dataArray);
+    void addUserIdPlaceholder(QByteArray &array);
+    void fillMiniExportPayload(QByteArray &unknownCardPayload);
+
+    void convertMiniToBleNode(QByteArray &array);
 
 signals:
     void userSettingsChanged(QJsonObject settings);
@@ -157,6 +162,7 @@ private:
     bool m_categoriesFetched = false;
     QJsonObject m_deviceLanguages;
     QJsonObject m_keyboardLayouts;
+    MPMiniToBleNodeConverter m_bleNodeConverter;
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;
@@ -170,6 +176,7 @@ private:
     static constexpr int FIRST_PACKET_PAYLOAD_SIZE = 58;
     static constexpr int INVALID_LAYOUT_LANG_SIZE = 0xFFFF;
     const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
+    static constexpr int UNKNOWN_CARD_PAYLOAD_SIZE = 72;
     const static char ZERO_BYTE = static_cast<char>(0x00);
 };
 

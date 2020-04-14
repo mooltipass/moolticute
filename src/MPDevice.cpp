@@ -5091,7 +5091,7 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
     }
 }
 
-void MPDevice::readExportNodes(QJsonArray &&nodes, ExportPayloadData id)
+void MPDevice::readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle /*= false*/)
 {
     for (qint32 i = 0; i < nodes.size(); i++)
     {
@@ -5106,6 +5106,10 @@ void MPDevice::readExportNodes(QJsonArray &&nodes, ExportPayloadData id)
         QJsonObject dataObj = qjobject["data"].toObject();
         QByteArray dataCore = QByteArray();
         for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
+        if (fromMiniToBle)
+        {
+            bleImpl->convertMiniToBleNode(dataCore);
+        }
 
         /* Recreate node and add it to the list of imported nodes */
         MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
@@ -5119,10 +5123,11 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 
     const auto dataSize = dataArray.size();
     const bool isBleExport = dataSize >= BLE_EXPORT_FIELD_MIN_NUM && dataArray[EXPORT_IS_BLE_INDEX].toBool();
+    const bool isMiniExportFile = dataSize == MC_EXPORT_FIELD_NUM;
     const QString deviceVersion = dataArray[EXPORT_DEVICE_VERSION_INDEX].toString();
     /* Checks */
     if (!((deviceVersion == "mooltipass" && dataSize == MP_EXPORT_FIELD_NUM)
-          || (deviceVersion == "moolticute" && (dataSize == MC_EXPORT_FIELD_NUM || isBleExport))))
+          || (deviceVersion == "moolticute" && (isMiniExportFile || isBleExport))))
     {
         qCritical() << "Invalid MooltiApp file";
         errorString = "Selected File Isn't Correct";
@@ -5147,6 +5152,8 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         qDebug() << "Imported mini serial number: " << importedDbMiniSerialNumber;
     }
 
+    const bool miniExportToBle = isBLE() && isMiniExportFile;
+
     /* Read CTR */
     importedCtrValue = QByteArray();
     auto qjobject = dataArray[EXPORT_CTR_INDEX].toObject();
@@ -5159,6 +5166,11 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     {
         qjobject = qjarray[i].toObject();
         QByteArray qbarray = QByteArray();
+        if (miniExportToBle)
+        {
+            //Add userid placeholder to BLE cpz lut entry
+            bleImpl->addUserIdPlaceholder(qbarray);
+        }
         for (qint32 j = 0; j < qjobject.size(); j++) {qbarray.append(qjobject[QString::number(j)].toInt());}
         qDebug() << "Imported CPZ/CTR value : " << qbarray.toHex();
         importedCpzCtrValue.append(qbarray);
@@ -5172,6 +5184,10 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         {
             qDebug() << "Import file is a backup for current user";
             unknownCardAddPayload = importedCpzCtrValue[i];
+            if (miniExportToBle)
+            {
+                bleImpl->fillMiniExportPayload(unknownCardAddPayload);
+            }
             cpzFound = true;
         }
     }
@@ -5219,10 +5235,10 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
     }
 
     /* Read service nodes */
-    readExportNodes(dataArray[EXPORT_SERVICE_NODES_INDEX].toArray(), EXPORT_SERVICE_NODES_INDEX);
+    readExportNodes(dataArray[EXPORT_SERVICE_NODES_INDEX].toArray(), EXPORT_SERVICE_NODES_INDEX, miniExportToBle);
 
     /* Read service child nodes */
-    readExportNodes(dataArray[EXPORT_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_SERVICE_CHILD_NODES_INDEX);
+    readExportNodes(dataArray[EXPORT_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_SERVICE_CHILD_NODES_INDEX, miniExportToBle);
 
     if (!isMooltiAppImportFile)
     {
