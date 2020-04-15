@@ -5134,6 +5134,13 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
         return false;
     }
 
+    if (isBleExport && !isBLE())
+    {
+        qWarning() << "Cannot use BLE export file for mini";
+        errorString = "Selected File Is A BLE Backup";
+        return false;
+    }
+
     /* Know which bundle we're dealing with */
     if (deviceVersion == "mooltipass")
     {
