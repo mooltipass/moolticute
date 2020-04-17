@@ -389,6 +389,46 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "set_data_node")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString service = o["service"].toString();
+        QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
+        if (data.isEmpty())
+        {
+            sendFailedJson(root, "node_data is empty");
+            return;
+        }
+
+        int maxSize = MP_MAX_FILE_SIZE;
+        if (service.toLower() == MC_SSH_SERVICE)
+            maxSize = MP_MAX_SSH_SIZE;
+        if (data.size() > maxSize)
+        {
+            sendFailedJson(root, "data is too big to be stored in device");
+            return;
+        }
+
+        mpdevice->setDataNode(service, data,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            ores["service"] = service;
+            QJsonObject oroot = root;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -837,46 +877,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
             QJsonObject oroot = root;
             ores["service"] = service;
             ores["node_data"] = QString(dataNode.toBase64());
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        cbProgress);
-    }
-    else if (root["msg"] == "set_data_node")
-    {
-        QJsonObject o = root["data"].toObject();
-        QString service = o["service"].toString();
-        QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
-        if (data.isEmpty())
-        {
-            sendFailedJson(root, "node_data is empty");
-            return;
-        }
-
-        int maxSize = MP_MAX_FILE_SIZE;
-        if (service.toLower() == MC_SSH_SERVICE)
-            maxSize = MP_MAX_SSH_SIZE;
-        if (data.size() > maxSize)
-        {
-            sendFailedJson(root, "data is too big to be stored in device");
-            return;
-        }
-
-        mpdevice->setDataNode(service, data,
-                [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            ores["service"] = service;
-            QJsonObject oroot = root;
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         },

@@ -4385,20 +4385,39 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
     QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
-    jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
-                                  sdata,
-                                  [this, jobs, service](const QByteArray &data, bool &) -> bool
+    if (isBLE())
     {
-        if (pMesProt->getFirstPayloadByte(data) != 1)
+        sdata.append((char)0);
+        jobs->append(new MPCommandJob(this, MPCmd::ADD_DATA_SERVICE,
+                                      sdata,
+                                      [this, service, cb](const QByteArray &data, bool &) -> bool
         {
-            qWarning() << "context " << service << " does not exist";
-            //Context does not exists, create it
-            createJobAddContext(service, jobs, true);
-        }
-        else
-            qDebug() << "set_data_context " << service;
-        return true;
-    }));
+            if (pMesProt->getFirstPayloadByte(data) != 1)
+            {
+                qWarning() << service << " already exists";
+                cb(false, "Service already exists.");
+                return false;
+            }
+            return true;
+        }));
+    }
+    else
+    {
+        jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
+                                      sdata,
+                                      [this, jobs, service](const QByteArray &data, bool &) -> bool
+        {
+            if (pMesProt->getFirstPayloadByte(data) != 1)
+            {
+                qWarning() << "context " << service << " does not exist";
+                //Context does not exists, create it
+                createJobAddContext(service, jobs, true);
+            }
+            else
+                qDebug() << "set_data_context " << service;
+            return true;
+        }));
+    }
 
     //set size of data
     currentDataNode = QByteArray();

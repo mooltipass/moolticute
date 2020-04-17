@@ -302,7 +302,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::SET_UID               , 0xBC},
         {MPCmd::GET_UID               , 0xBD},
         {MPCmd::SET_DATA_SERVICE      , 0xBE},
-        {MPCmd::ADD_DATA_SERVICE      , 0xBF},
+        {MPCmd::ADD_DATA_SERVICE      , 0x0021},
         {MPCmd::WRITE_32B_IN_DN       , 0xC0},
         {MPCmd::READ_32B_IN_DN        , 0xC1},
         {MPCmd::GET_CUR_CARD_CPZ      , 0x000B},
