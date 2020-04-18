@@ -4352,7 +4352,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 
     //send 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
-    jobs->append(new MPCommandJob(this, MPCmd::WRITE_32B_IN_DN,
+    jobs->append(new MPCommandJob(this, MPCmd::WRITE_DATA,
               packet,
               [this, jobs, current, cbProgress](const QByteArray &data, bool &done)
                 {
@@ -4421,28 +4421,38 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 
     //set size of data
     currentDataNode = QByteArray();
-    currentDataNode.resize(MP_DATA_HEADER_SIZE);
-    qToBigEndian(nodeData.size(), (quint8 *)currentDataNode.data());
+    if (!isBLE())
+    {
+        currentDataNode.resize(MP_DATA_HEADER_SIZE);
+        qToBigEndian(nodeData.size(), (quint8 *)currentDataNode.data());
+    }
     currentDataNode.append(nodeData);
 
-    //first packet
-    QByteArray firstPacket;
-    char eod = (nodeData.size() + MP_DATA_HEADER_SIZE <= MOOLTIPASS_BLOCK_SIZE)?1:0;
-    firstPacket.append(eod);
-    firstPacket.append(currentDataNode.mid(0, MOOLTIPASS_BLOCK_SIZE));
-    firstPacket.resize(MOOLTIPASS_BLOCK_SIZE + 1);
+    if (isBLE())
+    {
+        bleImpl->storeFileData(0, jobs, cbProgress);
+    }
+    else
+    {
+        //first packet
+        QByteArray firstPacket;
+        char eod = (nodeData.size() + MP_DATA_HEADER_SIZE <= MOOLTIPASS_BLOCK_SIZE)?1:0;
+        firstPacket.append(eod);
+        firstPacket.append(currentDataNode.mid(0, MOOLTIPASS_BLOCK_SIZE));
+        firstPacket.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
-//    cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, MOOLTIPASS_BLOCK_SIZE);
+        //cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, MOOLTIPASS_BLOCK_SIZE);
 
-    //send the first 32bytes packet
-    //bind to a member function of MPDevice, to be able to loop over until with got all the data
-    jobs->append(new MPCommandJob(this, MPCmd::WRITE_32B_IN_DN,
-              firstPacket,
-              [this, jobs, cbProgress](const QByteArray &data, bool &done)
-                {
-                    return setDataNodeCb(jobs, MOOLTIPASS_BLOCK_SIZE, std::move(cbProgress), data, done);
-                }
-              ));
+        //send the first 32bytes packet
+        //bind to a member function of MPDevice, to be able to loop over until with got all the data
+        jobs->append(new MPCommandJob(this, MPCmd::WRITE_DATA,
+                  firstPacket,
+                  [this, jobs, cbProgress](const QByteArray &data, bool &done)
+                    {
+                        return setDataNodeCb(jobs, MOOLTIPASS_BLOCK_SIZE, std::move(cbProgress), data, done);
+                    }
+                  ));
+    }
 
     connect(jobs, &AsyncJobs::finished, [this, cb, service, nodeData](const QByteArray &)
     {
