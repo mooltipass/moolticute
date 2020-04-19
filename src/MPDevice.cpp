@@ -778,7 +778,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         }));
     }
 
-    if (getData && !isBLE()) //TODO: Data fetching is not implemented yet for BLE
+    if (getData)
     {
         //Get parent data node start address
         jobs->append(new MPCommandJob(this, MPCmd::GET_DN_START_PARENT,
@@ -794,8 +794,16 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             else
             {
-                startDataNode = pMesProt->getFullPayload(data);
-                startDataNodeClone = pMesProt->getFullPayload(data);
+                if (isBLE())
+                {
+                    startDataNode = bleImpl->getDataStartNode(pMesProt->getFullPayload(data));
+                    startDataNodeClone = startDataNode;
+                }
+                else
+                {
+                    startDataNode = pMesProt->getFullPayload(data);
+                    startDataNodeClone = pMesProt->getFullPayload(data);
+                }
                 qDebug() << "Start data node addr:" << startDataNode.toHex();
 
                 //if data parent address is not null, load nodes
@@ -1345,24 +1353,25 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
         {
             //Node is loaded
             qDebug() << "Child data node loaded";
+            const auto dataEncSize = pMesProt->getDataNodeEncSize();
 
             QVariantMap data = {
                 {"total", -1},
                 {"current", 0},
                 {"msg", "Loading data for %1: %2 encrypted bytes read" },
-                {"msg_args", QVariantList({parent->getService(), nbBytesFetched + MP_NODE_DATA_ENC_SIZE})}
+                {"msg_args", QVariantList({parent->getService(), nbBytesFetched + dataEncSize})}
             };
             cbProgress(data);
 
             //Load next child
             if (cnode->getNextChildDataAddress() != MPNode::EmptyAddress)
             {
-                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress(), cbProgress, nbBytesFetched + MP_NODE_DATA_ENC_SIZE);
+                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress(), cbProgress, nbBytesFetched + dataEncSize);
             }
             else
             {
-                parent->setEncDataSize(nbBytesFetched + MP_NODE_DATA_ENC_SIZE);
-                parentClone->setEncDataSize(nbBytesFetched + MP_NODE_DATA_ENC_SIZE);
+                parent->setEncDataSize(nbBytesFetched + dataEncSize);
+                parentClone->setEncDataSize(nbBytesFetched + dataEncSize);
 
                 /* and if our parent doesn't have next one... */
                 if (parent->getNextParentAddress() == MPNode::EmptyAddress)

@@ -34,8 +34,8 @@ bool MPNodeBLE::isValid() const
         return false;
     }
 
-    return (data.size() == PARENT_NODE_LENGTH && NodeParent == type) ||
-           (data.size() == CHILD_NODE_LENGTH && NodeChild == type);
+    return (data.size() == PARENT_NODE_LENGTH && (NodeParent == type || NodeParentData == type)) ||
+           (data.size() == CHILD_NODE_LENGTH && (NodeChild == type || NodeChildData == type));
 }
 
 QString MPNodeBLE::getService() const

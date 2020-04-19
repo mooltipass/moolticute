@@ -405,7 +405,18 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
     }
     qDebug() << "Received starting node: " << res.size();
     return res;
-}
+ }
+
+ QByteArray MPDeviceBleImpl::getDataStartNode(const QByteArray &data) const
+ {
+     auto addresses = processReceivedStartNodes(data);
+     if (addresses.size() <= FIRST_DATA_STARTING_ADDR)
+     {
+        qCritical() << "Data starting address is not received";
+        return MPNode::EmptyAddress;
+     }
+     return addresses[FIRST_DATA_STARTING_ADDR];
+ }
 
 bool MPDeviceBleImpl::isAfterAuxFlash()
 {

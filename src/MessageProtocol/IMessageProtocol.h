@@ -185,6 +185,7 @@ public:
     virtual int getParentNodeSize() const = 0;
     virtual int getChildNodeSize() const = 0;
     virtual uint getMaxFavorite() const = 0;
+    virtual uint getDataNodeEncSize() const = 0;
 
     virtual int getCredentialPackageSize() const = 0;
 

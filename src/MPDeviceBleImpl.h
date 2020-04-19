@@ -77,6 +77,7 @@ public:
     bool processReceivedData(const QByteArray& data, QByteArray& dataReceived);
 
     QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
+    QByteArray getDataStartNode(const QByteArray& data) const;
 
     bool isAfterAuxFlash();
 
@@ -181,6 +182,7 @@ private:
     static constexpr int UNKNOWN_CARD_PAYLOAD_SIZE = 72;
     const static char ZERO_BYTE = static_cast<char>(0x00);
     const static int BLE_DATA_BLOCK_SIZE = 512;
+    const static int FIRST_DATA_STARTING_ADDR = 10;
 };
 
 #endif // MPDEVICEBLEIMPL_H
