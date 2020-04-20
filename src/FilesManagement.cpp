@@ -138,10 +138,10 @@ void FilesManagement::setWsClient(WSClient *c)
     });
     connect(wsClient, &WSClient::filesCacheChanged, this, &FilesManagement::loadFilesCacheModel);
 
-    setFileCacheControlsVisible(wsClient->isFw12());
+    setFileCacheControlsVisible(wsClient->isFw12() || wsClient->isMPBLE());
     connect(wsClient, &WSClient::fwVersionChanged, [=](const QString &)
     {
-        setFileCacheControlsVisible(wsClient->isFw12());
+        setFileCacheControlsVisible(wsClient->isFw12() || wsClient->isMPBLE());
     });
     connect(wsClient, &WSClient::wsConnected, [=] ()
     {
@@ -217,7 +217,7 @@ void FilesManagement::loadModel()
 
 void FilesManagement::loadFilesCacheModel(bool isInSync)
 {
-    if (!wsClient->isFw12())
+    if (!wsClient->isFw12() && !wsClient->isMPBLE())
     {
         setFileCacheControlsVisible(false);
         return;
