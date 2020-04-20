@@ -78,6 +78,7 @@ public:
 
     QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
     QByteArray getDataStartNode(const QByteArray& data) const;
+    bool readDataNode(AsyncJobs *jobs, const QByteArray& data);
 
     bool isAfterAuxFlash();
 

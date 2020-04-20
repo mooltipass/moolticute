@@ -101,7 +101,7 @@ public:
             SET_DATA_SERVICE    ,
             ADD_DATA_SERVICE    ,
             WRITE_DATA          ,
-            READ_32B_IN_DN      ,
+            READ_DATA_FILE      ,
             GET_CUR_CARD_CPZ    ,
             CANCEL_USER_REQUEST ,
             PLEASE_RETRY        ,

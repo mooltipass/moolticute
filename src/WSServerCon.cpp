@@ -429,6 +429,43 @@ void WSServerCon::processMessage(const QString &message)
         },
         defaultProgressCb);
     }
+    else if (root["msg"] == "get_data_node")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, const QByteArray &dataNode)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["node_data"] = QString(dataNode.toBase64());
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
+    else if (root["msg"] == "refresh_files_cache")
+    {
+        mpdevice->updateFilesCache();
+    }
+    else if (root["msg"] == "list_files_cache")
+    {
+        sendFilesCache();
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -853,35 +890,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
         const QByteArray key = o.value("key").toString().toUtf8().simplified();
         mpdevice->getUID(key);
     }
-    else if (root["msg"] == "get_data_node")
-    {
-        QJsonObject o = root["data"].toObject();
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
-                reqid,
-                [=](bool success, QString errstr, const QString &service, const QByteArray &dataNode)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["service"] = service;
-            ores["node_data"] = QString(dataNode.toBase64());
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        cbProgress);
-    }
     else if (root["msg"] == "delete_data_nodes")
     {
         QJsonObject o = root["data"].toObject();
@@ -972,14 +980,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });
-    }
-    else if (root["msg"] == "refresh_files_cache")
-    {
-        mpdevice->updateFilesCache();
-    }
-    else if (root["msg"] == "list_files_cache")
-    {
-        sendFilesCache();
     }
 }
 

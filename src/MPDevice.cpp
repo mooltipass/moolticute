@@ -4219,7 +4219,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
 
         //ask for the next 32bytes packet
         //bind to a member function of MPDevice, to be able to loop over until with got all the data
-        jobs->append(new MPCommandJob(this, MPCmd::READ_32B_IN_DN,
+        jobs->append(new MPCommandJob(this, MPCmd::READ_DATA_FILE,
                   [this, jobs, cbProgress](const QByteArray &data, bool &done)
                     {
                         return getDataNodeCb(jobs, std::move(cbProgress), data, done);
@@ -4254,54 +4254,68 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
     QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
-    jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
-                                  sdata,
-                                  [this, jobs, service,fallback_service](const QByteArray &data, bool &) -> bool
+    if (isBLE())
     {
-        if (pMesProt->getFirstPayloadByte(data) != 1)
-        {
-            if (!fallback_service.isEmpty())
-            {
-                QByteArray fsdata = pMesProt->toByteArray(fallback_service);
-                fsdata.append((char)0);
-                jobs->prepend(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
-                                              fsdata,
-                                              [this, jobs, fallback_service](const QByteArray &data, bool &) -> bool
-                {
-                    if (pMesProt->getFirstPayloadByte(data) != 1)
+        sdata.append((char)0);
+        jobs->append(new MPCommandJob(this, MPCmd::READ_DATA_FILE,
+                                      sdata,
+                  [this, jobs, cbProgress](const QByteArray &data, bool &done)
                     {
-                        qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
-                        jobs->setCurrentJobError("failed to select context and fallback_context on device");
-                        return false;
+                        return bleImpl->readDataNode(jobs, data);
                     }
+                  ));
+    }
+    else
+    {
+        jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
+                                      sdata,
+                                      [this, jobs, service,fallback_service](const QByteArray &data, bool &) -> bool
+        {
+            if (pMesProt->getFirstPayloadByte(data) != 1)
+            {
+                if (!fallback_service.isEmpty())
+                {
+                    QByteArray fsdata = pMesProt->toByteArray(fallback_service);
+                    fsdata.append((char)0);
+                    jobs->prepend(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
+                                                  fsdata,
+                                                  [this, jobs, fallback_service](const QByteArray &data, bool &) -> bool
+                    {
+                        if (pMesProt->getFirstPayloadByte(data) != 1)
+                        {
+                            qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
+                            jobs->setCurrentJobError("failed to select context and fallback_context on device");
+                            return false;
+                        }
 
-                    QVariantMap m = {{ "service", fallback_service }};
-                    jobs->user_data = m;
+                        QVariantMap m = {{ "service", fallback_service }};
+                        jobs->user_data = m;
 
+                        return true;
+                    }));
                     return true;
-                }));
-                return true;
+                }
+
+                qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
+                jobs->setCurrentJobError("failed to select context on device");
+                return false;
             }
 
-            qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
-            jobs->setCurrentJobError("failed to select context on device");
-            return false;
-        }
+            QVariantMap m = {{ "service", service }};
+            jobs->user_data = m;
 
-        QVariantMap m = {{ "service", service }};
-        jobs->user_data = m;
+            return true;
+        }));
 
-        return true;
-    }));
-
-    //ask for the first 32bytes packet
-    //bind to a member function of MPDevice, to be able to loop over until with got all the data
-    jobs->append(new MPCommandJob(this, MPCmd::READ_32B_IN_DN,
-              [this, jobs, cbProgress](const QByteArray &data, bool &done)
-                {
-                    return getDataNodeCb(jobs, std::move(cbProgress), data, done);
-                }
-              ));
+        //ask for the first 32bytes packet
+        //bind to a member function of MPDevice, to be able to loop over until with got all the data
+        jobs->append(new MPCommandJob(this, MPCmd::READ_DATA_FILE,
+                  [this, jobs, cbProgress](const QByteArray &data, bool &done)
+                    {
+                        return getDataNodeCb(jobs, std::move(cbProgress), data, done);
+                    }
+                  ));
+    }
 
     connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &)
     {

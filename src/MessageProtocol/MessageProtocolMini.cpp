@@ -208,7 +208,7 @@ void MessageProtocolMini::fillCommandMapping()
         {MPCmd::SET_DATA_SERVICE      , 0xBE},
         {MPCmd::ADD_DATA_SERVICE      , 0xBF},
         {MPCmd::WRITE_DATA            , 0xC0},
-        {MPCmd::READ_32B_IN_DN        , 0xC1},
+        {MPCmd::READ_DATA_FILE        , 0xC1},
         {MPCmd::GET_CUR_CARD_CPZ      , 0xC2},
         {MPCmd::CANCEL_USER_REQUEST   , 0xC3},
         {MPCmd::PLEASE_RETRY          , 0xC4},

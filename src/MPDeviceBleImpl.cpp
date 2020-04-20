@@ -418,6 +418,47 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
      return addresses[FIRST_DATA_STARTING_ADDR];
  }
 
+bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
+{
+    if (bleProt->getMessageSize(data) == 1 && //data size is 1
+        bleProt->getFirstPayloadByte(data) == 0)   //value is 0 means end of data
+    {
+        QVariantMap m = jobs->user_data.toMap();
+        if (!m.contains("data"))
+        {
+            //if no data at all, report an error
+            jobs->setCurrentJobError("reading data failed or no data");
+            return false;
+        }
+        return true;
+    }
+
+    if (bleProt->getMessageSize(data) != 0)
+    {
+        QVariantMap m = jobs->user_data.toMap();
+        QByteArray ba = m["data"].toByteArray();
+
+        //first packet, we can read the file size
+        if (!ba.isEmpty())
+        {
+            QByteArray payload = bleProt->getFullPayload(data);
+            QByteArray payloadSize = payload.left(2);
+            ba.append(payload.mid(2));
+        }
+
+        m["data"] = ba;
+        jobs->user_data = m;
+
+        jobs->append(new MPCommandJob(mpDev, MPCmd::READ_DATA_FILE,
+                  [this, jobs](const QByteArray &data, bool &)
+                    {
+                        return readDataNode(jobs, data);
+                    }
+                  ));
+    }
+    return true;
+}
+
 bool MPDeviceBleImpl::isAfterAuxFlash()
 {
     QSettings s;
