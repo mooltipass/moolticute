@@ -4317,18 +4317,22 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
                   ));
     }
 
-    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, jobs, cb](const QByteArray &)
     {
         //all jobs finished success
         qInfo() << "get_data_node success";
         QVariantMap m = jobs->user_data.toMap();
         QByteArray ndata = m["data"].toByteArray();
 
-        //check data size
-        quint32 sz = qFromBigEndian<quint32>((quint8 *)ndata.data());
-        qDebug() << "Data size: " << sz;
+        if (!isBLE())
+        {
+            //check data size
+            quint32 sz = qFromBigEndian<quint32>((quint8 *)ndata.data());
+            qDebug() << "Data size: " << sz;
+            ndata = ndata.mid(4, sz);
+        }
 
-        cb(true, QString(), m["service"].toString(), ndata.mid(4, sz));
+        cb(true, QString(), m["service"].toString(), ndata);
     });
 
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)

@@ -420,13 +420,11 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
 
 bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
 {
-    if (bleProt->getMessageSize(data) == 1 && //data size is 1
-        bleProt->getFirstPayloadByte(data) == 0)   //value is 0 means end of data
+    if (bleProt->getFirstPayloadByte(data) == 0) //Get Data File Chunk fails
     {
         QVariantMap m = jobs->user_data.toMap();
         if (!m.contains("data"))
         {
-            //if no data at all, report an error
             jobs->setCurrentJobError("reading data failed or no data");
             return false;
         }
@@ -439,12 +437,19 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
         QByteArray ba = m["data"].toByteArray();
 
         //first packet, we can read the file size
-        if (!ba.isEmpty())
+        QByteArray payload = bleProt->getFullPayload(data);
+        QByteArray payloadSize = payload.mid(2, 2);
+        quint16 size = qFromLittleEndian<quint16>((quint8*)payloadSize.data());
+        if (0 == size)
         {
-            QByteArray payload = bleProt->getFullPayload(data);
-            QByteArray payloadSize = payload.left(2);
-            ba.append(payload.mid(2));
+            if (!m.contains("data"))
+            {
+                jobs->setCurrentJobError("reading data failed or no data");
+                return false;
+            }
+            return true;
         }
+        ba.append(payload.mid(4, size));
 
         m["data"] = ba;
         jobs->user_data = m;
