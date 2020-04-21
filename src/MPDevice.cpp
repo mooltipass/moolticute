@@ -3251,7 +3251,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted data service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getParentNodeSize(), 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3264,7 +3264,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted data child node";
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getChildNodeSize(), 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3275,7 +3275,14 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         {
             qDebug() << "Updating start data node";
             diagSavePacketsGenerated = true;
-            jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startDataNode, pMesProt->getDefaultFuncDone()));
+            QByteArray startData;
+            if (isBLE())
+            {
+                const auto ZERO_BYTE = static_cast<char>(0);
+                startData.append(2, ZERO_BYTE);
+            }
+            startData.append(startDataNode);
+            jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startData, pMesProt->getDefaultFuncDone()));
         }
     }
 

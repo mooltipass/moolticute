@@ -458,6 +458,39 @@ void WSServerCon::processMessage(const QString &message)
         },
         defaultProgressCb);
     }
+    else if (root["msg"] == "delete_data_nodes")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        if (!mpdevice->get_memMgmtMode())
+        {
+            sendFailedJson(root, "Not in memory management mode");
+            return;
+        }
+
+        QJsonArray jarr = o["services"].toArray();
+        QStringList services;
+        for (int i = 0;i < jarr.size();i++)
+            services.append(jarr[i].toString());
+
+        mpdevice->deleteDataNodesAndLeave(services,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            oroot["data"] = QJsonObject({{ "success", true }});
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
     else if (root["msg"] == "refresh_files_cache")
     {
         mpdevice->updateFilesCache();
@@ -889,39 +922,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
         QJsonObject o = root["data"].toObject();
         const QByteArray key = o.value("key").toString().toUtf8().simplified();
         mpdevice->getUID(key);
-    }
-    else if (root["msg"] == "delete_data_nodes")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        if (!mpdevice->get_memMgmtMode())
-        {
-            sendFailedJson(root, "Not in memory management mode");
-            return;
-        }
-
-        QJsonArray jarr = o["services"].toArray();
-        QStringList services;
-        for (int i = 0;i < jarr.size();i++)
-            services.append(jarr[i].toString());
-
-        mpdevice->deleteDataNodesAndLeave(services,
-                [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject oroot = root;
-            oroot["data"] = QJsonObject({{ "success", true }});
-            sendJsonMessage(oroot);
-        },
-        cbProgress);
     }
     else if (root["msg"] == "credential_exists")
     {

@@ -322,7 +322,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::CARD_CPZ_CTR_PACKET   , 0xCF},
         {MPCmd::GET_FREE_ADDRESSES    , 0x0108},
         {MPCmd::GET_DN_START_PARENT   , 0x0100},
-        {MPCmd::SET_DN_START_PARENT   , 0xD2},
+        {MPCmd::SET_DN_START_PARENT   , 0x0106},
         {MPCmd::END_MEMORYMGMT        , 0x0101},
         {MPCmd::SET_USER_CHANGE_NB    , 0x0103},
         {MPCmd::SET_DATA_CHANGE_NB    , 0x0104},
