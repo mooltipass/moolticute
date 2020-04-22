@@ -3565,13 +3565,16 @@ void MPDevice::processStatusChange(const QByteArray &data)
             QTimer::singleShot(10, this, &MPDevice::sendSetupDeviceMessages);
         }
 
-        if ((s == Common::Unlocked) || (s == Common::UnknownSmartcard))
+        if (s == Common::Unlocked || s == Common::UnknownSmartcard)
         {
             QTimer::singleShot(20, this, &MPDevice::getCurrentCardCPZ);
         }
         else
         {
-            filesCache.resetState();
+            if (s != Common::MMMMode)
+            {
+                filesCache.resetState();
+            }
         }
 
         if (s == Common::Unlocked)
