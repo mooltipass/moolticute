@@ -4269,7 +4269,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
         sdata.append((char)0);
         jobs->append(new MPCommandJob(this, MPCmd::READ_DATA_FILE,
                                       sdata,
-                  [this, jobs, cbProgress](const QByteArray &data, bool &done)
+                  [this, jobs, cbProgress](const QByteArray &data, bool &)
                     {
                         return bleImpl->readDataNode(jobs, data);
                     }
@@ -4389,7 +4389,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 
     //send 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
-    jobs->append(new MPCommandJob(this, MPCmd::WRITE_DATA,
+    jobs->append(new MPCommandJob(this, MPCmd::WRITE_DATA_FILE,
               packet,
               [this, jobs, current, cbProgress](const QByteArray &data, bool &done)
                 {
@@ -4482,7 +4482,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 
         //send the first 32bytes packet
         //bind to a member function of MPDevice, to be able to loop over until with got all the data
-        jobs->append(new MPCommandJob(this, MPCmd::WRITE_DATA,
+        jobs->append(new MPCommandJob(this, MPCmd::WRITE_DATA_FILE,
                   firstPacket,
                   [this, jobs, cbProgress](const QByteArray &data, bool &done)
                     {

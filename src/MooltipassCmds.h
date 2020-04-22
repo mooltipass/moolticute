@@ -100,7 +100,7 @@ public:
             GET_UID             ,
             SET_DATA_SERVICE    ,
             ADD_DATA_SERVICE    ,
-            WRITE_DATA          ,
+            WRITE_DATA_FILE     ,
             READ_DATA_FILE      ,
             GET_CUR_CARD_CPZ    ,
             CANCEL_USER_REQUEST ,

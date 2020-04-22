@@ -34,7 +34,7 @@ bool MPCmd::isUserRequired(Command c)
            c == SET_CARD_PASS ||
            c == ADD_UNKNOWN_CARD ||
            c == ADD_DATA_SERVICE ||
-           c == WRITE_DATA ||
+           c == WRITE_DATA_FILE ||
            c == GET_DESCRIPTION ||
            c == SET_DESCRIPTION;
 }

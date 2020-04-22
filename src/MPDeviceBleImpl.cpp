@@ -436,7 +436,6 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
         QVariantMap m = jobs->user_data.toMap();
         QByteArray ba = m["data"].toByteArray();
 
-        //first packet, we can read the file size
         QByteArray payload = bleProt->getFullPayload(data);
         QByteArray payloadSize = payload.mid(2, 2);
         quint16 size = qFromLittleEndian<quint16>((quint8*)payloadSize.data());
@@ -999,7 +998,7 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
     // 0 to signal upcoming data, otherwise 1 to signal last packet
     packet.append(static_cast<char>(moreChunk ? 1 : 0));
     packet.append(ZERO_BYTE);
-    jobs->append(new MPCommandJob(mpDev, MPCmd::WRITE_DATA,
+    jobs->append(new MPCommandJob(mpDev, MPCmd::WRITE_DATA_FILE,
               packet,
               [this, jobs, cbProgress, current, moreChunk](const QByteArray &data, bool &)
                 {
