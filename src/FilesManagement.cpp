@@ -574,9 +574,7 @@ void FilesManagement::on_pushButtonFilename_clicked()
     s.setValue("last_used_path/load_file_dir", fileInfo.canonicalPath());
 
     ui->lineEditFilename->setText(fileName);
-
-    if (ui->addFileServiceInput->text().isEmpty())
-        ui->addFileServiceInput->setText(fileInfo.fileName().toLower());
+    ui->addFileServiceInput->setText(fileInfo.fileName().toLower());
 }
 
 void FilesManagement::changeEvent(QEvent *event)
