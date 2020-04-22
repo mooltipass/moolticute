@@ -20,6 +20,7 @@
 #include "ui_FilesManagement.h"
 #include "Common.h"
 #include "AppGui.h"
+#include "DeviceDetector.h"
 
 FilesFilterModel::FilesFilterModel(QObject *parent):
     QSortFilterProxyModel(parent)
@@ -118,6 +119,12 @@ FilesManagement::FilesManagement(QWidget *parent) :
             wsClient->sendRefreshFilesCacheRequest();
     });
 
+    connect(&DeviceDetector::instance(), &DeviceDetector::deviceChanged,
+            [this](Common::MPHwVersion newDevType)
+            {
+                ui->pushButtonUpdateFile->setVisible(Common::MP_BLE != newDevType);
+            });
+
     ui->filesCacheListWidget->setVisible(false);
     ui->emptyCacheLabel->setVisible(false);
 }
@@ -147,6 +154,7 @@ void FilesManagement::setWsClient(WSClient *c)
     {
         wsClient->sendListFilesCacheRequest();
     });
+    ui->pushButtonUpdateFile->setVisible(!wsClient->isMPBLE());
 }
 
 void FilesManagement::setFileCacheControlsVisible(bool visible)
