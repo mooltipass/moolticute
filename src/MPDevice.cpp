@@ -4281,7 +4281,7 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
                                       sdata,
                                       [this, jobs, service,fallback_service](const QByteArray &data, bool &) -> bool
         {
-            if (pMesProt->getFirstPayloadByte(data) != 1)
+            if (pMesProt->getFirstPayloadByte(data) != MSG_SUCCESS)
             {
                 if (!fallback_service.isEmpty())
                 {
@@ -4429,7 +4429,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
                                       sdata,
                                       [this, service, cb](const QByteArray &data, bool &) -> bool
         {
-            if (pMesProt->getFirstPayloadByte(data) != 1)
+            if (pMesProt->getFirstPayloadByte(data) != MSG_SUCCESS)
             {
                 qWarning() << service << " already exists";
                 cb(false, "Service already exists.");
