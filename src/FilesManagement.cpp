@@ -20,6 +20,7 @@
 #include "ui_FilesManagement.h"
 #include "Common.h"
 #include "AppGui.h"
+#include "DeviceDetector.h"
 
 FilesFilterModel::FilesFilterModel(QObject *parent):
     QSortFilterProxyModel(parent)
@@ -118,6 +119,12 @@ FilesManagement::FilesManagement(QWidget *parent) :
             wsClient->sendRefreshFilesCacheRequest();
     });
 
+    connect(&DeviceDetector::instance(), &DeviceDetector::deviceChanged,
+            [this](Common::MPHwVersion newDevType)
+            {
+                ui->pushButtonUpdateFile->setVisible(Common::MP_BLE != newDevType);
+            });
+
     ui->filesCacheListWidget->setVisible(false);
     ui->emptyCacheLabel->setVisible(false);
 }
@@ -138,15 +145,16 @@ void FilesManagement::setWsClient(WSClient *c)
     });
     connect(wsClient, &WSClient::filesCacheChanged, this, &FilesManagement::loadFilesCacheModel);
 
-    setFileCacheControlsVisible(wsClient->isFw12());
+    setFileCacheControlsVisible(wsClient->isFw12() || wsClient->isMPBLE());
     connect(wsClient, &WSClient::fwVersionChanged, [=](const QString &)
     {
-        setFileCacheControlsVisible(wsClient->isFw12());
+        setFileCacheControlsVisible(wsClient->isFw12() || wsClient->isMPBLE());
     });
     connect(wsClient, &WSClient::wsConnected, [=] ()
     {
         wsClient->sendListFilesCacheRequest();
     });
+    ui->pushButtonUpdateFile->setVisible(!wsClient->isMPBLE());
 }
 
 void FilesManagement::setFileCacheControlsVisible(bool visible)
@@ -217,7 +225,7 @@ void FilesManagement::loadModel()
 
 void FilesManagement::loadFilesCacheModel(bool isInSync)
 {
-    if (!wsClient->isFw12())
+    if (!wsClient->isFw12() && !wsClient->isMPBLE())
     {
         setFileCacheControlsVisible(false);
         return;
@@ -566,9 +574,7 @@ void FilesManagement::on_pushButtonFilename_clicked()
     s.setValue("last_used_path/load_file_dir", fileInfo.canonicalPath());
 
     ui->lineEditFilename->setText(fileName);
-
-    if (ui->addFileServiceInput->text().isEmpty())
-        ui->addFileServiceInput->setText(fileInfo.fileName().toLower());
+    ui->addFileServiceInput->setText(fileInfo.fileName().toLower());
 }
 
 void FilesManagement::changeEvent(QEvent *event)

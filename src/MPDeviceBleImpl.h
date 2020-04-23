@@ -77,6 +77,8 @@ public:
     bool processReceivedData(const QByteArray& data, QByteArray& dataReceived);
 
     QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
+    QByteArray getDataStartNode(const QByteArray& data) const;
+    bool readDataNode(AsyncJobs *jobs, const QByteArray& data);
 
     bool isAfterAuxFlash();
 
@@ -122,6 +124,8 @@ public:
     void fillMiniExportPayload(QByteArray &unknownCardPayload);
 
     void convertMiniToBleNode(QByteArray &array);
+
+    void storeFileData(int current, AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
 
 signals:
     void userSettingsChanged(QJsonObject settings);
@@ -178,6 +182,8 @@ private:
     const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
     static constexpr int UNKNOWN_CARD_PAYLOAD_SIZE = 72;
     const static char ZERO_BYTE = static_cast<char>(0x00);
+    const static int BLE_DATA_BLOCK_SIZE = 512;
+    const static int FIRST_DATA_STARTING_ADDR = 10;
 };
 
 #endif // MPDEVICEBLEIMPL_H

@@ -405,6 +405,62 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
     }
     qDebug() << "Received starting node: " << res.size();
     return res;
+ }
+
+ QByteArray MPDeviceBleImpl::getDataStartNode(const QByteArray &data) const
+ {
+     auto addresses = processReceivedStartNodes(data);
+     if (addresses.size() <= FIRST_DATA_STARTING_ADDR)
+     {
+        qCritical() << "Data starting address is not received";
+        return MPNode::EmptyAddress;
+     }
+     return addresses[FIRST_DATA_STARTING_ADDR];
+ }
+
+bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
+{
+    if (bleProt->getFirstPayloadByte(data) == 0) //Get Data File Chunk fails
+    {
+        QVariantMap m = jobs->user_data.toMap();
+        if (!m.contains("data"))
+        {
+            jobs->setCurrentJobError("reading data failed or no data");
+            return false;
+        }
+        return true;
+    }
+
+    if (bleProt->getMessageSize(data) != 0)
+    {
+        QVariantMap m = jobs->user_data.toMap();
+        QByteArray ba = m["data"].toByteArray();
+
+        QByteArray payload = bleProt->getFullPayload(data);
+        QByteArray payloadSize = payload.mid(2, 2);
+        quint16 size = qFromLittleEndian<quint16>((quint8*)payloadSize.data());
+        if (0 == size)
+        {
+            if (!m.contains("data"))
+            {
+                jobs->setCurrentJobError("reading data failed or no data");
+                return false;
+            }
+            return true;
+        }
+        ba.append(payload.mid(4, size));
+
+        m["data"] = ba;
+        jobs->user_data = m;
+
+        jobs->append(new MPCommandJob(mpDev, MPCmd::READ_DATA_FILE,
+                  [this, jobs](const QByteArray &data, bool &)
+                    {
+                        return readDataNode(jobs, data);
+                    }
+                  ));
+    }
+    return true;
 }
 
 bool MPDeviceBleImpl::isAfterAuxFlash()
@@ -895,6 +951,77 @@ void MPDeviceBleImpl::fillMiniExportPayload(QByteArray &unknownCardPayload)
 void MPDeviceBleImpl::convertMiniToBleNode(QByteArray &array)
 {
     m_bleNodeConverter.convert(array);
+}
+
+void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress)
+{
+    QByteArray packet;
+    // 4B Set to 0
+    const int BYTES_TO_ZERO_SIZE = 4;
+    packet.append(BYTES_TO_ZERO_SIZE, ZERO_BYTE);
+
+    auto& currentDataNode = mpDev->currentDataNode;
+    const auto currentNodeSize = currentDataNode.size();
+    int currentSize = currentNodeSize - current;
+    bool moreChunk = false;
+    if (currentSize > BLE_DATA_BLOCK_SIZE)
+    {
+        currentSize = BLE_DATA_BLOCK_SIZE;
+        moreChunk = true;
+    }
+    // Amount of bytes in this packet (from 0 to 512)
+    QByteArray currentSizeArr;
+    currentSizeArr.resize(2);
+    qToLittleEndian(currentSize, currentSizeArr.data());
+    packet.append(currentSizeArr);
+
+    // First (up to) 256B of data to store
+    QByteArray firstChunkData = currentDataNode.mid(current, BLE_DATA_BLOCK_SIZE/2);
+    firstChunkData.resize(BLE_DATA_BLOCK_SIZE/2);
+    packet.append(firstChunkData);
+
+    // 4B Set to 0
+    packet.append(BYTES_TO_ZERO_SIZE, ZERO_BYTE);
+
+    // Second (up to) 256B of data to store
+    QByteArray secondChunkData = currentDataNode.mid(current + BLE_DATA_BLOCK_SIZE/2, BLE_DATA_BLOCK_SIZE/2);
+    secondChunkData.resize(BLE_DATA_BLOCK_SIZE/2);
+    packet.append(secondChunkData);
+
+    // Total file size
+    QByteArray totalSize;
+    const int TOTAL_SIZE_LENGTH = 4;
+    totalSize.resize(TOTAL_SIZE_LENGTH);
+    qToLittleEndian(currentNodeSize, totalSize.data());
+    packet.append(totalSize);
+
+    // 0 to signal upcoming data, otherwise 1 to signal last packet
+    packet.append(static_cast<char>(moreChunk ? 1 : 0));
+    packet.append(ZERO_BYTE);
+    jobs->append(new MPCommandJob(mpDev, MPCmd::WRITE_DATA_FILE,
+              packet,
+              [this, jobs, cbProgress, current, moreChunk](const QByteArray &data, bool &)
+                {
+                    if (bleProt->getFirstPayloadByte(data) != 1)
+                    {
+                        qCritical() << "Cannot write data to device";
+                        return false;
+                    }
+
+                    if (moreChunk)
+                    {
+                        storeFileData(current+BLE_DATA_BLOCK_SIZE, jobs, cbProgress);
+                    }
+                    return true;
+                }
+              ));
+
+    QVariantMap cbData = {
+        {"total", currentNodeSize},
+        {"current", current + BLE_DATA_BLOCK_SIZE},
+        {"msg", "WORKING on setDataNodeCb"}
+    };
+    cbProgress(cbData);
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()

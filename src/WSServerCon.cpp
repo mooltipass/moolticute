@@ -389,6 +389,116 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "set_data_node")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString service = o["service"].toString();
+        QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
+        if (data.isEmpty())
+        {
+            sendFailedJson(root, "node_data is empty");
+            return;
+        }
+
+        int maxSize = MP_MAX_FILE_SIZE;
+        if (service.toLower() == MC_SSH_SERVICE)
+            maxSize = MP_MAX_SSH_SIZE;
+        if (data.size() > maxSize)
+        {
+            sendFailedJson(root, "data is too big to be stored in device");
+            return;
+        }
+
+        mpdevice->setDataNode(service, data,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            ores["service"] = service;
+            QJsonObject oroot = root;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
+    else if (root["msg"] == "get_data_node")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, const QByteArray &dataNode)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["node_data"] = QString(dataNode.toBase64());
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
+    else if (root["msg"] == "delete_data_nodes")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        if (!mpdevice->get_memMgmtMode())
+        {
+            sendFailedJson(root, "Not in memory management mode");
+            return;
+        }
+
+        QJsonArray jarr = o["services"].toArray();
+        QStringList services;
+        for (int i = 0;i < jarr.size();i++)
+            services.append(jarr[i].toString());
+
+        mpdevice->deleteDataNodesAndLeave(services,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            oroot["data"] = QJsonObject({{ "success", true }});
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
+    else if (root["msg"] == "refresh_files_cache")
+    {
+        mpdevice->updateFilesCache();
+    }
+    else if (root["msg"] == "list_files_cache")
+    {
+        sendFilesCache();
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -561,7 +671,7 @@ void WSServerCon::sendFilesCache()
     }
 
     auto deviceStatus = mpdevice->get_status();
-    if (deviceStatus != Common::Unlocked)
+    if (deviceStatus != Common::Unlocked && deviceStatus != Common::MMMMode)
     {
         qDebug() << "It's an unknown smartcard or it's locked, no need to search for files cache";
         return;
@@ -813,108 +923,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
         const QByteArray key = o.value("key").toString().toUtf8().simplified();
         mpdevice->getUID(key);
     }
-    else if (root["msg"] == "get_data_node")
-    {
-        QJsonObject o = root["data"].toObject();
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
-                reqid,
-                [=](bool success, QString errstr, const QString &service, const QByteArray &dataNode)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["service"] = service;
-            ores["node_data"] = QString(dataNode.toBase64());
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        cbProgress);
-    }
-    else if (root["msg"] == "set_data_node")
-    {
-        QJsonObject o = root["data"].toObject();
-        QString service = o["service"].toString();
-        QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
-        if (data.isEmpty())
-        {
-            sendFailedJson(root, "node_data is empty");
-            return;
-        }
-
-        int maxSize = MP_MAX_FILE_SIZE;
-        if (service.toLower() == MC_SSH_SERVICE)
-            maxSize = MP_MAX_SSH_SIZE;
-        if (data.size() > maxSize)
-        {
-            sendFailedJson(root, "data is too big to be stored in device");
-            return;
-        }
-
-        mpdevice->setDataNode(service, data,
-                [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            ores["service"] = service;
-            QJsonObject oroot = root;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        cbProgress);
-    }
-    else if (root["msg"] == "delete_data_nodes")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        if (!mpdevice->get_memMgmtMode())
-        {
-            sendFailedJson(root, "Not in memory management mode");
-            return;
-        }
-
-        QJsonArray jarr = o["services"].toArray();
-        QStringList services;
-        for (int i = 0;i < jarr.size();i++)
-            services.append(jarr[i].toString());
-
-        mpdevice->deleteDataNodesAndLeave(services,
-                [=](bool success, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject oroot = root;
-            oroot["data"] = QJsonObject({{ "success", true }});
-            sendJsonMessage(oroot);
-        },
-        cbProgress);
-    }
     else if (root["msg"] == "credential_exists")
     {
         QJsonObject o = root["data"].toObject();
@@ -972,14 +980,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });
-    }
-    else if (root["msg"] == "refresh_files_cache")
-    {
-        mpdevice->updateFilesCache();
-    }
-    else if (root["msg"] == "list_files_cache")
-    {
-        sendFilesCache();
     }
 }
 

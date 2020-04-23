@@ -582,12 +582,10 @@ void MainWindow::updateDeviceDependentUI()
         {
             ui->groupBox_UserSettings->show();
         }
-        ui->pushButtonFiles->hide();
     }
     else
     {
         ui->groupBox_UserSettings->hide();
-        ui->pushButtonFiles->show();
     }
 }
 

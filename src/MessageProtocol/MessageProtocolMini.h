@@ -42,6 +42,7 @@ public:
     int getChildNodeSize() const override { return MP_NODE_SIZE; }
     uint getMaxFavorite() const override { return MOOLTIPASS_FAV_MAX; }
     int getCredentialPackageSize() const override { return CRED_PACKAGE_SIZE; }
+    uint getDataNodeEncSize() const override { return DATA_NODE_ENC_SIZE; }
 
     int getLoginMaxLength() const override { return LOGIN_MAX_LENGTH; }
     int getPwdMaxLength() const override { return PWD_MAX_LENGTH; }
@@ -55,6 +56,7 @@ private:
     static constexpr int PWD_MAX_LENGTH = 32;
     static constexpr int LOGIN_MAX_LENGTH = 63;
     static constexpr int CPZ_START = 0;
+    static constexpr uint DATA_NODE_ENC_SIZE = 128;
 };
 
 #endif // MESSAGEPROTOCOLMINI_H

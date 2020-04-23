@@ -778,7 +778,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
         }));
     }
 
-    if (getData && !isBLE()) //TODO: Data fetching is not implemented yet for BLE
+    if (getData)
     {
         //Get parent data node start address
         jobs->append(new MPCommandJob(this, MPCmd::GET_DN_START_PARENT,
@@ -794,8 +794,16 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             }
             else
             {
-                startDataNode = pMesProt->getFullPayload(data);
-                startDataNodeClone = pMesProt->getFullPayload(data);
+                if (isBLE())
+                {
+                    startDataNode = bleImpl->getDataStartNode(pMesProt->getFullPayload(data));
+                    startDataNodeClone = startDataNode;
+                }
+                else
+                {
+                    startDataNode = pMesProt->getFullPayload(data);
+                    startDataNodeClone = pMesProt->getFullPayload(data);
+                }
                 qDebug() << "Start data node addr:" << startDataNode.toHex();
 
                 //if data parent address is not null, load nodes
@@ -1345,24 +1353,25 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
         {
             //Node is loaded
             qDebug() << "Child data node loaded";
+            const auto dataEncSize = pMesProt->getDataNodeEncSize();
 
             QVariantMap data = {
                 {"total", -1},
                 {"current", 0},
                 {"msg", "Loading data for %1: %2 encrypted bytes read" },
-                {"msg_args", QVariantList({parent->getService(), nbBytesFetched + MP_NODE_DATA_ENC_SIZE})}
+                {"msg_args", QVariantList({parent->getService(), nbBytesFetched + dataEncSize})}
             };
             cbProgress(data);
 
             //Load next child
             if (cnode->getNextChildDataAddress() != MPNode::EmptyAddress)
             {
-                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress(), cbProgress, nbBytesFetched + MP_NODE_DATA_ENC_SIZE);
+                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress(), cbProgress, nbBytesFetched + dataEncSize);
             }
             else
             {
-                parent->setEncDataSize(nbBytesFetched + MP_NODE_DATA_ENC_SIZE);
-                parentClone->setEncDataSize(nbBytesFetched + MP_NODE_DATA_ENC_SIZE);
+                parent->setEncDataSize(nbBytesFetched + dataEncSize);
+                parentClone->setEncDataSize(nbBytesFetched + dataEncSize);
 
                 /* and if our parent doesn't have next one... */
                 if (parent->getNextParentAddress() == MPNode::EmptyAddress)
@@ -3242,7 +3251,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted data service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getParentNodeSize(), 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3255,7 +3264,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (!temp_node_pointer)
             {
                 qDebug() << "Generating delete packet for deleted data child node";
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(MP_NODE_SIZE, 0xFF), dataWriteProgressCb);
+                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getChildNodeSize(), 0xFF), dataWriteProgressCb);
                 diagSavePacketsGenerated = true;
                 progressTotal += 3;
             }
@@ -3266,7 +3275,14 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         {
             qDebug() << "Updating start data node";
             diagSavePacketsGenerated = true;
-            jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startDataNode, pMesProt->getDefaultFuncDone()));
+            QByteArray startData;
+            if (isBLE())
+            {
+                const auto ZERO_BYTE = static_cast<char>(0);
+                startData.append(2, ZERO_BYTE);
+            }
+            startData.append(startDataNode);
+            jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startData, pMesProt->getDefaultFuncDone()));
         }
     }
 
@@ -3549,13 +3565,16 @@ void MPDevice::processStatusChange(const QByteArray &data)
             QTimer::singleShot(10, this, &MPDevice::sendSetupDeviceMessages);
         }
 
-        if ((s == Common::Unlocked) || (s == Common::UnknownSmartcard))
+        if (s == Common::Unlocked || s == Common::UnknownSmartcard)
         {
             QTimer::singleShot(20, this, &MPDevice::getCurrentCardCPZ);
         }
         else
         {
-            filesCache.resetState();
+            if (s != Common::MMMMode)
+            {
+                filesCache.resetState();
+            }
         }
 
         if (s == Common::Unlocked)
@@ -4210,7 +4229,7 @@ bool MPDevice::getDataNodeCb(AsyncJobs *jobs,
 
         //ask for the next 32bytes packet
         //bind to a member function of MPDevice, to be able to loop over until with got all the data
-        jobs->append(new MPCommandJob(this, MPCmd::READ_32B_IN_DN,
+        jobs->append(new MPCommandJob(this, MPCmd::READ_DATA_FILE,
                   [this, jobs, cbProgress](const QByteArray &data, bool &done)
                     {
                         return getDataNodeCb(jobs, std::move(cbProgress), data, done);
@@ -4245,67 +4264,85 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
     QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
-    jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
-                                  sdata,
-                                  [this, jobs, service,fallback_service](const QByteArray &data, bool &) -> bool
+    if (isBLE())
     {
-        if (pMesProt->getFirstPayloadByte(data) != 1)
-        {
-            if (!fallback_service.isEmpty())
-            {
-                QByteArray fsdata = pMesProt->toByteArray(fallback_service);
-                fsdata.append((char)0);
-                jobs->prepend(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
-                                              fsdata,
-                                              [this, jobs, fallback_service](const QByteArray &data, bool &) -> bool
-                {
-                    if (pMesProt->getFirstPayloadByte(data) != 1)
+        sdata.append((char)0);
+        jobs->append(new MPCommandJob(this, MPCmd::READ_DATA_FILE,
+                                      sdata,
+                  [this, jobs, cbProgress](const QByteArray &data, bool &)
                     {
-                        qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
-                        jobs->setCurrentJobError("failed to select context and fallback_context on device");
-                        return false;
+                        return bleImpl->readDataNode(jobs, data);
                     }
+                  ));
+    }
+    else
+    {
+        jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
+                                      sdata,
+                                      [this, jobs, service,fallback_service](const QByteArray &data, bool &) -> bool
+        {
+            if (pMesProt->getFirstPayloadByte(data) != MSG_SUCCESS)
+            {
+                if (!fallback_service.isEmpty())
+                {
+                    QByteArray fsdata = pMesProt->toByteArray(fallback_service);
+                    fsdata.append((char)0);
+                    jobs->prepend(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
+                                                  fsdata,
+                                                  [this, jobs, fallback_service](const QByteArray &data, bool &) -> bool
+                    {
+                        if (pMesProt->getFirstPayloadByte(data) != 1)
+                        {
+                            qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
+                            jobs->setCurrentJobError("failed to select context and fallback_context on device");
+                            return false;
+                        }
 
-                    QVariantMap m = {{ "service", fallback_service }};
-                    jobs->user_data = m;
+                        QVariantMap m = {{ "service", fallback_service }};
+                        jobs->user_data = m;
 
+                        return true;
+                    }));
                     return true;
-                }));
-                return true;
+                }
+
+                qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
+                jobs->setCurrentJobError("failed to select context on device");
+                return false;
             }
 
-            qWarning() << "Error setting context: " << pMesProt->getFirstPayloadByte(data);
-            jobs->setCurrentJobError("failed to select context on device");
-            return false;
-        }
+            QVariantMap m = {{ "service", service }};
+            jobs->user_data = m;
 
-        QVariantMap m = {{ "service", service }};
-        jobs->user_data = m;
+            return true;
+        }));
 
-        return true;
-    }));
+        //ask for the first 32bytes packet
+        //bind to a member function of MPDevice, to be able to loop over until with got all the data
+        jobs->append(new MPCommandJob(this, MPCmd::READ_DATA_FILE,
+                  [this, jobs, cbProgress](const QByteArray &data, bool &done)
+                    {
+                        return getDataNodeCb(jobs, std::move(cbProgress), data, done);
+                    }
+                  ));
+    }
 
-    //ask for the first 32bytes packet
-    //bind to a member function of MPDevice, to be able to loop over until with got all the data
-    jobs->append(new MPCommandJob(this, MPCmd::READ_32B_IN_DN,
-              [this, jobs, cbProgress](const QByteArray &data, bool &done)
-                {
-                    return getDataNodeCb(jobs, std::move(cbProgress), data, done);
-                }
-              ));
-
-    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, jobs, cb](const QByteArray &)
     {
         //all jobs finished success
         qInfo() << "get_data_node success";
         QVariantMap m = jobs->user_data.toMap();
         QByteArray ndata = m["data"].toByteArray();
 
-        //check data size
-        quint32 sz = qFromBigEndian<quint32>((quint8 *)ndata.data());
-        qDebug() << "Data size: " << sz;
+        if (!isBLE())
+        {
+            //check data size
+            quint32 sz = qFromBigEndian<quint32>((quint8 *)ndata.data());
+            qDebug() << "Data size: " << sz;
+            ndata = ndata.mid(4, sz);
+        }
 
-        cb(true, QString(), m["service"].toString(), ndata.mid(4, sz));
+        cb(true, QString(), m["service"].toString(), ndata);
     });
 
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
@@ -4352,7 +4389,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 
     //send 32bytes packet
     //bind to a member function of MPDevice, to be able to loop over until with got all the data
-    jobs->append(new MPCommandJob(this, MPCmd::WRITE_32B_IN_DN,
+    jobs->append(new MPCommandJob(this, MPCmd::WRITE_DATA_FILE,
               packet,
               [this, jobs, current, cbProgress](const QByteArray &data, bool &done)
                 {
@@ -4385,45 +4422,74 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
     QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
-    jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
-                                  sdata,
-                                  [this, jobs, service](const QByteArray &data, bool &) -> bool
+    if (isBLE())
     {
-        if (pMesProt->getFirstPayloadByte(data) != 1)
+        sdata.append((char)0);
+        jobs->append(new MPCommandJob(this, MPCmd::ADD_DATA_SERVICE,
+                                      sdata,
+                                      [this, service, cb](const QByteArray &data, bool &) -> bool
         {
-            qWarning() << "context " << service << " does not exist";
-            //Context does not exists, create it
-            createJobAddContext(service, jobs, true);
-        }
-        else
-            qDebug() << "set_data_context " << service;
-        return true;
-    }));
+            if (pMesProt->getFirstPayloadByte(data) != MSG_SUCCESS)
+            {
+                qWarning() << service << " already exists";
+                cb(false, "Service already exists.");
+                return false;
+            }
+            return true;
+        }));
+    }
+    else
+    {
+        jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
+                                      sdata,
+                                      [this, jobs, service](const QByteArray &data, bool &) -> bool
+        {
+            if (pMesProt->getFirstPayloadByte(data) != 1)
+            {
+                qWarning() << "context " << service << " does not exist";
+                //Context does not exists, create it
+                createJobAddContext(service, jobs, true);
+            }
+            else
+                qDebug() << "set_data_context " << service;
+            return true;
+        }));
+    }
 
     //set size of data
     currentDataNode = QByteArray();
-    currentDataNode.resize(MP_DATA_HEADER_SIZE);
-    qToBigEndian(nodeData.size(), (quint8 *)currentDataNode.data());
+    if (!isBLE())
+    {
+        currentDataNode.resize(MP_DATA_HEADER_SIZE);
+        qToBigEndian(nodeData.size(), (quint8 *)currentDataNode.data());
+    }
     currentDataNode.append(nodeData);
 
-    //first packet
-    QByteArray firstPacket;
-    char eod = (nodeData.size() + MP_DATA_HEADER_SIZE <= MOOLTIPASS_BLOCK_SIZE)?1:0;
-    firstPacket.append(eod);
-    firstPacket.append(currentDataNode.mid(0, MOOLTIPASS_BLOCK_SIZE));
-    firstPacket.resize(MOOLTIPASS_BLOCK_SIZE + 1);
+    if (isBLE())
+    {
+        bleImpl->storeFileData(0, jobs, cbProgress);
+    }
+    else
+    {
+        //first packet
+        QByteArray firstPacket;
+        char eod = (nodeData.size() + MP_DATA_HEADER_SIZE <= MOOLTIPASS_BLOCK_SIZE)?1:0;
+        firstPacket.append(eod);
+        firstPacket.append(currentDataNode.mid(0, MOOLTIPASS_BLOCK_SIZE));
+        firstPacket.resize(MOOLTIPASS_BLOCK_SIZE + 1);
 
-//    cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, MOOLTIPASS_BLOCK_SIZE);
+        //cbProgress(currentDataNode.size() - MP_DATA_HEADER_SIZE, MOOLTIPASS_BLOCK_SIZE);
 
-    //send the first 32bytes packet
-    //bind to a member function of MPDevice, to be able to loop over until with got all the data
-    jobs->append(new MPCommandJob(this, MPCmd::WRITE_32B_IN_DN,
-              firstPacket,
-              [this, jobs, cbProgress](const QByteArray &data, bool &done)
-                {
-                    return setDataNodeCb(jobs, MOOLTIPASS_BLOCK_SIZE, std::move(cbProgress), data, done);
-                }
-              ));
+        //send the first 32bytes packet
+        //bind to a member function of MPDevice, to be able to loop over until with got all the data
+        jobs->append(new MPCommandJob(this, MPCmd::WRITE_DATA_FILE,
+                  firstPacket,
+                  [this, jobs, cbProgress](const QByteArray &data, bool &done)
+                    {
+                        return setDataNodeCb(jobs, MOOLTIPASS_BLOCK_SIZE, std::move(cbProgress), data, done);
+                    }
+                  ));
+    }
 
     connect(jobs, &AsyncJobs::finished, [this, cb, service, nodeData](const QByteArray &)
     {
