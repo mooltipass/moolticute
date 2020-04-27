@@ -42,6 +42,9 @@ signals:
     void usbDeviceAdded(QString path);
     void usbDeviceRemoved(QString path);
 
+private slots:
+    void handleBtTimeout();
+
 private:
     UsbMonitor_mac();
     void initHidmanager(IOHIDManagerRef& hidMan, int vendorId, int productId);
@@ -49,9 +52,11 @@ private:
     IOHIDManagerRef hidmanager;
     IOHIDManagerRef hidmanagerBLE;
     QHash<QString, MPPlatformDef> deviceHash;
+    QMap<int, MPPlatformDef> btMap;
 
     static const QString TRANSPORT_BLE;
     static const QString TRANSPORT_USB;
+    static constexpr int BT_WAIT_MS = 500;
 
     //Callbacks from IOHIDManager
     friend void _device_matching_callback(void *user_data, IOReturn inResult, void *inSender, IOHIDDeviceRef inIOHIDDeviceRef);

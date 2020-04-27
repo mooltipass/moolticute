@@ -66,6 +66,7 @@ void _device_matching_callback(void *user_data,
     def.id = QString("%1").arg((quint64)def.hidref);
     def.isBLE = vendorID == MOOLTIPASS_BLE_VENDORID;
 
+    int uniqueId = 0;
     if (def.isBLE)
     {
         CFTypeRef bleNumRef = (CFTypeRef)IOHIDDeviceGetProperty(inIOHIDDeviceRef, CFSTR(kIOHIDTransportKey));
@@ -73,6 +74,12 @@ void _device_matching_callback(void *user_data,
         if (UsbMonitor_mac::TRANSPORT_BLE == transport)
         {
             qDebug() << "BT connection";
+
+            CFNumberRef uniqueRef = (CFNumberRef)IOHIDDeviceGetProperty(inIOHIDDeviceRef, CFSTR(kIOHIDUniqueIDKey)) ;
+            if (uniqueRef)
+            {
+                CFNumberGetValue(uniqueRef, kCFNumberSInt32Type, &uniqueId);
+            }
             def.isBluetooth = true;
         }
         else if (UsbMonitor_mac::TRANSPORT_USB == transport)
@@ -86,6 +93,25 @@ void _device_matching_callback(void *user_data,
         }
     }
 
+    if (def.isBLE)
+    {
+        // Two hid interface is detected for bluetooth,
+        // but we can only write the one with higher unique id
+        if (um->btMap.isEmpty())
+        {
+            um->btMap.insert(uniqueId, def);
+            QTimer::singleShot(um->BT_WAIT_MS, um, &UsbMonitor_mac::handleBtTimeout);
+            return;
+        }
+        else
+        {
+            if (um->btMap.firstKey() > uniqueId)
+            {
+                def = um->btMap.first();
+            }
+            um->btMap.clear();
+        }
+    }
     if (um->deviceHash.isEmpty())
     {
         um->deviceHash[def.id] = def;
@@ -195,4 +221,16 @@ QList<MPPlatformDef> UsbMonitor_mac::getDeviceList()
         deviceList << it.value();
 
     return deviceList;
+}
+
+void UsbMonitor_mac::handleBtTimeout()
+{
+    if (!btMap.empty() && deviceHash.isEmpty())
+    {
+        auto& def = btMap.first();
+        deviceHash[def.id] = def;
+        emit usbDeviceAdded(def.id);
+        qDebug() << "Device added: " << def.id;
+        btMap.clear();
+    }
 }
