@@ -73,6 +73,7 @@ private slots:
 
 private:
     qreal round (const qreal& input);
+    void retryDownload();
 
 private:
     QString m_url;
@@ -82,6 +83,12 @@ private:
     QNetworkReply* m_reply;
     bool m_useCustomProcedures;
     QNetworkAccessManager* m_manager;
+    QString m_lastDownloadUrl;
+    uint m_retryCount = 0;
+    bool m_newDownloadStarted = false;
+
+    static constexpr uint MAX_DOWNLOAD_RETRY = 5;
+    static constexpr uint MIN_UPDATE_FILE_SIZE = 2048;
 };
 
 #endif

@@ -121,6 +121,9 @@ void Downloader::startDownload (const QUrl& url)
     if (!DOWNLOAD_DIR.exists())
         DOWNLOAD_DIR.mkpath (".");
 
+    m_lastDownloadUrl = url.toString();
+    m_newDownloadStarted = false;
+
     /* Remove old downloads */
     QFile::remove (DOWNLOAD_DIR.filePath (m_fileName));
     QFile::remove (DOWNLOAD_DIR.filePath (m_fileName + PARTIAL_DOWN));
@@ -307,6 +310,12 @@ void Downloader::calculateSizes (qint64 received, qint64 total)
  */
 void Downloader::updateProgress (qint64 received, qint64 total)
 {
+    if (total < MIN_UPDATE_FILE_SIZE)
+    {
+        // Handle when invalid size of update received
+        retryDownload();
+        return;
+    }
     if (total > 0) {
         m_ui->progressBar->setMinimum (0);
         m_ui->progressBar->setMaximum (100);
@@ -383,6 +392,29 @@ void Downloader::calculateTimeRemaining (qint64 received, qint64 total)
 qreal Downloader::round (const qreal& input)
 {
     return roundf (input * 100) / 100;
+}
+
+void Downloader::retryDownload()
+{
+    QUrl url = m_reply->attribute (
+                   QNetworkRequest::RedirectionTargetAttribute).toUrl();
+    if (!url.isEmpty())
+    {
+        m_lastDownloadUrl = url.toString();
+    }
+
+    if (m_retryCount++ < MAX_DOWNLOAD_RETRY)
+    {
+        m_reply->close();
+        if (!m_newDownloadStarted)
+        {
+            startDownload(m_lastDownloadUrl);
+        }
+        m_newDownloadStarted = true;
+    }
+    {
+        qCritical() << "Retry limit is reached, update file is not reachable";
+    }
 }
 
 /**
