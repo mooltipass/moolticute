@@ -601,7 +601,13 @@ void MainWindow::updateBackupControlsVisibility(bool visible)
 
 void MainWindow::updatePage()
 {
-    bool isCardUnknown = wsClient->get_status() == Common::UnknownSmartcard;
+    const auto status = wsClient->get_status();
+    bool isCardUnknown = status == Common::UnknownSmartcard;
+    if (wsClient->isMPBLE() && Common::MMMMode == status)
+    {
+        // Do not update pages when BLE is in MMM Mode
+        return;
+    }
 
     ui->label_13->setVisible(!isCardUnknown);
     ui->label_14->setVisible(!isCardUnknown);
