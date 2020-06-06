@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "MPDevice_mac.h"
 #include "UsbMonitor_mac.h"
+#include "BleCommon.h"
 #include <QtConcurrent/QtConcurrent>
 
 void _read_report_callback(void *context,
@@ -119,7 +120,7 @@ void MPDevice_mac::platformWrite(const QByteArray &data)
         if (isBT())
         {
             dataArray.append(static_cast<char>(0x00));
-            reportId = 3;
+            reportId = BT_REPORT_ID;
         }
         dataArray.append(data);
         IOReturn res = IOHIDDeviceSetReport(hidref,

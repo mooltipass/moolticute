@@ -19,6 +19,7 @@
 #include "MPDevice_win.h"
 #include "HIDLoader.h"
 #include "AppDaemon.h"
+#include "BleCommon.h"
 #include <cstring>
 
 // Windows GUID object
@@ -169,7 +170,7 @@ void MPDevice_win::platformWriteToDevice(const QByteArray &data)
     QByteArray ba;
     if (isBluetooth)
     {
-        reportByte = static_cast<char>(0x03);
+        reportByte = static_cast<char>(BT_REPORT_ID);
     }
     ba.append(reportByte); //add report id (even if not used). windows requires that
     ba.append(data);

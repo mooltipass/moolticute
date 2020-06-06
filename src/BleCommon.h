@@ -7,6 +7,9 @@
 static constexpr quint16 MSG_FAILED = 0x00;
 static constexpr quint16 MSG_SUCCESS = 0x01;
 
+static constexpr quint16 BT_REPORT_ID = 0x04;
+
+
 class BleCredential
 {
 public:
