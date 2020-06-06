@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "MPDevice_linux.h"
 #include "UsbMonitor_linux.h"
+#include "BleCommon.h"
 
 #include <linux/hidraw.h>
 #include <linux/version.h>
@@ -187,7 +188,7 @@ void MPDevice_linux::writeNextPacket()
       * Adding a plus 0x00 or 0x03 byte before the message
       * for setting the report number.
       */
-    const auto reportId =  static_cast<char>(isBluetooth ? 0x03 : 0x00);
+    const auto reportId =  static_cast<char>(isBluetooth ? BT_REPORT_ID : 0x00);
     ba.insert(0, static_cast<char>(reportId));
     ssize_t res = ::write(devfd, ba.data(), static_cast<size_t>(ba.size()));
 
