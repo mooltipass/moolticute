@@ -132,13 +132,13 @@ void MPSettingsBLE::setSettings()
                     }
     ));
     jobs->append(new MPCommandJob(mpDevice,
-                   MPCmd::SET_USER_LANG,
-                   QByteArray(1, get_user_language()),
+                   MPCmd::SET_DEVICE_LANG,
+                   QByteArray(1, get_device_language()),
                    pMesProt->getDefaultFuncDone()
     ));
     jobs->append(new MPCommandJob(mpDevice,
-                   MPCmd::SET_DEVICE_LANG,
-                   QByteArray(1, get_device_language()),
+                   MPCmd::SET_USER_LANG,
+                   QByteArray(1, get_user_language()),
                    pMesProt->getDefaultFuncDone()
     ));
     QByteArray layoutUsbData;
