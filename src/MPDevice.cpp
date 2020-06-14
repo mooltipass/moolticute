@@ -5315,11 +5315,14 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 
     if (!isMooltiAppImportFile)
     {
-        /* Read service nodes */
-        readExportNodes(dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_NODES_INDEX);
+        if (!miniExportToBle)
+        {
+            /* Read service nodes */
+            readExportNodes(dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_NODES_INDEX);
 
-        /* Read service child nodes */
-        readExportNodes(dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_CHILD_NODES_INDEX);
+            /* Read service child nodes */
+            readExportNodes(dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_CHILD_NODES_INDEX);
+        }
 
         if (isBleExport)
         {
