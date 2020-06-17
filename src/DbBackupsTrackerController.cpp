@@ -227,7 +227,7 @@ void DbBackupsTrackerController::handleNewTrack(const QString &cardId, const QSt
 
 void DbBackupsTrackerController::handleDeviceStatusChanged(const Common::MPStatus &status)
 {
-    if (status != Common::Unlocked)
+    if (status != Common::Unlocked && status != Common::MMMMode)
     {
         clearTrackerCardInfo();
 
