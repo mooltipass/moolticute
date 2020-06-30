@@ -469,7 +469,7 @@ protected:
     static constexpr int MC_EXPORT_FIELD_NUM = 14;
     static constexpr int BLE_EXPORT_FIELD_MIN_NUM = 18;
 
-    static constexpr int RESET_SEND_DELAY = 300;
+    static constexpr int RESET_SEND_DELAY = 800;
     static constexpr int INIT_STARTING_DELAY = RESET_SEND_DELAY + 150;
     static constexpr int STATUS_STARTING_DELAY = RESET_SEND_DELAY + 500;
     static constexpr int CATEGORY_FETCH_DELAY = 5000;
