@@ -561,6 +561,13 @@ void MPDevice::removeFileFromCache(QString fileName)
     emit filesCacheChanged();
 }
 
+void MPDevice::resetCommunication()
+{
+    jobsQueue.clear();
+    currentJobs = nullptr;
+    commandQueue.clear();
+}
+
 void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                                     const MPDeviceProgressCb &cbProgress,bool getCreds,
                                     bool getData, bool getDataChilds)
