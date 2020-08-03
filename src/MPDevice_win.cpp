@@ -422,7 +422,14 @@ void MPDevice_win::openPathRetry()
 {
     if (openPath())
     {
+        qDebug() << "Device opening retry was successful";
         platformRead();
+        resetCommunication();
+        m_writeQueue.clear();
+        while (!m_writeBufferQueue.isEmpty())
+        {
+            delete[] m_writeBufferQueue.dequeue();
+        }
         sendInitMessages();
     }
     else
