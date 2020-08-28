@@ -5411,8 +5411,10 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
 
     /* Ask device to go into MMM first */
-    jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
-
+    if (!isBLE())
+    {
+        jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
+    }
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
                             cbProgress,
