@@ -69,6 +69,7 @@ private:
     bool isLocalSocketDeviceConnected();
     void disconnectLocalSocketDevice();
     bool isBLEConnectedWithUsb();
+    bool isBLEConnectedWithBT();
     void disconnectingDevices();
 
     QHash<QString, MPDevice *> devices;

@@ -109,7 +109,7 @@ void MPManager::usbDeviceAdded(QString path)
 
     disconnectLocalSocketDevice();
 
-    if (devices.empty())
+    if (devices.empty() || isBLEConnectedWithBT())
     {
         MPDevice *device = nullptr;
 #if defined(Q_OS_WIN)
@@ -122,10 +122,17 @@ void MPManager::usbDeviceAdded(QString path)
             return;
         }
 
-        if (isBluetooth && isBLEConnectedWithUsb())
+        if (!devices.empty() && !isBluetooth)
         {
-            qDebug() << "BLE is already connected with usb";
-            return;
+            auto it = devices.begin();
+            auto devicePath = it.key();
+            if (it != devices.end())
+            {
+                qDebug() << "Disconnecting: " << devicePath;
+                emit mpDisconnected(it.value());
+                delete it.value();
+                devices.remove(devicePath);
+            }
         }
 
         device = new MPDevice_win(this, MPDevice_win::getPlatDef(path, isBLE, isBluetooth));
@@ -354,7 +361,14 @@ void MPManager::disconnectLocalSocketDevice()
 bool MPManager::isBLEConnectedWithUsb()
 {
     return std::find_if(devices.begin(), devices.end(),
-              [](MPDevice * dev){ return dev->isBLE();})
+              [](MPDevice * dev){ return dev->isBLE() && !dev->isBT();})
+    != devices.end();
+}
+
+bool MPManager::isBLEConnectedWithBT()
+{
+    return std::find_if(devices.begin(), devices.end(),
+              [](MPDevice * dev){ return dev->isBLE() && dev->isBT();})
     != devices.end();
 }
 
