@@ -124,15 +124,7 @@ void MPManager::usbDeviceAdded(QString path)
 
         if (!devices.empty() && !isBluetooth)
         {
-            auto it = devices.begin();
-            auto devicePath = it.key();
-            if (it != devices.end())
-            {
-                qDebug() << "Disconnecting: " << devicePath;
-                emit mpDisconnected(it.value());
-                delete it.value();
-                devices.remove(devicePath);
-            }
+            disconnectDevice();
         }
 
         device = new MPDevice_win(this, MPDevice_win::getPlatDef(path, isBLE, isBluetooth));
@@ -153,12 +145,11 @@ void MPManager::usbDeviceAdded(QString path, bool isBLE, bool isBT)
 {
     disconnectLocalSocketDevice();
 
-    if (devices.empty())
+    if (devices.empty() || isBLEConnectedWithBT())
     {
-        if (isBLE && isBLEConnectedWithUsb())
+        if (!devices.empty() && !isBT)
         {
-            qDebug() << "BLE is already connected with usb";
-            return;
+            disconnectDevice();
         }
         MPDevice *device = nullptr;
         //Create our platform device object
@@ -355,6 +346,19 @@ void MPManager::disconnectLocalSocketDevice()
         qDebug() << "Device is connected, emulator disconnecting";
         emit sendNotification("show_emulator_disconnect");
         disconnectingDevices();
+    }
+}
+
+void MPManager::disconnectDevice()
+{
+    auto it = devices.begin();
+    auto devicePath = it.key();
+    if (it != devices.end())
+    {
+        qDebug() << "Disconnecting: " << devicePath;
+        emit mpDisconnected(it.value());
+        delete it.value();
+        devices.remove(devicePath);
     }
 }
 
