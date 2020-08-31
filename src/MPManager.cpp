@@ -46,6 +46,7 @@ bool MPManager::initialize()
 #elif defined(Q_OS_MAC)
         connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceAdded(QString)), this, SLOT(usbDeviceAdded(QString)));
         connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved(QString)));
+        connect(this, SIGNAL(removeDevice(QString)), UsbMonitor_mac::Instance(), SLOT(removeDeviceHash(QString)));
 
 #elif defined(Q_OS_LINUX)
         connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded(QString, bool, bool)), this, SLOT(usbDeviceAdded(QString, bool, bool)), Qt::QueuedConnection);
@@ -129,6 +130,13 @@ void MPManager::usbDeviceAdded(QString path)
 
         device = new MPDevice_win(this, MPDevice_win::getPlatDef(path, isBLE, isBluetooth));
 #elif defined(Q_OS_MAC)
+        if (!devices.empty())
+        {
+            QString btPath = devices.begin().key();
+            disconnectDevice();
+            emit removeDevice(btPath);
+        }
+
         device = new MPDevice_mac(this, MPDevice_mac::getPlatDef(path));
 #endif
         devices[path] = device;
@@ -136,6 +144,9 @@ void MPManager::usbDeviceAdded(QString path)
     }
     else
     {
+#if defined(Q_OS_MAC)
+        emit removeDevice(path);
+#endif
         qDebug() << "Device is already added: " << path;
     }
 }

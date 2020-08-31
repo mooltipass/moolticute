@@ -85,6 +85,7 @@ void _device_matching_callback(void *user_data,
         else if (UsbMonitor_mac::TRANSPORT_USB == transport)
         {
             qDebug() << "USB connection.";
+            def.isBluetooth = false;
         }
         else
         {
@@ -93,7 +94,7 @@ void _device_matching_callback(void *user_data,
         }
     }
 
-    if (def.isBLE)
+    if (def.isBLE && def.isBluetooth)
     {
         // Two hid interface is detected for bluetooth,
         // but we can only write the one with higher unique id
@@ -112,7 +113,7 @@ void _device_matching_callback(void *user_data,
             um->btMap.clear();
         }
     }
-    if (um->deviceHash.isEmpty())
+    if (um->deviceHash.isEmpty() || (def.isBLE && !def.isBluetooth))
     {
         um->deviceHash[def.id] = def;
         emit um->usbDeviceAdded(def.id);
@@ -232,5 +233,17 @@ void UsbMonitor_mac::handleBtTimeout()
         emit usbDeviceAdded(def.id);
         qDebug() << "Device added: " << def.id;
         btMap.clear();
+    }
+}
+
+void UsbMonitor_mac::removeDeviceHash(QString hash)
+{
+    if (deviceHash.contains(hash))
+    {
+        deviceHash.remove(hash);
+    }
+    else
+    {
+        qCritical() << "device hash does not contain: " << hash;
     }
 }

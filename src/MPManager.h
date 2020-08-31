@@ -51,6 +51,7 @@ signals:
     void mpConnected(MPDevice *device);
     void mpDisconnected(MPDevice *device);
     void sendNotification(QString message);
+    void removeDevice(QString device);
 
 private slots:
     void usbDeviceAdded();

@@ -44,6 +44,7 @@ signals:
 
 private slots:
     void handleBtTimeout();
+    void removeDeviceHash(QString hash);
 
 private:
     UsbMonitor_mac();
