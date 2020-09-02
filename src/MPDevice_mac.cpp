@@ -87,6 +87,17 @@ MPDevice_mac::MPDevice_mac(QObject *parent, const MPPlatformDef &platformDef):
 
 MPDevice_mac::~MPDevice_mac()
 {
+    IOHIDDeviceRegisterRemovalCallback(hidref, nullptr, this);
+    // Clear the registered callbacks.
+    IOHIDDeviceRegisterInputReportCallback(hidref,
+                                           (uint8_t *)readBuf.data(),
+                                           readBuf.size(),
+                                           nullptr,
+                                           this);
+
+    IOHIDDeviceRegisterRemovalCallback(hidref, nullptr, this);
+
+    IOHIDDeviceClose(hidref, kIOHIDOptionsTypeNone);
     CFRelease(hidref);
 }
 
