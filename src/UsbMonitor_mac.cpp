@@ -113,11 +113,19 @@ void _device_matching_callback(void *user_data,
             um->btMap.clear();
         }
     }
-    if (um->deviceHash.isEmpty() || (def.isBLE && !def.isBluetooth))
+    if (um->deviceHash.isEmpty())
     {
         um->deviceHash[def.id] = def;
         emit um->usbDeviceAdded(def.id);
         qDebug() << "Device added: " << def.id;
+    }
+    else if (def.isBLE)
+    {
+        um->deviceHash[def.id] = def;
+        if (!def.isBluetooth)
+        {
+            emit um->disconnectCurrentDevice();
+        }
     }
 }
 
@@ -226,24 +234,20 @@ QList<MPPlatformDef> UsbMonitor_mac::getDeviceList()
 
 void UsbMonitor_mac::handleBtTimeout()
 {
-    if (!btMap.empty() && deviceHash.isEmpty())
+    if (!btMap.empty())
     {
         auto& def = btMap.first();
         deviceHash[def.id] = def;
-        emit usbDeviceAdded(def.id);
-        qDebug() << "Device added: " << def.id;
+        if (deviceHash.isEmpty())
+        {
+            emit usbDeviceAdded(def.id);
+            qDebug() << "Device added: " << def.id;
+        }
+        else
+        {
+            qDebug() << "BT is detected: " << def.id
+                     << ", but a device is already connected with USB";
+        }
         btMap.clear();
-    }
-}
-
-void UsbMonitor_mac::removeDeviceHash(QString hash)
-{
-    if (deviceHash.contains(hash))
-    {
-        deviceHash.remove(hash);
-    }
-    else
-    {
-        qCritical() << "device hash does not contain: " << hash;
     }
 }

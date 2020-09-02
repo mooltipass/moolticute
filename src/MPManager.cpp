@@ -46,7 +46,7 @@ bool MPManager::initialize()
 #elif defined(Q_OS_MAC)
         connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceAdded(QString)), this, SLOT(usbDeviceAdded(QString)));
         connect(UsbMonitor_mac::Instance(), SIGNAL(usbDeviceRemoved(QString)), this, SLOT(usbDeviceRemoved(QString)));
-        connect(this, SIGNAL(removeDevice(QString)), UsbMonitor_mac::Instance(), SLOT(removeDeviceHash(QString)));
+        connect(UsbMonitor_mac::Instance(), SIGNAL(disconnectCurrentDevice()), this, SLOT(disconnectAndCheckDevices()));
 
 #elif defined(Q_OS_LINUX)
         connect(UsbMonitor_linux::Instance(), SIGNAL(usbDeviceAdded(QString, bool, bool)), this, SLOT(usbDeviceAdded(QString, bool, bool)), Qt::QueuedConnection);
@@ -130,12 +130,6 @@ void MPManager::usbDeviceAdded(QString path)
 
         device = new MPDevice_win(this, MPDevice_win::getPlatDef(path, isBLE, isBluetooth));
 #elif defined(Q_OS_MAC)
-        if (!devices.empty())
-        {
-            QString btPath = devices.begin().key();
-            disconnectDevice();
-            emit removeDevice(btPath);
-        }
 
         device = new MPDevice_mac(this, MPDevice_mac::getPlatDef(path));
 #endif
@@ -144,9 +138,6 @@ void MPManager::usbDeviceAdded(QString path)
     }
     else
     {
-#if defined(Q_OS_MAC)
-        emit removeDevice(path);
-#endif
         qDebug() << "Device is already added: " << path;
     }
 }
@@ -201,6 +192,17 @@ void MPManager::usbDeviceRemoved(QString path)
     if (isMpDisconnected && devices.isEmpty())
     {
         qDebug() << "Check if other MP device is connected ";
+        checkUsbDevices();
+    }
+}
+
+void MPManager::disconnectAndCheckDevices()
+{
+    //Only disconnect current device if it is connected with BT
+    if (devices.begin() != devices.end() && devices.begin().value()->isBT())
+    {
+        qDebug() << "Disconnecting BT device";
+        disconnectDevice();
         checkUsbDevices();
     }
 }
@@ -284,6 +286,11 @@ void MPManager::checkUsbDevices()
 #if defined(Q_OS_WIN)
                 device = new MPDevice_win(this, def);
 #elif defined(Q_OS_MAC)
+                if (devlist.size() > 1 && def.isBluetooth)
+                {
+                    //Make sure to use USB, when BT and USB is connected
+                    continue;
+                }
                 device = new MPDevice_mac(this, def);
 #elif defined(Q_OS_LINUX)
                 device = new MPDevice_linux(this, def);

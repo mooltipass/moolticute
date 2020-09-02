@@ -51,7 +51,6 @@ signals:
     void mpConnected(MPDevice *device);
     void mpDisconnected(MPDevice *device);
     void sendNotification(QString message);
-    void removeDevice(QString device);
 
 private slots:
     void usbDeviceAdded();
@@ -61,6 +60,7 @@ private slots:
     void usbDeviceAdded(QString path, bool isBLE, bool isBT);
 #endif
     void usbDeviceRemoved(QString path);
+    void disconnectAndCheckDevices();
 
 private:
     MPManager();
