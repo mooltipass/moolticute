@@ -237,14 +237,15 @@ void UsbMonitor_mac::handleBtTimeout()
     if (!btMap.empty())
     {
         auto& def = btMap.first();
-        deviceHash[def.id] = def;
         if (deviceHash.isEmpty())
         {
+            deviceHash[def.id] = def;
             emit usbDeviceAdded(def.id);
             qDebug() << "Device added: " << def.id;
         }
         else
         {
+            deviceHash[def.id] = def;
             qDebug() << "BT is detected: " << def.id
                      << ", but a device is already connected with USB";
         }
