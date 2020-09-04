@@ -85,6 +85,7 @@ void _device_matching_callback(void *user_data,
         else if (UsbMonitor_mac::TRANSPORT_USB == transport)
         {
             qDebug() << "USB connection.";
+            def.isBluetooth = false;
         }
         else
         {
@@ -93,7 +94,7 @@ void _device_matching_callback(void *user_data,
         }
     }
 
-    if (def.isBLE)
+    if (def.isBLE && def.isBluetooth)
     {
         // Two hid interface is detected for bluetooth,
         // but we can only write the one with higher unique id
@@ -117,6 +118,14 @@ void _device_matching_callback(void *user_data,
         um->deviceHash[def.id] = def;
         emit um->usbDeviceAdded(def.id);
         qDebug() << "Device added: " << def.id;
+    }
+    else if (def.isBLE)
+    {
+        um->deviceHash[def.id] = def;
+        if (!def.isBluetooth)
+        {
+            emit um->disconnectCurrentDevice();
+        }
     }
 }
 
@@ -225,12 +234,21 @@ QList<MPPlatformDef> UsbMonitor_mac::getDeviceList()
 
 void UsbMonitor_mac::handleBtTimeout()
 {
-    if (!btMap.empty() && deviceHash.isEmpty())
+    if (!btMap.empty())
     {
         auto& def = btMap.first();
-        deviceHash[def.id] = def;
-        emit usbDeviceAdded(def.id);
-        qDebug() << "Device added: " << def.id;
+        if (deviceHash.isEmpty())
+        {
+            deviceHash[def.id] = def;
+            emit usbDeviceAdded(def.id);
+            qDebug() << "Device added: " << def.id;
+        }
+        else
+        {
+            deviceHash[def.id] = def;
+            qDebug() << "BT is detected: " << def.id
+                     << ", but a device is already connected with USB";
+        }
         btMap.clear();
     }
 }

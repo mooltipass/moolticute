@@ -41,6 +41,7 @@ public:
 signals:
     void usbDeviceAdded(QString path);
     void usbDeviceRemoved(QString path);
+    void disconnectCurrentDevice();
 
 private slots:
     void handleBtTimeout();
