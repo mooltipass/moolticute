@@ -5411,7 +5411,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
     AsyncJobs *jobs = new AsyncJobs("Starting MMM mode for import file merging", this);
 
     /* Ask device to go into MMM first */
-    if (!isBLE())
+    if (!isBLE() || get_status() != Common::UnknownSmartcard)
     {
         jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
     }
