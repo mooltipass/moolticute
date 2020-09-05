@@ -61,7 +61,7 @@ void SettingsGuiMini::updateUI()
     ui->settings_advanced_lockunlock->show();
 }
 
-void SettingsGuiMini::setupKeyboardLayout()
+void SettingsGuiMini::setupKeyboardLayout(bool)
 {
     auto* langCb = ui->comboBoxLang;
     if (langCb->count() > 0)

@@ -5,6 +5,9 @@
 #include "AppDaemon.h"
 #include "DeviceSettingsBLE.h"
 
+int MPDeviceBleImpl::s_LangNum = 0;
+int MPDeviceBleImpl::s_LayoutNum = 0;
+
 MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     bleProt(mesProt),
     mpDev(dev),
@@ -750,7 +753,7 @@ QByteArray MPDeviceBleImpl::getStartAddressToSet(const QVector<QByteArray>& star
     return setAddress;
 }
 
-void MPDeviceBleImpl::readLanguages()
+void MPDeviceBleImpl::readLanguages(bool onlyCheck)
 {
     m_deviceLanguages = QJsonObject{};
     m_keyboardLayouts = QJsonObject{};
@@ -759,7 +762,7 @@ void MPDeviceBleImpl::readLanguages()
                           this);
     jobs->append(new MPCommandJob(mpDev,
                    MPCmd::GET_LANG_NUM,
-                   [this, jobs] (const QByteArray &data, bool &)
+                   [this, jobs, onlyCheck] (const QByteArray &data, bool &)
                     {
                         const auto payload = bleProt->getFullPayload(data);
                         const int langNum = bleProt->toIntFromLittleEndian(payload[0], payload[1]);
@@ -768,6 +771,15 @@ void MPDeviceBleImpl::readLanguages()
                         {
                             qCritical() << "Invalid number of languages";
                             return false;
+                        }
+                        if (s_LangNum == langNum && onlyCheck)
+                        {
+                            qDebug() << "No need to fetch languages, it is already up-to-date.";
+                            return true;
+                        }
+                        else
+                        {
+                            s_LangNum = langNum;
                         }
                         for (int i = 0; i < langNum; ++i)
                         {
@@ -795,7 +807,7 @@ void MPDeviceBleImpl::readLanguages()
     ));
     jobs->append(new MPCommandJob(mpDev,
                    MPCmd::GET_KEYB_LAYOUT_NUM,
-                   [this, jobs] (const QByteArray &data, bool &)
+                   [this, jobs, onlyCheck] (const QByteArray &data, bool &)
                     {
                         const auto payload = bleProt->getFullPayload(data);
                         const auto layoutNum = bleProt->toIntFromLittleEndian(payload[0], payload[1]);
@@ -804,6 +816,15 @@ void MPDeviceBleImpl::readLanguages()
                         {
                             qCritical() << "Invalid number of keyboard layouts";
                             return false;
+                        }
+                        if (s_LayoutNum == layoutNum && onlyCheck)
+                        {
+                            qDebug() << "No need to fetch layouts, it is already up-to-date.";
+                            return true;
+                        }
+                        else
+                        {
+                            s_LayoutNum = layoutNum;
                         }
                         for (int i = 0; i < layoutNum; ++i)
                         {
