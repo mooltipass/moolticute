@@ -717,9 +717,11 @@ void WSClient::sendLoadParams()
     sendJsonData({{ "msg", "load_params" }});
 }
 
-void WSClient::requestBleKeyboardLayout()
+void WSClient::requestBleKeyboardLayout(bool onlyCheck)
 {
-    sendJsonData({{ "msg", "request_keyboard_layout" }});
+    QJsonObject o;
+    o["only_check"] = onlyCheck;
+    sendJsonData({{ "msg", "request_keyboard_layout" }, {"data", o}});
 }
 
 void WSClient::sendLockDevice()

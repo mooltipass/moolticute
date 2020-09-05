@@ -41,7 +41,7 @@ public:
     virtual void loadParameters() = 0;
     virtual void updateParam(MPParams::Param param, int val) = 0;
     void updateParam(MPParams::Param param, bool en);
-    virtual void setupKeyboardLayout() {}
+    virtual void setupKeyboardLayout(bool) {}
 
     const QMetaObject* getMetaObject() const {return metaObject();}
 

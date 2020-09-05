@@ -110,7 +110,7 @@ public:
 
     QByteArray getStartAddressToSet(const QVector<QByteArray>& startNodeArray, Common::AddressType addrType) const;
 
-    void readLanguages();
+    void readLanguages(bool onlyCheck);
 
     void loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
     void appendLoginNode(MPNode* loginNode, MPNode* loginNodeClone, Common::AddressType addrType);
@@ -167,6 +167,9 @@ private:
     QJsonObject m_deviceLanguages;
     QJsonObject m_keyboardLayouts;
     MPMiniToBleNodeConverter m_bleNodeConverter;
+
+    static int s_LangNum;
+    static int s_LayoutNum;
 
     static constexpr quint8 MESSAGE_FLIP_BIT = 0x80;
     static constexpr quint8 MESSAGE_ACK_AND_PAYLOAD_LENGTH = 0x7F;

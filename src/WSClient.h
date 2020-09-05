@@ -109,7 +109,7 @@ public:
     inline bool isFw12() const { return isFwVersion(12); }
     inline bool isFw13() const { return isFwVersion(13); }
 
-    void requestBleKeyboardLayout();
+    void requestBleKeyboardLayout(bool onlyCheck);
 
     void sendLockDevice();
     SettingsGuiHelper* settingsHelper();

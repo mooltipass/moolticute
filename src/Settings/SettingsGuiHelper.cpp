@@ -81,6 +81,11 @@ void SettingsGuiHelper::createSettingUIMapping()
     else if (m_settings)
     {
         // If type is not different do not recreate m_settings
+        if (Common::MP_BLE == type)
+        {
+            // For BLE check if it is the same number of lang/layout
+            m_settings->setupKeyboardLayout(true);
+        }
         return;
     }
     m_deviceType = type;
@@ -97,7 +102,7 @@ void SettingsGuiHelper::createSettingUIMapping()
         return;
     }
 
-    m_settings->setupKeyboardLayout();
+    m_settings->setupKeyboardLayout(false);
     m_settings->connectSendParams(this);
     dynamic_cast<ISettingsGui*>(m_settings)->updateUI();
     initKnockSetting();

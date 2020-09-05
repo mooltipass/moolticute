@@ -1165,7 +1165,8 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "request_keyboard_layout")
     {
-        bleImpl->readLanguages();
+        QJsonObject o = root["data"].toObject();
+        bleImpl->readLanguages(o["only_check"].toBool());
     }
     else
     {

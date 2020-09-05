@@ -64,7 +64,7 @@ void SettingsGuiBLE::updateUI()
     ui->settings_advanced_lockunlock->show();
 }
 
-void SettingsGuiBLE::setupKeyboardLayout()
+void SettingsGuiBLE::setupKeyboardLayout(bool onlyCheck)
 {
-    m_mw->wsClient->requestBleKeyboardLayout();
+    m_mw->wsClient->requestBleKeyboardLayout(onlyCheck);
 }
