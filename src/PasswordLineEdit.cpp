@@ -148,7 +148,8 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent):
     m_lengthSlider = new QSlider;
     m_lengthSlider->setMinimum(1);
     m_lengthSlider->setMaximum(31);
-    m_lengthSlider->setValue(12);
+    QSettings s;
+    m_lengthSlider->setValue(s.value("settings/default_password_length", Common::DEFAULT_PASSWORD_LENGTH).toInt());
     m_lengthSlider->setOrientation(Qt::Horizontal);
     m_sliderLengthLabel = new QLabel;
     m_quality = new QLabel;
@@ -282,6 +283,8 @@ void PasswordOptionsPopup::onPasswordProfileChanged(int index)
 
 void PasswordOptionsPopup::showEvent(QShowEvent* e)
 {
+    QSettings s;
+    m_lengthSlider->setValue(s.value("settings/default_password_length", Common::DEFAULT_PASSWORD_LENGTH).toInt());
     generatePassword();
     QFrame::showEvent(e);
 }

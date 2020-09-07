@@ -290,6 +290,7 @@ public:
     static const QString ISODateWithMsFormat;
     static const QString SIMPLE_CRYPT;
     static const QString SIMPLE_CRYPT_V2;
+    static const int DEFAULT_PASSWORD_LENGTH = 16;
 };
 
 enum class DeviceType

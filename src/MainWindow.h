@@ -163,6 +163,8 @@ private slots:
 
     void handleAdvancedModeChange(bool isEnabled);
 
+    void on_spinBoxDefaultPwdLength_valueChanged(int val);
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
