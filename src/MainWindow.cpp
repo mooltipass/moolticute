@@ -1735,3 +1735,9 @@ void MainWindow::handleAdvancedModeChange(bool isEnabled)
         ui->groupBox_UserSettings->hide();
     }
 }
+
+void MainWindow::on_spinBoxDefaultPwdLength_valueChanged(int val)
+{
+    QSettings s;
+    s.setValue("settings/default_password_length", val);
+}
