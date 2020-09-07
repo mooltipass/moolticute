@@ -729,6 +729,16 @@ void WSClient::sendLockDevice()
     sendJsonData({{ "msg", "lock_device" }});
 }
 
+void WSClient::sendInformLocked()
+{
+    sendJsonData({{ "msg", "inform_locked" }});
+}
+
+void WSClient::sendInformUnlocked()
+{
+    sendJsonData({{ "msg", "inform_unlocked" }});
+}
+
 SettingsGuiHelper* WSClient::settingsHelper()
 {
     return m_settingsHelper;

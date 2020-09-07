@@ -1168,6 +1168,40 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         QJsonObject o = root["data"].toObject();
         bleImpl->readLanguages(o["only_check"].toBool());
     }
+    else if (root["msg"] == "inform_locked")
+    {
+        mpdevice->lockDevice([this, root](bool success, QString errstr)
+        {
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "inform_unlocked")
+    {
+        mpdevice->lockDevice([this, root](bool success, QString errstr)
+        {
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

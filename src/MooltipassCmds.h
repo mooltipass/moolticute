@@ -148,6 +148,8 @@ public:
             SET_KEYB_LAYOUT_ID  ,
             SET_USER_LANG       ,
             SET_DEVICE_LANG     ,
+            INFORM_LOCKED       ,
+            INFORM_UNLOCKED     ,
             CMD_DBG_MESSAGE     ,
             CMD_DBG_OPEN_DISP_BUFFER    ,
             CMD_DBG_SEND_TO_DISP_BUFFER ,
