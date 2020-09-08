@@ -1170,7 +1170,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "inform_locked")
     {
-        mpdevice->lockDevice([this, root](bool success, QString errstr)
+        mpdevice->informLocked([this, root](bool success, QString errstr)
         {
             if (!success)
             {
@@ -1187,7 +1187,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "inform_unlocked")
     {
-        mpdevice->lockDevice([this, root](bool success, QString errstr)
+        mpdevice->informUnlocked([this, root](bool success, QString errstr)
         {
             if (!success)
             {

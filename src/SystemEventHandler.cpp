@@ -168,6 +168,10 @@ bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *me
         {
             emit screenLocked();
         }
+        else if (msg->message == WM_WTSSESSION_CHANGE && msg->wParam == WTS_SESSION_UNLOCK)
+        {
+            emit screenUnlocked();
+        }
     }
 #else
     Q_UNUSED(eventType);

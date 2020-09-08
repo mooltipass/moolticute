@@ -499,6 +499,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(&eventHandler, &SystemEventHandler::loggingOff, this, &MainWindow::onSystemEvents);
     connect(&eventHandler, &SystemEventHandler::goingToSleep, this, &MainWindow::onSystemEvents);
     connect(&eventHandler, &SystemEventHandler::shuttingDown, this, &MainWindow::onSystemEvents);
+    connect(&eventHandler, &SystemEventHandler::screenUnlocked, this, &MainWindow::onSystemUnlock);
 
     checkAutoStart();
     checkSubdomainSelection();
@@ -1630,6 +1631,8 @@ void MainWindow::onSystemEvents()
         qDebug() << "System event. Locking device!";
         wsClient->sendLockDevice();
     }
+    wsClient->sendInformLocked();
+    m_computerUnlocked = false;
 
     // In certain cases it is necessary to tell the system that it can proceed closing the
     // application down. It doesn't have any effect if the application wasn't about to be closed
@@ -1637,6 +1640,13 @@ void MainWindow::onSystemEvents()
 #ifdef Q_OS_MAC
     QTimer::singleShot(2 * 1000, &eventHandler, &SystemEventHandler::readyToTerminate);
 #endif
+}
+
+void MainWindow::onSystemUnlock()
+{
+    qDebug() << "System is unlocked, informing device.";
+    wsClient->sendInformUnlocked();
+    m_computerUnlocked = true;
 }
 
 void MainWindow::on_comboBoxSystrayIcon_currentIndexChanged(int index)

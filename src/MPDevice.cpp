@@ -7375,7 +7375,7 @@ void MPDevice::informLocked(const MessageHandlerCb &cb)
     auto *jobs = new AsyncJobs("Inform device about computer locked", this);
 
     const auto afterFn = [](const QByteArray &, bool &) -> bool { return true; };
-    jobs->append(new MPCommandJob(this, MPCmd::LOCK_DEVICE, afterFn));
+    jobs->append(new MPCommandJob(this, MPCmd::INFORM_LOCKED, afterFn));
 
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
@@ -7393,7 +7393,7 @@ void MPDevice::informUnlocked(const MessageHandlerCb &cb)
     auto *jobs = new AsyncJobs("Inform device about computer unlocked", this);
 
     const auto afterFn = [](const QByteArray &, bool &) -> bool { return true; };
-    jobs->append(new MPCommandJob(this, MPCmd::INFORM_LOCKED, afterFn));
+    jobs->append(new MPCommandJob(this, MPCmd::INFORM_UNLOCKED, afterFn));
 
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {

@@ -145,6 +145,7 @@ private slots:
 
     void onLockDeviceSystemEventsChanged(bool checked);
     void onSystemEvents();
+    void onSystemUnlock();
 
     void on_comboBoxSystrayIcon_currentIndexChanged(int index);
 
@@ -221,6 +222,8 @@ private:
 
     QJsonObject m_keyboardLayoutCache;
     QJsonObject m_languagesCache;
+
+    bool m_computerUnlocked = true;
 
     const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
 #ifdef Q_OS_MAC
