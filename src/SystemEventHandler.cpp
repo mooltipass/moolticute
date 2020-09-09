@@ -212,6 +212,10 @@ void SystemEventHandler::screenSaverActiveChanged(bool on)
     {
         emit screenLocked();
     }
+    else
+    {
+        emit screenUnlocked();
+    }
 }
 
 void SystemEventHandler::kdeAboutToSuspend()
