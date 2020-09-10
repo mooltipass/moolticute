@@ -114,6 +114,10 @@ void SystemEventHandler::emitEvent(const SystemEvent event)
             emit screenLocked();
             break;
 
+        case SCREEN_UNLOCKED:
+            emit screenUnlocked();
+            break;
+
         case LOGGING_OFF:
             emit loggingOff();
             break;

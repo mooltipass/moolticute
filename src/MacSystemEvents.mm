@@ -9,6 +9,7 @@
 @property(assign) void (*trigger)(const int, void *);
 
 - (void)screenLocked:(NSNotification *)notif;
+- (void)screenUnlocked:(NSNotification *)notif;
 - (void)loggingOff:(NSNotification *)notif;
 - (void)goingToSleep:(NSNotification *)notif;
 - (void)shuttingDown:(NSNotification *)notif;
@@ -27,6 +28,11 @@
         [center addObserver:newSelf
                    selector:@selector(screenLocked:)
                        name:@"com.apple.screenIsLocked"
+                     object:nil];
+
+        [center addObserver:newSelf
+                   selector:@selector(screenUnlocked:)
+                       name:@"com.apple.screenIsUnlocked"
                      object:nil];
 
         id notifCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
@@ -52,6 +58,12 @@
 {
     (void) notif;
     _trigger(SCREEN_LOCKED, _instance);
+}
+
+- (void)screenUnlocked:(NSNotification *)notif
+{
+    (void) notif;
+    _trigger(SCREEN_UNLOCKED, _instance);
 }
 
 - (void)loggingOff:(NSNotification *)notif
