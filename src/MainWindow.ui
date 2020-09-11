@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>988</width>
-    <height>759</height>
+    <height>632</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -501,9 +501,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-361</y>
-             <width>1002</width>
-             <height>1380</height>
+             <y>0</y>
+             <width>720</width>
+             <height>882</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
