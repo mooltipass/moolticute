@@ -53,6 +53,7 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxFlash->hide();
     ui->checkBoxLockDevice->hide();
     ui->checkBoxPinOnBack->show();
+    ui->checkBoxPinOnEntry->show();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();

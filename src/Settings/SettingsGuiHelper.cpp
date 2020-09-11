@@ -51,7 +51,8 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::KEYBOARD_BT_LAYOUT, ui->comboBoxBtLayout},
         {MPParams::BOOT_ANIMATION_PARAM, ui->checkBoxBootAnim},
         {MPParams::DEVICE_LOCK_USB_DISC, ui->checkBoxDeviceLockUSBDisc},
-        {MPParams::PIN_SHOWN_ON_BACK, ui->checkBoxPinOnBack}
+        {MPParams::PIN_SHOWN_ON_BACK, ui->checkBoxPinOnBack},
+        {MPParams::PIN_SHOW_ON_ENTRY, ui->checkBoxPinOnEntry}
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)

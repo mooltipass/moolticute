@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>988</width>
-    <height>632</height>
+    <height>759</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -501,9 +501,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
-             <width>720</width>
-             <height>882</height>
+             <y>-361</y>
+             <width>1002</width>
+             <height>1380</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1323,6 +1323,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                  <property name="text">
                   <string>Display pin on back pressed</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxPinOnEntry">
+                 <property name="toolTip">
+                  <string>Do not hide PIN when entering PIN</string>
+                 </property>
+                 <property name="text">
+                  <string>Display full PIN on entry</string>
                  </property>
                 </widget>
                </item>

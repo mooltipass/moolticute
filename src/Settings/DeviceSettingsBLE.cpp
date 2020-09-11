@@ -29,5 +29,7 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::LOCK_UNLOCK_FEATURE_PARAM] = UNLOCK_FEATURE_BYTE;
     m_paramMap.insert(MPParams::PIN_SHOWN_ON_BACK, "pin_shown_on_back");
     m_bleByteMapping[MPParams::PIN_SHOWN_ON_BACK] = PIN_SHOWN_ON_BACK_BYTE;
+    m_paramMap.insert(MPParams::PIN_SHOW_ON_ENTRY, "pin_show_on_entry");
+    m_bleByteMapping[MPParams::PIN_SHOW_ON_ENTRY] = PIN_SHOW_ON_ENTRY_BYTE;
 }
 
