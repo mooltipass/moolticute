@@ -118,7 +118,8 @@ void DeviceSettings::fillParameterMapping()
         {MPParams::USER_INTER_TIMEOUT_PARAM, "user_interaction_timeout"},
         {MPParams::RANDOM_INIT_PIN_PARAM, "random_starting_pin"},
         {MPParams::MINI_KNOCK_THRES_PARAM, "knock_sensitivity"},
-        {MPParams::LOCK_UNLOCK_FEATURE_PARAM, "lock_unlock_mode"}
+        {MPParams::LOCK_UNLOCK_FEATURE_PARAM, "lock_unlock_mode"},
+        {MPParams::TUTORIAL_BOOL_PARAM, "tutorial_enabled"}
     };
 }
 
