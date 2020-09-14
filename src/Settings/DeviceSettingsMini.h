@@ -15,7 +15,6 @@ class DeviceSettingsMini : public DeviceSettings
     QT_SETTINGS_PROPERTY(bool, user_request_cancel, false, MPParams::USER_REQ_CANCEL_PARAM)
     QT_SETTINGS_PROPERTY(bool, flash_screen, false, MPParams::FLASH_SCREEN_PARAM)
     QT_SETTINGS_PROPERTY(bool, offline_mode, false, MPParams::OFFLINE_MODE_PARAM)
-    QT_SETTINGS_PROPERTY(bool, tutorial_enabled, false, MPParams::TUTORIAL_BOOL_PARAM)
 
     QT_SETTINGS_PROPERTY(bool, key_after_login_enabled, false, MPParams::KEY_AFTER_LOGIN_SEND_BOOL_PARAM)
     QT_SETTINGS_PROPERTY(bool, key_after_pass_enabled, false, MPParams::KEY_AFTER_PASS_SEND_BOOL_PARAM)

@@ -1189,16 +1189,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBoxTuto">
-                 <property name="toolTip">
-                  <string>Display the device tutorial after the next Mooltipass start</string>
-                 </property>
-                 <property name="text">
-                  <string>Enable device tutorial</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QCheckBox" name="checkBoxBoot">
                  <property name="toolTip">
                   <string>Enable offline mode of your Mooltipass in which passwords are displayed on its screen</string>
@@ -1323,6 +1313,26 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                  <property name="text">
                   <string>Display pin on back pressed</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxPinOnEntry">
+                 <property name="toolTip">
+                  <string>Do not hide PIN when entering PIN</string>
+                 </property>
+                 <property name="text">
+                  <string>Display full PIN on entry</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxTuto">
+                 <property name="toolTip">
+                  <string>Display the device tutorial after the next Mooltipass start</string>
+                 </property>
+                 <property name="text">
+                  <string>Enable device tutorial</string>
                  </property>
                 </widget>
                </item>

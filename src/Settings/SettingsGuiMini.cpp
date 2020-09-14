@@ -51,6 +51,7 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxFlash->show();
     ui->checkBoxLockDevice->show();
     ui->checkBoxPinOnBack->hide();
+    ui->checkBoxPinOnEntry->hide();
 
     ui->groupBox_BLESettings->hide();
 

@@ -222,7 +222,8 @@ public:
         KEYBOARD_USB_LAYOUT,
         KEYBOARD_BT_LAYOUT,
         DEVICE_LOCK_USB_DISC,
-        PIN_SHOWN_ON_BACK
+        PIN_SHOWN_ON_BACK,
+        PIN_SHOW_ON_ENTRY,
     };
     Q_ENUM(Param)
 };
