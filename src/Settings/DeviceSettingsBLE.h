@@ -38,6 +38,7 @@ public:
         KNOCK_DET_BYTE = 11,
         PIN_SHOWN_ON_BACK_BYTE = 14,
         UNLOCK_FEATURE_BYTE = 15,
+        DEVICE_TUTORIAL_BYTE = 16,
         PIN_SHOW_ON_ENTRY_BYTE = 17,
     };
 

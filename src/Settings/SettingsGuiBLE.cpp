@@ -43,7 +43,7 @@ void SettingsGuiBLE::updateUI()
 
     // Miscellaneous groupbox
     ui->settings_miscellaneous_brightness->hide();
-    ui->checkBoxTuto->hide();
+    ui->checkBoxTuto->show();
     ui->checkBoxBoot->hide();
     ui->checkBoxKnock->hide();
     ui->label_KnockSensitivity->show();

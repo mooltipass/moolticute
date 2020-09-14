@@ -37,6 +37,7 @@ void MPSettingsBLE::loadParameters()
                         set_knock_sensitivity(knockValue);
                         set_lock_unlock_mode(m_lastDeviceSettings.at(DeviceSettingsBLE::UNLOCK_FEATURE_BYTE));
                         set_pin_shown_on_back(m_lastDeviceSettings.at(DeviceSettingsBLE::PIN_SHOWN_ON_BACK_BYTE) != 0);
+                        set_tutorial_enabled(m_lastDeviceSettings.at(DeviceSettingsBLE::DEVICE_TUTORIAL_BYTE) != 0);
                         set_pin_show_on_entry(m_lastDeviceSettings.at(DeviceSettingsBLE::PIN_SHOW_ON_ENTRY_BYTE) != 0);
                         return true;
                     }
