@@ -1631,7 +1631,10 @@ void MainWindow::onSystemEvents()
         qDebug() << "System event. Locking device!";
         wsClient->sendLockDevice();
     }
-    wsClient->sendInformLocked();
+    if (wsClient->isMPBLE())
+    {
+        wsClient->sendInformLocked();
+    }
     m_computerUnlocked = false;
 
     // In certain cases it is necessary to tell the system that it can proceed closing the
@@ -1644,8 +1647,11 @@ void MainWindow::onSystemEvents()
 
 void MainWindow::onSystemUnlock()
 {
-    qDebug() << "System is unlocked, informing device.";
-    wsClient->sendInformUnlocked();
+    if (wsClient->isMPBLE())
+    {
+        qDebug() << "System is unlocked, informing device.";
+        wsClient->sendInformUnlocked();
+    }
     m_computerUnlocked = true;
 }
 
