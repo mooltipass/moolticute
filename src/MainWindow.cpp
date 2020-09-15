@@ -169,6 +169,13 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->widgetFiles, &FilesManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
 
+    connect(wsClient, &WSClient::memMgmtModeChanged, [this](bool isMMM){
+        if (isMMM && ui->promptWidget->isMMMErrorPrompt())
+        {
+            ui->promptWidget->hide();
+        }
+    });
+
     connect(wsClient, &WSClient::statusChanged, [this](Common::MPStatus status)
     {
         if (status == Common::UnknownSmartcard)
@@ -1370,7 +1377,7 @@ void MainWindow::memMgmtModeFailed(int errCode, QString errMsg)
 {
     Q_UNUSED(errCode)
     updatePage();
-    showPrompt(new PromptMessage{"<b>" + tr("Memory Management Error") + "</b><br>" +
+    showPrompt(new PromptMessage{"<b>" + PromptWidget::MMM_ERROR + "</b><br>" +
                                  tr("An error occured when trying to go into Memory Management mode.\n\n%1").arg(errMsg)});
 }
 
