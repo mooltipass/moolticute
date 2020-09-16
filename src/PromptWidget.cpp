@@ -7,6 +7,8 @@
 
 #include "Common.h"
 
+QString PromptWidget::MMM_ERROR = tr("Memory Management Error");
+
 PromptWidget::PromptWidget(QWidget *parent) :
     QFrame(parent),
     m_hideAfterAccepted(true),
@@ -73,6 +75,11 @@ void PromptWidget::cleanPromptMessage()
         delete m_promptMessage;
         m_promptMessage = nullptr;
     }
+}
+
+bool PromptWidget::isMMMErrorPrompt() const
+{
+    return m_promptMessage && m_messageLabel->text().contains(MMM_ERROR);
 }
 
 void PromptWidget::onAccepted()

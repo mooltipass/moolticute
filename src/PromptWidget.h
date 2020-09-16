@@ -51,6 +51,9 @@ public:
     void setText(const QString &text);
     void setPromptMessage(PromptMessage *promptMessage);
     void cleanPromptMessage();
+    bool isMMMErrorPrompt() const;
+
+    static QString MMM_ERROR;
 
 signals:
     void accepted();
