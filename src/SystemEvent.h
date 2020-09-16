@@ -6,7 +6,8 @@ enum SystemEvent
     SCREEN_LOCKED,
     LOGGING_OFF,
     GOING_TO_SLEEP,
-    SHUTTING_DOWN
+    SHUTTING_DOWN,
+    SCREEN_UNLOCKED
 };
 
 #endif // SRC_SYSTEMEVENT_H

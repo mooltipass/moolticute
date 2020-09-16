@@ -112,6 +112,8 @@ public:
     void requestBleKeyboardLayout(bool onlyCheck);
 
     void sendLockDevice();
+    void sendInformLocked();
+    void sendInformUnlocked();
     SettingsGuiHelper* settingsHelper();
 
 signals:

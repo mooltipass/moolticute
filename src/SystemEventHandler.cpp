@@ -114,6 +114,10 @@ void SystemEventHandler::emitEvent(const SystemEvent event)
             emit screenLocked();
             break;
 
+        case SCREEN_UNLOCKED:
+            emit screenUnlocked();
+            break;
+
         case LOGGING_OFF:
             emit loggingOff();
             break;
@@ -168,6 +172,10 @@ bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *me
         {
             emit screenLocked();
         }
+        else if (msg->message == WM_WTSSESSION_CHANGE && msg->wParam == WTS_SESSION_UNLOCK)
+        {
+            emit screenUnlocked();
+        }
     }
 #else
     Q_UNUSED(eventType);
@@ -207,6 +215,10 @@ void SystemEventHandler::screenSaverActiveChanged(bool on)
     if (on)
     {
         emit screenLocked();
+    }
+    else
+    {
+        emit screenUnlocked();
     }
 }
 

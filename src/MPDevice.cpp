@@ -7370,6 +7370,42 @@ void MPDevice::lockDevice(const MessageHandlerCb &cb)
     runAndDequeueJobs();
 }
 
+void MPDevice::informLocked(const MessageHandlerCb &cb)
+{
+    auto *jobs = new AsyncJobs("Inform device about computer locked", this);
+
+    const auto afterFn = [](const QByteArray &, bool &) -> bool { return true; };
+    jobs->append(new MPCommandJob(this, MPCmd::INFORM_LOCKED, afterFn));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Failed to inform locked!";
+        cb(false, {});
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
+void MPDevice::informUnlocked(const MessageHandlerCb &cb)
+{
+    auto *jobs = new AsyncJobs("Inform device about computer unlocked", this);
+
+    const auto afterFn = [](const QByteArray &, bool &) -> bool { return true; };
+    jobs->append(new MPCommandJob(this, MPCmd::INFORM_UNLOCKED, afterFn));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        qCritical() << "Failed to inform unlocked!";
+        cb(false, {});
+    });
+
+    jobsQueue.enqueue(jobs);
+    runAndDequeueJobs();
+}
+
 void MPDevice::getAvailableUsers(const MessageHandlerCb &cb)
 {
     auto *jobs = new AsyncJobs("Get Available User", this);
