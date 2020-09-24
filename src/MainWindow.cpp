@@ -1724,7 +1724,6 @@ void MainWindow::onDeviceConnected()
 {
     if (wsClient->isMPBLE())
     {
-        wsClient->sendUserSettingsRequest();
         if (m_computerUnlocked)
         {
             wsClient->sendInformUnlocked();
@@ -1733,6 +1732,7 @@ void MainWindow::onDeviceConnected()
         {
             wsClient->sendInformLocked();
         }
+        wsClient->sendUserSettingsRequest();
     }
     updateDeviceDependentUI();
 }

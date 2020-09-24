@@ -7384,7 +7384,7 @@ void MPDevice::informLocked(const MessageHandlerCb &cb)
         cb(false, {});
     });
 
-    jobsQueue.enqueue(jobs);
+    jobsQueue.prepend(jobs);
     runAndDequeueJobs();
 }
 
@@ -7402,7 +7402,7 @@ void MPDevice::informUnlocked(const MessageHandlerCb &cb)
         cb(false, {});
     });
 
-    jobsQueue.enqueue(jobs);
+    jobsQueue.prepend(jobs);
     runAndDequeueJobs();
 }
 
