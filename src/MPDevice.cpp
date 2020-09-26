@@ -235,7 +235,16 @@ void MPDevice::newDataRead(const QByteArray &data)
     //this should be done by the platform code
 
     QByteArray dataReceived = data;
-    if (m_isDebugMsg || pMesProt->getCommand(data) == MPCmd::DEBUG)
+    bool isDebugStartMsg = false;
+    if (isBLE())
+    {
+        isDebugStartMsg = bleImpl->isFirstPacket(data) && pMesProt->getCommand(data) == MPCmd::DEBUG;
+    }
+    else
+    {
+        isDebugStartMsg = pMesProt->getCommand(data) == MPCmd::DEBUG;
+    }
+    if (m_isDebugMsg || isDebugStartMsg)
     {
         if (isBLE())
         {
