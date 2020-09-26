@@ -380,6 +380,12 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
             constexpr int EXTRA_INFO_SIZE = 6;
             int fullResponseSize = cmd.responseSize + EXTRA_INFO_SIZE;
             QByteArray responseData = cmd.response;
+            if (responseData.size() <= fullResponseSize - PAYLOAD_SIZE)
+            {
+                qDebug() << "Not all packet was received";
+                handleLongMessageTimeout();
+                return false;
+            }
             responseData.append(bleProt->getFullPayload(data).left(fullResponseSize - responseData.size()));
             dataReceived = responseData;
         }
@@ -1051,9 +1057,9 @@ void MPDeviceBleImpl::handleLongMessageTimeout()
     auto& cmd = mpDev->commandQueue.head();
     delete cmd.timerTimeout;
     cmd.timerTimeout = nullptr;
-    bool done = true;
-    cmd.cb(false, QByteArray{}, done);
-    mpDev->commandQueue.dequeue();
+    cmd.running = false;
+    cmd.checkReturn = true;
+    cmd.response = QByteArray{};
     mpDev->sendDataDequeue();
 }
 

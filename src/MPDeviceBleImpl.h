@@ -181,6 +181,7 @@ private:
     static constexpr int FAV_NUMBER = 50;
     static constexpr int LONG_MESSAGE_TIMEOUT_MS = 2000;
     static constexpr int FIRST_PACKET_PAYLOAD_SIZE = 58;
+    static constexpr int PAYLOAD_SIZE = 60;
     static constexpr int INVALID_LAYOUT_LANG_SIZE = 0xFFFF;
     const QString AFTER_AUX_FLASH_SETTING = "settings/after_aux_flash";
     static constexpr int UNKNOWN_CARD_PAYLOAD_SIZE = 72;
