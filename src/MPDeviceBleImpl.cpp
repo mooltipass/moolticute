@@ -380,7 +380,7 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
             constexpr int EXTRA_INFO_SIZE = 6;
             int fullResponseSize = cmd.responseSize + EXTRA_INFO_SIZE;
             QByteArray responseData = cmd.response;
-            if (responseData.size() <= fullResponseSize - PAYLOAD_SIZE)
+            if (responseData.size() < fullResponseSize - PAYLOAD_SIZE)
             {
                 qDebug() << "Not all packet was received";
                 handleLongMessageTimeout();
