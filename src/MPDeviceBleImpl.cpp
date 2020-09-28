@@ -174,30 +174,16 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
     mpDev->enqueueAndRunJob(jobs);
 }
 
-void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerCb cb)
+void MPDeviceBleImpl::checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb)
 {
-    auto *jobs = new AsyncJobs(QString("Store Credential"), this);
+    auto *jobs = new AsyncJobs(QString("Check and Store Credential"), this);
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::CHECK_CREDENTIAL, createCheckCredMessage(cred),
                         [this, cb, jobs, cred] (const QByteArray &data, bool &)
                         {
                             if (MSG_SUCCESS != bleProt->getFirstPayloadByte(data))
                             {
-                                jobs->prepend(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, createStoreCredMessage(cred),
-                                   [this, cb](const QByteArray &data, bool &)
-                                   {
-                                       if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
-                                       {
-                                           qDebug() << "Credential stored successfully";
-                                           cb(true, "");
-                                       }
-                                       else
-                                       {
-                                           qWarning() << "Credential store failed";
-                                           cb(false, "Credential store failed");
-                                       }
-                                       return true;
-                                   }));
+                                storeCredential(cred, cb, jobs);
                             }
                             else
                             {
@@ -209,6 +195,36 @@ void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerC
                ));
 
     mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerCb cb, AsyncJobs *jobs /* =nullptr */)
+{
+    bool onlyStore = !jobs;
+    if (onlyStore)
+    {
+        jobs = new AsyncJobs(QString("Store Credential"), this);
+    }
+
+    jobs->prepend(new MPCommandJob(mpDev, MPCmd::STORE_CREDENTIAL, createStoreCredMessage(cred),
+       [this, cb](const QByteArray &data, bool &)
+       {
+           if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
+           {
+               qDebug() << "Credential stored successfully";
+               cb(true, "");
+           }
+           else
+           {
+               qWarning() << "Credential store failed";
+               cb(false, "Credential store failed");
+           }
+           return true;
+       }));
+
+    if (onlyStore)
+    {
+        mpDev->enqueueAndRunJob(jobs);
+    }
 }
 
 void MPDeviceBleImpl::getCredential(const QString& service, const QString& login, const QString& reqid, const QString& fallbackService, const MessageHandlerCbData &cb)
