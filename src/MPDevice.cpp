@@ -6657,7 +6657,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
             }
 
             /* finally, call setmmccredentials */
-            setMMCredentials(creds_processed, true, cbProgress, cb);
+            setMMCredentials(creds_processed, true, cbProgress, cb, true);
         }
         else
         {
@@ -6681,7 +6681,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
 
 void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                                 const MPDeviceProgressCb &cbProgress,
-                                MessageHandlerCb cb)
+                                MessageHandlerCb cb, bool isCsv /* = false */)
 {
     newAddressesNeededCounter = 0;
     newAddressesReceivedCounter = 0;
@@ -7004,7 +7004,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     /* Out of pure coding laziness, ask free addresses even if we don't need them */
     loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
 
-    connect(jobs, &AsyncJobs::finished, [this, cb, cbProgress](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, cb, cbProgress, isCsv](const QByteArray &)
     {
         qInfo() << "Received enough free addresses";
 
@@ -7035,7 +7035,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         }
 
         AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
-        connect(mergeOperations, &AsyncJobs::finished, [this, cb, cbProgress](const QByteArray &data)
+        connect(mergeOperations, &AsyncJobs::finished, [this, cb, cbProgress, isCsv](const QByteArray &data)
         {
             Q_UNUSED(data);
 
@@ -7053,7 +7053,14 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             {
                 for (qint32 i = 0; i < mmmPasswordChangeArray.size(); i++)
                 {
-                    bleImpl->storeCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
+                    if (isCsv)
+                    {
+                        bleImpl->storeCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
+                    }
+                    else
+                    {
+                        bleImpl->checkAndStoreCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
+                    }
                 }
             }
 

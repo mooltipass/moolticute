@@ -1098,7 +1098,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         {
             return;
         }
-        bleImpl->storeCredential(BleCredential{o["service"].toString(), o["login"].toString(),
+        bleImpl->checkAndStoreCredential(BleCredential{o["service"].toString(), o["login"].toString(),
                                                o["description"].toString(), "", o["password"].toString()},
                                  [=](bool success, QString errstr)
                                  {

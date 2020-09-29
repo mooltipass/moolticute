@@ -162,7 +162,7 @@ public:
 
     //Set full list of credentials in MMM
     void setMMCredentials(const QJsonArray &creds, bool noDelete, const MPDeviceProgressCb &cbProgress,
-                          MessageHandlerCb cb);
+                          MessageHandlerCb cb, bool isCsv = false);
 
     //Export database
     void exportDatabase(const QString &encryption, std::function<void(bool success, QString errstr, QByteArray fileData)> cb,
