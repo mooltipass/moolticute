@@ -4660,7 +4660,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
     runAndDequeueJobs();
 }
 
-void MPDevice::changeVirtualAddressesToFreeAddresses()
+void MPDevice::changeVirtualAddressesToFreeAddresses(bool onlyChangePwd /* = false*/)
 {
     if (virtualStartNode[Common::CRED_ADDR_IDX] != 0)
     {
@@ -4688,7 +4688,13 @@ void MPDevice::changeVirtualAddressesToFreeAddresses()
     qDebug() << "Replacing virtual addresses for child nodes...";
     for (auto &i: loginChildNodes)
     {
+        int virtAddr = i->getVirtualAddress();
         if (i->getAddress().isNull()) i->setAddress(getFreeAddress(i->getVirtualAddress()));
+        if (onlyChangePwd && mmmPasswordChangeNewAddrArray.contains(virtAddr))
+        {
+            auto& change = mmmPasswordChangeNewAddrArray[virtAddr];
+            change.addr = i->getAddress();
+        }
         if (i->getNextChildAddress().isNull()) i->setNextChildAddress(getFreeAddress(i->getNextChildVirtualAddress()));
         if (i->getPreviousChildAddress().isNull()) i->setPreviousChildAddress(getFreeAddress(i->getPreviousChildVirtualAddress()));
     }
@@ -6686,6 +6692,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     newAddressesNeededCounter = 0;
     newAddressesReceivedCounter = 0;
     bool packet_send_needed = false;
+    bool onlyChangePwd = isBLE() && isCsv && !bleImpl->get_advancedMenu();
     AsyncJobs *jobs = new AsyncJobs("Merging credentials changes", this);
 
     /// TODO: sanitize inputs (or not, as it is done at the mpnode.cpp level)
@@ -6788,9 +6795,16 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 newNodePt->setFavoriteProperty(favorite);
 
                 /* Finally, change password */
-                QStringList changeList;
-                changeList << service << login << password;
-                mmmPasswordChangeArray.append(changeList);
+                if (onlyChangePwd)
+                {
+                    mmmPasswordChangeNewAddrArray.insert(newNodePt->getVirtualAddress(), ChangeElem{password});
+                }
+                else
+                {
+                    QStringList changeList;
+                    changeList << service << login << password;
+                    mmmPasswordChangeArray.append(changeList);
+                }
                 qDebug() << "Queing password change as well";
             }
             else if (!nodePtr)
@@ -6835,9 +6849,15 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 {
                     qDebug() << "Detected password change for" << login << "on" << service;
 
-                    QStringList changeList;
-                    changeList << service << login << password;
-                    mmmPasswordChangeArray.append(changeList);
+                    if (onlyChangePwd)
+                    {
+                        mmmPasswordChangeExistingAddrArray.insert(nodePtr->getAddress(), password);
+                    }
+                    {
+                        QStringList changeList;
+                        changeList << service << login << password;
+                        mmmPasswordChangeArray.append(changeList);
+                    }
                 }
 
                 /* Set bool */
@@ -6919,9 +6939,16 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 {
                     qDebug() << "Detected password change for" << login << "on" << service;
 
-                    QStringList changeList;
-                    changeList << service << login << password;
-                    mmmPasswordChangeArray.append(changeList);
+                    if (onlyChangePwd)
+                    {
+                        mmmPasswordChangeExistingAddrArray.insert(nodePtr->getAddress(), password);
+                    }
+                    else
+                    {
+                        QStringList changeList;
+                        changeList << service << login << password;
+                        mmmPasswordChangeArray.append(changeList);
+                    }
                     packet_send_needed = true;
                 }
             }
@@ -7004,14 +7031,14 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     /* Out of pure coding laziness, ask free addresses even if we don't need them */
     loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
 
-    connect(jobs, &AsyncJobs::finished, [this, cb, cbProgress, isCsv](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, cb, cbProgress, isCsv, onlyChangePwd](const QByteArray &)
     {
         qInfo() << "Received enough free addresses";
 
         /* We got all the addresses, change virtual addrs for real addrs and finish merging */
         if (newAddressesNeededCounter > 0)
         {
-            changeVirtualAddressesToFreeAddresses();
+            changeVirtualAddressesToFreeAddresses(onlyChangePwd);
         }
 
         /* Browse through the memory contents to find to store favorites */
@@ -7035,11 +7062,13 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         }
 
         AsyncJobs* mergeOperations = new AsyncJobs("Starting merge operations...", this);
-        connect(mergeOperations, &AsyncJobs::finished, [this, cb, cbProgress, isCsv](const QByteArray &data)
+        connect(mergeOperations, &AsyncJobs::finished, [this, cb, cbProgress, isCsv, onlyChangePwd](const QByteArray &data)
         {
             Q_UNUSED(data);
 
-            if (mmmPasswordChangeArray.isEmpty())
+            if (mmmPasswordChangeArray.isEmpty() &&
+                    mmmPasswordChangeNewAddrArray.isEmpty() &&
+                    mmmPasswordChangeExistingAddrArray.isEmpty())
             {
                 cb(true, "Changes Applied to Memory");
                 qInfo() << "No passwords to be changed";
@@ -7055,11 +7084,32 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 {
                     if (isCsv)
                     {
-                        bleImpl->storeCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
+                        if (bleImpl->get_advancedMenu())
+                        {
+                            bleImpl->storeCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     else
                     {
                         bleImpl->checkAndStoreCredential(BleCredential{mmmPasswordChangeArray[i][0], mmmPasswordChangeArray[i][1], "", "", mmmPasswordChangeArray[i][2]}, cb);
+                    }
+                }
+                if (onlyChangePwd)
+                {
+                    qDebug() << "Changing pwd for new nodes";
+                    for (auto& change : mmmPasswordChangeNewAddrArray)
+                    {
+                        bleImpl->changePassword(change.addr, change.pwd, cb);
+                    }
+
+                    qDebug() << "Changing pwd for existing nodes";
+                    for (auto& change : mmmPasswordChangeExistingAddrArray.toStdMap())
+                    {
+                        bleImpl->changePassword(change.first, change.second, cb);
                     }
                 }
             }
@@ -7145,12 +7195,16 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 cb(true, "Changes Applied to Memory");
                 qInfo() << "Passwords changed!";
                 mmmPasswordChangeArray.clear();
+                mmmPasswordChangeNewAddrArray.clear();
+                mmmPasswordChangeExistingAddrArray.clear();
             });
 
             connect(pwdChangeJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
             {
                 Q_UNUSED(failedJob);
                 mmmPasswordChangeArray.clear();
+                mmmPasswordChangeNewAddrArray.clear();
+                mmmPasswordChangeExistingAddrArray.clear();
                 qCritical() << "Couldn't change passwords";
                 cb(false, "Please Approve Password Changes On The Device");
             });

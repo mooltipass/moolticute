@@ -280,6 +280,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::SET_LOGIN             , 0xA6},
         {MPCmd::SET_PASSWORD          , 0xA7},
         {MPCmd::CHECK_PASSWORD        , 0xA8},
+        {MPCmd::SET_NODE_PASSWORD     , 0x0110},
         {MPCmd::ADD_CONTEXT           , 0xA9},
         {MPCmd::SET_BOOTLOADER_PWD    , 0xAA},
         {MPCmd::JUMP_TO_BOOTLOADER    , 0xAB},
