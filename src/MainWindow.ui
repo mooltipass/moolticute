@@ -1148,16 +1148,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="randomStartingPinCheckBox">
-                 <property name="toolTip">
-                  <string>Random starting pin every time card unlock is needed</string>
-                 </property>
-                 <property name="text">
-                  <string>Random Starting Pin</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QWidget" name="settings_advanced_lockunlock" native="true">
                  <property name="toolTip">
                   <string>Select the lock/unlock action performed when your card is inserted/removed</string>
@@ -1400,6 +1390,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                  <property name="text">
                   <string>Display full PIN on entry</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="randomStartingPinCheckBox">
+                 <property name="toolTip">
+                  <string>Random starting pin every time card unlock is needed</string>
+                 </property>
+                 <property name="text">
+                  <string>Random Starting Pin</string>
                  </property>
                 </widget>
                </item>
