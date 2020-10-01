@@ -1132,11 +1132,78 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_miscellaneous">
+             <widget class="QGroupBox" name="advancedSettingsGB">
               <property name="title">
-               <string>Miscellaneous</string>
+               <string>Advanced Settings (See User Manual)</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_16">
+              <layout class="QVBoxLayout" name="verticalLayout_21">
+               <item>
+                <widget class="QCheckBox" name="hashDisplayFeatureCheckBox">
+                 <property name="toolTip">
+                  <string>A hash will be displayed before and after your card is unlocked. Make sure this hash doesn't change to know that your firmware hasn't been tampered with.</string>
+                 </property>
+                 <property name="text">
+                  <string>Display the security hash before &amp;&amp; after the card is unlocked</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="settings_advanced_lockunlock" native="true">
+                 <property name="toolTip">
+                  <string>Select the lock/unlock action performed when your card is inserted/removed</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_27">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_30">
+                    <property name="text">
+                     <string>Lock Unlock Feature</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="lockUnlockModeComboBox">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="currentIndex">
+                     <number>-1</number>
+                    </property>
+                    <property name="modelColumn">
+                     <number>0</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_32">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
                <item>
                 <widget class="QWidget" name="settings_miscellaneous_brightness" native="true">
                  <property name="toolTip">
@@ -1327,35 +1394,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBoxTuto">
-                 <property name="toolTip">
-                  <string>Display the device tutorial after the next Mooltipass start</string>
-                 </property>
-                 <property name="text">
-                  <string>Enable device tutorial</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="advancedSettingsGB">
-              <property name="title">
-               <string>Advanced Settings (See User Manual)</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_21">
-               <item>
-                <widget class="QCheckBox" name="hashDisplayFeatureCheckBox">
-                 <property name="toolTip">
-                  <string>A hash will be displayed before and after your card is unlocked. Make sure this hash doesn't change to know that your firmware hasn't been tampered with.</string>
-                 </property>
-                 <property name="text">
-                  <string>Display the security hash before &amp;&amp; after the card is unlocked</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QCheckBox" name="randomStartingPinCheckBox">
                  <property name="toolTip">
                   <string>Random starting pin every time card unlock is needed</string>
@@ -1366,60 +1404,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="settings_advanced_lockunlock" native="true">
+                <widget class="QCheckBox" name="checkBoxTuto">
                  <property name="toolTip">
-                  <string>Select the lock/unlock action performed when your card is inserted/removed</string>
+                  <string>Display the device tutorial after the next Mooltipass start</string>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_27">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_30">
-                    <property name="text">
-                     <string>Lock Unlock Feature</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="lockUnlockModeComboBox">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="currentIndex">
-                     <number>-1</number>
-                    </property>
-                    <property name="modelColumn">
-                     <number>0</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_32">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
+                 <property name="text">
+                  <string>Enable device tutorial</string>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -1554,7 +1545,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </spacer>
             </item>
            </layout>
-           <zorder>groupBox_miscellaneous</zorder>
            <zorder>groupBox_keyboard</zorder>
            <zorder>groupBox_2</zorder>
            <zorder>advancedSettingsGB</zorder>
