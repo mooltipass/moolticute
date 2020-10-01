@@ -227,6 +227,29 @@ void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerC
     }
 }
 
+void MPDeviceBleImpl::changePassword(const QByteArray& address, const QString &pwd, MessageHandlerCb cb)
+{
+    auto* jobs = new AsyncJobs(QString("Change password"), this);
+
+    jobs->prepend(new MPCommandJob(mpDev, MPCmd::SET_NODE_PASSWORD, createChangePasswordMsg(address, pwd),
+       [this, cb](const QByteArray &data, bool &)
+       {
+           if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
+           {
+               qDebug() << "Password changed successfully";
+               cb(true, "");
+           }
+           else
+           {
+               qWarning() << "Password change failed";
+               cb(false, "Password change failed");
+           }
+           return true;
+       }));
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 void MPDeviceBleImpl::getCredential(const QString& service, const QString& login, const QString& reqid, const QString& fallbackService, const MessageHandlerCbData &cb)
 {
     AsyncJobs *jobs;
@@ -1122,6 +1145,14 @@ QByteArray MPDeviceBleImpl::createCredentialMessage(const CredMap &credMap)
 
     storeMessage.append(credDatas);
     return storeMessage;
+}
+
+QByteArray MPDeviceBleImpl::createChangePasswordMsg(const QByteArray& address, QString pwd)
+{
+    auto msg = address;
+    msg.append(bleProt->toByteArray(pwd));
+    msg.append(bleProt->toLittleEndianFromInt(static_cast<quint16>(0x0)));
+    return msg;
 }
 
 void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress)

@@ -349,7 +349,7 @@ private:
 
     QByteArray getFreeAddress(quint32 virtualAddr);
     // once we fetched free addresses, this function is called
-    void changeVirtualAddressesToFreeAddresses();
+    void changeVirtualAddressesToFreeAddresses(bool onlyChangePwd = false);
 
     void updateChangeNumbers(AsyncJobs *jobs, quint8 flags);
 
@@ -378,6 +378,15 @@ private:
 
     //passwords we need to change after leaving mmm
     QList<QStringList> mmmPasswordChangeArray;
+    struct ChangeElem
+    {
+      ChangeElem(): addr{QByteArray{}}, pwd{""}{}
+      ChangeElem(QString pwd): addr{QByteArray{}}, pwd{pwd}{}
+      QByteArray addr;
+      QString pwd;
+    };
+    QMap<quint32, ChangeElem> mmmPasswordChangeNewAddrArray;
+    QMap<QByteArray, QString> mmmPasswordChangeExistingAddrArray;
 
     // Number of new addresses we need
     quint32 newAddressesNeededCounter = 0;

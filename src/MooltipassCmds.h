@@ -150,6 +150,7 @@ public:
             SET_DEVICE_LANG     ,
             INFORM_LOCKED       ,
             INFORM_UNLOCKED     ,
+            SET_NODE_PASSWORD   ,
             CMD_DBG_MESSAGE     ,
             CMD_DBG_OPEN_DISP_BUFFER    ,
             CMD_DBG_SEND_TO_DISP_BUFFER ,
