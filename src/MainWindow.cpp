@@ -1742,6 +1742,7 @@ void MainWindow::onDeviceDisconnected()
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");
     ui->lineEdit_dbBackupFilePath->setText("");
+    on_pushButtonSettingsReset_clicked();
 }
 
 void MainWindow::on_checkBoxDebugHttp_stateChanged(int)
