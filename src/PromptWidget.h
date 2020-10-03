@@ -52,8 +52,10 @@ public:
     void setPromptMessage(PromptMessage *promptMessage);
     void cleanPromptMessage();
     bool isMMMErrorPrompt() const;
+    bool isBackupPrompt() const;
 
     static QString MMM_ERROR;
+    static QString BACKUP_PROMPT;
 
 signals:
     void accepted();

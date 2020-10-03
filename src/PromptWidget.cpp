@@ -8,6 +8,7 @@
 #include "Common.h"
 
 QString PromptWidget::MMM_ERROR = tr("Memory Management Error");
+QString PromptWidget::BACKUP_PROMPT = tr("You haven't made a backup of your database in a while. ");
 
 PromptWidget::PromptWidget(QWidget *parent) :
     QFrame(parent),
@@ -80,6 +81,11 @@ void PromptWidget::cleanPromptMessage()
 bool PromptWidget::isMMMErrorPrompt() const
 {
     return m_promptMessage && m_messageLabel->text().contains(MMM_ERROR);
+}
+
+bool PromptWidget::isBackupPrompt() const
+{
+    return m_promptMessage && m_messageLabel->text().contains(BACKUP_PROMPT);
 }
 
 void PromptWidget::onAccepted()
