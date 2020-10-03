@@ -3593,6 +3593,11 @@ void MPDevice::processStatusChange(const QByteArray &data)
             }
         }
 
+        if (Common::MMMMode == prevStatus && Common::NoCardInserted == s)
+        {
+            exitMemMgmtMode();
+        }
+
         if (s == Common::Unlocked)
         {
             /* If v1.2 firmware, query user change number */

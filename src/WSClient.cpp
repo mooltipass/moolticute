@@ -462,10 +462,19 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if(rootobj["msg"] == "get_user_categories")
     {
         QJsonObject o = rootobj["data"].toObject();
-        emit displayUserCategories(o["category_1"].toString(),
-                                   o["category_2"].toString(),
-                                   o["category_3"].toString(),
-                                   o["category_4"].toString());
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        if (success)
+        {
+            emit displayUserCategories(o["category_1"].toString(),
+                                       o["category_2"].toString(),
+                                       o["category_3"].toString(),
+                                       o["category_4"].toString());
+        }
+        else
+        {
+            qDebug() << "get_user_categories failed";
+        }
+
     }
     else if(rootobj["msg"] == "set_user_categories")
     {
