@@ -170,7 +170,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, [this](bool isMMM){
-        if (isMMM && ui->promptWidget->isMMMErrorPrompt())
+        if (isMMM && (ui->promptWidget->isMMMErrorPrompt()
+                  || ui->promptWidget->isBackupPrompt()))
         {
             ui->promptWidget->hide();
         }
