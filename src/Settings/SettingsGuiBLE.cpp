@@ -7,6 +7,7 @@ SettingsGuiBLE::SettingsGuiBLE(QObject *parent, MainWindow *mw)
       ISettingsGui(mw)
 {
     ui = mw->ui;
+    connect(this, &DeviceSettings::lock_unlock_modeChanged, mw, &MainWindow::lockUnlockChanged);
 }
 
 void SettingsGuiBLE::loadParameters()
@@ -54,6 +55,7 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxLockDevice->hide();
     ui->checkBoxPinOnBack->show();
     ui->checkBoxPinOnEntry->show();
+    ui->checkBoxNoPasswordPrompt->show();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();

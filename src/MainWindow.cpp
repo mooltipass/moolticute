@@ -337,17 +337,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->closeBehaviorComboBox->setVisible(false);
 #endif
 
-    using LF = Common::LockUnlockModeFeatureFlags;
-
-    ui->lockUnlockModeComboBox->addItem(tr("Disabled")          , (uint)LF::Disabled);
-    ui->lockUnlockModeComboBox->addItem(tr("Password Only")     , (uint)LF::Password);
-    ui->lockUnlockModeComboBox->addItem(tr("Login + Password")  , (uint)LF::Password|(uint)LF::Login);
-    ui->lockUnlockModeComboBox->addItem(tr("Enter + Password")  , (uint)LF::Password|(uint)LF::SendEnter);
-    ui->lockUnlockModeComboBox->addItem(tr("Password / Win + L")  , (uint)LF::Password|(uint)LF::SendWin_L);
-    ui->lockUnlockModeComboBox->addItem(tr("Login + Pass / Win + L"), (uint)LF::Password|(uint)LF::Login|(uint)LF::SendWin_L);
-    ui->lockUnlockModeComboBox->addItem(tr("Enter + Pass / Win + L"), (uint)LF::Password|(uint)LF::SendEnter|(uint)LF::SendWin_L);
-    ui->lockUnlockModeComboBox->addItem(tr("Ctrl + Alt + Del / Win + L"), (uint)LF::SendCtrl_Alt_Del|(uint)LF::Password|(uint)LF::SendWin_L);
-    ui->lockUnlockModeComboBox->setCurrentIndex(0);
+    fillLockUnlockItems();
 
     ui->comboBoxSystrayIcon->blockSignals(true);
     ui->comboBoxSystrayIcon->addItem(tr("Black"), tr(""));
@@ -532,7 +522,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->checkBoxDebugHttp->setChecked(s.value("settings/http_dev_server").toBool());
     ui->checkBoxDebugLog->setChecked(s.value("settings/enable_dev_log").toBool());
-    ui->spinBoxDefaultPwdLength->setValue(s.value("settings/default_password_length", Common::DEFAULT_PASSWORD_LENGTH).toInt());
 #ifdef Q_OS_MAC
     resize(width(), MAC_DEFAULT_HEIGHT);
 #endif
@@ -546,6 +535,53 @@ MainWindow::~MainWindow()
 
     delete ui;
 }
+
+void MainWindow::fillLockUnlockItems()
+{
+    using LF = Common::LockUnlockModeFeatureFlags;
+    m_lockUnlockItems = {
+        {tr("Disabled"), (uint)LF::Disabled},
+        {tr("Password Only"), (uint)LF::Password},
+        {tr("Login + Password"), (uint)LF::Password|(uint)LF::Login},
+        {tr("Enter + Password"), (uint)LF::Password|(uint)LF::SendEnter},
+        {tr("Password / Win + L"), (uint)LF::Password|(uint)LF::SendWin_L},
+        {tr("Login + Pass / Win + L"), (uint)LF::Password|(uint)LF::Login|(uint)LF::SendWin_L},
+        {tr("Enter + Pass / Win + L"), (uint)LF::Password|(uint)LF::SendEnter|(uint)LF::SendWin_L},
+        {tr("Ctrl + Alt + Del / Win + L"), (uint)LF::SendCtrl_Alt_Del|(uint)LF::Password|(uint)LF::SendWin_L}
+    };
+
+    for (auto &item : m_lockUnlockItems)
+    {
+        ui->lockUnlockModeComboBox->addItem(item.action, item.bitmap|m_noPwdPrompt);
+    }
+
+    ui->lockUnlockModeComboBox->setCurrentIndex(0);
+}
+
+void MainWindow::updateLockUnlockItems()
+{
+    for (int i = 0; i < m_lockUnlockItems.size(); ++i)
+    {
+        ui->lockUnlockModeComboBox->setItemData(i, m_lockUnlockItems[i].bitmap|m_noPwdPrompt);
+    }
+    int val = ui->lockUnlockModeComboBox->currentIndex();
+    // Need to modify selection temporarly to detect change
+    ui->lockUnlockModeComboBox->setCurrentIndex(0);
+    ui->lockUnlockModeComboBox->setCurrentIndex(val);
+}
+
+void MainWindow::checkLockUnlockReset()
+{
+    bool settingNoPrompt = wsClient->settingsHelper()->getLockUnlockMode()&NO_PWD_PROMPT_MASK;
+    bool cbNoPrompt = ui->lockUnlockModeComboBox->currentData().toInt()&NO_PWD_PROMPT_MASK;
+    if (settingNoPrompt != cbNoPrompt)
+    {
+        ui->checkBoxNoPasswordPrompt->setChecked(!ui->checkBoxNoPasswordPrompt->isChecked());
+        noPasswordPromptChanged(ui->checkBoxNoPasswordPrompt->isChecked());
+    }
+
+}
+
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -758,6 +794,10 @@ void MainWindow::checkSettingsChanged()
 
 void MainWindow::on_pushButtonSettingsReset_clicked()
 {
+    if (wsClient->isMPBLE())
+    {
+        checkLockUnlockReset();
+    }
     wsClient->settingsHelper()->resetSettings();
 
     ui->pushButtonSettingsReset->setVisible(false);
@@ -941,6 +981,17 @@ void MainWindow::showDbBackTrackingControls(const bool &show)
 {
     dbBackupTrakingControlsVisible = show;
     updatePage();
+}
+
+void MainWindow::lockUnlockChanged(int val)
+{
+    bool checked = ui->checkBoxNoPasswordPrompt->isChecked();
+    bool noPwdPromptEnabled = val & NO_PWD_PROMPT_MASK;
+    if (noPwdPromptEnabled != checked)
+    {
+        //Update no password prompt checkbox, based on value set on device
+        ui->checkBoxNoPasswordPrompt->setChecked(noPwdPromptEnabled);
+    }
 }
 
 void MainWindow::wantExitFilesManagement()
@@ -1498,6 +1549,12 @@ bool MainWindow::shouldUpdateItems(QJsonObject &cache, const QJsonObject &receiv
     return true;
 }
 
+void MainWindow::noPasswordPromptChanged(bool val)
+{
+    m_noPwdPrompt = val ? NO_PWD_PROMPT_MASK : 0x00;
+    updateLockUnlockItems();
+}
+
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
@@ -1774,4 +1831,9 @@ void MainWindow::on_spinBoxDefaultPwdLength_valueChanged(int val)
 {
     QSettings s;
     s.setValue("settings/default_password_length", val);
+}
+
+void MainWindow::on_checkBoxNoPasswordPrompt_stateChanged(int)
+{
+    noPasswordPromptChanged(ui->checkBoxNoPasswordPrompt->isChecked());
 }

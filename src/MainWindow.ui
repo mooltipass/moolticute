@@ -1205,6 +1205,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="checkBoxNoPasswordPrompt">
+                 <property name="text">
+                  <string>No Password Input Prompt</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QWidget" name="settings_miscellaneous_brightness" native="true">
                  <property name="toolTip">
                   <string>Mooltipass screen brightness</string>
