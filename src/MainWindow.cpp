@@ -522,6 +522,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->checkBoxDebugHttp->setChecked(s.value("settings/http_dev_server").toBool());
     ui->checkBoxDebugLog->setChecked(s.value("settings/enable_dev_log").toBool());
+    ui->spinBoxDefaultPwdLength->setValue(s.value("settings/default_password_length", Common::DEFAULT_PASSWORD_LENGTH).toInt());
 #ifdef Q_OS_MAC
     resize(width(), MAC_DEFAULT_HEIGHT);
 #endif

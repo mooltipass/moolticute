@@ -231,6 +231,7 @@ private:
     bool m_computerUnlocked = true;
     struct LockUnlockItem
     {
+        LockUnlockItem() = default;
         LockUnlockItem(QString a, quint16 b) : action{a}, bitmap{b}{}
         QString action;
         quint16 bitmap;
