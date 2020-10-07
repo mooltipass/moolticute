@@ -1189,6 +1189,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
+                   <widget class="QCheckBox" name="checkBoxNoPasswordPrompt">
+                    <property name="text">
+                     <string>No Password Input Prompt</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <spacer name="horizontalSpacer_32">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -1202,13 +1209,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </spacer>
                   </item>
                  </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBoxNoPasswordPrompt">
-                 <property name="text">
-                  <string>No Password Input Prompt</string>
-                 </property>
                 </widget>
                </item>
                <item>
