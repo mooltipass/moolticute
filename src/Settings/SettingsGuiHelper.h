@@ -22,6 +22,7 @@ public:
     void resetSettings();
     void getChangedSettings(QJsonObject& o);
     void updateParameters(const QJsonObject &data);
+    int getLockUnlockMode() const;
 
 public slots:
     void checkKeyboardLayout();

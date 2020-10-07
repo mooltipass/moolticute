@@ -221,6 +221,11 @@ void SettingsGuiHelper::updateParameters(const QJsonObject &data)
     m_settings->updateParam(m_settings->getParamId(param), val);
 }
 
+int SettingsGuiHelper::getLockUnlockMode() const
+{
+    return m_settings->get_lock_unlock_mode();
+}
+
 void SettingsGuiHelper::sendParams(bool value, int param)
 {
     QWidget* widget = m_widgetMapping[MPParams::Param(param)];

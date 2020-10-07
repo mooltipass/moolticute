@@ -52,6 +52,7 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxLockDevice->show();
     ui->checkBoxPinOnBack->hide();
     ui->checkBoxPinOnEntry->hide();
+    ui->checkBoxNoPasswordPrompt->hide();
 
     ui->groupBox_BLESettings->hide();
 

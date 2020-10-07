@@ -84,6 +84,7 @@ public slots:
     void showPrompt(PromptMessage * message);
     void hidePrompt();
     void showDbBackTrackingControls(const bool &show);
+    void lockUnlockChanged(int val);
 
 private slots:
     void enableCredentialsManagement(bool enable);
@@ -166,6 +167,8 @@ private slots:
 
     void on_spinBoxDefaultPwdLength_valueChanged(int val);
 
+    void on_checkBoxNoPasswordPrompt_stateChanged(int val);
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -191,6 +194,8 @@ private:
     void updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items);
 
     bool shouldUpdateItems(QJsonObject& cache, const QJsonObject& received);
+
+    void noPasswordPromptChanged(bool val);
 
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
@@ -224,6 +229,18 @@ private:
     QJsonObject m_languagesCache;
 
     bool m_computerUnlocked = true;
+    struct LockUnlockItem
+    {
+        LockUnlockItem(QString a, quint16 b) : action{a}, bitmap{b}{}
+        QString action;
+        quint16 bitmap;
+    };
+    void fillLockUnlockItems();
+    void updateLockUnlockItems();
+    void checkLockUnlockReset();
+    QVector<LockUnlockItem> m_lockUnlockItems;
+    quint16 m_noPwdPrompt = 0x00;
+    static constexpr quint16 NO_PWD_PROMPT_MASK = 0x20;
 
     const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
 #ifdef Q_OS_MAC
