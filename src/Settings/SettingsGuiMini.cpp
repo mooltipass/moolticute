@@ -54,6 +54,10 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxPinOnEntry->hide();
     ui->checkBoxNoPasswordPrompt->hide();
 
+    ui->checkBoxSwitchOffUSBDisc->hide();
+    ui->checkBoxDisableBleOnCardRemove->hide();
+    ui->checkBoxDisableBleOnLock->hide();
+
     ui->groupBox_BLESettings->hide();
 
     // Inactivity groupbox
@@ -61,6 +65,7 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxScreensaver->show();
     ui->hashDisplayFeatureCheckBox->show();
     ui->settings_advanced_lockunlock->show();
+    ui->setting_ble_inactivity_lock->hide();
 }
 
 void SettingsGuiMini::setupKeyboardLayout(bool)

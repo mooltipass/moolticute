@@ -1128,6 +1128,50 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QWidget" name="setting_ble_inactivity_lock" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_57">
+                  <property name="spacing">
+                   <number>6</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_InactivityTimer">
+                    <property name="text">
+                     <string>Inactivity Timer</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxInactivityTimer"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_53">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
@@ -1463,6 +1507,27 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                  <property name="text">
                   <string>Device Lock on USB Disconnection</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxSwitchOffUSBDisc">
+                 <property name="text">
+                  <string>Switch off device after USB Disconnection</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxDisableBleOnCardRemove">
+                 <property name="text">
+                  <string>Disable BLE on card removed</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxDisableBleOnLock">
+                 <property name="text">
+                  <string>Disable BLE on device lock</string>
                  </property>
                 </widget>
                </item>

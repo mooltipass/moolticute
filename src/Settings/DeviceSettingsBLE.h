@@ -18,6 +18,11 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(bool, device_lock_usb_disc, false, MPParams::DEVICE_LOCK_USB_DISC)
     QT_SETTINGS_PROPERTY(bool, pin_shown_on_back, false, MPParams::PIN_SHOWN_ON_BACK)
     QT_SETTINGS_PROPERTY(bool, pin_show_on_entry, false, MPParams::PIN_SHOW_ON_ENTRY)
+    QT_SETTINGS_PROPERTY(bool, disable_ble_on_card_remove, false, MPParams::DISABLE_BLE_ON_CARD_REMOVE)
+    QT_SETTINGS_PROPERTY(bool, disable_ble_on_lock, false, MPParams::DISABLE_BLE_ON_LOCK)
+    QT_SETTINGS_PROPERTY(int, nb_20mins_ticks_for_lock, 0, MPParams::NB_20MINS_TICKS_FOR_LOCK)
+    QT_SETTINGS_PROPERTY(bool, switch_off_after_usb_disc, false, MPParams::SWITCH_OFF_AFTER_USB_DISC)
+
 
 public:
     DeviceSettingsBLE(QObject *parent);
@@ -40,6 +45,10 @@ public:
         UNLOCK_FEATURE_BYTE = 15,
         DEVICE_TUTORIAL_BYTE = 16,
         PIN_SHOW_ON_ENTRY_BYTE = 17,
+        DISABLE_BLE_ON_CARD_REMOVE = 18,
+        DISABLE_BLE_ON_LOCK = 19,
+        NB_20MINS_TICKS_FOR_LOCK = 20,
+        SWITCH_OFF_AFTER_USB_DISC = 21
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;

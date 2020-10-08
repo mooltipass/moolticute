@@ -293,6 +293,15 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxKnock->addItem(tr("Medium"), 2);
     ui->comboBoxKnock->addItem(tr("High"), 3);
 
+    ui->comboBoxInactivityTimer->addItem(tr("No Inactivity"), 0);
+    ui->comboBoxInactivityTimer->addItem(tr("20 minutes"), 1);
+    ui->comboBoxInactivityTimer->addItem(tr("40 minutes"), 2);
+    ui->comboBoxInactivityTimer->addItem(tr("1 hour"), 3);
+    ui->comboBoxInactivityTimer->addItem(tr("2 hours"), 6);
+    ui->comboBoxInactivityTimer->addItem(tr("3 hours"), 9);
+    ui->comboBoxInactivityTimer->addItem(tr("4 hours"), 12);
+    ui->comboBoxInactivityTimer->addItem(tr("5 hours"), 15);
+
     // Close behavior
 #ifdef Q_OS_MAC
     ui->closeBehaviorComboBox->addItem(

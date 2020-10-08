@@ -225,6 +225,10 @@ public:
         DEVICE_LOCK_USB_DISC,
         PIN_SHOWN_ON_BACK,
         PIN_SHOW_ON_ENTRY,
+        DISABLE_BLE_ON_CARD_REMOVE,
+        DISABLE_BLE_ON_LOCK,
+        NB_20MINS_TICKS_FOR_LOCK,
+        SWITCH_OFF_AFTER_USB_DISC
     };
     Q_ENUM(Param)
 };
