@@ -1124,7 +1124,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <string>Enable the Mooltipass screen saver</string>
                  </property>
                  <property name="text">
-                  <string>Enable screen saver</string>
+                  <string>Enable Screen Saver</string>
                  </property>
                 </widget>
                </item>
@@ -1360,7 +1360,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QLabel" name="label_KnockSensitivity">
                     <property name="text">
-                     <string>Knock detection sensitivity:</string>
+                     <string>Knock Detection Sensitivity</string>
                     </property>
                    </widget>
                   </item>
@@ -1430,7 +1430,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <string>Do not erase characters when going back in the pin entering screen</string>
                  </property>
                  <property name="text">
-                  <string>Display pin on back pressed</string>
+                  <string>Display Pin on Back Pressed</string>
                  </property>
                 </widget>
                </item>
@@ -1440,7 +1440,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <string>Do not hide PIN when entering PIN</string>
                  </property>
                  <property name="text">
-                  <string>Display full PIN on entry</string>
+                  <string>Display Full Pin on Entry</string>
                  </property>
                 </widget>
                </item>
@@ -1460,7 +1460,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <string>Display the device tutorial after the next Mooltipass start</string>
                  </property>
                  <property name="text">
-                  <string>Enable device tutorial</string>
+                  <string>Enable Device Tutorial</string>
                  </property>
                 </widget>
                </item>
@@ -1513,21 +1513,21 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QCheckBox" name="checkBoxSwitchOffUSBDisc">
                  <property name="text">
-                  <string>Switch off device after USB Disconnection</string>
+                  <string>Switch Off Device After USB Disconnection</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxDisableBleOnCardRemove">
                  <property name="text">
-                  <string>Disable BLE on card removed</string>
+                  <string>Disable BLE on Card Removed</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxDisableBleOnLock">
                  <property name="text">
-                  <string>Disable BLE on device lock</string>
+                  <string>Disable BLE on Device Lock</string>
                  </property>
                 </widget>
                </item>
