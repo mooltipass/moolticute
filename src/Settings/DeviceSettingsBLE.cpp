@@ -32,5 +32,13 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_paramMap.insert(MPParams::PIN_SHOW_ON_ENTRY, "pin_show_on_entry");
     m_bleByteMapping[MPParams::TUTORIAL_BOOL_PARAM] = DEVICE_TUTORIAL_BYTE;
     m_bleByteMapping[MPParams::PIN_SHOW_ON_ENTRY] = PIN_SHOW_ON_ENTRY_BYTE;
+    m_paramMap.insert(MPParams::DISABLE_BLE_ON_CARD_REMOVE, "disable_ble_on_card_remove");
+    m_bleByteMapping[MPParams::DISABLE_BLE_ON_CARD_REMOVE] = DISABLE_BLE_ON_CARD_REMOVE;
+    m_paramMap.insert(MPParams::DISABLE_BLE_ON_LOCK, "disable_ble_on_lock");
+    m_bleByteMapping[MPParams::DISABLE_BLE_ON_LOCK] = DISABLE_BLE_ON_LOCK;
+    m_paramMap.insert(MPParams::NB_20MINS_TICKS_FOR_LOCK, "nb_20mins_ticks_for_lock");
+    m_bleByteMapping[MPParams::NB_20MINS_TICKS_FOR_LOCK] = NB_20MINS_TICKS_FOR_LOCK;
+    m_paramMap.insert(MPParams::SWITCH_OFF_AFTER_USB_DISC, "switch_off_after_usb_disc");
+    m_bleByteMapping[MPParams::SWITCH_OFF_AFTER_USB_DISC] = SWITCH_OFF_AFTER_USB_DISC;
 }
 

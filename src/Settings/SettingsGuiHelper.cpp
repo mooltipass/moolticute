@@ -52,7 +52,11 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::BOOT_ANIMATION_PARAM, ui->checkBoxBootAnim},
         {MPParams::DEVICE_LOCK_USB_DISC, ui->checkBoxDeviceLockUSBDisc},
         {MPParams::PIN_SHOWN_ON_BACK, ui->checkBoxPinOnBack},
-        {MPParams::PIN_SHOW_ON_ENTRY, ui->checkBoxPinOnEntry}
+        {MPParams::PIN_SHOW_ON_ENTRY, ui->checkBoxPinOnEntry},
+        {MPParams::DISABLE_BLE_ON_CARD_REMOVE, ui->checkBoxDisableBleOnCardRemove},
+        {MPParams::DISABLE_BLE_ON_LOCK, ui->checkBoxDisableBleOnLock},
+        {MPParams::SWITCH_OFF_AFTER_USB_DISC, ui->checkBoxSwitchOffUSBDisc},
+        {MPParams::NB_20MINS_TICKS_FOR_LOCK, ui->comboBoxInactivityTimer}
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)

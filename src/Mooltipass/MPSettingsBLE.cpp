@@ -39,6 +39,10 @@ void MPSettingsBLE::loadParameters()
                         set_pin_shown_on_back(m_lastDeviceSettings.at(DeviceSettingsBLE::PIN_SHOWN_ON_BACK_BYTE) != 0);
                         set_tutorial_enabled(m_lastDeviceSettings.at(DeviceSettingsBLE::DEVICE_TUTORIAL_BYTE) != 0);
                         set_pin_show_on_entry(m_lastDeviceSettings.at(DeviceSettingsBLE::PIN_SHOW_ON_ENTRY_BYTE) != 0);
+                        set_disable_ble_on_card_remove(m_lastDeviceSettings.at(DeviceSettingsBLE::DISABLE_BLE_ON_CARD_REMOVE) != 0);
+                        set_disable_ble_on_lock(m_lastDeviceSettings.at(DeviceSettingsBLE::DISABLE_BLE_ON_LOCK) != 0);
+                        set_nb_20mins_ticks_for_lock(m_lastDeviceSettings.at(DeviceSettingsBLE::NB_20MINS_TICKS_FOR_LOCK));
+                        set_switch_off_after_usb_disc(m_lastDeviceSettings.at(DeviceSettingsBLE::SWITCH_OFF_AFTER_USB_DISC) != 0);
                         return true;
                     }
     ));
