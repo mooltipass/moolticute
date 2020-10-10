@@ -152,6 +152,11 @@ bool SettingsGuiHelper::checkSettingsChanged()
 
 void SettingsGuiHelper::resetSettings()
 {
+    if (!m_settings)
+    {
+        qDebug() << "Cannot reset, settings is not inited yet";
+        return;
+    }
     auto* metaObj = m_settings->getMetaObject();
     while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
     {
