@@ -490,6 +490,11 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         emit updateBLEKeyboardLayout(rootobj["data"].toObject());
     }
+    else if (rootobj["msg"] == "send_battery")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit updateBatteryPercent(o["battery"].toInt());
+    }
 }
 
 bool WSClient::isFwVersion(int version) const
@@ -715,6 +720,11 @@ void WSClient::sendUserSettingsRequest()
 void WSClient::sendLoadParams()
 {
     sendJsonData({{ "msg", "load_params" }});
+}
+
+void WSClient::sendBatteryRequest()
+{
+    sendJsonData({{ "msg", "get_battery" }});
 }
 
 void WSClient::requestBleKeyboardLayout(bool onlyCheck)

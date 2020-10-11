@@ -212,6 +212,7 @@ public:
     void removeFileFromCache(QString fileName);
 
     void loadParams() { pSettings->loadParameters(); }
+    void getBattery();
 
 protected:
     enum ExportPayloadData

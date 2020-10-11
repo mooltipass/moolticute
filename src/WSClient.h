@@ -105,6 +105,7 @@ public:
     void sendSetUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
     void sendUserSettingsRequest();
     void sendLoadParams();
+    void sendBatteryRequest();
 
     inline bool isFw12() const { return isFwVersion(12); }
     inline bool isFw13() const { return isFwVersion(13); }
@@ -147,6 +148,7 @@ signals:
     void deleteDataNodesFinished();
     void updateBLEDeviceLanguage(const QJsonObject& langs);
     void updateBLEKeyboardLayout(const QJsonObject& layouts);
+    void updateBatteryPercent(int battery);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

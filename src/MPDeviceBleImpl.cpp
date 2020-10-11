@@ -662,6 +662,14 @@ void MPDeviceBleImpl::readBatteryPercent(const QByteArray& statusData)
     }
 }
 
+void MPDeviceBleImpl::getBattery()
+{
+    if (m_battery != INVALID_BATTERY)
+    {
+        emit batteryPercentChanged(m_battery);
+    }
+}
+
 void MPDeviceBleImpl::processDebugMsg(const QByteArray &data, bool &isDebugMsg)
 {
     if (isFirstPacket(data))

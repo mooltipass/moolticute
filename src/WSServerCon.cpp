@@ -1212,6 +1212,10 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "get_battery")
+    {
+        mpdevice->getBattery();
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

@@ -124,6 +124,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->labelAboutAuxMCU->setText(tr("Aux MCU version:"));
     ui->labelAboutMainMCU->setText(tr("Main MCU version:"));
 
+    ui->pbBleBattery->setStyleSheet("border: 1px solid black");
+    ui->pbBleBattery->hide();
+
     initHelpLabels();
 
     //Disable this option for now, firmware does not support it
@@ -239,12 +242,18 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::displayAvailableUsers,
             [this](const QString& num)
             {
-                this->ui->lineEdit_AvailableUsers->setText(num);
+                ui->lineEdit_AvailableUsers->setText(num);
             });
     connect(wsClient, &WSClient::connectedChanged, this,
             [this]()
             {
-                this->ui->lineEdit_AvailableUsers->setText("");
+                ui->lineEdit_AvailableUsers->setText("");
+            });
+    connect(wsClient, &WSClient::updateBatteryPercent,
+            [this](int battery)
+            {
+                qCritical() << "Battery: " << battery;
+                ui->pbBleBattery->setValue(battery);
             });
 
 
@@ -1801,12 +1810,18 @@ void MainWindow::onDeviceConnected()
             wsClient->sendInformLocked();
         }
         wsClient->sendUserSettingsRequest();
+        wsClient->sendBatteryRequest();
+        ui->pbBleBattery->show();
     }
     updateDeviceDependentUI();
 }
 
 void MainWindow::onDeviceDisconnected()
 {
+    if (wsClient->isMPBLE())
+    {
+        ui->pbBleBattery->hide();
+    }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");
     ui->lineEdit_dbBackupFilePath->setText("");

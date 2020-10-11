@@ -570,6 +570,14 @@ void MPDevice::removeFileFromCache(QString fileName)
     emit filesCacheChanged();
 }
 
+void MPDevice::getBattery()
+{
+    if (isBLE())
+    {
+        bleImpl->getBattery();
+    }
+}
+
 void MPDevice::resetCommunication()
 {
     jobsQueue.clear();

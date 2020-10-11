@@ -92,6 +92,7 @@ public:
     void readUserSettings(const QByteArray& settings);
     void sendUserSettings();
     void readBatteryPercent(const QByteArray& statusData);
+    void getBattery();
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
     MPBLEFreeAddressProvider& getFreeAddressProvider() { return freeAddressProv; }
@@ -173,7 +174,8 @@ private:
     QJsonObject m_keyboardLayouts;
     MPMiniToBleNodeConverter m_bleNodeConverter;
 
-    int m_battery = -1;
+    static constexpr int INVALID_BATTERY = -1;
+    int m_battery = INVALID_BATTERY;
 
     static int s_LangNum;
     static int s_LayoutNum;
