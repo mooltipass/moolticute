@@ -91,6 +91,8 @@ public:
 
     void readUserSettings(const QByteArray& settings);
     void sendUserSettings();
+    void readBatteryPercent(const QByteArray& statusData);
+    void getBattery();
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
     MPBLEFreeAddressProvider& getFreeAddressProvider() { return freeAddressProv; }
@@ -133,6 +135,7 @@ signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);
     void bleKeyboardLayout(const QJsonObject& layouts);
+    void batteryPercentChanged(int batteryPct);
 
 private slots:
     void handleLongMessageTimeout();
@@ -171,6 +174,9 @@ private:
     QJsonObject m_keyboardLayouts;
     MPMiniToBleNodeConverter m_bleNodeConverter;
 
+    static constexpr int INVALID_BATTERY = -1;
+    int m_battery = INVALID_BATTERY;
+
     static int s_LangNum;
     static int s_LayoutNum;
 
@@ -191,6 +197,8 @@ private:
     const static char ZERO_BYTE = static_cast<char>(0x00);
     const static int BLE_DATA_BLOCK_SIZE = 512;
     const static int FIRST_DATA_STARTING_ADDR = 10;
+    const static int STATUS_MSG_SIZE_WITH_BATTERY = 5;
+    const static int BATTERY_BYTE = 1;
 };
 
 #endif // MPDEVICEBLEIMPL_H

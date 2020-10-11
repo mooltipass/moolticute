@@ -648,6 +648,28 @@ void MPDeviceBleImpl::sendUserSettings()
     emit userSettingsChanged(settingJson);
 }
 
+void MPDeviceBleImpl::readBatteryPercent(const QByteArray& statusData)
+{
+    if (STATUS_MSG_SIZE_WITH_BATTERY == bleProt->getMessageSize(statusData))
+    {
+        int batteryPct = bleProt->getPayloadByteAt(statusData, BATTERY_BYTE);
+        qDebug() << "Battery percent: " << batteryPct;
+        if (batteryPct != m_battery)
+        {
+            m_battery = batteryPct;
+            emit batteryPercentChanged(m_battery);
+        }
+    }
+}
+
+void MPDeviceBleImpl::getBattery()
+{
+    if (m_battery != INVALID_BATTERY)
+    {
+        emit batteryPercentChanged(m_battery);
+    }
+}
+
 void MPDeviceBleImpl::processDebugMsg(const QByteArray &data, bool &isDebugMsg)
 {
     if (isFirstPacket(data))

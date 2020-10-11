@@ -570,6 +570,14 @@ void MPDevice::removeFileFromCache(QString fileName)
     emit filesCacheChanged();
 }
 
+void MPDevice::getBattery()
+{
+    if (isBLE())
+    {
+        bleImpl->getBattery();
+    }
+}
+
 void MPDevice::resetCommunication()
 {
     jobsQueue.clear();
@@ -3566,6 +3574,11 @@ void MPDevice::processStatusChange(const QByteArray &data)
     if (isBLE() && Common::Unlocked == s)
     {
         bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
+    }
+
+    if (isBLE())
+    {
+        bleImpl->readBatteryPercent(data);
     }
 
     /* Trigger on status change */
