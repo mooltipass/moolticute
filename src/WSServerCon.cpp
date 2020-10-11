@@ -555,7 +555,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::userSettingsChanged, this, &WSServerCon::sendUserSettings);
         connect(mpBle, &MPDeviceBleImpl::bleDeviceLanguage, this, &WSServerCon::sendDeviceLanguage);
         connect(mpBle, &MPDeviceBleImpl::bleKeyboardLayout, this, &WSServerCon::sendKeyboardLayout);
-        connect(mpBle, &MPDeviceBleImpl::batteryPercentChanged, this, &WSServerCon::sendBatteryPct);
+        connect(mpBle, &MPDeviceBleImpl::batteryPercentChanged, this, &WSServerCon::sendBatteryPercent);
     }
 }
 
@@ -765,7 +765,7 @@ void WSServerCon::sendUserSettings(QJsonObject settings)
     sendJsonMessage(oroot);
 }
 
-void WSServerCon::sendBatteryPct(int batteryPct)
+void WSServerCon::sendBatteryPercent(int batteryPct)
 {
     QJsonObject oroot = { {"msg", "send_battery"} };
     QJsonObject data;
