@@ -66,6 +66,8 @@ private slots:
 
     void sendHibpNotification(QString credInfo, QString pwnedNum);
     void sendUserSettings(QJsonObject settings);
+
+    void sendBatteryPct(int batteryPct);
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
     bool processSetCredential(QJsonObject &root, QJsonObject &o);

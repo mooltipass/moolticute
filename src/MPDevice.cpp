@@ -3568,6 +3568,11 @@ void MPDevice::processStatusChange(const QByteArray &data)
         bleImpl->readUserSettings(pMesProt->getPayloadBytes(data, 2, 4));
     }
 
+    if (isBLE())
+    {
+        bleImpl->readBatteryPercent(data);
+    }
+
     /* Trigger on status change */
     if (s != prevStatus)
     {
