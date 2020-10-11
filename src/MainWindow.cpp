@@ -252,7 +252,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::updateBatteryPercent,
             [this](int battery)
             {
-                qCritical() << "Battery: " << battery;
                 ui->pbBleBattery->setValue(battery);
             });
 
