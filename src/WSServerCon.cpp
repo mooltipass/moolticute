@@ -531,12 +531,12 @@ void WSServerCon::resetDevice(MPDevice *dev)
         return;
     }
 
+    sendVersion();
     sendJsonMessage({{ "msg", "mp_connected" }});
 
     //Whenever mp status changes, send state update to client
     connect(mpdevice, &MPDevice::statusChanged, this, &WSServerCon::statusChanged);
 
-    sendVersion();
     mpdevice->settings()->connectSendParams(this);
 
     connect(mpdevice, SIGNAL(memMgmtModeChanged(bool)), this, SLOT(sendMemMgmtMode()));
@@ -556,6 +556,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::bleDeviceLanguage, this, &WSServerCon::sendDeviceLanguage);
         connect(mpBle, &MPDeviceBleImpl::bleKeyboardLayout, this, &WSServerCon::sendKeyboardLayout);
         connect(mpBle, &MPDeviceBleImpl::batteryPercentChanged, this, &WSServerCon::sendBatteryPercent);
+        connect(mpBle, &MPDeviceBleImpl::userCategoriesFetched, this, &WSServerCon::sendUserCategories);
     }
 }
 
@@ -762,6 +763,13 @@ void WSServerCon::sendUserSettings(QJsonObject settings)
 {
     QJsonObject oroot = { {"msg", "send_user_settings"} };
     oroot["data"] = settings;
+    sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendUserCategories(QJsonObject categories)
+{
+    QJsonObject oroot = { {"msg", "get_user_categories"} };
+    oroot["data"] = categories;
     sendJsonMessage(oroot);
 }
 

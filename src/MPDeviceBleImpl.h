@@ -136,6 +136,7 @@ signals:
     void bleDeviceLanguage(const QJsonObject& langs);
     void bleKeyboardLayout(const QJsonObject& layouts);
     void batteryPercentChanged(int batteryPct);
+    void userCategoriesFetched(QJsonObject categories);
 
 private slots:
     void handleLongMessageTimeout();
