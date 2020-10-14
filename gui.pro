@@ -26,6 +26,7 @@ SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \
     src/ParseDomain.cpp \
     src/Common.cpp \
+    src/TOTPCredential.cpp \
     src/WSClient.cpp \
     src/RotateSpinner.cpp \
     src/AppGui.cpp \
@@ -74,6 +75,7 @@ HEADERS  += src/MainWindow.h \
     src/ParseDomain.h \
     src/Common.h \
     src/QtHelper.h \
+    src/TOTPCredential.h \
     src/WSClient.h \
     src/RotateSpinner.h \
     src/version.h \
@@ -138,6 +140,7 @@ INCLUDEPATH += src\
     src/zxcvbn-c
 
 FORMS    += src/MainWindow.ui \
+    src/TOTPCredential.ui \
     src/WindowLog.ui \
     src/CredentialsManagement.ui \
     src/FilesManagement.ui \

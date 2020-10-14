@@ -51,6 +51,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonTOTP->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->buttonExit->setText(tr("Exit Credential Management"));
     ui->buttonExit->setStyleSheet(CSS_BLUE_BUTTON);
@@ -1122,6 +1123,7 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
         }
         ui->addCredPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
+        ui->pushButtonTOTP->show();
     }
     else
     {
@@ -1133,6 +1135,7 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
         ui->credDisplayKeyAfterPwdLabel->hide();
         ui->addCredPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
+        ui->pushButtonTOTP->hide();
     }
 }
 
@@ -1205,4 +1208,20 @@ void CredentialsManagement::handleAdvancedModeChange(bool isEnabled)
         ui->credDisplayKeyAfterPwdLabel->hide();
         ui->credDisplayKeyAfterPwdInput->hide();
     }
+}
+
+void CredentialsManagement::on_pushButtonTOTP_clicked()
+{
+    if (m_pTOTPCred)
+    {
+        m_pTOTPCred->show();
+        return;
+    }
+
+    m_pTOTPCred = new TOTPCredential(this);
+    m_pTOTPCred->show();
+    connect(m_pTOTPCred, &WindowLog::destroyed, [this]()
+    {
+        m_pTOTPCred = nullptr;
+    });
 }

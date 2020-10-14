@@ -24,6 +24,7 @@
 
 // Application
 #include "WSClient.h"
+#include "TOTPCredential.h"
 
 namespace Ui {
 class CredentialsManagement;
@@ -90,6 +91,8 @@ private slots:
     void onCategoryEdited(const QString& edited);
     void handleAdvancedModeChange(bool isEnabled);
 
+    void on_pushButtonTOTP_clicked();
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);
@@ -117,6 +120,7 @@ private:
     WSClient *wsClient = nullptr;
     QTimer m_tSelectLoginTimer;
     LoginItem *m_pAddedLoginItem;
+    TOTPCredential *m_pTOTPCred = nullptr;
 
     QMenu m_favMenu;
     QJsonArray m_loadedModelSerialiation;
