@@ -83,6 +83,12 @@ QJsonObject LoginItem::toJson() const
         ret.insert("category", m_iCategory);
         ret.insert("key_after_login", m_iKeyAfterLogin);
         ret.insert("key_after_pwd", m_iKeyAfterPwd);
+        if (m_totpCred.valid)
+        {
+            ret.insert("totp_secret_key", m_totpCred.secretKey);
+            ret.insert("totp_time_step", m_totpCred.timeStep);
+            ret.insert("totp_code_size", m_totpCred.codeSize);
+        }
     }
     return ret;
 }
@@ -105,4 +111,9 @@ bool LoginItem::hasBlankPwdChanged() const
 TreeItem::TreeType LoginItem::treeType() const
 {
     return Login;
+}
+
+void LoginItem::setTOTPCredential(QString secretKey, int timeStep, int codeSize)
+{
+    m_totpCred = TOTPCredential{secretKey, timeStep, codeSize};
 }

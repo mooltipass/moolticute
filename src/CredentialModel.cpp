@@ -298,6 +298,15 @@ void CredentialModel::updateCategories(const QString &cat1, const QString &cat2,
     m_categoryClean = true;
 }
 
+void CredentialModel::setTOTP(const QModelIndex &idx, QString secretKey, int timeStep, int codeSize)
+{
+    LoginItem *pLoginItem = getLoginItemByIndex(idx);
+    if (pLoginItem != nullptr)
+    {
+        pLoginItem->setTOTPCredential(secretKey, timeStep, codeSize);
+    }
+}
+
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat, int iLoginKey, int iPwdKey)
 {
     // Retrieve item

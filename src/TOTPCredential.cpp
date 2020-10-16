@@ -13,3 +13,18 @@ TOTPCredential::~TOTPCredential()
 {
     delete ui;
 }
+
+QString TOTPCredential::getSecretKey() const
+{
+    return ui->lineEditSecretKey->text();
+}
+
+int TOTPCredential::getTimeStep() const
+{
+    return ui->spinBoxTimeStep->value();
+}
+
+int TOTPCredential::getCodeSize() const
+{
+    return ui->spinBoxCodeSize->value();
+}

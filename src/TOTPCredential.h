@@ -14,6 +14,9 @@ class TOTPCredential : public QDialog
 public:
     explicit TOTPCredential(QWidget *parent = nullptr);
     ~TOTPCredential();
+    QString getSecretKey() const;
+    int getTimeStep() const;
+    int getCodeSize() const;
 
 private:
     Ui::TOTPCredential *ui;

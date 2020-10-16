@@ -58,6 +58,7 @@ public:
     void updateCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
     bool isUserCategoryClean() const { return m_categoryClean; }
     void setUserCategoryClean(bool clean) { m_categoryClean = clean; }
+    void setTOTP(const QModelIndex &idx, QString secretKey, int timeStep, int codeSize);
 
 private:
     ServiceItem *addService(const QString &sServiceName);

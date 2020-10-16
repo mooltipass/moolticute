@@ -470,6 +470,22 @@ void CredentialsManagement::saveSelectedCredential()
         saveCredential(currentSelectionIndex);
 }
 
+void CredentialsManagement::saveSelectedTOTP()
+{
+    const QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
+    const QModelIndex currentSelectionIndex = pSelectionModel->currentIndex();
+
+    if (currentSelectionIndex.isValid())
+    {
+        QModelIndex srcIndex = getSourceIndexFromProxyIndex(currentSelectionIndex);
+
+        LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
+        if (pLoginItem != nullptr) {
+            m_pCredModel->setTOTP(srcIndex, m_pTOTPCred->getSecretKey(), m_pTOTPCred->getTimeStep(), m_pTOTPCred->getCodeSize());
+        }
+    }
+}
+
 bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex)
 {   
     if (ui->stackedWidget->currentWidget() != ui->pageUnlocked || !wsClient->get_memMgmtMode())
@@ -1220,8 +1236,16 @@ void CredentialsManagement::on_pushButtonTOTP_clicked()
 
     m_pTOTPCred = new TOTPCredential(this);
     m_pTOTPCred->show();
-    connect(m_pTOTPCred, &WindowLog::destroyed, [this]()
+    connect(m_pTOTPCred, &TOTPCredential::destroyed, [this]()
     {
+        qCritical() << "TOTP Credential is destroyed";
         m_pTOTPCred = nullptr;
+    });
+
+    connect(m_pTOTPCred, &TOTPCredential::accepted, [this]()
+    {
+        qCritical() << "Accepted";
+        qCritical() << m_pTOTPCred->getSecretKey();
+        saveSelectedTOTP();
     });
 }

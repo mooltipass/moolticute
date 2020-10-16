@@ -26,12 +26,33 @@ public:
     bool passwordLocked() const;
     bool hasBlankPwdChanged() const;
     virtual TreeType treeType()  const Q_DECL_OVERRIDE;
+    void setTOTPCredential(QString secretKey, int timeStep, int codeSize);
 private:    
     QByteArray m_bAddress;
     qint8 m_iFavorite;
     QString m_sPassword;
     QString m_sPasswordOrig;
     bool m_bPasswordLocked;
+
+    struct TOTPCredential
+    {
+        QString secretKey;
+        int timeStep;
+        int codeSize;
+        bool valid = false;
+
+        TOTPCredential(QString secretKey, int timeStep, int codeSize):
+            secretKey{secretKey},
+            timeStep{timeStep},
+            codeSize{codeSize},
+            valid{true}
+        {}
+
+        TOTPCredential() = default;
+
+    };
+
+    TOTPCredential m_totpCred;
 };
 
 #endif // LOGINITEM_H

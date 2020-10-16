@@ -57,6 +57,7 @@ private slots:
     void onPasswordUnlocked(const QString &service, const QString &login, const QString &password, bool success);
     void onCredentialUpdated(const QString &service, const QString &login, const QString &description, bool success);
     void saveSelectedCredential();
+    void saveSelectedTOTP();
     void on_pushButtonEnterMMM_clicked();
     void on_buttonDiscard_pressed();
     void onButtonDiscard_confirmed();
