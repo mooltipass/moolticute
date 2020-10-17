@@ -28,3 +28,10 @@ int TOTPCredential::getCodeSize() const
 {
     return ui->spinBoxCodeSize->value();
 }
+
+void TOTPCredential::clearFields()
+{
+    ui->lineEditSecretKey->clear();
+    ui->spinBoxTimeStep->setValue(DEFAULT_TIME_STEP);
+    ui->spinBoxCodeSize->setValue(DEFAULT_CODE_SIZE);
+}

@@ -18,8 +18,14 @@ public:
     int getTimeStep() const;
     int getCodeSize() const;
 
+public slots:
+    void clearFields();
+
 private:
     Ui::TOTPCredential *ui;
+
+    static constexpr int DEFAULT_TIME_STEP = 30;
+    static constexpr int DEFAULT_CODE_SIZE = 6;
 };
 
 #endif // TOTPCREDENTIAL_H
