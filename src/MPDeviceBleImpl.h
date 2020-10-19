@@ -88,6 +88,9 @@ public:
     void setUserCategories(const QJsonObject &categories, const MessageHandlerCbData &cb);
     void fillGetCategory(const QByteArray& data, QJsonObject &categories);
     QByteArray createUserCategoriesMsg(const QJsonObject &categories);
+    void createTOTPCredMessage(const QString& service, const QString& login, const QJsonObject& totp);
+    bool storeTOTPCreds();
+    void clearTOTPCredArray() { mmmTOTPStoreArray.clear(); }
 
     void readUserSettings(const QByteArray& settings);
     void sendUserSettings();
@@ -173,6 +176,7 @@ private:
     QJsonObject m_deviceLanguages;
     QJsonObject m_keyboardLayouts;
     MPMiniToBleNodeConverter m_bleNodeConverter;
+    QList<QByteArray> mmmTOTPStoreArray;
 
     static constexpr int INVALID_BATTERY = -1;
     int m_battery = INVALID_BATTERY;
@@ -199,6 +203,7 @@ private:
     const static int FIRST_DATA_STARTING_ADDR = 10;
     const static int STATUS_MSG_SIZE_WITH_BATTERY = 5;
     const static int BATTERY_BYTE = 1;
+    const static int SECRET_KEY_LENGTH = 32;
 };
 
 #endif // MPDEVICEBLEIMPL_H

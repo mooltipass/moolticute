@@ -6717,7 +6717,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         QJsonObject qjobject = creds[i].toObject();
 
         /* Check format */
-        if (qjobject.size() != pMesProt->getCredentialPackageSize())
+        bool isTotpCred = isBLE() && (MessageProtocolBLE::TOTP_PACKAGE_SIZE == qjobject.size());
+        if (qjobject.size() != pMesProt->getCredentialPackageSize() && !isTotpCred)
         {
             qCritical() << "Unknown JSON return format:" << qjobject;
             cb(false, "Wrong JSON formated credential list");
@@ -6741,6 +6742,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 category = qjobject["category"].toInt();
                 keyAfterLogin = qjobject["key_after_login"].toInt();
                 keyAfterPwd = qjobject["key_after_pwd"].toInt();
+                if (isTotpCred)
+                {
+                    bleImpl->createTOTPCredMessage(service, login, qjobject["totp"].toObject());
+                }
             }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
@@ -7025,6 +7030,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     /* Generate save passwords */
     if (!packet_send_needed)
     {
+        if (isBLE() && bleImpl->storeTOTPCreds())
+        {
+            runAndDequeueJobs();
+        }
         qInfo() << "No changes detected";
         cb(true, "No Changes Required");
         exitMemMgmtMode(true);
@@ -7078,6 +7087,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         connect(mergeOperations, &AsyncJobs::finished, [this, cb, cbProgress, isCsv, onlyChangePwd](const QByteArray &data)
         {
             Q_UNUSED(data);
+
+            if (isBLE())
+            {
+                bleImpl->storeTOTPCreds();
+            }
 
             if (mmmPasswordChangeArray.isEmpty() &&
                     mmmPasswordChangeNewAddrArray.isEmpty() &&
@@ -7210,6 +7224,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 mmmPasswordChangeArray.clear();
                 mmmPasswordChangeNewAddrArray.clear();
                 mmmPasswordChangeExistingAddrArray.clear();
+                if (isBLE())
+                {
+                    bleImpl->clearTOTPCredArray();
+                }
             });
 
             connect(pwdChangeJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
@@ -7218,6 +7236,10 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 mmmPasswordChangeArray.clear();
                 mmmPasswordChangeNewAddrArray.clear();
                 mmmPasswordChangeExistingAddrArray.clear();
+                if (isBLE())
+                {
+                    bleImpl->clearTOTPCredArray();
+                }
                 qCritical() << "Couldn't change passwords";
                 cb(false, "Please Approve Password Changes On The Device");
             });
