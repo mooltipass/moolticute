@@ -4,6 +4,7 @@
 #include "MPNodeBLE.h"
 #include "AppDaemon.h"
 #include "DeviceSettingsBLE.h"
+#include "Base32.h"
 
 int MPDeviceBleImpl::s_LangNum = 0;
 int MPDeviceBleImpl::s_LayoutNum = 0;
@@ -623,7 +624,7 @@ QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categorie
 void MPDeviceBleImpl::createTOTPCredMessage(const QString &service, const QString &login, const QJsonObject &totp)
 {
     QByteArray data;
-    QString secretKey = totp["totp_secret_key"].toString();
+    QString secretKey = Base32::decode(totp["totp_secret_key"].toString());
     int timeStep = totp["totp_time_step"].toInt();
     int codeSize = totp["totp_code_size"].toInt();
 

@@ -11,7 +11,7 @@ CONFIG -= app_bundle
 
 CONFIG += c++11
 
-INCLUDEPATH += $$PWD/src $$PWD/src/MessageProtocol $$PWD/src/Mooltipass $$PWD/src/Settings
+INCLUDEPATH += $$PWD/src $$PWD/src/MessageProtocol $$PWD/src/Mooltipass $$PWD/src/Settings $$PWD/src/CyoEncode
 
 win32 {
     LIBS += -lsetupapi -luser32
@@ -56,6 +56,9 @@ mac {
 }
 
 SOURCES += src/main_daemon.cpp \
+    src/CyoEncode/Base32.cpp \
+    src/CyoEncode/CyoDecode.c \
+    src/CyoEncode/CyoEncode.c \
     src/MPDevice.cpp \
     src/MPDevice_localSocket.cpp \
     src/MPManager.cpp \
@@ -89,6 +92,11 @@ SOURCES += src/main_daemon.cpp \
 
 HEADERS  += \
     src/Common.h \
+    src/CyoEncode/Base32.h \
+    src/CyoEncode/CyoDecode.h \
+    src/CyoEncode/CyoDecode.hpp \
+    src/CyoEncode/CyoEncode.h \
+    src/CyoEncode/CyoEncode.hpp \
     src/MPDevice.h \
     src/MPDevice_localSocket.h \
     src/MPManager.h \
