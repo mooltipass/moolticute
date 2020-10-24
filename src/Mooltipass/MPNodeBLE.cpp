@@ -212,3 +212,15 @@ void MPNodeBLE::setPwdBlankFlag()
         data[PWD_BLANK_FLAG] = static_cast<char>(BLANK_CHAR);
     }
 }
+
+int MPNodeBLE::getTOTPTimeStep() const
+{
+    if (!isValid()) return 0;
+    return data[TOTP_TIME_STEP];
+}
+
+int MPNodeBLE::getTOTPCodeSize() const
+{
+    if (!isValid()) return 0;
+    return data[TOTP_CODE_SIZE];
+}

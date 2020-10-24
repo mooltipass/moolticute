@@ -447,6 +447,8 @@ QJsonObject MPNode::toJson() const
             obj["key_after_login"] = QString::number(bleNode->getKeyAfterLogin());
             obj["key_after_pwd"] = QString::number(bleNode->getKeyAfterPwd());
             obj["pwd_blank_flag"] = QString::number(bleNode->getPwdBlankFlag());
+            obj["totp_time_step"] = QString::number(bleNode->getTOTPTimeStep());
+            obj["totp_code_size"] = QString::number(bleNode->getTOTPCodeSize());
         }
     }
     else if (getType() == NodeChildData)
