@@ -30,9 +30,19 @@ int TOTPCredential::getTimeStep() const
     return ui->spinBoxTimeStep->value();
 }
 
+void TOTPCredential::setTimeStep(int timeStep)
+{
+    ui->spinBoxTimeStep->setValue(timeStep);
+}
+
 int TOTPCredential::getCodeSize() const
 {
     return ui->spinBoxCodeSize->value();
+}
+
+void TOTPCredential::setCodeSize(int codeSize)
+{
+    ui->spinBoxCodeSize->setValue(codeSize);
 }
 
 void TOTPCredential::clearFields()

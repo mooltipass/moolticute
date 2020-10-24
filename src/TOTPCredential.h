@@ -16,7 +16,9 @@ public:
     ~TOTPCredential();
     QString getSecretKey() const;
     int getTimeStep() const;
+    void setTimeStep(int timeStep);
     int getCodeSize() const;
+    void setCodeSize(int codeSize);
 
 public slots:
     void clearFields();

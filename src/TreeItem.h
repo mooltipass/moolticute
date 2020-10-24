@@ -35,6 +35,10 @@ public:
     void setkeyAfterPwd(int key);
     int pwdBlankFlag() const;
     void setPwdBlankFlag(int flag);
+    int totpTimeStep() const;
+    void setTotpTimeStep(int timeStep);
+    int totpCodeSize() const;
+    void setTotpCodeSize(int codeSize);
     TreeItem *child(int iIndex);
     const QVector<TreeItem *> &childs() const;
     int childCount() const;
@@ -65,6 +69,8 @@ protected:
     int m_iKeyAfterLogin = 0xFFFF;
     int m_iKeyAfterPwd = 0xFFFF;
     int m_iPwdBlankFlag = 0;
+    int m_iTOTPTimeStep = 0;
+    int m_iTOTPCodeSize = 0;
 };
 
 #endif // TREEITEM_H

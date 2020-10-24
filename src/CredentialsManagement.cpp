@@ -113,6 +113,10 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     initKeyAfterInput(ui->credDisplayKeyAfterLoginInput);
     initKeyAfterInput(ui->credDisplayKeyAfterPwdInput);
 
+    m_pTOTPCred = new TOTPCredential(this);
+    connect(m_pTOTPCred, &TOTPCredential::accepted, this, &CredentialsManagement::saveSelectedTOTP);
+    connect(this, &CredentialsManagement::loginSelected, m_pTOTPCred, &TOTPCredential::clearFields);
+
     connect(m_pCredModel, &CredentialModel::modelReset, this, &CredentialsManagement::updateFavMenu);
     connect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::updateFavMenu);
 
@@ -869,6 +873,16 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
                 ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
                 auto keyAfterPwdIdx = ui->credDisplayKeyAfterPwdInput->findData(pLoginItem->keyAfterPwd());
                 ui->credDisplayKeyAfterPwdInput->setCurrentIndex(keyAfterPwdIdx);
+                if (pLoginItem->totpTimeStep() != 0)
+                {
+                    m_pTOTPCred->setTimeStep(pLoginItem->totpTimeStep());
+                    m_pTOTPCred->setCodeSize(pLoginItem->totpCodeSize());
+                    ui->pushButtonTOTP->setText(tr("View TOTP Credential"));
+                }
+                else
+                {
+                    ui->pushButtonTOTP->setText(tr("Setup TOTP Credential"));
+                }
             }
         }
     }
@@ -1234,10 +1248,4 @@ void CredentialsManagement::on_pushButtonTOTP_clicked()
         m_pTOTPCred->show();
         return;
     }
-
-    m_pTOTPCred = new TOTPCredential(this);
-    m_pTOTPCred->show();
-
-    connect(m_pTOTPCred, &TOTPCredential::accepted, this, &CredentialsManagement::saveSelectedTOTP);
-    connect(this, &CredentialsManagement::loginSelected, m_pTOTPCred, &TOTPCredential::clearFields);
 }

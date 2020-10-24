@@ -224,6 +224,11 @@ void CredentialModel::load(const QJsonArray &json)
                 pLoginItem->setkeyAfterLogin(cnode["key_after_login"].toVariant().toInt());
                 pLoginItem->setkeyAfterPwd(cnode["key_after_pwd"].toVariant().toInt());
                 pLoginItem->setPwdBlankFlag(cnode["pwd_blank_flag"].toVariant().toInt());
+                if (cnode.contains("totp_time_step"))
+                {
+                    pLoginItem->setTotpTimeStep(cnode["totp_time_step"].toVariant().toInt());
+                    pLoginItem->setTotpCodeSize(cnode["totp_code_size"].toVariant().toInt());
+                }
             }
 
             QJsonArray a = cnode["address"].toArray();

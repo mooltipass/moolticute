@@ -145,6 +145,26 @@ void TreeItem::setPwdBlankFlag(int flag)
     m_iPwdBlankFlag = flag;
 }
 
+int TreeItem::totpTimeStep() const
+{
+    return m_iTOTPTimeStep;
+}
+
+void TreeItem::setTotpTimeStep(int timeStep)
+{
+    m_iTOTPTimeStep = timeStep;
+}
+
+int TreeItem::totpCodeSize() const
+{
+    return m_iTOTPCodeSize;
+}
+
+void TreeItem::setTotpCodeSize(int codeSize)
+{
+    m_iTOTPCodeSize = codeSize;
+}
+
 const QVector<TreeItem *> &TreeItem::childs() const
 {
     return m_vChilds;
