@@ -73,6 +73,12 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->toolButtonEditService->setIcon(AppGui::qtAwesome()->icon(fa::edit));
     ui->toolButtonEditService->setToolTip(tr("Edit Service Name"));
 
+    ui->toolButtonTOTPService->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->toolButtonTOTPService->setIcon(AppGui::qtAwesome()->icon(fa::clocko));
+    ui->toolButtonTOTPService->setToolTip(tr("There is a TOTP Credential for the service"));
+    ui->toolButtonTOTPService->setEnabled(false);
+    ui->toolButtonTOTPService->hide();
+
     ui->label_UserCategories->setText(tr("Set user categories"));
     ui->labelCategory1->setText(tr("Category 1:"));
     ui->labelCategory2->setText(tr("Category 2:"));
@@ -878,10 +884,12 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
                     m_pTOTPCred->setTimeStep(pLoginItem->totpTimeStep());
                     m_pTOTPCred->setCodeSize(pLoginItem->totpCodeSize());
                     ui->pushButtonTOTP->setText(tr("View TOTP Credential"));
+                    ui->toolButtonTOTPService->show();
                 }
                 else
                 {
                     ui->pushButtonTOTP->setText(tr("Setup TOTP Credential"));
+                    ui->toolButtonTOTPService->hide();
                 }
             }
         }
