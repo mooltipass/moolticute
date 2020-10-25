@@ -1245,13 +1245,16 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
             byteCounter = BUNBLE_DATA_ADDRESS_SIZE;
         }
     }
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, message,
-                  [](const QByteArray &data, bool &) -> bool
-                      {
-                          Q_UNUSED(data);
-                          qDebug() << "Sending bundle is DONE";
-                          return true;
-                      }));
+    if (byteCounter != BUNBLE_DATA_ADDRESS_SIZE)
+    {
+        jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, message,
+                      [](const QByteArray &data, bool &) -> bool
+                          {
+                              Q_UNUSED(data);
+                              qDebug() << "Sending bundle is DONE";
+                              return true;
+                          }));
+    }
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_REINDEX_BUNDLE, bleProt->getDefaultFuncDone()));
 }
