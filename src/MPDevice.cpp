@@ -3496,7 +3496,7 @@ void MPDevice::setCurrentDate()
                                   [this](const QByteArray &, QByteArray &data_to_send) -> bool
     {
         data_to_send.clear();
-        data_to_send.append(pMesProt->convertDate(QDateTime::currentDateTime()));
+        data_to_send.append(pMesProt->convertDate(QDateTime::currentDateTimeUtc()));
 
         qDebug() << "Sending current date: " << data_to_send.toHex();
 
