@@ -4,6 +4,7 @@
 #include "MPNodeBLE.h"
 #include "AppDaemon.h"
 #include "DeviceSettingsBLE.h"
+#include "Base32.h"
 
 int MPDeviceBleImpl::s_LangNum = 0;
 int MPDeviceBleImpl::s_LayoutNum = 0;
@@ -618,6 +619,68 @@ QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categorie
         data.append(categoryArr);
     }
     return data;
+}
+
+void MPDeviceBleImpl::createTOTPCredMessage(const QString &service, const QString &login, const QJsonObject &totp)
+{
+    QByteArray data;
+    QString secretKey = Base32::decode(totp["totp_secret_key"].toString());
+    int timeStep = totp["totp_time_step"].toInt();
+    int codeSize = totp["totp_code_size"].toInt();
+
+    // 0->251 Service name
+    QByteArray serviceArr = bleProt->toByteArray(service);
+    Common::fill(serviceArr, MPNodeBLE::SERVICE_LENGTH - serviceArr.size(), ZERO_BYTE);
+    data.append(serviceArr);
+    // 252->379 Login name
+    QByteArray loginArr = bleProt->toByteArray(login);
+    Common::fill(loginArr, MPNodeBLE::LOGIN_LENGTH - loginArr.size(), ZERO_BYTE);
+    data.append(loginArr);
+    // 380->411 TOTP secret key
+    QByteArray secKeyArr;
+    secKeyArr.append(secretKey);
+    Common::fill(secKeyArr, SECRET_KEY_LENGTH - secKeyArr.size(), ZERO_BYTE);
+    data.append(secKeyArr);
+    // 412 TOTP secret key length
+    data.append(secretKey.size());
+    // 413 TOTP number of digits
+    data.append(codeSize);
+    // 414 TOTP time step
+    data.append(timeStep);
+    // 415 TOTP SHA version
+    data.append(ZERO_BYTE);
+
+    mmmTOTPStoreArray.append(data);
+}
+
+bool MPDeviceBleImpl::storeTOTPCreds()
+{
+    if (mmmTOTPStoreArray.isEmpty())
+    {
+        return false;
+    }
+    AsyncJobs *totpStoreJob = new AsyncJobs("Storing TOTP Credentials...", this);
+    for (QByteArray& totpMsg : mmmTOTPStoreArray)
+    {
+        totpStoreJob->append(new MPCommandJob(mpDev, MPCmd::STORE_TOTP_CRED,
+                                      totpMsg,
+                                      [this](const QByteArray &data, bool &) -> bool
+        {
+            if (bleProt->getFirstPayloadByte(data) == MSG_FAILED)
+            {
+                mpDev->currentJobs->setCurrentJobError("store_totp_cred failed on device");
+                qWarning() << "Failed to set TOTP Credential";
+                return false;
+            }
+            else
+            {
+                qDebug() << "Stored TOTP Credential succesfully";
+                return true;
+            }
+        }));
+    }
+    mpDev->jobsQueue.enqueue(totpStoreJob);
+    return true;
 }
 
 void MPDeviceBleImpl::readUserSettings(const QByteArray& settings)

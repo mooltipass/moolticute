@@ -306,6 +306,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::ADD_DATA_SERVICE      , 0x0021},
         {MPCmd::WRITE_DATA_FILE       , 0x0022},
         {MPCmd::READ_DATA_FILE        , 0x0023},
+        {MPCmd::STORE_TOTP_CRED       , 0x0027},
         {MPCmd::GET_CUR_CARD_CPZ      , 0x000B},
         {MPCmd::CANCEL_USER_REQUEST   , 0x0005},
         {MPCmd::PLEASE_RETRY          , 0x0002},

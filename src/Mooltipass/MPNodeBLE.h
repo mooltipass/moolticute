@@ -38,17 +38,20 @@ public:
     int getPwdBlankFlag() const;
     void setPwdBlankFlag();
 
+    int getTOTPTimeStep() const;
+    int getTOTPCodeSize() const;
+
     static constexpr int PARENT_NODE_LENGTH = 264;
     static constexpr int CHILD_NODE_LENGTH = 528;
+    static constexpr int SERVICE_LENGTH = 252;
+    static constexpr int LOGIN_LENGTH = 128;
 
 protected:
-    static constexpr int SERVICE_LENGTH = 252;
     static constexpr int CTR_DATA_ADDR_START = 261;
     static constexpr int CTR_ADDR_START = 395;
     static constexpr int DESC_ADDR_START = 140;
     static constexpr int DESC_LENGTH = 48;
     static constexpr int LOGIN_ADDR_START = 12;
-    static constexpr int LOGIN_LENGTH = 128;
     static constexpr int PWD_ENC_ADDR_START = 266;
     static constexpr int PWD_ENC_LENGTH = 128;
     static constexpr int DATE_CREATED_ADDR_START = 8;
@@ -56,6 +59,8 @@ protected:
     static constexpr int KEY_AFTER_LOGIN_ADDR_START = 260;
     static constexpr int KEY_AFTER_PWD_ADDR_START = 262;
     static constexpr int PWD_BLANK_FLAG = 266;
+    static constexpr int TOTP_TIME_STEP = 434;
+    static constexpr int TOTP_CODE_SIZE = 436;
     static constexpr int KEY_AFTER_LENGTH = 2;
     static constexpr char BLANK_CHAR = 0x01;
 };

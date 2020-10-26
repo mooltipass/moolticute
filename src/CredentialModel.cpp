@@ -224,6 +224,11 @@ void CredentialModel::load(const QJsonArray &json)
                 pLoginItem->setkeyAfterLogin(cnode["key_after_login"].toVariant().toInt());
                 pLoginItem->setkeyAfterPwd(cnode["key_after_pwd"].toVariant().toInt());
                 pLoginItem->setPwdBlankFlag(cnode["pwd_blank_flag"].toVariant().toInt());
+                if (cnode.contains("totp_time_step"))
+                {
+                    pLoginItem->setTotpTimeStep(cnode["totp_time_step"].toVariant().toInt());
+                    pLoginItem->setTotpCodeSize(cnode["totp_code_size"].toVariant().toInt());
+                }
             }
 
             QJsonArray a = cnode["address"].toArray();
@@ -296,6 +301,15 @@ void CredentialModel::updateCategories(const QString &cat1, const QString &cat2,
     m_categories[3] = cat3;
     m_categories[4] = cat4;
     m_categoryClean = true;
+}
+
+void CredentialModel::setTOTP(const QModelIndex &idx, QString secretKey, int timeStep, int codeSize)
+{
+    LoginItem *pLoginItem = getLoginItemByIndex(idx);
+    if (pLoginItem != nullptr)
+    {
+        pLoginItem->setTOTPCredential(secretKey, timeStep, codeSize);
+    }
 }
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat, int iLoginKey, int iPwdKey)

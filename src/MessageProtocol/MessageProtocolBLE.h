@@ -56,6 +56,8 @@ public:
 
     QByteArray getCpzValue(const QByteArray &cpzCtr) const override { return cpzCtr.mid(CPZ_START, CPZ_LENGTH); }
 
+    static constexpr uint TOTP_PACKAGE_SIZE = 10;
+
 private:
     virtual void fillCommandMapping() override;
     int getStartingPayloadPosition(const QByteArray &data) const;

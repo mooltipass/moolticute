@@ -51,6 +51,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->buttonSaveChanges->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonTOTP->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->buttonExit->setText(tr("Exit Credential Management"));
     ui->buttonExit->setStyleSheet(CSS_BLUE_BUTTON);
@@ -71,6 +72,12 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->toolButtonEditService->setStyleSheet(CSS_BLUE_BUTTON);
     ui->toolButtonEditService->setIcon(AppGui::qtAwesome()->icon(fa::edit));
     ui->toolButtonEditService->setToolTip(tr("Edit Service Name"));
+
+    ui->toolButtonTOTPService->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->toolButtonTOTPService->setIcon(AppGui::qtAwesome()->icon(fa::clocko));
+    ui->toolButtonTOTPService->setToolTip(tr("There is a TOTP Credential for the service"));
+    ui->toolButtonTOTPService->setEnabled(false);
+    ui->toolButtonTOTPService->hide();
 
     ui->label_UserCategories->setText(tr("Set user categories"));
     ui->labelCategory1->setText(tr("Category 1:"));
@@ -111,6 +118,10 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     initKeyAfterInput(ui->credDisplayKeyAfterLoginInput);
     initKeyAfterInput(ui->credDisplayKeyAfterPwdInput);
+
+    m_pTOTPCred = new TOTPCredential(this);
+    connect(m_pTOTPCred, &TOTPCredential::accepted, this, &CredentialsManagement::saveSelectedTOTP);
+    connect(this, &CredentialsManagement::loginSelected, m_pTOTPCred, &TOTPCredential::clearFields);
 
     connect(m_pCredModel, &CredentialModel::modelReset, this, &CredentialsManagement::updateFavMenu);
     connect(m_pCredModel, &CredentialModel::dataChanged, this, &CredentialsManagement::updateFavMenu);
@@ -467,6 +478,23 @@ void CredentialsManagement::saveSelectedCredential()
 
     if (currentSelectionIndex.isValid())
         saveCredential(currentSelectionIndex);
+}
+
+void CredentialsManagement::saveSelectedTOTP()
+{
+    const QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
+    const QModelIndex currentSelectionIndex = pSelectionModel->currentIndex();
+
+    if (currentSelectionIndex.isValid())
+    {
+        QModelIndex srcIndex = getSourceIndexFromProxyIndex(currentSelectionIndex);
+
+        LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
+        if (pLoginItem != nullptr) {
+            m_pCredModel->setTOTP(srcIndex, m_pTOTPCred->getSecretKey(), m_pTOTPCred->getTimeStep(), m_pTOTPCred->getCodeSize());
+            credentialDataChanged();
+        }
+    }
 }
 
 bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex)
@@ -851,6 +879,18 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
                 ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
                 auto keyAfterPwdIdx = ui->credDisplayKeyAfterPwdInput->findData(pLoginItem->keyAfterPwd());
                 ui->credDisplayKeyAfterPwdInput->setCurrentIndex(keyAfterPwdIdx);
+                if (pLoginItem->totpTimeStep() != 0)
+                {
+                    m_pTOTPCred->setTimeStep(pLoginItem->totpTimeStep());
+                    m_pTOTPCred->setCodeSize(pLoginItem->totpCodeSize());
+                    ui->pushButtonTOTP->setText(tr("View TOTP Credential"));
+                    ui->toolButtonTOTPService->show();
+                }
+                else
+                {
+                    ui->pushButtonTOTP->setText(tr("Setup TOTP Credential"));
+                    ui->toolButtonTOTPService->hide();
+                }
             }
         }
     }
@@ -1122,6 +1162,7 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
         }
         ui->addCredPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
+        ui->pushButtonTOTP->show();
     }
     else
     {
@@ -1133,6 +1174,7 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
         ui->credDisplayKeyAfterPwdLabel->hide();
         ui->addCredPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
+        ui->pushButtonTOTP->hide();
     }
 }
 
@@ -1204,5 +1246,14 @@ void CredentialsManagement::handleAdvancedModeChange(bool isEnabled)
         ui->credDisplayKeyAfterLoginInput->hide();
         ui->credDisplayKeyAfterPwdLabel->hide();
         ui->credDisplayKeyAfterPwdInput->hide();
+    }
+}
+
+void CredentialsManagement::on_pushButtonTOTP_clicked()
+{
+    if (m_pTOTPCred)
+    {
+        m_pTOTPCred->show();
+        return;
     }
 }
