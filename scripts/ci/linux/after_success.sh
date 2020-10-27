@@ -18,6 +18,7 @@ docker exec mc-deb bash /scripts/build_source.sh $VERSION bionic
 docker exec mc-deb bash /scripts/build_source.sh $VERSION disco
 docker exec mc-deb bash /scripts/build_source.sh $VERSION eoan
 docker exec mc-deb bash /scripts/build_source.sh $VERSION focal
+docker exec mc-deb bash /scripts/build_source.sh $VERSION groovy
 
 #windows and appimage
 docker exec appimgbuilder bash /scripts/package.sh
