@@ -66,6 +66,7 @@ private slots:
 
     void sendHibpNotification(QString credInfo, QString pwnedNum);
     void sendUserSettings(QJsonObject settings);
+    void sendUserCategories(QJsonObject categories);
 
     void sendBatteryPercent(int batteryPct);
 private:

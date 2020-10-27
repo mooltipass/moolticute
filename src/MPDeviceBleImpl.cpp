@@ -604,6 +604,7 @@ void MPDeviceBleImpl::fetchCategories()
                              {
                                 QJsonObject ores;
                                 fillGetCategory(data, ores);
+                                emit userCategoriesFetched(ores);
                              }
                          });
     }
