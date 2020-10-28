@@ -1087,7 +1087,7 @@ void MPDeviceBleImpl::fillAddUnknownCard(const QJsonArray &dataArray)
 
 void MPDeviceBleImpl::addUserIdPlaceholder(QByteArray &array)
 {
-    array.append(2, ZERO_BYTE);
+    Common::fill(array, 2, ZERO_BYTE);
 }
 
 void MPDeviceBleImpl::fillMiniExportPayload(QByteArray &unknownCardPayload)
