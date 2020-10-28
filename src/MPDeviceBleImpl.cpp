@@ -1111,6 +1111,7 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
     // 4B Set to 0
     const int BYTES_TO_ZERO_SIZE = 4;
     packet.append(BYTES_TO_ZERO_SIZE, ZERO_BYTE);
+    Common::fill(packet, BYTES_TO_ZERO_SIZE, ZERO_BYTE);
 
     auto& currentDataNode = mpDev->currentDataNode;
     const auto currentNodeSize = currentDataNode.size();
@@ -1133,7 +1134,7 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
     packet.append(firstChunkData);
 
     // 4B Set to 0
-    packet.append(BYTES_TO_ZERO_SIZE, ZERO_BYTE);
+    Common::fill(packet, BYTES_TO_ZERO_SIZE, ZERO_BYTE);
 
     // Second (up to) 256B of data to store
     QByteArray secondChunkData = currentDataNode.mid(current + BLE_DATA_BLOCK_SIZE/2, BLE_DATA_BLOCK_SIZE/2);
