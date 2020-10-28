@@ -1110,7 +1110,6 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
     QByteArray packet;
     // 4B Set to 0
     const int BYTES_TO_ZERO_SIZE = 4;
-    packet.append(BYTES_TO_ZERO_SIZE, ZERO_BYTE);
     Common::fill(packet, BYTES_TO_ZERO_SIZE, ZERO_BYTE);
 
     auto& currentDataNode = mpDev->currentDataNode;
