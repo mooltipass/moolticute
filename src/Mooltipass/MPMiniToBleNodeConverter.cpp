@@ -1,4 +1,5 @@
 #include "MPMiniToBleNodeConverter.h"
+#include "Common.h"
 
 MPMiniToBleNodeConverter::MPMiniToBleNodeConverter()
 {
@@ -45,7 +46,7 @@ QByteArray MPMiniToBleNodeConverter::convertMiniChildNodeToBle(const QByteArray 
     QByteArray bleArray = dataArray.left(CHILD_ADDRESSES);
     bleArray[0] = dataArray[0]|(1<<ASCII_FLAG); // Setting ascii flag for child node
     // Pointed to child
-    bleArray.append(2, ZERO_BYTE);
+    Common::fill(bleArray, 2, ZERO_BYTE);
     // Last modified/used day
     bleArray.append(dataArray.mid(MINI_DATES_START_BYTE, DATES_SIZE));
     // Convert login to ascii
@@ -55,7 +56,7 @@ QByteArray MPMiniToBleNodeConverter::convertMiniChildNodeToBle(const QByteArray 
         bleArray.append(ZERO_BYTE);
     }
     // Fill remaining login
-    bleArray.append(2, ZERO_BYTE);
+    Common::fill(bleArray, 2, ZERO_BYTE);
     // Convert description to ascii
     for (int i = CHILD_ADDRESSES; i < MINI_DESC_LAST_BYTE; ++i)
     {
@@ -79,7 +80,7 @@ QByteArray MPMiniToBleNodeConverter::convertMiniChildNodeToBle(const QByteArray 
     const quint16 REMAINING_PASSWORD_SIZE = 96;
     bleArray.append(REMAINING_PASSWORD_SIZE, ZERO_BYTE);
     // password terminating 0
-    bleArray.append(2, ZERO_BYTE);
+    Common::fill(bleArray, 2, ZERO_BYTE);
     // TBD
     const quint16 TBD_SIZE = 128;
     bleArray.append(TBD_SIZE, ZERO_BYTE);

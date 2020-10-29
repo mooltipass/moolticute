@@ -3303,7 +3303,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             if (isBLE())
             {
                 const auto ZERO_BYTE = static_cast<char>(0);
-                startData.append(2, ZERO_BYTE);
+                Common::fill(startData, 2, ZERO_BYTE);
             }
             startData.append(startDataNode);
             jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startData, pMesProt->getDefaultFuncDone()));
