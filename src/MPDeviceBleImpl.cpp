@@ -680,6 +680,20 @@ bool MPDeviceBleImpl::storeTOTPCreds()
             }
         }));
     }
+
+    connect(totpStoreJob, &AsyncJobs::finished, [this](const QByteArray &)
+    {
+        qInfo() << "TOTP Credentials added!";
+        mmmTOTPStoreArray.clear();
+    });
+
+    connect(totpStoreJob, &AsyncJobs::failed, [this](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob)
+        mmmTOTPStoreArray.clear();
+        qCritical() << "Couldn't change setup/update TOTP Credential";
+    });
+
     mpDev->jobsQueue.enqueue(totpStoreJob);
     return true;
 }
