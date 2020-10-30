@@ -7224,10 +7224,6 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 mmmPasswordChangeArray.clear();
                 mmmPasswordChangeNewAddrArray.clear();
                 mmmPasswordChangeExistingAddrArray.clear();
-                if (isBLE())
-                {
-                    bleImpl->clearTOTPCredArray();
-                }
             });
 
             connect(pwdChangeJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
@@ -7236,10 +7232,6 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 mmmPasswordChangeArray.clear();
                 mmmPasswordChangeNewAddrArray.clear();
                 mmmPasswordChangeExistingAddrArray.clear();
-                if (isBLE())
-                {
-                    bleImpl->clearTOTPCredArray();
-                }
                 qCritical() << "Couldn't change passwords";
                 cb(false, "Please Approve Password Changes On The Device");
             });

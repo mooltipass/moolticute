@@ -20,6 +20,8 @@ public:
     int getCodeSize() const;
     void setCodeSize(int codeSize);
 
+    bool validateInput();
+
 public slots:
     void clearFields();
 
@@ -32,6 +34,7 @@ private:
     static constexpr int DEFAULT_TIME_STEP = 30;
     static constexpr int DEFAULT_CODE_SIZE = 6;
     static const QString BASE32_REGEXP;
+    static const QString BASE32_CHAR_REGEXP;
 };
 
 #endif // TOTPCREDENTIAL_H

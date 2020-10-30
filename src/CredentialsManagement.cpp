@@ -482,6 +482,10 @@ void CredentialsManagement::saveSelectedCredential()
 
 void CredentialsManagement::saveSelectedTOTP()
 {
+    if (!m_pTOTPCred->validateInput())
+    {
+        return;
+    }
     const QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
     const QModelIndex currentSelectionIndex = pSelectionModel->currentIndex();
 

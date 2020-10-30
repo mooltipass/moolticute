@@ -90,7 +90,6 @@ public:
     QByteArray createUserCategoriesMsg(const QJsonObject &categories);
     void createTOTPCredMessage(const QString& service, const QString& login, const QJsonObject& totp);
     bool storeTOTPCreds();
-    void clearTOTPCredArray() { mmmTOTPStoreArray.clear(); }
 
     void readUserSettings(const QByteArray& settings);
     void sendUserSettings();
