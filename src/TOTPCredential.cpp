@@ -52,7 +52,7 @@ bool TOTPCredential::validateInput()
     if (!getSecretKey().contains(QRegExp(BASE32_REGEXP)))
     {
         QMessageBox::warning(this, tr("Invalid Secret Key"), tr("The entered Secret Key is not a valid Base32 string"));
-        clearFields();
+        ui->lineEditSecretKey->clear();
         return false;
     }
     return true;
