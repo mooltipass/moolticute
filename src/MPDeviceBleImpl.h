@@ -19,6 +19,7 @@ class MPDeviceBleImpl: public QObject
 
     QT_WRITABLE_PROPERTY(QString, mainMCUVersion, QString())
     QT_WRITABLE_PROPERTY(QString, auxMCUVersion, QString())
+    QT_WRITABLE_PROPERTY(int, bundleVersion, 0)
     QT_WRITABLE_PROPERTY(bool, loginPrompt, false)
     QT_WRITABLE_PROPERTY(bool, PINforMMM, false)
     QT_WRITABLE_PROPERTY(bool, storagePrompt, false)
