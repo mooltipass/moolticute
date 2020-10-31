@@ -419,7 +419,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         ui->widgetParamMini->setVisible(wsClient->isMPMini());
         ui->labelAbouHwSerial->setVisible(wsClient->isMPMini() || wsClient->isMPBLE());
         displayMCUVersion(wsClient->isMPBLE());
-        displayBundleVersion();
         if (!wsClient->isFw12() && !wsClient->isMPBLE())
         {
             ui->groupBox_Information->hide();
@@ -432,6 +431,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::fwVersionChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwMemoryChanged, this, &MainWindow::updateSerialInfos);
+    connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::displayBundleVersion);
 
     connect(wsClient, &WSClient::memMgmtModeFailed, this, &MainWindow::memMgmtModeFailed);
 
@@ -779,7 +779,6 @@ void MainWindow::updateSerialInfos() {
         //When ble is detected not displaying fw version
         ui->labelAboutFwVers->setVisible(!wsClient->isMPBLE());
         ui->labelAboutFwVersValue->setVisible(!wsClient->isMPBLE());
-        displayBundleVersion();
     }
     else
     {
