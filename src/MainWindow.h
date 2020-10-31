@@ -191,6 +191,8 @@ private:
 
     void displayMCUVersion(bool visible = true);
 
+    void displayBundleVersion();
+
     void updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items);
 
     bool shouldUpdateItems(QJsonObject& cache, const QJsonObject& received);

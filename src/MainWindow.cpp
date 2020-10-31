@@ -431,6 +431,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::fwVersionChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwMemoryChanged, this, &MainWindow::updateSerialInfos);
+    connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::displayBundleVersion);
 
     connect(wsClient, &WSClient::memMgmtModeFailed, this, &MainWindow::memMgmtModeFailed);
 
@@ -789,7 +790,7 @@ void MainWindow::updateSerialInfos() {
         wsClient->set_hwMemory(0);
         wsClient->set_auxMCUVersion(NONE_STRING);
         wsClient->set_mainMCUVersion(NONE_STRING);
-
+        wsClient->set_bundleVersion(0);
     }
 }
 
@@ -1540,6 +1541,22 @@ void MainWindow::displayMCUVersion(bool visible)
     ui->labelAboutMainMCU->setVisible(visible);
     ui->labelAboutMainMCUValue->setVisible(visible);
     ui->labelAboutMainMCUValue->setText(wsClient->get_mainMCUVersion());
+}
+
+void MainWindow::displayBundleVersion()
+{
+    if (wsClient->isMPBLE())
+    {
+        ui->labelBundleVersionValue->setText(QString::number(wsClient->get_bundleVersion()));
+        const bool displayBundle = wsClient->get_bundleVersion() > 0;
+        ui->labelBundleVersion->setVisible(displayBundle);
+        ui->labelBundleVersionValue->setVisible(displayBundle);
+    }
+    else
+    {
+        ui->labelBundleVersion->hide();
+        ui->labelBundleVersionValue->hide();
+    }
 }
 
 void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)

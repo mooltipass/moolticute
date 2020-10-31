@@ -195,6 +195,7 @@ void WSClient::onTextMessageReceived(const QString &message)
             set_mpHwVersion(Common::MP_BLE);
             set_auxMCUVersion(o["aux_mcu_version"].toString());
             set_mainMCUVersion(o["main_mcu_version"].toString());
+            set_bundleVersion(o["bundle_version"].toInt());
         }
         else
         {
