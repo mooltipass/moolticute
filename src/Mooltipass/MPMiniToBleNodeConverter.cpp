@@ -32,7 +32,7 @@ QByteArray MPMiniToBleNodeConverter::convertMiniParentNodeToBle(const QByteArray
     }
     // Fill remaining service name
     const quint16 REMAINING_SERVICE_NAME = 10;
-    bleArray.append(REMAINING_SERVICE_NAME, ZERO_BYTE);
+    Common::fill(bleArray, REMAINING_SERVICE_NAME, ZERO_BYTE);
     // Reserved
     bleArray.append(ZERO_BYTE);
     // CTR value
@@ -64,10 +64,10 @@ QByteArray MPMiniToBleNodeConverter::convertMiniChildNodeToBle(const QByteArray 
         bleArray.append(ZERO_BYTE);
     }
     // Fill arbitrary third field
-    bleArray.append(THIRD_FIELD_SIZE, ZERO_BYTE);
+    Common::fill(bleArray, THIRD_FIELD_SIZE, ZERO_BYTE);
     // Key pressed
     const char DEFAULT_CHAR = static_cast<char>(0xFF);
-    bleArray.append(KEY_PRESSED_SIZE, DEFAULT_CHAR);
+    Common::fill(bleArray, KEY_PRESSED_SIZE, DEFAULT_CHAR);
     // same as flags, but with bit 5 set to 1
     bleArray.append(bleArray.left(2));
     bleArray[FLAGS_BYTE_NOT_VALID_SET] = bleArray[FLAGS_BYTE_NOT_VALID_SET]|(1<<FLAGS_NOT_VALID_BIT);
@@ -78,12 +78,12 @@ QByteArray MPMiniToBleNodeConverter::convertMiniChildNodeToBle(const QByteArray 
     // Encrypted password
     bleArray.append(dataArray.mid(MINI_PWD_START_BYTE, MINI_PWD_SIZE));
     const quint16 REMAINING_PASSWORD_SIZE = 96;
-    bleArray.append(REMAINING_PASSWORD_SIZE, ZERO_BYTE);
+    Common::fill(bleArray, REMAINING_PASSWORD_SIZE, ZERO_BYTE);
     // password terminating 0
     Common::fill(bleArray, 2, ZERO_BYTE);
     // TBD
     const quint16 TBD_SIZE = 128;
-    bleArray.append(TBD_SIZE, ZERO_BYTE);
+    Common::fill(bleArray, TBD_SIZE, ZERO_BYTE);
 
     return bleArray;
 }
