@@ -236,9 +236,10 @@ void MPDevice::newDataRead(const QByteArray &data)
 
     QByteArray dataReceived = data;
     bool isDebugStartMsg = false;
+    bool isFirstBlePacket = isBLE() && bleImpl->isFirstPacket(data);
     if (isBLE())
     {
-        isDebugStartMsg = bleImpl->isFirstPacket(data) && pMesProt->getCommand(data) == MPCmd::DEBUG;
+        isDebugStartMsg = isFirstBlePacket && pMesProt->getCommand(data) == MPCmd::DEBUG;
     }
     else
     {
@@ -276,7 +277,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     // First if: Resend the command, if device ask for retrying
     // Second if: Special case: if command check was requested but the device returned a mooltipass status (user entering his PIN), resend packet
     const auto dataCommand = pMesProt->getCommand(data);
-    if ((dataCommand == MPCmd::PLEASE_RETRY) ||
+    if ((dataCommand == MPCmd::PLEASE_RETRY && (isFirstBlePacket || !isBLE())) ||
         (currentCmd.checkReturn &&
         currentCommand != MPCmd::MOOLTIPASS_STATUS &&
         dataCommand == MPCmd::MOOLTIPASS_STATUS &&
