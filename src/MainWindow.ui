@@ -1582,7 +1582,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <string>Prompt to display credentials on screen during manual recall. Control this setting in the settings menu of the advanced menu</string>
                  </property>
                  <property name="text">
-                  <string>Password Display on Screen Prompts</string>
+                  <string>Management Storage Confirmation Prompt</string>
                  </property>
                 </widget>
                </item>
