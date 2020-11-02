@@ -1413,7 +1413,10 @@ void MainWindow::updateTabButtons()
     };
 
     if (ui->stackedWidget->currentWidget() == ui->pageWaiting)
+    {
         setEnabledToAllTabButtons(false);
+        return;
+    }
 
     // Enable or Disable tabs according to the device status
     if (wsClient->get_status() == Common::UnknownSmartcard)
