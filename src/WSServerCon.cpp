@@ -668,12 +668,6 @@ void WSServerCon::sendDeviceUID()
 
 void WSServerCon::sendFilesCache()
 {
-    if (!mpdevice->hasFilesCache())
-    {
-        qDebug() << "There is fo files cache to send";
-        return;
-    }
-
     auto deviceStatus = mpdevice->get_status();
     if (deviceStatus != Common::Unlocked && deviceStatus != Common::MMMMode)
     {
@@ -684,8 +678,16 @@ void WSServerCon::sendFilesCache()
     qDebug() << "Sending files cache";
     QJsonObject oroot = { {"msg", "files_cache_list"} };
     QJsonArray array;
-    for (QVariantMap item : mpdevice->getFilesCache())
-        array.append(QJsonDocument::fromVariant(item).object());
+
+    if (mpdevice->hasFilesCache())
+    {
+        for (QVariantMap item : mpdevice->getFilesCache())
+            array.append(QJsonDocument::fromVariant(item).object());
+    }
+    else
+    {
+        qDebug() << "There is no files cache to send";
+    }
 
     oroot["data"] = array;
     oroot["sync"] = mpdevice->isFilesCacheInSync();
