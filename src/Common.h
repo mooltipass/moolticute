@@ -157,6 +157,23 @@ struct QOverload : QConstOverload<Args...>, QNonConstOverload<Args...>
     { return ptr; }
 };
 
+/*
+ * ENDIAN FUNCTIONS
+ */
+
+// Used to implement a type-safe and alignment-safe copy operation
+// If you want to avoid the memcpy, you must write specializations for these functions
+template <typename T> inline void qToUnaligned(const T src, void *dest)
+{
+    // Using sizeof(T) inside memcpy function produces internal compiler error with
+    // MSVC2008/ARM in tst_endian -> use extra indirection to resolve size of T.
+    const size_t size = sizeof(T);
+    memcpy(dest, &src, size);
+}
+
+template <typename T> inline void qToLittleEndian(T src, void *dest)
+{ qToUnaligned<T>(src, dest); }
+
 #endif
 
 //Q_DISABLE_COPY_MOVE from Qt 5.15
