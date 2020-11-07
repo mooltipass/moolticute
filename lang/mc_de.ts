@@ -282,7 +282,7 @@
 <context>
     <name>CredentialModel</name>
     <message>
-        <location filename="../src/CredentialModel.h" line="67"/>
+        <location filename="../src/CredentialModel.h" line="68"/>
         <source>Default category</source>
         <translation type="unfinished"></translation>
     </message>
@@ -302,13 +302,13 @@
     <message>
         <location filename="../src/CredentialsManagement.ui" line="44"/>
         <location filename="../src/CredentialsManagement.ui" line="125"/>
-        <location filename="../src/CredentialsManagement.ui" line="856"/>
+        <location filename="../src/CredentialsManagement.ui" line="905"/>
         <source>FrameTitle</source>
         <translation>FrameTitle</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="62"/>
-        <location filename="../src/CredentialsManagement.ui" line="492"/>
+        <location filename="../src/CredentialsManagement.ui" line="508"/>
         <source>Login</source>
         <translation>Anmeldename</translation>
     </message>
@@ -324,8 +324,8 @@
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="110"/>
-        <location filename="../src/CredentialsManagement.ui" line="926"/>
-        <location filename="../src/CredentialsManagement.cpp" line="86"/>
+        <location filename="../src/CredentialsManagement.ui" line="975"/>
+        <location filename="../src/CredentialsManagement.cpp" line="93"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
@@ -356,7 +356,7 @@
     </message>
     <message>
         <location filename="../src/CredentialsManagement.ui" line="322"/>
-        <location filename="../src/CredentialsManagement.cpp" line="981"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1025"/>
         <source>Expand All</source>
         <translation>Alle einblenden</translation>
     </message>
@@ -366,82 +366,87 @@
         <translation>Keine Anmeldeinformationen ausgewählt.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="521"/>
+        <location filename="../src/CredentialsManagement.ui" line="537"/>
         <source>Password:</source>
         <translation>Kennwort:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="552"/>
+        <location filename="../src/CredentialsManagement.ui" line="568"/>
         <source>Description:</source>
         <translation>Beschreibung:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="583"/>
+        <location filename="../src/CredentialsManagement.ui" line="599"/>
         <source>Last Modified:</source>
         <translation>Letzte Änderung:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="617"/>
+        <location filename="../src/CredentialsManagement.ui" line="633"/>
         <source>Last Accessed:</source>
         <translation>Letzter Zugriffs:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="645"/>
+        <location filename="../src/CredentialsManagement.ui" line="661"/>
         <source>Category:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="660"/>
+        <location filename="../src/CredentialsManagement.ui" line="676"/>
         <source>Key After Login:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="675"/>
+        <location filename="../src/CredentialsManagement.ui" line="691"/>
         <source>Key After Password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="735"/>
+        <location filename="../src/CredentialsManagement.ui" line="719"/>
+        <source>TOTP Credential</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.ui" line="782"/>
         <source>Confirm changes</source>
         <translation>Änderungen Bestätigen</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="808"/>
-        <location filename="../src/CredentialsManagement.cpp" line="55"/>
+        <location filename="../src/CredentialsManagement.ui" line="857"/>
+        <location filename="../src/CredentialsManagement.cpp" line="56"/>
         <source>Exit Credential Management</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="821"/>
+        <location filename="../src/CredentialsManagement.ui" line="870"/>
         <source>Save all changes</source>
         <translation>Alle Änderungen speichern</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="853"/>
+        <location filename="../src/CredentialsManagement.ui" line="902"/>
         <source>Set category names</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="874"/>
-        <location filename="../src/CredentialsManagement.cpp" line="79"/>
+        <location filename="../src/CredentialsManagement.ui" line="923"/>
+        <location filename="../src/CredentialsManagement.cpp" line="86"/>
         <source>Category 4:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="884"/>
-        <location filename="../src/CredentialsManagement.cpp" line="78"/>
+        <location filename="../src/CredentialsManagement.ui" line="933"/>
+        <location filename="../src/CredentialsManagement.cpp" line="85"/>
         <source>Category 3:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="894"/>
-        <location filename="../src/CredentialsManagement.cpp" line="77"/>
+        <location filename="../src/CredentialsManagement.ui" line="943"/>
+        <location filename="../src/CredentialsManagement.cpp" line="84"/>
         <source>Category 2:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="904"/>
-        <location filename="../src/CredentialsManagement.cpp" line="76"/>
+        <location filename="../src/CredentialsManagement.ui" line="953"/>
+        <location filename="../src/CredentialsManagement.cpp" line="83"/>
         <source>Category 1:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -451,88 +456,103 @@
         <translation>Alle Änderungen verwerfen</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="63"/>
+        <location filename="../src/CredentialsManagement.cpp" line="64"/>
         <source>Discard changes</source>
         <translation>Änderungen verwerfen</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1099"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1143"/>
         <source>Not a favorite</source>
         <translation>Kein Favorit</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1105"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1149"/>
         <source>Set as favorite #%1</source>
         <translation>As Favorit setzen #%1</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="341"/>
+        <location filename="../src/CredentialsManagement.cpp" line="352"/>
         <source>Please Approve On Device</source>
         <translation>Bitte am Gerät genehmigen</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="73"/>
+        <location filename="../src/CredentialsManagement.cpp" line="74"/>
         <source>Edit Service Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="75"/>
+        <location filename="../src/CredentialsManagement.cpp" line="78"/>
+        <source>There is a TOTP Credential for the service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="82"/>
         <source>Set user categories</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="376"/>
+        <location filename="../src/CredentialsManagement.cpp" line="387"/>
         <source>%1: New Login %2 added.</source>
         <translation>%1: Neue Anmeldung %2 hinzugefügt.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="378"/>
-        <location filename="../src/CredentialsManagement.cpp" line="432"/>
+        <location filename="../src/CredentialsManagement.cpp" line="389"/>
+        <location filename="../src/CredentialsManagement.cpp" line="443"/>
         <source>Failure</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="378"/>
+        <location filename="../src/CredentialsManagement.cpp" line="389"/>
         <source>Couldn&apos;t Add New Credential to Device</source>
         <translation>Neue Anmeldeinformationen konnten dem Gerät nicht hinzugefügt werden</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="424"/>
+        <location filename="../src/CredentialsManagement.cpp" line="435"/>
         <source>Password Query Was Denied</source>
         <translation>Passwortabfrage wurde abgelehnt</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="432"/>
+        <location filename="../src/CredentialsManagement.cpp" line="443"/>
         <source>Unable to modify %1/%2</source>
         <translation>%1/%2 können nicht geändert werden</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="514"/>
+        <location filename="../src/CredentialsManagement.cpp" line="546"/>
         <source>Discard Modifications ?</source>
         <translation>Änderungen verwerfen?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="515"/>
+        <location filename="../src/CredentialsManagement.cpp" line="547"/>
         <source>You have modified %1/%2 - Do you want to discard the modifications ?</source>
         <translation>Sie haben %1/%2 geändert - Möchten Sie die Änderungen verwerfen?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="643"/>
+        <location filename="../src/CredentialsManagement.cpp" line="675"/>
         <source>Service already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="734"/>
+        <location filename="../src/CredentialsManagement.cpp" line="766"/>
         <source>Delete?</source>
         <translation>Löschen?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="735"/>
+        <location filename="../src/CredentialsManagement.cpp" line="767"/>
         <source>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Delete credential &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</source>
         <translation>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Anmeldedaten &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt; löschen?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="981"/>
+        <location filename="../src/CredentialsManagement.cpp" line="890"/>
+        <source>View TOTP Credential</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="895"/>
+        <source>Setup TOTP Credential</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1025"/>
         <source>Collapse All</source>
         <translation>Alle Ausblenden</translation>
     </message>
@@ -626,11 +646,6 @@
     <message>
         <location filename="../src/DbExportsRegistryController.cpp" line="101"/>
         <source>It&apos;s always good to make a backup of your database. Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="111"/>
-        <source>You haven&apos;t made a backup of your database in a while. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -996,12 +1011,12 @@ Die maximal zulässige Größe beträgt %2 Byte.</translation>
 <context>
     <name>LockedPasswordLineEdit</name>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="312"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="315"/>
         <source>Password Locked</source>
         <translation>Kennwort Gesperrt</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="326"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="329"/>
         <source>Non-initialized password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1010,14 +1025,14 @@ Die maximal zulässige Größe beträgt %2 Byte.</translation>
     <name>MainWindow</name>
     <message>
         <location filename="../src/MainWindow.ui" line="14"/>
-        <location filename="../src/MainWindow.cpp" line="1206"/>
-        <location filename="../src/MainWindow.cpp" line="1228"/>
+        <location filename="../src/MainWindow.cpp" line="1286"/>
+        <location filename="../src/MainWindow.cpp" line="1308"/>
         <source>Moolticute</source>
         <translation>Moolticute</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="100"/>
-        <location filename="../src/MainWindow.ui" line="474"/>
+        <location filename="../src/MainWindow.ui" line="490"/>
         <source>Device Settings</source>
         <translation>Gerät Einstellungen</translation>
     </message>
@@ -1058,32 +1073,32 @@ Die maximal zulässige Größe beträgt %2 Byte.</translation>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="316"/>
+        <location filename="../src/MainWindow.ui" line="332"/>
         <source>A connection to the Moolticute daemon could not be established. Try to restart the application.</source>
         <translation>Eine Verbindung zum Moolticute-Daemon konnte nicht hergestellt werden. Versuchen Sie, die Anwendung neu zu starten.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="413"/>
+        <location filename="../src/MainWindow.ui" line="429"/>
         <source>A connection to the device could not be established. Connect your device, or unplug it and try again.</source>
         <translation>Eine Verbindung zum Gerät konnte nicht hergestellt werden. Schließe das Gerät an oder entferne es und versuche es erneut.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="525"/>
+        <location filename="../src/MainWindow.ui" line="541"/>
         <source>Keyboard Output</source>
         <translation>Tastaturausgabe</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="651"/>
+        <location filename="../src/MainWindow.ui" line="667"/>
         <source>Keyboard Layout</source>
         <translation>Tastaturbelegung</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="817"/>
+        <location filename="../src/MainWindow.ui" line="833"/>
         <source>For slow computers: wait</source>
         <translation>Für langsame Computer: warte</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="840"/>
+        <location filename="../src/MainWindow.ui" line="856"/>
         <source>ms after each key press</source>
         <translation>ms nach jedem Tastendruck</translation>
     </message>
@@ -1092,472 +1107,489 @@ Die maximal zulässige Größe beträgt %2 Byte.</translation>
         <translation type="vanished">Senden</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="905"/>
+        <location filename="../src/MainWindow.ui" line="921"/>
         <source>after each login output</source>
         <translation>nach jeder Login-Ausgabe</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="970"/>
+        <location filename="../src/MainWindow.ui" line="986"/>
         <source>after each password output</source>
         <translation>nach jedem Kennwort-Ausgabe</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="996"/>
+        <location filename="../src/MainWindow.ui" line="1012"/>
         <source>Inactivity</source>
         <translation>Inaktivität</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1020"/>
+        <location filename="../src/MainWindow.ui" line="1036"/>
         <source>Cancel credentials request after</source>
         <translation>Anforderung von Anmeldeinformationen abbrechen nach</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1037"/>
+        <location filename="../src/MainWindow.ui" line="1053"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1078"/>
+        <location filename="../src/MainWindow.ui" line="1094"/>
         <source>Lock after</source>
         <translation>Sperren nach</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1101"/>
+        <location filename="../src/MainWindow.ui" line="1117"/>
         <source>minutes of inactivity</source>
         <translation>Minuten Inaktivität</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1127"/>
         <source>Enable screen saver</source>
-        <translation>Bildschirmschoner aktivieren</translation>
+        <translation type="vanished">Bildschirmschoner aktivieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1137"/>
         <source>Miscellaneous</source>
-        <translation>Verschiedenes</translation>
+        <translation type="vanished">Verschiedenes</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1161"/>
+        <location filename="../src/MainWindow.ui" line="1295"/>
         <source>Screen Brightness</source>
         <translation>Bildschirmhelligkeit</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1197"/>
         <source>Enable device tutorial</source>
-        <translation>Geräte-Tutorial aktivieren</translation>
+        <translation type="vanished">Geräte-Tutorial aktivieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1207"/>
+        <location filename="../src/MainWindow.ui" line="1331"/>
         <source>Allow boot without host (e.g. USB battery / Charger)</source>
         <translation>Boot ohne Host zulassen (z. B. USB-Akku / Ladegerät)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1248"/>
+        <location filename="../src/MainWindow.ui" line="1372"/>
         <source>Enable knock detection with</source>
         <translation>Klopferkennung aktivieren mit</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1255"/>
-        <source>Knock detection sensitivity:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="1262"/>
+        <location filename="../src/MainWindow.ui" line="1386"/>
         <source>How sensitive to vibration your device should be</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1269"/>
+        <location filename="../src/MainWindow.ui" line="1393"/>
         <source>sensitivity</source>
         <translation>empfindlichkeit</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1289"/>
+        <location filename="../src/MainWindow.ui" line="1413"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic; color:#ac0000;&quot;&gt;(remove the card to change that setting)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic; color:#ac0000;&quot;&gt;(Entfernen Sie die Karte, um diese Einstellung zu ändern)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1305"/>
+        <location filename="../src/MainWindow.ui" line="1429"/>
         <source>Flash screen when input is required</source>
         <translation>Fenster blinkt bei Eingabeaufforderung</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1312"/>
+        <location filename="../src/MainWindow.ui" line="1436"/>
         <source>Lock device when computer sleeps or shuts down, if screen is locked, or user logs off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1322"/>
+        <location filename="../src/MainWindow.ui" line="1446"/>
         <source>Do not erase characters when going back in the pin entering screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1325"/>
-        <source>Display pin on back pressed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="1335"/>
+        <location filename="../src/MainWindow.ui" line="1197"/>
         <source>Advanced Settings (See User Manual)</source>
         <translation>Erweiterte Einstellungen (Siehe Benutzerhandbuch)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1341"/>
+        <location filename="../src/MainWindow.ui" line="1203"/>
         <source>A hash will be displayed before and after your card is unlocked. Make sure this hash doesn&apos;t change to know that your firmware hasn&apos;t been tampered with.</source>
         <translation>Ein Hashwert wird vor und nach dem Freischalten Ihrer Karte angezeigt. Stellen Sie sicher, dass sich dieser Hashwert nicht ändert, um zu wissen, dass Ihre Firmware nicht manipuliert wurde.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1344"/>
+        <location filename="../src/MainWindow.ui" line="1206"/>
         <source>Display the security hash before &amp;&amp; after the card is unlocked</source>
         <translation>Sicherheits-Hashwert vor und nach dem Entsperren der Karte anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1354"/>
+        <location filename="../src/MainWindow.ui" line="1469"/>
         <source>Random Starting Pin</source>
         <translation>Zufälliger Start-PIN</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1379"/>
+        <location filename="../src/MainWindow.ui" line="1231"/>
         <source>Lock Unlock Feature</source>
         <translation>Sperren/Entsperren Funktion</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1421"/>
+        <location filename="../src/MainWindow.ui" line="1489"/>
         <source>General Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1427"/>
+        <location filename="../src/MainWindow.ui" line="1495"/>
         <source>BLE Reserved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1434"/>
+        <location filename="../src/MainWindow.ui" line="1502"/>
         <source>Display an animation when an action is required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1437"/>
+        <location filename="../src/MainWindow.ui" line="1505"/>
         <source>Prompt Animation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1444"/>
+        <location filename="../src/MainWindow.ui" line="1512"/>
         <source>Animation at device boot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1447"/>
+        <location filename="../src/MainWindow.ui" line="1515"/>
         <source>Boot Animation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1454"/>
+        <location filename="../src/MainWindow.ui" line="1522"/>
         <source>Automatically lock the device when it is disconnected from USB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1457"/>
+        <location filename="../src/MainWindow.ui" line="1525"/>
         <source>Device Lock on USB Disconnection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1467"/>
+        <location filename="../src/MainWindow.ui" line="1556"/>
         <source>User Security Settings (Only changeable from device)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1473"/>
+        <location filename="../src/MainWindow.ui" line="1562"/>
         <source>Confirm to output each credential. Control this setting in the settings menu of the advanced menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1476"/>
+        <location filename="../src/MainWindow.ui" line="1565"/>
         <source>Login Confirmation Prompt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1483"/>
+        <location filename="../src/MainWindow.ui" line="1572"/>
         <source>Require PIN to enter management mode. Control this setting in the settings menu of the advanced menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1486"/>
+        <location filename="../src/MainWindow.ui" line="1575"/>
         <source>PIN for Management Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1493"/>
+        <location filename="../src/MainWindow.ui" line="1582"/>
         <source>Prompt to display credentials on screen during manual recall. Control this setting in the settings menu of the advanced menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1496"/>
-        <source>Password Display on Screen Prompts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="1503"/>
+        <location filename="../src/MainWindow.ui" line="1592"/>
         <source>Switch menu modes by a long wheel press in the main menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1506"/>
+        <location filename="../src/MainWindow.ui" line="1595"/>
         <source>Advanced Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1513"/>
+        <location filename="../src/MainWindow.ui" line="1602"/>
         <source>Use Bluetooth Menu to enable/disable the Mooltipass Bluetooth interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1516"/>
+        <location filename="../src/MainWindow.ui" line="1605"/>
         <source>Bluetooth Enabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1523"/>
+        <location filename="../src/MainWindow.ui" line="1612"/>
         <source>Knock detection can be enabled/disabled on the device.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1526"/>
+        <location filename="../src/MainWindow.ui" line="1615"/>
         <source>Knock Detection Disabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1601"/>
+        <location filename="../src/MainWindow.ui" line="1689"/>
         <source>Reset</source>
         <translation>Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1614"/>
+        <location filename="../src/MainWindow.ui" line="1702"/>
         <source>Save to device</source>
         <translation>Auf Gerät speichern</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1953"/>
+        <location filename="../src/MainWindow.ui" line="2041"/>
         <source>Export Database to File</source>
         <translation>Datenbank in Datei exportieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2595"/>
+        <location filename="../src/MainWindow.ui" line="2683"/>
         <source>Moolticute (c) The Mooltipass Team</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2768"/>
+        <location filename="../src/MainWindow.ui" line="2856"/>
         <source>Aux MCU Version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2802"/>
+        <location filename="../src/MainWindow.ui" line="2890"/>
         <source>Main MCU Version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2971"/>
+        <location filename="../src/MainWindow.ui" line="2924"/>
+        <source>Bundle Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="3093"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3383"/>
+        <location filename="../src/MainWindow.ui" line="3505"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Behavior of ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3410"/>
+        <location filename="../src/MainWindow.ui" line="3532"/>
         <source>Systray icon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3443"/>
+        <location filename="../src/MainWindow.ui" line="3565"/>
         <source>Subdomain selection: Enabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3480"/>
+        <location filename="../src/MainWindow.ui" line="3602"/>
         <source>Integration with Have I Been Pwned: Enabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3523"/>
+        <location filename="../src/MainWindow.ui" line="3645"/>
         <source>Enable full developer log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3555"/>
+        <location filename="../src/MainWindow.ui" line="3677"/>
         <source>Enable Debug Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3856"/>
+        <location filename="../src/MainWindow.ui" line="3688"/>
+        <source>Default Password Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="4015"/>
         <source>Reset card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3890"/>
+        <location filename="../src/MainWindow.ui" line="4049"/>
         <source>Erase Inserted Card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3900"/>
-        <location filename="../src/MainWindow.ui" line="3950"/>
-        <location filename="../src/MainWindow.ui" line="3975"/>
+        <location filename="../src/MainWindow.ui" line="4059"/>
+        <location filename="../src/MainWindow.ui" line="4109"/>
+        <location filename="../src/MainWindow.ui" line="4134"/>
         <source>?</source>
         <translation>?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3909"/>
+        <location filename="../src/MainWindow.ui" line="4068"/>
         <source>Reset Card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3921"/>
+        <location filename="../src/MainWindow.ui" line="4080"/>
         <source>CSV file import/export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3943"/>
+        <location filename="../src/MainWindow.ui" line="4102"/>
         <source>Import unencrypted passwords</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3959"/>
+        <location filename="../src/MainWindow.ui" line="4118"/>
         <source>Import CSV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3968"/>
+        <location filename="../src/MainWindow.ui" line="4127"/>
         <source>Export passwords unencrypted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3984"/>
+        <location filename="../src/MainWindow.ui" line="4143"/>
         <source>Export CSV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3996"/>
+        <location filename="../src/MainWindow.ui" line="4155"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4019"/>
+        <location filename="../src/MainWindow.ui" line="4178"/>
         <source>Get</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4040"/>
+        <location filename="../src/MainWindow.ui" line="4199"/>
         <source>Number of available users:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2000"/>
+        <location filename="../src/MainWindow.ui" line="2088"/>
         <source>Make a backup of your database on your local computer</source>
         <translation>Eine Sicherungskopie der Datenbank auf dem lokalen Computer erstellen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2012"/>
+        <location filename="../src/MainWindow.ui" line="1479"/>
+        <source>Enable Device Tutorial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1532"/>
+        <source>Switch Off Device After USB Disconnection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1539"/>
+        <source>Disable BLE on Card Removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1546"/>
+        <source>Disable BLE on Device Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1585"/>
+        <source>Management Storage Confirmation Prompt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="2100"/>
         <source>Generate MooltiApp Compatible File</source>
         <translation>Mooltiapp Kompatible Datei Erstellen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2394"/>
+        <location filename="../src/MainWindow.ui" line="2482"/>
         <source>Unlock Your Mooltipass Device</source>
         <translation>Mooltipass Gerät entsperren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2629"/>
+        <location filename="../src/MainWindow.ui" line="2717"/>
         <source>Check For Updates</source>
         <translation>Auf Updates prüfen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2666"/>
+        <location filename="../src/MainWindow.ui" line="2754"/>
         <source>Device Firmware Version:</source>
         <translation>Geräte-Firmware-Version:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3040"/>
+        <location filename="../src/MainWindow.ui" line="3162"/>
         <source>Moolticute Settings</source>
         <translation>Moolticute Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3071"/>
+        <location filename="../src/MainWindow.ui" line="3193"/>
         <source>Application Language</source>
         <translation>Applikation-Sprache</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3147"/>
+        <location filename="../src/MainWindow.ui" line="3269"/>
         <source>View Daemon Logs</source>
         <translation>Daemon-Protokollen Anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3184"/>
+        <location filename="../src/MainWindow.ui" line="3306"/>
         <source>Start Moolticute SSH Agent Automatically</source>
         <translation>Moolticute SSH-Agent automatisch starten</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3196"/>
-        <location filename="../src/MainWindow.ui" line="3239"/>
-        <location filename="../src/MainWindow.ui" line="3535"/>
+        <location filename="../src/MainWindow.ui" line="3318"/>
+        <location filename="../src/MainWindow.ui" line="3361"/>
+        <location filename="../src/MainWindow.ui" line="3657"/>
         <source>(Restart Needed)</source>
         <translation>(Neustart benötigt)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3227"/>
+        <location filename="../src/MainWindow.ui" line="3349"/>
         <source>Moolticute SSH Arguments</source>
         <translation>Moolticute SSH-Argumente</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3272"/>
+        <location filename="../src/MainWindow.ui" line="3394"/>
         <source>Restart Daemon with Debug Web Server (on port 8484)</source>
         <translation>Daemon neu starten mit Debug Web Server (auf Port 8484</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3292"/>
+        <location filename="../src/MainWindow.ui" line="3414"/>
         <source>Enable Daemon Web Server</source>
         <translation>Daemon Web Server aktivieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3309"/>
+        <location filename="../src/MainWindow.ui" line="3431"/>
         <source>Manage Your Password Profiles</source>
         <translation>Kennwort-Profile Verwalten</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3329"/>
+        <location filename="../src/MainWindow.ui" line="3451"/>
         <source>Password Profiles...</source>
         <translation>Kennwort-Profile...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3346"/>
+        <location filename="../src/MainWindow.ui" line="3468"/>
         <source>Delayed Cancel Buttons to Prevent Mistakes</source>
         <translation>Verzögerte Abbrechen-Schaltflächen, um Fehler zu verhindern</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3366"/>
+        <location filename="../src/MainWindow.ui" line="3488"/>
         <source>Enable Long Press Cancel Buttons</source>
         <translation>Lang-Drücken Abbrechen-Tasten aktivieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2097"/>
+        <location filename="../src/MainWindow.ui" line="2185"/>
         <source>Import Database from File</source>
         <translation>Datenbank aus Datei importieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2147"/>
+        <location filename="../src/MainWindow.ui" line="2235"/>
         <source>Restore your database from a file</source>
         <translation>Datenbank aus einer Datei wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1840"/>
-        <location filename="../src/MainWindow.ui" line="3671"/>
+        <location filename="../src/MainWindow.ui" line="1928"/>
+        <location filename="../src/MainWindow.ui" line="3830"/>
         <source>Integrity Check</source>
         <translation>Integritätsprüfung</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1890"/>
+        <location filename="../src/MainWindow.ui" line="1978"/>
         <source>Scan your device for errors and correct them automatically.</source>
         <translation>Das Gerät auf Fehler scannen und diese automatisch korrigieren.</translation>
     </message>
@@ -1572,195 +1604,230 @@ Die maximal zulässige Größe beträgt %2 Byte.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="309"/>
+        <location filename="../src/MainWindow.ui" line="325"/>
         <source>The Moolticute Daemon is Not Running.</source>
         <translation>Der Moolticute-Daemon wird nicht ausgeführt.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="406"/>
+        <location filename="../src/MainWindow.ui" line="422"/>
         <source>Connect Your Mooltipass Device</source>
         <translation>Schließe das Mooltipass-Gerät an</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="481"/>
+        <location filename="../src/MainWindow.ui" line="497"/>
         <source>These settings change parameters on your Mooltipass device. For browser specific settings, go to the options page of the extension.
 Hint: keep your mouse positioned over an option to get more details.</source>
         <translation>Diese Einstellungen ändern Parameter am Mooltipass-Gerät. Für browserspezifische Einstellungen siehe die Optionsseite der Erweiterung.
 Tipp: Halten Sie die Maus über eine Option, um weitere Details zu erhalten.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="531"/>
+        <location filename="../src/MainWindow.ui" line="547"/>
         <source>Default language for your device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="549"/>
+        <location filename="../src/MainWindow.ui" line="565"/>
         <source>Device Default Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="582"/>
+        <location filename="../src/MainWindow.ui" line="598"/>
         <source>Language used for your user profile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="600"/>
+        <location filename="../src/MainWindow.ui" line="616"/>
         <source>Current User Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="633"/>
+        <location filename="../src/MainWindow.ui" line="649"/>
         <source>Select the keyboard layout that your computer uses</source>
         <translation>Wählen Sie das Tastaturlayout aus, das der Computer verwendet</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="690"/>
+        <location filename="../src/MainWindow.ui" line="706"/>
         <source>Keyboard layout used when typing characters over the Bluetooth interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="708"/>
+        <location filename="../src/MainWindow.ui" line="724"/>
         <source>Bluetooth Keyboard Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="741"/>
+        <location filename="../src/MainWindow.ui" line="757"/>
         <source>Keyboard layout used when typing characters over the USB interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="759"/>
+        <location filename="../src/MainWindow.ui" line="775"/>
         <source>USB Keyboard Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="792"/>
+        <location filename="../src/MainWindow.ui" line="808"/>
         <source>Enable this feature if characters are missing when using manual credential recall</source>
         <translation>Aktivieren Sie diese Funktion, wenn bei Verwendung des manuellen Anmeldedatenabrufs Zeichen fehlen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="863"/>
+        <location filename="../src/MainWindow.ui" line="879"/>
         <source>Select which key is pressed after a login is manually entered</source>
         <translation>Wählen Sie aus, welche Taste gedrückt wird, nachdem ein Login manuell eingegeben wurde</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="888"/>
-        <location filename="../src/MainWindow.ui" line="953"/>
+        <location filename="../src/MainWindow.ui" line="904"/>
+        <location filename="../src/MainWindow.ui" line="969"/>
         <source>By default, send</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="928"/>
+        <location filename="../src/MainWindow.ui" line="944"/>
         <source>Select which key is pressed after a password is manually entered</source>
         <translation>Wählen Sie aus, welche Taste gedrückt wird, nachdem ein Kennwort manuell eingegeben wurde</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1002"/>
+        <location filename="../src/MainWindow.ui" line="1018"/>
         <source>Number of seconds after which the prompt screen disappears</source>
         <translation>Anzahl der Sekunden, nach denen der Eingabeaufforderungsbildschirm ausgeblendet wird</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1060"/>
+        <location filename="../src/MainWindow.ui" line="1076"/>
         <source>When enabled, the Mooltipass will lock itself after a given number of minutes of inactivity</source>
         <translation>Wenn diese Option aktiviert ist, wird Mooltipass nach einer bestimmten Anzahl von Inaktivitätsminuten automatisch gesperrt</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1124"/>
+        <location filename="../src/MainWindow.ui" line="1140"/>
         <source>Enable the Mooltipass screen saver</source>
         <translation>Mooltipass Bildschirmschoner aktivieren</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1143"/>
+        <source>Enable Screen Saver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1168"/>
+        <source>Inactivity Timer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1254"/>
+        <source>No Password Input Prompt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1277"/>
         <source>Mooltipass screen brightness</source>
         <translation>Mooltipass Bildschirmhelligkeit</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1194"/>
+        <location filename="../src/MainWindow.ui" line="1379"/>
+        <source>Knock Detection Sensitivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1449"/>
+        <source>Display Pin on Back Pressed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1456"/>
+        <source>Do not hide PIN when entering PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1459"/>
+        <source>Display Full Pin on Entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1476"/>
         <source>Display the device tutorial after the next Mooltipass start</source>
         <translation>Das Geräte-Tutorial nach dem nächsten Start von Mooltipass anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1204"/>
+        <location filename="../src/MainWindow.ui" line="1328"/>
         <source>Enable offline mode of your Mooltipass in which passwords are displayed on its screen</source>
         <translation>Aktivieren Sie den Offline-Modus des Mooltipass, in dem Kennwörter auf dem Bildschirm angezeigt werden</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1220"/>
+        <location filename="../src/MainWindow.ui" line="1344"/>
         <source>Enable the knock to approve feature</source>
         <translation>&apos;Klopfen um zu bestätigen&apos;-Funktion aktivieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1302"/>
+        <location filename="../src/MainWindow.ui" line="1426"/>
         <source>Flash screen when an action is required</source>
         <translation>Fenster blinkt wenn eine Aktion erforderlich ist</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1351"/>
+        <location filename="../src/MainWindow.ui" line="1466"/>
         <source>Random starting pin every time card unlock is needed</source>
         <translation>Zufälliger Start-PIN jedes Mal, wenn Kartenentsperrung benötigt wird</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1361"/>
+        <location filename="../src/MainWindow.ui" line="1213"/>
         <source>Select the lock/unlock action performed when your card is inserted/removed</source>
         <translation>Die Sperr- / Entsperrungsaktion, die ausgeführt wird, wenn Ihre Karte eingesetzt / entfernt wird wählen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2064"/>
+        <location filename="../src/MainWindow.ui" line="2152"/>
         <source>Export To File</source>
         <translation>In Datei exportieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2163"/>
+        <location filename="../src/MainWindow.ui" line="2251"/>
         <source>Do Not Delete Credentials on Local DB</source>
         <translation>Keine Anmeldeinformationen in der lokalen Datenbank löschen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2190"/>
+        <location filename="../src/MainWindow.ui" line="2278"/>
         <source>Import From File</source>
         <translation>Aus Datei importieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1920"/>
+        <location filename="../src/MainWindow.ui" line="2008"/>
         <source>Perform Integrity Check</source>
         <translation>Integritätsprüfung ausführen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1715"/>
+        <location filename="../src/MainWindow.ui" line="1803"/>
         <source>Database Backup Monitoring</source>
         <translation>Überwachung der Datenbanksicherung</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1759"/>
+        <location filename="../src/MainWindow.ui" line="1847"/>
         <source>Keep your database backup synchronized with this mooltipass database.</source>
         <translation>Die Datenbanksicherung mit dieser Mooltipass-Datenbank synchronisiert halten.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1789"/>
+        <location filename="../src/MainWindow.ui" line="1877"/>
         <source>Backup file path</source>
         <translation>Pfad der Sicherungsdatei</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2297"/>
+        <location filename="../src/MainWindow.ui" line="2385"/>
         <source>Security Card is missing</source>
         <translation>Sicherheitskarte fehlt</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2304"/>
+        <location filename="../src/MainWindow.ui" line="2392"/>
         <source>No card has been found. If you have a card in your Mooltipass device, try to remove and insert the card again.</source>
         <translation>Es wurde keine Karte gefunden. Wenn Sie eine Karte in Ihrem Mooltipass-Gerät haben, versuchen Sie, die Karte wieder zu entfernen und einzufügen.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2401"/>
+        <location filename="../src/MainWindow.ui" line="2489"/>
         <source>The connected device is currently locked. Unlock it to modify settings and manage your credentials.</source>
         <translation>Das angeschlossene Gerät ist derzeit gesperrt. Entsperren Sie es, um die Einstellungen zu ändern und Ihre Anmeldedaten zu verwalten.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2480"/>
+        <location filename="../src/MainWindow.ui" line="2568"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Wait for device confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Auf die Geräts-Bestätigung warten&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Bestätigen Sie die Anfrage auf dem Gerät.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2530"/>
+        <location filename="../src/MainWindow.ui" line="2618"/>
         <source>Working</source>
         <translation>Wird ausgeführt</translation>
     </message>
@@ -1769,32 +1836,32 @@ Tipp: Halten Sie die Maus über eine Option, um weitere Details zu erhalten.</tr
         <translation type="vanished">Moolticute (c) Raoul Hecky</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2609"/>
+        <location filename="../src/MainWindow.ui" line="2697"/>
         <source>Version: %1</source>
         <translation>Version: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2700"/>
+        <location filename="../src/MainWindow.ui" line="2788"/>
         <source>Device Serial:</source>
         <translation>Gerätseriennummer:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2734"/>
+        <location filename="../src/MainWindow.ui" line="2822"/>
         <source>Device Memory:</source>
         <translation>Gerätespeicher:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2842"/>
+        <location filename="../src/MainWindow.ui" line="2964"/>
         <source>UID Request</source>
         <translation>UID-Anfrage</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2878"/>
+        <location filename="../src/MainWindow.ui" line="3000"/>
         <source>Password</source>
         <translation>Kennwort</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2885"/>
+        <location filename="../src/MainWindow.ui" line="3007"/>
         <source>Validate</source>
         <translation>Validieren</translation>
     </message>
@@ -1803,64 +1870,64 @@ Tipp: Halten Sie die Maus über eine Option, um weitere Details zu erhalten.</tr
         <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/raoulh/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/raoulh/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3104"/>
+        <location filename="../src/MainWindow.ui" line="3226"/>
         <source>Start Moolticute with the computer: Enabled</source>
         <translation>Moolitcute mit dem Computer starten: Aktiviert</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3130"/>
-        <location filename="../src/MainWindow.ui" line="3469"/>
-        <location filename="../src/MainWindow.ui" line="3506"/>
+        <location filename="../src/MainWindow.ui" line="3252"/>
+        <location filename="../src/MainWindow.ui" line="3591"/>
+        <location filename="../src/MainWindow.ui" line="3628"/>
         <source>Change</source>
         <translation>Ändere</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3173"/>
+        <location filename="../src/MainWindow.ui" line="3295"/>
         <source>View</source>
         <translation>Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3216"/>
+        <location filename="../src/MainWindow.ui" line="3338"/>
         <source>Autostart SSH Agent</source>
         <translation>Autostart SSH-Agent</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3678"/>
+        <location filename="../src/MainWindow.ui" line="3837"/>
         <source>Now checking the integrity of your stored credentials. This may take a while. Please do not unplug your Mooltipass during the check.</source>
         <translation>Die Integrität Ihrer gespeicherten Anmeldeinformationen wird getestet. Das kann eine Weile dauern. Bitte trennen Sie Ihren Mooltipass nicht während des Checks.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3718"/>
+        <location filename="../src/MainWindow.ui" line="3877"/>
         <source>TextLabel</source>
         <translation>TextLabel</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3824"/>
+        <location filename="../src/MainWindow.ui" line="3983"/>
         <source>SSH Key Tab</source>
         <translation>SSH-Schlüssel Tab</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3836"/>
+        <location filename="../src/MainWindow.ui" line="3995"/>
         <source>Visible ON DE&amp;MAND  (use CTRL+SHIFT+F1 keyboard shortcut)</source>
         <translation>Sichtbar bei &amp;Bedarf (Tastenkombination STRG + UMSCHALT + F1 verwenden)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3846"/>
+        <location filename="../src/MainWindow.ui" line="4005"/>
         <source>ALWA&amp;YS visible</source>
         <translation>Immer &amp;sichtbar</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="284"/>
+        <location filename="../src/MainWindow.cpp" line="300"/>
         <source>Low</source>
         <translation>Niedrig</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="285"/>
+        <location filename="../src/MainWindow.cpp" line="301"/>
         <source>Medium</source>
         <translation>Mittel</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="286"/>
+        <location filename="../src/MainWindow.cpp" line="302"/>
         <source>High</source>
         <translation>Hoch</translation>
     </message>
@@ -1920,116 +1987,116 @@ Think twice before resetting a card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="291"/>
+        <location filename="../src/MainWindow.cpp" line="316"/>
         <source>Close Application</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="293"/>
+        <location filename="../src/MainWindow.cpp" line="318"/>
         <source>Hide Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="310"/>
+        <location filename="../src/MainWindow.cpp" line="335"/>
         <source>&amp;File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="311"/>
+        <location filename="../src/MainWindow.cpp" line="336"/>
         <source>&amp;Quit</source>
         <translation type="unfinished">&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="334"/>
-        <location filename="../src/MainWindow.cpp" line="1022"/>
-        <location filename="../src/MainWindow.cpp" line="1035"/>
-        <location filename="../src/MainWindow.cpp" line="1052"/>
+        <location filename="../src/MainWindow.cpp" line="562"/>
+        <location filename="../src/MainWindow.cpp" line="1102"/>
+        <location filename="../src/MainWindow.cpp" line="1115"/>
+        <location filename="../src/MainWindow.cpp" line="1132"/>
         <source>Disabled</source>
         <translation>Deaktiviert</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="335"/>
+        <location filename="../src/MainWindow.cpp" line="563"/>
         <source>Password Only</source>
         <translation>Allein Kennwort</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="336"/>
+        <location filename="../src/MainWindow.cpp" line="564"/>
         <source>Login + Password</source>
         <translation>Anmeldename + Kennwort</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="337"/>
+        <location filename="../src/MainWindow.cpp" line="565"/>
         <source>Enter + Password</source>
         <translation>Eingabetaste + Kennwort</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="338"/>
+        <location filename="../src/MainWindow.cpp" line="566"/>
         <source>Password / Win + L</source>
         <translation>Kennwort / Win + L</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="339"/>
+        <location filename="../src/MainWindow.cpp" line="567"/>
         <source>Login + Pass / Win + L</source>
         <translation>Anmeldename + Kennwort / Win + L</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="340"/>
+        <location filename="../src/MainWindow.cpp" line="568"/>
         <source>Enter + Pass / Win + L</source>
         <translation>Eingabetaste + Kennwort / Win + L</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="341"/>
+        <location filename="../src/MainWindow.cpp" line="569"/>
         <source>Ctrl + Alt + Del / Win + L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="345"/>
+        <location filename="../src/MainWindow.cpp" line="360"/>
         <source>Black</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="346"/>
+        <location filename="../src/MainWindow.cpp" line="361"/>
         <source>White</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="346"/>
+        <location filename="../src/MainWindow.cpp" line="361"/>
         <source>_white</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="452"/>
+        <location filename="../src/MainWindow.cpp" line="468"/>
         <source>Fetching UID from device. This may take a few seconds...</source>
         <translation>UID vom Gerät holen. Das kann ein paar Sekunden dauern ...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="468"/>
+        <location filename="../src/MainWindow.cpp" line="484"/>
         <source>Either the device have been tempered with or the input key is invalid.</source>
         <translation>Entweder wurde das Gerät manipuliert oder der EingabeSchlüssel- ist ungültig.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="472"/>
+        <location filename="../src/MainWindow.cpp" line="488"/>
         <source>Your device&apos;s UID is %1</source>
         <translation>Die Geräte-UID ist %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="548"/>
+        <location filename="../src/MainWindow.cpp" line="613"/>
         <source>Credentials have been modified.
 Do you want to save your changes?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="690"/>
+        <location filename="../src/MainWindow.cpp" line="755"/>
         <source>Remove the card from the device to change this setting.</source>
         <translation>Entfernen Sie die Karte vom Gerät, um diese Einstellung zu ändern.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1678"/>
+        <location filename="../src/MainWindow.cpp" line="1798"/>
         <source>Disable Have I Been Pwned check?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1682"/>
+        <location filename="../src/MainWindow.cpp" line="1802"/>
         <source>Enable Have I Been Pwned check?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2039,128 +2106,168 @@ Do you want to save your changes?</source>
         <translation>Keine</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="712"/>
+        <location filename="../src/MainWindow.cpp" line="304"/>
+        <source>No Inactivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="305"/>
+        <source>30 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="306"/>
+        <source>1 hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="307"/>
+        <source>2 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="308"/>
+        <source>3 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="309"/>
+        <source>4 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="310"/>
+        <source>5 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="311"/>
+        <source>6 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="777"/>
         <source>%1Mb</source>
         <translation>%1 Mb</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="842"/>
+        <location filename="../src/MainWindow.cpp" line="911"/>
         <source>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Auf die Geräts-Bestätigung warten&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Bestätigen Sie die Anfrage auf dem Gerät.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="855"/>
+        <location filename="../src/MainWindow.cpp" line="924"/>
         <source>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving Changes to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Änderungen am Gerät speichern&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Bitte warten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="882"/>
+        <location filename="../src/MainWindow.cpp" line="951"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Bestätigen Sie die Anfrage auf dem Gerät.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="895"/>
+        <location filename="../src/MainWindow.cpp" line="964"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Bestätigen Sie die Anfrage auf dem Gerät.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="939"/>
+        <location filename="../src/MainWindow.cpp" line="1019"/>
         <source>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Änderungen im Gerätespeicher speichern&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Bitte warten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="980"/>
+        <location filename="../src/MainWindow.cpp" line="1060"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Exporting Database from Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Die Datenbank wird vom Gerät exportiert&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Bitte warten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="983"/>
+        <location filename="../src/MainWindow.cpp" line="1063"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Importing and Merging File to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Datei auf Gerät importieren und zusammenführen&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Bitte warten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1035"/>
+        <location filename="../src/MainWindow.cpp" line="1115"/>
         <source>Subdomain selection: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1050"/>
+        <location filename="../src/MainWindow.cpp" line="1130"/>
         <source>Integration with &lt;a href=&quot;%1&quot;&gt;Have I Been Pwned&lt;/a&gt;: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1148"/>
+        <location filename="../src/MainWindow.cpp" line="1228"/>
         <source>Select database export...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1206"/>
+        <location filename="../src/MainWindow.cpp" line="1286"/>
         <source>Successfully exported the database from your device.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1292"/>
+        <location filename="../src/MainWindow.cpp" line="1372"/>
         <source>Memory integrity check done successfully!
 %1 of %2 credential slots used.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1301"/>
+        <location filename="../src/MainWindow.cpp" line="1381"/>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1501"/>
+        <location filename="../src/MainWindow.cpp" line="1606"/>
         <source>Memory exports (*.bin)</source>
         <translation>Speicherabbilder (*.bin)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1532"/>
+        <location filename="../src/MainWindow.cpp" line="1637"/>
         <source>Reset card failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1534"/>
+        <location filename="../src/MainWindow.cpp" line="1639"/>
         <source>Reset card done successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1541"/>
+        <location filename="../src/MainWindow.cpp" line="1646"/>
         <source>Select CSV file to import...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1569"/>
+        <location filename="../src/MainWindow.cpp" line="1674"/>
         <source>Nothing is read from %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1596"/>
+        <location filename="../src/MainWindow.cpp" line="1701"/>
         <source>Unable to import %1: Each row must contain exact 3 items. Some lines don&apos;t (lines number: %2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1600"/>
+        <location filename="../src/MainWindow.cpp" line="1705"/>
         <source>Unable to import %1: Each row must contain exact 3 items (more than 10 lines don&apos;t)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1608"/>
+        <location filename="../src/MainWindow.cpp" line="1713"/>
         <source>Unable to import %1: Each row must contain exact 3 items using comma as a delimiter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1656"/>
+        <location filename="../src/MainWindow.cpp" line="1776"/>
         <source>Disable subdomain selection?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1658"/>
+        <location filename="../src/MainWindow.cpp" line="1778"/>
         <source>Enable subdomain selection?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="868"/>
+        <location filename="../src/MainWindow.cpp" line="937"/>
         <source>Failure</source>
         <translation>Fehler</translation>
     </message>
@@ -2192,61 +2299,61 @@ Sie werden aufgefordert, Import- oder Exportvorgänge durchzuführen, wenn Ände
         <translation type="vanished">Die MooltiApp-Sicherungsdatei verfügt nicht über verschlüsselte Anmeldungen.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="868"/>
+        <location filename="../src/MainWindow.cpp" line="937"/>
         <source>Couldn&apos;t save credentials, please contact the support team with moolticute&apos;s log</source>
         <translation>Die Anmeldedaten konnten nicht gespeichert werden. Bitte kontaktieren Sie das Support-Team mit dem Moolticute-Protokoll</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1001"/>
+        <location filename="../src/MainWindow.cpp" line="1081"/>
         <source>Disable autostart at boot?</source>
         <translation>Autostart beim Booten deaktivieren?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1003"/>
+        <location filename="../src/MainWindow.cpp" line="1083"/>
         <source>Enable autostart at boot?</source>
         <translation>Autostart beim Booten aktivieren?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1022"/>
+        <location filename="../src/MainWindow.cpp" line="1102"/>
         <source>Start Moolticute with the computer: %1</source>
         <translation>Starte Moolticute mit dem Computer: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1022"/>
-        <location filename="../src/MainWindow.cpp" line="1035"/>
-        <location filename="../src/MainWindow.cpp" line="1052"/>
+        <location filename="../src/MainWindow.cpp" line="1102"/>
+        <location filename="../src/MainWindow.cpp" line="1115"/>
+        <location filename="../src/MainWindow.cpp" line="1132"/>
         <source>Enabled</source>
         <translation>Aktiviert</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1024"/>
-        <location filename="../src/MainWindow.cpp" line="1037"/>
-        <location filename="../src/MainWindow.cpp" line="1055"/>
+        <location filename="../src/MainWindow.cpp" line="1104"/>
+        <location filename="../src/MainWindow.cpp" line="1117"/>
+        <location filename="../src/MainWindow.cpp" line="1135"/>
         <source>Disable</source>
         <translation>Deaktivieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1026"/>
-        <location filename="../src/MainWindow.cpp" line="1039"/>
-        <location filename="../src/MainWindow.cpp" line="1059"/>
+        <location filename="../src/MainWindow.cpp" line="1106"/>
+        <location filename="../src/MainWindow.cpp" line="1119"/>
+        <location filename="../src/MainWindow.cpp" line="1139"/>
         <source>Enable</source>
         <translation>Aktivieren</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1181"/>
+        <location filename="../src/MainWindow.cpp" line="1261"/>
         <source>Save database export...</source>
         <translation>Datenbankexport speichern...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1157"/>
-        <location filename="../src/MainWindow.cpp" line="1178"/>
-        <location filename="../src/MainWindow.cpp" line="1201"/>
-        <location filename="../src/MainWindow.cpp" line="1232"/>
-        <location filename="../src/MainWindow.cpp" line="1550"/>
-        <location filename="../src/MainWindow.cpp" line="1569"/>
-        <location filename="../src/MainWindow.cpp" line="1596"/>
-        <location filename="../src/MainWindow.cpp" line="1600"/>
-        <location filename="../src/MainWindow.cpp" line="1608"/>
+        <location filename="../src/MainWindow.cpp" line="1237"/>
+        <location filename="../src/MainWindow.cpp" line="1258"/>
+        <location filename="../src/MainWindow.cpp" line="1281"/>
+        <location filename="../src/MainWindow.cpp" line="1312"/>
+        <location filename="../src/MainWindow.cpp" line="1655"/>
+        <location filename="../src/MainWindow.cpp" line="1674"/>
+        <location filename="../src/MainWindow.cpp" line="1701"/>
+        <location filename="../src/MainWindow.cpp" line="1705"/>
+        <location filename="../src/MainWindow.cpp" line="1713"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
@@ -2266,38 +2373,38 @@ Sie werden aufgefordert, Import- oder Exportvorgänge durchzuführen, wenn Ände
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="283"/>
+        <location filename="../src/MainWindow.cpp" line="299"/>
         <source>Very Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1157"/>
-        <location filename="../src/MainWindow.cpp" line="1550"/>
+        <location filename="../src/MainWindow.cpp" line="1237"/>
+        <location filename="../src/MainWindow.cpp" line="1655"/>
         <source>Unable to read file %1</source>
         <translation>Kann Datei %1 nicht lesen</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1201"/>
+        <location filename="../src/MainWindow.cpp" line="1281"/>
         <source>Unable to write to file %1</source>
         <translation>Kann nicht in Datei %1 schreiben</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1228"/>
+        <location filename="../src/MainWindow.cpp" line="1308"/>
         <source>Successfully imported and merged database into the device.</source>
         <translation>Die Datenbank wurde erfolgreich in das Gerät importiert und zusammengeführt.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1243"/>
+        <location filename="../src/MainWindow.cpp" line="1323"/>
         <source>Do you want to start the integrity check of your device?</source>
         <translation>Möchten Sie die Integritätsprüfung Ihres Geräts starten?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1254"/>
+        <location filename="../src/MainWindow.cpp" line="1334"/>
         <source>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Auf die Geräts-Bestätigung warten&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Bestätigen Sie die Anfrage auf dem Gerät.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1286"/>
+        <location filename="../src/MainWindow.cpp" line="1366"/>
         <source>Memory integrity check failed!</source>
         <translation>Speicherintegritätsprüfung fehlgeschlagen!</translation>
     </message>
@@ -2310,12 +2417,11 @@ Sie werden aufgefordert, Import- oder Exportvorgänge durchzuführen, wenn Ände
         <translation type="vanished">Um sicherzustellen, dass niemand Ihr Gerät manipuliert hat, können Sie ein Passwort anfordern, mit dem Sie die UID Ihres Geräts abrufen können.&lt;ol&gt;&lt;li&gt;Holen Sie sich die Seriennummer von der Rückseite des Geräts.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID-Anforderungscode&amp;body=Meine Seriennummer ist %1&quot;&gt;senden Sie uns eine Email&lt;/a&gt; mit der Seriennummer und fordern Sie das Passwort an.&lt;/li&gt;&lt;li&gt;Geben Sie das Passwort ein, das Sie von uns erhalten haben&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1372"/>
         <source>Memory Management Error</source>
-        <translation>Speicherverwaltungsfehler</translation>
+        <translation type="vanished">Speicherverwaltungsfehler</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1373"/>
+        <location filename="../src/MainWindow.cpp" line="1456"/>
         <source>An error occured when trying to go into Memory Management mode.
 
 %1</source>
@@ -2324,7 +2430,7 @@ Sie werden aufgefordert, Import- oder Exportvorgänge durchzuführen, wenn Ände
 %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1386"/>
+        <location filename="../src/MainWindow.cpp" line="1469"/>
         <source>System default language</source>
         <translation>System standard Sprache</translation>
     </message>
@@ -2423,77 +2529,90 @@ Sie werden aufgefordert, Import- oder Exportvorgänge durchzuführen, wenn Ände
 <context>
     <name>PasswordOptionsPopup</name>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="160"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="161"/>
         <source>Upper case letters</source>
         <translation>Großbuchstaben</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="163"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="164"/>
         <source>Lower case letters</source>
         <translation>Kleinbuchstaben</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="166"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="167"/>
         <source>Digits</source>
         <translation>Ziffern</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="169"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="170"/>
         <source>Symbols &amp;&amp; specials characters</source>
         <translation>Symbole und Sonderzeichen</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="179"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="180"/>
         <source>Fill</source>
         <translation>Füllen</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="182"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="183"/>
         <source>Refresh</source>
         <translation>Aktualisierung</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="195"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="196"/>
         <source>Password Profile:</source>
         <translation>Kennwort-Profile:</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="265"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="266"/>
         <source>Length: %1 </source>
         <translation>Länge: %1</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="364"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="367"/>
         <source>Entropy: %1 bit</source>
         <translation>Entropie: %1 bit</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="374"/>
-        <location filename="../src/PasswordLineEdit.cpp" line="379"/>
-        <location filename="../src/PasswordLineEdit.cpp" line="384"/>
-        <location filename="../src/PasswordLineEdit.cpp" line="389"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="377"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="382"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="387"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="392"/>
         <source>Password Quality: %1</source>
         <translation>Kennwortqualität: %1</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="374"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="377"/>
         <source>Poor</source>
         <translation>Arm</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="379"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="382"/>
         <source>Weak</source>
         <translation>Schwach</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="384"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="387"/>
         <source>Good</source>
         <translation>Gut</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="389"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="392"/>
         <source>Excellent</source>
         <translation>Exzellent</translation>
+    </message>
+</context>
+<context>
+    <name>PromptWidget</name>
+    <message>
+        <location filename="../src/PromptWidget.cpp" line="10"/>
+        <source>Memory Management Error</source>
+        <translation type="unfinished">Speicherverwaltungsfehler</translation>
+    </message>
+    <message>
+        <location filename="../src/PromptWidget.cpp" line="11"/>
+        <source>You haven&apos;t made a backup of your database in a while. </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2906,6 +3025,59 @@ Fortfahren?</translation>
     </message>
 </context>
 <context>
+    <name>TOTPCredential</name>
+    <message>
+        <location filename="../src/TOTPCredential.ui" line="23"/>
+        <source>TOTP Credential</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.ui" line="37"/>
+        <source>You have entered an invalid Base32 character.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.ui" line="52"/>
+        <source>Secret Key:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.ui" line="74"/>
+        <source>Settings</source>
+        <translation type="unfinished">Einstellungen</translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.ui" line="83"/>
+        <source>Time step:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.ui" line="102"/>
+        <source> sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.ui" line="118"/>
+        <source>Code size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.ui" line="137"/>
+        <source> digits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.cpp" line="54"/>
+        <source>Invalid Secret Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.cpp" line="54"/>
+        <source>The entered Secret Key is not a valid Base32 string</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Updater</name>
     <message>
         <location filename="../src/QSimpleUpdater/src/Updater.cpp" line="494"/>
@@ -2936,42 +3108,42 @@ Fortfahren?</translation>
 <context>
     <name>WSClient</name>
     <message>
-        <location filename="../src/WSClient.cpp" line="263"/>
+        <location filename="../src/WSClient.cpp" line="264"/>
         <source>Credentials Detected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="263"/>
+        <location filename="../src/WSClient.cpp" line="264"/>
         <source>Please Approve their Storage on the Mooltipass</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="434"/>
+        <location filename="../src/WSClient.cpp" line="435"/>
         <source>Device connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="434"/>
+        <location filename="../src/WSClient.cpp" line="435"/>
         <source>Disconnecting emulator from Moolticute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="455"/>
+        <location filename="../src/WSClient.cpp" line="456"/>
         <source>Password Compromised</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="476"/>
+        <location filename="../src/WSClient.cpp" line="477"/>
         <source>Error</source>
         <translation type="unfinished">Fehler</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="476"/>
+        <location filename="../src/WSClient.cpp" line="477"/>
         <source>Set user category failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.h" line="172"/>
+        <location filename="../src/WSClient.h" line="177"/>
         <source>this password has been compromised %1 times.</source>
         <translation type="unfinished"></translation>
     </message>
