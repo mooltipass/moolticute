@@ -366,6 +366,7 @@ private:
 
     //timer that asks status
     QTimer *statusTimer = nullptr;
+    QTimer *setDateTimer = nullptr;
 
     //local vars for performance diagnostics
     qint64 diagLastSecs;
@@ -488,6 +489,7 @@ protected:
     static constexpr int INIT_STARTING_DELAY = RESET_SEND_DELAY + 150;
     static constexpr int STATUS_STARTING_DELAY = RESET_SEND_DELAY + 500;
     static constexpr int CATEGORY_FETCH_DELAY = 5000;
+    static constexpr int SET_DATE_INTERVAL = 60*60*1000;
 };
 
 #endif // MPDEVICE_H
