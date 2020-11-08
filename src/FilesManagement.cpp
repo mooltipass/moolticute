@@ -106,6 +106,8 @@ FilesManagement::FilesManagement(QWidget *parent) :
     ui->progressBarTop->hide();
     ui->progressBarQuick->hide();
 
+    ui->labelConfirmRequest->hide();
+
     connect(ui->lineEditFilterFiles, &QLineEdit::textChanged, [=](const QString &t)
     {
         filterModel->setFilter(t);
@@ -252,23 +254,14 @@ void FilesManagement::loadFilesCacheModel(bool isInSync)
 
         connect(button, &QToolButton::clicked, [=]()
         {
-            QSettings s;
-            QDir d = s.value("last_used_path/save_file_dir", QDir::homePath()).toString();
-
             QString target_file = jsonObject.value("name").toString();
-
-            fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), d.filePath(target_file));
-
-            if (fileName.isEmpty())
-                return;
-
-            s.setValue("last_used_path/save_file_dir", QFileInfo(fileName).canonicalPath());
 
             ui->progressBarQuick->setMinimum(0);
             ui->progressBarQuick->setMaximum(0);
             ui->progressBarQuick->setValue(0);
             ui->progressBarQuick->show();
             updateButtonsUI();
+            ui->labelConfirmRequest->show();
 
             connect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
             connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
@@ -425,11 +418,11 @@ void FilesManagement::on_pushButtonDelFile_clicked()
 
 void FilesManagement::dataFileRequested(const QString &service, const QByteArray &data, bool success)
 {
-    Q_UNUSED(service)
     disconnect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
     disconnect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
     ui->progressBar->hide();
     ui->progressBarQuick->hide();
+    ui->labelConfirmRequest->hide();
     updateButtonsUI();
 
     if (!success)
@@ -440,6 +433,18 @@ void FilesManagement::dataFileRequested(const QString &service, const QByteArray
             QMessageBox::warning(this, tr("Failure"), tr("Data Fetch Denied!"));
         return;
     }
+
+    QSettings s;
+    QDir d = s.value("last_used_path/save_file_dir", QDir::homePath()).toString();
+
+    fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), d.filePath(service));
+
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
+    s.setValue("last_used_path/save_file_dir", QFileInfo(fileName).canonicalPath());
 
     QFile f(fileName);
     if (!f.open(QFile::ReadWrite))
