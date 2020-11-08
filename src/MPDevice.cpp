@@ -4297,6 +4297,8 @@ void MPDevice::getDataNode(QString service, const QString &fallback_service, con
     if (isBLE())
     {
         sdata.append((char)0);
+        QVariantMap m = {{ "service", service }};
+        jobs->user_data = m;
         jobs->append(new MPCommandJob(this, MPCmd::READ_DATA_FILE,
                                       sdata,
                   [this, jobs, cbProgress](const QByteArray &data, bool &)
