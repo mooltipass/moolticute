@@ -3664,6 +3664,12 @@ void MPDevice::sendSetupDeviceMessages()
     /* First start: load parameters */
     pSettings->loadParameters();
     setCurrentDate();
+    if (isBLE())
+    {
+        setDateTimer = new QTimer{this};
+        connect(setDateTimer, &QTimer::timeout, this, &MPDevice::setCurrentDate);
+        setDateTimer->start(SET_DATE_INTERVAL);
+    }
 }
 
 void MPDevice::handleDeviceUnlocked()
