@@ -678,6 +678,7 @@ void WSServerCon::sendFilesCache()
     qDebug() << "Sending files cache";
     QJsonObject oroot = { {"msg", "files_cache_list"} };
     QJsonArray array;
+    oroot["sync"] = mpdevice->isFilesCacheInSync();
 
     if (mpdevice->hasFilesCache())
     {
@@ -687,10 +688,10 @@ void WSServerCon::sendFilesCache()
     else
     {
         qDebug() << "There is no files cache to send";
+        oroot["sync"] = false;
     }
 
     oroot["data"] = array;
-    oroot["sync"] = mpdevice->isFilesCacheInSync();
     sendJsonMessage(oroot);
 }
 
