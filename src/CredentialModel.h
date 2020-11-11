@@ -59,9 +59,11 @@ public:
     bool isUserCategoryClean() const { return m_categoryClean; }
     void setUserCategoryClean(bool clean) { m_categoryClean = clean; }
     void setTOTP(const QModelIndex &idx, QString secretKey, int timeStep, int codeSize);
+    QSet<qint8> getTakenFavorites() const;
 
 private:
     ServiceItem *addService(const QString &sServiceName);
+    qint8 getAvailableFavorite(qint8 newFav);
 
 private:
     RootItem *m_pRootItem;
