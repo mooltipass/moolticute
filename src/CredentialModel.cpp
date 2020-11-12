@@ -270,6 +270,28 @@ ServiceItem *CredentialModel::addService(const QString &sServiceName)
     return new ServiceItem(sServiceName);
 }
 
+qint8 CredentialModel::getAvailableFavorite(qint8 newFav)
+{
+    QSet<qint8> favorites = getTakenFavorites();
+    if (favorites.contains(newFav))
+    {
+        qint8 startFav = (newFav/MAX_BLE_CAT_NUM)*MAX_BLE_CAT_NUM;
+        for (qint8 fav = startFav; fav < startFav + MAX_BLE_CAT_NUM; ++fav)
+        {
+            if (!favorites.contains(fav))
+            {
+                return fav;
+            }
+        }
+        qDebug() << "No remaining favorite slot for category";
+        return Common::FAV_NOT_SET;
+    }
+    else
+    {
+        return newFav;
+    }
+}
+
 QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName, int column) const
 {
     QModelIndexList lMatches = match(index(0, column, QModelIndex()), Qt::DisplayRole, sServiceName, 1, Qt::MatchExactly);
@@ -310,6 +332,28 @@ void CredentialModel::setTOTP(const QModelIndex &idx, QString secretKey, int tim
     {
         pLoginItem->setTOTPCredential(secretKey, timeStep, codeSize);
     }
+}
+
+QSet<qint8> CredentialModel::getTakenFavorites() const
+{
+    int services = rowCount();
+    QSet<qint8> favorites;
+    for (int i = 0; i < services; ++i)
+    {
+        auto service_index = index(i,0);
+        int logins = rowCount(service_index);
+        for (int j = 0; j < logins; ++j)
+        {
+            auto login_index = index(j, 0, service_index);
+            auto login = getLoginItemByIndex(login_index);
+            auto favNumber = login->favorite();
+            if (favNumber > Common::FAV_NOT_SET)
+            {
+                favorites.insert(favNumber);
+            }
+        }
+    }
+    return favorites;
 }
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat, int iLoginKey, int iPwdKey)
@@ -411,7 +455,8 @@ void CredentialModel::updateLoginItem(const QModelIndex &idx, const ItemRole &ro
             // When category changed reset favorite
             if (pLoginItem->favorite() > Common::FAV_NOT_SET)
             {
-                pLoginItem->setFavorite(Common::FAV_NOT_SET);
+                int newFav = iCat * MAX_BLE_CAT_NUM + pLoginItem->favorite() % MAX_BLE_CAT_NUM;
+                pLoginItem->setFavorite(getAvailableFavorite(newFav));
             }
             bChanged = true;
         }
