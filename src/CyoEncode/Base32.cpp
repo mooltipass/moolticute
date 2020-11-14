@@ -25,7 +25,7 @@ QString Base32::encode(QString str)
     return QString::fromUtf8(encodedStr.c_str());
 }
 
-QString Base32::decode(QString str)
+QByteArray Base32::decode(QString str)
 {
     // Fill = padding if necessary
     if (str.size() % BASE32_BYTE != 0)
@@ -43,6 +43,17 @@ QString Base32::decode(QString str)
         qCritical() << "Base32 decoding failed";
         return "";
     }
-    std::string decodedStr((char*)&decoded.front());
-    return QString::fromUtf8(decodedStr.c_str());
+    QByteArray decodedArr;
+    if (decoded.front() != static_cast<char>(0x00))
+    {
+        decodedArr.append((char*)&decoded.front());
+    }
+    else
+    {
+        for (auto& c : decoded)
+        {
+            decodedArr.append(static_cast<char>(c));
+        }
+    }
+    return decodedArr;
 }

@@ -627,7 +627,7 @@ QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categorie
 void MPDeviceBleImpl::createTOTPCredMessage(const QString &service, const QString &login, const QJsonObject &totp)
 {
     QByteArray data;
-    QString secretKey = Base32::decode(totp["totp_secret_key"].toString());
+    QByteArray secretKey = Base32::decode(totp["totp_secret_key"].toString());
     int timeStep = totp["totp_time_step"].toInt();
     int codeSize = totp["totp_code_size"].toInt();
 
