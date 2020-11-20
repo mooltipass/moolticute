@@ -6,6 +6,7 @@ os:
 - linux
 - osx
 language: cpp
+osx_image: xcode12.2
 
 before_install:
   - git fetch --tags && git fetch
