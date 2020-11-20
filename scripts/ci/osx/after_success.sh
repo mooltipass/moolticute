@@ -92,6 +92,7 @@ create-dmg \
     --icon-size 128 \
     --icon "$APP.app" 192 344 \
     --app-drop-link 448 344 \
+    --skip-jenkins \
     build/$APP-$VERSION.dmg \
     build/$APP.app
 
