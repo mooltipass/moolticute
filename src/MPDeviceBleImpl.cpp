@@ -642,6 +642,11 @@ void MPDeviceBleImpl::createTOTPCredMessage(const QString &service, const QStrin
     // 380->411 TOTP secret key
     QByteArray secKeyArr;
     secKeyArr.append(secretKey);
+    if (secKeyArr.length() > SECRET_KEY_LENGTH)
+    {
+        qCritical() << "Secretkey is longer than " << SECRET_KEY_LENGTH;
+        secKeyArr = secKeyArr.left(SECRET_KEY_LENGTH);
+    }
     Common::fill(secKeyArr, SECRET_KEY_LENGTH - secKeyArr.size(), ZERO_BYTE);
     data.append(secKeyArr);
     // 412 TOTP secret key length
