@@ -44,16 +44,26 @@ QByteArray Base32::decode(QString str)
         return "";
     }
     QByteArray decodedArr;
-    if (decoded.front() != static_cast<char>(0x00))
+    const auto ZERO_CHAR = static_cast<char>(0x00);
+    for (auto& c : decoded)
     {
-        decodedArr.append((char*)&decoded.front());
+        decodedArr.append(static_cast<char>(c));
     }
-    else
+
+    if (decoded.front() != ZERO_CHAR)
     {
-        for (auto& c : decoded)
-        {
-            decodedArr.append(static_cast<char>(c));
-        }
+       // Truncate zero chars from the end
+       if (decodedArr.back() == ZERO_CHAR)
+       {
+           auto it = decodedArr.rbegin();
+           auto endZeroSize = 0;
+           while (*it == ZERO_CHAR)
+           {
+               ++endZeroSize;
+               ++it;
+           }
+           decodedArr.truncate(decodedArr.size() - endZeroSize);
+       }
     }
     return decodedArr;
 }
