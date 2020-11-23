@@ -154,7 +154,12 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credDisplayLoginInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayDescriptionInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayPasswordInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
-    connect(ui->credDisplayCategoryInput, QOverload<int>::of(&QComboBox::currentIndexChanged), [this] { updateSaveDiscardState(); });
+    connect(ui->credDisplayCategoryInput, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            [this]
+            {
+                ui->pushButtonFavorite->setEnabled(false);
+                updateSaveDiscardState();
+            });
     connect(ui->credDisplayKeyAfterLoginInput, QOverload<int>::of(&QComboBox::currentIndexChanged), [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayKeyAfterPwdInput, QOverload<int>::of(&QComboBox::currentIndexChanged), [this] { updateSaveDiscardState(); });
     connect(ui->credDisplayServiceInput, &QLineEdit::editingFinished,
@@ -946,6 +951,7 @@ void CredentialsManagement::enableNonCredentialEditWidgets()
 {
     ui->quickInsertWidget->setEnabled(true);
     ui->credentialsListWdiget->setEnabled(true);
+    ui->pushButtonFavorite->setEnabled(true);
 }
 
 bool CredentialsManagement::isServiceNameExist(const QString &serviceName) const
