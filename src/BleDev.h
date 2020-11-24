@@ -34,8 +34,6 @@ private slots:
 
     void on_btnFetchRandomData_clicked();
 
-    void on_btnUpdatePlatform_clicked();
-
 private:
     void initUITexts();
     void fetchData(const Common::FetchType &fetchType);

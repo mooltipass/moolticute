@@ -25,7 +25,6 @@ BleDev::BleDev(QWidget *parent) :
     ui->btnFileBrowser->setMinimumWidth(140);
 #endif
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
-    ui->btnUpdatePlatform->setIcon(AppGui::qtAwesome()->icon(fa::upload, whiteButtons));
     ui->btnFetchDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
     ui->progressBarFetchData->setVisible(false);
     ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
@@ -197,9 +196,4 @@ void BleDev::on_btnFetchAccData_clicked()
 void BleDev::on_btnFetchRandomData_clicked()
 {
     fetchData(Common::FetchType::RANDOM_BYTES);
-}
-
-void BleDev::on_btnUpdatePlatform_clicked()
-{
-    wsClient->sendFlashMCU();
 }
