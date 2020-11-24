@@ -24,10 +24,6 @@ public:
 private slots:
     void on_btnFileBrowser_clicked();
 
-    void on_btnPlatInfo_clicked();
-
-    void displayDebugPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor);
-
     void displayUploadBundleResultReceived(bool success);
 
     void updateProgress(int total, int curr, QString msg);

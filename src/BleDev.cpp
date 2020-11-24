@@ -46,16 +46,11 @@ BleDev::~BleDev()
 void BleDev::setWsClient(WSClient *c)
 {
     wsClient = c;
-    connect(wsClient, &WSClient::displayDebugPlatInfo, this, &BleDev::displayDebugPlatInfoReceived);
     connect(wsClient, &WSClient::displayUploadBundleResult, this, &BleDev::displayUploadBundleResultReceived);
 }
 
 void BleDev::clearWidgets()
 {
-    ui->lineEditAuxMCUMaj->clear();
-    ui->lineEditAuxMCUMin->clear();
-    ui->lineEditMainMCUMaj->clear();
-    ui->lineEditMainMCUMin->clear();
 }
 
 void BleDev::initUITexts()
@@ -65,13 +60,6 @@ void BleDev::initUITexts()
     ui->label_BLEDesc->setText(tr("BLE description"));
 
     ui->groupBoxUploadBundle->setTitle(tr("Bundle Settings"));
-
-    ui->groupBoxPlatInfo->setTitle(tr("Platform informations"));
-    ui->label_AuxMCUMaj->setText(tr("Aux MCU major:"));
-    ui->label_AuxMCUMin->setText(tr("Aux MCU minor:"));
-    ui->label_MainMCUMaj->setText(tr("Main MCU major:"));
-    ui->label_MainMCUMin->setText(tr("Main MCU minor:"));
-    ui->btnPlatInfo->setText(tr("Get Plat Info"));
 
     ui->groupBoxFetchData->setTitle(tr("Data Fetch"));
     ui->label_FetchDataFile->setText(tr("Storage file:"));
@@ -141,19 +129,6 @@ void BleDev::on_btnFileBrowser_clicked()
     ui->label_UploadProgress->setText(tr("Starting upload bundle file."));
     ui->label_UploadProgress->show();
     wsClient->sendUploadBundle(fileName);
-}
-
-void BleDev::on_btnPlatInfo_clicked()
-{
-    wsClient->sendPlatInfoRequest();
-}
-
-void BleDev::displayDebugPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor)
-{
-    ui->lineEditAuxMCUMaj->setText(QString::number(auxMajor));
-    ui->lineEditAuxMCUMin->setText(QString::number(auxMinor));
-    ui->lineEditMainMCUMaj->setText(QString::number(mainMajor));
-    ui->lineEditMainMCUMin->setText(QString::number(mainMinor));
 }
 
 void BleDev::displayUploadBundleResultReceived(bool success)
