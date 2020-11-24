@@ -1312,9 +1312,9 @@ void MainWindow::dbImported(bool success, QString message)
         QMessageBox::warning(this, tr("Error"), message);
     }
 
-
     ui->stackedWidget->setCurrentWidget(ui->pageSync);
 
+    updateTabButtons();
     disconnect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 }
 
