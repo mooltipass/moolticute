@@ -148,7 +148,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEditBundlePassword"/>
+         <widget class="QLineEdit" name="lineEditBundlePassword">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="maxLength">
+           <number>32</number>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="horizontalSpacer">

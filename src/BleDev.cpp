@@ -50,6 +50,7 @@ void BleDev::setWsClient(WSClient *c)
 
 void BleDev::clearWidgets()
 {
+    ui->lineEditBundlePassword->clear();
 }
 
 void BleDev::initUITexts()
@@ -95,6 +96,39 @@ void BleDev::fetchData(const Common::FetchType &fetchType)
     }
 }
 
+bool BleDev::checkBundlePassword(QFile* file) const
+{
+    int size = 0;
+    QByteArray arr;
+    while(size < CHECK_BUNDLE_BYTE_SIZE)
+    {
+        char data;
+        file->read(&data, sizeof(char));
+        arr.append(data);
+        ++size;
+    }
+
+    QString bundlePassword = ui->lineEditBundlePassword->text();
+    if (bundlePassword.size() == CHECK_BUNDLE_BYTE_SIZE * 2)
+    {
+        for (int i = 0; i < CHECK_BUNDLE_BYTE_SIZE; ++i)
+        {
+            bool ok = false;
+            const int BASE = 16;
+            auto ch = bundlePassword.mid(i*2, 2).toUInt(&ok, BASE);
+            if (!ok || arr.at(i) != static_cast<char>(ch))
+            {
+                return false;
+            }
+        }
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
 void BleDev::on_btnFileBrowser_clicked()
 {
     QSettings s;
@@ -110,13 +144,21 @@ void BleDev::on_btnFileBrowser_clicked()
 
     s.setValue("last_used_path/bundle_dir", QFileInfo(fileName).canonicalPath());
 
-    QFileInfo file(fileName);
+    QFile file(fileName);
 
-    if (!file.exists() || !file.isFile())
+    if (!file.open(QIODevice::ReadOnly))
     {
         qCritical() << fileName << " is not a file.";
         QMessageBox::warning(this, tr("Invalid path"),
                              tr("The choosen path for bundle is not a file."));
+        return;
+    }
+
+    bool bundlePasswordOk = checkBundlePassword(&file);
+    if (!bundlePasswordOk)
+    {
+        QMessageBox::warning(this, tr("Invalid bundle password"),
+                             tr("The given password for bundle is not correct."));
         return;
     }
 
@@ -140,6 +182,7 @@ void BleDev::displayUploadBundleResultReceived(bool success)
     const auto title = tr("Upload Bundle Result");
     if (success)
     {
+        wsClient->sendFlashMCU();
         QMessageBox::information(this, title,
                                  tr("Upload bundle finished successfully."));
     }

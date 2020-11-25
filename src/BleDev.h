@@ -37,12 +37,14 @@ private slots:
 private:
     void initUITexts();
     void fetchData(const Common::FetchType &fetchType);
+    bool checkBundlePassword(QFile* file) const;
 
     Ui::BleDev *ui;
     WSClient *wsClient = nullptr;
     Common::FetchState fetchState = Common::FetchState::STOPPED;
     const QString FETCH_ACC_DATA_TEXT = tr("Fetch acceleration");
     const QString FETCH_RANDOM_DATA_TEXT = tr("Fetch random data");
+    static constexpr int CHECK_BUNDLE_BYTE_SIZE = 10;
 };
 
 #endif // BLEDEV_H
