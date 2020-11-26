@@ -34,6 +34,8 @@ private slots:
 
     void on_btnFetchRandomData_clicked();
 
+    void on_lineEditBundlePassword_textChanged(const QString &arg1);
+
 private:
     void initUITexts();
     void fetchData(const Common::FetchType &fetchType);
@@ -44,7 +46,8 @@ private:
     Common::FetchState fetchState = Common::FetchState::STOPPED;
     const QString FETCH_ACC_DATA_TEXT = tr("Fetch acceleration");
     const QString FETCH_RANDOM_DATA_TEXT = tr("Fetch random data");
-    static constexpr int CHECK_BUNDLE_BYTE_SIZE = 10;
+    static const QString HEXA_CHAR_REGEXP;
+    static constexpr int CHECK_BUNDLE_BYTE_SIZE = 4;
 };
 
 #endif // BLEDEV_H

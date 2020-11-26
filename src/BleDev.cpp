@@ -4,6 +4,8 @@
 #include "AppGui.h"
 #include "WSClient.h"
 
+const QString BleDev::HEXA_CHAR_REGEXP = "[^A-Fa-f0-9*]";
+
 BleDev::BleDev(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::BleDev)
@@ -30,6 +32,8 @@ BleDev::BleDev(QWidget *parent) :
     ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
     ui->progressBarFetchData->setMinimum(0);
     ui->progressBarFetchData->setMaximum(0);
+    ui->labelInvalidBundle->setStyleSheet("QLabel { color : red; }");
+    ui->labelInvalidBundle->hide();
 
 #if defined(Q_OS_LINUX)
     ui->label_FetchDataFile->setMaximumWidth(150);
@@ -239,4 +243,18 @@ void BleDev::on_btnFetchAccData_clicked()
 void BleDev::on_btnFetchRandomData_clicked()
 {
     fetchData(Common::FetchType::RANDOM_BYTES);
+}
+
+void BleDev::on_lineEditBundlePassword_textChanged(const QString &arg1)
+{
+    if (arg1.contains(QRegExp(HEXA_CHAR_REGEXP)))
+    {
+        ui->btnFileBrowser->setEnabled(false);
+        ui->labelInvalidBundle->show();
+    }
+    else
+    {
+        ui->btnFileBrowser->setEnabled(true);
+        ui->labelInvalidBundle->hide();
+    }
 }
