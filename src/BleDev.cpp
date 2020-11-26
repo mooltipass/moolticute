@@ -115,12 +115,12 @@ bool BleDev::checkBundlePassword(QFile* file) const
     QString bundlePassword = ui->lineEditBundlePassword->text();
     if (bundlePassword.size() == CHECK_BUNDLE_BYTE_SIZE * 2)
     {
+        const int BASE = 16;
         for (int i = 0; i < CHECK_BUNDLE_BYTE_SIZE; ++i)
         {
             bool ok = false;
-            const int BASE = 16;
-            auto ch = bundlePassword.mid(i*2, 2).toUInt(&ok, BASE);
-            if (!ok || arr.at(i) != static_cast<char>(ch))
+            auto passwordChar = bundlePassword.mid(i*2, 2).toUInt(&ok, BASE);
+            if (!ok || arr.at(i) != static_cast<char>(passwordChar))
             {
                 return false;
             }
@@ -186,6 +186,7 @@ void BleDev::displayUploadBundleResultReceived(bool success)
     const auto title = tr("Upload Bundle Result");
     if (success)
     {
+        // Update platform after successful upload
         wsClient->sendFlashMCU();
         QMessageBox::information(this, title,
                                  tr("Upload bundle finished successfully."));
