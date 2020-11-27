@@ -5,6 +5,7 @@
 #include "WSClient.h"
 
 const QString BleDev::HEXA_CHAR_REGEXP = "[^A-Fa-f0-9*]";
+const QByteArray BleDev::START_BUNDLE_BYTES = "\x78\x56\x34\x12";
 
 BleDev::BleDev(QWidget *parent) :
     QWidget(parent),
@@ -61,7 +62,6 @@ void BleDev::initUITexts()
 {
     const auto browseText = tr("Browse");
     ui->label_DevTab->setText(tr("BLE Developer Tab"));
-    ui->label_BLEDesc->setText(tr("BLE description"));
 
     ui->groupBoxUploadBundle->setTitle(tr("Bundle Settings"));
 
@@ -100,36 +100,18 @@ void BleDev::fetchData(const Common::FetchType &fetchType)
     }
 }
 
-bool BleDev::checkBundlePassword(QFile* file) const
+bool BleDev::isValidBundleFile(QFile* file) const
 {
-    int size = 0;
-    QByteArray arr;
-    while(size < CHECK_BUNDLE_BYTE_SIZE)
+    for (int i = 0; i < START_BUNDLE_BYTES.size(); ++i)
     {
         char data;
         file->read(&data, sizeof(char));
-        arr.append(data);
-        ++size;
-    }
-
-    QString bundlePassword = ui->lineEditBundlePassword->text();
-    if (bundlePassword.size() == CHECK_BUNDLE_BYTE_SIZE * 2)
-    {
-        const int BASE = 16;
-        for (int i = 0; i < CHECK_BUNDLE_BYTE_SIZE; ++i)
+        if (data != START_BUNDLE_BYTES[i])
         {
-            bool ok = false;
-            auto passwordChar = bundlePassword.mid(i*2, 2).toUInt(&ok, BASE);
-            if (!ok || arr.at(i) != static_cast<char>(passwordChar))
-            {
-                return false;
-            }
+            return false;
         }
     }
-    else
-    {
-        return false;
-    }
+
     return true;
 }
 
@@ -158,11 +140,11 @@ void BleDev::on_btnFileBrowser_clicked()
         return;
     }
 
-    bool bundlePasswordOk = checkBundlePassword(&file);
-    if (!bundlePasswordOk)
+    bool validBundle = isValidBundleFile(&file);
+    if (!validBundle)
     {
-        QMessageBox::warning(this, tr("Invalid bundle password"),
-                             tr("The given password for bundle is not correct."));
+        QMessageBox::warning(this, tr("Invalid bundle file is selected"),
+                             tr("The given bundle file is not correct."));
         return;
     }
 
@@ -173,7 +155,7 @@ void BleDev::on_btnFileBrowser_clicked()
     ui->progressBarUpload->setValue(0);
     ui->label_UploadProgress->setText(tr("Starting upload bundle file."));
     ui->label_UploadProgress->show();
-    wsClient->sendUploadBundle(fileName);
+    wsClient->sendUploadBundle(fileName, ui->lineEditBundlePassword->text());
 }
 
 void BleDev::displayUploadBundleResultReceived(bool success)
@@ -248,14 +230,16 @@ void BleDev::on_btnFetchRandomData_clicked()
 
 void BleDev::on_lineEditBundlePassword_textChanged(const QString &arg1)
 {
-    if (arg1.contains(QRegExp(HEXA_CHAR_REGEXP)))
-    {
-        ui->btnFileBrowser->setEnabled(false);
-        ui->labelInvalidBundle->show();
-    }
-    else
+    auto size = arg1.size();
+    if ((size == 0 || size == UPLOAD_PASSWORD_SIZE) &&
+            !arg1.contains(QRegExp(HEXA_CHAR_REGEXP)))
     {
         ui->btnFileBrowser->setEnabled(true);
         ui->labelInvalidBundle->hide();
+    }
+    else
+    {
+        ui->btnFileBrowser->setEnabled(false);
+        ui->labelInvalidBundle->show();
     }
 }

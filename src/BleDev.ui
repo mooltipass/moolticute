@@ -79,7 +79,7 @@
       </font>
      </property>
      <property name="text">
-      <string>BLE description</string>
+      <string>This tab allows you to use your Mini BLE advanced features</string>
      </property>
     </widget>
    </item>
@@ -135,7 +135,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="labelBundlePassword">
+         <widget class="QLabel" name="labelUploadPassword">
           <property name="font">
            <font>
             <weight>50</weight>
@@ -143,7 +143,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Bundle Password:</string>
+           <string>Upload Password:</string>
           </property>
          </widget>
         </item>
@@ -222,7 +222,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Invalid Bundle Password</string>
+         <string>Invalid Upload Password</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
