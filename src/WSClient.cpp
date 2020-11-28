@@ -675,10 +675,11 @@ void WSClient::sendFlashMCU()
     sendJsonData({{ "msg", "flash_mcu" }});
 }
 
-void WSClient::sendUploadBundle(QString bundleFilePath)
+void WSClient::sendUploadBundle(QString bundleFilePath, QString password)
 {
     QJsonObject o;
     o["file"] = bundleFilePath;
+    o["password"] = password;
     sendJsonData({{ "msg", "upload_bundle" },
                   {"data", o}});
 }

@@ -4,6 +4,9 @@
 #include "AppGui.h"
 #include "WSClient.h"
 
+const QString BleDev::HEXA_CHAR_REGEXP = "[^A-Fa-f0-9*]";
+const QByteArray BleDev::START_BUNDLE_BYTES = "\x78\x56\x34\x12";
+
 BleDev::BleDev(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::BleDev)
@@ -25,12 +28,13 @@ BleDev::BleDev(QWidget *parent) :
     ui->btnFileBrowser->setMinimumWidth(140);
 #endif
     ui->btnFileBrowser->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
-    ui->btnUpdatePlatform->setIcon(AppGui::qtAwesome()->icon(fa::upload, whiteButtons));
     ui->btnFetchDataBrowse->setIcon(AppGui::qtAwesome()->icon(fa::file, whiteButtons));
     ui->progressBarFetchData->setVisible(false);
     ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
     ui->progressBarFetchData->setMinimum(0);
     ui->progressBarFetchData->setMaximum(0);
+    ui->labelInvalidBundle->setStyleSheet("QLabel { color : red; }");
+    ui->labelInvalidBundle->hide();
 
 #if defined(Q_OS_LINUX)
     ui->label_FetchDataFile->setMaximumWidth(150);
@@ -46,32 +50,20 @@ BleDev::~BleDev()
 void BleDev::setWsClient(WSClient *c)
 {
     wsClient = c;
-    connect(wsClient, &WSClient::displayDebugPlatInfo, this, &BleDev::displayDebugPlatInfoReceived);
     connect(wsClient, &WSClient::displayUploadBundleResult, this, &BleDev::displayUploadBundleResultReceived);
 }
 
 void BleDev::clearWidgets()
 {
-    ui->lineEditAuxMCUMaj->clear();
-    ui->lineEditAuxMCUMin->clear();
-    ui->lineEditMainMCUMaj->clear();
-    ui->lineEditMainMCUMin->clear();
+    ui->lineEditBundlePassword->clear();
 }
 
 void BleDev::initUITexts()
 {
     const auto browseText = tr("Browse");
     ui->label_DevTab->setText(tr("BLE Developer Tab"));
-    ui->label_BLEDesc->setText(tr("BLE description"));
 
     ui->groupBoxUploadBundle->setTitle(tr("Bundle Settings"));
-
-    ui->groupBoxPlatInfo->setTitle(tr("Platform informations"));
-    ui->label_AuxMCUMaj->setText(tr("Aux MCU major:"));
-    ui->label_AuxMCUMin->setText(tr("Aux MCU minor:"));
-    ui->label_MainMCUMaj->setText(tr("Main MCU major:"));
-    ui->label_MainMCUMin->setText(tr("Main MCU minor:"));
-    ui->btnPlatInfo->setText(tr("Get Plat Info"));
 
     ui->groupBoxFetchData->setTitle(tr("Data Fetch"));
     ui->label_FetchDataFile->setText(tr("Storage file:"));
@@ -108,6 +100,21 @@ void BleDev::fetchData(const Common::FetchType &fetchType)
     }
 }
 
+bool BleDev::isValidBundleFile(QFile* file) const
+{
+    for (int i = 0; i < START_BUNDLE_BYTES.size(); ++i)
+    {
+        char data;
+        file->read(&data, sizeof(char));
+        if (data != START_BUNDLE_BYTES[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void BleDev::on_btnFileBrowser_clicked()
 {
     QSettings s;
@@ -123,13 +130,21 @@ void BleDev::on_btnFileBrowser_clicked()
 
     s.setValue("last_used_path/bundle_dir", QFileInfo(fileName).canonicalPath());
 
-    QFileInfo file(fileName);
+    QFile file(fileName);
 
-    if (!file.exists() || !file.isFile())
+    if (!file.open(QIODevice::ReadOnly))
     {
         qCritical() << fileName << " is not a file.";
         QMessageBox::warning(this, tr("Invalid path"),
                              tr("The choosen path for bundle is not a file."));
+        return;
+    }
+
+    bool validBundle = isValidBundleFile(&file);
+    if (!validBundle)
+    {
+        QMessageBox::warning(this, tr("Invalid bundle file is selected"),
+                             tr("The given bundle file is not correct."));
         return;
     }
 
@@ -140,20 +155,7 @@ void BleDev::on_btnFileBrowser_clicked()
     ui->progressBarUpload->setValue(0);
     ui->label_UploadProgress->setText(tr("Starting upload bundle file."));
     ui->label_UploadProgress->show();
-    wsClient->sendUploadBundle(fileName);
-}
-
-void BleDev::on_btnPlatInfo_clicked()
-{
-    wsClient->sendPlatInfoRequest();
-}
-
-void BleDev::displayDebugPlatInfoReceived(int auxMajor, int auxMinor, int mainMajor, int mainMinor)
-{
-    ui->lineEditAuxMCUMaj->setText(QString::number(auxMajor));
-    ui->lineEditAuxMCUMin->setText(QString::number(auxMinor));
-    ui->lineEditMainMCUMaj->setText(QString::number(mainMajor));
-    ui->lineEditMainMCUMin->setText(QString::number(mainMinor));
+    wsClient->sendUploadBundle(fileName, ui->lineEditBundlePassword->text());
 }
 
 void BleDev::displayUploadBundleResultReceived(bool success)
@@ -166,6 +168,8 @@ void BleDev::displayUploadBundleResultReceived(bool success)
     const auto title = tr("Upload Bundle Result");
     if (success)
     {
+        // Update platform after successful upload
+        wsClient->sendFlashMCU();
         QMessageBox::information(this, title,
                                  tr("Upload bundle finished successfully."));
     }
@@ -224,7 +228,18 @@ void BleDev::on_btnFetchRandomData_clicked()
     fetchData(Common::FetchType::RANDOM_BYTES);
 }
 
-void BleDev::on_btnUpdatePlatform_clicked()
+void BleDev::on_lineEditBundlePassword_textChanged(const QString &arg1)
 {
-    wsClient->sendFlashMCU();
+    auto size = arg1.size();
+    if ((size == 0 || size == UPLOAD_PASSWORD_SIZE) &&
+            !arg1.contains(QRegExp(HEXA_CHAR_REGEXP)))
+    {
+        ui->btnFileBrowser->setEnabled(true);
+        ui->labelInvalidBundle->hide();
+    }
+    else
+    {
+        ui->btnFileBrowser->setEnabled(false);
+        ui->labelInvalidBundle->show();
+    }
 }

@@ -99,7 +99,7 @@ public:
 
     void sendPlatInfoRequest();
     void sendFlashMCU();
-    void sendUploadBundle(QString bundleFilePath);
+    void sendUploadBundle(QString bundleFilePath, QString password);
     void sendFetchData(QString fileName, Common::FetchType fetchType);
     void sendStopFetchData();
     void sendGetUserCategories();
