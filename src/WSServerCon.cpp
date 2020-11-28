@@ -1052,7 +1052,8 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     else if (root["msg"] == "upload_bundle")
     {
         QJsonObject o = root["data"].toObject();
-        bleImpl->uploadBundle(o["file"].toString(), [this, root](bool success, QString errstr)
+        bleImpl->uploadBundle(o["file"].toString(), o["password"].toString(),
+                [this, root](bool success, QString errstr)
         {
             QJsonObject ores;
             QJsonObject oroot = root;
