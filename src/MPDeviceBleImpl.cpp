@@ -1334,7 +1334,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
         ++byteCounter;
         if ((BUNBLE_DATA_WRITE_SIZE + BUNBLE_DATA_ADDRESS_SIZE) == byteCounter)
         {
-            jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, message,
+            jobs->append(new MPCommandJob(mpDev, MPCmd::WRITE_256B_TO_FLASH, message,
                               [curAddress, cbProgress, fileSize](const QByteArray &data, bool &) -> bool
                                   {
                                       Q_UNUSED(data);
@@ -1363,7 +1363,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
     }
     if (byteCounter != BUNBLE_DATA_ADDRESS_SIZE)
     {
-        jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, message,
+        jobs->append(new MPCommandJob(mpDev, MPCmd::WRITE_256B_TO_FLASH, message,
                       [](const QByteArray &data, bool &) -> bool
                           {
                               Q_UNUSED(data);
@@ -1372,7 +1372,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
                           }));
     }
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_REINDEX_BUNDLE, bleProt->getDefaultFuncDone()));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::END_BUNDLE_UPLOAD, bleProt->getDefaultFuncDone()));
 }
 
 void MPDeviceBleImpl::writeFetchData(QFile *file, MPCmd::Command cmd)
