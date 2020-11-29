@@ -356,6 +356,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::SET_KEYB_LAYOUT_ID    , 0x001D},
         {MPCmd::SET_USER_LANG         , 0x001E},
         {MPCmd::SET_DEVICE_LANG       , 0x001F},
+        {MPCmd::NIMH_RECONDITION      , 0x0028},
         {MPCmd::START_BUNDLE_UPLOAD   , 0x0029},
         {MPCmd::WRITE_256B_TO_FLASH   , 0x002A},
         {MPCmd::END_BUNDLE_UPLOAD     , 0x002B},

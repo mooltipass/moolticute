@@ -107,6 +107,7 @@ public:
     void sendUserSettingsRequest();
     void sendLoadParams();
     void sendBatteryRequest();
+    void sendNiMHReconditioning();
 
     inline bool isFw12() const { return isFwVersion(12); }
     inline bool isFw13() const { return isFwVersion(13); }

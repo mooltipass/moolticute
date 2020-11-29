@@ -3971,109 +3971,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
         <property name="rightMargin">
          <number>80</number>
         </property>
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_SSH">
-          <property name="maximumSize">
-           <size>
-            <width>600</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="title">
-           <string>SSH Key Tab</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_24">
-           <property name="leftMargin">
-            <number>18</number>
-           </property>
-           <item>
-            <widget class="QRadioButton" name="radioButtonSSHTabOnDemand">
-             <property name="text">
-              <string>Visible ON DE&amp;MAND  (use CTRL+SHIFT+F1 keyboard shortcut)</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButtonSSHTabAlways">
-             <property name="text">
-              <string>ALWA&amp;YS visible</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QGroupBox" name="groupBox_ResetCard">
-          <property name="title">
-           <string>Reset card</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_26">
-           <item>
-            <layout class="QGridLayout" name="gridLayout_3">
-             <property name="sizeConstraint">
-              <enum>QLayout::SetNoConstraint</enum>
-             </property>
-             <property name="leftMargin">
-              <number>30</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>30</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <property name="horizontalSpacing">
-              <number>60</number>
-             </property>
-             <property name="verticalSpacing">
-              <number>30</number>
-             </property>
-             <item row="0" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_39">
-               <item>
-                <widget class="QLabel" name="label_6">
-                 <property name="text">
-                  <string>Erase Inserted Card</string>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_resetCardHelp">
-                 <property name="text">
-                  <string>?</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="pushButtonResetCard">
-               <property name="text">
-                <string>Reset Card</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
         <item row="2" column="0">
          <widget class="QGroupBox" name="groupBox_CSV">
           <property name="title">
@@ -4145,6 +4042,57 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               </widget>
              </item>
             </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <spacer name="verticalSpacer_18">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_SSH">
+          <property name="maximumSize">
+           <size>
+            <width>600</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>SSH Key Tab</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_24">
+           <property name="leftMargin">
+            <number>18</number>
+           </property>
+           <item>
+            <widget class="QRadioButton" name="radioButtonSSHTabOnDemand">
+             <property name="text">
+              <string>Visible ON DE&amp;MAND  (use CTRL+SHIFT+F1 keyboard shortcut)</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButtonSSHTabAlways">
+             <property name="text">
+              <string>ALWA&amp;YS visible</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -4251,18 +4199,99 @@ Hint: keep your mouse positioned over an option to get more details.</string>
           </layout>
          </widget>
         </item>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupBox_ResetCard">
+          <property name="title">
+           <string>Reset card</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_26">
+           <item>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <property name="sizeConstraint">
+              <enum>QLayout::SetNoConstraint</enum>
+             </property>
+             <property name="leftMargin">
+              <number>30</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>30</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <property name="horizontalSpacing">
+              <number>60</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>30</number>
+             </property>
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_39">
+               <item>
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Erase Inserted Card</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_resetCardHelp">
+                 <property name="text">
+                  <string>?</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="pushButtonResetCard">
+               <property name="text">
+                <string>Reset Card</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item row="4" column="0">
-         <spacer name="verticalSpacer_18">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+         <widget class="QGroupBox" name="groupBoxNiMHRecondition">
+          <property name="title">
+           <string>NiMH Reconditioning</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
-         </spacer>
+          <layout class="QVBoxLayout" name="verticalLayout_16">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_58">
+             <item>
+              <widget class="QPushButton" name="pushButtonNiMHRecondition">
+               <property name="maximumSize">
+                <size>
+                 <width>220</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Start NiMH Reconditioning</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
