@@ -53,7 +53,7 @@ QByteArray Base32::decode(QString str)
     if (decoded.front() != ZERO_CHAR)
     {
        // Truncate zero chars from the end
-       if (decodedArr.back() == ZERO_CHAR)
+       if (decodedArr.at(decodedArr.size() - 1) == ZERO_CHAR)
        {
            auto it = decodedArr.rbegin();
            auto endZeroSize = 0;

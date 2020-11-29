@@ -108,7 +108,7 @@ void MPDeviceBleImpl::flashMCU(const MessageHandlerCb &cb)
     mpDev->enqueueAndRunJob(jobs);
 }
 
-void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress)
+void MPDeviceBleImpl::uploadBundle(QString filePath, QString password, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress)
 {
     if (!isBundleFileReadable(filePath))
     {
@@ -119,8 +119,8 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb,
     QElapsedTimer *timer = new QElapsedTimer{};
     timer->start();
     auto *jobs = new AsyncJobs(QString("Upload bundle file"), this);
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_ERASE_DATA_FLASH,
-                      [cbProgress, this] (const QByteArray &data, bool &) -> bool
+    jobs->append(new MPCommandJob(mpDev, MPCmd::START_BUNDLE_UPLOAD, createUploadPasswordMessage(password),
+                      [cbProgress, timer, jobs, filePath, this] (const QByteArray &data, bool &) -> bool
                     {
                         if (MSG_SUCCESS != bleProt->getFirstPayloadByte(data))
                         {
@@ -130,16 +130,12 @@ void MPDeviceBleImpl::uploadBundle(QString filePath, const MessageHandlerCb &cb,
                         QVariantMap progress = {
                             {"total", 0},
                             {"current", 0},
-                            {"msg", "Erasing device data..." }
+                            {"msg", "Erasing data finished." }
                         };
+                        qDebug() << "Erase done in: " << timer->nsecsElapsed() / 1000000 << " ms";
+                        delete timer;
+                        sendBundleToDevice(filePath, jobs, cbProgress);
                         cbProgress(progress);
-                        return true;
-                    }));
-
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_IS_DATA_FLASH_READY,
-                    [this, timer, jobs, filePath, cbProgress](const QByteArray &data, bool &) -> bool
-                    {
-                        checkDataFlash(data, timer, jobs, filePath, cbProgress);
                         return true;
                     }));
 
@@ -1262,6 +1258,41 @@ QByteArray MPDeviceBleImpl::createChangePasswordMsg(const QByteArray& address, Q
     return msg;
 }
 
+QByteArray MPDeviceBleImpl::createUploadPasswordMessage(const QString &uploadPassword)
+{
+    if (uploadPassword.isEmpty())
+    {
+        return DEFAULT_BUNDLE_PASSWORD;
+    }
+
+    QByteArray passwordArray;
+    if (uploadPassword.size() == UPLOAD_PASSWORD_BYTE_SIZE * 2)
+    {
+        const int BASE = 16;
+        for (int i = 0; i < UPLOAD_PASSWORD_BYTE_SIZE; ++i)
+        {
+            bool ok = false;
+            auto passwordChar = uploadPassword.mid(i*2, 2).toUInt(&ok, BASE);
+            if (ok)
+            {
+                passwordArray.append(static_cast<char>(passwordChar));
+            }
+            else
+            {
+                qCritical() << "Invalid hex character";
+                return QByteArray{};
+            }
+        }
+    }
+    else
+    {
+        qCritical() << "Invalid length of upload password";
+        return QByteArray{};
+    }
+
+    return passwordArray;
+}
+
 void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress)
 {
     if (MSG_SUCCESS == bleProt->getFirstPayloadByte(data))
@@ -1303,7 +1334,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
         ++byteCounter;
         if ((BUNBLE_DATA_WRITE_SIZE + BUNBLE_DATA_ADDRESS_SIZE) == byteCounter)
         {
-            jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, message,
+            jobs->append(new MPCommandJob(mpDev, MPCmd::WRITE_256B_TO_FLASH, message,
                               [curAddress, cbProgress, fileSize](const QByteArray &data, bool &) -> bool
                                   {
                                       Q_UNUSED(data);
@@ -1332,7 +1363,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
     }
     if (byteCounter != BUNBLE_DATA_ADDRESS_SIZE)
     {
-        jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_DATAFLASH_WRITE_256B, message,
+        jobs->append(new MPCommandJob(mpDev, MPCmd::WRITE_256B_TO_FLASH, message,
                       [](const QByteArray &data, bool &) -> bool
                           {
                               Q_UNUSED(data);
@@ -1341,7 +1372,7 @@ void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, cons
                           }));
     }
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::CMD_DBG_REINDEX_BUNDLE, bleProt->getDefaultFuncDone()));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::END_BUNDLE_UPLOAD, bleProt->getDefaultFuncDone()));
 }
 
 void MPDeviceBleImpl::writeFetchData(QFile *file, MPCmd::Command cmd)

@@ -56,7 +56,7 @@ public:
     QVector<int> calcDebugPlatInfo(const QByteArray &platInfo);
 
     void flashMCU(const MessageHandlerCb &cb);
-    void uploadBundle(QString filePath, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
+    void uploadBundle(QString filePath, QString password, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
     void fetchData(QString filePath, MPCmd::Command cmd);
     inline void stopFetchData() { fetchState = Common::FetchState::STOPPED; }
 
@@ -158,6 +158,7 @@ private:
     QByteArray createCheckCredMessage(const BleCredential &cred);
     QByteArray createCredentialMessage(const CredMap &credMap);
     QByteArray createChangePasswordMsg(const QByteArray& address, QString pwd);
+    QByteArray createUploadPasswordMessage(const QString& uploadPassword);
 
     inline void flipBit();
     void resetFlipBit();
@@ -205,6 +206,8 @@ private:
     const static int STATUS_MSG_SIZE_WITH_BATTERY = 5;
     const static int BATTERY_BYTE = 1;
     const static int SECRET_KEY_LENGTH = 32;
+    static constexpr int UPLOAD_PASSWORD_BYTE_SIZE = 16;
+    const QByteArray DEFAULT_BUNDLE_PASSWORD = "\xb4\x07\x5f\x1b\xa2\xab\x52\x43\x30\x7b\x0a\x04\x83\x89\xad\xcb";
 };
 
 #endif // MPDEVICEBLEIMPL_H
