@@ -751,6 +751,21 @@ void MPDeviceBleImpl::getBattery()
     }
 }
 
+void MPDeviceBleImpl::nihmReconditioning()
+{
+    auto *jobs = new AsyncJobs("NiMH Reconditioning", mpDev);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, bleProt->getDefaultSizeCheckFuncDone()));
+
+    connect(jobs, &AsyncJobs::finished, [](const QByteArray &data)
+    {
+        Q_UNUSED(data)
+        qDebug() << "NiMH Reconditioning started";
+    });
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 void MPDeviceBleImpl::processDebugMsg(const QByteArray &data, bool &isDebugMsg)
 {
     if (isFirstPacket(data))

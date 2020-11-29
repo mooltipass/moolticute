@@ -152,6 +152,7 @@ public:
             INFORM_UNLOCKED     ,
             SET_NODE_PASSWORD   ,
             STORE_TOTP_CRED     ,
+            NIMH_RECONDITION    ,
             START_BUNDLE_UPLOAD ,
             WRITE_256B_TO_FLASH ,
             END_BUNDLE_UPLOAD   ,

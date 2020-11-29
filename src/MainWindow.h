@@ -169,6 +169,8 @@ private slots:
 
     void on_checkBoxNoPasswordPrompt_stateChanged(int val);
 
+    void on_pushButtonNiMHRecondition_clicked();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
