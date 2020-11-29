@@ -648,10 +648,12 @@ void MainWindow::updateDeviceDependentUI()
         {
             ui->groupBox_UserSettings->show();
         }
+        ui->groupBoxNiMHRecondition->show();
     }
     else
     {
         ui->groupBox_UserSettings->hide();
+        ui->groupBoxNiMHRecondition->hide();
     }
 }
 
