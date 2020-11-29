@@ -56,6 +56,8 @@ void BleDev::setWsClient(WSClient *c)
 void BleDev::clearWidgets()
 {
     ui->lineEditBundlePassword->clear();
+    ui->progressBarUpload->hide();
+    ui->label_UploadProgress->hide();
 }
 
 void BleDev::initUITexts()
@@ -169,7 +171,6 @@ void BleDev::displayUploadBundleResultReceived(bool success)
     if (success)
     {
         // Update platform after successful upload
-        wsClient->sendFlashMCU();
         QMessageBox::information(this, title,
                                  tr("Upload bundle finished successfully."));
     }
