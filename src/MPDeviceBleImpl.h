@@ -97,6 +97,8 @@ public:
     void readBatteryPercent(const QByteArray& statusData);
     void getBattery();
 
+    void nihmReconditioning();
+
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
     MPBLEFreeAddressProvider& getFreeAddressProvider() { return freeAddressProv; }
 

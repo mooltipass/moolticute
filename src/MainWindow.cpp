@@ -222,6 +222,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->btnPassGenerationProfiles->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSubDomain->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonHIBP->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonNiMHRecondition->setStyleSheet(CSS_BLUE_BUTTON);
 
     // Don't show the "check for updates" button when built from git directly.
     // Also deb packages are handled by our PPA, disable check
@@ -647,10 +648,12 @@ void MainWindow::updateDeviceDependentUI()
         {
             ui->groupBox_UserSettings->show();
         }
+        ui->groupBoxNiMHRecondition->show();
     }
     else
     {
         ui->groupBox_UserSettings->hide();
+        ui->groupBoxNiMHRecondition->hide();
     }
 }
 
@@ -1880,4 +1883,18 @@ void MainWindow::on_spinBoxDefaultPwdLength_valueChanged(int val)
 void MainWindow::on_checkBoxNoPasswordPrompt_stateChanged(int)
 {
     noPasswordPromptChanged(ui->checkBoxNoPasswordPrompt->isChecked());
+}
+
+void MainWindow::on_pushButtonNiMHRecondition_clicked()
+{
+    QMessageBox::StandardButton btn =  QMessageBox::information(
+                                            this, tr("NiMH Reconditioning"),
+                                            tr("This procedure will take around 5 hours, please confirm"),
+                                            QMessageBox::Ok | QMessageBox::No);
+
+
+    if (btn == QMessageBox::Ok)
+    {
+        wsClient->sendNiMHReconditioning();
+    }
 }

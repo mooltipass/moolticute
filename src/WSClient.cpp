@@ -729,6 +729,11 @@ void WSClient::sendBatteryRequest()
     sendJsonData({{ "msg", "get_battery" }});
 }
 
+void WSClient::sendNiMHReconditioning()
+{
+    sendJsonData({{ "msg", "nimh_reconditioning" }});
+}
+
 void WSClient::requestBleKeyboardLayout(bool onlyCheck)
 {
     QJsonObject o;

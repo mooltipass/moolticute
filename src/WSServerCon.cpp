@@ -1230,6 +1230,10 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     {
         mpdevice->getBattery();
     }
+    else if (root["msg"] == "nimh_reconditioning")
+    {
+        bleImpl->nihmReconditioning();
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";
