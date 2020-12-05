@@ -424,3 +424,29 @@ void Common::fill(QByteArray &ba, int count, char c)
         ba.append(c);
     }
 }
+
+QByteArray Common::toHexArray(const QString str)
+{
+    const int BASE = 16;
+    QByteArray res;
+    for (int i = 0; i < str.size()/2; ++i)
+    {
+        bool ok = false;
+        auto passwordChar = str.mid(i*2, 2).toUInt(&ok, BASE);
+        if (ok)
+        {
+            res.append(static_cast<char>(passwordChar));
+        }
+        else
+        {
+            qCritical() << "Invalid hex character";
+            return QByteArray{};
+        }
+    }
+    return res;
+}
+
+QString Common::toHexString(const QByteArray &array)
+{
+    return array.toHex();
+}

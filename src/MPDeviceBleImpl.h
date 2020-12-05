@@ -98,6 +98,7 @@ public:
     void getBattery();
 
     void nihmReconditioning();
+    void getSecurityChallenge(const QString& key, const MessageHandlerCb &cb);
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
     MPBLEFreeAddressProvider& getFreeAddressProvider() { return freeAddressProv; }

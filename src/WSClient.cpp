@@ -496,6 +496,18 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit updateBatteryPercent(o["battery"].toInt());
     }
+    else if (rootobj["msg"] == "request_security_challenge")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        if (o.value("failed").toBool())
+        {
+            emit challengeResultFailed();
+        }
+        else
+        {
+            emit challengeResultReceived(o["challenge_response"].toString());
+        }
+    }
 }
 
 bool WSClient::isFwVersion(int version) const
@@ -732,6 +744,13 @@ void WSClient::sendBatteryRequest()
 void WSClient::sendNiMHReconditioning()
 {
     sendJsonData({{ "msg", "nimh_reconditioning" }});
+}
+
+void WSClient::sendSecurityChallenge(QString str)
+{
+    sendJsonData({{ "msg", "request_security_challenge" },
+                  { "data", QJsonObject{ {"key", str } } }
+                 });
 }
 
 void WSClient::requestBleKeyboardLayout(bool onlyCheck)

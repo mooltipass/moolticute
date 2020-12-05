@@ -438,19 +438,39 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial)
     {
-        setUIDRequestInstructionsWithId(serial > 0 ? QString::number(serial) : "XXXX");
+        QString serialStr = serial > 0 ? QString::number(serial) : "XXXX";
+        if (wsClient->isMPBLE())
+        {
+            setSecurityChallengeText(serialStr);
+        }
+        else
+        {
+            setUIDRequestInstructionsWithId(serialStr);
+        }
     });
     connect(wsClient, &WSClient::connectedChanged, [this] ()
     {
-        setUIDRequestInstructionsWithId("XXXX");
+        if (wsClient->isMPBLE())
+        {
+            setSecurityChallengeText("XXXX");
+        }
+        else
+        {
+            setUIDRequestInstructionsWithId("XXXX");
+        }
     });
 
     QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{32}"), ui->UIDRequestKeyInput);
     ui->UIDRequestKeyInput->setValidator(uidKeyValidator);
+    ui->lineEditChallengeString->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{40}"), ui->UIDRequestKeyInput));
     ui->UIDRequestValidateBtn->setEnabled(false);
     connect(ui->UIDRequestKeyInput, &QLineEdit::textEdited, [this] ()
     {
         ui->UIDRequestValidateBtn->setEnabled(ui->UIDRequestKeyInput->hasAcceptableInput());
+    });
+    connect(ui->lineEditChallengeString, &QLineEdit::textEdited, [this] ()
+    {
+        ui->pushButtonSecurityValidate->setEnabled(ui->lineEditChallengeString->hasAcceptableInput());
     });
 
     gb_spinner = new QMovie(":/uid_spinner.gif",  {}, this);
@@ -491,12 +511,24 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::connectedChanged, [this](bool connected)
     {
-        ui->UIDRequestGB->setVisible(connected);
+        ui->UIDRequestGB->setVisible(connected && !wsClient->isMPBLE());
         gb_spinner->stop();
         ui->UIDRequestResultLabel->setMovie(nullptr);
         ui->UIDRequestResultLabel->setText({});
         ui->UIDRequestResultLabel->setVisible(false);
         ui->UIDRequestResultIcon->setVisible(false);
+    });
+
+    connect(wsClient, &WSClient::challengeResultReceived, [this](QString res)
+    {
+        qCritical() << "Security challange result: " << res;
+        ui->labelSecurityChallangeResult->setText(res);
+    });
+    connect(wsClient, &WSClient::challengeResultFailed, [this]()
+    {
+        ui->labelSecurityChallangeResult->setText("");
+        QMessageBox::warning(this, tr("Security Challenge"),
+                             tr("Security Challenge Failed"));
     });
 
     ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
@@ -649,11 +681,14 @@ void MainWindow::updateDeviceDependentUI()
             ui->groupBox_UserSettings->show();
         }
         ui->groupBoxNiMHRecondition->show();
+        ui->pbBleBattery->show();
+        ui->groupBoxSecurityChallenge->show();
     }
     else
     {
         ui->groupBox_UserSettings->hide();
         ui->groupBoxNiMHRecondition->hide();
+        ui->groupBoxSecurityChallenge->hide();
     }
 }
 
@@ -1387,6 +1422,14 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
                                     "<li>Enter the password you received from us</li></ol>").arg(id));
 }
 
+void MainWindow::setSecurityChallengeText(const QString &id)
+{
+    ui->labelSecurityChallenge->setText(tr("To be sure that no one has tampered with your device, you can request a challenge string and enter it below.<ol>"
+                                    "<li>Get the serial number from the back of your device.</li>"
+                                    "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO\">Send us an email</a> with the serial number and your order number, requesting the challenge string.</li>"
+                                    "<li>Enter the string you received from us</li></ol>").arg(id));
+}
+
 void MainWindow::enableCredentialsManagement(bool enable)
 {
     if (enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
@@ -1833,7 +1876,6 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
-        ui->pbBleBattery->show();
     }
     updateDeviceDependentUI();
 }
@@ -1897,4 +1939,16 @@ void MainWindow::on_pushButtonNiMHRecondition_clicked()
     {
         wsClient->sendNiMHReconditioning();
     }
+}
+
+void MainWindow::on_pushButtonSecurityValidate_clicked()
+{
+    const QString DEBUG_START = "FFFFFFFF";
+    auto challengeString = ui->lineEditChallengeString->text().toUpper();
+    if (DEBUG_START == challengeString.left(DEBUG_START.size()))
+    {
+        QMessageBox::information(this, tr("Security Challenge"),
+                             tr("This token is only used for debugging purposes"));
+    }
+    wsClient->sendSecurityChallenge(challengeString);
 }

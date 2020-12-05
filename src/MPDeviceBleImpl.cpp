@@ -766,6 +766,32 @@ void MPDeviceBleImpl::nihmReconditioning()
     mpDev->enqueueAndRunJob(jobs);
 }
 
+void MPDeviceBleImpl::getSecurityChallenge(const QString &key, const MessageHandlerCb &cb)
+{
+    AsyncJobs *jobs = new AsyncJobs("Send security challenge to device", this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::AUTH_CHALLENGE,
+                                Common::toHexArray(key),
+                                [this, cb](const QByteArray &data, bool &)
+    {
+        if (bleProt->getFirstPayloadByte(data) == MSG_FAILED )
+        {
+            qWarning() << "Authentication challenge failed";
+            cb(false, "Authentication challenge failed");
+            return false;
+        }
+        cb(true, Common::toHexString(bleProt->getFullPayload(data)));
+        return true;
+    }));
+
+    connect(jobs, &AsyncJobs::failed, [](AsyncJob *)
+    {
+        qWarning() << "Failed get uid from device";
+    });
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 void MPDeviceBleImpl::processDebugMsg(const QByteArray &data, bool &isDebugMsg)
 {
     if (isFirstPacket(data))

@@ -1234,6 +1234,26 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     {
         bleImpl->nihmReconditioning();
     }
+    else if (root["msg"] == "request_security_challenge")
+    {
+        QJsonObject o = root["data"].toObject();
+        const auto key = o.value("key").toString();
+        bleImpl->getSecurityChallenge(key, [this, root](bool success, QString res)
+        {
+            if (!success)
+            {
+                sendFailedJson(root, res);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = "true";
+            ores["challenge_response"] = res;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

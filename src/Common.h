@@ -243,6 +243,9 @@ public:
 
     static void fill(QByteArray &ba, int count, char c);
 
+    static QByteArray toHexArray(const QString str);
+    static QString toHexString(const QByteArray& array);
+
     typedef enum
     {
         MP_Classic = 0,
