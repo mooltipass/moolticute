@@ -243,6 +243,9 @@ public:
 
     static void fill(QByteArray &ba, int count, char c);
 
+    static QByteArray toHexArray(const QString str);
+    static QString toHexString(const QByteArray& array);
+
     typedef enum
     {
         MP_Classic = 0,
@@ -307,6 +310,7 @@ public:
     static const QString ISODateWithMsFormat;
     static const QString SIMPLE_CRYPT;
     static const QString SIMPLE_CRYPT_V2;
+    static const QString HEX_REGEXP;
     static const int DEFAULT_PASSWORD_LENGTH = 16;
 };
 

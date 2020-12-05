@@ -438,14 +438,29 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::hwSerialChanged, [this](quint32 serial)
     {
-        setUIDRequestInstructionsWithId(serial > 0 ? QString::number(serial) : "XXXX");
+        QString serialStr = serial > 0 ? QString::number(serial) : "XXXX";
+        if (wsClient->isMPBLE())
+        {
+            setSecurityChallengeText(serialStr);
+        }
+        else
+        {
+            setUIDRequestInstructionsWithId(serialStr);
+        }
     });
     connect(wsClient, &WSClient::connectedChanged, [this] ()
     {
-        setUIDRequestInstructionsWithId("XXXX");
+        if (wsClient->isMPBLE())
+        {
+            setSecurityChallengeText("XXXX");
+        }
+        else
+        {
+            setUIDRequestInstructionsWithId("XXXX");
+        }
     });
 
-    QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{32}"), ui->UIDRequestKeyInput);
+    QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression(Common::HEX_REGEXP.arg(UID_REQUEST_LENGTH)), ui->UIDRequestKeyInput);
     ui->UIDRequestKeyInput->setValidator(uidKeyValidator);
     ui->UIDRequestValidateBtn->setEnabled(false);
     connect(ui->UIDRequestKeyInput, &QLineEdit::textEdited, [this] ()
@@ -491,12 +506,41 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::connectedChanged, [this](bool connected)
     {
-        ui->UIDRequestGB->setVisible(connected);
+        bool isBle = wsClient->isMPBLE();
+        ui->UIDRequestGB->setVisible(connected && !isBle);
         gb_spinner->stop();
         ui->UIDRequestResultLabel->setMovie(nullptr);
         ui->UIDRequestResultLabel->setText({});
         ui->UIDRequestResultLabel->setVisible(false);
         ui->UIDRequestResultIcon->setVisible(false);
+        ui->groupBoxSecurityChallenge->setVisible(connected && isBle);
+        ui->labelSecurityChallengeResult->setText("");
+        ui->labelSecurityChallengeResult->setVisible(false);
+        ui->labelSecurityChallengeIcon->setVisible(false);
+    });
+
+    ui->lineEditChallengeString->setValidator(new QRegularExpressionValidator(
+                                                  QRegularExpression(Common::HEX_REGEXP.arg(SECURITY_CHALLENGE_LENGTH)),
+                                                  ui->UIDRequestKeyInput));
+
+    connect(ui->lineEditChallengeString, &QLineEdit::textEdited, [this] ()
+    {
+        ui->pushButtonSecurityValidate->setEnabled(ui->lineEditChallengeString->hasAcceptableInput());
+    });
+
+    connect(wsClient, &WSClient::challengeResultReceived, [this](QString res)
+    {
+        ui->labelSecurityChallengeIcon->setVisible(false);
+        gb_spinner->stop();
+        ui->labelSecurityChallengeResult->setText(res);
+    });
+    connect(wsClient, &WSClient::challengeResultFailed, [this]()
+    {
+        ui->labelSecurityChallengeIcon->setVisible(false);
+        gb_spinner->stop();
+        ui->labelSecurityChallengeResult->setText("");
+        QMessageBox::warning(this, tr("Security Challenge"),
+                             tr("Security Challenge Failed"));
     });
 
     ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
@@ -649,11 +693,14 @@ void MainWindow::updateDeviceDependentUI()
             ui->groupBox_UserSettings->show();
         }
         ui->groupBoxNiMHRecondition->show();
+        ui->pbBleBattery->show();
+        ui->groupBoxSecurityChallenge->show();
     }
     else
     {
         ui->groupBox_UserSettings->hide();
         ui->groupBoxNiMHRecondition->hide();
+        ui->groupBoxSecurityChallenge->hide();
     }
 }
 
@@ -1387,6 +1434,14 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
                                     "<li>Enter the password you received from us</li></ol>").arg(id));
 }
 
+void MainWindow::setSecurityChallengeText(const QString &id)
+{
+    ui->labelSecurityChallenge->setText(tr("To be sure that no one has tampered with your device, you can request a challenge string and enter it below.<ol>"
+                                    "<li>Get the serial number from the back of your device.</li>"
+                                    "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO\">Send us an email</a> with the serial number and your order number, requesting the challenge string.</li>"
+                                    "<li>Enter the string you received from us</li></ol>").arg(id));
+}
+
 void MainWindow::enableCredentialsManagement(bool enable)
 {
     if (enable && ui->stackedWidget->currentWidget() == ui->pageWaiting)
@@ -1833,7 +1888,6 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
-        ui->pbBleBattery->show();
     }
     updateDeviceDependentUI();
 }
@@ -1897,4 +1951,21 @@ void MainWindow::on_pushButtonNiMHRecondition_clicked()
     {
         wsClient->sendNiMHReconditioning();
     }
+}
+
+void MainWindow::on_pushButtonSecurityValidate_clicked()
+{
+    const QString DEBUG_START = "FFFFFFFF";
+    auto challengeString = ui->lineEditChallengeString->text().toUpper();
+    if (DEBUG_START == challengeString.left(DEBUG_START.size()))
+    {
+        QMessageBox::information(this, tr("Security Challenge"),
+                             tr("This token is only used for debugging purposes"));
+    }
+    ui->labelSecurityChallengeResult->setText(tr("Waiting for Security Challenge result..."));
+    ui->labelSecurityChallengeIcon->setMovie(gb_spinner);
+    ui->labelSecurityChallengeIcon->setVisible(true);
+    ui->labelSecurityChallengeResult->setVisible(true);
+    gb_spinner->start();
+    wsClient->sendSecurityChallenge(challengeString);
 }

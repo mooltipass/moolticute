@@ -108,6 +108,7 @@ public:
     void sendLoadParams();
     void sendBatteryRequest();
     void sendNiMHReconditioning();
+    void sendSecurityChallenge(QString str);
 
     inline bool isFw12() const { return isFwVersion(12); }
     inline bool isFw13() const { return isFwVersion(13); }
@@ -151,6 +152,8 @@ signals:
     void updateBLEDeviceLanguage(const QJsonObject& langs);
     void updateBLEKeyboardLayout(const QJsonObject& layouts);
     void updateBatteryPercent(int battery);
+    void challengeResultReceived(QString result);
+    void challengeResultFailed();
 
 public slots:
     void sendJsonData(const QJsonObject &data);

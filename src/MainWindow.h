@@ -171,8 +171,11 @@ private slots:
 
     void on_pushButtonNiMHRecondition_clicked();
 
+    void on_pushButtonSecurityValidate_clicked();
+    
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
+    void setSecurityChallengeText(const QString &id = "XXXX");
 
     virtual void closeEvent(QCloseEvent *event);
     virtual void changeEvent(QEvent *event);
@@ -246,6 +249,8 @@ private:
     QVector<LockUnlockItem> m_lockUnlockItems;
     quint16 m_noPwdPrompt = 0x00;
     static constexpr quint16 NO_PWD_PROMPT_MASK = 0x20;
+    static constexpr int UID_REQUEST_LENGTH = 32;
+    static constexpr int SECURITY_CHALLENGE_LENGTH = 40;
 
     const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
 #ifdef Q_OS_MAC

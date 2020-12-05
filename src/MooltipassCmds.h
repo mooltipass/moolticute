@@ -156,6 +156,7 @@ public:
             START_BUNDLE_UPLOAD ,
             WRITE_256B_TO_FLASH ,
             END_BUNDLE_UPLOAD   ,
+            AUTH_CHALLENGE      ,
             CMD_DBG_MESSAGE     ,
             CMD_DBG_OPEN_DISP_BUFFER    ,
             CMD_DBG_SEND_TO_DISP_BUFFER ,
