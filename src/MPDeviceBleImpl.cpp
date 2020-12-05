@@ -774,7 +774,7 @@ void MPDeviceBleImpl::getSecurityChallenge(const QString &key, const MessageHand
                                 Common::toHexArray(key),
                                 [this, cb](const QByteArray &data, bool &)
     {
-        if (bleProt->getFirstPayloadByte(data) == MSG_FAILED )
+        if (ERROR_MSG_SIZE == bleProt->getMessageSize(data))
         {
             qWarning() << "Authentication challenge failed";
             cb(false, "Authentication challenge failed");
