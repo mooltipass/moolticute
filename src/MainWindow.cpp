@@ -460,17 +460,12 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         }
     });
 
-    QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{32}"), ui->UIDRequestKeyInput);
+    QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression(Common::HEX_REGEXP.arg(UID_REQUEST_LENGTH)), ui->UIDRequestKeyInput);
     ui->UIDRequestKeyInput->setValidator(uidKeyValidator);
-    ui->lineEditChallengeString->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{40}"), ui->UIDRequestKeyInput));
     ui->UIDRequestValidateBtn->setEnabled(false);
     connect(ui->UIDRequestKeyInput, &QLineEdit::textEdited, [this] ()
     {
         ui->UIDRequestValidateBtn->setEnabled(ui->UIDRequestKeyInput->hasAcceptableInput());
-    });
-    connect(ui->lineEditChallengeString, &QLineEdit::textEdited, [this] ()
-    {
-        ui->pushButtonSecurityValidate->setEnabled(ui->lineEditChallengeString->hasAcceptableInput());
     });
 
     gb_spinner = new QMovie(":/uid_spinner.gif",  {}, this);
@@ -511,22 +506,39 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::connectedChanged, [this](bool connected)
     {
-        ui->UIDRequestGB->setVisible(connected && !wsClient->isMPBLE());
+        bool isBle = wsClient->isMPBLE();
+        ui->UIDRequestGB->setVisible(connected && !isBle);
         gb_spinner->stop();
         ui->UIDRequestResultLabel->setMovie(nullptr);
         ui->UIDRequestResultLabel->setText({});
         ui->UIDRequestResultLabel->setVisible(false);
         ui->UIDRequestResultIcon->setVisible(false);
+        ui->groupBoxSecurityChallenge->setVisible(connected && isBle);
+        ui->labelSecurityChallengeResult->setText("");
+        ui->labelSecurityChallengeResult->setVisible(false);
+        ui->labelSecurityChallengeIcon->setVisible(false);
+    });
+
+    ui->lineEditChallengeString->setValidator(new QRegularExpressionValidator(
+                                                  QRegularExpression(Common::HEX_REGEXP.arg(SECURITY_CHALLENGE_LENGTH)),
+                                                  ui->UIDRequestKeyInput));
+
+    connect(ui->lineEditChallengeString, &QLineEdit::textEdited, [this] ()
+    {
+        ui->pushButtonSecurityValidate->setEnabled(ui->lineEditChallengeString->hasAcceptableInput());
     });
 
     connect(wsClient, &WSClient::challengeResultReceived, [this](QString res)
     {
-        qCritical() << "Security challange result: " << res;
-        ui->labelSecurityChallangeResult->setText(res);
+        ui->labelSecurityChallengeIcon->setVisible(false);
+        gb_spinner->stop();
+        ui->labelSecurityChallengeResult->setText(res);
     });
     connect(wsClient, &WSClient::challengeResultFailed, [this]()
     {
-        ui->labelSecurityChallangeResult->setText("");
+        ui->labelSecurityChallengeIcon->setVisible(false);
+        gb_spinner->stop();
+        ui->labelSecurityChallengeResult->setText("");
         QMessageBox::warning(this, tr("Security Challenge"),
                              tr("Security Challenge Failed"));
     });
@@ -1950,5 +1962,10 @@ void MainWindow::on_pushButtonSecurityValidate_clicked()
         QMessageBox::information(this, tr("Security Challenge"),
                              tr("This token is only used for debugging purposes"));
     }
+    ui->labelSecurityChallengeResult->setText(tr("Waiting for Security Challenge result..."));
+    ui->labelSecurityChallengeIcon->setMovie(gb_spinner);
+    ui->labelSecurityChallengeIcon->setVisible(true);
+    ui->labelSecurityChallengeResult->setVisible(true);
+    gb_spinner->start();
     wsClient->sendSecurityChallenge(challengeString);
 }
