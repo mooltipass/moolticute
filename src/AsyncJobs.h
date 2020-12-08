@@ -195,6 +195,7 @@ public:
     void insertAfter(AsyncJob *j, int pos);
 
     QString getJobsId() { return jobsid; }
+    void failCurrent() { emit failed(currentJob); }
 
     //user data attached to this job queue
     QVariant user_data;

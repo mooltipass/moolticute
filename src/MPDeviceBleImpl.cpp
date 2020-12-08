@@ -14,6 +14,15 @@ MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     mpDev(dev),
     freeAddressProv(mesProt, dev)
 {
+    m_noBundleCommands = {
+        MPCmd::PING,
+        MPCmd::MOOLTIPASS_STATUS,
+        MPCmd::START_BUNDLE_UPLOAD,
+        MPCmd::WRITE_256B_TO_FLASH,
+        MPCmd::END_BUNDLE_UPLOAD,
+        MPCmd::CANCEL_USER_REQUEST,
+        MPCmd::INFORM_LOCKED,
+        MPCmd::INFORM_UNLOCKED};
 }
 
 bool MPDeviceBleImpl::isFirstPacket(const QByteArray &data)
@@ -1232,6 +1241,32 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
         {"msg", "WORKING on setDataNodeCb"}
     };
     cbProgress(cbData);
+}
+
+void MPDeviceBleImpl::checkNoBundle(Common::MPStatus status, Common::MPStatus prevStatus)
+{
+    if (status == Common::NoBundle)
+    {
+        m_noBundle = true;
+        mpDev->resetCommunication();
+    }
+    if (prevStatus == Common::NoBundle)
+    {
+        m_noBundle = false;
+    }
+}
+
+bool MPDeviceBleImpl::isNoBundle(MPCmd::Command cmd)
+{
+    if (m_noBundle && !m_noBundleCommands.contains(cmd))
+    {
+        qCritical() << "Remove command";
+        mpDev->currentJobs->failCurrent();
+        mpDev->commandQueue.dequeue();
+        mpDev->sendDataDequeue();
+        return true;
+    }
+    return false;
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()

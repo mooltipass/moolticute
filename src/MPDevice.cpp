@@ -115,10 +115,10 @@ void MPDevice::sendInitMessages()
             qDebug() << "Fixing communication with device after Aux Flash";
             writeCancelRequest();
         }
-        bleImpl->getPlatInfo();
+        //bleImpl->getPlatInfo();
     }
 
-    exitMemMgmtMode(false);
+    //exitMemMgmtMode(false);
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
@@ -384,16 +384,25 @@ void MPDevice::newDataRead(const QByteArray &data)
     bool done = true;
     currentCmd.cb(true, dataReceived, done);
     delete currentCmd.timerTimeout;
-    commandQueue.head().timerTimeout = nullptr;
+    if (!commandQueue.empty())
+    {
+        commandQueue.head().timerTimeout = nullptr;
+    }
 
     if (done)
     {
-        commandQueue.dequeue();
+        if (!commandQueue.empty())
+        {
+            commandQueue.dequeue();
+        }
         sendDataDequeue();
     }
     else
     {
-        commandQueue.head().checkReturn = false;
+        if (!commandQueue.empty())
+        {
+            commandQueue.head().checkReturn = false;
+        }
     }
 }
 
@@ -404,6 +413,11 @@ void MPDevice::sendDataDequeue()
 
     MPCommand &currentCmd = commandQueue.head();
     currentCmd.running = true;
+
+    if (bleImpl && bleImpl->isNoBundle(pMesProt->getCommand(currentCmd.data[0])))
+    {
+        return;
+    }
 
     int i = 0;
     if (AppDaemon::isDebugDev())
@@ -3515,7 +3529,7 @@ void MPDevice::setCurrentDate()
     connect(jobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
         qWarning() << "Failed to set date on device";
-        setCurrentDate(); // memory: does it get piled on?
+        //setCurrentDate(); // memory: does it get piled on?
     });
 
     jobsQueue.enqueue(jobs);
@@ -3611,6 +3625,11 @@ void MPDevice::processStatusChange(const QByteArray &data)
         {
             /* If v1.2 firmware, query user change number */
             QTimer::singleShot(50, this, &MPDevice::handleDeviceUnlocked);
+        }
+
+        if (bleImpl)
+        {
+            bleImpl->checkNoBundle(s, prevStatus);
         }
     }
 }

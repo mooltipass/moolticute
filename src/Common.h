@@ -212,7 +212,8 @@ public:
         Error7 = 7,
         Error8 = 8,
         UnknownSmartcard = 9,
-        MMMMode = 21
+        MMMMode = 21,
+        NoBundle = 32
     } MPStatus;
     static QHash<MPStatus, QString> MPStatusUserString, MPStatusString;
     static QMap<int, QString> BLE_CATEGORY_COLOR;
