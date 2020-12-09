@@ -1243,12 +1243,29 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
     cbProgress(cbData);
 }
 
+void MPDeviceBleImpl::sendInitialStatusRequest()
+{
+    auto *statusJob = new AsyncJobs(QString("Getting initial status"), this);
+    statusJob->append(new MPCommandJob(mpDev, MPCmd::MOOLTIPASS_STATUS, [this](const QByteArray &data, bool &)
+    {
+        mpDev->statusTimer->stop();
+        mpDev->processStatusChange(data);
+        return true;
+    }));
+    mpDev->enqueueAndRunJob(statusJob);
+}
+
 void MPDeviceBleImpl::checkNoBundle(Common::MPStatus status, Common::MPStatus prevStatus)
 {
-    if (status == Common::NoBundle)
+    if (status != Common::UnknownStatus &&
+            status&Common::NoBundle)
     {
         m_noBundle = true;
         mpDev->resetCommunication();
+        if (status != Common::NoBundle)
+        {
+            mpDev->set_status(Common::NoBundle);
+        }
     }
     if (prevStatus == Common::NoBundle)
     {

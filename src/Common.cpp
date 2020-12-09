@@ -75,7 +75,8 @@ QHash<Common::MPStatus, QString> Common::MPStatusUserString = {
     { Common::Error7, QObject::tr("Error 7 (should not happen)") },
     { Common::Error8, QObject::tr("Error 8 (should not happen)") },
     { Common::UnknownSmartcard, QObject::tr("Unknown smartcard inserted") },
-    { Common::MMMMode, QObject::tr("Device in management mode") }
+    { Common::MMMMode, QObject::tr("Device in management mode") },
+    { Common::NoBundle, QObject::tr("No bundle on the device") }
 };
 
 QHash<Common::MPStatus, QString> Common::MPStatusString = {
@@ -90,7 +91,8 @@ QHash<Common::MPStatus, QString> Common::MPStatusString = {
     { Common::Error7, "Error7" },
     { Common::Error8, "Error8" },
     { Common::UnknownSmartcard, "UnknownSmartcard" },
-    { Common::MMMMode, "MMMMode" }
+    { Common::MMMMode, "MMMMode" },
+    { Common::NoBundle, "NoBundle" }
 };
 
 QMap<int, QString> Common::BLE_CATEGORY_COLOR = {

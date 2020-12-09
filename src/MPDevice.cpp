@@ -45,11 +45,6 @@ MPDevice::MPDevice(QObject *parent):
             if (!success)
                 return;
 
-            if (isBLE())
-            {
-                //Only send status message request at ble connection
-                statusTimer->stop();
-            }
             processStatusChange(data);
         });
     });
@@ -99,7 +94,6 @@ void MPDevice::setupMessageProtocol()
 
 void MPDevice::sendInitMessages()
 {
-    statusTimer->start(STATUS_STARTING_DELAY);
     addTimerJob(INIT_STARTING_DELAY);
     if (isBLE())
     {
@@ -110,15 +104,22 @@ void MPDevice::sendInitMessages()
           */
         QTimer::singleShot(RESET_SEND_DELAY, this, &MPDevice::resetFlipBit);
 
+        // For BLE no status timer, only sending first status request
+        bleImpl->sendInitialStatusRequest();
+
         if (bleImpl->isAfterAuxFlash())
         {
             qDebug() << "Fixing communication with device after Aux Flash";
             writeCancelRequest();
         }
-        //bleImpl->getPlatInfo();
+        bleImpl->getPlatInfo();
+    }
+    else
+    {
+        statusTimer->start(STATUS_STARTING_DELAY);
     }
 
-    //exitMemMgmtMode(false);
+    exitMemMgmtMode(false);
 }
 
 void MPDevice::sendData(MPCmd::Command c, const QByteArray &data, quint32 timeout, MPCommandCb cb, bool checkReturn)
