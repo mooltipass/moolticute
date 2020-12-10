@@ -22,7 +22,8 @@ MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
         MPCmd::END_BUNDLE_UPLOAD,
         MPCmd::CANCEL_USER_REQUEST,
         MPCmd::INFORM_LOCKED,
-        MPCmd::INFORM_UNLOCKED};
+        MPCmd::INFORM_UNLOCKED,
+        MPCmd::SET_DATE};
 }
 
 bool MPDeviceBleImpl::isFirstPacket(const QByteArray &data)
@@ -1248,7 +1249,6 @@ void MPDeviceBleImpl::sendInitialStatusRequest()
     auto *statusJob = new AsyncJobs(QString("Getting initial status"), this);
     statusJob->append(new MPCommandJob(mpDev, MPCmd::MOOLTIPASS_STATUS, [this](const QByteArray &data, bool &)
     {
-        mpDev->statusTimer->stop();
         mpDev->processStatusChange(data);
         return true;
     }));

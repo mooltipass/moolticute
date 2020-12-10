@@ -3530,7 +3530,10 @@ void MPDevice::setCurrentDate()
     connect(jobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
         qWarning() << "Failed to set date on device";
-        //setCurrentDate(); // memory: does it get piled on?
+        if (!isBLE())
+        {
+            setCurrentDate(); // memory: does it get piled on?
+        }
     });
 
     jobsQueue.enqueue(jobs);
