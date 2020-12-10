@@ -138,7 +138,7 @@ public:
     void storeFileData(int current, AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
 
     void sendInitialStatusRequest();
-    void checkNoBundle(Common::MPStatus status, Common::MPStatus prevStatus);
+    void checkNoBundle(Common::MPStatus& status, Common::MPStatus prevStatus);
     bool isNoBundle(MPCmd::Command cmd);
 
 signals:

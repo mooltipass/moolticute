@@ -1255,7 +1255,7 @@ void MPDeviceBleImpl::sendInitialStatusRequest()
     mpDev->enqueueAndRunJob(statusJob);
 }
 
-void MPDeviceBleImpl::checkNoBundle(Common::MPStatus status, Common::MPStatus prevStatus)
+void MPDeviceBleImpl::checkNoBundle(Common::MPStatus& status, Common::MPStatus prevStatus)
 {
     if (status != Common::UnknownStatus &&
             status&Common::NoBundle)
@@ -1264,7 +1264,7 @@ void MPDeviceBleImpl::checkNoBundle(Common::MPStatus status, Common::MPStatus pr
         mpDev->resetCommunication();
         if (status != Common::NoBundle)
         {
-            mpDev->set_status(Common::NoBundle);
+            status = Common::NoBundle;
         }
     }
     if (prevStatus == Common::NoBundle)

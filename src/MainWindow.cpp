@@ -718,11 +718,25 @@ void MainWindow::updatePage()
 {
     const auto status = wsClient->get_status();
     bool isCardUnknown = status == Common::UnknownSmartcard;
-    if (wsClient->isMPBLE() && Common::MMMMode == status)
+    if (wsClient->isMPBLE())
     {
-        // Do not update pages when BLE is in MMM Mode
-        return;
+        if (Common::MMMMode == status)
+        {
+            // Do not update pages when BLE is in MMM Mode
+            return;
+        }
+
+        if (Common::NoBundle == status)
+        {
+            bBleDevTabVisible = true;
+            ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
+            previousWidget = ui->stackedWidget->currentWidget();
+            ui->stackedWidget->setCurrentWidget(ui->pageBleDev);
+
+            return;
+        }
     }
+
 
     ui->label_13->setVisible(!isCardUnknown);
     ui->label_14->setVisible(!isCardUnknown);
@@ -1471,6 +1485,12 @@ void MainWindow::updateTabButtons()
     };
 
     if (ui->stackedWidget->currentWidget() == ui->pageWaiting)
+    {
+        setEnabledToAllTabButtons(false);
+        return;
+    }
+
+    if (wsClient->get_status() == Common::NoBundle)
     {
         setEnabledToAllTabButtons(false);
         return;

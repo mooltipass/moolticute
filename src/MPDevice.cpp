@@ -3602,6 +3602,11 @@ void MPDevice::processStatusChange(const QByteArray &data)
     {
         qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
 
+        if (bleImpl)
+        {
+            bleImpl->checkNoBundle(s, prevStatus);
+        }
+
         /* Update status */
         set_status(s);
 
@@ -3626,11 +3631,6 @@ void MPDevice::processStatusChange(const QByteArray &data)
         {
             /* If v1.2 firmware, query user change number */
             QTimer::singleShot(50, this, &MPDevice::handleDeviceUnlocked);
-        }
-
-        if (bleImpl)
-        {
-            bleImpl->checkNoBundle(s, prevStatus);
         }
     }
 }
