@@ -732,7 +732,7 @@ void MainWindow::updatePage()
             ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
             previousWidget = ui->stackedWidget->currentWidget();
             ui->stackedWidget->setCurrentWidget(ui->pageBleDev);
-
+            updateTabButtons();
             return;
         }
     }
@@ -1917,6 +1917,14 @@ void MainWindow::onDeviceDisconnected()
     if (wsClient->isMPBLE())
     {
         ui->pbBleBattery->hide();
+        if (wsClient->get_status() == Common::NoBundle)
+        {
+            bBleDevTabVisible = false;
+            ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
+            ui->stackedWidget->setCurrentWidget(previousWidget);
+            wsClient->set_status(Common::UnknownStatus);
+            updatePage();
+        }
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");

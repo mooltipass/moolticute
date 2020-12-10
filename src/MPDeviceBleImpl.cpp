@@ -1277,7 +1277,6 @@ bool MPDeviceBleImpl::isNoBundle(MPCmd::Command cmd)
 {
     if (m_noBundle && !m_noBundleCommands.contains(cmd))
     {
-        qCritical() << "Remove command";
         mpDev->currentJobs->failCurrent();
         mpDev->commandQueue.dequeue();
         mpDev->sendDataDequeue();
