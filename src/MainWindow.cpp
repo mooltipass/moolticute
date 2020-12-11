@@ -1921,6 +1921,10 @@ void MainWindow::onDeviceDisconnected()
         {
             bBleDevTabVisible = false;
             ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
+            if (previousWidget == ui->pageBleDev)
+            {
+                previousWidget = ui->pageSettings;
+            }
             ui->stackedWidget->setCurrentWidget(previousWidget);
             wsClient->set_status(Common::UnknownStatus);
             updatePage();
