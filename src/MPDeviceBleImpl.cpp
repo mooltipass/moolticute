@@ -1261,7 +1261,6 @@ void MPDeviceBleImpl::checkNoBundle(Common::MPStatus& status, Common::MPStatus p
             status&Common::NoBundle)
     {
         m_noBundle = true;
-        mpDev->resetCommunication();
         if (status != Common::NoBundle)
         {
             status = Common::NoBundle;
