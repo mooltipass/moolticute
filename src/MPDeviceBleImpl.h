@@ -217,7 +217,7 @@ private:
     const static int BATTERY_BYTE = 1;
     const static int SECRET_KEY_LENGTH = 32;
     static constexpr int UPLOAD_PASSWORD_BYTE_SIZE = 16;
-    const QByteArray DEFAULT_BUNDLE_PASSWORD = "\xb4\x07\x5f\x1b\xa2\xab\x52\x43\x30\x7b\x0a\x04\x83\x89\xad\xcb";
+    const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
 };
 
 #endif // MPDEVICEBLEIMPL_H
