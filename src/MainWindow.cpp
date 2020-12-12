@@ -1671,6 +1671,23 @@ void MainWindow::noPasswordPromptChanged(bool val)
     updateLockUnlockItems();
 }
 
+void MainWindow::handleNoBundleDisconnected()
+{
+    bBleDevTabVisible = false;
+    ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
+    if (previousWidget == ui->pageBleDev || nullptr == previousWidget)
+    {
+        ui->stackedWidget->setCurrentWidget(ui->pageSettings);
+    }
+    else
+    {
+        ui->stackedWidget->setCurrentWidget(previousWidget);
+    }
+    ui->widgetBleDev->clearWidgets();
+    wsClient->set_status(Common::UnknownStatus);
+    updatePage();
+}
+
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
@@ -1920,15 +1937,7 @@ void MainWindow::onDeviceDisconnected()
         ui->pbBleBattery->hide();
         if (wsClient->get_status() == Common::NoBundle)
         {
-            bBleDevTabVisible = false;
-            ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
-            if (previousWidget == ui->pageBleDev)
-            {
-                previousWidget = ui->pageSettings;
-            }
-            ui->stackedWidget->setCurrentWidget(previousWidget);
-            wsClient->set_status(Common::UnknownStatus);
-            updatePage();
+            handleNoBundleDisconnected();
         }
     }
     ui->groupBox_UserSettings->hide();

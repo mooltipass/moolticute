@@ -204,6 +204,8 @@ private:
 
     void noPasswordPromptChanged(bool val);
 
+    void handleNoBundleDisconnected();
+
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
 
