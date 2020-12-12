@@ -45,11 +45,6 @@ MPDevice::MPDevice(QObject *parent):
             if (!success)
                 return;
 
-            if (isBLE())
-            {
-                //Only send status message request at ble connection
-                statusTimer->stop();
-            }
             processStatusChange(data);
         });
     });
@@ -99,7 +94,6 @@ void MPDevice::setupMessageProtocol()
 
 void MPDevice::sendInitMessages()
 {
-    statusTimer->start(STATUS_STARTING_DELAY);
     addTimerJob(INIT_STARTING_DELAY);
     if (isBLE())
     {
@@ -110,12 +104,19 @@ void MPDevice::sendInitMessages()
           */
         QTimer::singleShot(RESET_SEND_DELAY, this, &MPDevice::resetFlipBit);
 
+        // For BLE no status timer, only sending first status request
+        bleImpl->sendInitialStatusRequest();
+
         if (bleImpl->isAfterAuxFlash())
         {
             qDebug() << "Fixing communication with device after Aux Flash";
             writeCancelRequest();
         }
         bleImpl->getPlatInfo();
+    }
+    else
+    {
+        statusTimer->start(STATUS_STARTING_DELAY);
     }
 
     exitMemMgmtMode(false);
@@ -384,16 +385,25 @@ void MPDevice::newDataRead(const QByteArray &data)
     bool done = true;
     currentCmd.cb(true, dataReceived, done);
     delete currentCmd.timerTimeout;
-    commandQueue.head().timerTimeout = nullptr;
+    if (!commandQueue.empty())
+    {
+        commandQueue.head().timerTimeout = nullptr;
+    }
 
     if (done)
     {
-        commandQueue.dequeue();
+        if (!commandQueue.empty())
+        {
+            commandQueue.dequeue();
+        }
         sendDataDequeue();
     }
     else
     {
-        commandQueue.head().checkReturn = false;
+        if (!commandQueue.empty())
+        {
+            commandQueue.head().checkReturn = false;
+        }
     }
 }
 
@@ -404,6 +414,11 @@ void MPDevice::sendDataDequeue()
 
     MPCommand &currentCmd = commandQueue.head();
     currentCmd.running = true;
+
+    if (bleImpl && bleImpl->isNoBundle(pMesProt->getCommand(currentCmd.data[0])))
+    {
+        return;
+    }
 
     int i = 0;
     if (AppDaemon::isDebugDev())
@@ -3515,7 +3530,10 @@ void MPDevice::setCurrentDate()
     connect(jobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
         qWarning() << "Failed to set date on device";
-        setCurrentDate(); // memory: does it get piled on?
+        if (!isBLE())
+        {
+            setCurrentDate(); // memory: does it get piled on?
+        }
     });
 
     jobsQueue.enqueue(jobs);
@@ -3586,6 +3604,11 @@ void MPDevice::processStatusChange(const QByteArray &data)
     if (s != prevStatus)
     {
         qDebug() << "received MPCmd::MOOLTIPASS_STATUS: " << static_cast<int>(s);
+
+        if (bleImpl)
+        {
+            bleImpl->checkNoBundle(s, prevStatus);
+        }
 
         /* Update status */
         set_status(s);

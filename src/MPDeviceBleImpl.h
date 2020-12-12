@@ -137,6 +137,10 @@ public:
 
     void storeFileData(int current, AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
 
+    void sendInitialStatusRequest();
+    void checkNoBundle(Common::MPStatus& status, Common::MPStatus prevStatus);
+    bool isNoBundle(MPCmd::Command cmd);
+
 signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);
@@ -185,6 +189,9 @@ private:
 
     static constexpr int INVALID_BATTERY = -1;
     int m_battery = INVALID_BATTERY;
+
+    bool m_noBundle = false;
+    QList<MPCmd::Command> m_noBundleCommands;
 
     static int s_LangNum;
     static int s_LayoutNum;

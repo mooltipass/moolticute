@@ -718,11 +718,25 @@ void MainWindow::updatePage()
 {
     const auto status = wsClient->get_status();
     bool isCardUnknown = status == Common::UnknownSmartcard;
-    if (wsClient->isMPBLE() && Common::MMMMode == status)
+    if (wsClient->isMPBLE())
     {
-        // Do not update pages when BLE is in MMM Mode
-        return;
+        if (Common::MMMMode == status)
+        {
+            // Do not update pages when BLE is in MMM Mode
+            return;
+        }
+
+        if (Common::NoBundle == status)
+        {
+            bBleDevTabVisible = true;
+            ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
+            previousWidget = ui->stackedWidget->currentWidget();
+            ui->stackedWidget->setCurrentWidget(ui->pageBleDev);
+            updateTabButtons();
+            return;
+        }
     }
+
 
     ui->label_13->setVisible(!isCardUnknown);
     ui->label_14->setVisible(!isCardUnknown);
@@ -1476,6 +1490,12 @@ void MainWindow::updateTabButtons()
         return;
     }
 
+    if (wsClient->get_status() == Common::NoBundle)
+    {
+        setEnabledToAllTabButtons(false);
+        return;
+    }
+
     // Enable or Disable tabs according to the device status
     if (wsClient->get_status() == Common::UnknownSmartcard)
     {
@@ -1898,6 +1918,18 @@ void MainWindow::onDeviceDisconnected()
     if (wsClient->isMPBLE())
     {
         ui->pbBleBattery->hide();
+        if (wsClient->get_status() == Common::NoBundle)
+        {
+            bBleDevTabVisible = false;
+            ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
+            if (previousWidget == ui->pageBleDev)
+            {
+                previousWidget = ui->pageSettings;
+            }
+            ui->stackedWidget->setCurrentWidget(previousWidget);
+            wsClient->set_status(Common::UnknownStatus);
+            updatePage();
+        }
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");

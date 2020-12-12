@@ -14,6 +14,16 @@ MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
     mpDev(dev),
     freeAddressProv(mesProt, dev)
 {
+    m_noBundleCommands = {
+        MPCmd::PING,
+        MPCmd::MOOLTIPASS_STATUS,
+        MPCmd::START_BUNDLE_UPLOAD,
+        MPCmd::WRITE_256B_TO_FLASH,
+        MPCmd::END_BUNDLE_UPLOAD,
+        MPCmd::CANCEL_USER_REQUEST,
+        MPCmd::INFORM_LOCKED,
+        MPCmd::INFORM_UNLOCKED,
+        MPCmd::SET_DATE};
 }
 
 bool MPDeviceBleImpl::isFirstPacket(const QByteArray &data)
@@ -1232,6 +1242,47 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
         {"msg", "WORKING on setDataNodeCb"}
     };
     cbProgress(cbData);
+}
+
+void MPDeviceBleImpl::sendInitialStatusRequest()
+{
+    auto *statusJob = new AsyncJobs(QString("Getting initial status"), this);
+    statusJob->append(new MPCommandJob(mpDev, MPCmd::MOOLTIPASS_STATUS, [this](const QByteArray &data, bool &)
+    {
+        mpDev->processStatusChange(data);
+        return true;
+    }));
+    mpDev->enqueueAndRunJob(statusJob);
+}
+
+void MPDeviceBleImpl::checkNoBundle(Common::MPStatus& status, Common::MPStatus prevStatus)
+{
+    if (status != Common::UnknownStatus &&
+            status&Common::NoBundle)
+    {
+        m_noBundle = true;
+        mpDev->resetCommunication();
+        if (status != Common::NoBundle)
+        {
+            status = Common::NoBundle;
+        }
+    }
+    if (prevStatus == Common::NoBundle)
+    {
+        m_noBundle = false;
+    }
+}
+
+bool MPDeviceBleImpl::isNoBundle(MPCmd::Command cmd)
+{
+    if (m_noBundle && !m_noBundleCommands.contains(cmd))
+    {
+        mpDev->currentJobs->failCurrent();
+        mpDev->commandQueue.dequeue();
+        mpDev->sendDataDequeue();
+        return true;
+    }
+    return false;
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()
