@@ -1889,6 +1889,7 @@ void MainWindow::onDeviceConnected()
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
     }
+    displayBundleVersion();
     updateDeviceDependentUI();
 }
 
