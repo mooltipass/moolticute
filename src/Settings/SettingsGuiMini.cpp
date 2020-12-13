@@ -63,7 +63,6 @@ void SettingsGuiMini::updateUI()
     // Inactivity groupbox
     ui->settings_inactivity_lock->show();
     ui->checkBoxScreensaver->show();
-    ui->hashDisplayFeatureCheckBox->show();
     ui->settings_advanced_lockunlock->show();
     ui->setting_ble_inactivity_lock->hide();
 }

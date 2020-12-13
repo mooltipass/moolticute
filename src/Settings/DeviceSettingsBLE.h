@@ -48,7 +48,8 @@ public:
         DISABLE_BLE_ON_CARD_REMOVE = 18,
         DISABLE_BLE_ON_LOCK = 19,
         NB_20MINS_TICKS_FOR_LOCK = 20,
-        SWITCH_OFF_AFTER_USB_DISC = 21
+        SWITCH_OFF_AFTER_USB_DISC = 21,
+        HASH_DISPLAY_BYTE = 22
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;

@@ -119,7 +119,8 @@ void DeviceSettings::fillParameterMapping()
         {MPParams::RANDOM_INIT_PIN_PARAM, "random_starting_pin"},
         {MPParams::MINI_KNOCK_THRES_PARAM, "knock_sensitivity"},
         {MPParams::LOCK_UNLOCK_FEATURE_PARAM, "lock_unlock_mode"},
-        {MPParams::TUTORIAL_BOOL_PARAM, "tutorial_enabled"}
+        {MPParams::TUTORIAL_BOOL_PARAM, "tutorial_enabled"},
+        {MPParams::HASH_DISPLAY_FEATURE_PARAM, "hash_display"}
     };
 }
 
