@@ -40,5 +40,6 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::NB_20MINS_TICKS_FOR_LOCK] = NB_20MINS_TICKS_FOR_LOCK;
     m_paramMap.insert(MPParams::SWITCH_OFF_AFTER_USB_DISC, "switch_off_after_usb_disc");
     m_bleByteMapping[MPParams::SWITCH_OFF_AFTER_USB_DISC] = SWITCH_OFF_AFTER_USB_DISC;
+    m_bleByteMapping[MPParams::HASH_DISPLAY_FEATURE_PARAM] = HASH_DISPLAY_BYTE;
 }
 

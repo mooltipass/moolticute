@@ -66,7 +66,6 @@ void SettingsGuiBLE::updateUI()
     // Inactivity groupbox
     ui->settings_inactivity_lock->hide();
     ui->checkBoxScreensaver->hide();
-    ui->hashDisplayFeatureCheckBox->hide();
     ui->settings_advanced_lockunlock->show();
     ui->setting_ble_inactivity_lock->show();
 }
