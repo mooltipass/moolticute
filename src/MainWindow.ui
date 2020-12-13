@@ -1226,16 +1226,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_21">
                <item>
-                <widget class="QCheckBox" name="hashDisplayFeatureCheckBox">
-                 <property name="toolTip">
-                  <string>A hash will be displayed before and after your card is unlocked. Make sure this hash doesn't change to know that your firmware hasn't been tampered with.</string>
-                 </property>
-                 <property name="text">
-                  <string>Display the security hash before &amp;&amp; after the card is unlocked</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QWidget" name="settings_advanced_lockunlock" native="true">
                  <property name="toolTip">
                   <string>Select the lock/unlock action performed when your card is inserted/removed</string>
@@ -1351,16 +1341,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBoxBoot">
-                 <property name="toolTip">
-                  <string>Enable offline mode of your Mooltipass in which passwords are displayed on its screen</string>
-                 </property>
-                 <property name="text">
-                  <string>Allow boot without host (e.g. USB battery / Charger)</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QWidget" name="knockSettingsWidget" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -1446,6 +1426,26 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                  </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="hashDisplayFeatureCheckBox">
+                 <property name="toolTip">
+                  <string>A hash will be displayed before and after your card is unlocked. Make sure this hash doesn't change to know that your firmware hasn't been tampered with.</string>
+                 </property>
+                 <property name="text">
+                  <string>Display the security hash before &amp;&amp; after the card is unlocked</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxBoot">
+                 <property name="toolTip">
+                  <string>Enable offline mode of your Mooltipass in which passwords are displayed on its screen</string>
+                 </property>
+                 <property name="text">
+                  <string>Allow boot without host (e.g. USB battery / Charger)</string>
+                 </property>
                 </widget>
                </item>
                <item>
