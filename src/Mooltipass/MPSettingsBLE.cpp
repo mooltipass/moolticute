@@ -90,6 +90,16 @@ void MPSettingsBLE::loadParameters()
                     }
     ));
 
+    connect(jobs, &AsyncJobs::finished, [this](const QByteArray &)
+    {
+        //Sending every param when fetched first time
+        if (!m_everyParamSent)
+        {
+            sendEveryParameter();
+            m_everyParamSent = true;
+        }
+    });
+
     mpDevice->enqueueAndRunJob(jobs);
     return;
 }

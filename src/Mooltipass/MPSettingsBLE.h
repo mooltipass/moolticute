@@ -25,6 +25,7 @@ private:
 
     MPDevice* mpDevice = nullptr;
     IMessageProtocol* pMesProt = nullptr;
+    bool m_everyParamSent = false;
 
     QByteArray m_lastDeviceSettings;
 };
