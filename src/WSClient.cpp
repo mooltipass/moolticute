@@ -508,6 +508,11 @@ void WSClient::onTextMessageReceived(const QString &message)
             emit challengeResultReceived(o["challenge_response"].toString());
         }
     }
+    else if (rootobj["msg"] == "is_connected_with_bluetooth")
+    {
+        DeviceDetector::instance().setIsConnectedWithBluetooth(rootobj["data"].toBool());
+    }
+
 }
 
 bool WSClient::isFwVersion(int version) const

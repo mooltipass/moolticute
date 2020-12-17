@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "AppGui.h"
 #include "WSClient.h"
+#include "DeviceDetector.h"
 
 const QString BleDev::HEXA_CHAR_REGEXP = "[^A-Fa-f0-9*]";
 const QByteArray BleDev::START_BUNDLE_BYTES = "\x78\x56\x34\x12";
@@ -119,6 +120,13 @@ bool BleDev::isValidBundleFile(QFile* file) const
 
 void BleDev::on_btnFileBrowser_clicked()
 {
+    if (DeviceDetector::instance().isConnectedWithBluetooth() ||
+        DeviceDetector::instance().getBattery() < MIN_BATTERY_PCT_FOR_UPLOAD)
+    {
+        QMessageBox::warning(this, tr("Battery too low for bundle upload"),
+                             tr("Please have your device connected through USB and fully charged"));
+        return;
+    }
     QSettings s;
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select bundle file"),

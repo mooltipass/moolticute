@@ -551,6 +551,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
 
     if (nullptr != mpdevice->ble())
     {
+        sendIsConnectedWithBluetooth();
         const auto* mpBle = mpdevice->ble();
         connect(mpBle, &MPDeviceBleImpl::userSettingsChanged, this, &WSServerCon::sendUserSettings);
         connect(mpBle, &MPDeviceBleImpl::bleDeviceLanguage, this, &WSServerCon::sendDeviceLanguage);
@@ -606,6 +607,10 @@ void WSServerCon::sendInitialStatus()
         sendVersion();
         sendMemMgmtMode();
         sendCardDbMetadata();
+        if (mpdevice->isBLE())
+        {
+            sendIsConnectedWithBluetooth();
+        }
     }
 }
 
@@ -693,6 +698,15 @@ void WSServerCon::sendFilesCache()
 
     oroot["data"] = array;
     sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendIsConnectedWithBluetooth()
+{
+    if (!mpdevice)
+            return;
+    sendJsonMessage({{ "msg", "is_connected_with_bluetooth" },
+                     { "data", mpdevice->isBT() }
+                    });
 }
 
 void WSServerCon::sendDeviceLanguage(const QJsonObject &langs)

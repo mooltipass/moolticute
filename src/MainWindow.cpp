@@ -253,6 +253,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::updateBatteryPercent,
             [this](int battery)
             {
+                DeviceDetector::instance().setBattery(battery);
                 ui->pbBleBattery->setValue(battery);
             });
 
