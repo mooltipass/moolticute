@@ -508,9 +508,9 @@ void WSClient::onTextMessageReceived(const QString &message)
             emit challengeResultReceived(o["challenge_response"].toString());
         }
     }
-    else if (rootobj["msg"] == "is_bt")
+    else if (rootobj["msg"] == "is_connected_with_bluetooth")
     {
-        DeviceDetector::instance().setBt(rootobj["data"].toBool());
+        DeviceDetector::instance().setIsConnectedWithBluetooth(rootobj["data"].toBool());
     }
 
 }

@@ -551,7 +551,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
 
     if (nullptr != mpdevice->ble())
     {
-        sendIsBt();
+        sendIsConnectedWithBluetooth();
         const auto* mpBle = mpdevice->ble();
         connect(mpBle, &MPDeviceBleImpl::userSettingsChanged, this, &WSServerCon::sendUserSettings);
         connect(mpBle, &MPDeviceBleImpl::bleDeviceLanguage, this, &WSServerCon::sendDeviceLanguage);
@@ -609,7 +609,7 @@ void WSServerCon::sendInitialStatus()
         sendCardDbMetadata();
         if (mpdevice->isBLE())
         {
-            sendIsBt();
+            sendIsConnectedWithBluetooth();
         }
     }
 }
@@ -700,11 +700,11 @@ void WSServerCon::sendFilesCache()
     sendJsonMessage(oroot);
 }
 
-void WSServerCon::sendIsBt()
+void WSServerCon::sendIsConnectedWithBluetooth()
 {
     if (!mpdevice)
             return;
-    sendJsonMessage({{ "msg", "is_bt" },
+    sendJsonMessage({{ "msg", "is_connected_with_bluetooth" },
                      { "data", mpdevice->isBT() }
                     });
 }
