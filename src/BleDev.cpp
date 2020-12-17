@@ -124,7 +124,7 @@ void BleDev::on_btnFileBrowser_clicked()
         DeviceDetector::instance().getBattery() < MIN_BATTERY_PCT_FOR_UPLOAD)
     {
         QMessageBox::warning(this, tr("Battery too low for bundle upload"),
-                             tr("Please connect the device with usb and charge above 60%."));
+                             tr("Please have your device connected through USB and fully charged"));
         return;
     }
     QSettings s;
