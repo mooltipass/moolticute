@@ -551,6 +551,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
 
     if (nullptr != mpdevice->ble())
     {
+        sendIsBt();
         const auto* mpBle = mpdevice->ble();
         connect(mpBle, &MPDeviceBleImpl::userSettingsChanged, this, &WSServerCon::sendUserSettings);
         connect(mpBle, &MPDeviceBleImpl::bleDeviceLanguage, this, &WSServerCon::sendDeviceLanguage);
@@ -606,6 +607,10 @@ void WSServerCon::sendInitialStatus()
         sendVersion();
         sendMemMgmtMode();
         sendCardDbMetadata();
+        if (mpdevice->isBLE())
+        {
+            sendIsBt();
+        }
     }
 }
 
@@ -693,6 +698,15 @@ void WSServerCon::sendFilesCache()
 
     oroot["data"] = array;
     sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendIsBt()
+{
+    if (!mpdevice)
+            return;
+    sendJsonMessage({{ "msg", "is_bt" },
+                     { "data", mpdevice->isBT() }
+                    });
 }
 
 void WSServerCon::sendDeviceLanguage(const QJsonObject &langs)

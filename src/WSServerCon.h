@@ -58,6 +58,7 @@ private slots:
     void sendVersion();
     void sendDeviceUID();
     void sendFilesCache();
+    void sendIsBt();
 
     void sendDeviceLanguage(const QJsonObject& langs);
     void sendKeyboardLayout(const QJsonObject& layouts);

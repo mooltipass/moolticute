@@ -49,6 +49,7 @@ private:
     static const QString HEXA_CHAR_REGEXP;
     static const QByteArray START_BUNDLE_BYTES;
     static constexpr int UPLOAD_PASSWORD_SIZE = 32;
+    static constexpr int MIN_BATTERY_PCT_FOR_UPLOAD = 60;
 };
 
 #endif // BLEDEV_H

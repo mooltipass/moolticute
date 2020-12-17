@@ -33,6 +33,11 @@ public:
 
     bool isAdvancedMode() const;
 
+    bool isBt() const { return m_isBt; }
+    void setBt(bool bt) { m_isBt = bt; }
+    quint8 getBattery() const { return m_battery; }
+    void setBattery(quint8 battery) { m_battery = battery; }
+
 signals:
     void deviceChanged(Common::MPHwVersion newDevType);
 
@@ -42,6 +47,8 @@ public slots:
 private:
     Common::MPHwVersion m_deviceType = Common::MP_Unknown;
     bool m_advancedMode = false;
+    bool m_isBt = false;
+    quint8 m_battery = 0;
 };
 
 #endif // DEVICEDETECTOR_H
