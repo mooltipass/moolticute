@@ -69,6 +69,7 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxScreensaver->hide();
     ui->settings_advanced_lockunlock->show();
     ui->setting_ble_inactivity_lock->show();
+    ui->checkBoxInput->hide();
 }
 
 void SettingsGuiBLE::setupKeyboardLayout(bool onlyCheck)

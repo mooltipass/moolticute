@@ -67,6 +67,7 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxScreensaver->show();
     ui->settings_advanced_lockunlock->show();
     ui->setting_ble_inactivity_lock->hide();
+    ui->checkBoxInput->show();
 }
 
 void SettingsGuiMini::setupKeyboardLayout(bool)

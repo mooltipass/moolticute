@@ -1061,12 +1061,19 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QCheckBox" name="checkBoxInput">
                     <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_userInteractionTimeout">
+                    <property name="text">
                      <string>Cancel credentials request after</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="spinBoxInput">
+                   <widget class="QSpinBox" name="spinBoxInputUserInteractionTimeout">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
