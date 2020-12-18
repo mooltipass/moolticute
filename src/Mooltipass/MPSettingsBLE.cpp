@@ -44,6 +44,7 @@ void MPSettingsBLE::loadParameters()
                         set_nb_20mins_ticks_for_lock(m_lastDeviceSettings.at(DeviceSettingsBLE::NB_20MINS_TICKS_FOR_LOCK));
                         set_switch_off_after_usb_disc(m_lastDeviceSettings.at(DeviceSettingsBLE::SWITCH_OFF_AFTER_USB_DISC) != 0);
                         set_hash_display(m_lastDeviceSettings.at(DeviceSettingsBLE::HASH_DISPLAY_BYTE) != 0);
+                        set_information_time_delay(m_lastDeviceSettings.at(DeviceSettingsBLE::INFORMATION_TIME_DELAY_BYTE));
                         return true;
                     }
     ));

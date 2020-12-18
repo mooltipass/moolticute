@@ -312,6 +312,13 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxInactivityTimer->addItem(tr("5 hours"), 10);
     ui->comboBoxInactivityTimer->addItem(tr("6 hours"), 12);
 
+    ui->comboBoxInformationTimeDelay->addItem(tr("0.5 second"), 5);
+    ui->comboBoxInformationTimeDelay->addItem(tr("1 second"), 10);
+    ui->comboBoxInformationTimeDelay->addItem(tr("2 seconds"), 20);
+    ui->comboBoxInformationTimeDelay->addItem(tr("3 seconds"), 30);
+    ui->comboBoxInformationTimeDelay->addItem(tr("4 seconds"), 40);
+    ui->comboBoxInformationTimeDelay->addItem(tr("5 seconds"), 50);
+
     // Close behavior
 #ifdef Q_OS_MAC
     ui->closeBehaviorComboBox->addItem(

@@ -41,5 +41,7 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_paramMap.insert(MPParams::SWITCH_OFF_AFTER_USB_DISC, "switch_off_after_usb_disc");
     m_bleByteMapping[MPParams::SWITCH_OFF_AFTER_USB_DISC] = SWITCH_OFF_AFTER_USB_DISC;
     m_bleByteMapping[MPParams::HASH_DISPLAY_FEATURE_PARAM] = HASH_DISPLAY_BYTE;
+    m_paramMap.insert(MPParams::INFORMATION_TIME_DELAY, "information_time_delay");
+    m_bleByteMapping[MPParams::INFORMATION_TIME_DELAY] = INFORMATION_TIME_DELAY_BYTE;
 }
 

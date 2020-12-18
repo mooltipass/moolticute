@@ -58,6 +58,8 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxDisableBleOnCardRemove->hide();
     ui->checkBoxDisableBleOnLock->hide();
 
+    ui->settings_information_time_delay->hide();
+
     ui->groupBox_BLESettings->hide();
 
     // Inactivity groupbox

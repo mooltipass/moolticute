@@ -59,6 +59,7 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxSwitchOffUSBDisc->show();
     ui->checkBoxDisableBleOnCardRemove->show();
     ui->checkBoxDisableBleOnLock->show();
+    ui->settings_information_time_delay->show();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();
