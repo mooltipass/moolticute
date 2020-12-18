@@ -59,6 +59,7 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxSwitchOffUSBDisc->show();
     ui->checkBoxDisableBleOnCardRemove->show();
     ui->checkBoxDisableBleOnLock->show();
+    ui->settings_information_time_delay->show();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();
@@ -68,6 +69,7 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxScreensaver->hide();
     ui->settings_advanced_lockunlock->show();
     ui->setting_ble_inactivity_lock->show();
+    ui->checkBoxInput->hide();
 }
 
 void SettingsGuiBLE::setupKeyboardLayout(bool onlyCheck)

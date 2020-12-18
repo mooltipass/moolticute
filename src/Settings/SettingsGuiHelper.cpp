@@ -27,7 +27,7 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::LOCK_TIMEOUT_PARAM, ui->spinBoxLock},
         {MPParams::SCREENSAVER_PARAM, ui->checkBoxScreensaver},
         {MPParams::USER_REQ_CANCEL_PARAM, ui->checkBoxInput},
-        {MPParams::USER_INTER_TIMEOUT_PARAM, ui->spinBoxInput},
+        {MPParams::USER_INTER_TIMEOUT_PARAM, ui->spinBoxInputUserInteractionTimeout},
         {MPParams::FLASH_SCREEN_PARAM, ui->checkBoxFlash},
         {MPParams::OFFLINE_MODE_PARAM, ui->checkBoxBoot},
         {MPParams::TUTORIAL_BOOL_PARAM, ui->checkBoxTuto},
@@ -56,7 +56,8 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::DISABLE_BLE_ON_CARD_REMOVE, ui->checkBoxDisableBleOnCardRemove},
         {MPParams::DISABLE_BLE_ON_LOCK, ui->checkBoxDisableBleOnLock},
         {MPParams::SWITCH_OFF_AFTER_USB_DISC, ui->checkBoxSwitchOffUSBDisc},
-        {MPParams::NB_20MINS_TICKS_FOR_LOCK, ui->comboBoxInactivityTimer}
+        {MPParams::NB_20MINS_TICKS_FOR_LOCK, ui->comboBoxInactivityTimer},
+        {MPParams::INFORMATION_TIME_DELAY, ui->comboBoxInformationTimeDelay}
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)

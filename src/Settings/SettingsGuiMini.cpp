@@ -58,6 +58,8 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxDisableBleOnCardRemove->hide();
     ui->checkBoxDisableBleOnLock->hide();
 
+    ui->settings_information_time_delay->hide();
+
     ui->groupBox_BLESettings->hide();
 
     // Inactivity groupbox
@@ -65,6 +67,7 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxScreensaver->show();
     ui->settings_advanced_lockunlock->show();
     ui->setting_ble_inactivity_lock->hide();
+    ui->checkBoxInput->show();
 }
 
 void SettingsGuiMini::setupKeyboardLayout(bool)
