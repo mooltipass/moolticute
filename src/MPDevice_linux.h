@@ -72,6 +72,9 @@ private:
     //Bufferize the data sent by sending 64bytes packet at a time
     QQueue<QByteArray> sendBuffer;
     bool failToWriteLogged = false;
+
+    const static int USB_BUFFER_SIZE = 64;
+    const static int BT_BUFFER_SIZE = USB_BUFFER_SIZE + 1;
 };
 
 #endif // MPDEVICE_LINUX_H
