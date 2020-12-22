@@ -55,12 +55,12 @@ QByteArray Base32::decode(QString str)
        // Truncate zero chars from the end
        if (decodedArr.at(decodedArr.size() - 1) == ZERO_CHAR)
        {
-           auto it = decodedArr.rbegin();
+           auto it = decodedArr.end() - 1;
            auto endZeroSize = 0;
            while (*it == ZERO_CHAR)
            {
                ++endZeroSize;
-               ++it;
+               --it;
            }
            decodedArr.truncate(decodedArr.size() - endZeroSize);
        }
