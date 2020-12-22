@@ -68,8 +68,9 @@ MPDevice_linux::~MPDevice_linux()
 void MPDevice_linux::readyRead(int fd)
 {
     QByteArray recvData;
-    recvData.resize(64);
-    ssize_t sz = ::read(fd, recvData.data(), 64);
+    int bufferSize = isBluetooth ? BT_BUFFER_SIZE : USB_BUFFER_SIZE;
+    recvData.resize(bufferSize);
+    ssize_t sz = ::read(fd, recvData.data(), bufferSize);
 
     if (sz < 0)
     {
