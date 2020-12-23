@@ -120,8 +120,9 @@ bool BleDev::isValidBundleFile(QFile* file) const
 
 void BleDev::on_btnFileBrowser_clicked()
 {
-    if (DeviceDetector::instance().isConnectedWithBluetooth() ||
-        DeviceDetector::instance().getBattery() < MIN_BATTERY_PCT_FOR_UPLOAD)
+    if (wsClient->get_status() != Common::NoBundle &&
+        (DeviceDetector::instance().isConnectedWithBluetooth() ||
+        DeviceDetector::instance().getBattery() < MIN_BATTERY_PCT_FOR_UPLOAD))
     {
         QMessageBox::warning(this, tr("Battery too low for bundle upload"),
                              tr("Please have your device connected through USB and fully charged"));
