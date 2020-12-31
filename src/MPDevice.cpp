@@ -94,7 +94,14 @@ void MPDevice::setupMessageProtocol()
 
 void MPDevice::sendInitMessages()
 {
-    addTimerJob(INIT_STARTING_DELAY);
+    if (isBLE() && isBT())
+    {
+        addTimerJob(BLUETOOTH_DELAY);
+    }
+    else
+    {
+        addTimerJob(INIT_STARTING_DELAY);
+    }
     if (isBLE())
     {
         /**

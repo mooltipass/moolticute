@@ -489,6 +489,7 @@ protected:
     static constexpr int INIT_STARTING_DELAY = RESET_SEND_DELAY + 150;
     static constexpr int STATUS_STARTING_DELAY = RESET_SEND_DELAY + 500;
     static constexpr int CATEGORY_FETCH_DELAY = 5000;
+    static constexpr int BLUETOOTH_DELAY = 5000;
     static constexpr int SET_DATE_INTERVAL = 4096*1000;
 };
 
