@@ -94,14 +94,8 @@ void MPDevice::setupMessageProtocol()
 
 void MPDevice::sendInitMessages()
 {
-    if (isBLE() && isBT())
-    {
-        addTimerJob(BLUETOOTH_DELAY);
-    }
-    else
-    {
-        addTimerJob(INIT_STARTING_DELAY);
-    }
+    addTimerJob(INIT_STARTING_DELAY);
+
     if (isBLE())
     {
         /**
@@ -434,6 +428,10 @@ void MPDevice::sendDataDequeue()
     if (isBLE())
     {
         bleImpl->flipMessageBit(currentCmd.data);
+        if (isBT() && !bleImpl->isFirstMessageWritten())
+        {
+            bleImpl->handleFirstBluetoothMessage(currentCmd);
+        }
     }
     // send data with platform code
     for (const auto &data : currentCmd.data)

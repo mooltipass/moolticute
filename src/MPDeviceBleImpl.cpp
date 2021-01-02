@@ -618,6 +618,20 @@ void MPDeviceBleImpl::fetchCategories()
     }
 }
 
+void MPDeviceBleImpl::handleFirstBluetoothMessageTimeout()
+{
+    if (AppDaemon::isDebugDev())
+    {
+        qDebug() << "handleFirstBluetoothMessageTimeout";
+    }
+    auto& cmd = mpDev->commandQueue.head();
+    delete cmd.timerTimeout;
+    cmd.timerTimeout = nullptr;
+    cmd.running = false;
+    sendResetFlipBit();
+    mpDev->sendDataDequeue();
+}
+
 QByteArray MPDeviceBleImpl::createUserCategoriesMsg(const QJsonObject &categories)
 {
     QByteArray data;
@@ -1282,6 +1296,15 @@ bool MPDeviceBleImpl::isNoBundle(MPCmd::Command cmd)
         return true;
     }
     return false;
+}
+
+void MPDeviceBleImpl::handleFirstBluetoothMessage(MPCommand &cmd)
+{
+    cmd.timerTimeout = new QTimer(this);
+    connect(cmd.timerTimeout, &QTimer::timeout, this, &MPDeviceBleImpl::handleFirstBluetoothMessageTimeout);
+    cmd.timerTimeout->setInterval(BLUETOOTH_FIRST_MSG_TIMEOUT_MS);
+    cmd.timerTimeout->start();
+    m_isFirstMessageWritten = true;
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()

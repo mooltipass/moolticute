@@ -141,6 +141,9 @@ public:
     void checkNoBundle(Common::MPStatus& status, Common::MPStatus prevStatus);
     bool isNoBundle(MPCmd::Command cmd);
 
+    bool isFirstMessageWritten() const { return m_isFirstMessageWritten; }
+    void handleFirstBluetoothMessage(MPCommand& cmd);
+
 signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);
@@ -153,6 +156,7 @@ private slots:
 
 public slots:
     void fetchCategories();
+    void handleFirstBluetoothMessageTimeout();
 
 private:
     void checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress);
@@ -193,6 +197,8 @@ private:
     bool m_noBundle = false;
     QList<MPCmd::Command> m_noBundleCommands;
 
+    bool m_isFirstMessageWritten = false;
+
     static int s_LangNum;
     static int s_LayoutNum;
 
@@ -205,6 +211,7 @@ private:
     static constexpr int FAV_DATA_SIZE = 4;
     static constexpr int FAV_NUMBER = 50;
     static constexpr int LONG_MESSAGE_TIMEOUT_MS = 2000;
+    static constexpr int BLUETOOTH_FIRST_MSG_TIMEOUT_MS = 4000;
     static constexpr int FIRST_PACKET_PAYLOAD_SIZE = 58;
     static constexpr int PAYLOAD_SIZE = 62;
     static constexpr int INVALID_LAYOUT_LANG_SIZE = 0xFFFF;
