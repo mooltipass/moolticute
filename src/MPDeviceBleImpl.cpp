@@ -659,7 +659,7 @@ void MPDeviceBleImpl::createTOTPCredMessage(const QString &service, const QStrin
     QByteArray loginArr = bleProt->toByteArray(login);
     Common::fill(loginArr, MPNodeBLE::LOGIN_LENGTH - loginArr.size(), ZERO_BYTE);
     data.append(loginArr);
-    // 380->411 TOTP secret key
+    // 380->443 TOTP secret key
     QByteArray secKeyArr;
     secKeyArr.append(secretKey);
     if (secKeyArr.length() > SECRET_KEY_LENGTH)
@@ -669,13 +669,13 @@ void MPDeviceBleImpl::createTOTPCredMessage(const QString &service, const QStrin
     }
     Common::fill(secKeyArr, SECRET_KEY_LENGTH - secKeyArr.size(), ZERO_BYTE);
     data.append(secKeyArr);
-    // 412 TOTP secret key length
+    // 444 TOTP secret key length
     data.append(secretKey.size());
-    // 413 TOTP number of digits
+    // 445 TOTP number of digits
     data.append(codeSize);
-    // 414 TOTP time step
+    // 456 TOTP time step
     data.append(timeStep);
-    // 415 TOTP SHA version
+    // 447 TOTP SHA version
     data.append(ZERO_BYTE);
 
     mmmTOTPStoreArray.append(data);

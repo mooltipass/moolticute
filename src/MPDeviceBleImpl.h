@@ -222,7 +222,7 @@ private:
     const static int FIRST_DATA_STARTING_ADDR = 10;
     const static int STATUS_MSG_SIZE_WITH_BATTERY = 5;
     const static int BATTERY_BYTE = 1;
-    const static int SECRET_KEY_LENGTH = 32;
+    const static int SECRET_KEY_LENGTH = 64;
     static constexpr int UPLOAD_PASSWORD_BYTE_SIZE = 16;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
 };
