@@ -59,8 +59,8 @@ protected:
     static constexpr int KEY_AFTER_LOGIN_ADDR_START = 260;
     static constexpr int KEY_AFTER_PWD_ADDR_START = 262;
     static constexpr int PWD_BLANK_FLAG = 266;
-    static constexpr int TOTP_TIME_STEP = 434;
-    static constexpr int TOTP_CODE_SIZE = 436;
+    static constexpr int TOTP_TIME_STEP = 466;
+    static constexpr int TOTP_CODE_SIZE = 468;
     static constexpr int KEY_AFTER_LENGTH = 2;
     static constexpr char BLANK_CHAR = 0x01;
 };
