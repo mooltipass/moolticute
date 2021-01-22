@@ -23,6 +23,8 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(int, nb_20mins_ticks_for_lock, 0, MPParams::NB_20MINS_TICKS_FOR_LOCK)
     QT_SETTINGS_PROPERTY(bool, switch_off_after_usb_disc, false, MPParams::SWITCH_OFF_AFTER_USB_DISC)
     QT_SETTINGS_PROPERTY(int, information_time_delay, 0, MPParams::INFORMATION_TIME_DELAY)
+    QT_SETTINGS_PROPERTY(bool, bluetooth_shortcuts, false, MPParams::BLUETOOTH_SHORTCUTS)
+    QT_SETTINGS_PROPERTY(int, screen_saver_id, 0, MPParams::SCREEN_SAVER_ID)
 
 
 public:
@@ -51,7 +53,9 @@ public:
         NB_20MINS_TICKS_FOR_LOCK = 20,
         SWITCH_OFF_AFTER_USB_DISC = 21,
         HASH_DISPLAY_BYTE = 22,
-        INFORMATION_TIME_DELAY_BYTE = 23
+        INFORMATION_TIME_DELAY_BYTE = 23,
+        BLUETOOTH_SHORTCUTS_BYTE = 24,
+        SCREEN_SAVER_ID_BYTE = 25
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;

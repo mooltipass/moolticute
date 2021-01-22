@@ -57,7 +57,9 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::DISABLE_BLE_ON_LOCK, ui->checkBoxDisableBleOnLock},
         {MPParams::SWITCH_OFF_AFTER_USB_DISC, ui->checkBoxSwitchOffUSBDisc},
         {MPParams::NB_20MINS_TICKS_FOR_LOCK, ui->comboBoxInactivityTimer},
-        {MPParams::INFORMATION_TIME_DELAY, ui->comboBoxInformationTimeDelay}
+        {MPParams::INFORMATION_TIME_DELAY, ui->comboBoxInformationTimeDelay},
+        {MPParams::BLUETOOTH_SHORTCUTS, ui->checkBoxBTShortcuts},
+        {MPParams::SCREEN_SAVER_ID, ui->comboBoxScreensaverId}
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)
