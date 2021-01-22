@@ -45,6 +45,8 @@ void MPSettingsBLE::loadParameters()
                         set_switch_off_after_usb_disc(m_lastDeviceSettings.at(DeviceSettingsBLE::SWITCH_OFF_AFTER_USB_DISC) != 0);
                         set_hash_display(m_lastDeviceSettings.at(DeviceSettingsBLE::HASH_DISPLAY_BYTE) != 0);
                         set_information_time_delay(m_lastDeviceSettings.at(DeviceSettingsBLE::INFORMATION_TIME_DELAY_BYTE));
+                        set_bluetooth_shortcuts(m_lastDeviceSettings.at(DeviceSettingsBLE::BLUETOOTH_SHORTCUTS_BYTE) != 0);
+                        set_screen_saver_id(m_lastDeviceSettings.at(DeviceSettingsBLE::SCREEN_SAVER_ID_BYTE));
                         return true;
                     }
     ));

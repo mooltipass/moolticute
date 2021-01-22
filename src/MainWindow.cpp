@@ -319,6 +319,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxInformationTimeDelay->addItem(tr("4 seconds"), 40);
     ui->comboBoxInformationTimeDelay->addItem(tr("5 seconds"), 50);
 
+    ui->comboBoxScreensaverId->addItem(tr("None"), 0);
+    ui->comboBoxScreensaverId->addItem(tr("Nyancat"), 1);
+
     // Close behavior
 #ifdef Q_OS_MAC
     ui->closeBehaviorComboBox->addItem(

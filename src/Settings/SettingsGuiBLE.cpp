@@ -60,6 +60,8 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxDisableBleOnCardRemove->show();
     ui->checkBoxDisableBleOnLock->show();
     ui->settings_information_time_delay->show();
+    ui->settings_screen_saver_id->show();
+    ui->checkBoxBTShortcuts->show();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();

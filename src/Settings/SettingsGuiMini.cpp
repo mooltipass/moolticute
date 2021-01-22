@@ -59,6 +59,8 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxDisableBleOnLock->hide();
 
     ui->settings_information_time_delay->hide();
+    ui->settings_screen_saver_id->hide();
+    ui->checkBoxBTShortcuts->hide();
 
     ui->groupBox_BLESettings->hide();
 

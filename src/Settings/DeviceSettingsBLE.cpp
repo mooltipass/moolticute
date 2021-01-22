@@ -43,5 +43,9 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::HASH_DISPLAY_FEATURE_PARAM] = HASH_DISPLAY_BYTE;
     m_paramMap.insert(MPParams::INFORMATION_TIME_DELAY, "information_time_delay");
     m_bleByteMapping[MPParams::INFORMATION_TIME_DELAY] = INFORMATION_TIME_DELAY_BYTE;
+    m_paramMap.insert(MPParams::BLUETOOTH_SHORTCUTS, "bluetooth_shortcuts");
+    m_bleByteMapping[MPParams::BLUETOOTH_SHORTCUTS] = BLUETOOTH_SHORTCUTS_BYTE;
+    m_paramMap.insert(MPParams::SCREEN_SAVER_ID, "screen_saver_id");
+    m_bleByteMapping[MPParams::SCREEN_SAVER_ID] = SCREEN_SAVER_ID_BYTE;
 }
 
