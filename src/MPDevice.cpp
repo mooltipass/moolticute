@@ -4493,13 +4493,19 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
         sdata.append((char)0);
         jobs->append(new MPCommandJob(this, MPCmd::ADD_DATA_SERVICE,
                                       sdata,
-                                      [this, service, cb](const QByteArray &data, bool &) -> bool
+                                      [this, service, cb, sdata, jobs](const QByteArray &data, bool &) -> bool
         {
             if (pMesProt->getFirstPayloadByte(data) != MSG_SUCCESS)
             {
                 qWarning() << service << " already exists";
-                cb(false, "Service already exists.");
-                return false;
+                jobs->prepend(new MPCommandJob(this, MPCmd::MODIFY_DATA_FILE, sdata, [this, service](const QByteArray &data, bool&)
+                {
+                    if (pMesProt->getFirstPayloadByte(data) != MSG_SUCCESS)
+                    {
+                        qWarning() << "Modify data file failed for: " << service ;
+                    }
+                    return true;
+                }));
             }
             return true;
         }));
@@ -6563,15 +6569,32 @@ void MPDevice::serviceExists(bool isDatanode, QString service, const QString &re
     QByteArray sdata = pMesProt->toByteArray(service);
     sdata.append((char)0);
 
-    jobs->append(new MPCommandJob(this, isDatanode? MPCmd::SET_DATA_SERVICE : MPCmd::CONTEXT,
-                                  sdata,
-                                  [this, jobs, service](const QByteArray &data, bool &) -> bool
+    if (isBLE())
     {
-        QVariantMap m = {{ "service", service },
-                         { "exists", pMesProt->getFirstPayloadByte(data) == 1 }};
-        jobs->user_data = m;
-        return true;
-    }));
+        sdata.append((char)0);
+        jobs->append(new MPCommandJob(this, MPCmd::CHECK_DATA_FILE,
+                                      sdata,
+                  [this, jobs, service](const QByteArray &data, bool &)
+                    {
+                        QVariantMap m = {{ "service", service },
+                                         { "exists", pMesProt->getFirstPayloadByte(data) == MSG_SUCCESS }};
+                        jobs->user_data = m;
+                        return true;
+                    }
+                  ));
+    }
+    else
+    {
+        jobs->append(new MPCommandJob(this, isDatanode? MPCmd::SET_DATA_SERVICE : MPCmd::CONTEXT,
+                                      sdata,
+                                      [this, jobs, service](const QByteArray &data, bool &) -> bool
+        {
+            QVariantMap m = {{ "service", service },
+                             { "exists", pMesProt->getFirstPayloadByte(data) == 1 }};
+            jobs->user_data = m;
+            return true;
+        }));
+    }
 
     connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &)
     {

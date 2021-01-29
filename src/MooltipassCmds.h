@@ -102,6 +102,8 @@ public:
             ADD_DATA_SERVICE    ,
             WRITE_DATA_FILE     ,
             READ_DATA_FILE      ,
+            MODIFY_DATA_FILE    ,
+            CHECK_DATA_FILE     ,
             GET_CUR_CARD_CPZ    ,
             CANCEL_USER_REQUEST ,
             PLEASE_RETRY        ,
