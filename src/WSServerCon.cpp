@@ -436,7 +436,13 @@ void WSServerCon::processMessage(const QString &message)
         if (o.contains("request_id"))
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
-        mpdevice->getDataNode(o["service"].toString(), o["fallback_service"].toString(),
+        QString service = o["service"].toString();
+        if (mpdevice->isBLE() && service.toLower() == MC_SSH_SERVICE)
+        {
+            qDebug() << "Lowering ssh data service name";
+            service = service.toLower();
+        }
+        mpdevice->getDataNode(service, o["fallback_service"].toString(),
                 reqid,
                 [=](bool success, QString errstr, const QString &service, const QByteArray &dataNode)
         {
@@ -498,6 +504,35 @@ void WSServerCon::processMessage(const QString &message)
     else if (root["msg"] == "list_files_cache")
     {
         sendFilesCache();
+    }
+    else if (root["msg"] == "data_node_exists")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        QString reqid;
+        if (o.contains("request_id"))
+            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
+
+        mpdevice->serviceExists(true, o["service"].toString(),
+                reqid,
+                [=](bool success, QString errstr, const QString &service, bool exists)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["service"] = service;
+            ores["exists"] = exists;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
     }
     else if (mpdevice->isBLE())
     {
@@ -969,35 +1004,6 @@ void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb 
             reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
 
         mpdevice->serviceExists(false, o["service"].toString(),
-                reqid,
-                [=](bool success, QString errstr, const QString &service, bool exists)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["service"] = service;
-            ores["exists"] = exists;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
-    }
-    else if (root["msg"] == "data_node_exists")
-    {
-        QJsonObject o = root["data"].toObject();
-
-        QString reqid;
-        if (o.contains("request_id"))
-            reqid = QStringLiteral("%1-%2").arg(clientUid).arg(getRequestId(o["request_id"]));
-
-        mpdevice->serviceExists(true, o["service"].toString(),
                 reqid,
                 [=](bool success, QString errstr, const QString &service, bool exists)
         {
