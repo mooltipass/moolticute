@@ -59,6 +59,8 @@ public:
     void uploadBundle(QString filePath, QString password, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
     void fetchData(QString filePath, MPCmd::Command cmd);
     inline void stopFetchData() { fetchState = Common::FetchState::STOPPED; }
+    void fetchDataFiles();
+    void fetchDataFiles(AsyncJobs *jobs, QByteArray addr);
 
     void checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb);
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb, AsyncJobs *jobs = nullptr);

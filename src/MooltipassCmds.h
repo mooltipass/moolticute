@@ -104,6 +104,7 @@ public:
             READ_DATA_FILE      ,
             MODIFY_DATA_FILE    ,
             CHECK_DATA_FILE     ,
+            FETCH_DATA_NODES    ,
             GET_CUR_CARD_CPZ    ,
             CANCEL_USER_REQUEST ,
             PLEASE_RETRY        ,

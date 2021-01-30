@@ -183,6 +183,36 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
     mpDev->enqueueAndRunJob(jobs);
 }
 
+void MPDeviceBleImpl::fetchDataFiles()
+{
+    auto *jobs = new AsyncJobs(QString("Fetch data files"), this);
+
+    const QByteArray startingAddr(2, 0x00);
+    fetchDataFiles(jobs, startingAddr);
+    mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::fetchDataFiles(AsyncJobs *jobs, QByteArray addr)
+{
+    jobs->append(new MPCommandJob(mpDev, MPCmd::FETCH_DATA_NODES, addr,
+                        [this, jobs] (const QByteArray &data, bool &)
+                        {
+                            qCritical() << "Payload: " << bleProt->getFullPayload(data).toHex();
+                            qCritical() << "File name: " << bleProt->toQString(bleProt->getPayloadBytes(data, 2, bleProt->getMessageSize(data)));
+                            qCritical() << "Next addr: " << bleProt->getPayloadBytes(data, 0, 2);
+                            if (bleProt->getMessageSize(data) != 2)
+                            {
+                                fetchDataFiles(jobs, bleProt->getPayloadBytes(data, 0, 2));
+                            }
+                            else
+                            {
+                                qWarning() << "No More data files";
+                            }
+                            return true;
+                        }
+               ));
+}
+
 void MPDeviceBleImpl::checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb)
 {
     auto *jobs = new AsyncJobs(QString("Check and Store Credential"), this);

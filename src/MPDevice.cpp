@@ -114,6 +114,7 @@ void MPDevice::sendInitMessages()
             writeCancelRequest();
         }
         bleImpl->getPlatInfo();
+        bleImpl->fetchDataFiles();
     }
     else
     {
