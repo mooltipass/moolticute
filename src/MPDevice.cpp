@@ -1434,7 +1434,10 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
                     }
                     filesCache.save(list);
                     filesCache.setDbChangeNumber(get_dataDbChangeNumber());
-                    emit filesCacheChanged();
+                    if (!isBLE())
+                    {
+                        emit filesCacheChanged();
+                    }
                 }
             }
         }
@@ -3743,7 +3746,14 @@ void MPDevice::getChangeNumbers()
         if (filesCache.setDbChangeNumber(dataDbChangeNum))
         {
             qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
-            emit filesCacheChanged();
+            if (isBLE())
+            {
+                bleImpl->fetchDataFiles();
+            }
+            else
+            {
+                emit filesCacheChanged();
+            }
         }
         emit dbChangeNumbersChanged(credentialsDbChangeNumberClone, dataDbChangeNumberClone);
         qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
