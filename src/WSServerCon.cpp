@@ -718,17 +718,30 @@ void WSServerCon::sendFilesCache()
     qDebug() << "Sending files cache";
     QJsonObject oroot = { {"msg", "files_cache_list"} };
     QJsonArray array;
-    oroot["sync"] = mpdevice->isFilesCacheInSync();
 
-    if (mpdevice->hasFilesCache())
+    if (mpdevice->isBLE())
     {
-        for (QVariantMap item : mpdevice->getFilesCache())
-            array.append(QJsonDocument::fromVariant(item).object());
+        MPDeviceBleImpl *bleImpl = mpdevice->ble();
+        for (auto file : bleImpl->getDataFiles())
+        {
+            array.append(QJsonObject{{"name", file}});
+        }
+        oroot["sync"] = true;
     }
     else
     {
-        qDebug() << "There is no files cache to send";
-        oroot["sync"] = false;
+        oroot["sync"] = mpdevice->isFilesCacheInSync();
+
+        if (mpdevice->hasFilesCache())
+        {
+            for (QVariantMap item : mpdevice->getFilesCache())
+                array.append(QJsonDocument::fromVariant(item).object());
+        }
+        else
+        {
+            qDebug() << "There is no files cache to send";
+            oroot["sync"] = false;
+        }
     }
 
     oroot["data"] = array;

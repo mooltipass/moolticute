@@ -186,6 +186,7 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
 void MPDeviceBleImpl::fetchDataFiles()
 {
     auto *jobs = new AsyncJobs(QString("Fetch data files"), this);
+    m_dataFiles.clear();
 
     const QByteArray startingAddr(2, 0x00);
     fetchDataFiles(jobs, startingAddr);
@@ -198,7 +199,12 @@ void MPDeviceBleImpl::fetchDataFiles(AsyncJobs *jobs, QByteArray addr)
                         [this, jobs] (const QByteArray &data, bool &)
                         {
                             qCritical() << "Payload: " << bleProt->getFullPayload(data).toHex();
-                            qCritical() << "File name: " << bleProt->toQString(bleProt->getPayloadBytes(data, 2, bleProt->getMessageSize(data)));
+                            QString fileName = bleProt->toQString(bleProt->getPayloadBytes(data, 2, bleProt->getMessageSize(data)));
+                            qCritical() << "File name: " << fileName;
+                            if (!fileName.isEmpty())
+                            {
+                                m_dataFiles.append(fileName);
+                            }
                             qCritical() << "Next addr: " << bleProt->getPayloadBytes(data, 0, 2);
                             if (bleProt->getMessageSize(data) != 2)
                             {
@@ -207,10 +213,17 @@ void MPDeviceBleImpl::fetchDataFiles(AsyncJobs *jobs, QByteArray addr)
                             else
                             {
                                 qWarning() << "No More data files";
+                                emit mpDev->filesCacheChanged();
                             }
                             return true;
                         }
                ));
+}
+
+void MPDeviceBleImpl::addDataFile(const QString &file)
+{
+    m_dataFiles.append(file);
+    emit mpDev->filesCacheChanged();
 }
 
 void MPDeviceBleImpl::checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb)

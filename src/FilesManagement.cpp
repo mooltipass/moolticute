@@ -245,8 +245,11 @@ void FilesManagement::loadFilesCacheModel(bool isInSync)
         icon->setPixmap(AppGui::qtAwesome()->icon(fa::fileo).pixmap(18, 18));
         rowLayout->addWidget(icon);
         rowLayout->addWidget(new QLabel(jsonObject.value("name").toString()));
-        QString sizeStr = QString("(%1 bytes)").arg(jsonObject.value("size").toInt());
-        rowLayout->addWidget(new QLabel(sizeStr));
+        if (jsonObject.contains("size"))
+        {
+            QString sizeStr = QString("(%1 bytes)").arg(jsonObject.value("size").toInt());
+            rowLayout->addWidget(new QLabel(sizeStr));
+        }
 
         QToolButton *button = new QToolButton;
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
