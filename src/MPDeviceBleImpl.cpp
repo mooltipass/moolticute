@@ -183,6 +183,47 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
     mpDev->enqueueAndRunJob(jobs);
 }
 
+void MPDeviceBleImpl::fetchDataFiles()
+{
+    auto *jobs = new AsyncJobs(QString("Fetch data files"), this);
+    m_dataFiles.clear();
+
+    // Start fetch from 0x0000 address
+    const QByteArray startingAddr(2, 0x00);
+    fetchDataFiles(jobs, startingAddr);
+    mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::fetchDataFiles(AsyncJobs *jobs, QByteArray addr)
+{
+    jobs->append(new MPCommandJob(mpDev, MPCmd::FETCH_DATA_NODES, addr,
+                        [this, jobs] (const QByteArray &data, bool &)
+                        {
+                            const int FILENAME_STARTING_POS = 2;
+                            QString fileName = bleProt->toQString(bleProt->getPayloadBytes(data, FILENAME_STARTING_POS, bleProt->getMessageSize(data)));
+                            if (!fileName.isEmpty())
+                            {
+                                m_dataFiles.append(fileName);
+                            }
+                            if (bleProt->getMessageSize(data) != 2)
+                            {
+                                fetchDataFiles(jobs, bleProt->getPayloadBytes(data, 0, 2));
+                            }
+                            else
+                            {
+                                emit mpDev->filesCacheChanged();
+                            }
+                            return true;
+                        }
+               ));
+}
+
+void MPDeviceBleImpl::addDataFile(const QString &file)
+{
+    m_dataFiles.append(file);
+    emit mpDev->filesCacheChanged();
+}
+
 void MPDeviceBleImpl::checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb)
 {
     auto *jobs = new AsyncJobs(QString("Check and Store Credential"), this);

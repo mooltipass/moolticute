@@ -114,6 +114,7 @@ void MPDevice::sendInitMessages()
             writeCancelRequest();
         }
         bleImpl->getPlatInfo();
+        bleImpl->fetchDataFiles();
     }
     else
     {
@@ -1433,7 +1434,10 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
                     }
                     filesCache.save(list);
                     filesCache.setDbChangeNumber(get_dataDbChangeNumber());
-                    emit filesCacheChanged();
+                    if (!isBLE())
+                    {
+                        emit filesCacheChanged();
+                    }
                 }
             }
         }
@@ -3742,7 +3746,14 @@ void MPDevice::getChangeNumbers()
         if (filesCache.setDbChangeNumber(dataDbChangeNum))
         {
             qDebug() << "dbChangeNumber set to file cache, emitting file cache changed";
-            emit filesCacheChanged();
+            if (isBLE())
+            {
+                bleImpl->fetchDataFiles();
+            }
+            else
+            {
+                emit filesCacheChanged();
+            }
         }
         emit dbChangeNumbersChanged(credentialsDbChangeNumberClone, dataDbChangeNumberClone);
         qDebug() << "Credentials change number:" << get_credentialsDbChangeNumber();
@@ -4570,7 +4581,14 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
         cb(true, QString());
 
         // update file cache
-        addFileToCache(service, ((nodeData.size()+MP_DATA_HEADER_SIZE+MOOLTIPASS_BLOCK_SIZE-1)/MOOLTIPASS_BLOCK_SIZE)*MOOLTIPASS_BLOCK_SIZE);
+        if (isBLE())
+        {
+            bleImpl->addDataFile(service);
+        }
+        else
+        {
+            addFileToCache(service, ((nodeData.size()+MP_DATA_HEADER_SIZE+MOOLTIPASS_BLOCK_SIZE-1)/MOOLTIPASS_BLOCK_SIZE)*MOOLTIPASS_BLOCK_SIZE);
+        }
 
         // request change numbers in case they changed
         if (isFw12())

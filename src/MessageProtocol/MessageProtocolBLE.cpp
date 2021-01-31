@@ -363,6 +363,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::WRITE_256B_TO_FLASH   , 0x002A},
         {MPCmd::END_BUNDLE_UPLOAD     , 0x002B},
         {MPCmd::AUTH_CHALLENGE        , 0x002C},
+        {MPCmd::FETCH_DATA_NODES      , 0x0031},
         {MPCmd::CMD_DBG_OPEN_DISP_BUFFER    , 0x8001},
         {MPCmd::CMD_DBG_SEND_TO_DISP_BUFFER , 0x8002},
         {MPCmd::CMD_DBG_CLOSE_DISP_BUFFER   , 0x8003},

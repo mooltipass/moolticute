@@ -59,6 +59,10 @@ public:
     void uploadBundle(QString filePath, QString password, const MessageHandlerCb &cb, const MPDeviceProgressCb &cbProgress);
     void fetchData(QString filePath, MPCmd::Command cmd);
     inline void stopFetchData() { fetchState = Common::FetchState::STOPPED; }
+    void fetchDataFiles();
+    void fetchDataFiles(AsyncJobs *jobs, QByteArray addr);
+    void addDataFile(const QString& file);
+    QList<QString> getDataFiles() const { return m_dataFiles; }
 
     void checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb);
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb, AsyncJobs *jobs = nullptr);
@@ -198,6 +202,7 @@ private:
     QList<MPCmd::Command> m_noBundleCommands;
 
     bool m_isFirstMessageWritten = false;
+    QList<QString> m_dataFiles;
 
     static int s_LangNum;
     static int s_LayoutNum;
