@@ -114,7 +114,6 @@ void MPDevice::sendInitMessages()
             writeCancelRequest();
         }
         bleImpl->getPlatInfo();
-        bleImpl->fetchDataFiles();
     }
     else
     {
@@ -3643,6 +3642,10 @@ void MPDevice::processStatusChange(const QByteArray &data)
         {
             /* If v1.2 firmware, query user change number */
             QTimer::singleShot(50, this, &MPDevice::handleDeviceUnlocked);
+            if (isBLE())
+            {
+                bleImpl->fetchDataFiles();
+            }
         }
     }
 }

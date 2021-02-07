@@ -185,6 +185,14 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
 
 void MPDeviceBleImpl::fetchDataFiles()
 {
+    if (mpDev->get_status() != Common::Unlocked)
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qWarning() << "Device is not unlocked, cannot fetch data files";
+        }
+        return;
+    }
     auto *jobs = new AsyncJobs(QString("Fetch data files"), this);
     m_dataFiles.clear();
 
