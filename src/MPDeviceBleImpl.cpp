@@ -185,6 +185,14 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
 
 void MPDeviceBleImpl::fetchDataFiles()
 {
+    if (mpDev->get_status() != Common::Unlocked)
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qWarning() << "Device is not unlocked, cannot fetch data files";
+        }
+        return;
+    }
     auto *jobs = new AsyncJobs(QString("Fetch data files"), this);
     m_dataFiles.clear();
 
@@ -205,7 +213,14 @@ void MPDeviceBleImpl::fetchDataFiles(AsyncJobs *jobs, QByteArray addr)
                             {
                                 m_dataFiles.append(fileName);
                             }
-                            if (bleProt->getMessageSize(data) != 2)
+
+                            if (bleProt->getMessageSize(data) < DATA_FETCH_NO_NEXT_ADDR_SIZE)
+                            {
+                                qCritical() << "Invalid response size for fetch data nodes";
+                                return false;
+                            }
+
+                            if (bleProt->getMessageSize(data) != DATA_FETCH_NO_NEXT_ADDR_SIZE)
                             {
                                 fetchDataFiles(jobs, bleProt->getPayloadBytes(data, 0, 2));
                             }
