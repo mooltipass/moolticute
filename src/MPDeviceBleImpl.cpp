@@ -213,7 +213,14 @@ void MPDeviceBleImpl::fetchDataFiles(AsyncJobs *jobs, QByteArray addr)
                             {
                                 m_dataFiles.append(fileName);
                             }
-                            if (bleProt->getMessageSize(data) != 2)
+
+                            if (bleProt->getMessageSize(data) < DATA_FETCH_NO_NEXT_ADDR_SIZE)
+                            {
+                                qCritical() << "Invalid response size for fetch data nodes";
+                                return false;
+                            }
+
+                            if (bleProt->getMessageSize(data) != DATA_FETCH_NO_NEXT_ADDR_SIZE)
                             {
                                 fetchDataFiles(jobs, bleProt->getPayloadBytes(data, 0, 2));
                             }
