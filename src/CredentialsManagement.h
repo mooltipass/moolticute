@@ -48,6 +48,8 @@ public:
 public slots:
     bool confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex = {});
     void saveChanges();
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
 
 private slots:
     void enableCredentialsManagement(bool);
@@ -128,6 +130,7 @@ private:
     bool m_selectionCanceled;
     bool m_isClean = true;
     bool m_isSetCategoryClean = true;
+    bool m_altKeyPressed = false;
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 

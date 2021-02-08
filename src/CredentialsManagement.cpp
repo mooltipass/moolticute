@@ -287,8 +287,8 @@ void CredentialsManagement::enableCredentialsManagement(bool enable)
 
 void CredentialsManagement::updateQuickAddCredentialsButtonState()
 {
-    ui->addCredentialButton->setEnabled(ui->addCredServiceInput->hasAcceptableInput() && ui->addCredServiceInput->text().length() > 0 &&
-                                        ui->addCredPasswordInput->hasAcceptableInput() && ui->addCredPasswordInput->text().length() > 0);
+    bool isValidPasswordInput = (ui->addCredPasswordInput->hasAcceptableInput() && ui->addCredPasswordInput->text().length() > 0) || m_altKeyPressed;
+    ui->addCredentialButton->setEnabled(ui->addCredServiceInput->hasAcceptableInput() && ui->addCredServiceInput->text().length() > 0 && isValidPasswordInput);
 }
 
 void CredentialsManagement::onPasswordInputReturnPressed()
@@ -575,6 +575,32 @@ void CredentialsManagement::saveChanges()
     saveSelectedCredential();
     wsClient->sendCredentialsMM(m_pCredModel->getJsonChanges());
     emit wantSaveMemMode();
+}
+
+void CredentialsManagement::keyPressEvent(QKeyEvent *event)
+{
+    if (wsClient->get_memMgmtMode() || !wsClient->isMPBLE())
+    {
+        return;
+    }
+    if (Qt::Key_Alt == event->key())
+    {
+        m_altKeyPressed = true;
+        updateQuickAddCredentialsButtonState();
+    }
+}
+
+void CredentialsManagement::keyReleaseEvent(QKeyEvent *event)
+{
+    if (wsClient->get_memMgmtMode() || !wsClient->isMPBLE())
+    {
+        return;
+    }
+    if (Qt::Key_Alt == event->key())
+    {
+        m_altKeyPressed = false;
+        updateQuickAddCredentialsButtonState();
+    }
 }
 
 void CredentialsManagement::on_pushButtonConfirm_clicked()
