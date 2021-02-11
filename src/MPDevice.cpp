@@ -7555,6 +7555,11 @@ void MPDevice::informLocked(const MessageHandlerCb &cb)
     const auto afterFn = [](const QByteArray &, bool &) -> bool { return true; };
     jobs->append(new MPCommandJob(this, MPCmd::INFORM_LOCKED, afterFn));
 
+    if (m_memMgmtMode)
+    {
+        exitMemMgmtMode();
+    }
+
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
