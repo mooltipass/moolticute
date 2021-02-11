@@ -304,13 +304,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxKnock->addItem(tr("High"), 3);
 
     ui->comboBoxInactivityTimer->addItem(tr("No Inactivity"), 0);
-    ui->comboBoxInactivityTimer->addItem(tr("30 minutes"), 1);
-    ui->comboBoxInactivityTimer->addItem(tr("1 hour"), 2);
-    ui->comboBoxInactivityTimer->addItem(tr("2 hours"), 4);
-    ui->comboBoxInactivityTimer->addItem(tr("3 hours"), 6);
-    ui->comboBoxInactivityTimer->addItem(tr("4 hours"), 8);
-    ui->comboBoxInactivityTimer->addItem(tr("5 hours"), 10);
-    ui->comboBoxInactivityTimer->addItem(tr("6 hours"), 12);
+    ui->comboBoxInactivityTimer->addItem(tr("5 minutes"), 5);
+    ui->comboBoxInactivityTimer->addItem(tr("10 minutes"), 10);
+    ui->comboBoxInactivityTimer->addItem(tr("15 minutes"), 15);
+    ui->comboBoxInactivityTimer->addItem(tr("30 minutes"), 30);
 
     ui->comboBoxInformationTimeDelay->addItem(tr("0.5 second"), 5);
     ui->comboBoxInformationTimeDelay->addItem(tr("1 second"), 10);
