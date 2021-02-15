@@ -120,6 +120,8 @@ public:
     void sendInformUnlocked();
     SettingsGuiHelper* settingsHelper();
 
+    bool areSettingsFetched() const { return m_settingsFetched; };
+
 signals:
     void wsConnected();
     void wsDisconnected();
@@ -179,6 +181,7 @@ private:
 
     QTimer *randomNumTimer = nullptr;
     QString HIBP_COMPROMISED_FORMAT = tr("this password has been compromised %1 times.");
+    bool m_settingsFetched = true;
 };
 
 #endif // WSCLIENT_H

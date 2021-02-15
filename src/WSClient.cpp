@@ -490,6 +490,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "keyboard_layouts")
     {
         emit updateBLEKeyboardLayout(rootobj["data"].toObject());
+        m_settingsFetched = true;
     }
     else if (rootobj["msg"] == "send_battery")
     {
@@ -511,6 +512,10 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "is_connected_with_bluetooth")
     {
         DeviceDetector::instance().setIsConnectedWithBluetooth(rootobj["data"].toBool());
+    }
+    else if (rootobj["msg"] == "request_keyboard_layout")
+    {
+        m_settingsFetched = true;
     }
 
 }
@@ -763,6 +768,7 @@ void WSClient::requestBleKeyboardLayout(bool onlyCheck)
     QJsonObject o;
     o["only_check"] = onlyCheck;
     sendJsonData({{ "msg", "request_keyboard_layout" }, {"data", o}});
+    m_settingsFetched = false;
 }
 
 void WSClient::sendLockDevice()
