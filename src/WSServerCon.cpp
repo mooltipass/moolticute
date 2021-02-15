@@ -1223,7 +1223,11 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     else if (root["msg"] == "request_keyboard_layout")
     {
         QJsonObject o = root["data"].toObject();
-        bleImpl->readLanguages(o["only_check"].toBool());
+        bleImpl->readLanguages(o["only_check"].toBool(), [this, root](bool, QString)
+        {
+            //BLE callback to let know gui there were no update
+            sendJsonMessage(root);
+        });
     }
     else if (root["msg"] == "inform_locked")
     {

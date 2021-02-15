@@ -871,7 +871,7 @@ void MainWindow::checkSettingsChanged()
     bool uichanged = wsClient->settingsHelper()->checkSettingsChanged();
     //lang combobox
 
-    if (uichanged)
+    if (uichanged && wsClient->areSettingsFetched())
     {
         ui->pushButtonSettingsReset->setVisible(true);
         ui->pushButtonSettingsSave->setVisible(true);

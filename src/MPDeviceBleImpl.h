@@ -124,7 +124,7 @@ public:
 
     QByteArray getStartAddressToSet(const QVector<QByteArray>& startNodeArray, Common::AddressType addrType) const;
 
-    void readLanguages(bool onlyCheck);
+    void readLanguages(bool onlyCheck, const MessageHandlerCb &cb);
 
     void loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
     void appendLoginNode(MPNode* loginNode, MPNode* loginNodeClone, Common::AddressType addrType);

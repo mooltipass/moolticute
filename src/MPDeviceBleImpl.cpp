@@ -1022,7 +1022,7 @@ QByteArray MPDeviceBleImpl::getStartAddressToSet(const QVector<QByteArray>& star
     return setAddress;
 }
 
-void MPDeviceBleImpl::readLanguages(bool onlyCheck)
+void MPDeviceBleImpl::readLanguages(bool onlyCheck, const MessageHandlerCb &cb)
 {
     m_deviceLanguages = QJsonObject{};
     m_keyboardLayouts = QJsonObject{};
@@ -1076,7 +1076,7 @@ void MPDeviceBleImpl::readLanguages(bool onlyCheck)
     ));
     jobs->append(new MPCommandJob(mpDev,
                    MPCmd::GET_KEYB_LAYOUT_NUM,
-                   [this, jobs, onlyCheck] (const QByteArray &data, bool &)
+                   [this, jobs, onlyCheck, cb] (const QByteArray &data, bool &)
                     {
                         const auto payload = bleProt->getFullPayload(data);
                         const auto layoutNum = bleProt->toIntFromLittleEndian(payload[0], payload[1]);
@@ -1084,11 +1084,13 @@ void MPDeviceBleImpl::readLanguages(bool onlyCheck)
                         if (INVALID_LAYOUT_LANG_SIZE == layoutNum)
                         {
                             qCritical() << "Invalid number of keyboard layouts";
+                            cb(false, "");
                             return false;
                         }
                         if (s_LayoutNum == layoutNum && onlyCheck)
                         {
                             qDebug() << "No need to fetch layouts, it is already up-to-date.";
+                            cb(true, "");
                             return true;
                         }
                         else
