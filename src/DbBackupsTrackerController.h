@@ -45,6 +45,7 @@ private:
     WSClient *wsClient;
     bool isExportRequestMessageVisible;
     QMessageBox *askImportMessage;
+    bool signalsConnected = false;
 
     void askForImportBackup();
     void askForExportBackup();
