@@ -8,12 +8,17 @@
 
 void DbBackupsTrackerController::connectDbBackupsTracker()
 {
+    if (signalsConnected)
+    {
+        return;
+    }
     connect(&dbBackupsTracker, &DbBackupsTracker::greaterDbBackupChangeNumber,
             this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
     connect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber,
             this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
     connect(&dbBackupsTracker, &DbBackupsTracker::newTrack,
             this, &DbBackupsTrackerController::handleNewTrack);
+    signalsConnected = true;
 }
 
 void DbBackupsTrackerController::disconnectDbBackupsTracker()
@@ -24,6 +29,7 @@ void DbBackupsTrackerController::disconnectDbBackupsTracker()
                this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
     disconnect(&dbBackupsTracker, &DbBackupsTracker::newTrack,
                this, &DbBackupsTrackerController::handleNewTrack);
+    signalsConnected = false;
 }
 
 DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSClient *wsClient, const QString &settingsFilePath, QObject *parent):
