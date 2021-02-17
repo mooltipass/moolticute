@@ -1822,7 +1822,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </size>
             </property>
             <property name="text">
-             <string>Reset</string>
+             <string>Cancel Changes</string>
             </property>
            </widget>
           </item>

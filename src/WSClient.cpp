@@ -491,6 +491,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         emit updateBLEKeyboardLayout(rootobj["data"].toObject());
         m_settingsFetched = true;
+        // Languages and layouts fetch is finished with keyboard layout fetch
     }
     else if (rootobj["msg"] == "send_battery")
     {
@@ -515,6 +516,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
     else if (rootobj["msg"] == "request_keyboard_layout")
     {
+        // No new keyboard layout fetched
         m_settingsFetched = true;
     }
 
