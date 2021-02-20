@@ -257,6 +257,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->pbBleBattery->setValue(battery);
             });
 
+    connect(wsClient, &WSClient::reconditionFinished, this, &MainWindow::onReconditionFinished);
 
     // temporary hide 'CSV Export' until it will be implemented
     ui->label_ExportCSV->hide();
@@ -2018,4 +2019,18 @@ void MainWindow::on_pushButtonSecurityValidate_clicked()
     ui->labelSecurityChallengeResult->setVisible(true);
     gb_spinner->start();
     wsClient->sendSecurityChallenge(challengeString);
+}
+
+void MainWindow::onReconditionFinished(bool success, double dischargeTime)
+{
+    if (success)
+    {
+        QMessageBox::information(this, tr("NiMH Reconditioning Finished"),
+                     tr("Recondition finished in %1 seconds").arg(dischargeTime));
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("NiMH Reconditioning Error"),
+                     tr("Recondition finished with error"));
+    }
 }

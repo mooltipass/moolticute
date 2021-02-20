@@ -831,16 +831,38 @@ void MPDeviceBleImpl::getBattery()
     }
 }
 
-void MPDeviceBleImpl::nihmReconditioning()
+void MPDeviceBleImpl::nihmReconditioning(const MessageHandlerCb &cb)
 {
     auto *jobs = new AsyncJobs("NiMH Reconditioning", mpDev);
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, bleProt->getDefaultSizeCheckFuncDone()));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, [this, cb](const QByteArray &data, bool &)
+    {
+        if (ERROR_MSG_SIZE == bleProt->getMessageSize(data))
+        {
+            qWarning() << "Authentication challenge failed";
+            return false;
+        }
+        const auto payload = bleProt->getFullPayload(data);
+        const auto responseLower = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[0]), static_cast<quint8>(payload[1]));
+        const auto responseUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[2]), static_cast<quint8>(payload[3]));
+        quint32 response = responseLower;
+        response |= static_cast<quint32>((responseUpper<<16));
+        QString responseString = QString::number(response/1000.00);
+        if (std::numeric_limits<quint32>::max() == response)
+        {
+            qCritical() << "NiMH Recondition failed";
+            cb(false, responseString);
+            return false;
+        }
+        qCritical() << "Recondition finished : " << response;
+        cb(true, responseString);
+        return true;
+    }));
 
     connect(jobs, &AsyncJobs::finished, [](const QByteArray &data)
     {
         Q_UNUSED(data)
-        qDebug() << "NiMH Reconditioning started";
+        qDebug() << "NiMH Reconditioning finished";
     });
 
     mpDev->enqueueAndRunJob(jobs);

@@ -101,7 +101,7 @@ public:
     void readBatteryPercent(const QByteArray& statusData);
     void getBattery();
 
-    void nihmReconditioning();
+    void nihmReconditioning(const MessageHandlerCb &cb);
     void getSecurityChallenge(const QString& key, const MessageHandlerCb &cb);
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);

@@ -172,6 +172,8 @@ private slots:
     void on_pushButtonNiMHRecondition_clicked();
 
     void on_pushButtonSecurityValidate_clicked();
+
+    void onReconditionFinished(bool success, double dischargeTime);
     
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");

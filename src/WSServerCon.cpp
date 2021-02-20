@@ -1269,7 +1269,15 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "nimh_reconditioning")
     {
-        bleImpl->nihmReconditioning();
+        bleImpl->nihmReconditioning([this, root](bool success, QString response)
+        {
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            ores["discharge_time"] = response;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
     }
     else if (root["msg"] == "request_security_challenge")
     {
