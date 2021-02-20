@@ -519,6 +519,19 @@ void WSClient::onTextMessageReceived(const QString &message)
         // No new keyboard layout fetched
         m_settingsFetched = true;
     }
+    else if (rootobj["msg"] == "nimh_reconditioning")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = o["success"].toBool();
+        bool ok = false;
+        double dischargeTime = o["discharge_time"].toString().toDouble(&ok);
+        if (!ok)
+        {
+            qCritical() << "Cannot convert discarge time";
+            success = false;
+        }
+        emit reconditionFinished(success, dischargeTime);
+    }
 
 }
 

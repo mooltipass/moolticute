@@ -257,6 +257,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->pbBleBattery->setValue(battery);
             });
 
+    connect(wsClient, &WSClient::reconditionFinished, this, &MainWindow::onReconditionFinished);
 
     // temporary hide 'CSV Export' until it will be implemented
     ui->label_ExportCSV->hide();
@@ -2000,6 +2001,12 @@ void MainWindow::on_pushButtonNiMHRecondition_clicked()
     if (btn == QMessageBox::Ok)
     {
         wsClient->sendNiMHReconditioning();
+        ui->labelWait->show();
+        ui->labelWait->setText(tr("<html><!--nimh_recondition--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">NiMH Recondition is in progress.</span></p><p>Please wait.</p></body></html>"));
+        ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+        ui->progressBarWait->hide();
+        ui->labelProgressMessage->hide();
+        updateTabButtons();
     }
 }
 
@@ -2018,4 +2025,21 @@ void MainWindow::on_pushButtonSecurityValidate_clicked()
     ui->labelSecurityChallengeResult->setVisible(true);
     gb_spinner->start();
     wsClient->sendSecurityChallenge(challengeString);
+}
+
+void MainWindow::onReconditionFinished(bool success, double dischargeTime)
+{
+    ui->stackedWidget->setCurrentWidget(ui->pageAdvanced);
+    updatePage();
+    updateTabButtons();
+    if (success)
+    {
+        QMessageBox::information(this, tr("NiMH Recondition Finished"),
+                     tr("Recondition finished in %1 seconds").arg(dischargeTime));
+    }
+    else
+    {
+        QMessageBox::critical(this, tr("NiMH Recondition Error"),
+                     tr("Recondition finished with error"));
+    }
 }

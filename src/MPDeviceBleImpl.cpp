@@ -831,16 +831,39 @@ void MPDeviceBleImpl::getBattery()
     }
 }
 
-void MPDeviceBleImpl::nihmReconditioning()
+void MPDeviceBleImpl::nihmReconditioning(const MessageHandlerCb &cb)
 {
     auto *jobs = new AsyncJobs("NiMH Reconditioning", mpDev);
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, bleProt->getDefaultSizeCheckFuncDone()));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, [this, cb](const QByteArray &data, bool &)
+    {
+        const auto payload = bleProt->getFullPayload(data);
+        if (RECONDITION_RESPONSE_SIZE != payload.size())
+        {
+            qWarning() << "Invalid nimh recondition response size";
+            cb(false, "");
+            return false;
+        }
+        const auto dischargeTimeLower = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[0]), static_cast<quint8>(payload[1]));
+        const auto dischargeTimeUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[2]), static_cast<quint8>(payload[3]));
+        quint32 dischargeTime = dischargeTimeLower;
+        dischargeTime |= static_cast<quint32>((dischargeTimeUpper<<16));
+        QString responseString = QString::number(dischargeTime/1000.0);
+        if (std::numeric_limits<quint32>::max() == dischargeTime)
+        {
+            qCritical() << "NiMH Recondition failed";
+            cb(false, responseString);
+            return false;
+        }
+        qDebug() << "Recondition finished in " << dischargeTime << " msec";
+        cb(true, responseString);
+        return true;
+    }));
 
     connect(jobs, &AsyncJobs::finished, [](const QByteArray &data)
     {
         Q_UNUSED(data)
-        qDebug() << "NiMH Reconditioning started";
+        qDebug() << "NiMH Reconditioning finished";
     });
 
     mpDev->enqueueAndRunJob(jobs);

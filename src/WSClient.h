@@ -156,6 +156,7 @@ signals:
     void updateBatteryPercent(int battery);
     void challengeResultReceived(QString result);
     void challengeResultFailed();
+    void reconditionFinished(bool success, double dischargeTime);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

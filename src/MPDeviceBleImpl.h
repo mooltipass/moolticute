@@ -101,7 +101,7 @@ public:
     void readBatteryPercent(const QByteArray& statusData);
     void getBattery();
 
-    void nihmReconditioning();
+    void nihmReconditioning(const MessageHandlerCb &cb);
     void getSecurityChallenge(const QString& key, const MessageHandlerCb &cb);
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
@@ -230,6 +230,7 @@ private:
     const static int SECRET_KEY_LENGTH = 64;
     static constexpr int UPLOAD_PASSWORD_BYTE_SIZE = 16;
     static constexpr int DATA_FETCH_NO_NEXT_ADDR_SIZE = 2;
+    static constexpr int RECONDITION_RESPONSE_SIZE = 4;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
 };
 
