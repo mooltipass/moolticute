@@ -2039,7 +2039,7 @@ void MainWindow::onReconditionFinished(bool success, double dischargeTime)
     }
     else
     {
-        QMessageBox::critical(this, tr("NiMH Reconditioning Error"),
+        QMessageBox::critical(this, tr("NiMH Recondition Error"),
                      tr("Recondition finished with error"));
     }
 }

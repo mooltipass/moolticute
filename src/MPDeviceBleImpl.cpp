@@ -837,24 +837,25 @@ void MPDeviceBleImpl::nihmReconditioning(const MessageHandlerCb &cb)
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, [this, cb](const QByteArray &data, bool &)
     {
-        if (ERROR_MSG_SIZE == bleProt->getMessageSize(data))
+        const auto payload = bleProt->getFullPayload(data);
+        if (RECONDITION_RESPONSE_SIZE != payload.size())
         {
-            qWarning() << "Authentication challenge failed";
+            qWarning() << "Invalid nimh recondition response size";
+            cb(false, "");
             return false;
         }
-        const auto payload = bleProt->getFullPayload(data);
-        const auto responseLower = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[0]), static_cast<quint8>(payload[1]));
-        const auto responseUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[2]), static_cast<quint8>(payload[3]));
-        quint32 response = responseLower;
-        response |= static_cast<quint32>((responseUpper<<16));
-        QString responseString = QString::number(response/1000.00);
-        if (std::numeric_limits<quint32>::max() == response)
+        const auto dischargeTimeLower = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[0]), static_cast<quint8>(payload[1]));
+        const auto dischargeTimeUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[2]), static_cast<quint8>(payload[3]));
+        quint32 dischargeTime = dischargeTimeLower;
+        dischargeTime |= static_cast<quint32>((dischargeTimeUpper<<16));
+        QString responseString = QString::number(dischargeTime/1000.0);
+        if (std::numeric_limits<quint32>::max() == dischargeTime)
         {
             qCritical() << "NiMH Recondition failed";
             cb(false, responseString);
             return false;
         }
-        qCritical() << "Recondition finished : " << response;
+        qDebug() << "Recondition finished in " << dischargeTime << " msec";
         cb(true, responseString);
         return true;
     }));
