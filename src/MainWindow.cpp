@@ -2001,6 +2001,12 @@ void MainWindow::on_pushButtonNiMHRecondition_clicked()
     if (btn == QMessageBox::Ok)
     {
         wsClient->sendNiMHReconditioning();
+        ui->labelWait->show();
+        ui->labelWait->setText(tr("<html><!--nimh_recondition--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">NiMH Recondition is in progress.</span></p><p>Please wait.</p></body></html>"));
+        ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+        ui->progressBarWait->hide();
+        ui->labelProgressMessage->hide();
+        updateTabButtons();
     }
 }
 
@@ -2023,14 +2029,17 @@ void MainWindow::on_pushButtonSecurityValidate_clicked()
 
 void MainWindow::onReconditionFinished(bool success, double dischargeTime)
 {
+    ui->stackedWidget->setCurrentWidget(ui->pageAdvanced);
+    updatePage();
+    updateTabButtons();
     if (success)
     {
-        QMessageBox::information(this, tr("NiMH Reconditioning Finished"),
+        QMessageBox::information(this, tr("NiMH Recondition Finished"),
                      tr("Recondition finished in %1 seconds").arg(dischargeTime));
     }
     else
     {
-        QMessageBox::warning(this, tr("NiMH Reconditioning Error"),
+        QMessageBox::critical(this, tr("NiMH Reconditioning Error"),
                      tr("Recondition finished with error"));
     }
 }
