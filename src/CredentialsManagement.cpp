@@ -914,16 +914,17 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
                 ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
                 auto keyAfterPwdIdx = ui->credDisplayKeyAfterPwdInput->findData(pLoginItem->keyAfterPwd());
                 ui->credDisplayKeyAfterPwdInput->setCurrentIndex(keyAfterPwdIdx);
+                ui->pushButtonTOTP->setText(tr("Setup TOTP Credential"));
                 if (pLoginItem->totpTimeStep() != 0)
                 {
                     m_pTOTPCred->setTimeStep(pLoginItem->totpTimeStep());
                     m_pTOTPCred->setCodeSize(pLoginItem->totpCodeSize());
-                    ui->pushButtonTOTP->setText(tr("View TOTP Credential"));
+                    ui->pushButtonTOTP->setEnabled(false);
                     ui->toolButtonTOTPService->show();
                 }
                 else
                 {
-                    ui->pushButtonTOTP->setText(tr("Setup TOTP Credential"));
+                    ui->pushButtonTOTP->setEnabled(true);
                     ui->toolButtonTOTPService->hide();
                 }
             }
