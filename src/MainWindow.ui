@@ -152,6 +152,19 @@ QWidget {background-color: #EFEFEF;}</string>
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonFido">
+         <property name="text">
+          <string>Fido</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonSSH">
          <property name="text">
           <string>SSH Keys</string>
@@ -4181,6 +4194,25 @@ Hint: keep your mouse positioned over an option to get more details.</string>
         </property>
         <item>
          <widget class="FilesManagement" name="widgetFiles" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageFido">
+       <layout class="QHBoxLayout" name="horizontalLayout_50">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="FidoManagement" name="widgetFido" native="true"/>
         </item>
        </layout>
       </widget>
