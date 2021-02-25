@@ -4637,6 +4637,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>FidoManagement</class>
+   <extends>QWidget</extends>
+   <header>FidoManagement.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>PromptWidget</class>
    <extends>QFrame</extends>
    <header>PromptWidget.h</header>
