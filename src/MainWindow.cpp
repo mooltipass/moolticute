@@ -117,6 +117,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->widgetFiles->setWsClient(wsClient);
     ui->widgetSSH->setWsClient(wsClient);
     ui->widgetBleDev->setWsClient(wsClient);
+    ui->widgetFido->setWsClient(wsClient);
 
     ui->widgetCredentials->setPasswordProfilesModel(m_passwordProfilesModel);
 
@@ -1488,6 +1489,8 @@ void MainWindow::enableCredentialsManagement(bool enable)
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         else if (ui->pushButtonFiles->isChecked())
             ui->stackedWidget->setCurrentWidget(ui->pageFiles);
+        else if (ui->pushButtonFido->isChecked())
+            ui->stackedWidget->setCurrentWidget(ui->pageFido);
     }
 
     updateTabButtons();

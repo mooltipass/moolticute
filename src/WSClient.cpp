@@ -573,10 +573,10 @@ bool WSClient::requestDeviceUID(const QByteArray & key)
 }
 
 
-void WSClient::sendEnterMMRequest(bool wantData)
+void WSClient::sendEnterMMRequest(bool wantData, bool wantFido /*= false*/)
 {
     sendJsonData({{ "msg", "start_memorymgmt" },
-                  { "data", QJsonObject{ {"want_data", wantData } } }
+                  { "data", QJsonObject{ {"want_data", wantData }, {"want_fido", wantFido} } }
                  });
 }
 

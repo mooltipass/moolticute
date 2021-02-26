@@ -179,7 +179,7 @@ void WSServerCon::processMessage(const QString &message)
         WSServer::Instance()->setMemLockedClient(clientUid);
 
         //send command to start MMM
-        mpdevice->startMemMgmtMode(o["want_data"].toBool(),
+        mpdevice->startMemMgmtMode(o["want_data"].toBool(), o["want_fido"].toBool(),
                 defaultProgressCb,
                 [=](bool success, int errCode, QString errMsg)
         {
@@ -671,6 +671,16 @@ void WSServerCon::sendMemMgmtMode()
     QJsonObject jdata;
     jdata["login_nodes"] = logins;
     jdata["data_nodes"] = datas;
+
+    if (mpdevice->isBLE())
+    {
+        QJsonArray fidoData;
+        foreach (MPNode *n, mpdevice->getFidoDataNodes())
+        {
+            fidoData.append(n->toJson());
+        }
+        jdata["fido_nodes"] = fidoData;
+    }
 
     sendJsonMessage({{ "msg", "memorymgmt_data" },
                      { "data", jdata }});

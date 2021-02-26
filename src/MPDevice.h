@@ -103,7 +103,7 @@ public:
 
     //mem mgmt mode
     //cbFailure is used to propagate an error to clients when entering mmm
-    void startMemMgmtMode(bool wantData,
+    void startMemMgmtMode(bool wantData, bool wantFido,
                           const MPDeviceProgressCb &cbProgress,
                           const std::function<void(bool success, int errCode, QString errMsg)> &cb);
     void exitMemMgmtMode(bool setMMMBool = true);
@@ -192,6 +192,7 @@ public:
     //After successfull mem mgmt mode, clients can query data
     NodeList &getLoginNodes() { return loginNodes; }
     NodeList &getDataNodes() { return dataNodes; }
+    NodeList &getFidoDataNodes() { return webAuthnLoginNodes; }
 
     //true if device is a mini
     inline bool isMini() const { return DeviceType::MINI == deviceType; }
@@ -297,7 +298,7 @@ private:
     inline int getChildNodeSize() const { return pMesProt->getChildNodeSize(); }
 
     // Functions added by mathieu for MMM
-    void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds);
+    void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds, bool getFido = false);
     MPNode *findNodeWithAddressInList(NodeList list, const QByteArray &address, const quint32 virt_addr = 0);
     MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
@@ -323,7 +324,7 @@ private:
 
     // Functions added by mathieu for MMM : checks & repairs
     bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren, Common::AddressType addrType = Common::CRED_ADDR_IDX);
-    bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed);
+    bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido = false);
     void checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::AddressType addrType);
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);

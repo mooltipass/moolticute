@@ -608,7 +608,7 @@ void MPDevice::resetCommunication()
 
 void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                                     const MPDeviceProgressCb &cbProgress,bool getCreds,
-                                    bool getData, bool getDataChilds)
+                                    bool getData, bool getDataChilds, bool getFido /*= false*/)
 {
     /* For when the MMM is left */
     cleanMMMVars();
@@ -771,7 +771,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     {
         /* Get parent node start address */
         jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
-                                      [this, jobs, fullScan, cbProgress](const QByteArray &data, bool &) -> bool
+                                      [this, jobs, fullScan, cbProgress, getFido](const QByteArray &data, bool &) -> bool
         {
             if (pMesProt->getMessageSize(data) == 1)
             {
@@ -813,7 +813,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                     qInfo() << "No parent nodes to load.";
                 }
 
-                if (isBLE())
+                if (isBLE() && getFido)
                 {
                     bleImpl->loadWebAuthnNodes(jobs, cbProgress);
                 }
@@ -883,7 +883,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     }
 }
 
-void MPDevice::startMemMgmtMode(bool wantData,
+void MPDevice::startMemMgmtMode(bool wantData, bool wantFido,
                                 const MPDeviceProgressCb &cbProgress,
                                 const std::function<void(bool success, int errCode, QString errMsg)> &cb)
 {
@@ -904,9 +904,9 @@ void MPDevice::startMemMgmtMode(bool wantData,
     jobs->append(startMmmJob);
 
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
+    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true, wantFido);
 
-    connect(jobs, &AsyncJobs::finished, [this, cb, wantData](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, cb, wantData, wantFido](const QByteArray &data)
     {
         Q_UNUSED(data);
 
@@ -917,7 +917,7 @@ void MPDevice::startMemMgmtMode(bool wantData,
         }
 
         /* Check DB */
-        if (checkLoadedNodes(!wantData, wantData, false))
+        if (checkLoadedNodes(!wantData, wantData, false, wantFido))
         {
             qInfo() << "Mem management mode enabled, DB checked";
             force_memMgmtMode(true);
@@ -2940,7 +2940,7 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrT
     return addChildToDB(tempNodePt, childNodePt, addrType);
 }
 
-bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed)
+bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido /*=false*/)
 {
     QByteArray temp_pnode_address, temp_cnode_address;
     bool return_bool;
@@ -2949,7 +2949,10 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
     /* Tag pointed nodes, also detects DB errors */
     return_bool = tagPointedNodes(checkCredentials, checkData, repairAllowed);
-    return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
+    if (checkFido)
+    {
+        return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
+    }
 
     /* Scan for orphan nodes */
     quint32 nbOrphanParents = 0;
@@ -4024,7 +4027,7 @@ void MPDevice::delCredentialAndLeave(QString service, const QString &login,
 
     if (!get_memMgmtMode())
     {
-        startMemMgmtMode(false,
+        startMemMgmtMode(false, false,
                          cbProgress,
                          [cb, deleteCred](bool success, int, QString errMsg)
         {

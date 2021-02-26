@@ -71,7 +71,7 @@ public:
 
     bool requestDeviceUID(const QByteArray &key);
 
-    void sendEnterMMRequest(bool wantData = false);
+    void sendEnterMMRequest(bool wantData = false, bool wantFido = false);
     void sendLeaveMMRequest();
 
     void addOrUpdateCredential(const QString &service, const QString &login,

@@ -1,7 +1,7 @@
 #ifndef FIDOMANAGEMENT_H
 #define FIDOMANAGEMENT_H
 
-#include <QWidget>
+#include <QtWidgets>
 #include "WSClient.h"
 
 namespace Ui {
@@ -23,10 +23,17 @@ signals:
 
 private slots:
     void on_pushButtonEnterFido_clicked();
+    void loadModel();
+    void enableMemManagement(bool enable);
+
+    void on_pushButtonSaveExitFidoMMM_clicked();
 
 private:
     Ui::FidoManagement *ui;
     WSClient *wsClient;
+
+    QStandardItemModel *filesModel;
+    QStandardItem *currentItem = nullptr;
 };
 
 #endif // FIDOMANAGEMENT_H
