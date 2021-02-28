@@ -28,12 +28,19 @@ private slots:
 
     void on_pushButtonSaveExitFidoMMM_clicked();
 
+    void on_pushButtonDiscard_clicked();
+
+    void on_pushButtonDiscard_pressed();
+
+    void on_pushButtonDelete_clicked();
+
 private:
     Ui::FidoManagement *ui;
     WSClient *wsClient;
 
     QStandardItemModel *filesModel;
     QStandardItem *currentItem = nullptr;
+    QStringList deletedList;
 };
 
 #endif // FIDOMANAGEMENT_H

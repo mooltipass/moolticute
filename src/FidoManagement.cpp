@@ -18,10 +18,14 @@ FidoManagement::FidoManagement(QWidget *parent) :
     ui->pushButtonEnterFido->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
 
     ui->pushButtonSaveExitFidoMMM->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonDiscard->setStyleSheet(CSS_BLUE_BUTTON);
+
+    ui->pushButtonDelete->setStyleSheet(CSS_GREY_BUTTON);
+    ui->pushButtonDelete->setIcon(AppGui::qtAwesome()->icon(fa::trash, whiteButtons));
 
     filesModel = new QStandardItemModel(this);
     ui->listView->setModel(filesModel);
+
+    connect(ui->pushButtonDiscard, &AnimatedColorButton::actionValidated, this, &FidoManagement::on_pushButtonDiscard_clicked);
 }
 
 void FidoManagement::setWsClient(WSClient *c)
@@ -88,4 +92,48 @@ void FidoManagement::on_pushButtonSaveExitFidoMMM_clicked()
 //    }
 //    else
      wsClient->sendLeaveMMRequest();
+}
+
+void FidoManagement::on_pushButtonDiscard_clicked()
+{
+    wsClient->sendLeaveMMRequest();
+}
+
+void FidoManagement::on_pushButtonDiscard_pressed()
+{
+    if (deletedList.isEmpty())
+    {
+        wsClient->sendLeaveMMRequest();
+    }
+}
+
+void FidoManagement::on_pushButtonDelete_clicked()
+{
+    auto selectionModel = ui->listView->selectionModel();
+    auto selectedIndexes = selectionModel->selectedIndexes();
+
+    if (selectedIndexes.length() <= 0)
+        return;
+
+    auto selectedIndex = selectedIndexes.first();
+
+    currentItem = filesModel->itemFromIndex(selectedIndex);
+
+    if (!currentItem)
+        return;
+
+    if (QMessageBox::question(this, "Moolticute",
+                              tr("\"%1\" fido credential is going to be removed from the device.\nContinue?")
+                              .arg(currentItem->text())) != QMessageBox::Yes)
+    {
+        return;
+    }
+
+    deletedList.append(currentItem->text());
+    filesModel->removeRow(currentItem->row());
+
+    // Select another item
+    auto index = filesModel->index(std::min(selectedIndex.row(), filesModel->rowCount()-1),0);
+    selectionModel->select(index, QItemSelectionModel::ClearAndSelect);
+    //currentSelectionChanged(index, QModelIndex());
 }
