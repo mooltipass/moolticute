@@ -150,7 +150,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
     ui->pushButtonAdvanced->setVisible(bAdvancedTabVisible);
 
-    ui->pushButtonFido->setIcon(AppGui::qtAwesome()->icon(fa::clocko));
+    ui->pushButtonFido->setIcon(AppGui::qtAwesome()->icon(fa::usb));
     //ui->pushButtonFido->setVisible(wsClient->isMPBLE());
 
     m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F1), this);
@@ -1538,7 +1538,8 @@ void MainWindow::updateTabButtons()
 
     if ((ui->stackedWidget->currentWidget() == ui->pageFiles
          || ui->stackedWidget->currentWidget() == ui->pageCredentials
-         || ui->stackedWidget->currentWidget() == ui->pageIntegrity) &&
+         || ui->stackedWidget->currentWidget() == ui->pageIntegrity
+         || ui->stackedWidget->currentWidget() == ui->pageFido) &&
             wsClient->get_memMgmtMode())
     {
         // Disable all tab buttons

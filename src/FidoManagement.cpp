@@ -58,9 +58,16 @@ void FidoManagement::loadModel()
     for (int i = 0; i < fidoArr.count(); i++)
     {
         QJsonObject o = fidoArr.at(i).toObject();
-        QStandardItem *item = new QStandardItem(o["service"].toString());
-        item->setIcon(AppGui::qtAwesome()->icon(fa::clocko));
-        filesModel->appendRow(item);
+        const auto service = o["service"].toString();
+        auto childArray = o["childs"].toArray();
+        for (int j = 0; j < childArray.count(); ++j)
+        {
+            QStandardItem *item = new QStandardItem();
+            QString login = childArray.at(j)["login"].toString();
+            item->setText(service + " - " + login);
+            item->setIcon(AppGui::qtAwesome()->icon(fa::usb));
+            filesModel->appendRow(item);
+        }
     }
 
     // Select first item by default

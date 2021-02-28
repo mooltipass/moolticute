@@ -400,7 +400,7 @@ void MPNode::setDataChildNodeData(const QByteArray &flags, const QByteArray &d)
     }
 }
 
-QJsonObject MPNode::toJson() const
+QJsonObject MPNode::toJson(bool isFido /*= false*/) const
 {
     QJsonObject obj;
 
@@ -411,7 +411,7 @@ QJsonObject MPNode::toJson() const
         QJsonArray childs;
         foreach (MPNode *cnode, childNodes)
         {
-            QJsonObject cobj = cnode->toJson();
+            QJsonObject cobj = cnode->toJson(isFido);
             childs.append(cobj);
         }
 
@@ -433,6 +433,10 @@ QJsonObject MPNode::toJson() const
     else if (getType() == NodeChild)
     {
         obj["login"] = getLogin();
+        if (isFido)
+        {
+            return obj;
+        }
         obj["description"] = getDescription();
         obj["password_enc"] = Common::bytesToJson(getPasswordEnc());
         obj["date_created"] = getDateCreated().toString(Qt::ISODate);

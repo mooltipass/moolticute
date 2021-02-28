@@ -13,7 +13,28 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#FidoManagement
+{
+background-color: rgb(255, 255, 255);
+}
+
+.FrameTitle {
+border: 2px solid #EFEFEF;
+padding: 2px;
+font-size: 12pt;
+border-top: none;
+border-left: none;
+border-right: none;
+}</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>30</number>
+   </property>
+   <property name="rightMargin">
+    <number>30</number>
+   </property>
    <item>
     <widget class="QLabel" name="label">
      <property name="font">
@@ -23,6 +44,9 @@
      </property>
      <property name="text">
       <string>FIDO Management</string>
+     </property>
+     <property name="class" stdset="0">
+      <string>FrameTitle</string>
      </property>
     </widget>
    </item>
@@ -160,7 +184,11 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QListView" name="listView"/>
+          <widget class="QListView" name="listView">
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+          </widget>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">

@@ -135,7 +135,7 @@ public:
     static QByteArray EmptyAddress;
     static constexpr int ADDRESS_LENGTH = 2;
 
-    QJsonObject toJson() const;
+    QJsonObject toJson(bool isFido = false) const;
 
 protected:
     IMessageProtocol* getMesProt(QObject *parent);

@@ -677,7 +677,7 @@ void WSServerCon::sendMemMgmtMode()
         QJsonArray fidoData;
         foreach (MPNode *n, mpdevice->getFidoDataNodes())
         {
-            fidoData.append(n->toJson());
+            fidoData.append(n->toJson(true));
         }
         jdata["fido_nodes"] = fidoData;
     }
