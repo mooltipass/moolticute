@@ -3,6 +3,8 @@
 
 #include <QtWidgets>
 #include "WSClient.h"
+#include "CredentialModel.h"
+#include "CredentialModelFilter.h"
 
 namespace Ui {
 class FidoManagement;
@@ -34,11 +36,19 @@ private slots:
 
     void on_pushButtonDelete_clicked();
 
+    void onItemExpanded(const QModelIndex &proxyIndex);
+    void onItemCollapsed(const QModelIndex &proxyIndex);
+
 private:
+    QModelIndex getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex);
+    QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
+
+
     Ui::FidoManagement *ui;
     WSClient *wsClient;
 
-    QStandardItemModel *filesModel;
+    CredentialModel *m_pCredModel = nullptr;
+    CredentialModelFilter *m_pCredModelFilter = nullptr;
     QStandardItem *currentItem = nullptr;
     QStringList deletedList;
 };

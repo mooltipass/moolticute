@@ -42,7 +42,7 @@ public:
     virtual QModelIndex parent(const QModelIndex &idx) const;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    void load(const QJsonArray &json);
+    void load(const QJsonArray &json, bool isFido = false);
     void setClearTextPassword(const QString &sServiceName, const QString &sLoginName, const QString &sPassword);
     QJsonArray getJsonChanges();
     void addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription="");

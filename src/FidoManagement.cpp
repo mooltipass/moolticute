@@ -2,6 +2,7 @@
 #include "ui_FidoManagement.h"
 #include "Common.h"
 #include "AppGui.h"
+#include "ServiceItem.h"
 
 FidoManagement::FidoManagement(QWidget *parent) :
     QWidget(parent),
@@ -22,8 +23,15 @@ FidoManagement::FidoManagement(QWidget *parent) :
     ui->pushButtonDelete->setStyleSheet(CSS_GREY_BUTTON);
     ui->pushButtonDelete->setIcon(AppGui::qtAwesome()->icon(fa::trash, whiteButtons));
 
-    filesModel = new QStandardItemModel(this);
-    ui->listView->setModel(filesModel);
+    m_pCredModel = new CredentialModel(this);
+
+    m_pCredModelFilter = new CredentialModelFilter(this);
+    m_pCredModelFilter->setSourceModel(m_pCredModel);
+    ui->fidoTreeView->setModel(m_pCredModelFilter);
+
+    connect(m_pCredModel, &CredentialModel::modelLoaded, ui->fidoTreeView, &CredentialView::onModelLoaded);
+    connect(ui->fidoTreeView, &CredentialView::expanded, this, &FidoManagement::onItemExpanded);
+    connect(ui->fidoTreeView, &CredentialView::collapsed, this, &FidoManagement::onItemCollapsed);
 
     connect(ui->pushButtonDiscard, &AnimatedColorButton::actionValidated, this, &FidoManagement::on_pushButtonDiscard_clicked);
 }
@@ -49,32 +57,7 @@ void FidoManagement::on_pushButtonEnterFido_clicked()
 void FidoManagement::loadModel()
 {
     qCritical() << "Loading fido models";
-    filesModel->clear();
-    QJsonArray fidoArr = wsClient->getMemoryData()["fido_nodes"].toArray();
-    if (fidoArr.isEmpty())
-    {
-        return;
-    }
-    for (int i = 0; i < fidoArr.count(); i++)
-    {
-        QJsonObject o = fidoArr.at(i).toObject();
-        const auto service = o["service"].toString();
-        auto childArray = o["childs"].toArray();
-        for (int j = 0; j < childArray.count(); ++j)
-        {
-            QStandardItem *item = new QStandardItem();
-            QString login = childArray.at(j)["login"].toString();
-            item->setText(service + " - " + login);
-            item->setIcon(AppGui::qtAwesome()->icon(fa::usb));
-            filesModel->appendRow(item);
-        }
-    }
-
-    // Select first item by default
-    auto selectionModel = ui->listView->selectionModel();
-    auto index = filesModel->index(0,0);
-    selectionModel->select(index, QItemSelectionModel::ClearAndSelect);
-    //currentSelectionChanged(index, QModelIndex());
+    m_pCredModel->load(wsClient->getMemoryData()["fido_nodes"].toArray(), true);
 }
 
 void FidoManagement::enableMemManagement(bool enable)
@@ -91,7 +74,7 @@ void FidoManagement::enableMemManagement(bool enable)
 
 void FidoManagement::on_pushButtonSaveExitFidoMMM_clicked()
 {
-    filesModel->clear();
+    m_pCredModel->clear();
 //    if (!deletedList.isEmpty())
 //    {
 //        emit wantExitMemMode();
@@ -116,31 +99,60 @@ void FidoManagement::on_pushButtonDiscard_pressed()
 
 void FidoManagement::on_pushButtonDelete_clicked()
 {
-    auto selectionModel = ui->listView->selectionModel();
-    auto selectedIndexes = selectionModel->selectedIndexes();
+// TODO implement delete with treeview
+//    auto selectionModel = ui->fidoTreeView->selectionModel();
+//    auto selectedIndexes = selectionModel->selectedIndexes();
 
-    if (selectedIndexes.length() <= 0)
-        return;
+//    if (selectedIndexes.length() <= 0)
+//        return;
 
-    auto selectedIndex = selectedIndexes.first();
+//    auto selectedIndex = selectedIndexes.first();
 
-    currentItem = filesModel->itemFromIndex(selectedIndex);
+//    currentItem = filesModel->itemFromIndex(selectedIndex);
 
-    if (!currentItem)
-        return;
+//    if (!currentItem)
+//        return;
 
-    if (QMessageBox::question(this, "Moolticute",
-                              tr("\"%1\" fido credential is going to be removed from the device.\nContinue?")
-                              .arg(currentItem->text())) != QMessageBox::Yes)
-    {
-        return;
-    }
+//    if (QMessageBox::question(this, "Moolticute",
+//                              tr("\"%1\" fido credential is going to be removed from the device.\nContinue?")
+//                              .arg(currentItem->text())) != QMessageBox::Yes)
+//    {
+//        return;
+//    }
 
-    deletedList.append(currentItem->text());
-    filesModel->removeRow(currentItem->row());
+//    deletedList.append(currentItem->text());
+//    filesModel->removeRow(currentItem->row());
 
-    // Select another item
-    auto index = filesModel->index(std::min(selectedIndex.row(), filesModel->rowCount()-1),0);
-    selectionModel->select(index, QItemSelectionModel::ClearAndSelect);
+//    // Select another item
+//    auto index = filesModel->index(std::min(selectedIndex.row(), filesModel->rowCount()-1),0);
+//    selectionModel->select(index, QItemSelectionModel::ClearAndSelect);
     //currentSelectionChanged(index, QModelIndex());
+}
+
+void FidoManagement::onItemExpanded(const QModelIndex &proxyIndex)
+{
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
+    ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
+    if (pServiceItem != nullptr)
+        pServiceItem->setExpanded(true);
+}
+
+void FidoManagement::onItemCollapsed(const QModelIndex &proxyIndex)
+{
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(proxyIndex);
+    ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
+    if (pServiceItem != nullptr)
+        pServiceItem->setExpanded(false);
+}
+
+QModelIndex FidoManagement::getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex)
+{
+    if (proxyIndex.isValid())
+        return m_pCredModelFilter->mapToSource(proxyIndex);
+    return QModelIndex();
+}
+
+QModelIndex FidoManagement::getProxyIndexFromSourceIndex(const QModelIndex &srcIndex)
+{
+    return m_pCredModelFilter->mapFromSource(srcIndex);
 }

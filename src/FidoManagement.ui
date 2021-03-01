@@ -184,11 +184,7 @@ border-right: none;
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QListView" name="listView">
-           <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
-           </property>
-          </widget>
+          <widget class="CredentialView" name="fidoTreeView" native="true"/>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -248,7 +244,7 @@ border-right: none;
             </spacer>
            </item>
            <item>
-            <widget class="AnimatedColorButton" name="pushButtonDiscard">
+            <widget class="AnimatedColorButton" name="pushButtonDiscard" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -261,7 +257,7 @@ border-right: none;
                <height>0</height>
               </size>
              </property>
-             <property name="text">
+             <property name="text" stdset="0">
               <string>Discard deletions</string>
              </property>
             </widget>
@@ -305,8 +301,13 @@ border-right: none;
  <customwidgets>
   <customwidget>
    <class>AnimatedColorButton</class>
-   <extends>QPushButton</extends>
+   <extends>QWidget</extends>
    <header>AnimatedColorButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CredentialView</class>
+   <extends>QWidget</extends>
+   <header>CredentialView.h</header>
   </customwidget>
  </customwidgets>
  <resources>
