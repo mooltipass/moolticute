@@ -4740,6 +4740,109 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
     runAndDequeueJobs();
 }
 
+void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, MessageHandlerCb cb, const MPDeviceProgressCb &cbProgress)
+{
+    if (fidoCredentials.isEmpty())
+    {
+        //No fido credentials to delete, just exit mmm
+        exitMemMgmtMode(true);
+        return;
+    }
+
+    for (qint32 i = 0; i < fidoCredentials.size(); i++)
+    {
+        qDebug() << "Deleting file for " << fidoCredentials[i].service << " - " << fidoCredentials[i].login;
+        MPNode* parentPt = findNodeWithNameInList(webAuthnLoginNodes, fidoCredentials[i].service, true);
+        MPNode* childNode = findNodeWithAddressInList(webAuthnLoginChildNodes, fidoCredentials[i].address);
+
+        if(!parentPt || !childNode)
+        {
+            exitMemMgmtMode(true);
+            qCritical() << "Couldn't find node for " << fidoCredentials[i].service;
+            cb(false, "Moolticute Internal Error (DDNAL#1)");
+        }
+
+        //Case 1: childNode is the first node in the list
+        if (childNode->getPreviousChildAddress() == MPNode::EmptyAddress)
+        {
+            if (childNode->getNextChildAddress() == MPNode::EmptyAddress)
+            {
+                //Only child, delete parent as well
+            }
+            else
+            {
+                // Set parent next child to second child and set second child previous child to null
+                MPNode* secondChildNode = findNodeWithAddressInList(webAuthnLoginChildNodes, childNode->getNextChildAddress());
+                parentPt->setNextChildAddress(secondChildNode->getAddress());
+                secondChildNode->setPreviousChildAddress(MPNode::EmptyAddress);
+                webAuthnLoginChildNodes.removeOne(childNode);
+            }
+        }
+
+    }
+
+    /* Check our DB */
+//    if(!checkLoadedNodes(false, true, false, true))
+//    {
+//        exitMemMgmtMode(true);
+//        qCritical() << "Error in our internal algo";
+//        cb(false, "Moolticute Internal Error (DDNAL#2)");
+//    }
+
+    exitMemMgmtMode(true);
+    cb(true, "ok");
+
+    /* Generate save packets */
+//    AsyncJobs* saveJobs = new AsyncJobs("Starting save operations...", this);
+//    connect(saveJobs, &AsyncJobs::finished, [this, services, cb](const QByteArray &data)
+//    {
+//        Q_UNUSED(data);
+//        exitMemMgmtMode(true);
+//        qInfo() << "Save operations succeeded!";
+//        cb(true, "Successfully Saved File Database");
+
+//        /* Update file cache */
+//        for (qint32 i = 0; i < services.size(); i++)
+//        {
+//            /// Improvement: only trigger file storage after we have removed all files
+//            removeFileFromCache(services[i]);
+//        }
+
+//        return;
+//    });
+//    connect(saveJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
+//    {
+//        Q_UNUSED(failedJob);
+//        exitMemMgmtMode(true);
+//        qCritical() << "Save operations failed!";
+//        cb(false, "Couldn't Save File Database: Device Unplugged?");
+//        return;
+//    });
+//    if (generateSavePackets(saveJobs, false, true, cbProgress))
+//    {
+//        /* Increment db change number */
+//        if (services.size() > 0 && (isFw12() || isBLE()))
+//        {
+//            set_dataDbChangeNumber(get_dataDbChangeNumber() + 1);
+//            dataDbChangeNumberClone = get_dataDbChangeNumber();
+//            filesCache.setDbChangeNumber(get_dataDbChangeNumber());
+//            updateChangeNumbers(saveJobs, Common::DataNumberChanged);
+//            emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
+//        }
+
+//        /* Run jobs */
+//        jobsQueue.enqueue(saveJobs);
+//        runAndDequeueJobs();
+//    }
+//    else
+//    {
+//        exitMemMgmtMode(true);
+//        qInfo() << "No changes to make on database";
+//        cb(true, "No Changes Were Required On Local DB!");
+//        return;
+//    }
+}
+
 void MPDevice::changeVirtualAddressesToFreeAddresses(bool onlyChangePwd /* = false*/)
 {
     if (virtualStartNode[Common::CRED_ADDR_IDX] != 0)

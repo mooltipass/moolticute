@@ -213,6 +213,19 @@ void CredentialModel::load(const QJsonArray &json, bool isFido)
             QDate dUpdatedDate = QDate::fromString(cnode["date_last_used"].toString(), Qt::ISODate);
             pLoginItem->setAccessedDate(dUpdatedDate);
 
+            QJsonArray a = cnode["address"].toArray();
+            if (a.size() < 2)
+            {
+                qWarning() << "Moolticute daemon did not send the node address, please upgrade moolticute daemon.";
+                continue;
+            }
+            QByteArray bAddress;
+            bAddress.append((char)a.at(0).toInt());
+            bAddress.append((char)a.at(1).toInt());
+
+            // Update login item address
+            pLoginItem->setAddress(bAddress);
+
             if (isFido)
             {
                 pLoginItem->setCategory(0);
@@ -236,19 +249,6 @@ void CredentialModel::load(const QJsonArray &json, bool isFido)
                         pLoginItem->setTotpCodeSize(cnode["totp_code_size"].toVariant().toInt());
                     }
                 }
-
-                QJsonArray a = cnode["address"].toArray();
-                if (a.size() < 2)
-                {
-                    qWarning() << "Moolticute daemon did not send the node address, please upgrade moolticute daemon.";
-                    continue;
-                }
-                QByteArray bAddress;
-                bAddress.append((char)a.at(0).toInt());
-                bAddress.append((char)a.at(1).toInt());
-
-                // Update login item address
-                pLoginItem->setAddress(bAddress);
 
                 // Update login favorite
                 int iFavorite = cnode["favorite"].toInt();

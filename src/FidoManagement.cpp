@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "AppGui.h"
 #include "ServiceItem.h"
+#include "LoginItem.h"
 
 FidoManagement::FidoManagement(QWidget *parent) :
     QWidget(parent),
@@ -75,13 +76,16 @@ void FidoManagement::enableMemManagement(bool enable)
 void FidoManagement::on_pushButtonSaveExitFidoMMM_clicked()
 {
     m_pCredModel->clear();
-//    if (!deletedList.isEmpty())
-//    {
-//        emit wantExitMemMode();
-//        wsClient->deleteDataFilesAndLeave(deletedList);
-//    }
-//    else
-     wsClient->sendLeaveMMRequest();
+    if (!deletedList.isEmpty())
+    {
+        emit wantExitMemMode();
+        wsClient->deleteFidoAndLeave(deletedList);
+        deletedList.clear();
+    }
+    else
+    {
+        wsClient->sendLeaveMMRequest();
+    }
 }
 
 void FidoManagement::on_pushButtonDiscard_clicked()
@@ -99,34 +103,48 @@ void FidoManagement::on_pushButtonDiscard_pressed()
 
 void FidoManagement::on_pushButtonDelete_clicked()
 {
-// TODO implement delete with treeview
-//    auto selectionModel = ui->fidoTreeView->selectionModel();
-//    auto selectedIndexes = selectionModel->selectedIndexes();
+    // Retrieve selection model
+    QItemSelectionModel *pSelectionModel = ui->fidoTreeView->selectionModel();
 
-//    if (selectedIndexes.length() <= 0)
-//        return;
+    // Retrieve selected indexes
+    QModelIndexList lIndexes = pSelectionModel->selectedIndexes();
+    if (lIndexes.size() == 0)
+        return;
 
-//    auto selectedIndex = selectedIndexes.first();
+    // Retrieve src index
+    QModelIndex srcIndex = getSourceIndexFromProxyIndex(lIndexes.at(0));
 
-//    currentItem = filesModel->itemFromIndex(selectedIndex);
+    // Retrieve login item
+    LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
 
-//    if (!currentItem)
-//        return;
+    // Retrieve parent item
+    TreeItem *pParentItem = pLoginItem->parentItem();
 
-//    if (QMessageBox::question(this, "Moolticute",
-//                              tr("\"%1\" fido credential is going to be removed from the device.\nContinue?")
-//                              .arg(currentItem->text())) != QMessageBox::Yes)
-//    {
-//        return;
-//    }
+    if ((pLoginItem != nullptr) && (pParentItem != nullptr))
+    {
+        // Retrieve parent item
+        auto btn = QMessageBox::question(this,
+                                         tr("Delete?"),
+                                         tr("<i><b>%1</b></i>: Delete credential <i><b>%2</b></i>?").arg(pParentItem->name(), pLoginItem->name()),
+                                         QMessageBox::Yes |
+                                         QMessageBox::Cancel,
+                                         QMessageBox::Yes);
+        if (btn == QMessageBox::Yes)
+        {
+            qCritical() << "Deleted: " << pParentItem->name() << " - " << pLoginItem->name();
+            deletedList.append({pParentItem->name(), pLoginItem->name(), pLoginItem->address()});
+            QModelIndexList nextRow = m_pCredModelFilter->getNextRow(lIndexes.at(0));
+            auto selectionModel = ui->fidoTreeView->selectionModel();
+            if (nextRow.size()>0 && nextRow.at(0).isValid())
+                selectionModel->setCurrentIndex(nextRow.at(0)
+                    , QItemSelectionModel::ClearAndSelect  | QItemSelectionModel::Rows);
+            else
+                selectionModel->setCurrentIndex(QModelIndex()
+                    , QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 
-//    deletedList.append(currentItem->text());
-//    filesModel->removeRow(currentItem->row());
-
-//    // Select another item
-//    auto index = filesModel->index(std::min(selectedIndex.row(), filesModel->rowCount()-1),0);
-//    selectionModel->select(index, QItemSelectionModel::ClearAndSelect);
-    //currentSelectionChanged(index, QModelIndex());
+            m_pCredModel->removeCredential(srcIndex);
+        }
+    }
 }
 
 void FidoManagement::onItemExpanded(const QModelIndex &proxyIndex)
@@ -148,7 +166,9 @@ void FidoManagement::onItemCollapsed(const QModelIndex &proxyIndex)
 QModelIndex FidoManagement::getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex)
 {
     if (proxyIndex.isValid())
+    {
         return m_pCredModelFilter->mapToSource(proxyIndex);
+    }
     return QModelIndex();
 }
 

@@ -82,6 +82,7 @@ public:
     void requestDataFile(const QString &service);
     void sendDataFile(const QString &service, const QByteArray &data);
     void deleteDataFilesAndLeave(const QStringList &services);
+    void deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials);
 
     void requestResetCard();
     void requestAvailableUserNumber();

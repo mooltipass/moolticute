@@ -152,6 +152,11 @@ public:
                                  MessageHandlerCb cb,
                                  const MPDeviceProgressCb &cbProgress);
 
+    //Delete a data context from the device
+    void deleteFidoAndLeave(QList<FidoCredential> fidoCredentials,
+                                 MessageHandlerCb cb,
+                                 const MPDeviceProgressCb &cbProgress);
+
     //Check is credential/data node exists
     void serviceExists(bool isDatanode, QString service, const QString &reqid,
                        std::function<void(bool success, QString errstr, QString service, bool exists)> cb);

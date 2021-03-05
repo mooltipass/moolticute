@@ -1309,6 +1309,52 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "delete_fido_nodes")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        if (!mpdevice->get_memMgmtMode())
+        {
+            sendFailedJson(root, "Not in memory management mode");
+            return;
+        }
+
+        QJsonArray deletedFidosArray = o["deleted_fidos"].toArray();
+        QList<FidoCredential> deletedFidos;
+        for (auto fidoRef : deletedFidosArray)
+        {
+            QJsonObject fido = fidoRef.toObject();
+            QJsonObject childObj = fido["child"].toObject();
+            QJsonArray addrArray = childObj["address"].toArray();
+            if (addrArray.size() < 2)
+            {
+                qCritical() << "Invalid address array for deleted fido credential";
+                continue;
+            }
+            QByteArray bAddress;
+            bAddress.append(static_cast<char>(addrArray.at(0).toInt()));
+            bAddress.append(static_cast<char>(addrArray.at(1).toInt()));
+            deletedFidos.append({fido["service"].toString(), childObj["user"].toString(), bAddress});
+        }
+
+        mpdevice->deleteFidoAndLeave(deletedFidos,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            oroot["data"] = QJsonObject({{ "success", true }});
+            sendJsonMessage(oroot);
+        },
+        cbProgress);
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

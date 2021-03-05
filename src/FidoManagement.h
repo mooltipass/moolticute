@@ -50,7 +50,7 @@ private:
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;
     QStandardItem *currentItem = nullptr;
-    QStringList deletedList;
+    QList<FidoCredential> deletedList;
 };
 
 #endif // FIDOMANAGEMENT_H

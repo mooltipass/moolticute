@@ -630,6 +630,27 @@ void WSClient::deleteDataFilesAndLeave(const QStringList &services)
                   { "data", d }});
 }
 
+void WSClient::deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials)
+{
+    QJsonArray fidoNodeArray;
+    for (const FidoCredential &cred: qAsConst(fidoCredentials))
+    {
+        QJsonObject sobj;
+        QJsonArray addr;
+        addr.append(static_cast<int>(cred.address[0]));
+        addr.append(static_cast<int>(cred.address[1]));
+        sobj.insert("service", cred.service);
+        QJsonObject child;
+        child.insert("user", cred.login);
+        child.insert("address", addr);
+        sobj.insert("child", child);
+        fidoNodeArray.append(sobj);
+    }
+    QJsonObject d = {{ "deleted_fidos", fidoNodeArray }};
+    sendJsonData({{ "msg", "delete_fido_nodes" },
+                  { "data", d }});
+}
+
 void WSClient::requestResetCard()
 {
     sendJsonData({{ "msg", "reset_card" }});
