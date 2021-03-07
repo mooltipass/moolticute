@@ -4763,84 +4763,114 @@ void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, Message
         }
 
         //Case 1: childNode is the first node in the list
+        bool parentRemoved = false;
         if (childNode->getPreviousChildAddress() == MPNode::EmptyAddress)
         {
             if (childNode->getNextChildAddress() == MPNode::EmptyAddress)
             {
-                //Only child, delete parent as well
+                //Remove parent node
+                MPNode* prevParent = findNodeWithAddressInList(webAuthnLoginNodes, parentPt->getPreviousParentAddress());
+                MPNode* nextParent = findNodeWithAddressInList(webAuthnLoginNodes, parentPt->getNextParentAddress());
+                if (prevParent)
+                {
+                    prevParent->setNextParentAddress(nextParent ? nextParent->getAddress() : MPNode::EmptyAddress);
+                }
+                if (nextParent)
+                {
+                    nextParent->setPreviousParentAddress(prevParent ? prevParent->getAddress() : MPNode::EmptyAddress);
+                }
+                // For first parent node, change startNode address too
+                if (startNode[Common::WEBAUTHN_ADDR_IDX] == parentPt->getAddress())
+                {
+                    startNode[Common::WEBAUTHN_ADDR_IDX] = nextParent ? nextParent->getAddress() : MPNode::EmptyAddress;
+                }
+                webAuthnLoginNodes.removeOne(parentPt);
+                parentRemoved = true;
             }
             else
             {
                 // Set parent next child to second child and set second child previous child to null
                 MPNode* secondChildNode = findNodeWithAddressInList(webAuthnLoginChildNodes, childNode->getNextChildAddress());
+                if (nullptr == secondChildNode)
+                {
+                    qCritical() << "Second Child is invalid";
+                    continue;
+                }
                 parentPt->setNextChildAddress(secondChildNode->getAddress());
                 secondChildNode->setPreviousChildAddress(MPNode::EmptyAddress);
-                webAuthnLoginChildNodes.removeOne(childNode);
             }
         }
+        //Case 2: childNode is the last node in the list
+        else if (childNode->getNextChildAddress() == MPNode::EmptyAddress)
+        {
+            MPNode* prevChild = findNodeWithAddressInList(webAuthnLoginChildNodes, childNode->getPreviousChildAddress());
+            if (prevChild == nullptr)
+            {
+                qCritical() << "Not existing previous child";
+                continue;
+            }
+            prevChild->setNextChildAddress(MPNode::EmptyAddress);
+        }
+        //Case 3: childNode is not the first and not the last element in list
+        else
+        {
+            MPNode* prevChild = findNodeWithAddressInList(webAuthnLoginChildNodes, childNode->getPreviousChildAddress());
+            MPNode* nextChild = findNodeWithAddressInList(webAuthnLoginChildNodes, childNode->getNextChildAddress());
+            if (!prevChild || !nextChild)
+            {
+                qCritical() << "Previous or next child is invalid";
+                continue;
+            }
+            prevChild->setNextChildAddress(nextChild->getAddress());
+            nextChild->setPreviousChildAddress(prevChild->getAddress());
+        }
+        if (!parentRemoved)
+        {
+            parentPt->removeChild(childNode);
+        }
+        webAuthnLoginChildNodes.removeOne(childNode);
 
     }
 
     /* Check our DB */
-//    if(!checkLoadedNodes(false, true, false, true))
-//    {
-//        exitMemMgmtMode(true);
-//        qCritical() << "Error in our internal algo";
-//        cb(false, "Moolticute Internal Error (DDNAL#2)");
-//    }
-
-    exitMemMgmtMode(true);
-    cb(true, "ok");
+    if(!checkLoadedNodes(false, true, false, true))
+    {
+        exitMemMgmtMode(true);
+        qCritical() << "Error in our internal algo";
+        cb(false, "Moolticute Internal Error (DDNAL#2)");
+    }
 
     /* Generate save packets */
-//    AsyncJobs* saveJobs = new AsyncJobs("Starting save operations...", this);
-//    connect(saveJobs, &AsyncJobs::finished, [this, services, cb](const QByteArray &data)
-//    {
-//        Q_UNUSED(data);
-//        exitMemMgmtMode(true);
-//        qInfo() << "Save operations succeeded!";
-//        cb(true, "Successfully Saved File Database");
-
-//        /* Update file cache */
-//        for (qint32 i = 0; i < services.size(); i++)
-//        {
-//            /// Improvement: only trigger file storage after we have removed all files
-//            removeFileFromCache(services[i]);
-//        }
-
-//        return;
-//    });
-//    connect(saveJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
-//    {
-//        Q_UNUSED(failedJob);
-//        exitMemMgmtMode(true);
-//        qCritical() << "Save operations failed!";
-//        cb(false, "Couldn't Save File Database: Device Unplugged?");
-//        return;
-//    });
-//    if (generateSavePackets(saveJobs, false, true, cbProgress))
-//    {
-//        /* Increment db change number */
-//        if (services.size() > 0 && (isFw12() || isBLE()))
-//        {
-//            set_dataDbChangeNumber(get_dataDbChangeNumber() + 1);
-//            dataDbChangeNumberClone = get_dataDbChangeNumber();
-//            filesCache.setDbChangeNumber(get_dataDbChangeNumber());
-//            updateChangeNumbers(saveJobs, Common::DataNumberChanged);
-//            emit dbChangeNumbersChanged(get_credentialsDbChangeNumber(), get_dataDbChangeNumber());
-//        }
-
-//        /* Run jobs */
-//        jobsQueue.enqueue(saveJobs);
-//        runAndDequeueJobs();
-//    }
-//    else
-//    {
-//        exitMemMgmtMode(true);
-//        qInfo() << "No changes to make on database";
-//        cb(true, "No Changes Were Required On Local DB!");
-//        return;
-//    }
+    AsyncJobs* saveJobs = new AsyncJobs("Starting save operations...", this);
+    connect(saveJobs, &AsyncJobs::finished, [this, cb](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+        exitMemMgmtMode(true);
+        qInfo() << "Save operations succeeded!";
+        cb(true, "Successfully Saved File Database");
+        return;
+    });
+    connect(saveJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob);
+        exitMemMgmtMode(true);
+        qCritical() << "Save operations failed!";
+        cb(false, "Couldn't Save File Database: Device Unplugged?");
+        return;
+    });
+    if (generateSavePackets(saveJobs, true, false, cbProgress))
+    {
+        /* Run jobs */
+        jobsQueue.enqueue(saveJobs);
+        runAndDequeueJobs();
+    }
+    else
+    {
+        exitMemMgmtMode(true);
+        qInfo() << "No changes to make on database";
+        cb(true, "No Changes Were Required On Local DB!");
+        return;
+    }
 }
 
 void MPDevice::changeVirtualAddressesToFreeAddresses(bool onlyChangePwd /* = false*/)
