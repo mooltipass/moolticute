@@ -532,6 +532,15 @@ void WSClient::onTextMessageReceived(const QString &message)
         }
         emit reconditionFinished(success, dischargeTime);
     }
+    else if (rootobj["msg"] == "delete_fido_nodes")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        if (!success)
+        {
+            emit deleteFidoNodesFailed();
+        }
+    }
 
 }
 

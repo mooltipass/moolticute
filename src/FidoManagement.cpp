@@ -42,6 +42,7 @@ void FidoManagement::setWsClient(WSClient *c)
     wsClient = c;
     connect(wsClient, &WSClient::memoryDataChanged, this, &FidoManagement::loadModel);
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &FidoManagement::enableMemManagement);
+    connect(wsClient, &WSClient::deleteFidoNodesFailed, this, &FidoManagement::onDeleteFidoNodesFailed);
 }
 
 FidoManagement::~FidoManagement()
@@ -57,7 +58,6 @@ void FidoManagement::on_pushButtonEnterFido_clicked()
 
 void FidoManagement::loadModel()
 {
-    qCritical() << "Loading fido models";
     m_pCredModel->load(wsClient->getMemoryData()["fido_nodes"].toArray(), true);
 }
 
@@ -90,6 +90,7 @@ void FidoManagement::on_pushButtonSaveExitFidoMMM_clicked()
 
 void FidoManagement::on_pushButtonDiscard_clicked()
 {
+    deletedList.clear();
     wsClient->sendLeaveMMRequest();
 }
 
@@ -161,6 +162,12 @@ void FidoManagement::onItemCollapsed(const QModelIndex &proxyIndex)
     ServiceItem *pServiceItem = m_pCredModel->getServiceItemByIndex(srcIndex);
     if (pServiceItem != nullptr)
         pServiceItem->setExpanded(false);
+}
+
+void FidoManagement::onDeleteFidoNodesFailed()
+{
+    QMessageBox::warning(this, tr("Fido Management Mode"),
+                         tr("Deleting Fido Credential(s) Failed"));
 }
 
 QModelIndex FidoManagement::getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex)

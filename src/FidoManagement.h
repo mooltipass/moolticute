@@ -38,6 +38,7 @@ private slots:
 
     void onItemExpanded(const QModelIndex &proxyIndex);
     void onItemCollapsed(const QModelIndex &proxyIndex);
+    void onDeleteFidoNodesFailed();
 
 private:
     QModelIndex getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex);
