@@ -4768,7 +4768,7 @@ void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, Message
         {
             if (childNode->getNextChildAddress() == MPNode::EmptyAddress)
             {
-                //Remove parent node
+                //No more child, remove parent node
                 MPNode* prevParent = findNodeWithAddressInList(webAuthnLoginNodes, parentPt->getPreviousParentAddress());
                 MPNode* nextParent = findNodeWithAddressInList(webAuthnLoginNodes, parentPt->getNextParentAddress());
                 if (prevParent)
@@ -4794,9 +4794,10 @@ void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, Message
                 if (nullptr == secondChildNode)
                 {
                     qCritical() << "Second Child is invalid";
-                    continue;
+                    cb(false, "Invalid child node");
+                    return;
                 }
-                parentPt->setNextChildAddress(secondChildNode->getAddress());
+                parentPt->setStartChildAddress(secondChildNode->getAddress());
                 secondChildNode->setPreviousChildAddress(MPNode::EmptyAddress);
             }
         }
@@ -4807,7 +4808,8 @@ void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, Message
             if (prevChild == nullptr)
             {
                 qCritical() << "Not existing previous child";
-                continue;
+                cb(false, "Invalid child node");
+                return;
             }
             prevChild->setNextChildAddress(MPNode::EmptyAddress);
         }
@@ -4819,7 +4821,8 @@ void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, Message
             if (!prevChild || !nextChild)
             {
                 qCritical() << "Previous or next child is invalid";
-                continue;
+                cb(false, "Invalid child node");
+                return;
             }
             prevChild->setNextChildAddress(nextChild->getAddress());
             nextChild->setPreviousChildAddress(prevChild->getAddress());
@@ -4844,7 +4847,7 @@ void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, Message
     AsyncJobs* saveJobs = new AsyncJobs("Starting save operations...", this);
     connect(saveJobs, &AsyncJobs::finished, [this, cb](const QByteArray &data)
     {
-        Q_UNUSED(data);
+        Q_UNUSED(data)
         exitMemMgmtMode(true);
         qInfo() << "Save operations succeeded!";
         cb(true, "Successfully Saved File Database");
@@ -4852,7 +4855,7 @@ void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, Message
     });
     connect(saveJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
     {
-        Q_UNUSED(failedJob);
+        Q_UNUSED(failedJob)
         exitMemMgmtMode(true);
         qCritical() << "Save operations failed!";
         cb(false, "Couldn't Save File Database: Device Unplugged?");
