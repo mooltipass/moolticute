@@ -686,34 +686,37 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     /* Get favorites */
     if (isBLE())
     {
-        jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITES,
-                                  [this, jobs, cbProgress](const QByteArray &data, bool &)
-                    {
-                        if (pMesProt->getMessageSize(data) == 1)
+        if (getCreds)
+        {
+            jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITES,
+                                      [this, jobs, cbProgress](const QByteArray &data, bool &)
                         {
-                            /* Received one byte as answer: command fail */
-                            jobs->setCurrentJobError("Mooltipass refused to send us favorites");
-                            qCritical() << "Get favorite: couldn't get answer";
-                            return false;
-                        }
-                        if (AppDaemon::isDebugDev())
-                        {
-                            qDebug() << "Received favorites: " << data.toHex();
-                        }
-                        /* Append favorite to list */
-                        favoritesAddrs = bleImpl->getFavorites(data);
-                        favoritesAddrsClone = favoritesAddrs;
+                            if (pMesProt->getMessageSize(data) == 1)
+                            {
+                                /* Received one byte as answer: command fail */
+                                jobs->setCurrentJobError("Mooltipass refused to send us favorites");
+                                qCritical() << "Get favorite: couldn't get answer";
+                                return false;
+                            }
+                            if (AppDaemon::isDebugDev())
+                            {
+                                qDebug() << "Received favorites: " << data.toHex();
+                            }
+                            /* Append favorite to list */
+                            favoritesAddrs = bleImpl->getFavorites(data);
+                            favoritesAddrsClone = favoritesAddrs;
 
-                        progressCurrent++;
-                        QVariantMap cbData = {
-                            {"total", 1},
-                            {"current", 1},
-                            {"msg", "Favorite are loaded"}
-                        };
-                        cbProgress(cbData);
-                        return true;
-                    })
-        );
+                            progressCurrent++;
+                            QVariantMap cbData = {
+                                {"total", 1},
+                                {"current", 1},
+                                {"msg", "Favorite are loaded"}
+                            };
+                            cbProgress(cbData);
+                            return true;
+                        })
+            );
+        }
     }
     else
     {
@@ -767,11 +770,11 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     }
 
 
-    if (getCreds)
+    if (getCreds || getFido)
     {
         /* Get parent node start address */
         jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
-                                      [this, jobs, fullScan, cbProgress, getFido](const QByteArray &data, bool &) -> bool
+                                      [this, jobs, fullScan, cbProgress, getFido, getCreds](const QByteArray &data, bool &) -> bool
         {
             if (pMesProt->getMessageSize(data) == 1)
             {
@@ -795,7 +798,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                 qDebug() << "Start node addr:" << startNode[Common::CRED_ADDR_IDX].toHex();
 
                 //if parent address is not null, load nodes
-                if (startNode[Common::CRED_ADDR_IDX] != MPNode::EmptyAddress)
+                if (startNode[Common::CRED_ADDR_IDX] != MPNode::EmptyAddress && getCreds)
                 {
                     qInfo() << "Loading parent nodes...";
                     if (!fullScan)
@@ -903,21 +906,23 @@ void MPDevice::startMemMgmtMode(bool wantData, bool wantFido,
     startMmmJob->setTimeout(15000); //We need a big timeout here in case user enter a wrong pin code
     jobs->append(startMmmJob);
 
+    //Fetch credential when not data and not fido wanted
+    bool wantCredentials = !wantData && !wantFido;
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true, wantFido);
+    memMgmtModeReadFlash(jobs, false, cbProgress, wantCredentials, wantData, true, wantFido);
 
-    connect(jobs, &AsyncJobs::finished, [this, cb, wantData, wantFido](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, cb, wantData, wantFido, wantCredentials](const QByteArray &data)
     {
         Q_UNUSED(data);
 
         /* Tag favorites */
-        if (!wantData)
+        if (wantCredentials)
         {
             tagFavoriteNodes();
         }
 
         /* Check DB */
-        if (checkLoadedNodes(!wantData, wantData, false, wantFido))
+        if (checkLoadedNodes(wantCredentials, wantData, false, wantFido))
         {
             qInfo() << "Mem management mode enabled, DB checked";
             force_memMgmtMode(true);
@@ -2943,12 +2948,16 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrT
 bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido /*=false*/)
 {
     QByteArray temp_pnode_address, temp_cnode_address;
-    bool return_bool;
+    bool return_bool = true;
 
     qInfo() << "Checking database...";
 
     /* Tag pointed nodes, also detects DB errors */
-    return_bool = tagPointedNodes(checkCredentials, checkData, repairAllowed);
+    if (checkCredentials || checkData)
+    {
+        return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed);
+    }
+
     if (checkFido)
     {
         return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
@@ -2965,10 +2974,11 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     if (checkCredentials)
     {
         checkLoadedLoginNodes(nbOrphanParents, nbOrphanChildren, repairAllowed, Common::CRED_ADDR_IDX);
-        if (isBLE())
-        {
-           checkLoadedLoginNodes(nbWebauthnOrphanParents, nbWebauthnOrphanChildren, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
-        }
+    }
+
+    if (isBLE() && checkFido)
+    {
+        checkLoadedLoginNodes(nbWebauthnOrphanParents, nbWebauthnOrphanChildren, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
     }
 
     if (checkData)
@@ -7497,7 +7507,7 @@ void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
                             cbProgress
-                            , true, true, true);
+                            , true, true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [this, cb, encryption](const QByteArray &)
     {
