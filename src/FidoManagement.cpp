@@ -132,7 +132,6 @@ void FidoManagement::on_pushButtonDelete_clicked()
                                          QMessageBox::Yes);
         if (btn == QMessageBox::Yes)
         {
-            qCritical() << "Deleted: " << pParentItem->name() << " - " << pLoginItem->name();
             deletedList.append({pParentItem->name(), pLoginItem->name(), pLoginItem->address()});
             QModelIndexList nextRow = m_pCredModelFilter->getNextRow(lIndexes.at(0));
             auto selectionModel = ui->fidoTreeView->selectionModel();

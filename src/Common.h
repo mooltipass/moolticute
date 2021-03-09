@@ -318,10 +318,10 @@ public:
 struct FidoCredential
 {
     QString service;
-    QString login;
+    QString user;
     QByteArray address;
-    FidoCredential(QString service, QString login, QByteArray addr):
-        service{service}, login{login}, address{addr}{}
+    FidoCredential(QString service, QString user, QByteArray addr):
+        service{service}, user{user}, address{addr}{}
 };
 
 enum class DeviceType

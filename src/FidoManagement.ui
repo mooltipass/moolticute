@@ -123,7 +123,7 @@ border-right: none;
            <item>
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Browsing through your files list requires your device to be in management mode. Click the button below to start the process.</string>
+              <string>Browsing through your FIDO credentials requires your device to be in management mode. Click the button below to start the process.</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>

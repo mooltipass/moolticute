@@ -650,7 +650,7 @@ void WSClient::deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials)
         addr.append(static_cast<int>(cred.address[1]));
         sobj.insert("service", cred.service);
         QJsonObject child;
-        child.insert("user", cred.login);
+        child.insert("user", cred.user);
         child.insert("address", addr);
         sobj.insert("child", child);
         fidoNodeArray.append(sobj);

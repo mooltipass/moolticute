@@ -4761,7 +4761,10 @@ void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, Message
 
     for (qint32 i = 0; i < fidoCredentials.size(); i++)
     {
-        qDebug() << "Deleting file for " << fidoCredentials[i].service << " - " << fidoCredentials[i].login;
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Deleting file for " << fidoCredentials[i].service << " - " << fidoCredentials[i].user;
+        }
         MPNode* parentPt = findNodeWithNameInList(webAuthnLoginNodes, fidoCredentials[i].service, true);
         MPNode* childNode = findNodeWithAddressInList(webAuthnLoginChildNodes, fidoCredentials[i].address);
 
