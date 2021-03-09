@@ -151,7 +151,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonAdvanced->setVisible(bAdvancedTabVisible);
 
     ui->pushButtonFido->setIcon(AppGui::qtAwesome()->icon(fa::usb));
-    //ui->pushButtonFido->setVisible(wsClient->isMPBLE());
+    ui->pushButtonFido->setVisible(false);
 
     m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F1), this);
     setKeysTabVisibleOnDemand(bSSHKeysTabVisibleOnDemand);
@@ -712,6 +712,7 @@ void MainWindow::updateDeviceDependentUI()
         ui->groupBoxNiMHRecondition->show();
         ui->pbBleBattery->show();
         ui->groupBoxSecurityChallenge->show();
+        ui->pushButtonFido->setVisible(true);
     }
     else
     {
@@ -1120,7 +1121,12 @@ void MainWindow::wantExitFilesManagement()
 
 void MainWindow::wantExitFidoManagement()
 {
-    //TODO Fido implement
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--exit_fido_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
+    updateTabButtons();
 }
 
 void MainWindow::loadingProgress(int total, int current, QString message)
@@ -1967,6 +1973,7 @@ void MainWindow::onDeviceDisconnected()
         {
             handleNoBundleDisconnected();
         }
+        ui->pushButtonFido->setVisible(false);
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");
