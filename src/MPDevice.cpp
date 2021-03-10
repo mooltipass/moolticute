@@ -2960,7 +2960,7 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
     if (checkFido)
     {
-        return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
+        return_bool &= tagPointedNodes(true, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
     }
 
     /* Scan for orphan nodes */
@@ -3060,6 +3060,11 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
     /* Set return bool */
     if (nbOrphanParents+nbOrphanChildren+nbOrphanDataParents+nbOrphanDataChildren)
+    {
+        return_bool = false;
+    }
+
+    if (isBLE() && checkFido && nbWebauthnOrphanParents + nbWebauthnOrphanChildren > 0)
     {
         return_bool = false;
     }
