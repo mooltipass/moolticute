@@ -56,6 +56,7 @@ public:
 
     static QString MMM_ERROR;
     static QString BACKUP_PROMPT;
+    static QString MORE_RECENT_BACKUP_PROMPT;
 
 signals:
     void accepted();
