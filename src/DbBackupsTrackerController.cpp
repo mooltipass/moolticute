@@ -157,7 +157,7 @@ void DbBackupsTrackerController::askForExportBackup()
         }
     };
 
-    PromptMessage *message = new PromptMessage(tr("Credentials on the device are more recent. ") + "<br>" +
+    PromptMessage *message = new PromptMessage(PromptWidget::MORE_RECENT_BACKUP_PROMPT + "<br>" +
                                                   tr("Do you want to export your database?"),
                                                onAccept, onReject);
     window->showPrompt(message);
