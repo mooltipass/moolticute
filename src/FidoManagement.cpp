@@ -19,7 +19,8 @@ FidoManagement::FidoManagement(QWidget *parent) :
     ui->pushButtonEnterFido->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterFido->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
 
-    ui->pushButtonSaveExitFidoMMM->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonSaveFidoMMM->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonExitFidoMMM->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonDelete->setStyleSheet(CSS_GREY_BUTTON);
     ui->pushButtonDelete->setIcon(AppGui::qtAwesome()->icon(fa::trash, whiteButtons));
@@ -66,6 +67,7 @@ void FidoManagement::enableMemManagement(bool enable)
     if (enable)
     {
         ui->stackedWidget->setCurrentWidget(ui->pageUnlocked);
+        setFidoManagementClean(true);
     }
     else
     {
@@ -73,7 +75,7 @@ void FidoManagement::enableMemManagement(bool enable)
     }
 }
 
-void FidoManagement::on_pushButtonSaveExitFidoMMM_clicked()
+void FidoManagement::on_pushButtonSaveFidoMMM_clicked()
 {
     m_pCredModel->clear();
     if (!deletedList.isEmpty())
@@ -132,6 +134,10 @@ void FidoManagement::on_pushButtonDelete_clicked()
                                          QMessageBox::Yes);
         if (btn == QMessageBox::Yes)
         {
+            if (deletedList.isEmpty())
+            {
+                setFidoManagementClean(false);
+            }
             deletedList.append({pParentItem->name(), pLoginItem->name(), pLoginItem->address()});
             QModelIndexList nextRow = m_pCredModelFilter->getNextRow(lIndexes.at(0));
             auto selectionModel = ui->fidoTreeView->selectionModel();
@@ -181,4 +187,16 @@ QModelIndex FidoManagement::getSourceIndexFromProxyIndex(const QModelIndex &prox
 QModelIndex FidoManagement::getProxyIndexFromSourceIndex(const QModelIndex &srcIndex)
 {
     return m_pCredModelFilter->mapFromSource(srcIndex);
+}
+
+void FidoManagement::setFidoManagementClean(bool isClean)
+{
+    ui->pushButtonExitFidoMMM->setVisible(isClean);
+    ui->pushButtonSaveFidoMMM->setVisible(!isClean);
+    ui->pushButtonDiscard->setVisible(!isClean);
+}
+
+void FidoManagement::on_pushButtonExitFidoMMM_clicked()
+{
+    wsClient->sendLeaveMMRequest();
 }

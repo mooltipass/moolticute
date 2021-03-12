@@ -28,7 +28,7 @@ private slots:
     void loadModel();
     void enableMemManagement(bool enable);
 
-    void on_pushButtonSaveExitFidoMMM_clicked();
+    void on_pushButtonSaveFidoMMM_clicked();
 
     void on_pushButtonDiscard_clicked();
 
@@ -40,9 +40,13 @@ private slots:
     void onItemCollapsed(const QModelIndex &proxyIndex);
     void onDeleteFidoNodesFailed();
 
+    void on_pushButtonExitFidoMMM_clicked();
+
 private:
     QModelIndex getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex);
     QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
+
+    void setFidoManagementClean(bool isClean);
 
 
     Ui::FidoManagement *ui;

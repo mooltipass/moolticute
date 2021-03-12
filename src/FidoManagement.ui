@@ -263,7 +263,20 @@ border-right: none;
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButtonSaveExitFidoMMM">
+            <widget class="QPushButton" name="pushButtonExitFidoMMM">
+             <property name="minimumSize">
+              <size>
+               <width>250</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Exit FIDO Management Mode</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonSaveFidoMMM">
              <property name="minimumSize">
               <size>
                <width>200</width>
