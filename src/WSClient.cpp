@@ -532,6 +532,15 @@ void WSClient::onTextMessageReceived(const QString &message)
         }
         emit reconditionFinished(success, dischargeTime);
     }
+    else if (rootobj["msg"] == "delete_fido_nodes")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        if (!success)
+        {
+            emit deleteFidoNodesFailed();
+        }
+    }
 
 }
 
@@ -573,10 +582,10 @@ bool WSClient::requestDeviceUID(const QByteArray & key)
 }
 
 
-void WSClient::sendEnterMMRequest(bool wantData)
+void WSClient::sendEnterMMRequest(bool wantData, bool wantFido /*= false*/)
 {
     sendJsonData({{ "msg", "start_memorymgmt" },
-                  { "data", QJsonObject{ {"want_data", wantData } } }
+                  { "data", QJsonObject{ {"want_data", wantData }, {"want_fido", wantFido} } }
                  });
 }
 
@@ -627,6 +636,27 @@ void WSClient::deleteDataFilesAndLeave(const QStringList &services)
         s.append(srv.toLower());
     QJsonObject d = {{ "services", s }};
     sendJsonData({{ "msg", "delete_data_nodes" },
+                  { "data", d }});
+}
+
+void WSClient::deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials)
+{
+    QJsonArray fidoNodeArray;
+    for (const FidoCredential &cred: qAsConst(fidoCredentials))
+    {
+        QJsonObject sobj;
+        QJsonArray addr;
+        addr.append(static_cast<int>(cred.address[0]));
+        addr.append(static_cast<int>(cred.address[1]));
+        sobj.insert("service", cred.service);
+        QJsonObject child;
+        child.insert("user", cred.user);
+        child.insert("address", addr);
+        sobj.insert("child", child);
+        fidoNodeArray.append(sobj);
+    }
+    QJsonObject d = {{ "deleted_fidos", fidoNodeArray }};
+    sendJsonData({{ "msg", "delete_fido_nodes" },
                   { "data", d }});
 }
 

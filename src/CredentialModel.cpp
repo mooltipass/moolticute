@@ -167,7 +167,7 @@ TreeItem *CredentialModel::getItemByIndex(const QModelIndex &idx) const
     return static_cast<TreeItem *>(idx.internalPointer());
 }
 
-void CredentialModel::load(const QJsonArray &json)
+void CredentialModel::load(const QJsonArray &json, bool isFido)
 {
     if (json.isEmpty())
         return;
@@ -205,10 +205,6 @@ void CredentialModel::load(const QJsonArray &json)
                 pLoginItem = pServiceItem->addLogin(sLoginName);
             pLoginItem->setStatus(TreeItem::USED);
 
-            // Update login item description
-            QString sDescription = cnode["description"].toString();
-            pLoginItem->setDescription(sDescription);
-
             // Update login item created date
             QDate dCreatedDate = QDate::fromString(cnode["date_created"].toString(), Qt::ISODate);
             pLoginItem->setUpdatedDate(dCreatedDate);
@@ -216,20 +212,6 @@ void CredentialModel::load(const QJsonArray &json)
             // Update login item updated date
             QDate dUpdatedDate = QDate::fromString(cnode["date_last_used"].toString(), Qt::ISODate);
             pLoginItem->setAccessedDate(dUpdatedDate);
-
-            // Update login item category
-            if (DeviceDetector::instance().isBle())
-            {
-                pLoginItem->setCategory(cnode["category"].toVariant().toInt());
-                pLoginItem->setkeyAfterLogin(cnode["key_after_login"].toVariant().toInt());
-                pLoginItem->setkeyAfterPwd(cnode["key_after_pwd"].toVariant().toInt());
-                pLoginItem->setPwdBlankFlag(cnode["pwd_blank_flag"].toVariant().toInt());
-                if (cnode.contains("totp_time_step"))
-                {
-                    pLoginItem->setTotpTimeStep(cnode["totp_time_step"].toVariant().toInt());
-                    pLoginItem->setTotpCodeSize(cnode["totp_code_size"].toVariant().toInt());
-                }
-            }
 
             QJsonArray a = cnode["address"].toArray();
             if (a.size() < 2)
@@ -244,9 +226,34 @@ void CredentialModel::load(const QJsonArray &json)
             // Update login item address
             pLoginItem->setAddress(bAddress);
 
-            // Update login favorite
-            int iFavorite = cnode["favorite"].toInt();
-            pLoginItem->setFavorite(iFavorite);
+            if (isFido)
+            {
+                pLoginItem->setCategory(0);
+            }
+            else
+            {
+                // Update login item description
+                QString sDescription = cnode["description"].toString();
+                pLoginItem->setDescription(sDescription);
+
+                // Update login item category
+                if (DeviceDetector::instance().isBle())
+                {
+                    pLoginItem->setCategory(cnode["category"].toVariant().toInt());
+                    pLoginItem->setkeyAfterLogin(cnode["key_after_login"].toVariant().toInt());
+                    pLoginItem->setkeyAfterPwd(cnode["key_after_pwd"].toVariant().toInt());
+                    pLoginItem->setPwdBlankFlag(cnode["pwd_blank_flag"].toVariant().toInt());
+                    if (cnode.contains("totp_time_step"))
+                    {
+                        pLoginItem->setTotpTimeStep(cnode["totp_time_step"].toVariant().toInt());
+                        pLoginItem->setTotpCodeSize(cnode["totp_code_size"].toVariant().toInt());
+                    }
+                }
+
+                // Update login favorite
+                int iFavorite = cnode["favorite"].toInt();
+                pLoginItem->setFavorite(iFavorite);
+            }
         }
     }
 

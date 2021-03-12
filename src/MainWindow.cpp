@@ -110,12 +110,14 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     m_tabMap[ui->pageFiles] = ui->pushButtonFiles;
     m_tabMap[ui->pageSSH] = ui->pushButtonSSH;
     m_tabMap[ui->pageBleDev] = ui->pushButtonBleDev;
+    m_tabMap[ui->pageFido] = ui->pushButtonFido;
     connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::onCurrentTabChanged);
 
     ui->widgetCredentials->setWsClient(wsClient);
     ui->widgetFiles->setWsClient(wsClient);
     ui->widgetSSH->setWsClient(wsClient);
     ui->widgetBleDev->setWsClient(wsClient);
+    ui->widgetFido->setWsClient(wsClient);
 
     ui->widgetCredentials->setPasswordProfilesModel(m_passwordProfilesModel);
 
@@ -148,6 +150,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
     ui->pushButtonAdvanced->setVisible(bAdvancedTabVisible);
 
+    ui->pushButtonFido->setIcon(AppGui::qtAwesome()->icon(fa::usb));
+    ui->pushButtonFido->setVisible(false);
+
     m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F1), this);
     setKeysTabVisibleOnDemand(bSSHKeysTabVisibleOnDemand);
     connect(ui->radioButtonSSHTabAlways, &QRadioButton::toggled, this, &MainWindow::onRadioButtonSSHTabsAlwaysToggled);
@@ -171,6 +176,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(this, &MainWindow::saveMMMChanges, ui->widgetCredentials, &CredentialsManagement::saveChanges);
     connect(ui->widgetFiles, &FilesManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
+    connect(ui->widgetFido, &FidoManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
+    connect(ui->widgetFido, &FidoManagement::wantExitMemMode, this, &MainWindow::wantExitFidoManagement);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, [this](bool isMMM){
         if (isMMM && (ui->promptWidget->isMMMErrorPrompt()
@@ -273,6 +280,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->pushButtonSSH, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonAdvanced, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonBleDev, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonFido, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->btnPassGenerationProfiles, &QPushButton::clicked, [this]()
     {
         PassGenerationProfilesDialog dlg(this);
@@ -704,6 +712,7 @@ void MainWindow::updateDeviceDependentUI()
         ui->groupBoxNiMHRecondition->show();
         ui->pbBleBattery->show();
         ui->groupBoxSecurityChallenge->show();
+        ui->pushButtonFido->setVisible(true);
     }
     else
     {
@@ -807,6 +816,9 @@ void MainWindow::updatePage()
 
     else if (ui->pushButtonSSH->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageSSH);
+
+    else if (ui->pushButtonFido->isChecked())
+        ui->stackedWidget->setCurrentWidget(ui->pageFido);
 
     updateTabButtons();
 
@@ -1104,6 +1116,16 @@ void MainWindow::wantExitFilesManagement()
                     disconnect(*conn);
                 });
 
+    updateTabButtons();
+}
+
+void MainWindow::wantExitFidoManagement()
+{
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--exit_fido_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
     updateTabButtons();
 }
 
@@ -1473,6 +1495,8 @@ void MainWindow::enableCredentialsManagement(bool enable)
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         else if (ui->pushButtonFiles->isChecked())
             ui->stackedWidget->setCurrentWidget(ui->pageFiles);
+        else if (ui->pushButtonFido->isChecked())
+            ui->stackedWidget->setCurrentWidget(ui->pageFido);
     }
 
     updateTabButtons();
@@ -1520,7 +1544,8 @@ void MainWindow::updateTabButtons()
 
     if ((ui->stackedWidget->currentWidget() == ui->pageFiles
          || ui->stackedWidget->currentWidget() == ui->pageCredentials
-         || ui->stackedWidget->currentWidget() == ui->pageIntegrity) &&
+         || ui->stackedWidget->currentWidget() == ui->pageIntegrity
+         || ui->stackedWidget->currentWidget() == ui->pageFido) &&
             wsClient->get_memMgmtMode())
     {
         // Disable all tab buttons
@@ -1948,6 +1973,7 @@ void MainWindow::onDeviceDisconnected()
         {
             handleNoBundleDisconnected();
         }
+        ui->pushButtonFido->setVisible(false);
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");

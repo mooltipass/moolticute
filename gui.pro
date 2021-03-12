@@ -69,7 +69,8 @@ SOURCES += src/main_gui.cpp \
     src/Settings/SettingsGuiHelper.cpp \
     src/Settings/SettingsGuiMini.cpp \
     src/Settings/SettingsGuiBLE.cpp \
-    src/DeviceDetector.cpp
+    src/DeviceDetector.cpp \
+    src/FidoManagement.cpp \
 
 HEADERS  += src/MainWindow.h \
     src/ParseDomain.h \
@@ -123,7 +124,8 @@ HEADERS  += src/MainWindow.h \
     src/Settings/SettingsGuiMini.h \
     src/Settings/SettingsGuiBLE.h \
     src/Settings/ISettingsGui.h \
-    src/DeviceDetector.h
+    src/DeviceDetector.h \
+    src/FidoManagement.h
 
 mac {
     HEADERS += src/MacUtils.h \
@@ -148,7 +150,8 @@ FORMS    += src/MainWindow.ui \
     src/PassGenerationProfilesDialog.ui \
     src/RequestDomainSelectionDialog.ui \
     src/RequestLoginNameDialog.ui \
-    src/BleDev.ui
+    src/BleDev.ui \
+    src/FidoManagement.ui
 
 RESOURCES += \
     img/images.qrc \

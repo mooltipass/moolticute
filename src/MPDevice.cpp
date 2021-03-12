@@ -608,7 +608,7 @@ void MPDevice::resetCommunication()
 
 void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                                     const MPDeviceProgressCb &cbProgress,bool getCreds,
-                                    bool getData, bool getDataChilds)
+                                    bool getData, bool getDataChilds, bool getFido /*= false*/)
 {
     /* For when the MMM is left */
     cleanMMMVars();
@@ -686,34 +686,37 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     /* Get favorites */
     if (isBLE())
     {
-        jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITES,
-                                  [this, jobs, cbProgress](const QByteArray &data, bool &)
-                    {
-                        if (pMesProt->getMessageSize(data) == 1)
+        if (getCreds)
+        {
+            jobs->append(new MPCommandJob(this, MPCmd::GET_FAVORITES,
+                                      [this, jobs, cbProgress](const QByteArray &data, bool &)
                         {
-                            /* Received one byte as answer: command fail */
-                            jobs->setCurrentJobError("Mooltipass refused to send us favorites");
-                            qCritical() << "Get favorite: couldn't get answer";
-                            return false;
-                        }
-                        if (AppDaemon::isDebugDev())
-                        {
-                            qDebug() << "Received favorites: " << data.toHex();
-                        }
-                        /* Append favorite to list */
-                        favoritesAddrs = bleImpl->getFavorites(data);
-                        favoritesAddrsClone = favoritesAddrs;
+                            if (pMesProt->getMessageSize(data) == 1)
+                            {
+                                /* Received one byte as answer: command fail */
+                                jobs->setCurrentJobError("Mooltipass refused to send us favorites");
+                                qCritical() << "Get favorite: couldn't get answer";
+                                return false;
+                            }
+                            if (AppDaemon::isDebugDev())
+                            {
+                                qDebug() << "Received favorites: " << data.toHex();
+                            }
+                            /* Append favorite to list */
+                            favoritesAddrs = bleImpl->getFavorites(data);
+                            favoritesAddrsClone = favoritesAddrs;
 
-                        progressCurrent++;
-                        QVariantMap cbData = {
-                            {"total", 1},
-                            {"current", 1},
-                            {"msg", "Favorite are loaded"}
-                        };
-                        cbProgress(cbData);
-                        return true;
-                    })
-        );
+                            progressCurrent++;
+                            QVariantMap cbData = {
+                                {"total", 1},
+                                {"current", 1},
+                                {"msg", "Favorite are loaded"}
+                            };
+                            cbProgress(cbData);
+                            return true;
+                        })
+            );
+        }
     }
     else
     {
@@ -767,11 +770,11 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     }
 
 
-    if (getCreds)
+    if (getCreds || getFido)
     {
         /* Get parent node start address */
         jobs->append(new MPCommandJob(this, MPCmd::GET_STARTING_PARENT,
-                                      [this, jobs, fullScan, cbProgress](const QByteArray &data, bool &) -> bool
+                                      [this, jobs, fullScan, cbProgress, getFido, getCreds](const QByteArray &data, bool &) -> bool
         {
             if (pMesProt->getMessageSize(data) == 1)
             {
@@ -795,7 +798,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                 qDebug() << "Start node addr:" << startNode[Common::CRED_ADDR_IDX].toHex();
 
                 //if parent address is not null, load nodes
-                if (startNode[Common::CRED_ADDR_IDX] != MPNode::EmptyAddress)
+                if (startNode[Common::CRED_ADDR_IDX] != MPNode::EmptyAddress && getCreds)
                 {
                     qInfo() << "Loading parent nodes...";
                     if (!fullScan)
@@ -813,7 +816,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                     qInfo() << "No parent nodes to load.";
                 }
 
-                if (isBLE())
+                if (isBLE() && getFido)
                 {
                     bleImpl->loadWebAuthnNodes(jobs, cbProgress);
                 }
@@ -883,7 +886,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
     }
 }
 
-void MPDevice::startMemMgmtMode(bool wantData,
+void MPDevice::startMemMgmtMode(bool wantData, bool wantFido,
                                 const MPDeviceProgressCb &cbProgress,
                                 const std::function<void(bool success, int errCode, QString errMsg)> &cb)
 {
@@ -903,21 +906,23 @@ void MPDevice::startMemMgmtMode(bool wantData,
     startMmmJob->setTimeout(15000); //We need a big timeout here in case user enter a wrong pin code
     jobs->append(startMmmJob);
 
+    //Fetch credential when not data and not fido wanted
+    bool wantCredentials = !wantData && !wantFido;
     /* Load flash contents the usual way */
-    memMgmtModeReadFlash(jobs, false, cbProgress, !wantData, wantData, true);
+    memMgmtModeReadFlash(jobs, false, cbProgress, wantCredentials, wantData, true, wantFido);
 
-    connect(jobs, &AsyncJobs::finished, [this, cb, wantData](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, cb, wantData, wantFido, wantCredentials](const QByteArray &data)
     {
         Q_UNUSED(data);
 
         /* Tag favorites */
-        if (!wantData)
+        if (wantCredentials)
         {
             tagFavoriteNodes();
         }
 
         /* Check DB */
-        if (checkLoadedNodes(!wantData, wantData, false))
+        if (checkLoadedNodes(wantCredentials, wantData, false, wantFido))
         {
             qInfo() << "Mem management mode enabled, DB checked";
             force_memMgmtMode(true);
@@ -2940,16 +2945,23 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrT
     return addChildToDB(tempNodePt, childNodePt, addrType);
 }
 
-bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed)
+bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido /*=false*/)
 {
     QByteArray temp_pnode_address, temp_cnode_address;
-    bool return_bool;
+    bool return_bool = true;
 
     qInfo() << "Checking database...";
 
     /* Tag pointed nodes, also detects DB errors */
-    return_bool = tagPointedNodes(checkCredentials, checkData, repairAllowed);
-    return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
+    if (checkCredentials || checkData)
+    {
+        return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed);
+    }
+
+    if (checkFido)
+    {
+        return_bool &= tagPointedNodes(true, checkData, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
+    }
 
     /* Scan for orphan nodes */
     quint32 nbOrphanParents = 0;
@@ -2962,10 +2974,11 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     if (checkCredentials)
     {
         checkLoadedLoginNodes(nbOrphanParents, nbOrphanChildren, repairAllowed, Common::CRED_ADDR_IDX);
-        if (isBLE())
-        {
-           checkLoadedLoginNodes(nbWebauthnOrphanParents, nbWebauthnOrphanChildren, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
-        }
+    }
+
+    if (isBLE() && checkFido)
+    {
+        checkLoadedLoginNodes(nbWebauthnOrphanParents, nbWebauthnOrphanChildren, repairAllowed, Common::WEBAUTHN_ADDR_IDX);
     }
 
     if (checkData)
@@ -3047,6 +3060,11 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
     /* Set return bool */
     if (nbOrphanParents+nbOrphanChildren+nbOrphanDataParents+nbOrphanDataChildren)
+    {
+        return_bool = false;
+    }
+
+    if (isBLE() && checkFido && nbWebauthnOrphanParents + nbWebauthnOrphanChildren > 0)
     {
         return_bool = false;
     }
@@ -4024,7 +4042,7 @@ void MPDevice::delCredentialAndLeave(QString service, const QString &login,
 
     if (!get_memMgmtMode())
     {
-        startMemMgmtMode(false,
+        startMemMgmtMode(false, false,
                          cbProgress,
                          [cb, deleteCred](bool success, int, QString errMsg)
         {
@@ -4735,6 +4753,145 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
+}
+
+void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, MessageHandlerCb cb, const MPDeviceProgressCb &cbProgress)
+{
+    if (fidoCredentials.isEmpty())
+    {
+        //No fido credentials to delete, just exit mmm
+        exitMemMgmtMode(true);
+        return;
+    }
+
+    for (qint32 i = 0; i < fidoCredentials.size(); i++)
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Deleting file for " << fidoCredentials[i].service << " - " << fidoCredentials[i].user;
+        }
+        MPNode* parentPt = findNodeWithNameInList(webAuthnLoginNodes, fidoCredentials[i].service, true);
+        MPNode* childNode = findNodeWithAddressInList(webAuthnLoginChildNodes, fidoCredentials[i].address);
+
+        if(!parentPt || !childNode)
+        {
+            exitMemMgmtMode(true);
+            qCritical() << "Couldn't find node for " << fidoCredentials[i].service;
+            cb(false, "Moolticute Internal Error (DDNAL#1)");
+        }
+
+        //Case 1: childNode is the first node in the list
+        bool parentRemoved = false;
+        if (childNode->getPreviousChildAddress() == MPNode::EmptyAddress)
+        {
+            if (childNode->getNextChildAddress() == MPNode::EmptyAddress)
+            {
+                //No more child, remove parent node
+                MPNode* prevParent = findNodeWithAddressInList(webAuthnLoginNodes, parentPt->getPreviousParentAddress());
+                MPNode* nextParent = findNodeWithAddressInList(webAuthnLoginNodes, parentPt->getNextParentAddress());
+                if (prevParent)
+                {
+                    prevParent->setNextParentAddress(nextParent ? nextParent->getAddress() : MPNode::EmptyAddress);
+                }
+                if (nextParent)
+                {
+                    nextParent->setPreviousParentAddress(prevParent ? prevParent->getAddress() : MPNode::EmptyAddress);
+                }
+                // For first parent node, change startNode address too
+                if (startNode[Common::WEBAUTHN_ADDR_IDX] == parentPt->getAddress())
+                {
+                    startNode[Common::WEBAUTHN_ADDR_IDX] = nextParent ? nextParent->getAddress() : MPNode::EmptyAddress;
+                }
+                webAuthnLoginNodes.removeOne(parentPt);
+                parentRemoved = true;
+            }
+            else
+            {
+                // Set parent next child to second child and set second child previous child to null
+                MPNode* secondChildNode = findNodeWithAddressInList(webAuthnLoginChildNodes, childNode->getNextChildAddress());
+                if (nullptr == secondChildNode)
+                {
+                    qCritical() << "Second Child is invalid";
+                    cb(false, "Invalid child node");
+                    return;
+                }
+                parentPt->setStartChildAddress(secondChildNode->getAddress());
+                secondChildNode->setPreviousChildAddress(MPNode::EmptyAddress);
+            }
+        }
+        //Case 2: childNode is the last node in the list
+        else if (childNode->getNextChildAddress() == MPNode::EmptyAddress)
+        {
+            MPNode* prevChild = findNodeWithAddressInList(webAuthnLoginChildNodes, childNode->getPreviousChildAddress());
+            if (prevChild == nullptr)
+            {
+                qCritical() << "Not existing previous child";
+                cb(false, "Invalid child node");
+                return;
+            }
+            prevChild->setNextChildAddress(MPNode::EmptyAddress);
+        }
+        //Case 3: childNode is not the first and not the last element in list
+        else
+        {
+            MPNode* prevChild = findNodeWithAddressInList(webAuthnLoginChildNodes, childNode->getPreviousChildAddress());
+            MPNode* nextChild = findNodeWithAddressInList(webAuthnLoginChildNodes, childNode->getNextChildAddress());
+            if (!prevChild || !nextChild)
+            {
+                qCritical() << "Previous or next child is invalid";
+                cb(false, "Invalid child node");
+                return;
+            }
+            prevChild->setNextChildAddress(nextChild->getAddress());
+            nextChild->setPreviousChildAddress(prevChild->getAddress());
+        }
+        if (!parentRemoved)
+        {
+            parentPt->removeChild(childNode);
+        }
+        webAuthnLoginChildNodes.removeOne(childNode);
+
+    }
+
+    /* Check our DB */
+    if(!checkLoadedNodes(false, true, false, true))
+    {
+        exitMemMgmtMode(true);
+        qCritical() << "Error in our internal algo";
+        cb(false, "Moolticute Internal Error (DDNAL#2)");
+    }
+
+    /* Generate save packets */
+    AsyncJobs* saveJobs = new AsyncJobs("Starting save operations...", this);
+    connect(saveJobs, &AsyncJobs::finished, [this, cb](const QByteArray &data)
+    {
+        Q_UNUSED(data)
+        exitMemMgmtMode(true);
+        qInfo() << "Save operations succeeded!";
+        cb(true, "Successfully Saved File Database");
+        return;
+    });
+    connect(saveJobs, &AsyncJobs::failed, [this, cb](AsyncJob *failedJob)
+    {
+        Q_UNUSED(failedJob)
+        exitMemMgmtMode(true);
+        qCritical() << "Save operations failed!";
+        cb(false, "Couldn't Save File Database: Device Unplugged?");
+        return;
+    });
+    if (generateSavePackets(saveJobs, true, false, cbProgress))
+    {
+        /* Run jobs */
+        jobsQueue.enqueue(saveJobs);
+        runAndDequeueJobs();
+    }
+    else
+    {
+        exitMemMgmtMode(true);
+        qInfo() << "No changes to make on database";
+        cb(true, "No Changes Were Required On Local DB!");
+        return;
+    }
 }
 
 void MPDevice::changeVirtualAddressesToFreeAddresses(bool onlyChangePwd /* = false*/)
@@ -7358,7 +7515,7 @@ void MPDevice::exportDatabase(const QString &encryption, std::function<void(bool
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
                             cbProgress
-                            , true, true, true);
+                            , true, true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [this, cb, encryption](const QByteArray &)
     {

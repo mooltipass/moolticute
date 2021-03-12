@@ -71,7 +71,7 @@ public:
 
     bool requestDeviceUID(const QByteArray &key);
 
-    void sendEnterMMRequest(bool wantData = false);
+    void sendEnterMMRequest(bool wantData = false, bool wantFido = false);
     void sendLeaveMMRequest();
 
     void addOrUpdateCredential(const QString &service, const QString &login,
@@ -82,6 +82,7 @@ public:
     void requestDataFile(const QString &service);
     void sendDataFile(const QString &service, const QByteArray &data);
     void deleteDataFilesAndLeave(const QStringList &services);
+    void deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials);
 
     void requestResetCard();
     void requestAvailableUserNumber();
@@ -157,6 +158,7 @@ signals:
     void challengeResultReceived(QString result);
     void challengeResultFailed();
     void reconditionFinished(bool success, double dischargeTime);
+    void deleteFidoNodesFailed();
 
 public slots:
     void sendJsonData(const QJsonObject &data);

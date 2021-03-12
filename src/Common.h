@@ -315,6 +315,15 @@ public:
     static const int DEFAULT_PASSWORD_LENGTH = 16;
 };
 
+struct FidoCredential
+{
+    QString service;
+    QString user;
+    QByteArray address;
+    FidoCredential(QString service, QString user, QByteArray addr):
+        service{service}, user{user}, address{addr}{}
+};
+
 enum class DeviceType
 {
     MOOLTIPASS = 0,

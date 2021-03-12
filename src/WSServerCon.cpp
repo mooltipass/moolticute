@@ -179,7 +179,7 @@ void WSServerCon::processMessage(const QString &message)
         WSServer::Instance()->setMemLockedClient(clientUid);
 
         //send command to start MMM
-        mpdevice->startMemMgmtMode(o["want_data"].toBool(),
+        mpdevice->startMemMgmtMode(o["want_data"].toBool(), o["want_fido"].toBool(),
                 defaultProgressCb,
                 [=](bool success, int errCode, QString errMsg)
         {
@@ -671,6 +671,16 @@ void WSServerCon::sendMemMgmtMode()
     QJsonObject jdata;
     jdata["login_nodes"] = logins;
     jdata["data_nodes"] = datas;
+
+    if (mpdevice->isBLE())
+    {
+        QJsonArray fidoData;
+        foreach (MPNode *n, mpdevice->getFidoDataNodes())
+        {
+            fidoData.append(n->toJson(true));
+        }
+        jdata["fido_nodes"] = fidoData;
+    }
 
     sendJsonMessage({{ "msg", "memorymgmt_data" },
                      { "data", jdata }});
@@ -1298,6 +1308,52 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });
+    }
+    else if (root["msg"] == "delete_fido_nodes")
+    {
+        QJsonObject o = root["data"].toObject();
+
+        if (!mpdevice->get_memMgmtMode())
+        {
+            sendFailedJson(root, "Not in memory management mode");
+            return;
+        }
+
+        QJsonArray deletedFidosArray = o["deleted_fidos"].toArray();
+        QList<FidoCredential> deletedFidos;
+        for (auto fidoRef : deletedFidosArray)
+        {
+            QJsonObject fido = fidoRef.toObject();
+            QJsonObject childObj = fido["child"].toObject();
+            QJsonArray addrArray = childObj["address"].toArray();
+            if (addrArray.size() < 2)
+            {
+                qCritical() << "Invalid address array for deleted fido credential";
+                continue;
+            }
+            QByteArray bAddress;
+            bAddress.append(static_cast<char>(addrArray.at(0).toInt()));
+            bAddress.append(static_cast<char>(addrArray.at(1).toInt()));
+            deletedFidos.append({fido["service"].toString(), childObj["user"].toString(), bAddress});
+        }
+
+        mpdevice->deleteFidoAndLeave(deletedFidos,
+                [=](bool success, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject oroot = root;
+            oroot["data"] = QJsonObject({{ "success", true }});
+            sendJsonMessage(oroot);
+        },
+        cbProgress);
     }
     else
     {
