@@ -4854,11 +4854,12 @@ void MPDevice::deleteFidoAndLeave(QList<FidoCredential> fidoCredentials, Message
     }
 
     /* Check our DB */
-    if(!checkLoadedNodes(false, true, false, true))
+    if(!checkLoadedNodes(false, false, false, true))
     {
         exitMemMgmtMode(true);
         qCritical() << "Error in our internal algo";
         cb(false, "Moolticute Internal Error (DDNAL#2)");
+        return;
     }
 
     /* Generate save packets */
@@ -5652,6 +5653,8 @@ void MPDevice::cleanMMMVars(void)
         clearAndDelete(webAuthnLoginNodesClone);
         bleImpl->getFreeAddressProvider().cleanFreeAddresses();
     }
+    startDataNode = MPNode::EmptyAddress;
+    startNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
 }
 
 void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, MessageHandlerCb cb, bool noDelete)
