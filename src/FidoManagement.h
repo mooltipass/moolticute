@@ -42,6 +42,8 @@ private slots:
 
     void on_pushButtonExitFidoMMM_clicked();
 
+    void onCredentialSelected(const QModelIndex &current, const QModelIndex &previous);
+
 private:
     QModelIndex getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex);
     QModelIndex getProxyIndexFromSourceIndex(const QModelIndex &srcIndex);
