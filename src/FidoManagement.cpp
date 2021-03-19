@@ -36,6 +36,8 @@ FidoManagement::FidoManagement(QWidget *parent) :
     connect(ui->fidoTreeView, &CredentialView::collapsed, this, &FidoManagement::onItemCollapsed);
 
     connect(ui->pushButtonDiscard, &AnimatedColorButton::actionValidated, this, &FidoManagement::on_pushButtonDiscard_clicked);
+    connect(ui->fidoTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &FidoManagement::onCredentialSelected);
 }
 
 void FidoManagement::setWsClient(WSClient *c)
@@ -199,4 +201,27 @@ void FidoManagement::setFidoManagementClean(bool isClean)
 void FidoManagement::on_pushButtonExitFidoMMM_clicked()
 {
     wsClient->sendLeaveMMRequest();
+}
+
+void FidoManagement::onCredentialSelected(const QModelIndex &current, const QModelIndex &previous)
+{
+    if (current == previous)
+    {
+        return;
+    }
+
+    const QItemSelectionModel *pSelectionModel = ui->fidoTreeView->selectionModel();
+    const QModelIndex realCurrent = pSelectionModel->currentIndex();
+
+    if (realCurrent.isValid())
+    {
+        auto sourceIndex = getSourceIndexFromProxyIndex(realCurrent);
+        auto pFidoUser  = m_pCredModel->getLoginItemByIndex(sourceIndex);
+        // Only display delete button, when login item is selected
+        ui->pushButtonDelete->setVisible(pFidoUser != nullptr);
+    }
+    else
+    {
+        ui->pushButtonDelete->setVisible(false);
+    }
 }
