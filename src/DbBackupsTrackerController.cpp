@@ -16,6 +16,8 @@ void DbBackupsTrackerController::connectDbBackupsTracker()
             this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
     connect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber,
             this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
+    connect(&dbBackupsTracker, &DbBackupsTracker::hideBackupPrompt,
+            this, &DbBackupsTrackerController::onHideBackupPrompt);
     connect(&dbBackupsTracker, &DbBackupsTracker::newTrack,
             this, &DbBackupsTrackerController::handleNewTrack);
     signalsConnected = true;
@@ -183,6 +185,12 @@ void DbBackupsTrackerController::handleLowerDbBackupChangeNumber()
     hideImportRequestIfVisible();
     hideExportRequestIfVisible();
     askForExportBackup();
+}
+
+void DbBackupsTrackerController::onHideBackupPrompt()
+{
+    hideImportRequestIfVisible();
+    hideExportRequestIfVisible();
 }
 
 void DbBackupsTrackerController::writeDbBackup(QString file, const QByteArray& d)

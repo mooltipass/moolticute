@@ -65,6 +65,7 @@ signals:
 
     void greaterDbBackupChangeNumber();
     void lowerDbBackupChangeNumber();
+    void hideBackupPrompt();
 
     void dataDbChangeNumberChanged(int dataDbChangeNumber);
 
