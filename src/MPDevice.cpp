@@ -4605,6 +4605,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
         if (isBLE())
         {
             bleImpl->addDataFile(service);
+            return;
         }
         else
         {
