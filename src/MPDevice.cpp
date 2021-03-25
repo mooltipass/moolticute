@@ -3658,11 +3658,19 @@ void MPDevice::processStatusChange(const QByteArray &data)
 
         if (s == Common::Unlocked)
         {
-            /* If v1.2 firmware, query user change number */
-            QTimer::singleShot(50, this, &MPDevice::handleDeviceUnlocked);
             if (isBLE())
             {
                 bleImpl->fetchDataFiles();
+            }
+
+            /*
+             * For BLE there is a MMMMode, but do not need to call
+             * handleDeviceUnlocked when only exiting MMM.
+             */
+            if (!isBLE() || prevStatus != Common::MMMMode)
+            {
+                /* If v1.2 firmware, query user change number */
+                QTimer::singleShot(50, this, &MPDevice::handleDeviceUnlocked);
             }
         }
     }
