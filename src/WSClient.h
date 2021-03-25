@@ -159,6 +159,7 @@ signals:
     void challengeResultFailed();
     void reconditionFinished(bool success, double dischargeTime);
     void deleteFidoNodesFailed();
+    void showExportPrompt();
 
 public slots:
     void sendJsonData(const QJsonObject &data);

@@ -48,6 +48,8 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSCli
 
     connect(wsClient, &WSClient::fwVersionChanged,
             this, &DbBackupsTrackerController::handleFirmwareVersionChange);
+    connect(wsClient, &WSClient::showExportPrompt,
+            this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
 
     handleFirmwareVersionChange(wsClient->get_fwVersion());
     handleDeviceStatusChanged(wsClient->get_status());
