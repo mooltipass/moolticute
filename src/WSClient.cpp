@@ -268,6 +268,10 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o["failed"].toBool();
         auto message = success ? o["description"].toString() : o["error_message"].toString();
+        if (success && isMPBLE())
+        {
+            emit showExportPrompt();
+        }
         emit credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
     }
     else if (rootobj["msg"] == "set_credentials")
@@ -336,6 +340,10 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o.value("failed").toBool();
+        if (success && isMPBLE())
+        {
+            emit showExportPrompt();
+        }
         emit dataFileSent(o["service"].toString(), success);
     }
     else if (rootobj["msg"] == "delete_data_node")

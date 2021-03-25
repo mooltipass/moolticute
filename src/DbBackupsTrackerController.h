@@ -36,6 +36,7 @@ public slots:
 protected slots:
     void handleGreaterDbBackupChangeNumber();
     void handleLowerDbBackupChangeNumber();
+    void onHideBackupPrompt();
     void handleNewTrack(const QString &cardId, const QString &path);
     void handleFirmwareVersionChange(const QString &version);
 

@@ -295,12 +295,25 @@ void DbBackupsTracker::checkDbBackupSynchronization()
             return;
 
         qDebug () << "Backup file changed: " << backupCCN << " - " << backupDCN;
+        bool changeSinceBackup = false;
 
         if (isDbBackupChangeNumberGreater(backupCCN, backupDCN))
+        {
+            changeSinceBackup = true;
             emit greaterDbBackupChangeNumber();
+        }
 
         if (isDbBackupChangeNumberLower(backupCCN, backupDCN))
+        {
+            changeSinceBackup = true;
             emit lowerDbBackupChangeNumber();
+        }
+
+        if (!changeSinceBackup)
+        {
+            emit hideBackupPrompt();
+        }
+
     }
     catch (DbBackupsTrackerNoBackupFileSet)
     {

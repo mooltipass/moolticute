@@ -16,6 +16,8 @@ void DbBackupsTrackerController::connectDbBackupsTracker()
             this, &DbBackupsTrackerController::handleGreaterDbBackupChangeNumber);
     connect(&dbBackupsTracker, &DbBackupsTracker::lowerDbBackupChangeNumber,
             this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
+    connect(&dbBackupsTracker, &DbBackupsTracker::hideBackupPrompt,
+            this, &DbBackupsTrackerController::onHideBackupPrompt);
     connect(&dbBackupsTracker, &DbBackupsTracker::newTrack,
             this, &DbBackupsTrackerController::handleNewTrack);
     signalsConnected = true;
@@ -46,6 +48,8 @@ DbBackupsTrackerController::DbBackupsTrackerController(MainWindow *window, WSCli
 
     connect(wsClient, &WSClient::fwVersionChanged,
             this, &DbBackupsTrackerController::handleFirmwareVersionChange);
+    connect(wsClient, &WSClient::showExportPrompt,
+            this, &DbBackupsTrackerController::handleLowerDbBackupChangeNumber);
 
     handleFirmwareVersionChange(wsClient->get_fwVersion());
     handleDeviceStatusChanged(wsClient->get_status());
@@ -183,6 +187,12 @@ void DbBackupsTrackerController::handleLowerDbBackupChangeNumber()
     hideImportRequestIfVisible();
     hideExportRequestIfVisible();
     askForExportBackup();
+}
+
+void DbBackupsTrackerController::onHideBackupPrompt()
+{
+    hideImportRequestIfVisible();
+    hideExportRequestIfVisible();
 }
 
 void DbBackupsTrackerController::writeDbBackup(QString file, const QByteArray& d)
