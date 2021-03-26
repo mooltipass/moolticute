@@ -1974,6 +1974,7 @@ void MainWindow::onDeviceDisconnected()
             handleNoBundleDisconnected();
         }
         ui->pushButtonFido->setVisible(false);
+        noPasswordPromptChanged(false);
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");
