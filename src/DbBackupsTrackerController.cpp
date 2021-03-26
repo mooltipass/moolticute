@@ -219,6 +219,7 @@ void DbBackupsTrackerController::handleExportDbResult(const QByteArray &d, bool 
     if (! success)
     {
         QMessageBox::warning(window, tr("Error"), tr(d));
+        window->handleBackupExported();
         return;
     }
 
