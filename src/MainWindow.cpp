@@ -2075,3 +2075,8 @@ void MainWindow::onReconditionFinished(bool success, double dischargeTime)
                      tr("Recondition finished with error"));
     }
 }
+
+void MainWindow::on_pushButtonSettingsSetToDefault_clicked()
+{
+    wsClient->sendJsonData({{ "msg", "reset_default_settings" }});
+}

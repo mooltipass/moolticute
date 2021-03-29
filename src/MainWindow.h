@@ -176,6 +176,8 @@ private slots:
 
     void onReconditionFinished(bool success, double dischargeTime);
     
+    void on_pushButtonSettingsSetToDefault_clicked();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
     void setSecurityChallengeText(const QString &id = "XXXX");

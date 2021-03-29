@@ -1388,6 +1388,18 @@ void MPDeviceBleImpl::handleFirstBluetoothMessage(MPCommand &cmd)
     m_isFirstMessageWritten = true;
 }
 
+void MPDeviceBleImpl::resetDefaultSettings()
+{
+    auto* bleSettings = static_cast<DeviceSettingsBLE*>(mpDev->settings());
+    if (!bleSettings)
+    {
+        qCritical() << "Invalid device settings";
+        return;
+    }
+
+    bleSettings->resetDefaultSettings();
+}
+
 void MPDeviceBleImpl::handleLongMessageTimeout()
 {
     qWarning() << "Timout for multiple packet expired";
