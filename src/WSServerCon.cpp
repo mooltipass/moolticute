@@ -1357,7 +1357,15 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "reset_default_settings")
     {
-        bleImpl->resetDefaultSettings();
+        if (bleImpl->resetDefaultSettings())
+        {
+            emit parameterProcessFinished();
+            mpdevice->settings()->loadParameters();
+        }
+        else
+        {
+            qCritical() << root["msg"] << " failed";
+        }
     }
     else
     {

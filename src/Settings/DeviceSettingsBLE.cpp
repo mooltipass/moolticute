@@ -4,7 +4,8 @@ DeviceSettingsBLE::DefaultValues DeviceSettingsBLE::m_bleDefaultValues =
     {
         {MPParams::RANDOM_INIT_PIN_PARAM, 0},
         {MPParams::USER_INTER_TIMEOUT_PARAM, 15},
-        {MPParams::FLASH_SCREEN_PARAM, 1},
+        {MPParams::PROMPT_ANIMATION_PARAM, 1}, //FLASH_SCREEN_ID
+        {MPParams::BOOT_ANIMATION_PARAM, 1},
         {MPParams::DEVICE_LANGUAGE, 0},
         {MPParams::KEY_AFTER_LOGIN_SEND_PARAM, 0x09},
         {MPParams::KEY_AFTER_PASS_SEND_PARAM, 0x0A},
@@ -36,9 +37,8 @@ void DeviceSettingsBLE::resetDefaultSettings()
 {
     for (DefaultValues::iterator it = m_bleDefaultValues.begin(); it != m_bleDefaultValues.end(); ++it)
     {
-        setProperty(m_paramMap[it.key()], it.value());
+        updateParam(it.key(), it.value());
     }
-    sendEveryParameter();
 }
 
 void DeviceSettingsBLE::fillParameterMapping()

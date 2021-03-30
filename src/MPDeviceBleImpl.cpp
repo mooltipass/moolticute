@@ -1388,16 +1388,17 @@ void MPDeviceBleImpl::handleFirstBluetoothMessage(MPCommand &cmd)
     m_isFirstMessageWritten = true;
 }
 
-void MPDeviceBleImpl::resetDefaultSettings()
+bool MPDeviceBleImpl::resetDefaultSettings()
 {
     auto* bleSettings = static_cast<DeviceSettingsBLE*>(mpDev->settings());
     if (!bleSettings)
     {
         qCritical() << "Invalid device settings";
-        return;
+        return false;
     }
 
     bleSettings->resetDefaultSettings();
+    return true;
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()
