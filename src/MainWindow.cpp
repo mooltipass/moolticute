@@ -2078,5 +2078,13 @@ void MainWindow::onReconditionFinished(bool success, double dischargeTime)
 
 void MainWindow::on_pushButtonSettingsSetToDefault_clicked()
 {
-    wsClient->sendJsonData({{ "msg", "reset_default_settings" }});
+    QMessageBox::StandardButton btn =  QMessageBox::information(
+                                            this, tr("Confirm Reset Settings to Default"),
+                                            tr("Do you want to reset every settings value to device defaults?"),
+                                            QMessageBox::Yes | QMessageBox::Cancel);
+
+    if (QMessageBox::Yes == btn)
+    {
+        wsClient->sendJsonData({{ "msg", "reset_default_settings" }});
+    }
 }
