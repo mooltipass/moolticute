@@ -149,6 +149,7 @@ public:
             GET_LANG_DESC       ,
             GET_LAYOUT_DESC     ,
             SET_KEYB_LAYOUT_ID  ,
+            SET_TMP_KEYB_LAYOUT ,
             SET_USER_LANG       ,
             SET_DEVICE_LANG     ,
             INFORM_LOCKED       ,

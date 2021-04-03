@@ -176,6 +176,10 @@ private slots:
 
     void onReconditionFinished(bool success, double dischargeTime);
     
+    void on_checkBoxEnforceBTLayout_stateChanged(int arg1);
+
+    void on_checkBoxEnforceUSBLayout_stateChanged(int arg1);
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
     void setSecurityChallengeText(const QString &id = "XXXX");

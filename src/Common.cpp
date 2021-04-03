@@ -123,6 +123,8 @@ const QString Common::ISODateWithMsFormat = "yyyy-MM-ddTHH:mm:ss.zzz";
 const QString Common::SIMPLE_CRYPT = "SimpleCrypt";
 const QString Common::SIMPLE_CRYPT_V2 = "SimpleCryptV2";
 const QString Common::HEX_REGEXP = "[0-9A-Fa-f]{%1}";
+const QString Common::SETTING_USB_LAYOUT_ENFORCE = "settings/enforce_usb_layout";
+const QString Common::SETTING_BT_LAYOUT_ENFORCE = "settings/enforce_bt_layout";
 
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {

@@ -563,6 +563,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
     connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
+    ui->checkBoxEnforceBTLayout->setChecked(s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool());
+    ui->checkBoxEnforceUSBLayout->setChecked(s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool());
+
     wsClient->settingsHelper()->setMainWindow(this);
 #ifdef Q_OS_WIN
     const auto keyboardLayoutWidth = 150;
@@ -2069,4 +2072,16 @@ void MainWindow::onReconditionFinished(bool success, double dischargeTime)
         QMessageBox::critical(this, tr("NiMH Recondition Error"),
                      tr("Recondition finished with error"));
     }
+}
+
+void MainWindow::on_checkBoxEnforceBTLayout_stateChanged(int arg1)
+{
+    QSettings s;
+    s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE, Qt::Checked == arg1);
+}
+
+void MainWindow::on_checkBoxEnforceUSBLayout_stateChanged(int arg1)
+{
+    QSettings s;
+    s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE, Qt::Checked == arg1);
 }

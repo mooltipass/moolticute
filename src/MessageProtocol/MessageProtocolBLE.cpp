@@ -356,6 +356,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::GET_LANG_DESC         , 0x001B},
         {MPCmd::GET_LAYOUT_DESC       , 0x001C},
         {MPCmd::SET_KEYB_LAYOUT_ID    , 0x001D},
+        {MPCmd::SET_TMP_KEYB_LAYOUT   , 0x0037},
         {MPCmd::SET_USER_LANG         , 0x001E},
         {MPCmd::SET_DEVICE_LANG       , 0x001F},
         {MPCmd::NIMH_RECONDITION      , 0x0028},
