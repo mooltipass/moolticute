@@ -1388,6 +1388,46 @@ void MPDeviceBleImpl::handleFirstBluetoothMessage(MPCommand &cmd)
     m_isFirstMessageWritten = true;
 }
 
+void MPDeviceBleImpl::enforceLayout()
+{
+    QSettings s;
+    bool btLayoutEnforced = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool();
+    qDebug() << "BT Layout enforced: " << btLayoutEnforced;
+    bool usbLayoutEnforced = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool();
+    qDebug() << "USB Layout enforced: " << usbLayoutEnforced;
+    if (!btLayoutEnforced && !usbLayoutEnforced)
+    {
+        return;
+    }
+    AsyncJobs *jobs = new AsyncJobs("Enforce layout", mpDev);
+    auto* bleSettings = static_cast<DeviceSettingsBLE*>(mpDev->settings());
+    if (usbLayoutEnforced)
+    {
+        QByteArray layoutUsbData;
+        layoutUsbData.append(DeviceSettingsBLE::USB_LAYOUT_ID);
+        layoutUsbData.append(bleSettings->get_keyboard_usb_layout());
+        jobs->append(new MPCommandJob(mpDev,
+                       MPCmd::SET_TMP_KEYB_LAYOUT,
+                       layoutUsbData,
+                       bleProt->getDefaultFuncDone()
+        ));
+    }
+
+    if (btLayoutEnforced)
+    {
+        QByteArray layoutBtData;
+        layoutBtData.append(DeviceSettingsBLE::BT_LAYOUT_ID);
+        layoutBtData.append(bleSettings->get_keyboard_bt_layout());
+        jobs->append(new MPCommandJob(mpDev,
+                       MPCmd::SET_TMP_KEYB_LAYOUT,
+                       layoutBtData,
+                       bleProt->getDefaultFuncDone()
+        ));
+    }
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 void MPDeviceBleImpl::handleLongMessageTimeout()
 {
     qWarning() << "Timout for multiple packet expired";

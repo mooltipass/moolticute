@@ -3661,11 +3661,7 @@ void MPDevice::processStatusChange(const QByteArray &data)
             if (isBLE())
             {
                 bleImpl->fetchDataFiles();
-                QSettings s;
-                bool btLayoutEnforced = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool();
-                qDebug() << "BT Layout enforced: " << btLayoutEnforced;
-                bool usbLayoutEnforced = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool();
-                qDebug() << "USB Layout enforced: " << usbLayoutEnforced;
+                bleImpl->enforceLayout();
             }
 
             /*

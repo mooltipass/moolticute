@@ -148,6 +148,8 @@ public:
     bool isFirstMessageWritten() const { return m_isFirstMessageWritten; }
     void handleFirstBluetoothMessage(MPCommand& cmd);
 
+    void enforceLayout();
+
 signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);
