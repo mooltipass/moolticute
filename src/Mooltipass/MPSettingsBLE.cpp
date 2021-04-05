@@ -3,6 +3,7 @@
 #include "MPDevice.h"
 #include "IMessageProtocol.h"
 #include "WSServerCon.h"
+#include "MPDeviceBleImpl.h"
 
 MPSettingsBLE::MPSettingsBLE(MPDevice *parent, IMessageProtocol *mesProt)
     : DeviceSettingsBLE(parent),
@@ -89,6 +90,8 @@ void MPSettingsBLE::loadParameters()
                         const auto layoutId = pMesProt->getFirstPayloadByte(data);
                         qDebug() << "Keyboard Bluetooth layout: " << layoutId;
                         set_keyboard_bt_layout(layoutId);
+                        //Enforce layout after bt and usb layouts are fetched
+                        mpDevice->ble()->enforceLayout();
                         return true;
                     }
     ));

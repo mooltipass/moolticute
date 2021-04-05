@@ -3661,7 +3661,7 @@ void MPDevice::processStatusChange(const QByteArray &data)
             if (isBLE())
             {
                 bleImpl->fetchDataFiles();
-                bleImpl->enforceLayout();
+                bleImpl->activateEnforceLayout();
             }
 
             /*
