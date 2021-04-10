@@ -164,6 +164,13 @@ void MPSettingsBLE::setSettings()
                    QByteArray(1, get_user_language()),
                    pMesProt->getDefaultFuncDone()
     ));
+    QSettings s;
+    bool usbLayoutEnforced = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool();
+    if (usbLayoutEnforced)
+    {
+        s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE, get_keyboard_usb_layout());
+        qDebug() << "usb layout enforce set to: " << get_keyboard_usb_layout();
+    }
     QByteArray layoutUsbData;
     layoutUsbData.append(USB_LAYOUT_ID);
     layoutUsbData.append(get_keyboard_usb_layout());
@@ -172,6 +179,12 @@ void MPSettingsBLE::setSettings()
                    layoutUsbData,
                    pMesProt->getDefaultFuncDone()
     ));
+    bool btLayoutEnforced = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool();
+    if (btLayoutEnforced)
+    {
+        s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE, get_keyboard_bt_layout());
+        qDebug() << "bt layout enforce set to: " << get_keyboard_bt_layout();
+    }
     QByteArray layoutBtData;
     layoutBtData.append(BT_LAYOUT_ID);
     layoutBtData.append(get_keyboard_bt_layout());

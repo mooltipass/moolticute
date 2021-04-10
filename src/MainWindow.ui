@@ -778,6 +778,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   </item>
                   <item>
                    <widget class="QCheckBox" name="checkBoxEnforceBTLayout">
+                    <property name="toolTip">
+                     <string>If enabled Bluetooth Keyboard Layout value is used from Moolticute instead of the device.</string>
+                    </property>
                     <property name="text">
                      <string>Enforce at connection</string>
                     </property>
@@ -836,6 +839,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   </item>
                   <item>
                    <widget class="QCheckBox" name="checkBoxEnforceUSBLayout">
+                    <property name="toolTip">
+                     <string>If enabled USB Keyboard Layout value is used from Moolticute instead of the device.</string>
+                    </property>
                     <property name="text">
                      <string>Enforce at connection</string>
                     </property>

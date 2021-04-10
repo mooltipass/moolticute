@@ -1402,12 +1402,11 @@ void MPDeviceBleImpl::enforceLayout()
         return;
     }
     AsyncJobs *jobs = new AsyncJobs("Enforce layout", mpDev);
-    auto* bleSettings = static_cast<DeviceSettingsBLE*>(mpDev->settings());
     if (usbLayoutEnforced)
     {
         QByteArray layoutUsbData;
         layoutUsbData.append(DeviceSettingsBLE::USB_LAYOUT_ID);
-        layoutUsbData.append(bleSettings->get_keyboard_usb_layout());
+        layoutUsbData.append(s.value(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE).toInt());
         jobs->append(new MPCommandJob(mpDev,
                        MPCmd::SET_TMP_KEYB_LAYOUT,
                        layoutUsbData,
@@ -1419,7 +1418,7 @@ void MPDeviceBleImpl::enforceLayout()
     {
         QByteArray layoutBtData;
         layoutBtData.append(DeviceSettingsBLE::BT_LAYOUT_ID);
-        layoutBtData.append(bleSettings->get_keyboard_bt_layout());
+        layoutBtData.append(s.value(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE).toInt());
         jobs->append(new MPCommandJob(mpDev,
                        MPCmd::SET_TMP_KEYB_LAYOUT,
                        layoutBtData,

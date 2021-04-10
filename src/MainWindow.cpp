@@ -2077,11 +2077,41 @@ void MainWindow::onReconditionFinished(bool success, double dischargeTime)
 void MainWindow::on_checkBoxEnforceBTLayout_stateChanged(int arg1)
 {
     QSettings s;
-    s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE, Qt::Checked == arg1);
+    bool checked = Qt::Checked == arg1;
+    s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE, checked);
+    if (arg1 == Qt::Checked)
+    {
+        const auto btLayout = ui->comboBoxBtLayout->currentData().toInt();
+        // On Gui start bt layout is not fetched yet (0) so we should not set enforce value to that
+        if (btLayout != 0)
+        {
+            s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE, btLayout);
+            qDebug() << "bt layout enforce value stored: " << btLayout;
+        }
+    }
+    else
+    {
+        s.remove(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE);
+    }
 }
 
 void MainWindow::on_checkBoxEnforceUSBLayout_stateChanged(int arg1)
 {
     QSettings s;
-    s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE, Qt::Checked == arg1);
+    bool checked = Qt::Checked == arg1;
+    s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE, checked);
+    if (arg1 == Qt::Checked)
+    {
+        const auto usbLayout = ui->comboBoxUsbLayout->currentData().toInt();
+        // On Gui start usb layout is not fetched yet (0) so we should not set enforce value to that
+        if (usbLayout != 0)
+        {
+            s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE, usbLayout);
+            qDebug() << "usb layout enforce value stored: " << usbLayout;
+        }
+    }
+    else
+    {
+        s.remove(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE);
+    }
 }

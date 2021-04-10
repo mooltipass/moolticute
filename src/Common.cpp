@@ -124,7 +124,9 @@ const QString Common::SIMPLE_CRYPT = "SimpleCrypt";
 const QString Common::SIMPLE_CRYPT_V2 = "SimpleCryptV2";
 const QString Common::HEX_REGEXP = "[0-9A-Fa-f]{%1}";
 const QString Common::SETTING_USB_LAYOUT_ENFORCE = "settings/enforce_usb_layout";
+const QString Common::SETTING_USB_LAYOUT_ENFORCE_VALUE = "settings/enforce_usb_layout_value";
 const QString Common::SETTING_BT_LAYOUT_ENFORCE = "settings/enforce_bt_layout";
+const QString Common::SETTING_BT_LAYOUT_ENFORCE_VALUE = "settings/enforce_bt_layout_value";
 
 static void _messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {

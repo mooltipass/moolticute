@@ -313,7 +313,9 @@ public:
     static const QString SIMPLE_CRYPT_V2;
     static const QString HEX_REGEXP;
     static const QString SETTING_USB_LAYOUT_ENFORCE;
+    static const QString SETTING_USB_LAYOUT_ENFORCE_VALUE;
     static const QString SETTING_BT_LAYOUT_ENFORCE;
+    static const QString SETTING_BT_LAYOUT_ENFORCE_VALUE;
     static const int DEFAULT_PASSWORD_LENGTH = 16;
 };
 
