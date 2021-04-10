@@ -213,6 +213,8 @@ private:
 
     void handleNoBundleDisconnected();
 
+    void sendChangedParam(const QString& paramName, int value);
+
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
 

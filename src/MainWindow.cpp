@@ -1725,6 +1725,14 @@ void MainWindow::handleNoBundleDisconnected()
     updatePage();
 }
 
+void MainWindow::sendChangedParam(const QString &paramName, int value)
+{
+    QJsonObject o;
+    o[paramName] = value;
+    // After enforce is disabled send the current layout to device
+    wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
+}
+
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
@@ -2079,9 +2087,9 @@ void MainWindow::on_checkBoxEnforceBTLayout_stateChanged(int arg1)
     QSettings s;
     bool checked = Qt::Checked == arg1;
     s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE, checked);
+    const auto btLayout = ui->comboBoxBtLayout->currentData().toInt();
     if (arg1 == Qt::Checked)
     {
-        const auto btLayout = ui->comboBoxBtLayout->currentData().toInt();
         // On Gui start bt layout is not fetched yet (0) so we should not set enforce value to that
         if (btLayout != 0)
         {
@@ -2092,6 +2100,7 @@ void MainWindow::on_checkBoxEnforceBTLayout_stateChanged(int arg1)
     else
     {
         s.remove(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE);
+        sendChangedParam("keyboard_bt_layout", btLayout);
     }
 }
 
@@ -2100,9 +2109,9 @@ void MainWindow::on_checkBoxEnforceUSBLayout_stateChanged(int arg1)
     QSettings s;
     bool checked = Qt::Checked == arg1;
     s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE, checked);
+    const auto usbLayout = ui->comboBoxUsbLayout->currentData().toInt();
     if (arg1 == Qt::Checked)
     {
-        const auto usbLayout = ui->comboBoxUsbLayout->currentData().toInt();
         // On Gui start usb layout is not fetched yet (0) so we should not set enforce value to that
         if (usbLayout != 0)
         {
@@ -2113,5 +2122,6 @@ void MainWindow::on_checkBoxEnforceUSBLayout_stateChanged(int arg1)
     else
     {
         s.remove(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE);
+        sendChangedParam("keyboard_usb_layout", usbLayout);
     }
 }
