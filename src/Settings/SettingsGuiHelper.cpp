@@ -300,20 +300,20 @@ void SettingsGuiHelper::initKnockSetting()
 bool SettingsGuiHelper::checkEnforceLayoutChanged()
 {
     QSettings s;
-    bool btLayoutEnforceChanged = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool() != m_mw->getOriginalBTKeyboardLayout();
-    bool usbLayoutEnforceChanged = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool() != m_mw->getOriginalUsbKeyboardLayout();
+    bool btLayoutEnforceChanged = m_mw->getActualBTKeyboardLayout() != m_mw->getOriginalBTKeyboardLayout();
+    bool usbLayoutEnforceChanged = m_mw->getActualUsbKeyboardLayout() != m_mw->getOriginalUsbKeyboardLayout();
     return btLayoutEnforceChanged || usbLayoutEnforceChanged;
 }
 
 void SettingsGuiHelper::resetEnforceLayout()
 {
     QSettings s;
-    bool btLayoutEnforceChanged = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool() != m_mw->getOriginalBTKeyboardLayout();
+    bool btLayoutEnforceChanged = m_mw->getActualBTKeyboardLayout() != m_mw->getOriginalBTKeyboardLayout();
     if (btLayoutEnforceChanged)
     {
         ui->checkBoxEnforceBTLayout->setChecked(m_mw->getOriginalBTKeyboardLayout());
     }
-    bool usbLayoutEnforceChanged = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool() != m_mw->getOriginalUsbKeyboardLayout();
+    bool usbLayoutEnforceChanged = m_mw->getActualUsbKeyboardLayout() != m_mw->getOriginalUsbKeyboardLayout();
     if (usbLayoutEnforceChanged)
     {
         ui->checkBoxEnforceUSBLayout->setChecked(m_mw->getOriginalUsbKeyboardLayout());
@@ -324,29 +324,41 @@ void SettingsGuiHelper::resetEnforceLayout()
 void SettingsGuiHelper::saveEnforceLayout()
 {
     QSettings s;
-    bool actualBtLayoutEnforce = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool();
+    bool actualBtLayoutEnforce = m_mw->getActualBTKeyboardLayout();
     bool btLayoutEnforceChanged = actualBtLayoutEnforce != m_mw->getOriginalBTKeyboardLayout();
     if (btLayoutEnforceChanged)
     {
-        if (!actualBtLayoutEnforce)
+        const auto btLayout = ui->comboBoxBtLayout->currentData().toInt();
+        if (actualBtLayoutEnforce)
+        {
+            s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE, btLayout);
+        }
+        else
         {
             // When disable bt enforce value set the current layout
             s.remove(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE);
-            m_wsClient->sendChangedParam("keyboard_bt_layout", ui->comboBoxBtLayout->currentData().toInt());
+            m_wsClient->sendChangedParam("keyboard_bt_layout", btLayout);
         }
+        s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE, actualBtLayoutEnforce);
         m_mw->setOriginalBTKeyboardLayout(actualBtLayoutEnforce);
     }
 
-    bool actualUsbLayoutEnforce = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool();
-    bool usbLayoutEnforceChanged = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool() != m_mw->getOriginalUsbKeyboardLayout();
+    bool actualUsbLayoutEnforce = m_mw->getActualUsbKeyboardLayout();
+    bool usbLayoutEnforceChanged = actualUsbLayoutEnforce != m_mw->getOriginalUsbKeyboardLayout();
     if (usbLayoutEnforceChanged)
     {
-        if (!actualUsbLayoutEnforce)
+        const auto usbLayout = ui->comboBoxUsbLayout->currentData().toInt();
+        if (actualUsbLayoutEnforce)
+        {
+            s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE, usbLayout);
+        }
+        else
         {
             // When disable usb enforce value set the current layout
             s.remove(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE);
-            m_wsClient->sendChangedParam("keyboard_usb_layout", ui->comboBoxUsbLayout->currentData().toInt());
+            m_wsClient->sendChangedParam("keyboard_usb_layout", usbLayout);
         }
+        s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE, actualUsbLayoutEnforce);
         m_mw->setOriginalUsbKeyboardLayout(actualUsbLayoutEnforce);
     }
     m_mw->checkSettingsChanged();

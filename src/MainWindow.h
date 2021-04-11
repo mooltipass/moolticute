@@ -59,6 +59,8 @@ public:
     bool isDebugLogChecked();
     bool getOriginalBTKeyboardLayout() const { return m_keyboardBTLayoutOrigValue; }
     bool getOriginalUsbKeyboardLayout() const { return m_keyboardUsbLayoutOrigValue; }
+    bool getActualBTKeyboardLayout() const { return m_keyboardBTLayoutActualValue; }
+    bool getActualUsbKeyboardLayout() const { return m_keyboardUsbLayoutActualValue; }
     void setOriginalBTKeyboardLayout(bool val) { m_keyboardBTLayoutOrigValue = val; }
     void setOriginalUsbKeyboardLayout(bool val) { m_keyboardUsbLayoutOrigValue = val; }
 
@@ -250,6 +252,8 @@ private:
 
     bool m_keyboardUsbLayoutOrigValue = false;
     bool m_keyboardBTLayoutOrigValue = false;
+    bool m_keyboardUsbLayoutActualValue = false;
+    bool m_keyboardBTLayoutActualValue = false;
 
     bool m_computerUnlocked = true;
     struct LockUnlockItem

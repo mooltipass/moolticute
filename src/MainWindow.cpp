@@ -564,8 +564,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
     m_keyboardBTLayoutOrigValue = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool();
+    m_keyboardBTLayoutActualValue = m_keyboardBTLayoutOrigValue;
     ui->checkBoxEnforceBTLayout->setChecked(m_keyboardBTLayoutOrigValue);
     m_keyboardUsbLayoutOrigValue = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool();
+    m_keyboardUsbLayoutActualValue = m_keyboardUsbLayoutOrigValue;
     ui->checkBoxEnforceUSBLayout->setChecked(m_keyboardUsbLayoutOrigValue);
 
     wsClient->settingsHelper()->setMainWindow(this);
@@ -2078,18 +2080,10 @@ void MainWindow::onReconditionFinished(bool success, double dischargeTime)
 
 void MainWindow::on_checkBoxEnforceBTLayout_stateChanged(int arg1)
 {
-    QSettings s;
-    bool checked = Qt::Checked == arg1;
-    s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE, checked);
+    m_keyboardBTLayoutActualValue = Qt::Checked == arg1;
     const auto btLayout = ui->comboBoxBtLayout->currentData().toInt();
-    if (arg1 == Qt::Checked)
-    {
-        // On Gui start bt layout is not fetched yet (0) so we should not set enforce value to that
-        if (btLayout != 0)
-        {
-            s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE, btLayout);
-        }
-    }
+
+    // On Gui start bt layout is not fetched yet (0) so we should not check settings
     if (btLayout != 0)
     {
         checkSettingsChanged();
@@ -2098,18 +2092,10 @@ void MainWindow::on_checkBoxEnforceBTLayout_stateChanged(int arg1)
 
 void MainWindow::on_checkBoxEnforceUSBLayout_stateChanged(int arg1)
 {
-    QSettings s;
-    bool checked = Qt::Checked == arg1;
-    s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE, checked);
+    m_keyboardUsbLayoutActualValue = Qt::Checked == arg1;
     const auto usbLayout = ui->comboBoxUsbLayout->currentData().toInt();
-    if (arg1 == Qt::Checked)
-    {
-        // On Gui start usb layout is not fetched yet (0) so we should not set enforce value to that
-        if (usbLayout != 0)
-        {
-            s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE, usbLayout);
-        }
-    }
+
+    // On Gui start usb layout is not fetched yet (0) so we should not check settings
     if (usbLayout != 0)
     {
         checkSettingsChanged();
