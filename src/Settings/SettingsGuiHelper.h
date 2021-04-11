@@ -33,6 +33,9 @@ private slots:
 
 private:
     void initKnockSetting();
+    bool checkEnforceLayoutChanged();
+    void resetEnforceLayout();
+    void saveEnforceLayout();
 
     WSClient* m_wsClient = nullptr;
     DeviceSettings* m_settings = nullptr;

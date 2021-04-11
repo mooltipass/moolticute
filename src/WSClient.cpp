@@ -816,6 +816,14 @@ void WSClient::sendSecurityChallenge(QString str)
                  });
 }
 
+void WSClient::sendChangedParam(const QString &paramName, int value)
+{
+    QJsonObject o;
+    o[paramName] = value;
+    // After enforce is disabled send the current layout to device
+    sendJsonData({{ "msg", "param_set" }, { "data", o }});
+}
+
 void WSClient::requestBleKeyboardLayout(bool onlyCheck)
 {
     QJsonObject o;

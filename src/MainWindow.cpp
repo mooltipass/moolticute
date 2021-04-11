@@ -563,8 +563,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
     connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
-    ui->checkBoxEnforceBTLayout->setChecked(s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool());
-    ui->checkBoxEnforceUSBLayout->setChecked(s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool());
+    m_keyboardBTLayoutOrigValue = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool();
+    ui->checkBoxEnforceBTLayout->setChecked(m_keyboardBTLayoutOrigValue);
+    m_keyboardUsbLayoutOrigValue = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool();
+    ui->checkBoxEnforceUSBLayout->setChecked(m_keyboardUsbLayoutOrigValue);
 
     wsClient->settingsHelper()->setMainWindow(this);
 #ifdef Q_OS_WIN
@@ -1725,14 +1727,6 @@ void MainWindow::handleNoBundleDisconnected()
     updatePage();
 }
 
-void MainWindow::sendChangedParam(const QString &paramName, int value)
-{
-    QJsonObject o;
-    o[paramName] = value;
-    // After enforce is disabled send the current layout to device
-    wsClient->sendJsonData({{ "msg", "param_set" }, { "data", o }});
-}
-
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
@@ -2094,13 +2088,11 @@ void MainWindow::on_checkBoxEnforceBTLayout_stateChanged(int arg1)
         if (btLayout != 0)
         {
             s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE, btLayout);
-            qDebug() << "bt layout enforce value stored: " << btLayout;
         }
     }
-    else
+    if (btLayout != 0)
     {
-        s.remove(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE);
-        sendChangedParam("keyboard_bt_layout", btLayout);
+        checkSettingsChanged();
     }
 }
 
@@ -2116,12 +2108,10 @@ void MainWindow::on_checkBoxEnforceUSBLayout_stateChanged(int arg1)
         if (usbLayout != 0)
         {
             s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE, usbLayout);
-            qDebug() << "usb layout enforce value stored: " << usbLayout;
         }
     }
-    else
+    if (usbLayout != 0)
     {
-        s.remove(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE);
-        sendChangedParam("keyboard_usb_layout", usbLayout);
+        checkSettingsChanged();
     }
 }

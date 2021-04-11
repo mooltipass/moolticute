@@ -57,6 +57,10 @@ public:
 
     bool isHttpDebugChecked();
     bool isDebugLogChecked();
+    bool getOriginalBTKeyboardLayout() const { return m_keyboardBTLayoutOrigValue; }
+    bool getOriginalUsbKeyboardLayout() const { return m_keyboardUsbLayoutOrigValue; }
+    void setOriginalBTKeyboardLayout(bool val) { m_keyboardBTLayoutOrigValue = val; }
+    void setOriginalUsbKeyboardLayout(bool val) { m_keyboardUsbLayoutOrigValue = val; }
 
     void updateBackupControlsVisibility(bool visible);
 
@@ -213,8 +217,6 @@ private:
 
     void handleNoBundleDisconnected();
 
-    void sendChangedParam(const QString& paramName, int value);
-
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
 
@@ -245,6 +247,9 @@ private:
 
     QJsonObject m_keyboardLayoutCache;
     QJsonObject m_languagesCache;
+
+    bool m_keyboardUsbLayoutOrigValue = false;
+    bool m_keyboardBTLayoutOrigValue = false;
 
     bool m_computerUnlocked = true;
     struct LockUnlockItem
