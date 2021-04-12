@@ -1388,6 +1388,48 @@ void MPDeviceBleImpl::handleFirstBluetoothMessage(MPCommand &cmd)
     m_isFirstMessageWritten = true;
 }
 
+void MPDeviceBleImpl::enforceLayout()
+{
+    if (!m_enforceLayout)
+    {
+        return;
+    }
+    QSettings s;
+    bool btLayoutEnforced = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool();
+    bool usbLayoutEnforced = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool();
+    if (!btLayoutEnforced && !usbLayoutEnforced)
+    {
+        return;
+    }
+    AsyncJobs *jobs = new AsyncJobs("Enforce layout", mpDev);
+    if (usbLayoutEnforced)
+    {
+        QByteArray layoutUsbData;
+        layoutUsbData.append(DeviceSettingsBLE::USB_LAYOUT_ID);
+        layoutUsbData.append(s.value(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE).toInt());
+        jobs->append(new MPCommandJob(mpDev,
+                       MPCmd::SET_TMP_KEYB_LAYOUT,
+                       layoutUsbData,
+                       bleProt->getDefaultFuncDone()
+        ));
+    }
+
+    if (btLayoutEnforced)
+    {
+        QByteArray layoutBtData;
+        layoutBtData.append(DeviceSettingsBLE::BT_LAYOUT_ID);
+        layoutBtData.append(s.value(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE).toInt());
+        jobs->append(new MPCommandJob(mpDev,
+                       MPCmd::SET_TMP_KEYB_LAYOUT,
+                       layoutBtData,
+                       bleProt->getDefaultFuncDone()
+        ));
+    }
+
+    mpDev->enqueueAndRunJob(jobs);
+    m_enforceLayout = false;
+}
+
 bool MPDeviceBleImpl::resetDefaultSettings()
 {
     auto* bleSettings = static_cast<DeviceSettingsBLE*>(mpDev->settings());

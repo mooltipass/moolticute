@@ -119,6 +119,13 @@ void SettingsGuiHelper::createSettingUIMapping()
 bool SettingsGuiHelper::checkSettingsChanged()
 {
     auto* metaObj = m_settings->getMetaObject();
+    if (m_wsClient->isMPBLE())
+    {
+        if (checkEnforceLayoutChanged())
+        {
+            return true;
+        }
+    }
     while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
     {
         for (int i = metaObj->propertyOffset(); i < metaObj->propertyCount(); ++i)
@@ -160,6 +167,10 @@ void SettingsGuiHelper::resetSettings()
         qDebug() << "Cannot reset, settings is not inited yet";
         return;
     }
+    if (m_wsClient->isMPBLE())
+    {
+        resetEnforceLayout();
+    }
     auto* metaObj = m_settings->getMetaObject();
     while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
     {
@@ -188,6 +199,10 @@ void SettingsGuiHelper::resetSettings()
 void SettingsGuiHelper::getChangedSettings(QJsonObject &o)
 {
     auto* metaObj = m_settings->getMetaObject();
+    if (m_wsClient->isMPBLE())
+    {
+        saveEnforceLayout();
+    }
     while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
     {
         for (int i = metaObj->propertyOffset(); i < metaObj->propertyCount(); ++i)
@@ -280,6 +295,73 @@ void SettingsGuiHelper::initKnockSetting()
     {
         m_mw->enableKnockSettings(m_wsClient->get_status() == Common::NoCardInserted);
     }
+}
+
+bool SettingsGuiHelper::checkEnforceLayoutChanged()
+{
+    QSettings s;
+    bool btLayoutEnforceChanged = m_mw->getActualBTKeyboardLayout() != m_mw->getOriginalBTKeyboardLayout();
+    bool usbLayoutEnforceChanged = m_mw->getActualUsbKeyboardLayout() != m_mw->getOriginalUsbKeyboardLayout();
+    return btLayoutEnforceChanged || usbLayoutEnforceChanged;
+}
+
+void SettingsGuiHelper::resetEnforceLayout()
+{
+    QSettings s;
+    bool btLayoutEnforceChanged = m_mw->getActualBTKeyboardLayout() != m_mw->getOriginalBTKeyboardLayout();
+    if (btLayoutEnforceChanged)
+    {
+        ui->checkBoxEnforceBTLayout->setChecked(m_mw->getOriginalBTKeyboardLayout());
+    }
+    bool usbLayoutEnforceChanged = m_mw->getActualUsbKeyboardLayout() != m_mw->getOriginalUsbKeyboardLayout();
+    if (usbLayoutEnforceChanged)
+    {
+        ui->checkBoxEnforceUSBLayout->setChecked(m_mw->getOriginalUsbKeyboardLayout());
+    }
+
+}
+
+void SettingsGuiHelper::saveEnforceLayout()
+{
+    QSettings s;
+    bool actualBtLayoutEnforce = m_mw->getActualBTKeyboardLayout();
+    bool btLayoutEnforceChanged = actualBtLayoutEnforce != m_mw->getOriginalBTKeyboardLayout();
+    if (btLayoutEnforceChanged)
+    {
+        const auto btLayout = ui->comboBoxBtLayout->currentData().toInt();
+        if (actualBtLayoutEnforce)
+        {
+            s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE, btLayout);
+        }
+        else
+        {
+            // When disable bt enforce value set the current layout
+            s.remove(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE);
+            m_wsClient->sendChangedParam("keyboard_bt_layout", btLayout);
+        }
+        s.setValue(Common::SETTING_BT_LAYOUT_ENFORCE, actualBtLayoutEnforce);
+        m_mw->setOriginalBTKeyboardLayout(actualBtLayoutEnforce);
+    }
+
+    bool actualUsbLayoutEnforce = m_mw->getActualUsbKeyboardLayout();
+    bool usbLayoutEnforceChanged = actualUsbLayoutEnforce != m_mw->getOriginalUsbKeyboardLayout();
+    if (usbLayoutEnforceChanged)
+    {
+        const auto usbLayout = ui->comboBoxUsbLayout->currentData().toInt();
+        if (actualUsbLayoutEnforce)
+        {
+            s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE, usbLayout);
+        }
+        else
+        {
+            // When disable usb enforce value set the current layout
+            s.remove(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE);
+            m_wsClient->sendChangedParam("keyboard_usb_layout", usbLayout);
+        }
+        s.setValue(Common::SETTING_USB_LAYOUT_ENFORCE, actualUsbLayoutEnforce);
+        m_mw->setOriginalUsbKeyboardLayout(actualUsbLayoutEnforce);
+    }
+    m_mw->checkSettingsChanged();
 }
 
 void SettingsGuiHelper::checkKeyboardLayout()

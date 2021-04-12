@@ -148,6 +148,9 @@ public:
     bool isFirstMessageWritten() const { return m_isFirstMessageWritten; }
     void handleFirstBluetoothMessage(MPCommand& cmd);
 
+    void activateEnforceLayout() { m_enforceLayout = true; }
+    void enforceLayout();
+
     bool resetDefaultSettings();
 
 signals:
@@ -205,6 +208,8 @@ private:
 
     bool m_isFirstMessageWritten = false;
     QList<QString> m_dataFiles;
+
+    bool m_enforceLayout = false;
 
     static int s_LangNum;
     static int s_LayoutNum;

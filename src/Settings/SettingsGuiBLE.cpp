@@ -17,6 +17,7 @@ void SettingsGuiBLE::loadParameters()
 
 void SettingsGuiBLE::updateParam(MPParams::Param param, int val)
 {
+    checkEnforceLayout(param, val);
     setProperty(getParamName(param), val);
 }
 
@@ -77,4 +78,19 @@ void SettingsGuiBLE::updateUI()
 void SettingsGuiBLE::setupKeyboardLayout(bool onlyCheck)
 {
     m_mw->wsClient->requestBleKeyboardLayout(onlyCheck);
+}
+
+void SettingsGuiBLE::checkEnforceLayout(MPParams::Param param, int &val)
+{
+    QSettings s;
+    if (param == MPParams::KEYBOARD_USB_LAYOUT && s.value(Common::SETTING_USB_LAYOUT_ENFORCE).toBool())
+    {
+        val = s.value(Common::SETTING_USB_LAYOUT_ENFORCE_VALUE).toInt();
+        qDebug() << "Using usb layout value from enforce: " << val;
+    }
+    if (param == MPParams::KEYBOARD_BT_LAYOUT && s.value(Common::SETTING_BT_LAYOUT_ENFORCE).toBool())
+    {
+        val = s.value(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE).toInt();
+        qDebug() << "Using bt layout value from enforce: " << val;
+    }
 }

@@ -566,6 +566,13 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
     connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
+    m_keyboardBTLayoutOrigValue = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool();
+    m_keyboardBTLayoutActualValue = m_keyboardBTLayoutOrigValue;
+    ui->checkBoxEnforceBTLayout->setChecked(m_keyboardBTLayoutOrigValue);
+    m_keyboardUsbLayoutOrigValue = s.value(Common::SETTING_USB_LAYOUT_ENFORCE, false).toBool();
+    m_keyboardUsbLayoutActualValue = m_keyboardUsbLayoutOrigValue;
+    ui->checkBoxEnforceUSBLayout->setChecked(m_keyboardUsbLayoutOrigValue);
+
     wsClient->settingsHelper()->setMainWindow(this);
 #ifdef Q_OS_WIN
     const auto keyboardLayoutWidth = 150;
@@ -2073,6 +2080,30 @@ void MainWindow::onReconditionFinished(bool success, double dischargeTime)
     {
         QMessageBox::critical(this, tr("NiMH Recondition Error"),
                      tr("Recondition finished with error"));
+    }
+}
+
+void MainWindow::on_checkBoxEnforceBTLayout_stateChanged(int arg1)
+{
+    m_keyboardBTLayoutActualValue = Qt::Checked == arg1;
+    const auto btLayout = ui->comboBoxBtLayout->currentData().toInt();
+
+    // On Gui start bt layout is not fetched yet (0) so we should not check settings
+    if (btLayout != 0)
+    {
+        checkSettingsChanged();
+    }
+}
+
+void MainWindow::on_checkBoxEnforceUSBLayout_stateChanged(int arg1)
+{
+    m_keyboardUsbLayoutActualValue = Qt::Checked == arg1;
+    const auto usbLayout = ui->comboBoxUsbLayout->currentData().toInt();
+
+    // On Gui start usb layout is not fetched yet (0) so we should not check settings
+    if (usbLayout != 0)
+    {
+        checkSettingsChanged();
     }
 }
 

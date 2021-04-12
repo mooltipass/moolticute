@@ -111,6 +111,8 @@ public:
     void sendNiMHReconditioning();
     void sendSecurityChallenge(QString str);
 
+    void sendChangedParam(const QString& paramName, int value);
+
     inline bool isFw12() const { return isFwVersion(12); }
     inline bool isFw13() const { return isFwVersion(13); }
 

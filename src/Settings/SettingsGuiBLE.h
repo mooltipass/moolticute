@@ -22,6 +22,16 @@ public:
     static const int ENTER_INDEX = 10;
     static const int SPACE_INDEX = 32;
     static const int DEFAULT_INDEX = 0xFFFF;
+
+private:
+    /**
+     * @brief checkEnforceLayout
+     * If enforce layout is enabled then using layout value
+     * from MC setting instead of the fetched value from device.
+     * @param param type, checked for usb/bt layout
+     * @param val Fetched value from device
+     */
+    inline void checkEnforceLayout(MPParams::Param param, int &val);
 };
 
 #endif // SETTINGSGUIBLE_H

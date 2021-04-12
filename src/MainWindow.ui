@@ -777,6 +777,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
+                   <widget class="QCheckBox" name="checkBoxEnforceBTLayout">
+                    <property name="toolTip">
+                     <string>If enabled Bluetooth Keyboard Layout value is used from Moolticute instead of the device.</string>
+                    </property>
+                    <property name="text">
+                     <string>Enforce at connection</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <spacer name="horizontalSpacer_51">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -824,6 +834,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                       <width>200</width>
                       <height>0</height>
                      </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="checkBoxEnforceUSBLayout">
+                    <property name="toolTip">
+                     <string>If enabled USB Keyboard Layout value is used from Moolticute instead of the device.</string>
+                    </property>
+                    <property name="text">
+                     <string>Enforce at connection</string>
                     </property>
                    </widget>
                   </item>
@@ -4214,7 +4234,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
        </layout>
       </widget>
       <widget class="QWidget" name="pageFido">
-       <layout class="QHBoxLayout" name="horizontalLayout_50">
+       <layout class="QHBoxLayout" name="horizontalLayout_64">
         <property name="leftMargin">
          <number>0</number>
         </property>

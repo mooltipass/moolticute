@@ -57,6 +57,12 @@ public:
 
     bool isHttpDebugChecked();
     bool isDebugLogChecked();
+    bool getOriginalBTKeyboardLayout() const { return m_keyboardBTLayoutOrigValue; }
+    bool getOriginalUsbKeyboardLayout() const { return m_keyboardUsbLayoutOrigValue; }
+    bool getActualBTKeyboardLayout() const { return m_keyboardBTLayoutActualValue; }
+    bool getActualUsbKeyboardLayout() const { return m_keyboardUsbLayoutActualValue; }
+    void setOriginalBTKeyboardLayout(bool val) { m_keyboardBTLayoutOrigValue = val; }
+    void setOriginalUsbKeyboardLayout(bool val) { m_keyboardUsbLayoutOrigValue = val; }
 
     void updateBackupControlsVisibility(bool visible);
 
@@ -176,6 +182,10 @@ private slots:
 
     void onReconditionFinished(bool success, double dischargeTime);
     
+    void on_checkBoxEnforceBTLayout_stateChanged(int arg1);
+
+    void on_checkBoxEnforceUSBLayout_stateChanged(int arg1);
+
     void on_pushButtonSettingsSetToDefault_clicked();
 
 private:
@@ -241,6 +251,11 @@ private:
 
     QJsonObject m_keyboardLayoutCache;
     QJsonObject m_languagesCache;
+
+    bool m_keyboardUsbLayoutOrigValue = false;
+    bool m_keyboardBTLayoutOrigValue = false;
+    bool m_keyboardUsbLayoutActualValue = false;
+    bool m_keyboardBTLayoutActualValue = false;
 
     bool m_computerUnlocked = true;
     struct LockUnlockItem
