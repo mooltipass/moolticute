@@ -151,6 +151,8 @@ public:
     void activateEnforceLayout() { m_enforceLayout = true; }
     void enforceLayout();
 
+    bool resetDefaultSettings();
+
 signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);

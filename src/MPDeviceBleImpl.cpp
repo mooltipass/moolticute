@@ -1430,6 +1430,19 @@ void MPDeviceBleImpl::enforceLayout()
     m_enforceLayout = false;
 }
 
+bool MPDeviceBleImpl::resetDefaultSettings()
+{
+    auto* bleSettings = static_cast<DeviceSettingsBLE*>(mpDev->settings());
+    if (!bleSettings)
+    {
+        qCritical() << "Invalid device settings";
+        return false;
+    }
+
+    bleSettings->resetDefaultSettings();
+    return true;
+}
+
 void MPDeviceBleImpl::handleLongMessageTimeout()
 {
     qWarning() << "Timout for multiple packet expired";

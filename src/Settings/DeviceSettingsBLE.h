@@ -31,6 +31,8 @@ public:
     DeviceSettingsBLE(QObject *parent);
     virtual ~DeviceSettingsBLE(){}
 
+    void resetDefaultSettings();
+
     enum BLESettingsByte
     {
         RESERVED_BYTE = 0,
@@ -63,7 +65,10 @@ public:
 
 protected:
     void fillParameterMapping();
+
     QMap<MPParams::Param, int> m_bleByteMapping;
+    using DefaultValues = QMap<MPParams::Param, int>;
+    static DefaultValues m_bleDefaultValues;
 };
 
 #endif // DEVICESETTINGSBLE_H

@@ -222,6 +222,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonImportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsReset->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsSave->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonSettingsSetToDefault->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->pushButtonAutoStart->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonViewLogs->setStyleSheet(CSS_BLUE_BUTTON);
@@ -240,8 +241,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->pushButtonSettingsSave->setIcon(AppGui::qtAwesome()->icon(fa::floppyo, whiteButtons));
     ui->pushButtonSettingsReset->setIcon(AppGui::qtAwesome()->icon(fa::undo, whiteButtons));
+    ui->pushButtonSettingsSetToDefault->setIcon(AppGui::qtAwesome()->icon(fa::repeat, whiteButtons));
     ui->pushButtonSettingsSave->setVisible(false);
     ui->pushButtonSettingsReset->setVisible(false);
+    ui->pushButtonSettingsSetToDefault->setVisible(false);
 
     ui->pushButtonResetCard->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonImportCSV->setStyleSheet(CSS_BLUE_BUTTON);
@@ -720,6 +723,7 @@ void MainWindow::updateDeviceDependentUI()
         ui->pbBleBattery->show();
         ui->groupBoxSecurityChallenge->show();
         ui->pushButtonFido->setVisible(true);
+        ui->pushButtonSettingsSetToDefault->setVisible(true);
     }
     else
     {
@@ -1982,6 +1986,7 @@ void MainWindow::onDeviceDisconnected()
         }
         ui->pushButtonFido->setVisible(false);
         noPasswordPromptChanged(false);
+        ui->pushButtonSettingsSetToDefault->setVisible(false);
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");
@@ -2099,5 +2104,18 @@ void MainWindow::on_checkBoxEnforceUSBLayout_stateChanged(int arg1)
     if (usbLayout != 0)
     {
         checkSettingsChanged();
+    }
+}
+
+void MainWindow::on_pushButtonSettingsSetToDefault_clicked()
+{
+    QMessageBox::StandardButton btn =  QMessageBox::information(
+                                            this, tr("Confirm Reset Settings to Default"),
+                                            tr("Do you want to reset every settings value to device defaults?"),
+                                            QMessageBox::Yes | QMessageBox::Cancel);
+
+    if (QMessageBox::Yes == btn)
+    {
+        wsClient->sendJsonData({{ "msg", "reset_default_settings" }});
     }
 }

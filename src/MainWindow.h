@@ -186,6 +186,8 @@ private slots:
 
     void on_checkBoxEnforceUSBLayout_stateChanged(int arg1);
 
+    void on_pushButtonSettingsSetToDefault_clicked();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
     void setSecurityChallengeText(const QString &id = "XXXX");
