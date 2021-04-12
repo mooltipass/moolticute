@@ -1355,6 +1355,18 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         },
         cbProgress);
     }
+    else if (root["msg"] == "reset_default_settings")
+    {
+        if (bleImpl->resetDefaultSettings())
+        {
+            emit parameterProcessFinished();
+            mpdevice->settings()->loadParameters();
+        }
+        else
+        {
+            qCritical() << root["msg"] << " failed";
+        }
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

@@ -1,9 +1,44 @@
 #include "DeviceSettingsBLE.h"
 
+DeviceSettingsBLE::DefaultValues DeviceSettingsBLE::m_bleDefaultValues =
+    {
+        {MPParams::RANDOM_INIT_PIN_PARAM, 0},
+        {MPParams::USER_INTER_TIMEOUT_PARAM, 15},
+        {MPParams::PROMPT_ANIMATION_PARAM, 1}, //FLASH_SCREEN_ID
+        {MPParams::BOOT_ANIMATION_PARAM, 1},
+        {MPParams::DEVICE_LANGUAGE, 0},
+        {MPParams::KEY_AFTER_LOGIN_SEND_PARAM, 0x09},
+        {MPParams::KEY_AFTER_PASS_SEND_PARAM, 0x0A},
+        {MPParams::DELAY_AFTER_KEY_ENTRY_PARAM, 15},
+        {MPParams::BOOT_ANIMATION_PARAM, 1},
+        {MPParams::DEVICE_LOCK_USB_DISC, 1},
+        {MPParams::MINI_KNOCK_THRES_PARAM, 9},
+        {MPParams::PIN_SHOWN_ON_BACK, 0},
+        {MPParams::LOCK_UNLOCK_FEATURE_PARAM, 0},
+        {MPParams::TUTORIAL_BOOL_PARAM, 1},
+        {MPParams::PIN_SHOW_ON_ENTRY, 0},
+        {MPParams::DISABLE_BLE_ON_CARD_REMOVE, 0},
+        {MPParams::DISABLE_BLE_ON_LOCK, 0},
+        {MPParams::NB_20MINS_TICKS_FOR_LOCK, 0},
+        {MPParams::SWITCH_OFF_AFTER_USB_DISC, 0},
+        {MPParams::HASH_DISPLAY_FEATURE_PARAM, 0},
+        {MPParams::INFORMATION_TIME_DELAY, 30},
+        {MPParams::BLUETOOTH_SHORTCUTS, 0},
+        {MPParams::SCREEN_SAVER_ID, 0}
+    };
+
 DeviceSettingsBLE::DeviceSettingsBLE(QObject *parent)
     : DeviceSettings(parent)
 {
     fillParameterMapping();
+}
+
+void DeviceSettingsBLE::resetDefaultSettings()
+{
+    for (DefaultValues::iterator it = m_bleDefaultValues.begin(); it != m_bleDefaultValues.end(); ++it)
+    {
+        updateParam(it.key(), it.value());
+    }
 }
 
 void DeviceSettingsBLE::fillParameterMapping()

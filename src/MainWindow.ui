@@ -1813,6 +1813,22 @@ Hint: keep your mouse positioned over an option to get more details.</string>
           <property name="spacing">
            <number>30</number>
           </property>
+          <property name="leftMargin">
+           <number>30</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="pushButtonSettingsSetToDefault">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Reset default values</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <spacer name="horizontalSpacer_11">
             <property name="orientation">
