@@ -2905,7 +2905,7 @@ bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool
                     parentNodePt->removeChild(childNodePt);
                     if (deleteFromList)
                     {
-                        loginChildNodes.removeOne(childNodePt);
+                        childNodes.removeOne(childNodePt);
                         delete childNodePt;
                     }
                     return true;
@@ -5680,7 +5680,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
     /* Load flash contents the usual way */
     memMgmtModeReadFlash(jobs, false,
                             cbProgress,
-                            true, true, true);
+                            true, true, true, true);
 
     connect(jobs, &AsyncJobs::finished, [this, cb, cbProgress, noDelete](const QByteArray &data)
     {
