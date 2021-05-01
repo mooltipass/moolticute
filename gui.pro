@@ -24,6 +24,7 @@ include (src/qtcsv/qtcsv.pri)
 
 SOURCES += src/main_gui.cpp \
     src/MainWindow.cpp \
+    src/NotesManagement.cpp \
     src/ParseDomain.cpp \
     src/Common.cpp \
     src/TOTPCredential.cpp \
@@ -73,6 +74,7 @@ SOURCES += src/main_gui.cpp \
     src/FidoManagement.cpp \
 
 HEADERS  += src/MainWindow.h \
+    src/NotesManagement.h \
     src/ParseDomain.h \
     src/Common.h \
     src/QtHelper.h \
@@ -142,6 +144,7 @@ INCLUDEPATH += src\
     src/zxcvbn-c
 
 FORMS    += src/MainWindow.ui \
+    src/NotesManagement.ui \
     src/TOTPCredential.ui \
     src/WindowLog.ui \
     src/CredentialsManagement.ui \

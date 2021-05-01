@@ -111,6 +111,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     m_tabMap[ui->pageSSH] = ui->pushButtonSSH;
     m_tabMap[ui->pageBleDev] = ui->pushButtonBleDev;
     m_tabMap[ui->pageFido] = ui->pushButtonFido;
+    m_tabMap[ui->pageNotes] = ui->pushButtonNotes;
     connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::onCurrentTabChanged);
 
     ui->widgetCredentials->setWsClient(wsClient);
@@ -118,6 +119,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->widgetSSH->setWsClient(wsClient);
     ui->widgetBleDev->setWsClient(wsClient);
     ui->widgetFido->setWsClient(wsClient);
+    ui->widgetNotes->setWsClient(wsClient);
 
     ui->widgetCredentials->setPasswordProfilesModel(m_passwordProfilesModel);
 
@@ -152,6 +154,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->pushButtonFido->setIcon(AppGui::qtAwesome()->icon(fa::usb));
     ui->pushButtonFido->setVisible(false);
+
+    ui->pushButtonNotes->setIcon(AppGui::qtAwesome()->icon(fa::newspapero));
+    ui->pushButtonNotes->setVisible(false);
 
     m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F1), this);
     setKeysTabVisibleOnDemand(bSSHKeysTabVisibleOnDemand);
@@ -284,6 +289,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->pushButtonAdvanced, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonBleDev, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonFido, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonNotes, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->btnPassGenerationProfiles, &QPushButton::clicked, [this]()
     {
         PassGenerationProfilesDialog dlg(this);
@@ -723,6 +729,7 @@ void MainWindow::updateDeviceDependentUI()
         ui->pbBleBattery->show();
         ui->groupBoxSecurityChallenge->show();
         ui->pushButtonFido->setVisible(true);
+        ui->pushButtonNotes->setVisible(true);
         ui->pushButtonSettingsSetToDefault->setVisible(true);
     }
     else
@@ -830,6 +837,9 @@ void MainWindow::updatePage()
 
     else if (ui->pushButtonFido->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageFido);
+
+    else if (ui->pushButtonNotes->isChecked())
+        ui->stackedWidget->setCurrentWidget(ui->pageNotes);
 
     updateTabButtons();
 
@@ -1508,6 +1518,8 @@ void MainWindow::enableCredentialsManagement(bool enable)
             ui->stackedWidget->setCurrentWidget(ui->pageFiles);
         else if (ui->pushButtonFido->isChecked())
             ui->stackedWidget->setCurrentWidget(ui->pageFido);
+        else if (ui->pushButtonNotes->isChecked())
+            ui->stackedWidget->setCurrentWidget(ui->pageNotes);
     }
 
     updateTabButtons();
@@ -1556,7 +1568,8 @@ void MainWindow::updateTabButtons()
     if ((ui->stackedWidget->currentWidget() == ui->pageFiles
          || ui->stackedWidget->currentWidget() == ui->pageCredentials
          || ui->stackedWidget->currentWidget() == ui->pageIntegrity
-         || ui->stackedWidget->currentWidget() == ui->pageFido) &&
+         || ui->stackedWidget->currentWidget() == ui->pageFido
+         || ui->stackedWidget->currentWidget() == ui->pageNotes) &&
             wsClient->get_memMgmtMode())
     {
         // Disable all tab buttons
@@ -1985,6 +1998,7 @@ void MainWindow::onDeviceDisconnected()
             handleNoBundleDisconnected();
         }
         ui->pushButtonFido->setVisible(false);
+        ui->pushButtonNotes->setVisible(false);
         noPasswordPromptChanged(false);
         ui->pushButtonSettingsSetToDefault->setVisible(false);
     }
