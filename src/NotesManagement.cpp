@@ -6,6 +6,9 @@ NotesManagement::NotesManagement(QWidget *parent) :
     ui(new Ui::NotesManagement)
 {
     ui->setupUi(this);
+
+    ui->pushButtonSaveNote->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonEnterNotesMMM->setStyleSheet(CSS_BLUE_BUTTON);
 }
 
 NotesManagement::~NotesManagement()
@@ -17,4 +20,9 @@ void NotesManagement::setWsClient(WSClient *c)
 {
     wsClient = c;
     //TODO connect signalslots
+}
+
+void NotesManagement::on_pushButtonSaveNote_clicked()
+{
+    qDebug() << "Name: " << ui->lineEditNoteName->text() << ", " << ui->lineEditNoteContent->text();
 }

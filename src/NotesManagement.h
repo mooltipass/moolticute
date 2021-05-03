@@ -18,6 +18,9 @@ public:
 
     void setWsClient(WSClient *c);
 
+private slots:
+    void on_pushButtonSaveNote_clicked();
+
 private:
     Ui::NotesManagement *ui;
 
