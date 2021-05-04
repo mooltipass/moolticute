@@ -1268,7 +1268,7 @@ void MPDeviceBleImpl::convertMiniToBleNode(QByteArray &array)
     m_bleNodeConverter.convert(array);
 }
 
-void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress)
+void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress, bool isFile)
 {
     QByteArray packet;
     // 4B Set to 0
@@ -1315,7 +1315,7 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
     packet.append(ZERO_BYTE);
     jobs->append(new MPCommandJob(mpDev, MPCmd::WRITE_DATA_FILE,
               packet,
-              [this, jobs, cbProgress, current, moreChunk](const QByteArray &data, bool &)
+              [this, jobs, cbProgress, current, moreChunk, isFile](const QByteArray &data, bool &)
                 {
                     if (bleProt->getFirstPayloadByte(data) != 1)
                     {
@@ -1325,7 +1325,7 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
 
                     if (moreChunk)
                     {
-                        storeFileData(current+BLE_DATA_BLOCK_SIZE, jobs, cbProgress);
+                        storeFileData(current+BLE_DATA_BLOCK_SIZE, jobs, cbProgress, isFile);
                     }
                     return true;
                 }

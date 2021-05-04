@@ -145,7 +145,7 @@ public:
     //Set data to a context on the device
     void setDataNode(QString service, const QByteArray &nodeData,
                      MessageHandlerCb cb,
-                     const MPDeviceProgressCb &cbProgress);
+                     const MPDeviceProgressCb &cbProgress, bool isFile = true);
 
     //Delete a data context from the device
     void deleteDataNodesAndLeave(QStringList services,

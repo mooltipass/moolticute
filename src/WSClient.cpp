@@ -629,10 +629,11 @@ void WSClient::requestDataFile(const QString &service)
                   { "data", d }});
 }
 
-void WSClient::sendDataFile(const QString &service, const QByteArray &data)
+void WSClient::sendDataFile(const QString &service, const QByteArray &data, bool isFile)
 {
     QJsonObject d = {{ "service", service.toLower() },
-                     { "node_data", QString(data.toBase64()) }};
+                     { "node_data", QString(data.toBase64()) },
+                     { "is_file", isFile}};
     sendJsonData({{ "msg", "set_data_node" },
                   { "data", d }});
 }

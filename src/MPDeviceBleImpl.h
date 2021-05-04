@@ -139,7 +139,7 @@ public:
 
     void convertMiniToBleNode(QByteArray &array);
 
-    void storeFileData(int current, AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
+    void storeFileData(int current, AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress, bool isFile = true);
 
     void sendInitialStatusRequest();
     void checkNoBundle(Common::MPStatus& status, Common::MPStatus prevStatus);

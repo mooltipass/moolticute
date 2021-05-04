@@ -25,4 +25,5 @@ void NotesManagement::setWsClient(WSClient *c)
 void NotesManagement::on_pushButtonSaveNote_clicked()
 {
     qDebug() << "Name: " << ui->lineEditNoteName->text() << ", " << ui->lineEditNoteContent->text();
+    wsClient->sendDataFile(ui->lineEditNoteName->text(), ui->lineEditNoteContent->text().toUtf8(), false);
 }

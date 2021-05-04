@@ -4509,7 +4509,7 @@ bool MPDevice::setDataNodeCb(AsyncJobs *jobs, int current,
 
 void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
                            MessageHandlerCb cb,
-                           const MPDeviceProgressCb &cbProgress)
+                           const MPDeviceProgressCb &cbProgress, bool isFile /* =true */)
 {
     if (service.isEmpty())
     {
@@ -4532,14 +4532,16 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
     if (isBLE())
     {
         sdata.append((char)0);
-        jobs->append(new MPCommandJob(this, MPCmd::ADD_DATA_SERVICE,
+        MPCmd::Command addCommand = isFile ? MPCmd::ADD_DATA_SERVICE : MPCmd::ADD_NOTE_FILE;
+        MPCmd::Command modifyCommand = isFile ? MPCmd::MODIFY_DATA_FILE : MPCmd::MODIFY_NOTE_FILE;
+        jobs->append(new MPCommandJob(this, addCommand,
                                       sdata,
-                                      [this, service, cb, sdata, jobs](const QByteArray &data, bool &) -> bool
+                                      [this, service, cb, sdata, jobs, modifyCommand](const QByteArray &data, bool &) -> bool
         {
             if (pMesProt->getFirstPayloadByte(data) != MSG_SUCCESS)
             {
                 qWarning() << service << " already exists";
-                jobs->prepend(new MPCommandJob(this, MPCmd::MODIFY_DATA_FILE, sdata, [this, service](const QByteArray &data, bool&)
+                jobs->prepend(new MPCommandJob(this, modifyCommand, sdata, [this, service](const QByteArray &data, bool&)
                 {
                     if (pMesProt->getFirstPayloadByte(data) != MSG_SUCCESS)
                     {
@@ -4553,6 +4555,12 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
     }
     else
     {
+        if (!isFile)
+        {
+            qWarning() << "Notes is only valid for BLE";
+            cb(false, "Invalid operation");
+            return;
+        }
         jobs->append(new MPCommandJob(this, MPCmd::SET_DATA_SERVICE,
                                       sdata,
                                       [this, jobs, service](const QByteArray &data, bool &) -> bool

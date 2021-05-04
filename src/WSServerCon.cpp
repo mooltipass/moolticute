@@ -393,6 +393,7 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
         QString service = o["service"].toString();
+        bool isFile = (o.contains("is_file") && o["is_file"].toBool()) || !o.contains("is_file");
         QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
         if (data.isEmpty())
         {
@@ -427,7 +428,7 @@ void WSServerCon::processMessage(const QString &message)
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         },
-        defaultProgressCb);
+        defaultProgressCb, isFile);
     }
     else if (root["msg"] == "get_data_node")
     {

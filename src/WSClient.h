@@ -80,7 +80,7 @@ public:
     void requestPassword(const QString &service, const QString &login);
 
     void requestDataFile(const QString &service);
-    void sendDataFile(const QString &service, const QByteArray &data);
+    void sendDataFile(const QString &service, const QByteArray &data, bool isFile = true);
     void deleteDataFilesAndLeave(const QStringList &services);
     void deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials);
 
