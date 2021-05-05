@@ -109,7 +109,7 @@ public:
             WRITE_NOTE_FILE     ,
             READ_NOTE_FILE      ,
             MODIFY_NOTE_FILE    ,
-            GET_NEXT_NODE_ADDR  ,
+            GET_NEXT_NOTE_ADDR  ,
             GET_CUR_CARD_CPZ    ,
             CANCEL_USER_REQUEST ,
             PLEASE_RETRY        ,

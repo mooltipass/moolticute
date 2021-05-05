@@ -312,7 +312,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::WRITE_NOTE_FILE       , 0x0035},
         {MPCmd::READ_NOTE_FILE        , 0x0033},
         {MPCmd::MODIFY_NOTE_FILE      , 0x0034},
-        {MPCmd::GET_NEXT_NODE_ADDR    , 0x0031},
+        {MPCmd::GET_NEXT_NOTE_ADDR    , 0x0031},
         {MPCmd::STORE_TOTP_CRED       , 0x0027},
         {MPCmd::GET_CUR_CARD_CPZ      , 0x000B},
         {MPCmd::CANCEL_USER_REQUEST   , 0x0005},

@@ -24,6 +24,14 @@ MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
         MPCmd::INFORM_LOCKED,
         MPCmd::INFORM_UNLOCKED,
         MPCmd::SET_DATE};
+
+    m_filesNotesMapping = {
+        {MPCmd::ADD_DATA_SERVICE, MPCmd::ADD_NOTE_FILE},
+        {MPCmd::WRITE_DATA_FILE, MPCmd::WRITE_NOTE_FILE},
+        {MPCmd::READ_DATA_FILE, MPCmd::READ_NOTE_FILE},
+        {MPCmd::MODIFY_DATA_FILE, MPCmd::MODIFY_NOTE_FILE},
+        {MPCmd::FETCH_DATA_NODES, MPCmd::GET_NEXT_NOTE_ADDR}
+    };
 }
 
 bool MPDeviceBleImpl::isFirstPacket(const QByteArray &data)
@@ -1313,7 +1321,8 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
     // 0 to signal upcoming data, otherwise 1 to signal last packet
     packet.append(static_cast<char>(moreChunk ? 1 : 0));
     packet.append(ZERO_BYTE);
-    jobs->append(new MPCommandJob(mpDev, MPCmd::WRITE_DATA_FILE,
+    MPCmd::Command writeCommand = isFile ? MPCmd::WRITE_DATA_FILE : MPCmd::WRITE_NOTE_FILE;
+    jobs->append(new MPCommandJob(mpDev, writeCommand,
               packet,
               [this, jobs, cbProgress, current, moreChunk, isFile](const QByteArray &data, bool &)
                 {
@@ -1441,6 +1450,11 @@ bool MPDeviceBleImpl::resetDefaultSettings()
 
     bleSettings->resetDefaultSettings();
     return true;
+}
+
+bool MPDeviceBleImpl::isMappedNoteCommand(MPCmd::Command receivedCommand, MPCmd::Command actualCommand) const
+{
+    return m_filesNotesMapping[receivedCommand] == actualCommand;
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()

@@ -335,7 +335,8 @@ void MPDevice::newDataRead(const QByteArray &data)
     //Only check returned command if it was asked
     //If the returned command does not match, fail
     if (currentCmd.checkReturn &&
-        dataCommand != currentCommand)
+        dataCommand != currentCommand &&
+        !(isBLE() && bleImpl->isMappedNoteCommand(dataCommand, currentCommand)))
     {
         if (isBLE() && MPCmd::MOOLTIPASS_STATUS == dataCommand)
         {
@@ -4588,7 +4589,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
 
     if (isBLE())
     {
-        bleImpl->storeFileData(0, jobs, cbProgress);
+        bleImpl->storeFileData(0, jobs, cbProgress, isFile);
     }
     else
     {
