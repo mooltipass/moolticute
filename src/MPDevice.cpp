@@ -335,8 +335,7 @@ void MPDevice::newDataRead(const QByteArray &data)
     //Only check returned command if it was asked
     //If the returned command does not match, fail
     if (currentCmd.checkReturn &&
-        dataCommand != currentCommand &&
-        !(isBLE() && bleImpl->isMappedNoteCommand(dataCommand, currentCommand)))
+        dataCommand != currentCommand)
     {
         if (isBLE() && MPCmd::MOOLTIPASS_STATUS == dataCommand)
         {

@@ -24,14 +24,6 @@ MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
         MPCmd::INFORM_LOCKED,
         MPCmd::INFORM_UNLOCKED,
         MPCmd::SET_DATE};
-
-    m_filesNotesMapping = {
-        {MPCmd::ADD_DATA_SERVICE, MPCmd::ADD_NOTE_FILE},
-        {MPCmd::WRITE_DATA_FILE, MPCmd::WRITE_NOTE_FILE},
-        {MPCmd::READ_DATA_FILE, MPCmd::READ_NOTE_FILE},
-        {MPCmd::MODIFY_DATA_FILE, MPCmd::MODIFY_NOTE_FILE},
-        {MPCmd::FETCH_DATA_NODES, MPCmd::GET_NEXT_NOTE_ADDR}
-    };
 }
 
 bool MPDeviceBleImpl::isFirstPacket(const QByteArray &data)
@@ -1450,11 +1442,6 @@ bool MPDeviceBleImpl::resetDefaultSettings()
 
     bleSettings->resetDefaultSettings();
     return true;
-}
-
-bool MPDeviceBleImpl::isMappedNoteCommand(MPCmd::Command receivedCommand, MPCmd::Command actualCommand) const
-{
-    return m_filesNotesMapping[receivedCommand] == actualCommand;
 }
 
 void MPDeviceBleImpl::handleLongMessageTimeout()

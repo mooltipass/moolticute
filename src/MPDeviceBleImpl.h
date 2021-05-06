@@ -153,8 +153,6 @@ public:
 
     bool resetDefaultSettings();
 
-    bool isMappedNoteCommand(MPCmd::Command receivedCommand, MPCmd::Command actualCommand) const;
-
 signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);
@@ -212,8 +210,6 @@ private:
     QList<QString> m_dataFiles;
 
     bool m_enforceLayout = false;
-
-    QMap<MPCmd::Command, MPCmd::Command> m_filesNotesMapping;
 
     static int s_LangNum;
     static int s_LayoutNum;
