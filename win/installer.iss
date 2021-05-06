@@ -21,13 +21,13 @@ DefaultGroupName=Moolticute
 DisableProgramGroupPage=no
 OutputDir=build
 OutputBaseFilename=moolticute_setup_{#MyAppVersion}
-Compression=lzma
+Compression=lzma2/ultra64
 SolidCompression=no
 AppCopyright=Copyright (c) The Mooltipass Team
 WizardSmallImageFile=WizModernSmallImage-IS.bmp
 SetupIconFile=Setup.ico
 UninstallDisplayIcon={app}\moolticute.exe
-MinVersion=0,5.01sp3
+MinVersion=0,6
 PrivilegesRequired=lowest
 
 [Languages]
@@ -53,7 +53,7 @@ Name: "Full"; Description: "Full installation"
 Name: "moolticute"; Description: "Moolticute"; Types: Full
 
 [Run]
-Filename: "{app}\moolticute.exe"; WorkingDir: "{app}"; Description: "Start Moolticute"; Flags: postinstall nowait skipifsilent runascurrentuser
+Filename: "{app}\moolticute.exe"; WorkingDir: "{app}"; Description: "Start Moolticute"; Flags: postinstall nowait runascurrentuser
 
 [Registry]
 Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Moolticute"; ValueData: "{app}\moolticute.exe --autolaunched"; Flags: uninsdeletevalue
@@ -114,14 +114,14 @@ begin
     RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1','DisplayVersion', oldVersion);
     if (CompareVersion(oldVersion, '{#MyAppVersion}') < 0) then
     begin
-      if MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. Do you want to replace this version with {#MyAppVersion}?', mbConfirmation, MB_YESNO) = IDNO then
+      if SuppressibleMsgBox('Version ' + oldVersion + ' of Moolticute is already installed. Do you want to replace this version with {#MyAppVersion}?', mbConfirmation, MB_YESNO, IDYES) = IDNO then
       begin
         Result := False;
       end
       else
       begin
           RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1', 'UninstallString', uninstaller);
-          ShellExec('', uninstaller, 'SILENT', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+          ShellExec('', uninstaller, '/SILENT /SUPPRESSMSGBOXES', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
           if (ErrorCode <> 0) then
           begin
             MsgBox( 'Failed to uninstall Moolticute version ' + oldVersion + '. Please restart Windows and run setup again.', mbError, MB_OK );
@@ -145,14 +145,14 @@ begin
     RegQueryStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1', 'DisplayVersion', oldVersion);
     if (CompareVersion(oldVersion, '{#MyAppVersion}') < 0) then
     begin
-      if MsgBox('Version ' + oldVersion + ' of Moolticute is already installed. Do you want to replace this version with {#MyAppVersion}?', mbConfirmation, MB_YESNO) = IDNO then
+      if SuppressibleMsgBox('Version ' + oldVersion + ' of Moolticute is already installed. Do you want to replace this version with {#MyAppVersion}?', mbConfirmation, MB_YESNO, IDYES) = IDNO then
       begin
         Result := False;
       end
       else
       begin
           RegQueryStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppID}_is1', 'UninstallString', uninstaller);
-          ShellExec('', uninstaller, 'SILENT', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+          ShellExec('', uninstaller, '/SILENT /SUPPRESSMSGBOXES', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
           if (ErrorCode <> 0) then
           begin
             MsgBox( 'Failed to uninstall Moolticute version ' + oldVersion + '. Please restart Windows and run setup again.', mbError, MB_OK );

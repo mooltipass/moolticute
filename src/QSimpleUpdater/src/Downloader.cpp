@@ -156,8 +156,16 @@ void Downloader::setFileName (const QString& file)
 void Downloader::openDownload()
 {
     if (!m_fileName.isEmpty())
+    {
+#ifdef Q_OS_WIN
+        QStringList args;
+        args << "/SILENT" << "/SUPPRESSMSGBOXES";
+        QProcess::startDetached(DOWNLOAD_DIR.filePath(m_fileName), args, QString());
+#else
         QDesktopServices::openUrl (QUrl::fromLocalFile (DOWNLOAD_DIR.filePath (
                 m_fileName)));
+#endif
+    }
 
     else {
         QMessageBox::critical (this,
