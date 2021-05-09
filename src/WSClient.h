@@ -74,6 +74,8 @@ public:
     void sendEnterMMRequest(bool wantData = false, bool wantFido = false);
     void sendLeaveMMRequest();
 
+    void sendFetchNotes();
+
     void addOrUpdateCredential(const QString &service, const QString &login,
                                const QString &password, const QString &description = {});
 

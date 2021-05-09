@@ -21,6 +21,8 @@ public:
 private slots:
     void on_pushButtonSaveNote_clicked();
 
+    void on_pushButtonEnterNotesMMM_clicked();
+
 private:
     Ui::NotesManagement *ui;
 

@@ -602,6 +602,11 @@ void WSClient::sendLeaveMMRequest()
     sendJsonData({{ "msg", "exit_memorymgmt" }});
 }
 
+void WSClient::sendFetchNotes()
+{
+    sendJsonData({{ "msg", "fetch_notes" }});
+}
+
 void WSClient::addOrUpdateCredential(const QString &service, const QString &login,
                                      const QString &password, const QString &description)
 {

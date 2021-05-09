@@ -1368,6 +1368,10 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             qCritical() << root["msg"] << " failed";
         }
     }
+    else if (root["msg"] == "fetch_notes")
+    {
+        bleImpl->fetchNotes();
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

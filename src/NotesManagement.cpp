@@ -27,3 +27,9 @@ void NotesManagement::on_pushButtonSaveNote_clicked()
     qDebug() << "Name: " << ui->lineEditNoteName->text() << ", " << ui->lineEditNoteContent->text();
     wsClient->sendDataFile(ui->lineEditNoteName->text(), ui->lineEditNoteContent->text().toUtf8(), false);
 }
+
+void NotesManagement::on_pushButtonEnterNotesMMM_clicked()
+{
+    qCritical() << "Entering Notes MMM";
+    wsClient->sendFetchNotes();
+}

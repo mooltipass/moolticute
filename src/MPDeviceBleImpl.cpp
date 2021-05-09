@@ -239,6 +239,52 @@ void MPDeviceBleImpl::addDataFile(const QString &file)
     emit mpDev->filesCacheChanged();
 }
 
+void MPDeviceBleImpl::fetchNotes()
+{
+    if (mpDev->get_status() != Common::Unlocked)
+    {
+        if (AppDaemon::isDebugDev())
+        {
+            qWarning() << "Device is not unlocked, cannot fetch notes";
+        }
+        return;
+    }
+    auto *jobs = new AsyncJobs(QString("Fetch notes"), this);
+    //m_dataFiles.clear();
+
+    // Start fetch from 0x0000 address
+    const QByteArray startingAddr(2, 0x00);
+    fetchNotes(jobs, startingAddr);
+    mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::fetchNotes(AsyncJobs *jobs, QByteArray addr)
+{
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_NEXT_NOTE_ADDR, addr,
+                        [this, jobs] (const QByteArray &data, bool &)
+                        {
+                            const int FILENAME_STARTING_POS = 2;
+                            QString noteName = bleProt->toQString(bleProt->getPayloadBytes(data, FILENAME_STARTING_POS, bleProt->getMessageSize(data)));
+                            if (!noteName.isEmpty())
+                            {
+                                qCritical() << "Note: " << noteName;
+                            }
+
+                            if (bleProt->getMessageSize(data) < DATA_FETCH_NO_NEXT_ADDR_SIZE)
+                            {
+                                qCritical() << "Invalid response size for fetch notes";
+                                return false;
+                            }
+
+                            if (bleProt->getMessageSize(data) != DATA_FETCH_NO_NEXT_ADDR_SIZE)
+                            {
+                                fetchNotes(jobs, bleProt->getPayloadBytes(data, 0, 2));
+                            }
+                            return true;
+                        }
+               ));
+}
+
 void MPDeviceBleImpl::checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb)
 {
     auto *jobs = new AsyncJobs(QString("Check and Store Credential"), this);

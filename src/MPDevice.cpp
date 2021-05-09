@@ -4612,7 +4612,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
                   ));
     }
 
-    connect(jobs, &AsyncJobs::finished, [this, cb, service, nodeData](const QByteArray &)
+    connect(jobs, &AsyncJobs::finished, [this, cb, service, nodeData, isFile](const QByteArray &)
     {
         //all jobs finished success
         qInfo() << "set_data_node success";
@@ -4621,7 +4621,10 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
         // update file cache
         if (isBLE())
         {
-            bleImpl->addDataFile(service);
+            if (isFile)
+            {
+                bleImpl->addDataFile(service);
+            }
             return;
         }
         else

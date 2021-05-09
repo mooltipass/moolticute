@@ -64,6 +64,9 @@ public:
     void addDataFile(const QString& file);
     QList<QString> getDataFiles() const { return m_dataFiles; }
 
+    void fetchNotes();
+    void fetchNotes(AsyncJobs *jobs, QByteArray addr);
+
     void checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb);
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb, AsyncJobs *jobs = nullptr);
     void changePassword(const QByteArray& address, const QString& pwd, MessageHandlerCb cb);
