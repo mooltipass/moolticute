@@ -58,6 +58,7 @@ private slots:
     void sendVersion();
     void sendDeviceUID();
     void sendFilesCache();
+    void sendNotes();
     void sendIsConnectedWithBluetooth();
 
     void sendDeviceLanguage(const QJsonObject& langs);

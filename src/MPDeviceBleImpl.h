@@ -66,6 +66,7 @@ public:
 
     void fetchNotes();
     void fetchNotes(AsyncJobs *jobs, QByteArray addr);
+    QList<QString> getNotes() const { return m_notes; }
 
     void checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb);
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb, AsyncJobs *jobs = nullptr);
@@ -162,6 +163,7 @@ signals:
     void bleKeyboardLayout(const QJsonObject& layouts);
     void batteryPercentChanged(int batteryPct);
     void userCategoriesFetched(QJsonObject categories);
+    void notesFetched();
 
 private slots:
     void handleLongMessageTimeout();
@@ -211,6 +213,7 @@ private:
 
     bool m_isFirstMessageWritten = false;
     QList<QString> m_dataFiles;
+    QList<QString> m_notes;
 
     bool m_enforceLayout = false;
 

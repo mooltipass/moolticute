@@ -3662,6 +3662,8 @@ void MPDevice::processStatusChange(const QByteArray &data)
             {
                 bleImpl->fetchDataFiles();
                 bleImpl->activateEnforceLayout();
+                //TODO add check for fw
+                bleImpl->fetchNotes();
             }
 
             /*

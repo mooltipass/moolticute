@@ -165,6 +165,8 @@ signals:
     void deleteFidoNodesFailed();
     void showExportPrompt();
 
+    void notesFetched(const QJsonArray& notes);
+
 public slots:
     void sendJsonData(const QJsonObject &data);
     void queryRandomNumbers();

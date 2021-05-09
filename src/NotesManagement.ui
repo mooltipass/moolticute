@@ -136,6 +136,9 @@ border-right: none;
         </spacer>
        </item>
        <item>
+        <widget class="QListWidget" name="listWidgetNotes"/>
+       </item>
+       <item>
         <widget class="QLabel" name="labelNotesManagementStack">
          <property name="font">
           <font>

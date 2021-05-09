@@ -404,6 +404,10 @@ void WSClient::onTextMessageReceived(const QString &message)
         filesCache = rootobj["data"].toArray();
         emit filesCacheChanged(rootobj["sync"].toBool());
     }
+    else if (rootobj["msg"] == "fetch_notes")
+    {
+        emit notesFetched(rootobj["data"].toArray());
+    }
     else if (rootobj["msg"] == "get_random_numbers")
     {
         std::vector<qint64> ints;

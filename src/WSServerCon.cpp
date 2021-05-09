@@ -595,6 +595,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::batteryPercentChanged, this, &WSServerCon::sendBatteryPercent);
         connect(mpBle, &MPDeviceBleImpl::userCategoriesFetched, this, &WSServerCon::sendUserCategories);
         connect(mpBle, &MPDeviceBleImpl::bundleVersionChanged, this, &WSServerCon::sendVersion);
+        connect(mpBle, &MPDeviceBleImpl::notesFetched, this, &WSServerCon::sendNotes);
     }
 }
 
@@ -753,6 +754,33 @@ void WSServerCon::sendFilesCache()
             qDebug() << "There is no files cache to send";
             oroot["sync"] = false;
         }
+    }
+
+    oroot["data"] = array;
+    sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendNotes()
+{
+    if (!mpdevice->isBLE())
+    {
+        qCritical() << "Notes are only available for BLE";
+        return;
+    }
+    auto deviceStatus = mpdevice->get_status();
+    if (deviceStatus != Common::Unlocked && deviceStatus != Common::MMMMode)
+    {
+        qDebug() << "It's an unknown smartcard or it's locked, no need to search for notes";
+        return;
+    }
+
+    qDebug() << "Sending notes";
+    QJsonObject oroot = { {"msg", "fetch_notes"} };
+    QJsonArray array;
+    MPDeviceBleImpl *bleImpl = mpdevice->ble();
+    for (auto file : bleImpl->getNotes())
+    {
+        array.append(QJsonObject{{"name", file}});
     }
 
     oroot["data"] = array;

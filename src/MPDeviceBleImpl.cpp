@@ -250,7 +250,7 @@ void MPDeviceBleImpl::fetchNotes()
         return;
     }
     auto *jobs = new AsyncJobs(QString("Fetch notes"), this);
-    //m_dataFiles.clear();
+    m_notes.clear();
 
     // Start fetch from 0x0000 address
     const QByteArray startingAddr(2, 0x00);
@@ -263,11 +263,12 @@ void MPDeviceBleImpl::fetchNotes(AsyncJobs *jobs, QByteArray addr)
     jobs->append(new MPCommandJob(mpDev, MPCmd::GET_NEXT_NOTE_ADDR, addr,
                         [this, jobs] (const QByteArray &data, bool &)
                         {
-                            const int FILENAME_STARTING_POS = 2;
-                            QString noteName = bleProt->toQString(bleProt->getPayloadBytes(data, FILENAME_STARTING_POS, bleProt->getMessageSize(data)));
+                            const int NOTENAME_STARTING_POS = 2;
+                            QString noteName = bleProt->toQString(bleProt->getPayloadBytes(data, NOTENAME_STARTING_POS, bleProt->getMessageSize(data)));
                             if (!noteName.isEmpty())
                             {
                                 qCritical() << "Note: " << noteName;
+                                m_notes.push_back(noteName);
                             }
 
                             if (bleProt->getMessageSize(data) < DATA_FETCH_NO_NEXT_ADDR_SIZE)
@@ -279,6 +280,10 @@ void MPDeviceBleImpl::fetchNotes(AsyncJobs *jobs, QByteArray addr)
                             if (bleProt->getMessageSize(data) != DATA_FETCH_NO_NEXT_ADDR_SIZE)
                             {
                                 fetchNotes(jobs, bleProt->getPayloadBytes(data, 0, 2));
+                            }
+                            else
+                            {
+                                emit notesFetched();
                             }
                             return true;
                         }

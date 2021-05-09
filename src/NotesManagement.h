@@ -24,6 +24,9 @@ private slots:
     void on_pushButtonEnterNotesMMM_clicked();
 
 private:
+    void loadNodes(const QJsonArray& notes);
+
+
     Ui::NotesManagement *ui;
 
     WSClient *wsClient;
