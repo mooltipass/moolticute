@@ -1400,6 +1400,30 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     {
         bleImpl->fetchNotes();
     }
+    else if (root["msg"] == "get_note_node")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString note = o["note"].toString();
+        bleImpl->getNoteNode(note,
+                [this, root](bool success, QString errstr, const QString &note, const QByteArray &dataNode)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["note"] = note;
+            ores["note_data"] = QString(dataNode.toBase64());
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

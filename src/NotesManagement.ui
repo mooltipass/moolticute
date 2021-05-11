@@ -123,44 +123,10 @@ border-right: none;
         <number>40</number>
        </property>
        <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
         <widget class="QListWidget" name="listWidgetNotes"/>
        </item>
        <item>
-        <widget class="QLabel" name="labelNotesManagementStack">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Notes Management Mode</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Browsing through your files list requires your device to be in management mode. Click the button below to start the process.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <widget class="QPlainTextEdit" name="textEditNote"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -173,7 +139,24 @@ border-right: none;
             </size>
            </property>
            <property name="text">
-            <string>Enter Notes Management Mode</string>
+            <string>Fetch notes</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="pushButtonAddNote">
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>38</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Add new note</string>
            </property>
           </widget>
          </item>

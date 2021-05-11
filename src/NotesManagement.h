@@ -23,6 +23,10 @@ private slots:
 
     void on_pushButtonEnterNotesMMM_clicked();
 
+    void on_pushButtonAddNote_clicked();
+
+    void onNoteReceived(const QString &note, const QByteArray &data, bool success);
+
 private:
     void loadNodes(const QJsonArray& notes);
 

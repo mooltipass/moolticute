@@ -86,6 +86,8 @@ public:
     void deleteDataFilesAndLeave(const QStringList &services);
     void deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials);
 
+    void requestNote(const QString &noteName);
+
     void requestResetCard();
     void requestAvailableUserNumber();
 
@@ -166,6 +168,7 @@ signals:
     void showExportPrompt();
 
     void notesFetched(const QJsonArray& notes);
+    void noteReceived(const QString &note, const QByteArray &data, bool success);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

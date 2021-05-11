@@ -12,6 +12,7 @@ NotesManagement::NotesManagement(QWidget *parent) :
 
     ui->pushButtonSaveNote->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterNotesMMM->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonAddNote->setStyleSheet(CSS_BLUE_BUTTON);
 }
 
 NotesManagement::~NotesManagement()
@@ -34,7 +35,6 @@ void NotesManagement::on_pushButtonSaveNote_clicked()
 
 void NotesManagement::on_pushButtonEnterNotesMMM_clicked()
 {
-    qCritical() << "Entering Notes MMM";
     wsClient->sendFetchNotes();
 }
 
@@ -57,9 +57,9 @@ void NotesManagement::loadNodes(const QJsonArray &notes)
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
         button->setIcon(AppGui::qtAwesome()->icon(fa::folderopen));
 
-//        connect(button, &QToolButton::clicked, [=]()
-//        {
-//            QString target_file = jsonObject.value("name").toString();
+        connect(button, &QToolButton::clicked, [=]()
+        {
+            QString note = jsonObject.value("name").toString();
 
 //            ui->progressBarQuick->setMinimum(0);
 //            ui->progressBarQuick->setMaximum(0);
@@ -68,11 +68,11 @@ void NotesManagement::loadNodes(const QJsonArray &notes)
 //            updateButtonsUI();
 //            ui->labelConfirmRequest->show();
 
-//            connect(wsClient, &WSClient::dataFileRequested, this, &FilesManagement::dataFileRequested);
+            connect(wsClient, &WSClient::noteReceived, this, &NotesManagement::onNoteReceived);
 //            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
 
-//            wsClient->requestDataFile(target_file);
-//        });
+            wsClient->requestNote(note);
+        });
 
         rowLayout->addWidget(button, 1, Qt::AlignRight);
         rowLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
@@ -88,4 +88,22 @@ void NotesManagement::loadNodes(const QJsonArray &notes)
     }
 
     listNotes->setVisible(listNotes->count() > 0);
+}
+
+void NotesManagement::on_pushButtonAddNote_clicked()
+{
+    qDebug() << "Add new note...";
+}
+
+void NotesManagement::onNoteReceived(const QString &note, const QByteArray &data, bool success)
+{
+    disconnect(wsClient, &WSClient::noteReceived, this, &NotesManagement::onNoteReceived);
+
+    if (!success)
+    {
+        QMessageBox::warning(this, tr("Failure"), tr("Note Fetch Denied!"));
+        return;
+    }
+
+    ui->textEditNote->setPlainText(QString{data});
 }

@@ -408,6 +408,13 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         emit notesFetched(rootobj["data"].toArray());
     }
+    else if (rootobj["msg"] == "get_note_node")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        QByteArray b = QByteArray::fromBase64(o["note_data"].toString().toLocal8Bit());
+        emit noteReceived(o["note"].toString(), b, success);
+    }
     else if (rootobj["msg"] == "get_random_numbers")
     {
         std::vector<qint64> ints;
@@ -675,6 +682,13 @@ void WSClient::deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials)
     }
     QJsonObject d = {{ "deleted_fidos", fidoNodeArray }};
     sendJsonData({{ "msg", "delete_fido_nodes" },
+                  { "data", d }});
+}
+
+void WSClient::requestNote(const QString &noteName)
+{
+    QJsonObject d = {{ "note", noteName }};
+    sendJsonData({{ "msg", "get_note_node" },
                   { "data", d }});
 }
 

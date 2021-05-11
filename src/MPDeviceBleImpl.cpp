@@ -267,7 +267,6 @@ void MPDeviceBleImpl::fetchNotes(AsyncJobs *jobs, QByteArray addr)
                             QString noteName = bleProt->toQString(bleProt->getPayloadBytes(data, NOTENAME_STARTING_POS, bleProt->getMessageSize(data)));
                             if (!noteName.isEmpty())
                             {
-                                qCritical() << "Note: " << noteName;
                                 m_notes.push_back(noteName);
                             }
 
@@ -287,7 +286,51 @@ void MPDeviceBleImpl::fetchNotes(AsyncJobs *jobs, QByteArray addr)
                             }
                             return true;
                         }
-               ));
+    ));
+}
+
+void MPDeviceBleImpl::getNoteNode(QString note, std::function<void (bool, QString, QString, QByteArray)> cb)
+{
+    if (note.isEmpty())
+    {
+        qWarning() << "note name is empty.";
+        cb(false, "note name is empty", QString(), QByteArray());
+        return;
+    }
+
+
+    AsyncJobs *jobs = new AsyncJobs(QString{"Getting note node"}, this);
+
+    QByteArray noteData = bleProt->toByteArray(note);
+    noteData.append(ZERO_BYTE);
+    noteData.append(ZERO_BYTE);
+
+    QVariantMap m = {{ "note", note }};
+    jobs->user_data = m;
+    jobs->append(new MPCommandJob(mpDev, MPCmd::READ_NOTE_FILE,
+                                  noteData,
+              [this, jobs](const QByteArray &data, bool &)
+                {
+                    return readDataNode(jobs, data, false);
+                }
+              ));
+
+    connect(jobs, &AsyncJobs::finished, [jobs, cb](const QByteArray &)
+    {
+        //all jobs finished success
+        qInfo() << "get_data_node success";
+        QVariantMap m = jobs->user_data.toMap();
+        QByteArray ndata = m["data"].toByteArray();
+        cb(true, QString(), m["note"].toString(), ndata);
+    });
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed getting note node";
+        cb(false, failedJob->getErrorStr(), QString(), QByteArray());
+    });
+
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 void MPDeviceBleImpl::checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb)
@@ -582,7 +625,7 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
      return addresses[FIRST_DATA_STARTING_ADDR];
  }
 
-bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
+bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data, bool isFile /*= true */)
 {
     if (bleProt->getFirstPayloadByte(data) == 0) //Get Data File Chunk fails
     {
@@ -617,10 +660,10 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
         m["data"] = ba;
         jobs->user_data = m;
 
-        jobs->append(new MPCommandJob(mpDev, MPCmd::READ_DATA_FILE,
-                  [this, jobs](const QByteArray &data, bool &)
+        jobs->append(new MPCommandJob(mpDev, isFile ? MPCmd::READ_DATA_FILE : MPCmd::READ_NOTE_FILE,
+                  [this, jobs, isFile](const QByteArray &data, bool &)
                     {
-                        return readDataNode(jobs, data);
+                        return readDataNode(jobs, data, isFile);
                     }
                   ));
     }

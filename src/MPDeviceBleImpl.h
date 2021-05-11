@@ -67,6 +67,7 @@ public:
     void fetchNotes();
     void fetchNotes(AsyncJobs *jobs, QByteArray addr);
     QList<QString> getNotes() const { return m_notes; }
+    void getNoteNode(QString note, std::function<void(bool, QString, QString, QByteArray)> cb);
 
     void checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb);
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb, AsyncJobs *jobs = nullptr);
@@ -89,7 +90,7 @@ public:
 
     QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
     QByteArray getDataStartNode(const QByteArray& data) const;
-    bool readDataNode(AsyncJobs *jobs, const QByteArray& data);
+    bool readDataNode(AsyncJobs *jobs, const QByteArray& data, bool isFile = true);
 
     bool isAfterAuxFlash();
 
