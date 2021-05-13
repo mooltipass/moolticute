@@ -1,6 +1,7 @@
 #include "NotesManagement.h"
 #include "ui_NotesManagement.h"
 #include "AppGui.h"
+#include "ClickableLabel.h"
 
 #include <QListWidget>
 
@@ -13,6 +14,12 @@ NotesManagement::NotesManagement(QWidget *parent) :
     ui->pushButtonSaveNote->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonEnterNotesMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonAddNote->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonSave->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDiscard->setStyleSheet(CSS_BLUE_BUTTON);
+
+    ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
+    ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
+    ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
 }
 
 NotesManagement::~NotesManagement()
@@ -40,54 +47,51 @@ void NotesManagement::on_pushButtonEnterNotesMMM_clicked()
 
 void NotesManagement::loadNodes(const QJsonArray &notes)
 {
-    QListWidget * listNotes = ui->listWidgetNotes;
-    listNotes->clear();
-    for (auto noteName : notes)
+//    QLayoutItem* child;
+//    while ((child = ui->gridLayoutNotes->takeAt(0)) != nullptr)
+//    {
+//        delete child;
+//    }
+    for (auto noteObj : notes)
     {
-        QJsonObject jsonObject = noteName.toObject();
+        QJsonObject jsonObject = noteObj.toObject();
+        QString noteName = jsonObject.value("name").toString();
 
-        QWidget* w = new QWidget();
-        QHBoxLayout *rowLayout = new QHBoxLayout(listNotes);
-        QLabel *icon = new QLabel(listNotes);
-        icon->setPixmap(AppGui::qtAwesome()->icon(fa::newspapero).pixmap(18, 18));
-        rowLayout->addWidget(icon);
-        rowLayout->addWidget(new QLabel(jsonObject.value("name").toString()));
-
-        QToolButton *button = new QToolButton;
-        button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        button->setIcon(AppGui::qtAwesome()->icon(fa::folderopen));
-
-        connect(button, &QToolButton::clicked, [=]()
-        {
-            QString note = jsonObject.value("name").toString();
-
-//            ui->progressBarQuick->setMinimum(0);
-//            ui->progressBarQuick->setMaximum(0);
-//            ui->progressBarQuick->setValue(0);
-//            ui->progressBarQuick->show();
-//            updateButtonsUI();
-//            ui->labelConfirmRequest->show();
-
-            connect(wsClient, &WSClient::noteReceived, this, &NotesManagement::onNoteReceived);
-//            connect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
-
-            wsClient->requestNote(note);
-        });
-
-        rowLayout->addWidget(button, 1, Qt::AlignRight);
-        rowLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
-        rowLayout->setMargin(0);
-        rowLayout->setContentsMargins(6,1,4,1);
-        w->setLayout(rowLayout);
-
-
-        QListWidgetItem *item = new QListWidgetItem();
-        item->setSizeHint( w->sizeHint() );
-        listNotes->addItem(item);
-        listNotes->setItemWidget(item,w);
+        addNewIcon(noteName);
     }
+}
 
-    listNotes->setVisible(listNotes->count() > 0);
+void NotesManagement::addNewIcon(const QString &name)
+{
+    auto* vertLayout = new QVBoxLayout();
+    auto* labelIcon = new ClickableLabel();
+    labelIcon->setAlignment(Qt::AlignCenter);
+    labelIcon->setPixmap(QString::fromUtf8(":/note.svg"));
+    labelIcon->setMaximumSize(200,200);
+    labelIcon->setPixmap(labelIcon->pixmap()->scaled(200,200, Qt::KeepAspectRatio));
+    labelIcon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    labelIcon->setAlignment(Qt::AlignCenter);
+
+    connect(labelIcon, &ClickableLabel::clicked, [=](){
+       connect(wsClient, &WSClient::noteReceived, this, &NotesManagement::onNoteReceived);
+       wsClient->requestNote(name);
+    });
+
+    vertLayout->addWidget(labelIcon);
+
+    auto* labelName = new QLabel();
+    labelName->setAlignment(Qt::AlignCenter);
+    labelName->setText(name);
+
+    vertLayout->addWidget(labelName);
+
+    int row = ui->gridLayoutNotes->rowCount() - 1;
+    if (actColumn == 4)
+    {
+        actColumn = 0;
+        ++row;
+    }
+    ui->gridLayoutNotes->addLayout(vertLayout, row, actColumn++, 1, 1);
 }
 
 void NotesManagement::on_pushButtonAddNote_clicked()
@@ -105,5 +109,19 @@ void NotesManagement::onNoteReceived(const QString &note, const QByteArray &data
         return;
     }
 
+    ui->stackedWidget->setCurrentWidget(ui->pageEditNotes);
+    ui->labelNoteName_2->setText(note);
     ui->textEditNote->setPlainText(QString{data});
+}
+
+void NotesManagement::on_pushButtonDiscard_clicked()
+{
+    qCritical() << "Discard note";
+    ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
+}
+
+void NotesManagement::on_pushButtonSave_clicked()
+{
+    qCritical() << "Save note";
+    ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
 }

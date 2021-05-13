@@ -27,8 +27,16 @@ private slots:
 
     void onNoteReceived(const QString &note, const QByteArray &data, bool success);
 
+    void on_pushButtonDiscard_clicked();
+
+    void on_pushButtonSave_clicked();
+
 private:
     void loadNodes(const QJsonArray& notes);
+    void addNewIcon(const QString& name);
+
+
+    int actColumn = 0;
 
 
     Ui::NotesManagement *ui;

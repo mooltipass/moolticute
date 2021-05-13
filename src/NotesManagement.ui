@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>712</width>
-    <height>489</height>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -111,7 +111,7 @@ border-right: none;
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="pageLocked">
+     <widget class="QWidget" name="pageListNotes">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
         <number>30</number>
@@ -123,13 +123,35 @@ border-right: none;
         <number>40</number>
        </property>
        <item>
-        <widget class="QListWidget" name="listWidgetNotes"/>
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>572</width>
+            <height>307</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <layout class="QGridLayout" name="gridLayoutNotes"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="textEditNote"/>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QPushButton" name="pushButtonEnterNotesMMM">
            <property name="maximumSize">
@@ -143,10 +165,19 @@ border-right: none;
            </property>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item>
           <widget class="QPushButton" name="pushButtonAddNote">
            <property name="maximumSize">
@@ -162,22 +193,55 @@ border-right: none;
          </item>
         </layout>
        </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageEditNotes">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QLabel" name="labelNoteName_2">
+         <property name="text">
+          <string>TextLabel</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
-        </spacer>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="textEditNote"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="pushButtonSave">
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>38</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Save</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonDiscard">
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>38</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Discard</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_2"/>
     </widget>
    </item>
   </layout>

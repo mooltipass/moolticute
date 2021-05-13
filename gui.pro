@@ -23,6 +23,7 @@ include (src/QSimpleUpdater/QSimpleUpdater.pri)
 include (src/qtcsv/qtcsv.pri)
 
 SOURCES += src/main_gui.cpp \
+    src/ClickableLabel.cpp \
     src/MainWindow.cpp \
     src/NotesManagement.cpp \
     src/ParseDomain.cpp \
@@ -74,6 +75,7 @@ SOURCES += src/main_gui.cpp \
     src/FidoManagement.cpp \
 
 HEADERS  += src/MainWindow.h \
+    src/ClickableLabel.h \
     src/NotesManagement.h \
     src/ParseDomain.h \
     src/Common.h \
