@@ -39,6 +39,7 @@ SOURCES += src/main_gui.cpp \
     src/AnsiEscapeCodeHandler.cpp \
     src/PasswordLineEdit.cpp \
     src/CredentialsManagement.cpp \
+    src/utils/GridLayoutUtil.cpp \
     src/zxcvbn-c/zxcvbn.c \
     src/FilesManagement.cpp \
     src/SSHManagement.cpp \
@@ -83,6 +84,7 @@ HEADERS  += src/MainWindow.h \
     src/TOTPCredential.h \
     src/WSClient.h \
     src/RotateSpinner.h \
+    src/utils/GridLayoutUtil.h \
     src/version.h \
     src/AppGui.h \
     src/DaemonMenuAction.h \

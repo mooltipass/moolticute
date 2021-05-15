@@ -1983,6 +1983,7 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
+        wsClient->sendFetchNotes();
     }
     displayBundleVersion();
     updateDeviceDependentUI();

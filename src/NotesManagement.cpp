@@ -2,6 +2,7 @@
 #include "ui_NotesManagement.h"
 #include "AppGui.h"
 #include "ClickableLabel.h"
+#include "utils/GridLayoutUtil.h"
 
 #include <QListWidget>
 
@@ -12,7 +13,6 @@ NotesManagement::NotesManagement(QWidget *parent) :
     ui->setupUi(this);
 
     ui->pushButtonSaveNote->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->pushButtonEnterNotesMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonAddNote->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSave->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonDiscard->setStyleSheet(CSS_BLUE_BUTTON);
@@ -30,7 +30,6 @@ NotesManagement::~NotesManagement()
 void NotesManagement::setWsClient(WSClient *c)
 {
     wsClient = c;
-    //TODO connect signalslots
     connect(wsClient, &WSClient::notesFetched, this, &NotesManagement::loadNodes);
 }
 
@@ -40,18 +39,9 @@ void NotesManagement::on_pushButtonSaveNote_clicked()
     wsClient->sendDataFile(ui->lineEditNoteName->text(), ui->lineEditNoteContent->text().toUtf8(), false);
 }
 
-void NotesManagement::on_pushButtonEnterNotesMMM_clicked()
-{
-    wsClient->sendFetchNotes();
-}
-
 void NotesManagement::loadNodes(const QJsonArray &notes)
 {
-//    QLayoutItem* child;
-//    while ((child = ui->gridLayoutNotes->takeAt(0)) != nullptr)
-//    {
-//        delete child;
-//    }
+    clearNotes();
     for (auto noteObj : notes)
     {
         QJsonObject jsonObject = noteObj.toObject();
@@ -92,6 +82,15 @@ void NotesManagement::addNewIcon(const QString &name)
         ++row;
     }
     ui->gridLayoutNotes->addLayout(vertLayout, row, actColumn++, 1, 1);
+}
+
+void NotesManagement::clearNotes()
+{
+    for (int i = 0; i < ui->gridLayoutNotes->rowCount(); ++i)
+    {
+        GridLayoutUtil::removeRow(ui->gridLayoutNotes, i);
+    }
+    actColumn = 0;
 }
 
 void NotesManagement::on_pushButtonAddNote_clicked()

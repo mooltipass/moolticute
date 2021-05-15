@@ -21,8 +21,6 @@ public:
 private slots:
     void on_pushButtonSaveNote_clicked();
 
-    void on_pushButtonEnterNotesMMM_clicked();
-
     void on_pushButtonAddNote_clicked();
 
     void onNoteReceived(const QString &note, const QByteArray &data, bool success);
@@ -34,6 +32,7 @@ private slots:
 private:
     void loadNodes(const QJsonArray& notes);
     void addNewIcon(const QString& name);
+    void clearNotes();
 
 
     int actColumn = 0;
