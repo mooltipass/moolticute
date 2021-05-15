@@ -169,6 +169,7 @@ signals:
 
     void notesFetched(const QJsonArray& notes);
     void noteReceived(const QString &note, const QByteArray &data, bool success);
+    void noteSaved(const QString &note, bool success);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

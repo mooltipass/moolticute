@@ -340,11 +340,19 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o.value("failed").toBool();
+        bool isFile = (o.contains("is_file") && o["is_file"].toBool()) || !o.contains("is_file");
         if (success && isMPBLE())
         {
             emit showExportPrompt();
         }
-        emit dataFileSent(o["service"].toString(), success);
+        if (isFile)
+        {
+            emit dataFileSent(o["service"].toString(), success);
+        }
+        else
+        {
+            emit noteSaved(o["service"].toString(), success);
+        }
     }
     else if (rootobj["msg"] == "delete_data_node")
     {

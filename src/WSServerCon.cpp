@@ -424,6 +424,7 @@ void WSServerCon::processMessage(const QString &message)
 
             QJsonObject ores;
             ores["service"] = service;
+            ores["is_file"] = isFile;
             QJsonObject oroot = root;
             oroot["data"] = ores;
             sendJsonMessage(oroot);

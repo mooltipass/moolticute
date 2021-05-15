@@ -19,7 +19,6 @@ public:
     void setWsClient(WSClient *c);
 
 private slots:
-    void on_pushButtonSaveNote_clicked();
 
     void on_pushButtonAddNote_clicked();
 
@@ -29,13 +28,16 @@ private slots:
 
     void on_pushButtonSave_clicked();
 
+    void on_toolButtonEditNote_clicked();
+
 private:
     void loadNodes(const QJsonArray& notes);
     void addNewIcon(const QString& name);
     void clearNotes();
 
 
-    int actColumn = 0;
+    int m_actColumn = 0;
+    bool m_isNewFile = false;
 
 
     Ui::NotesManagement *ui;
