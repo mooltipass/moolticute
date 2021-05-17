@@ -416,15 +416,16 @@ void WSServerCon::processMessage(const QString &message)
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
 
             QJsonObject ores;
             ores["service"] = service;
             ores["is_file"] = isFile;
+            if (!success)
+            {
+                ores["failed"] = true;
+                ores["error_message"] = errstr;
+            }
+
             QJsonObject oroot = root;
             oroot["data"] = ores;
             sendJsonMessage(oroot);

@@ -24,12 +24,26 @@ NotesManagement::NotesManagement(QWidget *parent) :
             ui->toolButtonEditNote->show();
             ui->lineEditNoteName->setReadOnly(true);
             ui->lineEditNoteName->setFrame(false);
+            QString noteName = ui->lineEditNoteName->text();
+            if (noteName.isEmpty() || (noteName != m_currentNote && m_noteList.contains(noteName)))
+            {
+                ui->pushButtonSave->hide();
+                ui->labelError->show();
+            }
+            else
+            {
+                ui->pushButtonSave->show();
+                ui->labelError->hide();
+            }
         }
     );
 
     ui->toolButtonEditNote->setStyleSheet(CSS_BLUE_BUTTON);
     ui->toolButtonEditNote->setIcon(AppGui::qtAwesome()->icon(fa::edit));
     ui->toolButtonEditNote->setToolTip(tr("Edit Note Name"));
+
+    ui->labelError->setStyleSheet("QLabel { color : red; }");
+    ui->labelError->hide();
 }
 
 NotesManagement::~NotesManagement()
@@ -41,24 +55,8 @@ void NotesManagement::setWsClient(WSClient *c)
 {
     wsClient = c;
     connect(wsClient, &WSClient::notesFetched, this, &NotesManagement::loadNodes);
-    connect(wsClient, &WSClient::noteSaved, [this](const QString& note, bool success)
-                {
-                    if (success)
-                    {
-                        addNewIcon(note);
-                    }
-                    else
-                    {
-                        qCritical() << "Note is note saved";
-                    }
-                });
+    connect(wsClient, &WSClient::noteSaved, this, &NotesManagement::onNoteSaved);
 }
-
-//void NotesManagement::on_pushButtonSaveNote_clicked()
-//{
-//    qDebug() << "Name: " << ui->lineEditNoteName->text() << ", " << ui->lineEditNoteContent->text();
-//    wsClient->sendDataFile(ui->lineEditNoteName->text(), ui->lineEditNoteContent->text().toUtf8(), false);
-//}
 
 void NotesManagement::loadNodes(const QJsonArray &notes)
 {
@@ -86,6 +84,7 @@ void NotesManagement::addNewIcon(const QString &name)
     connect(labelIcon, &ClickableLabel::clicked, [=](){
        connect(wsClient, &WSClient::noteReceived, this, &NotesManagement::onNoteReceived);
        wsClient->requestNote(name);
+       emit enterNoteEdit();
     });
 
     vertLayout->addWidget(labelIcon);
@@ -95,6 +94,7 @@ void NotesManagement::addNewIcon(const QString &name)
     labelName->setText(name);
 
     vertLayout->addWidget(labelName);
+    vertLayout->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
     int row = ui->gridLayoutNotes->rowCount() - 1;
     if (m_actColumn == 4)
@@ -103,6 +103,7 @@ void NotesManagement::addNewIcon(const QString &name)
         ++row;
     }
     ui->gridLayoutNotes->addLayout(vertLayout, row, m_actColumn++, 1, 1);
+    m_noteList.append(name);
 }
 
 void NotesManagement::clearNotes()
@@ -112,6 +113,7 @@ void NotesManagement::clearNotes()
         GridLayoutUtil::removeRow(ui->gridLayoutNotes, i);
     }
     m_actColumn = 0;
+    m_noteList.clear();
 }
 
 void NotesManagement::on_pushButtonAddNote_clicked()
@@ -125,6 +127,7 @@ void NotesManagement::on_pushButtonAddNote_clicked()
     ui->textEditNote->setPlainText("");
     ui->toolButtonEditNote->hide();
     m_isNewFile = true;
+    m_currentNote = "";
 }
 
 void NotesManagement::onNoteReceived(const QString &note, const QByteArray &data, bool success)
@@ -140,6 +143,7 @@ void NotesManagement::onNoteReceived(const QString &note, const QByteArray &data
     ui->stackedWidget->setCurrentWidget(ui->pageEditNotes);
     ui->lineEditNoteName->setText(note);
     ui->textEditNote->setPlainText(QString{data});
+    m_currentNote = note;
 }
 
 void NotesManagement::on_pushButtonDiscard_clicked()
@@ -156,6 +160,7 @@ void NotesManagement::on_pushButtonSave_clicked()
     {
         qDebug() << "Name: " << ui->lineEditNoteName->text() << ", " << ui->textEditNote->toPlainText();
         wsClient->sendDataFile(ui->lineEditNoteName->text(), ui->textEditNote->toPlainText().toUtf8(), false);
+        emit enterNoteEdit();
     }
     else
     {
@@ -171,4 +176,16 @@ void NotesManagement::on_toolButtonEditNote_clicked()
     ui->lineEditNoteName->setReadOnly(false);
     ui->lineEditNoteName->setFrame(true);
     ui->lineEditNoteName->setFocus();
+}
+
+void NotesManagement::onNoteSaved(const QString &note, bool success)
+{
+    if (success)
+    {
+        addNewIcon(note);
+    }
+    else
+    {
+        QMessageBox::critical(this, tr("Error"), tr("Saving note failed"));
+    }
 }

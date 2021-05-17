@@ -183,6 +183,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
     connect(ui->widgetFido, &FidoManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetFido, &FidoManagement::wantExitMemMode, this, &MainWindow::wantExitFidoManagement);
+    connect(ui->widgetNotes, &NotesManagement::enterNoteEdit, this, &MainWindow::wantEnterNoteEdit);
+
+    connect(wsClient, &WSClient::noteSaved, this, &MainWindow::displayNotePage);
+    connect(wsClient, &WSClient::noteReceived, this, &MainWindow::displayNotePage);
 
     connect(wsClient, &WSClient::memMgmtModeChanged, [this](bool isMMM){
         if (isMMM && (ui->promptWidget->isMMMErrorPrompt()
@@ -1144,6 +1148,16 @@ void MainWindow::wantExitFidoManagement()
 {
     ui->labelWait->show();
     ui->labelWait->setText(tr("<html><!--exit_fido_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
+    updateTabButtons();
+}
+
+void MainWindow::wantEnterNoteEdit()
+{
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--enter_credentials_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Waiting For Device Confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
@@ -2133,4 +2147,11 @@ void MainWindow::on_pushButtonSettingsSetToDefault_clicked()
     {
         wsClient->sendJsonData({{ "msg", "reset_default_settings" }});
     }
+}
+
+void MainWindow::displayNotePage()
+{
+    ui->stackedWidget->setCurrentWidget(ui->pageNotes);
+    updatePage();
+    updateTabButtons();
 }

@@ -36,14 +36,14 @@ border-right: none;
     <number>30</number>
    </property>
    <item>
-    <widget class="QLabel" name="labelNotesManagement">
+    <widget class="QLabel" name="labelNotesHeader">
      <property name="font">
       <font>
        <pointsize>12</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>Notes management</string>
+      <string>Notes</string>
      </property>
      <property name="class" stdset="0">
       <string>FrameTitle</string>
@@ -53,7 +53,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageListNotes">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -82,8 +82,8 @@ border-right: none;
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>20</width>
-            <height>20</height>
+            <width>572</width>
+            <height>396</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -179,6 +179,16 @@ border-right: none;
           </spacer>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelError">
+         <property name="text">
+          <string>Note Name already exists.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPlainTextEdit" name="textEditNote"/>

@@ -1426,12 +1426,15 @@ void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDevice
                 }
               ));
 
-    QVariantMap cbData = {
-        {"total", currentNodeSize},
-        {"current", current + BLE_DATA_BLOCK_SIZE},
-        {"msg", "WORKING on setDataNodeCb"}
-    };
-    cbProgress(cbData);
+    if (isFile)
+    {
+        QVariantMap cbData = {
+            {"total", currentNodeSize},
+            {"current", current + BLE_DATA_BLOCK_SIZE},
+            {"msg", "WORKING on setDataNodeCb"}
+        };
+        cbProgress(cbData);
+    }
 }
 
 void MPDeviceBleImpl::sendInitialStatusRequest()

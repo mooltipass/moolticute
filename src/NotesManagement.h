@@ -18,6 +18,10 @@ public:
 
     void setWsClient(WSClient *c);
 
+
+signals:
+    void enterNoteEdit();
+
 private slots:
 
     void on_pushButtonAddNote_clicked();
@@ -30,6 +34,8 @@ private slots:
 
     void on_toolButtonEditNote_clicked();
 
+    void onNoteSaved(const QString& note, bool success);
+
 private:
     void loadNodes(const QJsonArray& notes);
     void addNewIcon(const QString& name);
@@ -38,6 +44,9 @@ private:
 
     int m_actColumn = 0;
     bool m_isNewFile = false;
+
+    QVector<QString> m_noteList;
+    QString m_currentNote = "";
 
 
     Ui::NotesManagement *ui;
