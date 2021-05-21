@@ -187,6 +187,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::noteSaved, this, &MainWindow::displayNotePage);
     connect(wsClient, &WSClient::noteReceived, this, &MainWindow::displayNotePage);
+    connect(ui->widgetNotes, &NotesManagement::updateTabs, [this](){ updateTabButtons(); });
 
     connect(wsClient, &WSClient::memMgmtModeChanged, [this](bool isMMM){
         if (isMMM && (ui->promptWidget->isMMMErrorPrompt()
@@ -733,7 +734,6 @@ void MainWindow::updateDeviceDependentUI()
         ui->pbBleBattery->show();
         ui->groupBoxSecurityChallenge->show();
         ui->pushButtonFido->setVisible(true);
-        ui->pushButtonNotes->setVisible(true);
         ui->pushButtonSettingsSetToDefault->setVisible(true);
     }
     else
@@ -741,6 +741,7 @@ void MainWindow::updateDeviceDependentUI()
         ui->groupBox_UserSettings->hide();
         ui->groupBoxNiMHRecondition->hide();
         ui->groupBoxSecurityChallenge->hide();
+        ui->pushButtonNotes->setVisible(false);
     }
 }
 
@@ -1579,18 +1580,21 @@ void MainWindow::updateTabButtons()
         return;
     }
 
-    if ((ui->stackedWidget->currentWidget() == ui->pageFiles
+    if (((ui->stackedWidget->currentWidget() == ui->pageFiles
          || ui->stackedWidget->currentWidget() == ui->pageCredentials
          || ui->stackedWidget->currentWidget() == ui->pageIntegrity
          || ui->stackedWidget->currentWidget() == ui->pageFido
          || ui->stackedWidget->currentWidget() == ui->pageNotes) &&
-            wsClient->get_memMgmtMode())
+            wsClient->get_memMgmtMode()) ||
+            (ui->widgetNotes->isInNoteEditingMode() &&
+             ui->stackedWidget->currentWidget() == ui->pageNotes))
     {
         // Disable all tab buttons
         setEnabledToAllTabButtons(false);
 
         ui->pushButtonCred->setEnabled(ui->stackedWidget->currentWidget() == ui->pageCredentials);
         ui->pushButtonFiles->setEnabled(ui->stackedWidget->currentWidget() == ui->pageFiles);
+        ui->pushButtonFiles->setEnabled(ui->stackedWidget->currentWidget() == ui->pageNotes);
 
         return;
     }
@@ -1704,6 +1708,7 @@ void MainWindow::displayBundleVersion()
         const bool displayBundle = wsClient->get_bundleVersion() > 0;
         ui->labelBundleVersion->setVisible(displayBundle);
         ui->labelBundleVersionValue->setVisible(displayBundle);
+        ui->pushButtonNotes->setVisible(wsClient->get_bundleVersion() >= 1);
     }
     else
     {
@@ -2152,6 +2157,4 @@ void MainWindow::on_pushButtonSettingsSetToDefault_clicked()
 void MainWindow::displayNotePage()
 {
     ui->stackedWidget->setCurrentWidget(ui->pageNotes);
-    updatePage();
-    updateTabButtons();
 }

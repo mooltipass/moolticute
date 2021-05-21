@@ -18,9 +18,12 @@ public:
 
     void setWsClient(WSClient *c);
 
+    bool isInNoteEditingMode() const { return m_isNoteEditing; }
+
 
 signals:
     void enterNoteEdit();
+    void updateTabs();
 
 private slots:
 
@@ -35,6 +38,9 @@ private slots:
     void on_toolButtonEditNote_clicked();
 
     void onNoteSaved(const QString& note, bool success);
+    void onEditingFinished();
+
+    void on_textEditNote_textChanged();
 
 private:
     void loadNodes(const QJsonArray& notes);
@@ -44,9 +50,11 @@ private:
 
     int m_actColumn = 0;
     bool m_isNewFile = false;
+    bool m_isNoteEditing = false;
 
     QVector<QString> m_noteList;
-    QString m_currentNote = "";
+    QString m_currentNoteName = "";
+    QString m_noteContentClone = "";
 
 
     Ui::NotesManagement *ui;

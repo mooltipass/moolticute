@@ -19,24 +19,7 @@ NotesManagement::NotesManagement(QWidget *parent) :
     ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
-    connect(ui->lineEditNoteName, &QLineEdit::editingFinished,
-        [this] {
-            ui->toolButtonEditNote->show();
-            ui->lineEditNoteName->setReadOnly(true);
-            ui->lineEditNoteName->setFrame(false);
-            QString noteName = ui->lineEditNoteName->text();
-            if (noteName.isEmpty() || (noteName != m_currentNote && m_noteList.contains(noteName)))
-            {
-                ui->pushButtonSave->hide();
-                ui->labelError->show();
-            }
-            else
-            {
-                ui->pushButtonSave->show();
-                ui->labelError->hide();
-            }
-        }
-    );
+    connect(ui->lineEditNoteName, &QLineEdit::editingFinished, this, &NotesManagement::onEditingFinished);
 
     ui->toolButtonEditNote->setStyleSheet(CSS_BLUE_BUTTON);
     ui->toolButtonEditNote->setIcon(AppGui::qtAwesome()->icon(fa::edit));
@@ -127,47 +110,48 @@ void NotesManagement::on_pushButtonAddNote_clicked()
     ui->textEditNote->setPlainText("");
     ui->toolButtonEditNote->hide();
     m_isNewFile = true;
-    m_currentNote = "";
+    m_currentNoteName = "";
+    m_isNoteEditing = true;
+    emit updateTabs();
 }
 
 void NotesManagement::onNoteReceived(const QString &note, const QByteArray &data, bool success)
 {
     disconnect(wsClient, &WSClient::noteReceived, this, &NotesManagement::onNoteReceived);
 
+    m_isNoteEditing = success;
     if (!success)
     {
         QMessageBox::warning(this, tr("Failure"), tr("Note Fetch Denied!"));
+        emit updateTabs();
         return;
     }
 
     ui->stackedWidget->setCurrentWidget(ui->pageEditNotes);
     ui->lineEditNoteName->setText(note);
-    ui->textEditNote->setPlainText(QString{data});
-    m_currentNote = note;
+    ui->toolButtonEditNote->hide();
+    m_noteContentClone = QString{data};
+    ui->textEditNote->setPlainText(m_noteContentClone);
+    m_currentNoteName = note;
 }
 
 void NotesManagement::on_pushButtonDiscard_clicked()
 {
-    qCritical() << "Discard note";
     ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
+    ui->labelError->hide();
     m_isNewFile = false;
+    m_isNoteEditing = false;
+    emit updateTabs();
 }
 
 void NotesManagement::on_pushButtonSave_clicked()
 {
-    qCritical() << "Save note";
-    if (m_isNewFile)
-    {
-        qDebug() << "Name: " << ui->lineEditNoteName->text() << ", " << ui->textEditNote->toPlainText();
-        wsClient->sendDataFile(ui->lineEditNoteName->text(), ui->textEditNote->toPlainText().toUtf8(), false);
-        emit enterNoteEdit();
-    }
-    else
-    {
-        //send modify file
-    }
+    wsClient->sendDataFile(ui->lineEditNoteName->text(), ui->textEditNote->toPlainText().toUtf8(), false);
+    emit enterNoteEdit();
+
     ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
-    m_isNewFile = false;
+    ui->labelError->hide();
+    m_isNoteEditing = false;
 }
 
 void NotesManagement::on_toolButtonEditNote_clicked()
@@ -182,10 +166,51 @@ void NotesManagement::onNoteSaved(const QString &note, bool success)
 {
     if (success)
     {
-        addNewIcon(note);
+        if (m_isNewFile)
+        {
+            addNewIcon(note);
+        }
     }
     else
     {
         QMessageBox::critical(this, tr("Error"), tr("Saving note failed"));
+    }
+    m_isNewFile = false;
+    m_isNoteEditing = false;
+    emit updateTabs();
+}
+
+void NotesManagement::onEditingFinished()
+{
+    if (!m_isNewFile)
+    {
+        return;
+    }
+    ui->toolButtonEditNote->show();
+    ui->lineEditNoteName->setReadOnly(true);
+    ui->lineEditNoteName->setFrame(false);
+    QString noteName = ui->lineEditNoteName->text();
+    if (noteName.isEmpty() || (noteName != m_currentNoteName && m_noteList.contains(noteName)))
+    {
+        ui->pushButtonSave->hide();
+        ui->labelError->show();
+    }
+    else
+    {
+        ui->pushButtonSave->show();
+        ui->labelError->hide();
+    }
+}
+
+void NotesManagement::on_textEditNote_textChanged()
+{
+    QString note = ui->textEditNote->toPlainText();
+    if (note == m_noteContentClone || note.isEmpty())
+    {
+        ui->pushButtonSave->hide();
+    }
+    else
+    {
+        ui->pushButtonSave->show();
     }
 }
