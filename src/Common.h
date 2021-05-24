@@ -308,6 +308,12 @@ public:
         WEBAUTHN_ADDR_IDX = 1
     };
 
+    enum DataAddressType
+    {
+        DATA_ADDR_IDX = 0,
+        NOTE_ADDR_IDX = 1
+    };
+
     static const QString ISODateWithMsFormat;
     static const QString SIMPLE_CRYPT;
     static const QString SIMPLE_CRYPT_V2;

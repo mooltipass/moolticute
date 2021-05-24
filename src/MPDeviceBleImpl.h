@@ -69,6 +69,9 @@ public:
     QList<QString> getNotes() const { return m_notes; }
     void getNoteNode(QString note, std::function<void(bool, QString, QString, QByteArray)> cb);
 
+    bool isNoteAvailable() const;
+    void loadNotes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
+
     void checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb);
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb, AsyncJobs *jobs = nullptr);
     void changePassword(const QByteArray& address, const QString& pwd, MessageHandlerCb cb);
@@ -89,7 +92,7 @@ public:
     bool processReceivedData(const QByteArray& data, QByteArray& dataReceived);
 
     QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
-    QByteArray getDataStartNode(const QByteArray& data) const;
+    QVector<QByteArray> getDataStartNode(const QByteArray& data) const;
     bool readDataNode(AsyncJobs *jobs, const QByteArray& data, bool isFile = true);
 
     bool isAfterAuxFlash();
@@ -134,6 +137,8 @@ public:
     void loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
     void appendLoginNode(MPNode* loginNode, MPNode* loginNodeClone, Common::AddressType addrType);
     void appendLoginChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, Common::AddressType addrType);
+    void appendDataNode(MPNode* loginNode, MPNode* loginNodeClone, Common::DataAddressType addrType);
+    void appendDataChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, Common::DataAddressType addrType);
     void generateExportData(QJsonArray& exportTopArray);
 
     static char toChar(const QJsonValue &val) { return static_cast<char>(val.toInt()); }

@@ -99,6 +99,7 @@ private:
     QString fileName;
 
     QStringList deletedList;
+    QStringList deletedNoteList;
     void setFileCacheControlsVisible(bool visible);
 };
 

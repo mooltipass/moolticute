@@ -333,6 +333,24 @@ void MPDeviceBleImpl::getNoteNode(QString note, std::function<void (bool, QStrin
     mpDev->enqueueAndRunJob(jobs);
 }
 
+bool MPDeviceBleImpl::isNoteAvailable() const
+{
+    return get_bundleVersion() >= 1;
+}
+
+void MPDeviceBleImpl::loadNotes(AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress)
+{
+    if (mpDev->startDataNode[Common::NOTE_ADDR_IDX] != MPNode::EmptyAddress)
+    {
+        qInfo() << "Loading parent nodes...";
+        mpDev->loadDataNode(jobs, mpDev->startDataNode[Common::NOTE_ADDR_IDX], true, cbProgress, Common::NOTE_ADDR_IDX);
+    }
+    else
+    {
+        qInfo() << "No parent webauthn nodes to load.";
+    }
+}
+
 void MPDeviceBleImpl::checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb)
 {
     auto *jobs = new AsyncJobs(QString("Check and Store Credential"), this);
@@ -614,15 +632,19 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
     return res;
  }
 
- QByteArray MPDeviceBleImpl::getDataStartNode(const QByteArray &data) const
+ QVector<QByteArray> MPDeviceBleImpl::getDataStartNode(const QByteArray &data) const
  {
      auto addresses = processReceivedStartNodes(data);
      if (addresses.size() <= FIRST_DATA_STARTING_ADDR)
      {
         qCritical() << "Data starting address is not received";
-        return MPNode::EmptyAddress;
+        return {MPNode::EmptyAddress, MPNode::EmptyAddress};
      }
-     return addresses[FIRST_DATA_STARTING_ADDR];
+     auto dataAddresses = addresses.mid(FIRST_DATA_STARTING_ADDR, addresses.size() - FIRST_DATA_STARTING_ADDR);
+     qDebug() << "Received Data starting node: " << dataAddresses.size();
+     qDebug() << dataAddresses;
+
+     return dataAddresses;
  }
 
 bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data, bool isFile /*= true */)
@@ -1283,6 +1305,40 @@ void MPDeviceBleImpl::appendLoginChildNode(MPNode *loginChildNode, MPNode *login
         case Common::WEBAUTHN_ADDR_IDX:
             mpDev->webAuthnLoginChildNodes.append(loginChildNode);
             mpDev->webAuthnLoginChildNodesClone.append(loginChildNodeClone);
+            break;
+        default:
+            qCritical() << "Invalid address type";
+    }
+}
+
+void MPDeviceBleImpl::appendDataNode(MPNode *loginNode, MPNode *loginNodeClone, Common::DataAddressType addrType)
+{
+    switch(addrType)
+    {
+        case Common::DATA_ADDR_IDX:
+            mpDev->dataNodes.append(loginNode);
+            mpDev->dataNodesClone.append(loginNodeClone);
+            break;
+        case Common::NOTE_ADDR_IDX:
+            mpDev->notesLoginNodes.append(loginNode);
+            mpDev->notesLoginNodesClone.append(loginNodeClone);
+            break;
+        default:
+            qCritical() << "Invalid address type";
+    }
+}
+
+void MPDeviceBleImpl::appendDataChildNode(MPNode *loginChildNode, MPNode *loginChildNodeClone, Common::DataAddressType addrType)
+{
+    switch(addrType)
+    {
+        case Common::DATA_ADDR_IDX:
+            mpDev->dataChildNodes.append(loginChildNode);
+            mpDev->dataChildNodesClone.append(loginChildNodeClone);
+            break;
+        case Common::NOTE_ADDR_IDX:
+            mpDev->notesLoginChildNodes.append(loginChildNode);
+            mpDev->notesLoginChildNodesClone.append(loginChildNodeClone);
             break;
         default:
             qCritical() << "Invalid address type";

@@ -148,7 +148,7 @@ public:
                      const MPDeviceProgressCb &cbProgress, bool isFile = true);
 
     //Delete a data context from the device
-    void deleteDataNodesAndLeave(QStringList services,
+    void deleteDataNodesAndLeave(QStringList services, QStringList notes,
                                  MessageHandlerCb cb,
                                  const MPDeviceProgressCb &cbProgress);
 
@@ -198,6 +198,7 @@ public:
     NodeList &getLoginNodes() { return loginNodes; }
     NodeList &getDataNodes() { return dataNodes; }
     NodeList &getFidoDataNodes() { return webAuthnLoginNodes; }
+    NodeList &getNoteDataNodes() { return notesLoginNodes; }
 
     //true if device is a mini
     inline bool isMini() const { return DeviceType::MINI == deviceType; }
@@ -285,10 +286,12 @@ private:
     void loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone,
                             const QByteArray &address, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     void loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs,
-                      const MPDeviceProgressCb &cbProgress);
-    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress, quint32 nbBytesFetched);
+                      const MPDeviceProgressCb &cbProgress, Common::DataAddressType addrType = Common::DATA_ADDR_IDX);
+    void loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress,
+                           quint32 nbBytesFetched, Common::DataAddressType addrType = Common::DATA_ADDR_IDX);
     void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
                                const MPDeviceProgressCb &cbProgress);
+    void deleteDataNodes(QStringList nodeNames, MessageHandlerCb cb, Common::DataAddressType addrType);
 
     void createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode = false);
 
@@ -407,8 +410,8 @@ private:
     QByteArray ctrValue;
     QVector<QByteArray> startNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     QVector<quint32> virtualStartNode = {0, 0};
-    QByteArray startDataNode = MPNode::EmptyAddress;
-    quint32 virtualDataStartNode = 0;
+    QVector<QByteArray> startDataNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
+    QVector<quint32> virtualDataStartNode = {0, 0};
     QList<QByteArray> cpzCtrValue;
     QList<QByteArray> favoritesAddrs;
     NodeList loginNodes;         //list of all parent nodes for credentials
@@ -424,7 +427,7 @@ private:
     quint32 dataDbChangeNumberClone;
     QByteArray ctrValueClone;
     QVector<QByteArray> startNodeClone = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
-    QByteArray startDataNodeClone = MPNode::EmptyAddress;
+    QVector<QByteArray> startDataNodeClone = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     QList<QByteArray> cpzCtrValueClone;
     QList<QByteArray> favoritesAddrsClone;
     NodeList loginNodesClone;         //list of all parent nodes for credentials
@@ -456,6 +459,12 @@ private:
     NodeList webAuthnLoginNodesClone;
     NodeList webAuthnLoginChildNodes;
     NodeList webAuthnLoginChildNodesClone;
+
+    //Notes datas
+    NodeList notesLoginNodes;
+    NodeList notesLoginNodesClone;
+    NodeList notesLoginChildNodes;
+    NodeList notesLoginChildNodesClone;
 
 
     bool isFw12Flag = false;            // true if fw is at least v1.2

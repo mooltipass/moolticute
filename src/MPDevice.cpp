@@ -849,19 +849,19 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                 }
                 else
                 {
-                    startDataNode = pMesProt->getFullPayload(data);
-                    startDataNodeClone = pMesProt->getFullPayload(data);
+                    startDataNode[Common::DATA_ADDR_IDX] = pMesProt->getFullPayload(data);
+                    startDataNodeClone[Common::DATA_ADDR_IDX] = pMesProt->getFullPayload(data);
                 }
-                qDebug() << "Start data node addr:" << startDataNode.toHex();
+                qDebug() << "Start data node addr:" << startDataNode[Common::DATA_ADDR_IDX].toHex();
 
                 //if data parent address is not null, load nodes
-                if (startDataNode != MPNode::EmptyAddress)
+                if (startDataNode[Common::DATA_ADDR_IDX] != MPNode::EmptyAddress)
                 {
                     qInfo() << "Loading data parent nodes...";
                     if (!fullScan)
                     {
                         //full data nodes are not needed. Only parents for service name
-                        loadDataNode(jobs, startDataNode, getDataChilds, cbProgress);
+                        loadDataNode(jobs, startDataNode[Common::DATA_ADDR_IDX], getDataChilds, cbProgress);
                     }
                 }
                 else
@@ -871,6 +871,11 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                     filesCache.setDbChangeNumber(get_dataDbChangeNumber());
                     emit filesCacheChanged();
                     qInfo() << "No parent data nodes to load.";
+                }
+
+                if (isBLE() && bleImpl->isNoteAvailable())
+                {
+                    bleImpl->loadNotes(jobs, cbProgress);
                 }
 
                 //once we received start node address and data start node address, trigger full scan
@@ -1151,6 +1156,30 @@ void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
     }));
 }
 
+void MPDevice::deleteDataNodes(QStringList nodeNames, MessageHandlerCb cb, Common::DataAddressType addrType)
+{
+    for (int i = 0; i < nodeNames.size(); ++i)
+    {
+        qDebug() << "Deleting file for " << nodeNames[i];
+        MPNode* parentPt = findNodeWithNameInList(Common::DATA_ADDR_IDX == addrType ? dataNodes : notesLoginNodes, nodeNames[i], true);
+
+        if(!parentPt)
+        {
+            exitMemMgmtMode(true);
+            qCritical() << "Couldn't find node for " << nodeNames[i];
+            cb(false, "Moolticute Internal Error (DDNAL#1)");
+        }
+        else
+        {
+            /* Delete all the childs */
+            deleteDataParentChilds(parentPt);
+
+            /* Delete empty parent */
+            removeEmptyParentFromDB(parentPt, true);
+        }
+    }
+}
+
 void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qDebug() << "Loading cred parent node at address: " << address.toHex();
@@ -1299,18 +1328,25 @@ void MPDevice::loadLoginChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *paren
     }));
 }
 
-void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, const MPDeviceProgressCb &cbProgress)
+void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool load_childs, const MPDeviceProgressCb &cbProgress, Common::DataAddressType addrType /*= Common::DATA_ADDR_IDX*/)
 {
     MPNode *pnode = pMesProt->createMPNode(this, address);
-    dataNodes.append(pnode);
     MPNode *pnodeClone = pMesProt->createMPNode(this, address);
-    dataNodesClone.append(pnodeClone);
+    if (isBLE())
+    {
+        bleImpl->appendDataNode(pnode, pnodeClone, addrType);
+    }
+    else
+    {
+        dataNodes.append(pnode);
+        dataNodesClone.append(pnodeClone);
+    }
 
     qDebug() << "Loading data parent node at address: " << address.toHex();
 
     jobs->append(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, jobs, pnode, pnodeClone, load_childs, cbProgress](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, pnode, pnodeClone, load_childs, cbProgress, addrType](const QByteArray &data, bool &done) -> bool
     {
         if (pMesProt->getMessageSize(data) == 1)
         {
@@ -1346,7 +1382,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             if (pnode->getStartChildAddress() != MPNode::EmptyAddress && load_childs)
             {
                 qDebug() << "Loading data child nodes...";
-                loadDataChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress(), cbProgress, 0);
+                loadDataChildNode(jobs, pnode, pnodeClone, pnode->getStartChildAddress(), cbProgress, 0, addrType);
             }
             else
             {
@@ -1359,7 +1395,7 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
             //Load next parent
             if (pnode->getNextParentAddress() != MPNode::EmptyAddress)
             {
-                loadDataNode(jobs, pnode->getNextParentAddress(), load_childs, cbProgress);
+                loadDataNode(jobs, pnode->getNextParentAddress(), load_childs, cbProgress, addrType);
             }
         }
 
@@ -1367,20 +1403,29 @@ void MPDevice::loadDataNode(AsyncJobs *jobs, const QByteArray &address, bool loa
     }));
 }
 
-void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress, quint32 nbBytesFetched)
+void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parentClone, const QByteArray &address, const MPDeviceProgressCb &cbProgress,
+                                 quint32 nbBytesFetched, Common::DataAddressType addrType /*= Common::DATA_ADDR_IDX*/)
 {
     MPNode *cnode = pMesProt->createMPNode(this, address);
     parent->appendChildData(cnode);
-    dataChildNodes.append(cnode);
     MPNode *cnodeClone = pMesProt->createMPNode(this, address);
     parentClone->appendChildData(cnodeClone);
-    dataChildNodesClone.append(cnodeClone);
+
+    if (isBLE())
+    {
+        bleImpl->appendDataChildNode(cnode, cnodeClone, addrType);
+    }
+    else
+    {
+        dataChildNodes.append(cnode);
+        dataChildNodesClone.append(cnodeClone);
+    }
 
     qDebug() << "Loading data child node at address: " << address.toHex();
 
     jobs->prepend(new MPCommandJob(this, MPCmd::READ_FLASH_NODE,
                                   address,
-                                  [this, jobs, cnode, cnodeClone, cbProgress, nbBytesFetched, parent, parentClone](const QByteArray &data, bool &done) -> bool
+                                  [this, jobs, cnode, cnodeClone, cbProgress, nbBytesFetched, parent, parentClone, addrType](const QByteArray &data, bool &done) -> bool
     {
         if (pMesProt->getMessageSize(data) == 1)
         {
@@ -1424,7 +1469,9 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
                 parentClone->setEncDataSize(nbBytesFetched + dataEncSize);
 
                 /* and if our parent doesn't have next one... */
-                if (parent->getNextParentAddress() == MPNode::EmptyAddress)
+                // TODO: Check this
+                if (parent->getNextParentAddress() == MPNode::EmptyAddress &&
+                        Common::DATA_ADDR_IDX == addrType)
                 {
                     // No next parent, fill our file cache
                     QList<QVariantMap> list;
@@ -1975,8 +2022,8 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
     {
         /** SAME FOR DATA NODES **/
         /* start with start node (duh) */
-        tempParentAddress = startDataNode;
-        tempVirtualParentAddress = virtualDataStartNode;
+        tempParentAddress = startDataNode[Common::DATA_ADDR_IDX];
+        tempVirtualParentAddress = virtualDataStartNode[Common::DATA_ADDR_IDX];
 
         /* Loop through the parent nodes */
         while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
@@ -1991,11 +2038,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode[Common::DATA_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode[Common::DATA_ADDR_IDX]))
                     {
                         /* start node is incorrect */
-                        startDataNode = QByteArray(MPNode::EmptyAddress);
-                        virtualDataStartNode = 0;
+                        startDataNode[Common::DATA_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
+                        virtualDataStartNode[Common::DATA_ADDR_IDX] = 0;
                     }
                     else
                     {
@@ -2015,11 +2062,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode[Common::DATA_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode[Common::DATA_ADDR_IDX]))
                     {
                         /* start node is already tagged... how's that even possible? */
-                        startDataNode = QByteArray(MPNode::EmptyAddress);
-                        virtualDataStartNode = 0;
+                        startDataNode[Common::DATA_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
+                        virtualDataStartNode[Common::DATA_ADDR_IDX] = 0;
                     }
                     else
                     {
@@ -2035,7 +2082,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
             else
             {
                 /* check previous node address */
-                if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode))
+                if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode[Common::DATA_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode[Common::DATA_ADDR_IDX]))
                 {
                     /* first parent node: previous address should be an empty one */
                     if ((tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != 0))
@@ -2293,8 +2340,8 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     /* Which list do we want to browse ? */
     if (isDataParent)
     {
-        curNodeAddr = startDataNode;
-        curNodeAddrVirtual = virtualDataStartNode;
+        curNodeAddr = startDataNode[Common::DATA_ADDR_IDX];
+        curNodeAddrVirtual = virtualDataStartNode[Common::DATA_ADDR_IDX];
     }
     else
     {
@@ -2322,8 +2369,8 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
             /* Update starting parent */
             if (isDataParent)
             {
-                startDataNode = parentNodePt->getAddress();
-                virtualDataStartNode = parentNodePt->getVirtualAddress();
+                startDataNode[Common::DATA_ADDR_IDX] = parentNodePt->getAddress();
+                virtualDataStartNode[Common::DATA_ADDR_IDX] = parentNodePt->getVirtualAddress();
             }
             else
             {
@@ -2389,8 +2436,8 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
                         qDebug() << "Parent node is the new start node";
                         if (isDataParent)
                         {
-                            startDataNode = parentNodePt->getAddress();
-                            virtualDataStartNode = parentNodePt->getVirtualAddress();
+                            startDataNode[Common::DATA_ADDR_IDX] = parentNodePt->getAddress();
+                            virtualDataStartNode[Common::DATA_ADDR_IDX] = parentNodePt->getVirtualAddress();
                         }
                         else
                         {
@@ -2605,8 +2652,8 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
     /* Which list do we want to browse ? */
     if (isDataParent)
     {
-        curNodeAddr = startDataNode;
-        curNodeAddrVirtual = virtualDataStartNode;
+        curNodeAddr = startDataNode[Common::DATA_ADDR_IDX];
+        curNodeAddrVirtual = virtualDataStartNode[Common::DATA_ADDR_IDX];
     }
     else
     {
@@ -2708,8 +2755,8 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                             /* Linked list ends there, only credential */
                             if (isDataParent)
                             {
-                                startDataNode = MPNode::EmptyAddress;
-                                virtualDataStartNode = 0;
+                                startDataNode[Common::DATA_ADDR_IDX] = MPNode::EmptyAddress;
+                                virtualDataStartNode[Common::DATA_ADDR_IDX] = 0;
                             }
                             else
                             {
@@ -2722,8 +2769,8 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                             /* Link the chain together */
                             if (isDataParent)
                             {
-                                startDataNode = nextNodePt->getAddress();
-                                virtualDataStartNode = nextNodePt->getVirtualAddress();
+                                startDataNode[Common::DATA_ADDR_IDX] = nextNodePt->getAddress();
+                                virtualDataStartNode[Common::DATA_ADDR_IDX] = nextNodePt->getVirtualAddress();
                             }
                             else
                             {
@@ -3347,7 +3394,7 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
                 const auto ZERO_BYTE = static_cast<char>(0);
                 Common::fill(startData, 2, ZERO_BYTE);
             }
-            startData.append(startDataNode);
+            startData.append(startDataNode[Common::DATA_ADDR_IDX]);
             jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startData, pMesProt->getDefaultFuncDone()));
         }
     }
@@ -4660,7 +4707,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
     runAndDequeueJobs();
 }
 
-void  MPDevice::deleteDataNodesAndLeave(QStringList services,
+void  MPDevice::deleteDataNodesAndLeave(QStringList services, QStringList notes,
                                         MessageHandlerCb cb,
                                         const MPDeviceProgressCb &cbProgress)
 {
@@ -4669,7 +4716,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
     // Use this file size to make a progress bar for rescan and delete
     // ... and of course to display stats in file MMM
 
-    if (services.isEmpty())
+    if (services.isEmpty() && notes.isEmpty())
     {
         //No data services to delete, just exit mmm
         exitMemMgmtMode(true);
@@ -4682,29 +4729,14 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services,
     cleanMMMVars();
     memMgmtModeReadFlash(jobs, false, cbProgress, false, true, true);
 
-    connect(jobs, &AsyncJobs::finished, [this, services, cb, cbProgress](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, services, notes, cb, cbProgress](const QByteArray &data)
     {
         Q_UNUSED(data);
 
-        for (qint32 i = 0; i < services.size(); i++)
+        deleteDataNodes(services, cb, Common::DATA_ADDR_IDX);
+        if (isBLE())
         {
-            qDebug() << "Deleting file for " << services[i];
-            MPNode* parentPt = findNodeWithNameInList(dataNodes, services[i], true);
-
-            if(!parentPt)
-            {
-                exitMemMgmtMode(true);
-                qCritical() << "Couldn't find node for " << services[i];
-                cb(false, "Moolticute Internal Error (DDNAL#1)");
-            }
-            else
-            {
-                /* Delete all the childs */
-                deleteDataParentChilds(parentPt);
-
-                /* Delete empty parent */
-                removeEmptyParentFromDB(parentPt, true);
-            }
+            deleteDataNodes(notes, cb, Common::NOTE_ADDR_IDX);
         }
 
         /* Check our DB */
@@ -4930,10 +4962,10 @@ void MPDevice::changeVirtualAddressesToFreeAddresses(bool onlyChangePwd /* = fal
         qDebug() << "Setting start webauthn node to " << getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]).toHex();
         startNode[Common::WEBAUTHN_ADDR_IDX] = getFreeAddress(virtualStartNode[Common::WEBAUTHN_ADDR_IDX]);
     }
-    if (virtualDataStartNode != 0)
+    if (virtualDataStartNode[Common::DATA_ADDR_IDX] != 0)
     {
-        qDebug() << "Setting data start node to " << getFreeAddress(virtualDataStartNode).toHex();
-        startDataNode = getFreeAddress(virtualDataStartNode);
+        qDebug() << "Setting data start node to " << getFreeAddress(virtualDataStartNode[Common::DATA_ADDR_IDX]).toHex();
+        startDataNode[Common::DATA_ADDR_IDX] = getFreeAddress(virtualDataStartNode[Common::DATA_ADDR_IDX]);
     }
     qDebug() << "Replacing virtual addresses for login nodes...";
     for (auto &i: loginNodes)
@@ -5123,7 +5155,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping one data parent node link in chain: test failed!";return false;} else qInfo() << "Skipping one data parent node link in chain: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Skipping first data parent node";
-    startDataNode = dataNodes[1]->getAddress();
+    startDataNode[Common::DATA_ADDR_IDX] = dataNodes[1]->getAddress();
     dataNodes[1]->setPreviousParentAddress(MPNode::EmptyAddress);
     checkLoadedNodes(true, true, true);
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping first data parent node: test failed!";return false;} else qInfo() << "Skipping first data parent node: passed!";
@@ -5134,7 +5166,7 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Skipping last data parent node: test failed!";return false;} else qInfo() << "Skipping last data parent node: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Setting invalid startNode";
-    startDataNode = invalidAddress;
+    startDataNode[Common::DATA_ADDR_IDX] = invalidAddress;
     checkLoadedNodes(true, true, true);
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Setting invalid data startNode: test failed!";return false;} else qInfo() << "Setting invalid data startNode: passed!";
 
@@ -5233,7 +5265,7 @@ QByteArray MPDevice::generateExportFileData(const QString &encryption)
     exportTopArray.append(QJsonValue(Common::bytesToJson(startNode[Common::CRED_ADDR_IDX])));
 
     /* Data starting parent */
-    exportTopArray.append(QJsonValue(Common::bytesToJson(startDataNode)));
+    exportTopArray.append(QJsonValue(Common::bytesToJson(startDataNode[Common::DATA_ADDR_IDX])));
 
     /* Favorites */
     QJsonArray favQJsonArray = QJsonArray();
@@ -5626,7 +5658,7 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 void MPDevice::cleanImportedVars(void)
 {
     virtualStartNode = {0, 0};
-    virtualDataStartNode = 0;
+    virtualDataStartNode = {0, 0};
     newAddressesNeededCounter = 0;
     importedCtrValue.clear();
     importedStartNode.clear();
@@ -5651,7 +5683,7 @@ void MPDevice::cleanMMMVars(void)
 {
     /* Cleaning all temp values */
     virtualStartNode = {0, 0};
-    virtualDataStartNode = 0;
+    virtualDataStartNode = {0, 0};
     ctrValue.clear();
     cpzCtrValue.clear();
     clearAndDelete(loginChildNodes);
@@ -5674,9 +5706,13 @@ void MPDevice::cleanMMMVars(void)
         clearAndDelete(webAuthnLoginChildNodesClone);
         clearAndDelete(webAuthnLoginNodes);
         clearAndDelete(webAuthnLoginNodesClone);
+        clearAndDelete(notesLoginChildNodes);
+        clearAndDelete(notesLoginChildNodesClone);
+        clearAndDelete(notesLoginNodes);
+        clearAndDelete(notesLoginNodesClone);
         bleImpl->getFreeAddressProvider().cleanFreeAddresses();
     }
-    startDataNode = MPNode::EmptyAddress;
+    startDataNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     startNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
 }
 

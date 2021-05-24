@@ -185,18 +185,21 @@ void FilesManagement::on_pushButtonEnterMMM_clicked()
 void FilesManagement::on_buttonQuitMMM_clicked()
 {
     filesModel->clear();
-    if (!deletedList.isEmpty())
+    if (deletedList.isEmpty() && deletedNoteList.isEmpty())
     {
-        emit wantExitMemMode();
-        wsClient->deleteDataFilesAndLeave(deletedList);
+        wsClient->sendLeaveMMRequest();
     }
     else
-        wsClient->sendLeaveMMRequest();
+    {
+        emit wantExitMemMode();
+        wsClient->deleteDataFilesAndLeave(deletedList, deletedNoteList);
+    }
+
 }
 
 void FilesManagement::on_buttonDiscard_pressed()
 {
-    if (deletedList.isEmpty())
+    if (deletedList.isEmpty() && deletedNoteList.isEmpty())
         wsClient->sendLeaveMMRequest();
 }
 
@@ -216,7 +219,18 @@ void FilesManagement::loadModel()
         item->setIcon(AppGui::qtAwesome()->icon(fa::fileo));
         filesModel->appendRow(item);
     }
+
+    jarr = wsClient->getMemoryData()["notes_nodes"].toArray();
+    for (int i = 0;i < jarr.count();i++)
+    {
+        QJsonObject o = jarr.at(i).toObject();
+        QStandardItem *item = new QStandardItem(o["service"].toString());
+        item->setIcon(AppGui::qtAwesome()->icon(fa::newspapero));
+        item->setData("note");
+        filesModel->appendRow(item);
+    }
     deletedList.clear();
+    deletedNoteList.clear();
 
     // Select first item by default
     auto selectionModel = ui->filesListView->selectionModel();
@@ -410,7 +424,14 @@ void FilesManagement::on_pushButtonDelFile_clicked()
         return;
     }
 
-    deletedList.append(currentItem->text());
+    if (currentItem->data().toString() == "note")
+    {
+        deletedNoteList.append(currentItem->text());
+    }
+    else
+    {
+        deletedList.append(currentItem->text());
+    }
     filesModel->removeRow(currentItem->row());
 
     // Select another item

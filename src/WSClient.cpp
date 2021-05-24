@@ -662,12 +662,18 @@ void WSClient::sendDataFile(const QString &service, const QByteArray &data, bool
                   { "data", d }});
 }
 
-void WSClient::deleteDataFilesAndLeave(const QStringList &services)
+void WSClient::deleteDataFilesAndLeave(const QStringList &services, const QStringList &notes)
 {
     QJsonArray s;
     for (const QString &srv: qAsConst(services))
         s.append(srv.toLower());
-    QJsonObject d = {{ "services", s }};
+
+    QJsonArray noteArray;
+    for (const auto& note : notes)
+    {
+        noteArray.append(note);
+    }
+    QJsonObject d = {{ "services", s }, {"notes", noteArray}};
     sendJsonData({{ "msg", "delete_data_nodes" },
                   { "data", d }});
 }

@@ -479,10 +479,17 @@ void WSServerCon::processMessage(const QString &message)
 
         QJsonArray jarr = o["services"].toArray();
         QStringList services;
-        for (int i = 0;i < jarr.size();i++)
+        for (int i = 0; i < jarr.size(); i++)
             services.append(jarr[i].toString());
 
-        mpdevice->deleteDataNodesAndLeave(services,
+        QJsonArray noteArray = o["notes"].toArray();
+        QStringList notes;
+        for (int i = 0; i < noteArray.size(); i++)
+        {
+            notes.append(noteArray[i].toString());
+        }
+
+        mpdevice->deleteDataNodesAndLeave(services, notes,
                 [=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))
@@ -674,7 +681,6 @@ void WSServerCon::sendMemMgmtMode()
 
     QJsonObject jdata;
     jdata["login_nodes"] = logins;
-    jdata["data_nodes"] = datas;
 
     if (mpdevice->isBLE())
     {
@@ -684,7 +690,15 @@ void WSServerCon::sendMemMgmtMode()
             fidoData.append(n->toJson(true));
         }
         jdata["fido_nodes"] = fidoData;
+        QJsonArray notes;
+        foreach (MPNode *n, mpdevice->getNoteDataNodes())
+        {
+            notes.append(n->toJson());
+        }
+        jdata["notes_nodes"] = notes;
     }
+
+    jdata["data_nodes"] = datas;
 
     sendJsonMessage({{ "msg", "memorymgmt_data" },
                      { "data", jdata }});

@@ -83,7 +83,7 @@ public:
 
     void requestDataFile(const QString &service);
     void sendDataFile(const QString &service, const QByteArray &data, bool isFile = true);
-    void deleteDataFilesAndLeave(const QStringList &services);
+    void deleteDataFilesAndLeave(const QStringList &services, const QStringList &notes);
     void deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials);
 
     void requestNote(const QString &noteName);
