@@ -328,21 +328,24 @@ private:
     quint16 getNumberOfPages(void);
     quint16 getNodesPerPage(void);
     void detagPointedNodes(Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    void detagPointedNotesNodes();
     bool tagFavoriteNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
     bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido = false);
     void checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::AddressType addrType);
-    bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX,
+                         Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
-    bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX,
+                                 Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
     void readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle = false);
     bool readExportPayload(QJsonArray dataArray, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
-    bool deleteDataParentChilds(MPNode *parentNodePt);
+    bool deleteDataParentChilds(MPNode *parentNodePt, Common::DataAddressType addrType = Common::DATA_ADDR_IDX);
     MPNode* addNewServiceToDB(const QString &service, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     QByteArray generateExportFileData(const QString &encryption = "none");
@@ -354,6 +357,8 @@ private:
 
     // Generate save packets
     bool generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackleData, const MPDeviceProgressCb &cbProgress);
+    bool generateDataUpdatePackets(Common::DataAddressType addrType, AsyncJobs *jobs, std::function<void()> writeCb);
+    bool generateDataDeletePackets(Common::DataAddressType addrType, AsyncJobs *jobs, std::function<void()> writeCb);
     bool checkModifiedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType);
     bool checkRemovedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType);
 

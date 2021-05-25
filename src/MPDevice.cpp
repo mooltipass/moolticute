@@ -1172,10 +1172,10 @@ void MPDevice::deleteDataNodes(QStringList nodeNames, MessageHandlerCb cb, Commo
         else
         {
             /* Delete all the childs */
-            deleteDataParentChilds(parentPt);
+            deleteDataParentChilds(parentPt, addrType);
 
             /* Delete empty parent */
-            removeEmptyParentFromDB(parentPt, true);
+            removeEmptyParentFromDB(parentPt, true, Common::CRED_ADDR_IDX, addrType);
         }
     }
 }
@@ -1797,8 +1797,21 @@ void MPDevice::detagPointedNodes(Common::AddressType addrType /*= Common::CRED_A
     }
 }
 
+void MPDevice::detagPointedNotesNodes()
+{
+    for (auto &i: notesLoginNodes)
+    {
+        i->removePointedToCheck();
+    }
+    for (auto &i: notesLoginChildNodes)
+    {
+        i->removePointedToCheck();
+    }
+}
+
 /* Follow the chain to tag pointed nodes (useful when doing integrity check when we are getting everything we can) */
-bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
+bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/,
+                               Common::DataAddressType dataAddrType /*= Common::DATA_ADDR_IDX*/)
 {
     quint32 tempVirtualParentAddress;
     QByteArray tempParentAddress;
@@ -1812,6 +1825,9 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
     const bool isCred = Common::CRED_ADDR_IDX == addrType;
     NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
     NodeList& childNodes = isCred? loginChildNodes : webAuthnLoginChildNodes;
+    const bool isData = Common::DATA_ADDR_IDX == dataAddrType;
+    NodeList& dataNodesList = isData ? dataNodes : notesLoginNodes;
+    NodeList& dataChildNodesList = isData? dataChildNodes : notesLoginChildNodes;
 
     /* first, detag all nodes */
     detagPointedNodes(addrType);
@@ -2018,18 +2034,18 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
         }
     }
 
-    if (tagData && isCred)
+    if (tagData)
     {
         /** SAME FOR DATA NODES **/
         /* start with start node (duh) */
-        tempParentAddress = startDataNode[Common::DATA_ADDR_IDX];
-        tempVirtualParentAddress = virtualDataStartNode[Common::DATA_ADDR_IDX];
+        tempParentAddress = startDataNode[dataAddrType];
+        tempVirtualParentAddress = virtualDataStartNode[dataAddrType];
 
         /* Loop through the parent nodes */
         while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
         {
             /* Get pointer to next parent node */
-            tempNextParentNodePt = findNodeWithAddressInList(dataNodes, tempParentAddress, tempVirtualParentAddress);
+            tempNextParentNodePt = findNodeWithAddressInList(dataNodesList, tempParentAddress, tempVirtualParentAddress);
 
             /* Check that we could actually find it */
             if (!tempNextParentNodePt)
@@ -2038,11 +2054,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode[Common::DATA_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode[Common::DATA_ADDR_IDX]))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode[dataAddrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode[dataAddrType]))
                     {
                         /* start node is incorrect */
-                        startDataNode[Common::DATA_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
-                        virtualDataStartNode[Common::DATA_ADDR_IDX] = 0;
+                        startDataNode[dataAddrType] = QByteArray(MPNode::EmptyAddress);
+                        virtualDataStartNode[dataAddrType] = 0;
                     }
                     else
                     {
@@ -2062,11 +2078,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 
                 if (repairAllowed)
                 {
-                    if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode[Common::DATA_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode[Common::DATA_ADDR_IDX]))
+                    if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode[dataAddrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode[dataAddrType]))
                     {
                         /* start node is already tagged... how's that even possible? */
-                        startDataNode[Common::DATA_ADDR_IDX] = QByteArray(MPNode::EmptyAddress);
-                        virtualDataStartNode[Common::DATA_ADDR_IDX] = 0;
+                        startDataNode[dataAddrType] = QByteArray(MPNode::EmptyAddress);
+                        virtualDataStartNode[dataAddrType] = 0;
                     }
                     else
                     {
@@ -2082,7 +2098,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
             else
             {
                 /* check previous node address */
-                if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode[Common::DATA_ADDR_IDX]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode[Common::DATA_ADDR_IDX]))
+                if ((!tempParentAddress.isNull() && tempParentAddress == startDataNode[dataAddrType]) || (tempParentAddress.isNull() && tempVirtualParentAddress == virtualDataStartNode[dataAddrType]))
                 {
                     /* first parent node: previous address should be an empty one */
                     if ((tempNextParentNodePt->getPreviousParentAddress() != MPNode::EmptyAddress) || (tempNextParentNodePt->getPreviousParentAddress().isNull() && tempNextParentNodePt->getPreviousParentVirtualAddress() != 0))
@@ -2123,7 +2139,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
                 while ((tempChildAddress != MPNode::EmptyAddress) || (tempChildAddress.isNull() && tempVirtualChildAddress != 0))
                 {
                     /* Get pointer to the child node */
-                    tempNextChildNodePt = findNodeWithAddressInList(dataChildNodes, tempChildAddress, tempVirtualChildAddress);
+                    tempNextChildNodePt = findNodeWithAddressInList(dataChildNodesList, tempChildAddress, tempVirtualChildAddress);
 
                     /* Check we could find child pointer */
                     if (!tempNextChildNodePt)
@@ -2203,13 +2219,22 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
     return return_bool;
 }
 
-bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt)
+bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt, Common::DataAddressType addrType /*= Common::DATA_ADDR_IDX*/)
 {
+    const bool isData = Common::DATA_ADDR_IDX == addrType;
+    NodeList& childNodes = isData? dataChildNodes : notesLoginChildNodes;
     quint32 cur_child_addr_v = parentNodePt->getStartChildVirtualAddress();
     QByteArray cur_child_addr = parentNodePt->getStartChildAddress();
 
     /* Detag nodes */
-    detagPointedNodes();
+    if (isData)
+    {
+        detagPointedNodes();
+    }
+    else
+    {
+        detagPointedNotesNodes();
+    }
 
     /* Set empty child (required because of tests later */
     parentNodePt->setStartChildAddress(MPNode::EmptyAddress);
@@ -2220,7 +2245,7 @@ bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt)
         MPNode* cur_child_pt;
 
         /* Find node in list */
-        cur_child_pt = findNodeWithAddressInList(dataChildNodes, cur_child_addr, cur_child_addr_v);
+        cur_child_pt = findNodeWithAddressInList(childNodes, cur_child_addr, cur_child_addr_v);
 
         if (!cur_child_pt)
         {
@@ -2238,7 +2263,7 @@ bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt)
 
             /* Delete node */
             parentNodePt->removeChild(cur_child_pt);
-            dataChildNodes.removeOne(cur_child_pt);
+            childNodes.removeOne(cur_child_pt);
         }
     }
 
@@ -2628,7 +2653,7 @@ bool MPDevice::addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::A
     return true;
 }
 
-bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
+bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/, Common::DataAddressType dataAddrType /*= Common::DATA_ADDR_IDX*/)
 {
     qDebug() << "Removing parent " << parentNodePt->getService() << " from DB, addr: " << parentNodePt->getAddress().toHex();
     MPNode* nextNodePt = nullptr;
@@ -2638,6 +2663,8 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
     QByteArray curNodeAddr;
     const bool isCred = addrType == Common::CRED_ADDR_IDX;
     NodeList& nodes = isCred ? loginNodes : webAuthnLoginNodes;
+    const bool isData = dataAddrType == Common::DATA_ADDR_IDX;
+    NodeList& dataNodesList = isData ? dataNodes : notesLoginNodes;
 
     /* Tag nodes */
     if (!tagPointedNodes(!isDataParent, isDataParent, false, addrType))
@@ -2647,13 +2674,20 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
     }
 
     /* Detag them */
-    detagPointedNodes(addrType);
+    if (isDataParent && !isData)
+    {
+        detagPointedNotesNodes();
+    }
+    else
+    {
+        detagPointedNodes(addrType);
+    }
 
     /* Which list do we want to browse ? */
     if (isDataParent)
     {
-        curNodeAddr = startDataNode[Common::DATA_ADDR_IDX];
-        curNodeAddrVirtual = virtualDataStartNode[Common::DATA_ADDR_IDX];
+        curNodeAddr = startDataNode[dataAddrType];
+        curNodeAddrVirtual = virtualDataStartNode[dataAddrType];
     }
     else
     {
@@ -2683,7 +2717,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
             /* Look for node in list */
             if (isDataParent)
             {
-                curNodePt = findNodeWithAddressInList(dataNodes, curNodeAddr, curNodeAddrVirtual);
+                curNodePt = findNodeWithAddressInList(dataNodesList, curNodeAddr, curNodeAddrVirtual);
             }
             else
             {
@@ -2730,7 +2764,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                         /* Get next node pointer, if it exists */
                         if (isDataParent)
                         {
-                            nextNodePt = findNodeWithAddressInList(dataNodes, parentNodePt->getNextParentAddress(), parentNodePt->getNextParentVirtualAddress());
+                            nextNodePt = findNodeWithAddressInList(dataNodesList, parentNodePt->getNextParentAddress(), parentNodePt->getNextParentVirtualAddress());
                         }
                         else
                         {
@@ -2755,8 +2789,8 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                             /* Linked list ends there, only credential */
                             if (isDataParent)
                             {
-                                startDataNode[Common::DATA_ADDR_IDX] = MPNode::EmptyAddress;
-                                virtualDataStartNode[Common::DATA_ADDR_IDX] = 0;
+                                startDataNode[dataAddrType] = MPNode::EmptyAddress;
+                                virtualDataStartNode[dataAddrType] = 0;
                             }
                             else
                             {
@@ -2769,8 +2803,8 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                             /* Link the chain together */
                             if (isDataParent)
                             {
-                                startDataNode[Common::DATA_ADDR_IDX] = nextNodePt->getAddress();
-                                virtualDataStartNode[Common::DATA_ADDR_IDX] = nextNodePt->getVirtualAddress();
+                                startDataNode[dataAddrType] = nextNodePt->getAddress();
+                                virtualDataStartNode[dataAddrType] = nextNodePt->getVirtualAddress();
                             }
                             else
                             {
@@ -2782,7 +2816,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                         /* Delete object */
                         if (isDataParent)
                         {
-                            dataNodes.removeOne(parentNodePt);
+                            dataNodesList.removeOne(parentNodePt);
                         }
                         else
                         {
@@ -2808,7 +2842,7 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
                         /* Delete object */
                         if (isDataParent)
                         {
-                            dataNodes.removeOne(parentNodePt);
+                            dataNodesList.removeOne(parentNodePt);
                         }
                         else
                         {
@@ -3254,47 +3288,10 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
 
     if (tackleData)
     {
-        for (auto &nodelist_iterator: dataNodes)
+        diagSavePacketsGenerated |= generateDataUpdatePackets(Common::DATA_ADDR_IDX, jobs, dataWriteProgressCb);
+        if (isBLE())
         {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(dataNodesClone, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating save packet for new data service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-            else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
-            {
-                qDebug() << "Generating save packet for updated data service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-        }
-        for (auto &nodelist_iterator: dataChildNodes)
-        {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(dataChildNodesClone, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating save packet for new data child node";
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-            else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
-            {
-                qDebug() << "Generating save packet for updated data child node";
-                qDebug() << "Prev contents: " << temp_node_pointer->getNodeData().toHex();
-                qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
+            diagSavePacketsGenerated |= generateDataUpdatePackets(Common::NOTE_ADDR_IDX, jobs, dataWriteProgressCb);
         }
     }
 
@@ -3356,35 +3353,15 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
     }
     if (tackleData)
     {
-        for (auto &nodelist_iterator: dataNodesClone)
+        diagSavePacketsGenerated |= generateDataDeletePackets(Common::DATA_ADDR_IDX, jobs, dataWriteProgressCb);
+        if (isBLE())
         {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(dataNodes, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating delete packet for deleted data service" << nodelist_iterator->getService();
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getParentNodeSize(), 0xFF), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
-        }
-        for (auto &nodelist_iterator: dataChildNodesClone)
-        {
-            /* See if we can find the same node in the clone list */
-            temp_node_pointer = findNodeWithAddressInList(dataChildNodes, nodelist_iterator->getAddress(), 0);
-
-            if (!temp_node_pointer)
-            {
-                qDebug() << "Generating delete packet for deleted data child node";
-                addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getChildNodeSize(), 0xFF), dataWriteProgressCb);
-                diagSavePacketsGenerated = true;
-                progressTotal += 3;
-            }
+            diagSavePacketsGenerated |= generateDataDeletePackets(Common::NOTE_ADDR_IDX, jobs, dataWriteProgressCb);
         }
 
+        //TODO: Update notes starting node as well
         /* Diff start data node */
-        if (startDataNode != startDataNodeClone)
+        if (startDataNode[Common::DATA_ADDR_IDX] != startDataNodeClone[Common::DATA_ADDR_IDX])
         {
             qDebug() << "Updating start data node";
             diagSavePacketsGenerated = true;
@@ -3440,6 +3417,99 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         qInfo() << "No need to generate update packets";
     }
 
+    return diagSavePacketsGenerated;
+}
+
+bool MPDevice::generateDataUpdatePackets(Common::DataAddressType addrType, AsyncJobs *jobs, std::function<void()> writeCb)
+{
+    bool isData = Common::DATA_ADDR_IDX == addrType;
+    bool diagSavePacketsGenerated = false;
+    NodeList& dataNodesList = isData ? dataNodes : notesLoginNodes;
+    NodeList& dataNodesListClone = isData ? dataNodesClone : notesLoginNodesClone;
+    NodeList& dataChildNodesList = isData ? dataChildNodes : notesLoginChildNodes;
+    NodeList& dataChildNodesListClone = isData ? dataChildNodesClone : notesLoginChildNodesClone;
+    MPNode* temp_node_pointer;
+    for (auto &nodelist_iterator: dataNodesList)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(dataNodesListClone, nodelist_iterator->getAddress(), 0);
+
+        if (!temp_node_pointer)
+        {
+            qDebug() << "Generating save packet for new data service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            diagSavePacketsGenerated = true;
+            progressTotal += 3;
+        }
+        else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
+        {
+            qDebug() << "Generating save packet for updated data service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            diagSavePacketsGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    for (auto &nodelist_iterator: dataChildNodesList)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(dataChildNodesListClone, nodelist_iterator->getAddress(), 0);
+
+        if (!temp_node_pointer)
+        {
+            qDebug() << "Generating save packet for new data child node";
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            diagSavePacketsGenerated = true;
+            progressTotal += 3;
+        }
+        else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
+        {
+            qDebug() << "Generating save packet for updated data child node";
+            qDebug() << "Prev contents: " << temp_node_pointer->getNodeData().toHex();
+            qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
+            diagSavePacketsGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    return diagSavePacketsGenerated;
+}
+
+bool MPDevice::generateDataDeletePackets(Common::DataAddressType addrType, AsyncJobs *jobs, std::function<void ()> writeCb)
+{
+    bool isData = Common::DATA_ADDR_IDX == addrType;
+    bool diagSavePacketsGenerated = false;
+    NodeList& dataNodesList = isData ? dataNodes : notesLoginNodes;
+    NodeList& dataNodesListClone = isData ? dataNodesClone : notesLoginNodesClone;
+    NodeList& dataChildNodesList = isData ? dataChildNodes : notesLoginChildNodes;
+    NodeList& dataChildNodesListClone = isData ? dataChildNodesClone : notesLoginChildNodesClone;
+    MPNode* temp_node_pointer;
+
+    for (auto &nodelist_iterator: dataNodesListClone)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(dataNodesList, nodelist_iterator->getAddress(), 0);
+
+        if (!temp_node_pointer)
+        {
+            qDebug() << "Generating delete packet for deleted data service" << nodelist_iterator->getService();
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getParentNodeSize(), 0xFF), writeCb);
+            diagSavePacketsGenerated = true;
+            progressTotal += 3;
+        }
+    }
+    for (auto &nodelist_iterator: dataChildNodesListClone)
+    {
+        /* See if we can find the same node in the clone list */
+        temp_node_pointer = findNodeWithAddressInList(dataChildNodesList, nodelist_iterator->getAddress(), 0);
+
+        if (!temp_node_pointer)
+        {
+            qDebug() << "Generating delete packet for deleted data child node";
+            addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getChildNodeSize(), 0xFF), writeCb);
+            diagSavePacketsGenerated = true;
+            progressTotal += 3;
+        }
+    }
     return diagSavePacketsGenerated;
 }
 
@@ -6434,7 +6504,7 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
             {
                 /* Remove parent */
                 qDebug() << "Empty data parent " << nodeItem->getService() << " detected, deleting it...";
-                removeEmptyParentFromDB(nodeItem, true);
+                removeEmptyParentFromDB(nodeItem, true, Common::CRED_ADDR_IDX, Common::DATA_ADDR_IDX);
             }
 
             /* Check every children */
