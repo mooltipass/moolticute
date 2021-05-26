@@ -334,8 +334,9 @@ private:
 
     // Functions added by mathieu for MMM : checks & repairs
     bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren, Common::AddressType addrType = Common::CRED_ADDR_IDX);
-    bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido = false);
+    bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido = false, bool checkNotes = false);
     void checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::AddressType addrType);
+    void checkLoadedDataNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::DataAddressType addrType);
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX,
                          Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);

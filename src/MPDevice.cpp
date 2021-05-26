@@ -1852,6 +1852,11 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
     /* first, detag all nodes */
     detagPointedNodes(addrType);
 
+    if (tagData && !isData)
+    {
+        detagPointedNotesNodes();
+    }
+
     if (tagCredentials)
     {
         /* start with start node (duh) */
@@ -3046,7 +3051,7 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrT
     return addChildToDB(tempNodePt, childNodePt, addrType);
 }
 
-bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido /*=false*/)
+bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido /*=false*/, bool checkNotes /*= false*/)
 {
     QByteArray temp_pnode_address, temp_cnode_address;
     bool return_bool = true;
@@ -3071,6 +3076,9 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     quint32 nbOrphanDataChildren = 0;
     quint32 nbWebauthnOrphanParents = 0;
     quint32 nbWebauthnOrphanChildren = 0;
+    quint32 nbNotesOrphanParents = 0;
+    quint32 nbNotesOrphanChildren = 0;
+
 
     if (checkCredentials)
     {
@@ -3090,33 +3098,12 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
             return_bool = false;
         }
 
-        for (auto &i: dataNodes)
+        checkLoadedDataNodes(nbOrphanDataParents, nbOrphanDataChildren, repairAllowed, Common::DATA_ADDR_IDX);
+
+        if (checkNotes)
         {
-            if (!i->getPointedToCheck())
-            {
-                qWarning() << "Orphan data parent found:" << i->getService() << "at address:" << i->getAddress().toHex();
-                if (repairAllowed)
-                {
-                    addOrphanParentToDB(i, true, repairAllowed);
-                }
-                nbOrphanDataParents++;
-            }
-        }
-        QListIterator<MPNode*> i(dataChildNodes);
-        while (i.hasNext())
-        {
-            MPNode* nodeItem = i.next();
-            if (!nodeItem->getPointedToCheck())
-            {
-                qWarning() << "Orphan data child found at address:" << nodeItem->getAddress().toHex();
-                if (repairAllowed)
-                {
-                    /* no other choice than to delete them (the ctr is in the parent node */
-                    qDebug() << "Removing data child at address:" << nodeItem->getAddress().toHex();
-                    dataChildNodes.removeOne(nodeItem);
-                }
-                nbOrphanDataChildren++;
-            }
+            return_bool &= tagPointedNodes(false, true, repairAllowed, Common::CRED_ADDR_IDX, Common::NOTE_ADDR_IDX);
+            checkLoadedDataNodes(nbNotesOrphanParents, nbNotesOrphanChildren, repairAllowed, Common::NOTE_ADDR_IDX);
         }
     }
 
@@ -3126,8 +3113,16 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     qDebug() << "Number of data children orphans:" << nbOrphanDataChildren;
     if (isBLE())
     {
-        qDebug() << "Number of webauthn parent orphans:" << nbWebauthnOrphanParents;
-        qDebug() << "Number of webauthn children orphans:" << nbWebauthnOrphanChildren;
+        if (checkFido)
+        {
+            qDebug() << "Number of webauthn parent orphans:" << nbWebauthnOrphanParents;
+            qDebug() << "Number of webauthn children orphans:" << nbWebauthnOrphanChildren;
+        }
+        if (checkNotes)
+        {
+            qDebug() << "Number of notes parent orphans:" << nbNotesOrphanParents;
+            qDebug() << "Number of notes children orphans:" << nbNotesOrphanChildren;
+        }
     }
 
     if (checkCredentials)
@@ -3166,6 +3161,11 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     }
 
     if (isBLE() && checkFido && nbWebauthnOrphanParents + nbWebauthnOrphanChildren > 0)
+    {
+        return_bool = false;
+    }
+
+    if (isBLE() && checkNotes && nbNotesOrphanParents + nbNotesOrphanChildren > 0)
     {
         return_bool = false;
     }
@@ -3233,6 +3233,42 @@ void MPDevice::checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool
                     i->setLogin(service_name + QString::number(append_number));
                     append_number++;
                 }
+            }
+            childNum++;
+        }
+    }
+}
+
+void MPDevice::checkLoadedDataNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::DataAddressType addrType)
+{
+    const bool isData = addrType == Common::DATA_ADDR_IDX;
+    NodeList& nodes = isData ? dataNodes : notesLoginNodes;
+    NodeList& childNodes = isData? dataChildNodes : notesLoginChildNodes;
+
+    for (auto &i: nodes)
+    {
+        if (!i->getPointedToCheck())
+        {
+            qWarning() << "Orphan data parent found:" << i->getService() << "at address:" << i->getAddress().toHex();
+            if (repairAllowed)
+            {
+                addOrphanParentToDB(i, true, repairAllowed);
+            }
+            parentNum++;
+        }
+    }
+    QListIterator<MPNode*> i(childNodes);
+    while (i.hasNext())
+    {
+        MPNode* nodeItem = i.next();
+        if (!nodeItem->getPointedToCheck())
+        {
+            qWarning() << "Orphan data child found at address:" << nodeItem->getAddress().toHex();
+            if (repairAllowed)
+            {
+                /* no other choice than to delete them (the ctr is in the parent node */
+                qDebug() << "Removing data child at address:" << nodeItem->getAddress().toHex();
+                childNodes.removeOne(nodeItem);
             }
             childNum++;
         }
@@ -4821,7 +4857,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services, QStringList notes,
         }
 
         /* Check our DB */
-        if(!checkLoadedNodes(false, true, false))
+        if(!checkLoadedNodes(false, true, false, false, true))
         {
             exitMemMgmtMode(true);
             qCritical() << "Error in our internal algo";
