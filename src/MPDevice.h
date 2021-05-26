@@ -292,6 +292,7 @@ private:
     void loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address,
                                const MPDeviceProgressCb &cbProgress);
     void deleteDataNodes(QStringList nodeNames, MessageHandlerCb cb, Common::DataAddressType addrType);
+    bool checkDataNodeChanged(AsyncJobs *jobs, Common::DataAddressType addrType);
 
     void createJobAddContext(const QString &service, AsyncJobs *jobs, bool isDataNode = false);
 

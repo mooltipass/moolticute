@@ -1180,6 +1180,26 @@ void MPDevice::deleteDataNodes(QStringList nodeNames, MessageHandlerCb cb, Commo
     }
 }
 
+bool MPDevice::checkDataNodeChanged(AsyncJobs *jobs, Common::DataAddressType addrType)
+{
+    bool changed = false;
+    if (startDataNode[addrType] != startDataNodeClone[addrType])
+    {
+        qCritical() << "Updating start data node";
+        changed = true;
+        QByteArray startData;
+        if (isBLE())
+        {
+            const auto ZERO_BYTE = static_cast<char>(0);
+            startData.append(static_cast<char>(addrType));
+            startData.append(ZERO_BYTE);
+        }
+        startData.append(startDataNode[addrType]);
+        jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startData, pMesProt->getDefaultFuncDone()));
+    }
+    return changed;
+}
+
 void MPDevice::loadLoginNode(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     qDebug() << "Loading cred parent node at address: " << address.toHex();
@@ -3359,20 +3379,11 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
             diagSavePacketsGenerated |= generateDataDeletePackets(Common::NOTE_ADDR_IDX, jobs, dataWriteProgressCb);
         }
 
-        //TODO: Update notes starting node as well
         /* Diff start data node */
-        if (startDataNode[Common::DATA_ADDR_IDX] != startDataNodeClone[Common::DATA_ADDR_IDX])
+        diagSavePacketsGenerated |= checkDataNodeChanged(jobs, Common::DATA_ADDR_IDX);
+        if (isBLE())
         {
-            qDebug() << "Updating start data node";
-            diagSavePacketsGenerated = true;
-            QByteArray startData;
-            if (isBLE())
-            {
-                const auto ZERO_BYTE = static_cast<char>(0);
-                Common::fill(startData, 2, ZERO_BYTE);
-            }
-            startData.append(startDataNode[Common::DATA_ADDR_IDX]);
-            jobs->append(new MPCommandJob(this, MPCmd::SET_DN_START_PARENT, startData, pMesProt->getDefaultFuncDone()));
+            diagSavePacketsGenerated |= checkDataNodeChanged(jobs, Common::NOTE_ADDR_IDX);
         }
     }
 
