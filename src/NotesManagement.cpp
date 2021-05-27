@@ -101,7 +101,6 @@ void NotesManagement::clearNotes()
 
 void NotesManagement::on_pushButtonAddNote_clicked()
 {
-    qDebug() << "Add new note...";
     ui->stackedWidget->setCurrentWidget(ui->pageEditNotes);
     ui->lineEditNoteName->setText("");
     ui->lineEditNoteName->setFrame(true);
@@ -133,6 +132,7 @@ void NotesManagement::onNoteReceived(const QString &note, const QByteArray &data
     m_noteContentClone = QString{data};
     ui->textEditNote->setPlainText(m_noteContentClone);
     m_currentNoteName = note;
+    emit updateTabs();
 }
 
 void NotesManagement::on_pushButtonDiscard_clicked()
@@ -190,22 +190,32 @@ void NotesManagement::onEditingFinished()
     ui->lineEditNoteName->setReadOnly(true);
     ui->lineEditNoteName->setFrame(false);
     QString noteName = ui->lineEditNoteName->text();
-    if (noteName.isEmpty() || (noteName != m_currentNoteName && m_noteList.contains(noteName)))
+    if (noteName.isEmpty())
     {
         ui->pushButtonSave->hide();
+        ui->labelError->setText(tr("Note Name cannot be empty."));
         ui->labelError->show();
+        m_validNoteName = false;
+    }
+    else if (noteName != m_currentNoteName && m_noteList.contains(noteName))
+    {
+        ui->pushButtonSave->hide();
+        ui->labelError->setText(tr("Note Name already exists."));
+        ui->labelError->show();
+        m_validNoteName = false;
     }
     else
     {
         ui->pushButtonSave->show();
         ui->labelError->hide();
+        m_validNoteName = true;
     }
 }
 
 void NotesManagement::on_textEditNote_textChanged()
 {
     QString note = ui->textEditNote->toPlainText();
-    if (note == m_noteContentClone || note.isEmpty())
+    if (note == m_noteContentClone || note.isEmpty() || !m_validNoteName)
     {
         ui->pushButtonSave->hide();
     }

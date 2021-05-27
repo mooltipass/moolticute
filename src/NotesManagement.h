@@ -51,6 +51,7 @@ private:
     int m_actColumn = 0;
     bool m_isNewFile = false;
     bool m_isNoteEditing = false;
+    bool m_validNoteName = false;
 
     QVector<QString> m_noteList;
     QString m_currentNoteName = "";

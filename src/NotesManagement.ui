@@ -183,7 +183,7 @@ border-right: none;
        <item>
         <widget class="QLabel" name="labelError">
          <property name="text">
-          <string>Note Name already exists.</string>
+          <string/>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

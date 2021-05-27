@@ -22,6 +22,8 @@
 #include "AppGui.h"
 #include "DeviceDetector.h"
 
+const QString FilesManagement::NOTE_TYPE = "note";
+
 FilesFilterModel::FilesFilterModel(QObject *parent):
     QSortFilterProxyModel(parent)
 {
@@ -226,7 +228,7 @@ void FilesManagement::loadModel()
         QJsonObject o = jarr.at(i).toObject();
         QStandardItem *item = new QStandardItem(o["service"].toString());
         item->setIcon(AppGui::qtAwesome()->icon(fa::newspapero));
-        item->setData("note");
+        item->setData(NOTE_TYPE);
         filesModel->appendRow(item);
     }
     deletedList.clear();
@@ -424,9 +426,9 @@ void FilesManagement::on_pushButtonDelFile_clicked()
         return;
     }
 
-    if (currentItem->data().toString() == "note")
+    if (currentItem->data().toString() == NOTE_TYPE)
     {
-        deletedNoteList.append(currentItem->text());
+        deletedList.append(currentItem->text());
     }
     else
     {

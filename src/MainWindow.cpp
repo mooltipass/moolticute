@@ -2157,4 +2157,5 @@ void MainWindow::on_pushButtonSettingsSetToDefault_clicked()
 void MainWindow::displayNotePage()
 {
     ui->stackedWidget->setCurrentWidget(ui->pageNotes);
+    updateTabButtons();
 }
