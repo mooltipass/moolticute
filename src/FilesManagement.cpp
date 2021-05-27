@@ -331,6 +331,15 @@ void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QMo
     ui->filesDisplayFrame->show();
 
     currentItem = filesModel->itemFromIndex(filesModel->index(filterModel->indexToSource(curr.row()), 0));
+    if (currentItem->data().toString() == NOTE_TYPE)
+    {
+        //Disable save option for notes
+        ui->pushButtonSaveFile->hide();
+    }
+    else
+    {
+        ui->pushButtonSaveFile->show();
+    }
 }
 
 void FilesManagement::on_pushButtonUpdateFile_clicked()
@@ -428,7 +437,7 @@ void FilesManagement::on_pushButtonDelFile_clicked()
 
     if (currentItem->data().toString() == NOTE_TYPE)
     {
-        deletedList.append(currentItem->text());
+        deletedNoteList.append(currentItem->text());
     }
     else
     {

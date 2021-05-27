@@ -347,7 +347,7 @@ void MPDeviceBleImpl::loadNotes(AsyncJobs *jobs, const MPDeviceProgressCb &cbPro
     }
     else
     {
-        qInfo() << "No parent webauthn nodes to load.";
+        qInfo() << "No parent notes nodes to load.";
     }
 }
 
@@ -628,7 +628,11 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
     {
         res.append(data.mid(i, 2));
     }
-    qDebug() << "Received starting node: " << res.size();
+    qDebug() << "Received starting node size: " << res.size();
+    if (AppDaemon::isDebugDev())
+    {
+       qDebug() << "Starting addresses: " << res;
+    }
     return res;
  }
 
@@ -641,8 +645,11 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
         return {MPNode::EmptyAddress, MPNode::EmptyAddress};
      }
      auto dataAddresses = addresses.mid(FIRST_DATA_STARTING_ADDR, addresses.size() - FIRST_DATA_STARTING_ADDR);
-     qDebug() << "Received Data starting node: " << dataAddresses.size();
-     qDebug() << dataAddresses;
+     qDebug() << "Received data starting node size: " << dataAddresses.size();
+     if (AppDaemon::isDebugDev())
+     {
+        qDebug() << "Data starting addresses: " << dataAddresses;
+     }
 
      return dataAddresses;
  }

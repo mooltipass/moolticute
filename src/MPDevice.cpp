@@ -1174,7 +1174,10 @@ void MPDevice::deleteDataNodes(QStringList nodeNames, MessageHandlerCb cb, Commo
             /* Delete all the childs */
             deleteDataParentChilds(parentPt, addrType);
 
-            /* Delete empty parent */
+            /* Delete empty parent
+             * We do not need CRED_ADDR_IDX, but cannot call without it
+             */
+
             removeEmptyParentFromDB(parentPt, true, Common::CRED_ADDR_IDX, addrType);
         }
     }
@@ -1185,11 +1188,12 @@ bool MPDevice::checkDataNodeChanged(AsyncJobs *jobs, Common::DataAddressType add
     bool changed = false;
     if (startDataNode[addrType] != startDataNodeClone[addrType])
     {
-        qCritical() << "Updating start data node";
+        qDebug() << "Updating start data node";
         changed = true;
         QByteArray startData;
         if (isBLE())
         {
+            // Setting correct typeId based on received address type
             const auto ZERO_BYTE = static_cast<char>(0);
             startData.append(static_cast<char>(addrType));
             startData.append(ZERO_BYTE);
@@ -1489,7 +1493,6 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
                 parentClone->setEncDataSize(nbBytesFetched + dataEncSize);
 
                 /* and if our parent doesn't have next one... */
-                // TODO: Check this
                 if (parent->getNextParentAddress() == MPNode::EmptyAddress &&
                         Common::DATA_ADDR_IDX == addrType)
                 {
@@ -3304,7 +3307,6 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
 {
     qInfo() << "Generating Save Packets...";
     bool diagSavePacketsGenerated = false;
-    MPNode* temp_node_pointer;
     progressCurrent = 0;
     progressTotal = 0;
 
@@ -3826,8 +3828,10 @@ void MPDevice::processStatusChange(const QByteArray &data)
             {
                 bleImpl->fetchDataFiles();
                 bleImpl->activateEnforceLayout();
-                //TODO add check for fw
-                bleImpl->fetchNotes();
+                if (bleImpl->isNoteAvailable())
+                {
+                    bleImpl->fetchNotes();
+                }
             }
 
             /*

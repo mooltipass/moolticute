@@ -646,7 +646,6 @@ void WSServerCon::sendInitialStatus()
         sendJsonMessage({{ "msg", "mp_disconnected" }});
     else
     {
-        //sendJsonMessage({{ "msg", "mp_connected" }});
         sendJsonMessage({{ "msg", "status_changed" },
                          { "data", Common::MPStatusString[mpdevice->get_status()] }});
         mpdevice->settings()->sendEveryParameter();
