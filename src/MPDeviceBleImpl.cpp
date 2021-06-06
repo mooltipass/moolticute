@@ -576,6 +576,62 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
     return true;
 }
 
+void MPDeviceBleImpl::createBLEDataChildNodes(MPDevice::ExportPayloadData id, QByteArray& firstAddr, QVector<QByteArray> &miniDataArray)
+{
+    const int MINI_BLOCK_SIZE = 128;
+    const int FLAG_AND_NEXT_ADDR_SIZE = 4;
+    const int totalSize = (miniDataArray.size() - 1) * MINI_BLOCK_SIZE + (miniDataArray.last().size() - FLAG_AND_NEXT_ADDR_SIZE);
+    int currentSize = 0;
+    for (int i = 0; i < miniDataArray.size(); ++i)
+    {
+        QByteArray addr = firstAddr;
+        QByteArray dataPacket = m_bleNodeConverter.convertDataChildNode(miniDataArray[i], totalSize, currentSize, firstAddr);
+        /* Recreate node and add it to the list of imported nodes */
+        MPNode* importedNode = bleProt->createMPNode(qMove(dataPacket), mpDev, qMove(addr), 0);
+        mpDev->importNodeMap[id]->append(importedNode);
+    }
+}
+
+bool MPDeviceBleImpl::hasNextAddress(char addr1, char addr2)
+{
+    const auto ZEROCHAR = static_cast<char>(0);
+    return !(addr1 == ZEROCHAR && addr2 == ZEROCHAR);
+}
+
+void MPDeviceBleImpl::readExportDataChildNodes(const QJsonArray &nodes, MPDevice::ExportPayloadData id)
+{
+    for (qint32 i = 0; i < nodes.size(); i++)
+    {
+        QJsonObject qjobject = nodes[i].toObject();
+
+        /* Fetch address */
+        QJsonArray serviceAddrArr = qjobject["address"].toArray();
+        QByteArray serviceAddr = QByteArray();
+        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
+
+        /* Fetch core data */
+        QJsonObject dataObj = qjobject["data"].toObject();
+        QByteArray dataCore = QByteArray();
+        QVector<QByteArray> coreArray;
+        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
+        coreArray.append(dataCore);
+
+        if (hasNextAddress(dataCore[NEXT_ADDRESS_STARTING], dataCore[NEXT_ADDRESS_STARTING + 1]))
+        {
+            // Checking next three
+            do
+            {
+                qjobject = nodes[++i].toObject();
+                dataObj = qjobject["data"].toObject();
+                dataCore = QByteArray();
+                for (qint32 l = 0; l < dataObj.size(); l++) {dataCore.append(dataObj[QString::number(l)].toInt());}
+                coreArray.append(dataCore);
+            } while (hasNextAddress(dataCore[NEXT_ADDRESS_STARTING], dataCore[NEXT_ADDRESS_STARTING+1]));
+        }
+        createBLEDataChildNodes(id, serviceAddr, coreArray);
+    }
+}
+
 bool MPDeviceBleImpl::isAfterAuxFlash()
 {
     QSettings s;
@@ -1263,9 +1319,9 @@ void MPDeviceBleImpl::fillMiniExportPayload(QByteArray &unknownCardPayload)
     Common::fill(unknownCardPayload, UNKNOWN_CARD_PAYLOAD_SIZE - payloadSize, ZERO_BYTE);
 }
 
-void MPDeviceBleImpl::convertMiniToBleNode(QByteArray &array)
+void MPDeviceBleImpl::convertMiniToBleNode(QByteArray &array, bool isData)
 {
-    m_bleNodeConverter.convert(array);
+    m_bleNodeConverter.convert(array, isData);
 }
 
 void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress)

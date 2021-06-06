@@ -6,7 +6,7 @@ MPMiniToBleNodeConverter::MPMiniToBleNodeConverter()
 
 }
 
-void MPMiniToBleNodeConverter::convert(QByteArray &dataArray)
+void MPMiniToBleNodeConverter::convert(QByteArray &dataArray, bool isData)
 {
     const bool childNode = dataArray[1]&CHILD_NODE_FLAG;
 
@@ -16,11 +16,59 @@ void MPMiniToBleNodeConverter::convert(QByteArray &dataArray)
     }
     else
     {
-        dataArray = convertMiniParentNodeToBle(dataArray);
+        dataArray = convertMiniParentNodeToBle(dataArray, isData);
     }
 }
 
-QByteArray MPMiniToBleNodeConverter::convertMiniParentNodeToBle(const QByteArray &dataArray)
+QByteArray MPMiniToBleNodeConverter::convertDataChildNode(const QByteArray &packet, int totalSize, int &current, QByteArray &addr)
+{
+    QByteArray encryptedData = packet.mid(DATA_FLAGS_AND_NEXT_ADDR);
+    QByteArray dataPacket;
+    dataPacket.append(packet.left(DATA_FLAGS_AND_NEXT_ADDR));
+
+    //Add size of current packet
+    QByteArray currentSizeArr;
+    currentSizeArr.resize(2);
+    current += encryptedData.size();
+    qToLittleEndian(current, currentSizeArr.data());
+    dataPacket.append(currentSizeArr);
+
+    // Fill remaining encrypted data with 0
+    Common::fill(encryptedData, PACKET_ENCRYPTED_SIZE - encryptedData.size(), ZERO_BYTE);
+
+    // Add first 256 Bytes of encrypted data
+    dataPacket.append(encryptedData.left(PACKET_ENCRYPTED_SIZE/2));
+
+    // 2B Reserved
+    dataPacket.append(ZERO_BYTE);
+    dataPacket.append(ZERO_BYTE);
+    dataPacket.append(dataPacket.left(2));
+    dataPacket[FLAGS_BYTE_NOT_VALID_SET] = dataPacket[FLAGS_BYTE_NOT_VALID_SET]|(1<<FLAGS_NOT_VALID_BIT);
+
+
+    // Second (up to) 256B of data to store
+    dataPacket.append(encryptedData.right(PACKET_ENCRYPTED_SIZE/2));
+
+    // Total file size
+    QByteArray totalSizeArr;
+    const int TOTAL_SIZE_LENGTH = 4;
+    totalSizeArr.resize(TOTAL_SIZE_LENGTH);
+    qToLittleEndian(totalSize, totalSizeArr.data());
+    dataPacket.append(totalSizeArr);
+
+    // 2B Reserved
+    dataPacket.append(ZERO_BYTE);
+    dataPacket.append(ZERO_BYTE);
+
+    // Setting address for next address
+    addr.clear();
+    addr.append(dataPacket[DATA_NEXT_ADDR_STARTING]);
+    addr.append(dataPacket[DATA_NEXT_ADDR_STARTING+1]);
+
+    return dataPacket;
+}
+
+QByteArray MPMiniToBleNodeConverter::convertMiniParentNodeToBle(const QByteArray &dataArray, bool isData)
 {
     // Flags, prev, next parent, first child
     QByteArray bleArray = dataArray.left(PARENT_ADDRESSES);
@@ -29,6 +77,10 @@ QByteArray MPMiniToBleNodeConverter::convertMiniParentNodeToBle(const QByteArray
     {
         bleArray.append(dataArray[i]);
         bleArray.append(ZERO_BYTE);
+    }
+    if (isData)
+    {
+        bleArray[0] = bleArray[0]|(1<<ASCII_FLAG);
     }
     // Fill remaining service name
     const quint16 REMAINING_SERVICE_NAME = 10;
