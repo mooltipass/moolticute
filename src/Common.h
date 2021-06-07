@@ -247,6 +247,8 @@ public:
     static QByteArray toHexArray(const QString str);
     static QString toHexString(const QByteArray& array);
 
+    static QByteArray reverse(const QByteArray& array);
+
     typedef enum
     {
         MP_Classic = 0,

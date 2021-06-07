@@ -214,6 +214,8 @@ private:
 
     bool m_enforceLayout = false;
 
+    int m_miniFilePartCounter = 0;
+
     static int s_LangNum;
     static int s_LayoutNum;
 
@@ -242,6 +244,8 @@ private:
     static constexpr int DATA_FETCH_NO_NEXT_ADDR_SIZE = 2;
     static constexpr int RECONDITION_RESPONSE_SIZE = 4;
     static constexpr int NEXT_ADDRESS_STARTING = 2;
+    static constexpr int MINI_FILE_SIZE_BYTES = 4;
+    static constexpr int MINI_FILE_BLOCK_SIZE = 128;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
 };
 
