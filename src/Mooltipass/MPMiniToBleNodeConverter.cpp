@@ -80,6 +80,7 @@ QByteArray MPMiniToBleNodeConverter::convertMiniParentNodeToBle(const QByteArray
     }
     if (isData)
     {
+        // For data parent node setting the ASCII flag
         bleArray[0] = bleArray[0]|(1<<ASCII_FLAG);
     }
     // Fill remaining service name

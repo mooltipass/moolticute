@@ -562,10 +562,11 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
             if (m_miniFilePartCounter)
             {
                 const int FULL_SIZE_START = 4;
-                QByteArray fullSizeArr = Common::reverse(payload.mid(FULL_SIZE_START, MINI_FILE_SIZE_BYTES));
+                // Size is received in big endian, but convertToQuint32 expects little endian.
+                QByteArray fullSizeArr = Common::reverse(payload.mid(FULL_SIZE_START, MINI_FILE_FULL_SIZE_LENGTH));
                 quint32 fullSize = bleProt->convertToQuint32(fullSizeArr);
                 m["full_size"] = fullSize;
-                m["act_size"] = MINI_FILE_BLOCK_SIZE - MINI_FILE_SIZE_BYTES;
+                m["act_size"] = MINI_FILE_BLOCK_SIZE - MINI_FILE_FULL_SIZE_LENGTH;
             }
         }
 
@@ -587,7 +588,7 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
                  * After a 128B first packet we received an other packet, so it is a mini file
                  * and we can remove 4B size from beggining
                  */
-                ba.remove(0, MINI_FILE_SIZE_BYTES);
+                ba.remove(0, MINI_FILE_FULL_SIZE_LENGTH);
             }
             int fullSize = m["full_size"].toInt();
             int actSize = m["act_size"].toInt();
@@ -596,6 +597,10 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
                 int currentSize = actSize + size;
                 if (currentSize > fullSize)
                 {
+                    /**
+                     * When with the actual 128B payload the size is larger than
+                     * the full size, we only need the remaining file data from this packet
+                     */
                     ba.append(payload.mid(4, fullSize - actSize));
                     m["act_size"] = fullSize;
                 }
