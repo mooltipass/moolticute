@@ -645,7 +645,7 @@ void MPDeviceBleImpl::createBLEDataChildNodes(MPDevice::ExportPayloadData id, QB
     {
         QByteArray addr = firstAddr;
         QByteArray dataPacket = m_bleNodeConverter.convertDataChildNode(miniDataArray[i], totalSize, currentSize, firstAddr);
-        /* Recreate node and add it to the list of imported nodes */
+        /* Create node and add it to the list of imported data nodes */
         MPNode* importedNode = bleProt->createMPNode(qMove(dataPacket), mpDev, qMove(addr), 0);
         mpDev->importNodeMap[id]->append(importedNode);
     }
@@ -676,7 +676,7 @@ void MPDeviceBleImpl::readExportDataChildNodes(const QJsonArray &nodes, MPDevice
 
         if (hasNextAddress(dataCore[NEXT_ADDRESS_STARTING], dataCore[NEXT_ADDRESS_STARTING + 1]))
         {
-            // Checking next three
+            /* Collecting data child nodes, while they have next address */
             do
             {
                 qjobject = nodes[++i].toObject();
@@ -686,6 +686,7 @@ void MPDeviceBleImpl::readExportDataChildNodes(const QJsonArray &nodes, MPDevice
                 coreArray.append(dataCore);
             } while (hasNextAddress(dataCore[NEXT_ADDRESS_STARTING], dataCore[NEXT_ADDRESS_STARTING+1]));
         }
+        /* Create data child nodes for a given file */
         createBLEDataChildNodes(id, serviceAddr, coreArray);
     }
 }
