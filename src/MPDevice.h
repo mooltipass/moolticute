@@ -258,6 +258,7 @@ signals:
     void platformFailed();
     void filesCacheChanged();
     void dbChangeNumbersChanged(const int credentialsDbChangeNumber, const int dataDbChangeNumber);
+    void displayMiniImportWarning();
 
 private slots:
     void newDataRead(const QByteArray &data);

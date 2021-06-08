@@ -5594,11 +5594,19 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 
     if (!isMooltiAppImportFile)
     {
-        /* Read service nodes */
-        readExportNodes(dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_NODES_INDEX, miniExportToBle, true);
+        if (miniExportToBle && bleImpl->get_bundleVersion() < 1 && !dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray().isEmpty())
+        {
+            //Cannot import files, display warning information
+            emit displayMiniImportWarning();
+        }
+        else
+        {
+            /* Read service nodes */
+            readExportNodes(dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_NODES_INDEX, miniExportToBle, true);
 
-        /* Read service child nodes */
-        readExportDataChildNodes(dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_CHILD_NODES_INDEX, miniExportToBle);
+            /* Read service child nodes */
+            readExportDataChildNodes(dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_CHILD_NODES_INDEX, miniExportToBle);
+        }
 
         if (isBleExport)
         {

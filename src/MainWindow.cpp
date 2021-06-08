@@ -480,6 +480,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         }
     });
 
+    connect(wsClient, &WSClient::displayMiniImportWarning, this, &MainWindow::displayMiniImportWarning);
+
     QRegularExpressionValidator* uidKeyValidator = new QRegularExpressionValidator(QRegularExpression(Common::HEX_REGEXP.arg(UID_REQUEST_LENGTH)), ui->UIDRequestKeyInput);
     ui->UIDRequestKeyInput->setValidator(uidKeyValidator);
     ui->UIDRequestValidateBtn->setEnabled(false);
@@ -1731,6 +1733,13 @@ void MainWindow::handleNoBundleDisconnected()
     ui->widgetBleDev->clearWidgets();
     wsClient->set_status(Common::UnknownStatus);
     updatePage();
+}
+
+void MainWindow::displayMiniImportWarning()
+{
+    PromptMessage *message = new PromptMessage("<b>"+tr("Import Warning") + "</b><br>" +
+                                                  tr("Files were not imported from mini backup."));
+    showPrompt(message);
 }
 
 void MainWindow::on_toolButton_clearBackupFilePath_released()

@@ -594,6 +594,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::batteryPercentChanged, this, &WSServerCon::sendBatteryPercent);
         connect(mpBle, &MPDeviceBleImpl::userCategoriesFetched, this, &WSServerCon::sendUserCategories);
         connect(mpBle, &MPDeviceBleImpl::bundleVersionChanged, this, &WSServerCon::sendVersion);
+        connect(mpdevice, &MPDevice::displayMiniImportWarning, this, &WSServerCon::sendMiniImportWarning);
     }
 }
 
@@ -856,6 +857,12 @@ void WSServerCon::sendBatteryPercent(int batteryPct)
     QJsonObject data;
     data.insert("battery", batteryPct);
     oroot["data"] = data;
+    sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendMiniImportWarning()
+{
+    QJsonObject oroot = { {"msg", "display_mini_import_warning"} };
     sendJsonMessage(oroot);
 }
 
