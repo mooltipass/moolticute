@@ -68,3 +68,31 @@ do
     fi
 done
 
+# Trigger new build on OBS
+# Requires the following list of environment variables set
+# - OBS_API, for example "https://api.opensuse.org"
+# - OBS_PROJ, for example "home:someuser:someproject"
+# - OBS_USER, the user to authenticate as against the OBS_API
+# - OBS_PASS, the user's password
+
+# Just to be clear. The revision *must* be a git tag matching the python regex
+# v([0-9\.]*)(-testing)?(.*)
+REVISION="$VERSION"
+OBS_COMMIT_MSG="Update package to revision ${REVISION}"
+
+OBS_PKG="moolticute"
+if endsWith -testing "$VERSION"; then
+    OBS_PKG="moolticute-testing"
+fi
+
+# Fetch current _service file to CWD
+curl -u $OBS_USER:$OBS_PASS -X GET ${OBS_API}/source/${OBS_PROJ}/${OBS_PKG}/_service -o _service
+
+# Update revision to build
+sed -i "s|<param name=\"revision\">\(.*\)</param>|<param name=\"revision\">${REVISION}</param>|" _service
+
+# Push modified _service file back to OBS
+curl -u $OBS_USER:$OBS_PASS -X PUT -T _service ${OBS_API}/source/${OBS_PROJ}/${OBS_PKG}/_service
+
+# Commit changes, which will trigger a new build and eventually release
+curl -u $OBS_USER:$OBS_PASS -X POST ${OBS_API}/source/${OBS_PROJ}/${OBS_PKG}?cmd=commit --data-urlencode "comment=${OBS_COMMIT_MSG}"
