@@ -549,6 +549,10 @@ void WSClient::onTextMessageReceived(const QString &message)
             emit deleteFidoNodesFailed();
         }
     }
+    else if (rootobj["msg"] == "display_mini_import_warning")
+    {
+        emit displayMiniImportWarning();
+    }
 
 }
 

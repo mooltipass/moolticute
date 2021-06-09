@@ -457,3 +457,14 @@ QString Common::toHexString(const QByteArray &array)
 {
     return array.toHex();
 }
+
+QByteArray Common::reverse(const QByteArray &array)
+{
+    QByteArray res;
+    res.reserve(array.size());
+    for(int i = array.size() - 1; i >= 0; --i)
+    {
+        res.append(array[i]);
+    }
+    return res;
+}

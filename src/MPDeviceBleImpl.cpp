@@ -552,6 +552,24 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
         QByteArray payload = bleProt->getFullPayload(data);
         QByteArray payloadSize = payload.mid(2, 2);
         quint16 size = qFromLittleEndian<quint16>((quint8*)payloadSize.data());
+
+        bool firstPacket = false;
+        if (ba.isEmpty())
+        {
+            firstPacket = true;
+            //If ba is empty it is the first received packet
+            m_miniFilePartCounter = size == MINI_FILE_BLOCK_SIZE ? 1 : 0;
+            if (m_miniFilePartCounter)
+            {
+                const int FULL_SIZE_START = 4;
+                // Size is received in big endian, but convertToQuint32 expects little endian.
+                QByteArray fullSizeArr = Common::reverse(payload.mid(FULL_SIZE_START, MINI_FILE_FULL_SIZE_LENGTH));
+                quint32 fullSize = bleProt->convertToQuint32(fullSizeArr);
+                m["full_size"] = fullSize;
+                m["act_size"] = MINI_FILE_BLOCK_SIZE - MINI_FILE_FULL_SIZE_LENGTH;
+            }
+        }
+
         if (0 == size)
         {
             if (!m.contains("data"))
@@ -561,10 +579,56 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
             }
             return true;
         }
-        ba.append(payload.mid(4, size));
+
+        if (m_miniFilePartCounter > 1)
+        {
+            if (m_miniFilePartCounter == 2)
+            {
+                /**
+                 * After a 128B first packet we received an other packet, so it is a mini file
+                 * and we can remove 4B size from beggining
+                 */
+                ba.remove(0, MINI_FILE_FULL_SIZE_LENGTH);
+            }
+            int fullSize = m["full_size"].toInt();
+            int actSize = m["act_size"].toInt();
+            if (actSize != fullSize)
+            {
+                int currentSize = actSize + size;
+                if (currentSize > fullSize)
+                {
+                    /**
+                     * When with the actual 128B payload the size is larger than
+                     * the full size, we only need the remaining file data from this packet
+                     */
+                    ba.append(payload.mid(4, fullSize - actSize));
+                    m["act_size"] = fullSize;
+                }
+                else
+                {
+                    ba.append(payload.mid(4, size));
+                    actSize += size;
+                    m["act_size"] = actSize;
+                }
+            }
+            m_miniFilePartCounter++;
+        }
+        else
+        {
+            ba.append(payload.mid(4, size));
+        }
 
         m["data"] = ba;
         jobs->user_data = m;
+
+        if (firstPacket && m_miniFilePartCounter == 1)
+        {
+            /**
+             * For first packet we increase mini file part counter here, because
+             * until the second packet is not received we handle it as BLE file
+             */
+            ++m_miniFilePartCounter;
+        }
 
         jobs->append(new MPCommandJob(mpDev, MPCmd::READ_DATA_FILE,
                   [this, jobs](const QByteArray &data, bool &)
@@ -574,6 +638,62 @@ bool MPDeviceBleImpl::readDataNode(AsyncJobs *jobs, const QByteArray &data)
                   ));
     }
     return true;
+}
+
+void MPDeviceBleImpl::createBLEDataChildNodes(MPDevice::ExportPayloadData id, QByteArray& firstAddr, QVector<QByteArray> &miniDataArray)
+{
+    const int MINI_BLOCK_SIZE = 128;
+    const int FLAG_AND_NEXT_ADDR_SIZE = 4;
+    const int totalSize = (miniDataArray.size() - 1) * MINI_BLOCK_SIZE + (miniDataArray.last().size() - FLAG_AND_NEXT_ADDR_SIZE);
+    int currentSize = 0;
+    for (int i = 0; i < miniDataArray.size(); ++i)
+    {
+        QByteArray addr = firstAddr;
+        QByteArray dataPacket = m_bleNodeConverter.convertDataChildNode(miniDataArray[i], totalSize, currentSize, firstAddr);
+        /* Create node and add it to the list of imported data nodes */
+        MPNode* importedNode = bleProt->createMPNode(qMove(dataPacket), mpDev, qMove(addr), 0);
+        mpDev->importNodeMap[id]->append(importedNode);
+    }
+}
+
+bool MPDeviceBleImpl::hasNextAddress(char addr1, char addr2)
+{
+    return !(addr1 == ZERO_BYTE && addr2 == ZERO_BYTE);
+}
+
+void MPDeviceBleImpl::readExportDataChildNodes(const QJsonArray &nodes, MPDevice::ExportPayloadData id)
+{
+    for (qint32 i = 0; i < nodes.size(); i++)
+    {
+        QJsonObject qjobject = nodes[i].toObject();
+
+        /* Fetch address */
+        QJsonArray serviceAddrArr = qjobject["address"].toArray();
+        QByteArray serviceAddr = QByteArray();
+        for (qint32 j = 0; j < serviceAddrArr.size(); j++) {serviceAddr.append(serviceAddrArr[j].toInt());}
+
+        /* Fetch core data */
+        QJsonObject dataObj = qjobject["data"].toObject();
+        QByteArray dataCore = QByteArray();
+        QVector<QByteArray> coreArray;
+        for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
+        coreArray.append(dataCore);
+
+        if (hasNextAddress(dataCore[NEXT_ADDRESS_STARTING], dataCore[NEXT_ADDRESS_STARTING + 1]))
+        {
+            /* Collecting data child nodes, while they have next address */
+            do
+            {
+                qjobject = nodes[++i].toObject();
+                dataObj = qjobject["data"].toObject();
+                dataCore = QByteArray();
+                for (qint32 l = 0; l < dataObj.size(); l++) {dataCore.append(dataObj[QString::number(l)].toInt());}
+                coreArray.append(dataCore);
+            } while (hasNextAddress(dataCore[NEXT_ADDRESS_STARTING], dataCore[NEXT_ADDRESS_STARTING+1]));
+        }
+        /* Create data child nodes for a given file */
+        createBLEDataChildNodes(id, serviceAddr, coreArray);
+    }
 }
 
 bool MPDeviceBleImpl::isAfterAuxFlash()
@@ -1263,9 +1383,9 @@ void MPDeviceBleImpl::fillMiniExportPayload(QByteArray &unknownCardPayload)
     Common::fill(unknownCardPayload, UNKNOWN_CARD_PAYLOAD_SIZE - payloadSize, ZERO_BYTE);
 }
 
-void MPDeviceBleImpl::convertMiniToBleNode(QByteArray &array)
+void MPDeviceBleImpl::convertMiniToBleNode(QByteArray &array, bool isData)
 {
-    m_bleNodeConverter.convert(array);
+    m_bleNodeConverter.convert(array, isData);
 }
 
 void MPDeviceBleImpl::storeFileData(int current, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress)

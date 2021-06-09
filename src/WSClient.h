@@ -162,6 +162,7 @@ signals:
     void reconditionFinished(bool success, double dischargeTime);
     void deleteFidoNodesFailed();
     void showExportPrompt();
+    void displayMiniImportWarning();
 
 public slots:
     void sendJsonData(const QJsonObject &data);
