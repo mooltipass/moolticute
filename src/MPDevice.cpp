@@ -844,7 +844,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
             {
                 if (isBLE())
                 {
-                    startDataNode = bleImpl->getDataStartNode(pMesProt->getFullPayload(data));
+                    startDataNode = bleImpl->getDataStartNodes(pMesProt->getFullPayload(data));
                     startDataNodeClone = startDataNode;
                 }
                 else
@@ -1183,7 +1183,7 @@ void MPDevice::deleteDataNodes(QStringList nodeNames, MessageHandlerCb cb, Commo
     }
 }
 
-bool MPDevice::checkDataNodeChanged(AsyncJobs *jobs, Common::DataAddressType addrType)
+bool MPDevice::checkStartDataNodeAndGeneratePacket(AsyncJobs *jobs, Common::DataAddressType addrType)
 {
     bool changed = false;
     if (startDataNode[addrType] != startDataNodeClone[addrType])
@@ -2250,7 +2250,7 @@ bool MPDevice::tagPointedNodes(bool tagCredentials, bool tagData, bool repairAll
 bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt, Common::DataAddressType addrType /*= Common::DATA_ADDR_IDX*/)
 {
     const bool isData = Common::DATA_ADDR_IDX == addrType;
-    NodeList& childNodes = isData? dataChildNodes : notesLoginChildNodes;
+    NodeList& dataOrNotesChildNodes = isData? dataChildNodes : notesLoginChildNodes;
     quint32 cur_child_addr_v = parentNodePt->getStartChildVirtualAddress();
     QByteArray cur_child_addr = parentNodePt->getStartChildAddress();
 
@@ -2273,7 +2273,7 @@ bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt, Common::DataAddressT
         MPNode* cur_child_pt;
 
         /* Find node in list */
-        cur_child_pt = findNodeWithAddressInList(childNodes, cur_child_addr, cur_child_addr_v);
+        cur_child_pt = findNodeWithAddressInList(dataOrNotesChildNodes, cur_child_addr, cur_child_addr_v);
 
         if (!cur_child_pt)
         {
@@ -2291,7 +2291,7 @@ bool MPDevice::deleteDataParentChilds(MPNode *parentNodePt, Common::DataAddressT
 
             /* Delete node */
             parentNodePt->removeChild(cur_child_pt);
-            childNodes.removeOne(cur_child_pt);
+            dataOrNotesChildNodes.removeOne(cur_child_pt);
         }
     }
 
@@ -3105,7 +3105,7 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
 
         if (checkNotes)
         {
-            return_bool &= tagPointedNodes(false, true, repairAllowed, Common::CRED_ADDR_IDX, Common::NOTE_ADDR_IDX);
+            return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed, Common::CRED_ADDR_IDX, Common::NOTE_ADDR_IDX);
             checkLoadedDataNodes(nbNotesOrphanParents, nbNotesOrphanChildren, repairAllowed, Common::NOTE_ADDR_IDX);
         }
     }
@@ -3418,10 +3418,10 @@ bool MPDevice::generateSavePackets(AsyncJobs *jobs, bool tackleCreds, bool tackl
         }
 
         /* Diff start data node */
-        diagSavePacketsGenerated |= checkDataNodeChanged(jobs, Common::DATA_ADDR_IDX);
+        diagSavePacketsGenerated |= checkStartDataNodeAndGeneratePacket(jobs, Common::DATA_ADDR_IDX);
         if (isBLE())
         {
-            diagSavePacketsGenerated |= checkDataNodeChanged(jobs, Common::NOTE_ADDR_IDX);
+            diagSavePacketsGenerated |= checkStartDataNodeAndGeneratePacket(jobs, Common::NOTE_ADDR_IDX);
         }
     }
 

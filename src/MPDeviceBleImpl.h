@@ -92,7 +92,7 @@ public:
     bool processReceivedData(const QByteArray& data, QByteArray& dataReceived);
 
     QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
-    QVector<QByteArray> getDataStartNode(const QByteArray& data) const;
+    QVector<QByteArray> getDataStartNodes(const QByteArray& data) const;
     bool readDataNode(AsyncJobs *jobs, const QByteArray& data, bool isFile = true);
 
     bool isAfterAuxFlash();

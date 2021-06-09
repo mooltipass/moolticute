@@ -636,7 +636,7 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
     return res;
  }
 
- QVector<QByteArray> MPDeviceBleImpl::getDataStartNode(const QByteArray &data) const
+ QVector<QByteArray> MPDeviceBleImpl::getDataStartNodes(const QByteArray &data) const
  {
      auto addresses = processReceivedStartNodes(data);
      if (addresses.size() <= FIRST_DATA_STARTING_ADDR)
