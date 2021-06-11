@@ -6833,14 +6833,14 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
         QJsonObject qjobject = creds[i].toObject();
 
         /* Check login size */
-        if (qjobject["login"].toString().length() >= pMesProt->getLoginMaxLength()-1)
+        if (qjobject["login"].toString().length() > pMesProt->getLoginMaxLength())
         {
             cb(false, "Couldn't import CSV file: " + qjobject["login"].toString() + " has longer than supported length");
             return;
         }
 
         /* Check password size */
-        if (qjobject["password"].toString().length() >= pMesProt->getPwdMaxLength()-1)
+        if (qjobject["password"].toString().length() > pMesProt->getPwdMaxLength())
         {
             cb(false, "Couldn't import CSV file: " + qjobject["password"].toString() + " has longer than supported length");
             return;

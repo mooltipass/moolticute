@@ -53,7 +53,7 @@ public:
 
 private:
     static constexpr uint CRED_PACKAGE_SIZE = 6;
-    static constexpr int PWD_MAX_LENGTH = 32;
+    static constexpr int PWD_MAX_LENGTH = 31;
     static constexpr int LOGIN_MAX_LENGTH = 63;
     static constexpr int CPZ_START = 0;
     static constexpr uint DATA_NODE_ENC_SIZE = 128;
