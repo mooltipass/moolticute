@@ -3488,14 +3488,14 @@ bool MPDevice::generateDataUpdatePackets(Common::DataAddressType addrType, Async
             qDebug() << "Generating save packet for new data service" << nodelist_iterator->getService();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
             diagSavePacketsGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
         else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
         {
             qDebug() << "Generating save packet for updated data service" << nodelist_iterator->getService();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
             diagSavePacketsGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
     }
     for (auto &nodelist_iterator: dataChildNodesList)
@@ -3508,7 +3508,7 @@ bool MPDevice::generateDataUpdatePackets(Common::DataAddressType addrType, Async
             qDebug() << "Generating save packet for new data child node";
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
             diagSavePacketsGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
         else if (nodelist_iterator->getNodeData() != temp_node_pointer->getNodeData())
         {
@@ -3517,7 +3517,7 @@ bool MPDevice::generateDataUpdatePackets(Common::DataAddressType addrType, Async
             qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
             diagSavePacketsGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
     }
     return diagSavePacketsGenerated;
@@ -3543,7 +3543,7 @@ bool MPDevice::generateDataDeletePackets(Common::DataAddressType addrType, Async
             qDebug() << "Generating delete packet for deleted data service" << nodelist_iterator->getService();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getParentNodeSize(), 0xFF), writeCb);
             diagSavePacketsGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
     }
     for (auto &nodelist_iterator: dataChildNodesListClone)
@@ -3556,7 +3556,7 @@ bool MPDevice::generateDataDeletePackets(Common::DataAddressType addrType, Async
             qDebug() << "Generating delete packet for deleted data child node";
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(pMesProt->getChildNodeSize(), 0xFF), writeCb);
             diagSavePacketsGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
     }
     return diagSavePacketsGenerated;
@@ -3582,7 +3582,7 @@ bool MPDevice::checkModifiedSavePacketNodes(AsyncJobs *jobs, std::function<void(
             //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
             savePacketGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
         else if (nodelist_iterator->getNodeData() != tmpNodePtr->getNodeData())
         {
@@ -3591,7 +3591,7 @@ bool MPDevice::checkModifiedSavePacketNodes(AsyncJobs *jobs, std::function<void(
             //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
             savePacketGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
     }
     for (auto &nodelist_iterator: childNodes)
@@ -3605,14 +3605,14 @@ bool MPDevice::checkModifiedSavePacketNodes(AsyncJobs *jobs, std::function<void(
             //qDebug() << "New  contents: " << nodelist_iterator->getNodeData().toHex();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
             savePacketGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
         else if (nodelist_iterator->getNodeData() != tmpNodePtr->getNodeData())
         {
             qDebug() << "Generating save packet for updated login" << nodelist_iterator->getLogin();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), nodelist_iterator->getNodeData(), writeCb);
             savePacketGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
     }
     return savePacketGenerated;
@@ -3637,7 +3637,7 @@ bool MPDevice::checkRemovedSavePacketNodes(AsyncJobs *jobs, std::function<void (
             qDebug() << "Generating delete packet for deleted service" << nodelist_iterator->getService();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getParentNodeSize(), 0xFF), writeCb);
             savePacketGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
     }
     for (auto &nodelist_iterator : childNodesClone)
@@ -3650,10 +3650,22 @@ bool MPDevice::checkRemovedSavePacketNodes(AsyncJobs *jobs, std::function<void (
             qDebug() << "Generating delete packet for deleted login" << nodelist_iterator->getLogin();
             addWriteNodePacketToJob(jobs, nodelist_iterator->getAddress(), QByteArray(getChildNodeSize(), 0xFF), writeCb);
             savePacketGenerated = true;
-            progressTotal += 3;
+            increaseProgressTotalForGeneratedPacket();
         }
     }
     return savePacketGenerated;
+}
+
+void MPDevice::increaseProgressTotalForGeneratedPacket()
+{
+    if (isBLE())
+    {
+        ++progressTotal;
+    }
+    else
+    {
+        progressTotal += 3;
+    }
 }
 
 QByteArray MPDevice::getFreeAddress(quint32 virtualAddr)

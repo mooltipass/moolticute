@@ -365,6 +365,7 @@ private:
     bool generateDataDeletePackets(Common::DataAddressType addrType, AsyncJobs *jobs, std::function<void()> writeCb);
     bool checkModifiedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType);
     bool checkRemovedSavePacketNodes(AsyncJobs *jobs, std::function<void()> writeCb, Common::AddressType addrType);
+    void increaseProgressTotalForGeneratedPacket();
 
     QByteArray getFreeAddress(quint32 virtualAddr);
     // once we fetched free addresses, this function is called
