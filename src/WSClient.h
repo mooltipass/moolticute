@@ -74,15 +74,19 @@ public:
     void sendEnterMMRequest(bool wantData = false, bool wantFido = false);
     void sendLeaveMMRequest();
 
+    void sendFetchNotes();
+
     void addOrUpdateCredential(const QString &service, const QString &login,
                                const QString &password, const QString &description = {});
 
     void requestPassword(const QString &service, const QString &login);
 
     void requestDataFile(const QString &service);
-    void sendDataFile(const QString &service, const QByteArray &data);
-    void deleteDataFilesAndLeave(const QStringList &services);
+    void sendDataFile(const QString &service, const QByteArray &data, bool isFile = true);
+    void deleteDataFilesAndLeave(const QStringList &services, const QStringList &notes);
     void deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials);
+
+    void requestNote(const QString &noteName);
 
     void requestResetCard();
     void requestAvailableUserNumber();
@@ -163,6 +167,10 @@ signals:
     void deleteFidoNodesFailed();
     void showExportPrompt();
     void displayMiniImportWarning();
+
+    void notesFetched(const QJsonArray& notes);
+    void noteReceived(const QString &note, const QByteArray &data, bool success);
+    void noteSaved(const QString &note, bool success);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

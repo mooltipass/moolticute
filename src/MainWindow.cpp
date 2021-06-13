@@ -111,6 +111,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     m_tabMap[ui->pageSSH] = ui->pushButtonSSH;
     m_tabMap[ui->pageBleDev] = ui->pushButtonBleDev;
     m_tabMap[ui->pageFido] = ui->pushButtonFido;
+    m_tabMap[ui->pageNotes] = ui->pushButtonNotes;
     connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::onCurrentTabChanged);
 
     ui->widgetCredentials->setWsClient(wsClient);
@@ -118,6 +119,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->widgetSSH->setWsClient(wsClient);
     ui->widgetBleDev->setWsClient(wsClient);
     ui->widgetFido->setWsClient(wsClient);
+    ui->widgetNotes->setWsClient(wsClient);
 
     ui->widgetCredentials->setPasswordProfilesModel(m_passwordProfilesModel);
 
@@ -153,6 +155,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonFido->setIcon(AppGui::qtAwesome()->icon(fa::usb));
     ui->pushButtonFido->setVisible(false);
 
+    ui->pushButtonNotes->setIcon(AppGui::qtAwesome()->icon(fa::newspapero));
+    ui->pushButtonNotes->setVisible(false);
+
     m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F1), this);
     setKeysTabVisibleOnDemand(bSSHKeysTabVisibleOnDemand);
     connect(ui->radioButtonSSHTabAlways, &QRadioButton::toggled, this, &MainWindow::onRadioButtonSSHTabsAlwaysToggled);
@@ -178,6 +183,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
     connect(ui->widgetFido, &FidoManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetFido, &FidoManagement::wantExitMemMode, this, &MainWindow::wantExitFidoManagement);
+    connect(ui->widgetNotes, &NotesManagement::enterNoteEdit, this, &MainWindow::wantEnterNoteEdit);
+
+    connect(wsClient, &WSClient::noteSaved, this, &MainWindow::displayNotePage);
+    connect(wsClient, &WSClient::noteReceived, this, &MainWindow::displayNotePage);
+    connect(ui->widgetNotes, &NotesManagement::updateTabs, [this](){ updateTabButtons(); });
 
     connect(wsClient, &WSClient::memMgmtModeChanged, [this](bool isMMM){
         if (isMMM && (ui->promptWidget->isMMMErrorPrompt()
@@ -284,6 +294,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->pushButtonAdvanced, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonBleDev, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->pushButtonFido, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
+    connect(ui->pushButtonNotes, SIGNAL(clicked(bool)), this, SLOT(updatePage()));
     connect(ui->btnPassGenerationProfiles, &QPushButton::clicked, [this]()
     {
         PassGenerationProfilesDialog dlg(this);
@@ -732,6 +743,7 @@ void MainWindow::updateDeviceDependentUI()
         ui->groupBox_UserSettings->hide();
         ui->groupBoxNiMHRecondition->hide();
         ui->groupBoxSecurityChallenge->hide();
+        ui->pushButtonNotes->setVisible(false);
     }
 }
 
@@ -832,6 +844,9 @@ void MainWindow::updatePage()
 
     else if (ui->pushButtonFido->isChecked())
         ui->stackedWidget->setCurrentWidget(ui->pageFido);
+
+    else if (ui->pushButtonNotes->isChecked())
+        ui->stackedWidget->setCurrentWidget(ui->pageNotes);
 
     updateTabButtons();
 
@@ -1136,6 +1151,16 @@ void MainWindow::wantExitFidoManagement()
 {
     ui->labelWait->show();
     ui->labelWait->setText(tr("<html><!--exit_fido_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Saving changes to device's memory</span></p><p>Please wait.</p></body></html>"));
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
+    updateTabButtons();
+}
+
+void MainWindow::wantEnterNoteEdit()
+{
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--enter_credentials_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Waiting For Device Confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
     ui->progressBarWait->hide();
     ui->labelProgressMessage->hide();
@@ -1510,6 +1535,8 @@ void MainWindow::enableCredentialsManagement(bool enable)
             ui->stackedWidget->setCurrentWidget(ui->pageFiles);
         else if (ui->pushButtonFido->isChecked())
             ui->stackedWidget->setCurrentWidget(ui->pageFido);
+        else if (ui->pushButtonNotes->isChecked())
+            ui->stackedWidget->setCurrentWidget(ui->pageNotes);
     }
 
     updateTabButtons();
@@ -1555,17 +1582,21 @@ void MainWindow::updateTabButtons()
         return;
     }
 
-    if ((ui->stackedWidget->currentWidget() == ui->pageFiles
+    if (((ui->stackedWidget->currentWidget() == ui->pageFiles
          || ui->stackedWidget->currentWidget() == ui->pageCredentials
          || ui->stackedWidget->currentWidget() == ui->pageIntegrity
-         || ui->stackedWidget->currentWidget() == ui->pageFido) &&
-            wsClient->get_memMgmtMode())
+         || ui->stackedWidget->currentWidget() == ui->pageFido
+         || ui->stackedWidget->currentWidget() == ui->pageNotes) &&
+            wsClient->get_memMgmtMode()) ||
+            (ui->widgetNotes->isInNoteEditingMode() &&
+             ui->stackedWidget->currentWidget() == ui->pageNotes))
     {
         // Disable all tab buttons
         setEnabledToAllTabButtons(false);
 
         ui->pushButtonCred->setEnabled(ui->stackedWidget->currentWidget() == ui->pageCredentials);
         ui->pushButtonFiles->setEnabled(ui->stackedWidget->currentWidget() == ui->pageFiles);
+        ui->pushButtonFiles->setEnabled(ui->stackedWidget->currentWidget() == ui->pageNotes);
 
         return;
     }
@@ -1679,6 +1710,7 @@ void MainWindow::displayBundleVersion()
         const bool displayBundle = wsClient->get_bundleVersion() > 0;
         ui->labelBundleVersion->setVisible(displayBundle);
         ui->labelBundleVersionValue->setVisible(displayBundle);
+        ui->pushButtonNotes->setVisible(wsClient->get_bundleVersion() >= 1);
     }
     else
     {
@@ -1979,6 +2011,7 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
+        wsClient->sendFetchNotes();
     }
     displayBundleVersion();
     updateDeviceDependentUI();
@@ -1994,6 +2027,7 @@ void MainWindow::onDeviceDisconnected()
             handleNoBundleDisconnected();
         }
         ui->pushButtonFido->setVisible(false);
+        ui->pushButtonNotes->setVisible(false);
         noPasswordPromptChanged(false);
         ui->pushButtonSettingsSetToDefault->setVisible(false);
     }
@@ -2127,4 +2161,10 @@ void MainWindow::on_pushButtonSettingsSetToDefault_clicked()
     {
         wsClient->sendJsonData({{ "msg", "reset_default_settings" }});
     }
+}
+
+void MainWindow::displayNotePage()
+{
+    ui->stackedWidget->setCurrentWidget(ui->pageNotes);
+    updateTabButtons();
 }

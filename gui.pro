@@ -23,7 +23,9 @@ include (src/QSimpleUpdater/QSimpleUpdater.pri)
 include (src/qtcsv/qtcsv.pri)
 
 SOURCES += src/main_gui.cpp \
+    src/ClickableLabel.cpp \
     src/MainWindow.cpp \
+    src/NotesManagement.cpp \
     src/ParseDomain.cpp \
     src/Common.cpp \
     src/TOTPCredential.cpp \
@@ -37,6 +39,7 @@ SOURCES += src/main_gui.cpp \
     src/AnsiEscapeCodeHandler.cpp \
     src/PasswordLineEdit.cpp \
     src/CredentialsManagement.cpp \
+    src/utils/GridLayoutUtil.cpp \
     src/zxcvbn-c/zxcvbn.c \
     src/FilesManagement.cpp \
     src/SSHManagement.cpp \
@@ -73,12 +76,15 @@ SOURCES += src/main_gui.cpp \
     src/FidoManagement.cpp \
 
 HEADERS  += src/MainWindow.h \
+    src/ClickableLabel.h \
+    src/NotesManagement.h \
     src/ParseDomain.h \
     src/Common.h \
     src/QtHelper.h \
     src/TOTPCredential.h \
     src/WSClient.h \
     src/RotateSpinner.h \
+    src/utils/GridLayoutUtil.h \
     src/version.h \
     src/AppGui.h \
     src/DaemonMenuAction.h \
@@ -142,6 +148,7 @@ INCLUDEPATH += src\
     src/zxcvbn-c
 
 FORMS    += src/MainWindow.ui \
+    src/NotesManagement.ui \
     src/TOTPCredential.ui \
     src/WindowLog.ui \
     src/CredentialsManagement.ui \

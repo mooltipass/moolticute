@@ -99,7 +99,10 @@ private:
     QString fileName;
 
     QStringList deletedList;
+    QStringList deletedNoteList;
     void setFileCacheControlsVisible(bool visible);
+
+    static const QString NOTE_TYPE;
 };
 
 #endif // FILESMANAGEMENT_H

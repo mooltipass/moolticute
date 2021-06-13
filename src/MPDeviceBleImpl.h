@@ -64,6 +64,14 @@ public:
     void addDataFile(const QString& file);
     QList<QString> getDataFiles() const { return m_dataFiles; }
 
+    void fetchNotes();
+    void fetchNotes(AsyncJobs *jobs, QByteArray addr);
+    QList<QString> getNotes() const { return m_notes; }
+    void getNoteNode(QString note, std::function<void(bool, QString, QString, QByteArray)> cb);
+
+    bool isNoteAvailable() const;
+    void loadNotes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
+
     void checkAndStoreCredential(const BleCredential &cred, MessageHandlerCb cb);
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb, AsyncJobs *jobs = nullptr);
     void changePassword(const QByteArray& address, const QString& pwd, MessageHandlerCb cb);
@@ -84,8 +92,8 @@ public:
     bool processReceivedData(const QByteArray& data, QByteArray& dataReceived);
 
     QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
-    QByteArray getDataStartNode(const QByteArray& data) const;
-    bool readDataNode(AsyncJobs *jobs, const QByteArray& data);
+    QVector<QByteArray> getDataStartNodes(const QByteArray& data) const;
+    bool readDataNode(AsyncJobs *jobs, const QByteArray& data, bool isFile = true);
     void createBLEDataChildNodes(MPDevice::ExportPayloadData id, QByteArray& firstAddr, QVector<QByteArray>& miniDataArray);
     bool hasNextAddress(char addr1, char addr2);
     void readExportDataChildNodes(const QJsonArray& nodes, MPDevice::ExportPayloadData id);
@@ -132,6 +140,8 @@ public:
     void loadWebAuthnNodes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
     void appendLoginNode(MPNode* loginNode, MPNode* loginNodeClone, Common::AddressType addrType);
     void appendLoginChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, Common::AddressType addrType);
+    void appendDataNode(MPNode* loginNode, MPNode* loginNodeClone, Common::DataAddressType addrType);
+    void appendDataChildNode(MPNode* loginChildNode, MPNode* loginChildNodeClone, Common::DataAddressType addrType);
     void generateExportData(QJsonArray& exportTopArray);
 
     static char toChar(const QJsonValue &val) { return static_cast<char>(val.toInt()); }
@@ -142,7 +152,7 @@ public:
 
     void convertMiniToBleNode(QByteArray &array, bool isData);
 
-    void storeFileData(int current, AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);
+    void storeFileData(int current, AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress, bool isFile = true);
 
     void sendInitialStatusRequest();
     void checkNoBundle(Common::MPStatus& status, Common::MPStatus prevStatus);
@@ -162,6 +172,7 @@ signals:
     void bleKeyboardLayout(const QJsonObject& layouts);
     void batteryPercentChanged(int batteryPct);
     void userCategoriesFetched(QJsonObject categories);
+    void notesFetched();
 
 private slots:
     void handleLongMessageTimeout();
@@ -211,6 +222,7 @@ private:
 
     bool m_isFirstMessageWritten = false;
     QList<QString> m_dataFiles;
+    QList<QString> m_notes;
 
     bool m_enforceLayout = false;
 

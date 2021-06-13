@@ -393,6 +393,7 @@ void WSServerCon::processMessage(const QString &message)
     {
         QJsonObject o = root["data"].toObject();
         QString service = o["service"].toString();
+        bool isFile = (o.contains("is_file") && o["is_file"].toBool()) || !o.contains("is_file");
         QByteArray data = QByteArray::fromBase64(o["node_data"].toString().toLocal8Bit());
         if (data.isEmpty())
         {
@@ -415,19 +416,21 @@ void WSServerCon::processMessage(const QString &message)
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
 
-            if (!success)
-            {
-                sendFailedJson(root, errstr);
-                return;
-            }
 
             QJsonObject ores;
             ores["service"] = service;
+            ores["is_file"] = isFile;
+            if (!success)
+            {
+                ores["failed"] = true;
+                ores["error_message"] = errstr;
+            }
+
             QJsonObject oroot = root;
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         },
-        defaultProgressCb);
+        defaultProgressCb, isFile);
     }
     else if (root["msg"] == "get_data_node")
     {
@@ -476,10 +479,17 @@ void WSServerCon::processMessage(const QString &message)
 
         QJsonArray jarr = o["services"].toArray();
         QStringList services;
-        for (int i = 0;i < jarr.size();i++)
+        for (int i = 0; i < jarr.size(); i++)
             services.append(jarr[i].toString());
 
-        mpdevice->deleteDataNodesAndLeave(services,
+        QJsonArray noteArray = o["notes"].toArray();
+        QStringList notes;
+        for (int i = 0; i < noteArray.size(); i++)
+        {
+            notes.append(noteArray[i].toString());
+        }
+
+        mpdevice->deleteDataNodesAndLeave(services, notes,
                 [=](bool success, QString errstr)
         {
             if (!WSServer::Instance()->checkClientExists(this))
@@ -594,6 +604,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::batteryPercentChanged, this, &WSServerCon::sendBatteryPercent);
         connect(mpBle, &MPDeviceBleImpl::userCategoriesFetched, this, &WSServerCon::sendUserCategories);
         connect(mpBle, &MPDeviceBleImpl::bundleVersionChanged, this, &WSServerCon::sendVersion);
+        connect(mpBle, &MPDeviceBleImpl::notesFetched, this, &WSServerCon::sendNotes);
         connect(mpdevice, &MPDevice::displayMiniImportWarning, this, &WSServerCon::sendMiniImportWarning);
     }
 }
@@ -636,7 +647,6 @@ void WSServerCon::sendInitialStatus()
         sendJsonMessage({{ "msg", "mp_disconnected" }});
     else
     {
-        sendJsonMessage({{ "msg", "mp_connected" }});
         sendJsonMessage({{ "msg", "status_changed" },
                          { "data", Common::MPStatusString[mpdevice->get_status()] }});
         mpdevice->settings()->sendEveryParameter();
@@ -671,7 +681,6 @@ void WSServerCon::sendMemMgmtMode()
 
     QJsonObject jdata;
     jdata["login_nodes"] = logins;
-    jdata["data_nodes"] = datas;
 
     if (mpdevice->isBLE())
     {
@@ -681,7 +690,15 @@ void WSServerCon::sendMemMgmtMode()
             fidoData.append(n->toJson(true));
         }
         jdata["fido_nodes"] = fidoData;
+        QJsonArray notes;
+        foreach (MPNode *n, mpdevice->getNoteDataNodes())
+        {
+            notes.append(n->toJson());
+        }
+        jdata["notes_nodes"] = notes;
     }
+
+    jdata["data_nodes"] = datas;
 
     sendJsonMessage({{ "msg", "memorymgmt_data" },
                      { "data", jdata }});
@@ -753,6 +770,33 @@ void WSServerCon::sendFilesCache()
             qDebug() << "There is no files cache to send";
             oroot["sync"] = false;
         }
+    }
+
+    oroot["data"] = array;
+    sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendNotes()
+{
+    if (!mpdevice->isBLE())
+    {
+        qCritical() << "Notes are only available for BLE";
+        return;
+    }
+    auto deviceStatus = mpdevice->get_status();
+    if (deviceStatus != Common::Unlocked && deviceStatus != Common::MMMMode)
+    {
+        qDebug() << "It's an unknown smartcard or it's locked, no need to search for notes";
+        return;
+    }
+
+    qDebug() << "Sending notes";
+    QJsonObject oroot = { {"msg", "fetch_notes"} };
+    QJsonArray array;
+    MPDeviceBleImpl *bleImpl = mpdevice->ble();
+    for (auto file : bleImpl->getNotes())
+    {
+        array.append(QJsonObject{{"name", file}});
     }
 
     oroot["data"] = array;
@@ -1373,6 +1417,34 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         {
             qCritical() << root["msg"] << " failed";
         }
+    }
+    else if (root["msg"] == "fetch_notes")
+    {
+        bleImpl->fetchNotes();
+    }
+    else if (root["msg"] == "get_note_node")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString note = o["note"].toString();
+        bleImpl->getNoteNode(note,
+                [this, root](bool success, QString errstr, const QString &note, const QByteArray &dataNode)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            if (!success)
+            {
+                sendFailedJson(root, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["note"] = note;
+            ores["note_data"] = QString(dataNode.toBase64());
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
     }
     else
     {

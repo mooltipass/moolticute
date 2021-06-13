@@ -340,11 +340,19 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o.value("failed").toBool();
+        bool isFile = (o.contains("is_file") && o["is_file"].toBool()) || !o.contains("is_file");
         if (success && isMPBLE())
         {
             emit showExportPrompt();
         }
-        emit dataFileSent(o["service"].toString(), success);
+        if (isFile)
+        {
+            emit dataFileSent(o["service"].toString(), success);
+        }
+        else
+        {
+            emit noteSaved(o["service"].toString(), success);
+        }
     }
     else if (rootobj["msg"] == "delete_data_node")
     {
@@ -403,6 +411,17 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         filesCache = rootobj["data"].toArray();
         emit filesCacheChanged(rootobj["sync"].toBool());
+    }
+    else if (rootobj["msg"] == "fetch_notes")
+    {
+        emit notesFetched(rootobj["data"].toArray());
+    }
+    else if (rootobj["msg"] == "get_note_node")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = !o.contains("failed") || !o.value("failed").toBool();
+        QByteArray b = QByteArray::fromBase64(o["note_data"].toString().toLocal8Bit());
+        emit noteReceived(o["note"].toString(), b, success);
     }
     else if (rootobj["msg"] == "get_random_numbers")
     {
@@ -606,6 +625,11 @@ void WSClient::sendLeaveMMRequest()
     sendJsonData({{ "msg", "exit_memorymgmt" }});
 }
 
+void WSClient::sendFetchNotes()
+{
+    sendJsonData({{ "msg", "fetch_notes" }});
+}
+
 void WSClient::addOrUpdateCredential(const QString &service, const QString &login,
                                      const QString &password, const QString &description)
 {
@@ -633,20 +657,27 @@ void WSClient::requestDataFile(const QString &service)
                   { "data", d }});
 }
 
-void WSClient::sendDataFile(const QString &service, const QByteArray &data)
+void WSClient::sendDataFile(const QString &service, const QByteArray &data, bool isFile)
 {
     QJsonObject d = {{ "service", service.toLower() },
-                     { "node_data", QString(data.toBase64()) }};
+                     { "node_data", QString(data.toBase64()) },
+                     { "is_file", isFile}};
     sendJsonData({{ "msg", "set_data_node" },
                   { "data", d }});
 }
 
-void WSClient::deleteDataFilesAndLeave(const QStringList &services)
+void WSClient::deleteDataFilesAndLeave(const QStringList &services, const QStringList &notes)
 {
     QJsonArray s;
     for (const QString &srv: qAsConst(services))
         s.append(srv.toLower());
-    QJsonObject d = {{ "services", s }};
+
+    QJsonArray noteArray;
+    for (const auto& note : notes)
+    {
+        noteArray.append(note);
+    }
+    QJsonObject d = {{ "services", s }, {"notes", noteArray}};
     sendJsonData({{ "msg", "delete_data_nodes" },
                   { "data", d }});
 }
@@ -669,6 +700,13 @@ void WSClient::deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials)
     }
     QJsonObject d = {{ "deleted_fidos", fidoNodeArray }};
     sendJsonData({{ "msg", "delete_fido_nodes" },
+                  { "data", d }});
+}
+
+void WSClient::requestNote(const QString &noteName)
+{
+    QJsonObject d = {{ "note", noteName }};
+    sendJsonData({{ "msg", "get_note_node" },
                   { "data", d }});
 }
 

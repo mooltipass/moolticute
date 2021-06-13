@@ -22,6 +22,8 @@
 #include "AppGui.h"
 #include "DeviceDetector.h"
 
+const QString FilesManagement::NOTE_TYPE = "note";
+
 FilesFilterModel::FilesFilterModel(QObject *parent):
     QSortFilterProxyModel(parent)
 {
@@ -185,18 +187,21 @@ void FilesManagement::on_pushButtonEnterMMM_clicked()
 void FilesManagement::on_buttonQuitMMM_clicked()
 {
     filesModel->clear();
-    if (!deletedList.isEmpty())
+    if (deletedList.isEmpty() && deletedNoteList.isEmpty())
     {
-        emit wantExitMemMode();
-        wsClient->deleteDataFilesAndLeave(deletedList);
+        wsClient->sendLeaveMMRequest();
     }
     else
-        wsClient->sendLeaveMMRequest();
+    {
+        emit wantExitMemMode();
+        wsClient->deleteDataFilesAndLeave(deletedList, deletedNoteList);
+    }
+
 }
 
 void FilesManagement::on_buttonDiscard_pressed()
 {
-    if (deletedList.isEmpty())
+    if (deletedList.isEmpty() && deletedNoteList.isEmpty())
         wsClient->sendLeaveMMRequest();
 }
 
@@ -216,7 +221,18 @@ void FilesManagement::loadModel()
         item->setIcon(AppGui::qtAwesome()->icon(fa::fileo));
         filesModel->appendRow(item);
     }
+
+    jarr = wsClient->getMemoryData()["notes_nodes"].toArray();
+    for (int i = 0;i < jarr.count();i++)
+    {
+        QJsonObject o = jarr.at(i).toObject();
+        QStandardItem *item = new QStandardItem(o["service"].toString());
+        item->setIcon(AppGui::qtAwesome()->icon(fa::newspapero));
+        item->setData(NOTE_TYPE);
+        filesModel->appendRow(item);
+    }
     deletedList.clear();
+    deletedNoteList.clear();
 
     // Select first item by default
     auto selectionModel = ui->filesListView->selectionModel();
@@ -315,6 +331,15 @@ void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QMo
     ui->filesDisplayFrame->show();
 
     currentItem = filesModel->itemFromIndex(filesModel->index(filterModel->indexToSource(curr.row()), 0));
+    if (currentItem->data().toString() == NOTE_TYPE)
+    {
+        //Disable save option for notes
+        ui->pushButtonSaveFile->hide();
+    }
+    else
+    {
+        ui->pushButtonSaveFile->show();
+    }
 }
 
 void FilesManagement::on_pushButtonUpdateFile_clicked()
@@ -410,7 +435,14 @@ void FilesManagement::on_pushButtonDelFile_clicked()
         return;
     }
 
-    deletedList.append(currentItem->text());
+    if (currentItem->data().toString() == NOTE_TYPE)
+    {
+        deletedNoteList.append(currentItem->text());
+    }
+    else
+    {
+        deletedList.append(currentItem->text());
+    }
     filesModel->removeRow(currentItem->row());
 
     // Select another item

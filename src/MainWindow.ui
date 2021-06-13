@@ -165,6 +165,19 @@ QWidget {background-color: #EFEFEF;}</string>
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonNotes">
+         <property name="text">
+          <string>Notes</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonSSH">
          <property name="text">
           <string>SSH Keys</string>
@@ -4233,6 +4246,25 @@ Hint: keep your mouse positioned over an option to get more details.</string>
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="pageNotes">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="NotesManagement" name="widgetNotes" native="true"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="pageFido">
        <layout class="QHBoxLayout" name="horizontalLayout_64">
         <property name="leftMargin">
@@ -4682,6 +4714,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
    <class>PromptWidget</class>
    <extends>QFrame</extends>
    <header>PromptWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>NotesManagement</class>
+   <extends>QWidget</extends>
+   <header>NotesManagement.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

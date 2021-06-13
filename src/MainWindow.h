@@ -103,6 +103,7 @@ private slots:
     void wantSaveCredentialManagement();
     void wantExitFilesManagement();
     void wantExitFidoManagement();
+    void wantEnterNoteEdit();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);
@@ -187,6 +188,8 @@ private slots:
     void on_checkBoxEnforceUSBLayout_stateChanged(int arg1);
 
     void on_pushButtonSettingsSetToDefault_clicked();
+
+    void displayNotePage();
 
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");

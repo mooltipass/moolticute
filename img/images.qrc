@@ -29,5 +29,6 @@
         <file>systray_disconnected_white.png</file>
         <file>systray_white.png</file>
         <file>uid_spinner.gif</file>
+        <file>note.svg</file>
     </qresource>
 </RCC>
