@@ -1842,6 +1842,7 @@ void MainWindow::on_pushButtonImportCSV_clicked()
     QList<QStringList> readData;
     QString probe_separators = ",;.\t";
     QList<int> invalid_lines;
+    QList<QString> duplicateCredsWithDiffPwd;
 
     foreach (QChar c, probe_separators)
     {
@@ -1858,11 +1859,42 @@ void MainWindow::on_pushButtonImportCSV_clicked()
 
         invalid_lines.clear();
 
-        // Check every line of CSV file contains only 3 rows
-        for(int i = 0 ; i < readData.size() ; i++)
+        QMutableListIterator<QStringList> it{readData};
+        QMap<QString, QString> credentialMap;
+        int i = 0;
+        while (it.hasNext())
         {
-            if (readData.at(i).size() != 3)
+            auto list = it.next();
+            // Check every line of CSV file contains only 3 rows
+            if (list.size() != 3)
+            {
                 invalid_lines.append(i+1);
+            }
+            // Check for duplicate credentials
+            if (list.size() > 2)
+            {
+                QString credential = list.at(0) + "-" + list.at(1);
+                QString pwd = list.at(2);
+                if (credentialMap.contains(credential))
+                {
+                    if (pwd != credentialMap[credential])
+                    {
+                        /**
+                         * If password is different store credential in a list
+                         * to display warning later.
+                         */
+                        duplicateCredsWithDiffPwd.append(credential);
+                    }
+                    qDebug() << "Duplicate entry: " << credential;
+                    //Remove duplicate credential
+                    it.remove();
+                }
+                else
+                {
+                    credentialMap.insert(credential, pwd);
+                }
+            }
+            ++i;
         }
 
         if (invalid_lines.size() == 0)
@@ -1893,6 +1925,16 @@ void MainWindow::on_pushButtonImportCSV_clicked()
     {
         QMessageBox::warning(this, tr("Error"), tr("Unable to import %1: Each row must contain exact 3 items using comma as a delimiter").arg(fname));
         return;
+    }
+
+    // Display warning for duplicate credentials with different passwords
+    if (!duplicateCredsWithDiffPwd.isEmpty())
+    {
+        QString creds = "";
+        for (const auto& cred : duplicateCredsWithDiffPwd) creds += ("<b>" + cred + "</b>, ");
+        // Remove last comma
+        creds = creds.left(creds.size()-2);
+        QMessageBox::warning(this, tr("Warning"), tr("There were duplicate credentials with different passwords: %1").arg(creds));
     }
 
     ui->widgetHeader->setEnabled(false);
