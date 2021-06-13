@@ -5590,7 +5590,7 @@ bool MPDevice::readExportFile(const QByteArray &fileData, QString &errorString)
     }
 }
 
-void MPDevice::readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle /*= false*/)
+void MPDevice::readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle /*= false*/, bool isData /*= false*/)
 {
     for (qint32 i = 0; i < nodes.size(); i++)
     {
@@ -5607,12 +5607,24 @@ void MPDevice::readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fr
         for (qint32 j = 0; j < dataObj.size(); j++) {dataCore.append(dataObj[QString::number(j)].toInt());}
         if (fromMiniToBle)
         {
-            bleImpl->convertMiniToBleNode(dataCore);
+            bleImpl->convertMiniToBleNode(dataCore, isData);
         }
 
         /* Recreate node and add it to the list of imported nodes */
         MPNode* importedNode = pMesProt->createMPNode(qMove(dataCore), this, qMove(serviceAddr), 0);
         importNodeMap[id]->append(importedNode);
+    }
+}
+
+void MPDevice::readExportDataChildNodes(QJsonArray &&nodes, MPDevice::ExportPayloadData id, bool fromMiniToBle)
+{
+    if (fromMiniToBle)
+    {
+        bleImpl->readExportDataChildNodes(nodes, id);
+    }
+    else
+    {
+        readExportNodes(qMove(nodes), id, fromMiniToBle);
     }
 }
 
@@ -5748,13 +5760,18 @@ bool MPDevice::readExportPayload(QJsonArray dataArray, QString &errorString)
 
     if (!isMooltiAppImportFile)
     {
-        if (!miniExportToBle)
+        if (miniExportToBle && bleImpl->get_bundleVersion() < 1 && !dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray().isEmpty())
+        {
+            //Cannot import files, display warning information
+            emit displayMiniImportWarning();
+        }
+        else
         {
             /* Read service nodes */
-            readExportNodes(dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_NODES_INDEX);
+            readExportNodes(dataArray[EXPORT_MC_SERVICE_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_NODES_INDEX, miniExportToBle, true);
 
             /* Read service child nodes */
-            readExportNodes(dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_CHILD_NODES_INDEX);
+            readExportDataChildNodes(dataArray[EXPORT_MC_SERVICE_CHILD_NODES_INDEX].toArray(), EXPORT_MC_SERVICE_CHILD_NODES_INDEX, miniExportToBle);
         }
 
         if (isBleExport)
@@ -6986,14 +7003,14 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
         QJsonObject qjobject = creds[i].toObject();
 
         /* Check login size */
-        if (qjobject["login"].toString().length() >= pMesProt->getLoginMaxLength()-1)
+        if (qjobject["login"].toString().length() > pMesProt->getLoginMaxLength())
         {
             cb(false, "Couldn't import CSV file: " + qjobject["login"].toString() + " has longer than supported length");
             return;
         }
 
         /* Check password size */
-        if (qjobject["password"].toString().length() >= pMesProt->getPwdMaxLength()-1)
+        if (qjobject["password"].toString().length() > pMesProt->getPwdMaxLength())
         {
             cb(false, "Couldn't import CSV file: " + qjobject["password"].toString() + " has longer than supported length");
             return;

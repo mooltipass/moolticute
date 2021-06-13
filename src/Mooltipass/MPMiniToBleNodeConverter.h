@@ -8,9 +8,10 @@ class MPMiniToBleNodeConverter
 {
 public:
     MPMiniToBleNodeConverter();
-    void convert(QByteArray &dataArray);
+    void convert(QByteArray &dataArray, bool isData);
+    QByteArray convertDataChildNode(const QByteArray& packet, int totalSize, int& current, QByteArray& addr);
 private:
-    QByteArray convertMiniParentNodeToBle(const QByteArray& dataArray);
+    QByteArray convertMiniParentNodeToBle(const QByteArray& dataArray, bool isData);
     QByteArray convertMiniChildNodeToBle(const QByteArray& dataArray);
 
     const static char ZERO_BYTE = static_cast<char>(0x00);
@@ -32,6 +33,9 @@ private:
     const static quint16 MINI_PWD_SIZE = 32;
     const static quint16 FLAGS_BYTE_NOT_VALID_SET = 264;
     const static quint16 THIRD_FIELD_SIZE = 72;
+    const static quint16 DATA_FLAGS_AND_NEXT_ADDR = 4;
+    const static quint16 PACKET_ENCRYPTED_SIZE = 512;
+    const static quint16 DATA_NEXT_ADDR_STARTING = 2;
 };
 
 #endif // MPMINITOBLENODECONVERTER_H

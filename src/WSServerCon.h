@@ -71,6 +71,8 @@ private slots:
     void sendUserCategories(QJsonObject categories);
 
     void sendBatteryPercent(int batteryPct);
+
+    void sendMiniImportWarning();
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
     bool processSetCredential(QJsonObject &root, QJsonObject &o);

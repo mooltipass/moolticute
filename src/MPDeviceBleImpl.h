@@ -94,6 +94,9 @@ public:
     QVector<QByteArray> processReceivedStartNodes(const QByteArray& data) const;
     QVector<QByteArray> getDataStartNodes(const QByteArray& data) const;
     bool readDataNode(AsyncJobs *jobs, const QByteArray& data, bool isFile = true);
+    void createBLEDataChildNodes(MPDevice::ExportPayloadData id, QByteArray& firstAddr, QVector<QByteArray>& miniDataArray);
+    bool hasNextAddress(char addr1, char addr2);
+    void readExportDataChildNodes(const QJsonArray& nodes, MPDevice::ExportPayloadData id);
 
     bool isAfterAuxFlash();
 
@@ -147,7 +150,7 @@ public:
     void addUserIdPlaceholder(QByteArray &array);
     void fillMiniExportPayload(QByteArray &unknownCardPayload);
 
-    void convertMiniToBleNode(QByteArray &array);
+    void convertMiniToBleNode(QByteArray &array, bool isData);
 
     void storeFileData(int current, AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress, bool isFile = true);
 
@@ -223,6 +226,8 @@ private:
 
     bool m_enforceLayout = false;
 
+    int m_miniFilePartCounter = 0;
+
     static int s_LangNum;
     static int s_LayoutNum;
 
@@ -250,6 +255,9 @@ private:
     static constexpr int UPLOAD_PASSWORD_BYTE_SIZE = 16;
     static constexpr int DATA_FETCH_NO_NEXT_ADDR_SIZE = 2;
     static constexpr int RECONDITION_RESPONSE_SIZE = 4;
+    static constexpr int NEXT_ADDRESS_STARTING = 2;
+    static constexpr int MINI_FILE_FULL_SIZE_LENGTH = 4;
+    static constexpr int MINI_FILE_BLOCK_SIZE = 128;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
 };
 

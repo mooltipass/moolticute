@@ -42,7 +42,7 @@ Source: "C:\moolticute_build\*"; DestDir: "{app}"; Flags: ignoreversion recurses
 [Icons]
 Name: "{group}\Moolticute"; Filename: "{app}\moolticute.exe"; Components: moolticute
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\Moolticute"; Filename: "{app}\moolticute.exe"; Components: moolticute; Tasks: desktopicon
+Name: "{userdesktop}\Moolticute"; Filename: "{app}\moolticute.exe"; Components: moolticute; Tasks: desktopicon
 Name: "{group}\Mooltipass"; Filename: "http://themooltipass.com"; Components: moolticute; IconFilename: "{app}\question.ico";
 Name: "{group}\Moolticute Github"; Filename: "http://github.com/mooltipass/moolticute"; Components: moolticute; IconFilename: "{app}\question.ico";
 

@@ -224,6 +224,8 @@ private:
 
     void handleNoBundleDisconnected();
 
+    void displayMiniImportWarning();
+
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
 

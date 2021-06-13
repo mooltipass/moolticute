@@ -259,6 +259,7 @@ signals:
     void platformFailed();
     void filesCacheChanged();
     void dbChangeNumbersChanged(const int credentialsDbChangeNumber, const int dataDbChangeNumber);
+    void displayMiniImportWarning();
 
 private slots:
     void newDataRead(const QByteArray &data);
@@ -343,7 +344,8 @@ private:
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX,
                                  Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
-    void readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle = false);
+    void readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle = false, bool isData = false);
+    void readExportDataChildNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle = false);
     bool readExportPayload(QJsonArray dataArray, QString &errorString);
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);

@@ -166,6 +166,7 @@ signals:
     void reconditionFinished(bool success, double dischargeTime);
     void deleteFidoNodesFailed();
     void showExportPrompt();
+    void displayMiniImportWarning();
 
     void notesFetched(const QJsonArray& notes);
     void noteReceived(const QString &note, const QByteArray &data, bool success);
