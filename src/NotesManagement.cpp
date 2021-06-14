@@ -58,9 +58,9 @@ void NotesManagement::addNewIcon(const QString &name)
     auto* vertLayout = new QVBoxLayout();
     auto* labelIcon = new ClickableLabel();
     labelIcon->setAlignment(Qt::AlignCenter);
-    labelIcon->setPixmap(QString::fromUtf8(":/note.svg"));
+    labelIcon->setPixmap(QString::fromUtf8(":/note.png"));
     labelIcon->setMaximumSize(200,200);
-    labelIcon->setPixmap(labelIcon->pixmap()->scaled(200,200, Qt::KeepAspectRatio));
+    labelIcon->setPixmap(labelIcon->pixmap(Qt::ReturnByValue).scaled(200,200, Qt::KeepAspectRatio));
     labelIcon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     labelIcon->setAlignment(Qt::AlignCenter);
 
