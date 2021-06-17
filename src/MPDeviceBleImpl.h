@@ -63,13 +63,12 @@ public:
     void fetchDataFiles(AsyncJobs *jobs, QByteArray addr);
     void addDataFile(const QString& file);
     QList<QString> getDataFiles() const { return m_dataFiles; }
-    void deleteDataFile(QString file, std::function<void(bool)> cb);
+    void deleteFile(QString file, bool isNote, std::function<void(bool)> cb);
 
     void fetchNotes();
     void fetchNotes(AsyncJobs *jobs, QByteArray addr);
     QList<QString> getNotes() const { return m_notes; }
     void getNoteNode(QString note, std::function<void(bool, QString, QString, QByteArray)> cb);
-    void deleteNoteFile(QString note, std::function<void(bool)> cb);
 
     bool isNoteAvailable() const;
     void loadNotes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);

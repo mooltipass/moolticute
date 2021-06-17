@@ -1450,7 +1450,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     {
         QJsonObject o = root["data"].toObject();
         QString file = o["file"].toString();
-        bleImpl->deleteDataFile(file,
+        bleImpl->deleteFile(file, false,
                 [this, root, file](bool success)
         {
             if (!WSServer::Instance()->checkClientExists(this))
@@ -1468,7 +1468,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     {
         QJsonObject o = root["data"].toObject();
         QString note = o["note"].toString();
-        bleImpl->deleteNoteFile(note,
+        bleImpl->deleteFile(note, true,
                 [this, root, note](bool success)
         {
             if (!WSServer::Instance()->checkClientExists(this))

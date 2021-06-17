@@ -239,15 +239,15 @@ void MPDeviceBleImpl::addDataFile(const QString &file)
     emit mpDev->filesCacheChanged();
 }
 
-void MPDeviceBleImpl::deleteDataFile(QString file, std::function<void (bool)> cb)
+void MPDeviceBleImpl::deleteFile(QString file, bool isNote, std::function<void (bool)> cb)
 {
     QByteArray fileNameArray = bleProt->toByteArray(file);
     fileNameArray.append(ZERO_BYTE);
     fileNameArray.append(ZERO_BYTE);
-    auto *jobs = new AsyncJobs(QString("Delete Data File"), this);
-    jobs->append(new MPCommandJob(mpDev, MPCmd::DELETE_DATA_FILE,
+    auto *jobs = new AsyncJobs(QString("Delete File"), this);
+    jobs->append(new MPCommandJob(mpDev, isNote? MPCmd::DELETE_NOTE_FILE : MPCmd::DELETE_DATA_FILE,
                                   fileNameArray,
-                                  [this, file, cb](const QByteArray &data, bool &) -> bool
+                                  [this, file, cb, isNote](const QByteArray &data, bool &) -> bool
     {
         if (bleProt->getFirstPayloadByte(data) != MSG_SUCCESS)
         {
@@ -255,7 +255,11 @@ void MPDeviceBleImpl::deleteDataFile(QString file, std::function<void (bool)> cb
             cb(false);
             return false;
         }
-        m_dataFiles.removeOne(file);
+        if (!isNote)
+        {
+            // For files delete removed file from cache
+            m_dataFiles.removeOne(file);
+        }
         cb(true);
         return true;
     }));
@@ -353,28 +357,6 @@ void MPDeviceBleImpl::getNoteNode(QString note, std::function<void (bool, QStrin
         cb(false, failedJob->getErrorStr(), QString(), QByteArray());
     });
 
-    mpDev->enqueueAndRunJob(jobs);
-}
-
-void MPDeviceBleImpl::deleteNoteFile(QString note, std::function<void (bool)> cb)
-{
-    QByteArray noteNameArray = bleProt->toByteArray(note);
-    noteNameArray.append(ZERO_BYTE);
-    noteNameArray.append(ZERO_BYTE);
-    auto *jobs = new AsyncJobs(QString("Delete Note File"), this);
-    jobs->append(new MPCommandJob(mpDev, MPCmd::DELETE_NOTE_FILE,
-                                  noteNameArray,
-                                  [this, note, cb](const QByteArray &data, bool &) -> bool
-    {
-        if (bleProt->getFirstPayloadByte(data) != MSG_SUCCESS)
-        {
-            qWarning() << "Remove " << note << " failed";
-            cb(false);
-            return false;
-        }
-        cb(true);
-        return true;
-    }));
     mpDev->enqueueAndRunJob(jobs);
 }
 
