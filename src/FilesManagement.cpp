@@ -159,6 +159,7 @@ void FilesManagement::setWsClient(WSClient *c)
         wsClient->sendListFilesCacheRequest();
     });
     ui->pushButtonUpdateFile->setVisible(!wsClient->isMPBLE());
+    connect(wsClient, &WSClient::fileDeleted, this, &FilesManagement::onFileDeleted);
 }
 
 void FilesManagement::setFileCacheControlsVisible(bool visible)
@@ -267,6 +268,8 @@ void FilesManagement::loadFilesCacheModel(bool isInSync)
             rowLayout->addWidget(new QLabel(sizeStr));
         }
 
+        rowLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
         QToolButton *button = new QToolButton;
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
         button->setIcon(AppGui::qtAwesome()->icon(fa::save));
@@ -288,8 +291,29 @@ void FilesManagement::loadFilesCacheModel(bool isInSync)
             wsClient->requestDataFile(target_file);
         });
 
-        rowLayout->addWidget(button, 1, Qt::AlignRight);
-        rowLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
+        rowLayout->addWidget(button);
+
+        if (wsClient->isMPBLE() && wsClient->get_bundleVersion() >= 1)
+        {
+            QToolButton *buttonRemove = new QToolButton;
+            buttonRemove->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            buttonRemove->setIcon(AppGui::qtAwesome()->icon(fa::remove));
+
+            connect(buttonRemove, &QToolButton::clicked, [=]()
+            {
+                QString target_file = jsonObject.value("name").toString();
+
+                ui->progressBarQuick->setMinimum(0);
+                ui->progressBarQuick->setMaximum(0);
+                ui->progressBarQuick->setValue(0);
+                ui->progressBarQuick->show();
+                updateButtonsUI();
+                ui->labelConfirmRequest->show();
+
+                wsClient->requestDeleteDataFile(target_file);
+            });
+            rowLayout->addWidget(buttonRemove);
+        }
         rowLayout->setMargin(0);
         rowLayout->setContentsMargins(6,1,4,1);
         w->setLayout(rowLayout);
@@ -317,6 +341,22 @@ void FilesManagement::loadFilesCacheModel(bool isInSync)
     }
 
     ui->listFilesButton->setVisible(false);
+}
+
+void FilesManagement::onFileDeleted(bool success, const QString& file)
+{
+    ui->progressBarQuick->hide();
+    ui->labelConfirmRequest->hide();
+    updateButtonsUI();
+    if (success)
+    {
+        wsClient->sendListFilesCacheRequest();
+        QMessageBox::information(this, tr("File Deleted"), tr("'%1' file was deleted successfully!").arg(file));
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Failure"), tr("'%1' file delete failed!").arg(file));
+    }
 }
 
 void FilesManagement::currentSelectionChanged(const QModelIndex &curr, const QModelIndex &)

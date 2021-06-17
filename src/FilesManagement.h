@@ -83,6 +83,8 @@ private slots:
 
     void loadFilesCacheModel(bool isInSync);
 
+    void onFileDeleted(bool success, const QString& file);
+
 private:
     void loadModel();
     void addUpdateFile(QString service, QString filename, QProgressBar *pbar);

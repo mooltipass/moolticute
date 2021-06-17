@@ -239,6 +239,29 @@ void MPDeviceBleImpl::addDataFile(const QString &file)
     emit mpDev->filesCacheChanged();
 }
 
+void MPDeviceBleImpl::deleteDataFile(QString file, std::function<void (bool)> cb)
+{
+    QByteArray fileNameArray = bleProt->toByteArray(file);
+    fileNameArray.append(ZERO_BYTE);
+    fileNameArray.append(ZERO_BYTE);
+    auto *jobs = new AsyncJobs(QString("Delete Data File"), this);
+    jobs->append(new MPCommandJob(mpDev, MPCmd::DELETE_DATA_FILE,
+                                  fileNameArray,
+                                  [this, file, cb](const QByteArray &data, bool &) -> bool
+    {
+        if (bleProt->getFirstPayloadByte(data) != MSG_SUCCESS)
+        {
+            qWarning() << "Remove " << file << " failed";
+            cb(false);
+            return false;
+        }
+        m_dataFiles.removeOne(file);
+        cb(true);
+        return true;
+    }));
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 void MPDeviceBleImpl::fetchNotes()
 {
     if (mpDev->get_status() != Common::Unlocked)

@@ -572,6 +572,12 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         emit displayMiniImportWarning();
     }
+    else if (rootobj["msg"] == "delete_data_file")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = o.value("success").toBool();
+        emit fileDeleted(success, o.value("file").toString());
+    }
 
 }
 
@@ -654,6 +660,13 @@ void WSClient::requestDataFile(const QString &service)
 {
     QJsonObject d = {{ "service", service }};
     sendJsonData({{ "msg", "get_data_node" },
+                  { "data", d }});
+}
+
+void WSClient::requestDeleteDataFile(const QString &file)
+{
+    QJsonObject d = {{ "file", file }};
+    sendJsonData({{ "msg", "delete_data_file" },
                   { "data", d }});
 }
 
