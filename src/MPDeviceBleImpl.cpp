@@ -356,6 +356,28 @@ void MPDeviceBleImpl::getNoteNode(QString note, std::function<void (bool, QStrin
     mpDev->enqueueAndRunJob(jobs);
 }
 
+void MPDeviceBleImpl::deleteNoteFile(QString note, std::function<void (bool)> cb)
+{
+    QByteArray noteNameArray = bleProt->toByteArray(note);
+    noteNameArray.append(ZERO_BYTE);
+    noteNameArray.append(ZERO_BYTE);
+    auto *jobs = new AsyncJobs(QString("Delete Note File"), this);
+    jobs->append(new MPCommandJob(mpDev, MPCmd::DELETE_NOTE_FILE,
+                                  noteNameArray,
+                                  [this, note, cb](const QByteArray &data, bool &) -> bool
+    {
+        if (bleProt->getFirstPayloadByte(data) != MSG_SUCCESS)
+        {
+            qWarning() << "Remove " << note << " failed";
+            cb(false);
+            return false;
+        }
+        cb(true);
+        return true;
+    }));
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 bool MPDeviceBleImpl::isNoteAvailable() const
 {
     return get_bundleVersion() >= 1;

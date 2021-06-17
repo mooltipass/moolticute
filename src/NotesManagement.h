@@ -22,7 +22,7 @@ public:
 
 
 signals:
-    void enterNoteEdit();
+    void changeNote();
     void updateTabs();
 
 private slots:
@@ -41,6 +41,8 @@ private slots:
     void onEditingFinished();
 
     void on_textEditNote_textChanged();
+
+    void onNoteDeleted(bool success, const QString& note);
 
 private:
     void loadNodes(const QJsonArray& notes);

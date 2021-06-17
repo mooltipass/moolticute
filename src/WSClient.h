@@ -88,6 +88,7 @@ public:
     void deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials);
 
     void requestNote(const QString &noteName);
+    void requestDeleteNoteFile(const QString &note);
 
     void requestResetCard();
     void requestAvailableUserNumber();
@@ -172,6 +173,7 @@ signals:
     void notesFetched(const QJsonArray& notes);
     void noteReceived(const QString &note, const QByteArray &data, bool success);
     void noteSaved(const QString &note, bool success);
+    void noteDeleted(bool success, const QString& note);
 
     void fileDeleted(bool success, const QString& file);
 

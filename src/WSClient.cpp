@@ -578,6 +578,12 @@ void WSClient::onTextMessageReceived(const QString &message)
         bool success = o.value("success").toBool();
         emit fileDeleted(success, o.value("file").toString());
     }
+    else if (rootobj["msg"] == "delete_note_file")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        bool success = o.value("success").toBool();
+        emit noteDeleted(success, o.value("note").toString());
+    }
 
 }
 
@@ -720,6 +726,13 @@ void WSClient::requestNote(const QString &noteName)
 {
     QJsonObject d = {{ "note", noteName }};
     sendJsonData({{ "msg", "get_note_node" },
+                  { "data", d }});
+}
+
+void WSClient::requestDeleteNoteFile(const QString &note)
+{
+    QJsonObject d = {{ "note", note }};
+    sendJsonData({{ "msg", "delete_note_file" },
                   { "data", d }});
 }
 

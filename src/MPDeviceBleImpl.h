@@ -69,6 +69,7 @@ public:
     void fetchNotes(AsyncJobs *jobs, QByteArray addr);
     QList<QString> getNotes() const { return m_notes; }
     void getNoteNode(QString note, std::function<void(bool, QString, QString, QByteArray)> cb);
+    void deleteNoteFile(QString note, std::function<void(bool)> cb);
 
     bool isNoteAvailable() const;
     void loadNotes(AsyncJobs * jobs, const MPDeviceProgressCb &cbProgress);

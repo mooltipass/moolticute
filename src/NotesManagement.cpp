@@ -39,6 +39,7 @@ void NotesManagement::setWsClient(WSClient *c)
     wsClient = c;
     connect(wsClient, &WSClient::notesFetched, this, &NotesManagement::loadNodes);
     connect(wsClient, &WSClient::noteSaved, this, &NotesManagement::onNoteSaved);
+    connect(wsClient, &WSClient::noteDeleted, this, &NotesManagement::onNoteDeleted);
 }
 
 void NotesManagement::loadNodes(const QJsonArray &notes)
@@ -67,7 +68,7 @@ void NotesManagement::addNewIcon(const QString &name)
     connect(labelIcon, &ClickableLabel::clicked, [=](){
        connect(wsClient, &WSClient::noteReceived, this, &NotesManagement::onNoteReceived);
        wsClient->requestNote(name);
-       emit enterNoteEdit();
+       emit changeNote();
     });
 
     vertLayout->addWidget(labelIcon);
@@ -77,6 +78,19 @@ void NotesManagement::addNewIcon(const QString &name)
     labelName->setText(name);
 
     vertLayout->addWidget(labelName);
+    QToolButton *buttonRemove = new QToolButton;
+    buttonRemove->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    buttonRemove->setIcon(AppGui::qtAwesome()->icon(fa::remove));
+
+    connect(buttonRemove, &QToolButton::clicked, [name, this]()
+    {
+        emit changeNote();
+        wsClient->requestDeleteNoteFile(name);
+    });
+
+    auto* removeLayout = new QHBoxLayout();
+    removeLayout->addWidget(buttonRemove);
+    vertLayout->addItem(removeLayout);
     vertLayout->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
     int row = ui->gridLayoutNotes->rowCount() - 1;
@@ -147,7 +161,7 @@ void NotesManagement::on_pushButtonDiscard_clicked()
 void NotesManagement::on_pushButtonSave_clicked()
 {
     wsClient->sendDataFile(ui->lineEditNoteName->text(), ui->textEditNote->toPlainText().toUtf8(), false);
-    emit enterNoteEdit();
+    emit changeNote();
 
     ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
     ui->labelError->hide();
@@ -222,5 +236,21 @@ void NotesManagement::on_textEditNote_textChanged()
     else
     {
         ui->pushButtonSave->show();
+    }
+}
+
+void NotesManagement::onNoteDeleted(bool success, const QString &note)
+{
+    ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
+    emit updateTabs();
+    if (success)
+    {
+        clearNotes();
+        wsClient->sendFetchNotes();
+        QMessageBox::information(this, tr("Note Deleted"), tr("'%1' note was deleted successfully!").arg(note));
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Failure"), tr("'%1' note delete failed!").arg(note));
     }
 }
