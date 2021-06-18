@@ -105,6 +105,7 @@ private:
     void setFileCacheControlsVisible(bool visible);
 
     static const QString NOTE_TYPE;
+    static const QString DELETE_FILE_CONFIRM_TEXT;
 };
 
 #endif // FILESMANAGEMENT_H

@@ -84,8 +84,12 @@ void NotesManagement::addNewIcon(const QString &name)
 
     connect(buttonRemove, &QToolButton::clicked, [name, this]()
     {
-        emit changeNote();
-        wsClient->requestDeleteNoteFile(name);
+        if (QMessageBox::question(this, "Moolticute",
+                                  tr("The note \"%1\" is going to be removed from the device.\nContinue?").arg(name)) == QMessageBox::Yes)
+        {
+            emit changeNote();
+            wsClient->requestDeleteNoteFile(name);
+        }
     });
 
     auto* removeLayout = new QHBoxLayout();

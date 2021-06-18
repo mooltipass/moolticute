@@ -23,6 +23,7 @@
 #include "DeviceDetector.h"
 
 const QString FilesManagement::NOTE_TYPE = "note";
+const QString FilesManagement::DELETE_FILE_CONFIRM_TEXT = tr("The file \"%1\" is going to be removed from the device.\nContinue?");
 
 FilesFilterModel::FilesFilterModel(QObject *parent):
     QSortFilterProxyModel(parent)
@@ -303,14 +304,17 @@ void FilesManagement::loadFilesCacheModel(bool isInSync)
             {
                 QString target_file = jsonObject.value("name").toString();
 
-                ui->progressBarQuick->setMinimum(0);
-                ui->progressBarQuick->setMaximum(0);
-                ui->progressBarQuick->setValue(0);
-                ui->progressBarQuick->show();
-                updateButtonsUI();
-                ui->labelConfirmRequest->show();
-
-                wsClient->requestDeleteDataFile(target_file);
+                if (QMessageBox::question(this, "Moolticute",
+                                          DELETE_FILE_CONFIRM_TEXT.arg(target_file)) == QMessageBox::Yes)
+                {
+                    ui->progressBarQuick->setMinimum(0);
+                    ui->progressBarQuick->setMaximum(0);
+                    ui->progressBarQuick->setValue(0);
+                    ui->progressBarQuick->show();
+                    updateButtonsUI();
+                    ui->labelConfirmRequest->show();
+                    wsClient->requestDeleteDataFile(target_file);
+                }
             });
             rowLayout->addWidget(buttonRemove);
         }
@@ -469,8 +473,7 @@ void FilesManagement::on_pushButtonDelFile_clicked()
         return;
 
     if (QMessageBox::question(this, "Moolticute",
-                              tr("The file \"%1\" is going to be removed from the device.\nContinue?")
-                              .arg(currentItem->text())) != QMessageBox::Yes)
+                              DELETE_FILE_CONFIRM_TEXT.arg(currentItem->text())) != QMessageBox::Yes)
     {
         return;
     }
