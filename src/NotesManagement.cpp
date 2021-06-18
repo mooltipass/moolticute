@@ -71,13 +71,9 @@ void NotesManagement::addNewIcon(const QString &name)
        emit changeNote();
     });
 
-    vertLayout->addWidget(labelIcon);
+    auto* iconHorizontalLayout = new QHBoxLayout();
+    iconHorizontalLayout->addWidget(labelIcon);
 
-    auto* labelName = new QLabel();
-    labelName->setAlignment(Qt::AlignCenter);
-    labelName->setText(name);
-
-    vertLayout->addWidget(labelName);
     QToolButton *buttonRemove = new QToolButton;
     buttonRemove->setToolButtonStyle(Qt::ToolButtonIconOnly);
     buttonRemove->setIcon(AppGui::qtAwesome()->icon(fa::remove));
@@ -92,9 +88,18 @@ void NotesManagement::addNewIcon(const QString &name)
         }
     });
 
-    auto* removeLayout = new QHBoxLayout();
+    auto* removeLayout = new QVBoxLayout();
     removeLayout->addWidget(buttonRemove);
-    vertLayout->addItem(removeLayout);
+    removeLayout->addItem(new QSpacerItem(20, 120, QSizePolicy::Minimum, QSizePolicy::Preferred));
+    iconHorizontalLayout->addItem(removeLayout);
+
+    vertLayout->addItem(iconHorizontalLayout);
+
+    auto* labelName = new QLabel();
+    labelName->setAlignment(Qt::AlignCenter);
+    labelName->setText(name);
+
+    vertLayout->addWidget(labelName);
     vertLayout->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
     int row = ui->gridLayoutNotes->rowCount() - 1;
