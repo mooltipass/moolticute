@@ -103,7 +103,7 @@ private slots:
     void wantSaveCredentialManagement();
     void wantExitFilesManagement();
     void wantExitFidoManagement();
-    void wantEnterNoteEdit();
+    void wantChangeNote();
 
 //    void mpAdded(MPDevice *device);
 //    void mpRemoved(MPDevice *);

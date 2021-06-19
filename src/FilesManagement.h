@@ -83,6 +83,8 @@ private slots:
 
     void loadFilesCacheModel(bool isInSync);
 
+    void onFileDeleted(bool success, const QString& file);
+
 private:
     void loadModel();
     void addUpdateFile(QString service, QString filename, QProgressBar *pbar);
@@ -103,6 +105,7 @@ private:
     void setFileCacheControlsVisible(bool visible);
 
     static const QString NOTE_TYPE;
+    static const QString DELETE_FILE_CONFIRM_TEXT;
 };
 
 #endif // FILESMANAGEMENT_H

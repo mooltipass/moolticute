@@ -1446,6 +1446,42 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "delete_data_file")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString file = o["file"].toString();
+        bleImpl->deleteFile(file, false,
+                [this, root, file](bool success)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            ores["file"] = file;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "delete_note_file")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString note = o["note"].toString();
+        bleImpl->deleteFile(note, true,
+                [this, root, note](bool success)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            ores["note"] = note;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

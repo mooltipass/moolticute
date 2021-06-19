@@ -82,11 +82,13 @@ public:
     void requestPassword(const QString &service, const QString &login);
 
     void requestDataFile(const QString &service);
+    void requestDeleteDataFile(const QString &file);
     void sendDataFile(const QString &service, const QByteArray &data, bool isFile = true);
     void deleteDataFilesAndLeave(const QStringList &services, const QStringList &notes);
     void deleteFidoAndLeave(const QList<FidoCredential> &fidoCredentials);
 
     void requestNote(const QString &noteName);
+    void requestDeleteNoteFile(const QString &note);
 
     void requestResetCard();
     void requestAvailableUserNumber();
@@ -171,6 +173,9 @@ signals:
     void notesFetched(const QJsonArray& notes);
     void noteReceived(const QString &note, const QByteArray &data, bool success);
     void noteSaved(const QString &note, bool success);
+    void noteDeleted(bool success, const QString& note);
+
+    void fileDeleted(bool success, const QString& file);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

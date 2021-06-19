@@ -239,6 +239,33 @@ void MPDeviceBleImpl::addDataFile(const QString &file)
     emit mpDev->filesCacheChanged();
 }
 
+void MPDeviceBleImpl::deleteFile(QString file, bool isNote, std::function<void (bool)> cb)
+{
+    QByteArray fileNameArray = bleProt->toByteArray(file);
+    fileNameArray.append(ZERO_BYTE);
+    fileNameArray.append(ZERO_BYTE);
+    auto *jobs = new AsyncJobs(QString("Delete File"), this);
+    jobs->append(new MPCommandJob(mpDev, isNote? MPCmd::DELETE_NOTE_FILE : MPCmd::DELETE_DATA_FILE,
+                                  fileNameArray,
+                                  [this, file, cb, isNote](const QByteArray &data, bool &) -> bool
+    {
+        if (bleProt->getFirstPayloadByte(data) != MSG_SUCCESS)
+        {
+            qWarning() << "Remove " << file << " failed";
+            cb(false);
+            return false;
+        }
+        if (!isNote)
+        {
+            // For files delete removed file from cache
+            m_dataFiles.removeOne(file);
+        }
+        cb(true);
+        return true;
+    }));
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 void MPDeviceBleImpl::fetchNotes()
 {
     if (mpDev->get_status() != Common::Unlocked)

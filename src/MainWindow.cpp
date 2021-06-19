@@ -183,10 +183,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(ui->widgetFiles, &FilesManagement::wantExitMemMode, this, &MainWindow::wantExitFilesManagement);
     connect(ui->widgetFido, &FidoManagement::wantEnterMemMode, this, &MainWindow::wantEnterCredentialManagement);
     connect(ui->widgetFido, &FidoManagement::wantExitMemMode, this, &MainWindow::wantExitFidoManagement);
-    connect(ui->widgetNotes, &NotesManagement::enterNoteEdit, this, &MainWindow::wantEnterNoteEdit);
+    connect(ui->widgetNotes, &NotesManagement::changeNote, this, &MainWindow::wantChangeNote);
 
     connect(wsClient, &WSClient::noteSaved, this, &MainWindow::displayNotePage);
     connect(wsClient, &WSClient::noteReceived, this, &MainWindow::displayNotePage);
+    connect(wsClient, &WSClient::noteDeleted, this, &MainWindow::displayNotePage);
     connect(ui->widgetNotes, &NotesManagement::updateTabs, [this](){ updateTabButtons(); });
 
     connect(wsClient, &WSClient::memMgmtModeChanged, [this](bool isMMM){
@@ -1157,7 +1158,7 @@ void MainWindow::wantExitFidoManagement()
     updateTabButtons();
 }
 
-void MainWindow::wantEnterNoteEdit()
+void MainWindow::wantChangeNote()
 {
     ui->labelWait->show();
     ui->labelWait->setText(tr("<html><!--enter_credentials_mgm_job--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">Waiting For Device Confirmation</span></p><p>Confirm the request on your device.</p></body></html>"));

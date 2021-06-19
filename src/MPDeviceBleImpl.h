@@ -63,6 +63,7 @@ public:
     void fetchDataFiles(AsyncJobs *jobs, QByteArray addr);
     void addDataFile(const QString& file);
     QList<QString> getDataFiles() const { return m_dataFiles; }
+    void deleteFile(QString file, bool isNote, std::function<void(bool)> cb);
 
     void fetchNotes();
     void fetchNotes(AsyncJobs *jobs, QByteArray addr);
