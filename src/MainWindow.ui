@@ -136,6 +136,19 @@ QWidget {background-color: #EFEFEF;}</string>
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonNotes">
+         <property name="text">
+          <string>Notes</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonFiles">
          <property name="text">
           <string>Files</string>
@@ -154,7 +167,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <item>
         <widget class="QPushButton" name="pushButtonFido">
          <property name="text">
-          <string>Fido</string>
+          <string>Fido2</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -165,9 +178,9 @@ QWidget {background-color: #EFEFEF;}</string>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButtonNotes">
+        <widget class="QPushButton" name="pushButtonSync">
          <property name="text">
-          <string>Notes</string>
+          <string>Synchronization</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -184,19 +197,6 @@ QWidget {background-color: #EFEFEF;}</string>
          </property>
          <property name="shortcut">
           <string>Ctrl+A, Ctrl+D, Ctrl+F</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonSync">
-         <property name="text">
-          <string>Synchronization</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -4724,7 +4724,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
  </resources>
