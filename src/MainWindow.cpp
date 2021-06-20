@@ -606,6 +606,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     checkAutoStart();
     checkSubdomainSelection();
     checkHIBPSetting();
+    checkBackupRemindersSetting();
 
     //Check is ssh agent opt has to be checked
     ui->checkBoxSSHAgent->setChecked(s.value("settings/auto_start_ssh").toBool());
@@ -1247,6 +1248,19 @@ void MainWindow::checkSubdomainSelection()
     bool en = s.value("settings/enable_subdomain_selection").toBool();
 
     ui->labelSubdomainSelection->setText(tr("Subdomain selection: %1").arg((en?tr("Enabled"):tr("Disabled"))));
+    if (en)
+        ui->pushButtonSubDomain->setText(tr("Disable"));
+    else
+        ui->pushButtonSubDomain->setText(tr("Enable"));
+}
+
+void MainWindow::checkBackupRemindersSetting()
+{
+    QSettings s;
+
+    bool en = s.value("settings/enable_backup_reminders").toBool();
+
+    ui->labelSubdomainSelection->setText(tr("Show backup reminders: %1").arg((en?tr("Enabled"):tr("Disabled"))));
     if (en)
         ui->pushButtonSubDomain->setText(tr("Disable"));
     else
@@ -2007,6 +2021,27 @@ void MainWindow::on_pushButtonSubDomain_clicked()
         s.sync();
 
         checkSubdomainSelection();
+    }
+}
+
+void MainWindow::on_pushButtonBackupReminders_clicked()
+{
+    QSettings s;
+
+    bool en = s.value("settings/enable_backup_reminders").toBool();
+
+    int ret;
+    if (en)
+        ret = QMessageBox::question(this, "Moolticute", tr("Really disable backup reminders? Are you sure?"));
+    else
+        ret = QMessageBox::question(this, "Moolticute", tr("Enable backup reminders?"));
+
+    if (ret == QMessageBox::Yes)
+    {
+        s.setValue("settings/enable_backup_reminders", !en);
+        s.sync();
+
+        checkBackupRemindersSetting();
     }
 }
 
