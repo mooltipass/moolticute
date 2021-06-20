@@ -204,6 +204,8 @@ private:
     
     void checkSubdomainSelection();
 
+    void checkBackupRemindersSetting();
+
     void checkHIBPSetting();
 
     void setKeysTabVisibleOnDemand(bool bValue);
