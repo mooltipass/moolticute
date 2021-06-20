@@ -43,7 +43,7 @@ border-right: none;
       </font>
      </property>
      <property name="text">
-      <string>FIDO Management</string>
+      <string>FIDO2 Management</string>
      </property>
      <property name="class" stdset="0">
       <string>FrameTitle</string>
@@ -116,14 +116,14 @@ border-right: none;
               </font>
              </property>
              <property name="text">
-              <string>FIDO Management Mode</string>
+              <string>FIDO2 Management Mode</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Browsing through your FIDO credentials requires your device to be in management mode. Click the button below to start the process.</string>
+              <string>Browsing through your FIDO2 credentials requires your device to be in management mode. Click the button below to start the process.</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
@@ -141,7 +141,7 @@ border-right: none;
                 </size>
                </property>
                <property name="text">
-                <string>Enter FIDO Management Mode</string>
+                <string>Enter FIDO2 Management Mode</string>
                </property>
               </widget>
              </item>
@@ -271,7 +271,7 @@ border-right: none;
               </size>
              </property>
              <property name="text">
-              <string>Exit FIDO Management Mode</string>
+              <string>Exit FIDO2 Management Mode</string>
              </property>
             </widget>
            </item>
@@ -324,7 +324,6 @@ border-right: none;
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
  </resources>
