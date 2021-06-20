@@ -173,8 +173,8 @@ void FidoManagement::onItemCollapsed(const QModelIndex &proxyIndex)
 
 void FidoManagement::onDeleteFidoNodesFailed()
 {
-    QMessageBox::warning(this, tr("Fido Management Mode"),
-                         tr("Deleting Fido Credential(s) Failed"));
+    QMessageBox::warning(this, tr("Fido2 Management Mode"),
+                         tr("Deleting Fido2 Credential(s) Failed"));
 }
 
 QModelIndex FidoManagement::getSourceIndexFromProxyIndex(const QModelIndex &proxyIndex)
