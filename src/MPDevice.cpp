@@ -7054,6 +7054,7 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
 
             /* Array containing our processed credentials */
             QJsonArray creds_processed;
+            QList<QString> credentialList;
 
             /* In case of duplicate credentials, fill the node addresses */
             for (qint32 i = 0; i < creds.size(); i++)
@@ -7078,8 +7079,23 @@ void MPDevice::importFromCSV(const QJsonArray &creds, const MPDeviceProgressCb &
                     }
                 }
 
+                QString serviceName = qjobject["service"].toString();
+
+                QString credential = serviceName + "-" + qjobject["login"].toString();
+                // Check for unique credential
+                if (credentialList.contains(credential))
+                {
+                    qDebug() << "Duplicate entry: " << credential;
+                    //Skip duplicate entry
+                    continue;
+                }
+                else
+                {
+                    credentialList.push_back(credential);
+                }
+
                 /* Debug */
-                qDebug() << importedURL << "converted to:" << qjobject["service"].toString();
+                qDebug() << importedURL << "converted to:" << serviceName;
 
                 /* To reuse setMMCredentials() we add the required fields */
                 qjobject["description"] = "imported from CSV";
