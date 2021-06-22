@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>moolticute.desktop</id>
+
+  <name>Moolticute</name>
+  <summary>Companion GUI application for Mooltipass password manager devices</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0</project_license>
+
+  <description>
+    <p>
+      Moolticute is an easy to use companion app to your Mooltipass device and
+      extends the power of the device to more platform/tools. It allows you to
+      manage your Mooltipass with a cross-platform app and daemon service that
+      handles all USB communication with the device.
+    </p>
+    <p>
+      Moolticute comes with a daemon that runs in the background, and a user
+      interface app to control your Mooltipass. Other clients can also connect
+      and talk to the daemon (it uses a WebSocket connection and simple JSON messages).
+    </p>
+  </description>
+
+  <launchable type="desktop-id">moolticute.desktop</launchable>
+  <url type="homepage">https://www.mymooltipass.com/</url>
+  <url type="bugtracker">https://github.com/mooltipass/moolticute/</url>
+</component>
