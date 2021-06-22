@@ -238,7 +238,7 @@ void NotesManagement::onEditingFinished()
 void NotesManagement::on_textEditNote_textChanged()
 {
     QString note = ui->textEditNote->toPlainText();
-    if (note == m_noteContentClone || note.isEmpty() || !m_validNoteName)
+    if (note == m_noteContentClone || note.isEmpty() || (m_isNewFile && !m_validNoteName))
     {
         ui->pushButtonSave->hide();
     }
