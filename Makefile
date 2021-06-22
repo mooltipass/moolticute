@@ -13,11 +13,12 @@ test:
 	cd build; $(MAKE) check
 
 install:
-	install -m 755 -d "$(DESTDIR)$(PREFIX)/bin" "$(DESTDIR)/lib/udev/rules.d" "$(DESTDIR)$(PREFIX)/share/applications" "$(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps" "$(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps" "$(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps"
+	install -m 755 -d "$(DESTDIR)$(PREFIX)/bin" "$(DESTDIR)/lib/udev/rules.d" "$(DESTDIR)$(PREFIX)/share/applications" "$(DESTDIR)$(PREFIX)/share/metainfo" "$(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps" "$(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps" "$(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps"
 	install -m 755 build/moolticute "$(DESTDIR)$(PREFIX)/bin/"
 	install -m 755 build/moolticuted "$(DESTDIR)$(PREFIX)/bin/"
 	install -m 644 69-mooltipass.rules "$(DESTDIR)/lib/udev/rules.d/"
 	install -m 644 data/moolticute.desktop "$(DESTDIR)$(PREFIX)/share/applications/"
+	install -m 644 data/moolticute.metainfo.xml "$(DESTDIR)$(PREFIX)/share/metainfo/"
 	install -m 644 img/AppIcon.svg "$(DESTDIR)$(PREFIX)/share/icons/hicolor/scalable/apps/moolticute.svg"
 	install -m 644 img/AppIcon_32.png "$(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/moolticute.png"
 	install -m 644 img/AppIcon_128.png "$(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps/moolticute.png"
