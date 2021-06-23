@@ -45,9 +45,10 @@ private slots:
     void onNoteDeleted(bool success, const QString& note);
 
 private:
-    void loadNodes(const QJsonArray& notes);
+    void loadNotes(const QJsonArray& notes);
+    void refreshNotes();
     void addNewIcon(const QString& name);
-    void clearNotes();
+    void clearNotes(bool clearNoteList = true);
 
 
     int m_actColumn = 0;

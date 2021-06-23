@@ -37,12 +37,12 @@ NotesManagement::~NotesManagement()
 void NotesManagement::setWsClient(WSClient *c)
 {
     wsClient = c;
-    connect(wsClient, &WSClient::notesFetched, this, &NotesManagement::loadNodes);
+    connect(wsClient, &WSClient::notesFetched, this, &NotesManagement::loadNotes);
     connect(wsClient, &WSClient::noteSaved, this, &NotesManagement::onNoteSaved);
     connect(wsClient, &WSClient::noteDeleted, this, &NotesManagement::onNoteDeleted);
 }
 
-void NotesManagement::loadNodes(const QJsonArray &notes)
+void NotesManagement::loadNotes(const QJsonArray &notes)
 {
     clearNotes();
     for (auto noteObj : notes)
@@ -50,6 +50,15 @@ void NotesManagement::loadNodes(const QJsonArray &notes)
         QJsonObject jsonObject = noteObj.toObject();
         QString noteName = jsonObject.value("name").toString();
 
+        addNewIcon(noteName);
+    }
+}
+
+void NotesManagement::refreshNotes()
+{
+    clearNotes(false);
+    for (const auto& noteName : m_noteList)
+    {
         addNewIcon(noteName);
     }
 }
@@ -112,14 +121,17 @@ void NotesManagement::addNewIcon(const QString &name)
     m_noteList.append(name);
 }
 
-void NotesManagement::clearNotes()
+void NotesManagement::clearNotes(bool clearNoteList /*= true*/)
 {
     for (int i = 0; i < ui->gridLayoutNotes->rowCount(); ++i)
     {
         GridLayoutUtil::removeRow(ui->gridLayoutNotes, i);
     }
     m_actColumn = 0;
-    m_noteList.clear();
+    if (clearNoteList)
+    {
+        m_noteList.clear();
+    }
 }
 
 void NotesManagement::on_pushButtonAddNote_clicked()
@@ -254,8 +266,8 @@ void NotesManagement::onNoteDeleted(bool success, const QString &note)
     emit updateTabs();
     if (success)
     {
-        clearNotes();
-        wsClient->sendFetchNotes();
+        m_noteList.removeOne(note);
+        refreshNotes();
         QMessageBox::information(this, tr("Note Deleted"), tr("'%1' note was deleted successfully!").arg(note));
     }
     else
