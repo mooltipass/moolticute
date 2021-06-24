@@ -123,10 +123,10 @@ void NotesManagement::addNewIcon(const QString &name)
         ++row;
     }
 
-    QWidget *test = new QWidget();
-    test->setLayout(vertLayout);
-    test->setMaximumWidth(190);
-    ui->gridLayoutNotes->addWidget(test, row, m_actColumn++, 1, 1);
+    QWidget *iconWidget = new QWidget();
+    iconWidget->setLayout(vertLayout);
+    iconWidget->setMaximumWidth(190);
+    ui->gridLayoutNotes->addWidget(iconWidget, row, m_actColumn++, 1, 1);
 }
 
 void NotesManagement::clearNotes(bool clearNoteList /*= true*/)
