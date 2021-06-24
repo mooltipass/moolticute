@@ -87,6 +87,12 @@ border-right: none;
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
            <item>
             <layout class="QGridLayout" name="gridLayoutNotes"/>
            </item>
@@ -138,8 +144,16 @@ border-right: none;
              <height>16777215</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+            </font>
+           </property>
            <property name="frame">
             <bool>false</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
            <property name="readOnly">
             <bool>true</bool>

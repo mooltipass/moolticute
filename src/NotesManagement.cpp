@@ -51,6 +51,7 @@ void NotesManagement::loadNotes(const QJsonArray &notes)
         QString noteName = jsonObject.value("name").toString();
 
         addNewIcon(noteName);
+        m_noteList.append(noteName);
     }
 }
 
@@ -65,12 +66,13 @@ void NotesManagement::refreshNotes()
 
 void NotesManagement::addNewIcon(const QString &name)
 {
-    auto* vertLayout = new QVBoxLayout();
+
+    auto* vertIconNameLayout = new QVBoxLayout();
     auto* labelIcon = new ClickableLabel();
     labelIcon->setAlignment(Qt::AlignCenter);
     labelIcon->setPixmap(QString::fromUtf8(":/note.png"));
-    labelIcon->setMaximumSize(200,200);
-    labelIcon->setPixmap(labelIcon->pixmap()->scaled(200,200, Qt::KeepAspectRatio));
+    labelIcon->setMaximumSize(160,200);
+    labelIcon->setPixmap(labelIcon->pixmap()->scaled(160,200, Qt::KeepAspectRatio));
     labelIcon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     labelIcon->setAlignment(Qt::AlignCenter);
 
@@ -80,8 +82,17 @@ void NotesManagement::addNewIcon(const QString &name)
        emit changeNote();
     });
 
+    vertIconNameLayout->addWidget(labelIcon);
+
+    auto* labelName = new QLabel();
+    labelName->setAlignment(Qt::AlignCenter);
+    labelName->setText(name);
+
+    vertIconNameLayout->addWidget(labelName);
+    vertIconNameLayout->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
     auto* iconHorizontalLayout = new QHBoxLayout();
-    iconHorizontalLayout->addWidget(labelIcon);
+    iconHorizontalLayout->addItem(vertIconNameLayout);
 
     QToolButton *buttonRemove = new QToolButton;
     buttonRemove->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -99,17 +110,11 @@ void NotesManagement::addNewIcon(const QString &name)
 
     auto* removeLayout = new QVBoxLayout();
     removeLayout->addWidget(buttonRemove);
-    removeLayout->addItem(new QSpacerItem(20, 120, QSizePolicy::Minimum, QSizePolicy::Preferred));
-    iconHorizontalLayout->addItem(removeLayout);
+    removeLayout->addItem(new QSpacerItem(20, 60, QSizePolicy::Minimum, QSizePolicy::Expanding));
+    iconHorizontalLayout->addLayout(removeLayout);
 
-    vertLayout->addItem(iconHorizontalLayout);
-
-    auto* labelName = new QLabel();
-    labelName->setAlignment(Qt::AlignCenter);
-    labelName->setText(name);
-
-    vertLayout->addWidget(labelName);
-    vertLayout->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+    auto* vertLayout = new QVBoxLayout();
+    vertLayout->addLayout(iconHorizontalLayout);
 
     int row = ui->gridLayoutNotes->rowCount() - 1;
     if (m_actColumn == 4)
@@ -117,8 +122,11 @@ void NotesManagement::addNewIcon(const QString &name)
         m_actColumn = 0;
         ++row;
     }
-    ui->gridLayoutNotes->addLayout(vertLayout, row, m_actColumn++, 1, 1);
-    m_noteList.append(name);
+
+    QWidget *test = new QWidget();
+    test->setLayout(vertLayout);
+    test->setMaximumWidth(190);
+    ui->gridLayoutNotes->addWidget(test, row, m_actColumn++, 1, 1);
 }
 
 void NotesManagement::clearNotes(bool clearNoteList /*= true*/)
@@ -204,6 +212,7 @@ void NotesManagement::onNoteSaved(const QString &note, bool success)
         if (m_isNewFile)
         {
             addNewIcon(note);
+            m_noteList.append(note);
         }
     }
     else
