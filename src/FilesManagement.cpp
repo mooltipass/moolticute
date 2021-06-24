@@ -354,7 +354,18 @@ void FilesManagement::onFileDeleted(bool success, const QString& file)
     updateButtonsUI();
     if (success)
     {
-        wsClient->sendListFilesCacheRequest();
+        // Remove delete file from cache and reload model
+        auto& fileCache = wsClient->getFilesCache();
+        for (int i = 0; i < fileCache.size(); ++i)
+        {
+            QJsonObject jsonObject = fileCache[i].toObject();
+            if (jsonObject.value("name").toString() == file)
+            {
+                fileCache.removeAt(i);
+                break;
+            }
+        }
+        loadFilesCacheModel(true);
         QMessageBox::information(this, tr("File Deleted"), tr("'%1' file was deleted successfully!").arg(file));
     }
     else
