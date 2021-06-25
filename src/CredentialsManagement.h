@@ -96,6 +96,8 @@ private slots:
 
     void on_pushButtonTOTP_clicked();
 
+    void on_pushButtonDeleteTOTP_clicked();
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);

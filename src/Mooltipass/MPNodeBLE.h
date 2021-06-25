@@ -40,6 +40,7 @@ public:
 
     int getTOTPTimeStep() const;
     int getTOTPCodeSize() const;
+    void resetTOTPCredential();
 
     static constexpr int PARENT_NODE_LENGTH = 264;
     static constexpr int CHILD_NODE_LENGTH = 528;
@@ -59,6 +60,8 @@ protected:
     static constexpr int KEY_AFTER_LOGIN_ADDR_START = 260;
     static constexpr int KEY_AFTER_PWD_ADDR_START = 262;
     static constexpr int PWD_BLANK_FLAG = 266;
+    static constexpr int TOTP_ADDR_START = 400;
+    static constexpr int TOTP_LENGTH = 73;
     static constexpr int TOTP_TIME_STEP = 466;
     static constexpr int TOTP_CODE_SIZE = 468;
     static constexpr int KEY_AFTER_LENGTH = 2;

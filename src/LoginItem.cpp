@@ -89,6 +89,10 @@ QJsonObject LoginItem::toJson() const
             totp["totp_secret_key"] = m_totpCred.secretKey;
             totp["totp_time_step"] = m_totpCred.timeStep;
             totp["totp_code_size"] = m_totpCred.codeSize;
+            if (m_totpDeleted)
+            {
+                totp["totp_deleted"] = m_totpDeleted;
+            }
             ret.insert("totp", totp);
         }
     }

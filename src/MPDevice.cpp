@@ -7184,6 +7184,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 
         /* Check format */
         bool isTotpCred = isBLE() && (MessageProtocolBLE::TOTP_PACKAGE_SIZE == qjobject.size());
+        bool removeTOTP = false;
         if (qjobject.size() != pMesProt->getCredentialPackageSize() && !isTotpCred)
         {
             qCritical() << "Unknown JSON return format:" << qjobject;
@@ -7210,7 +7211,16 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 keyAfterPwd = qjobject["key_after_pwd"].toInt();
                 if (isTotpCred)
                 {
-                    bleImpl->createTOTPCredMessage(service, login, qjobject["totp"].toObject());
+                    auto totpObject = qjobject["totp"].toObject();
+                    if (totpObject.contains("totp_deleted") && totpObject["totp_deleted"].toBool())
+                    {
+                        removeTOTP = true;
+                    }
+
+                    if (!totpObject["totp_secret_key"].toString().isEmpty())
+                    {
+                        bleImpl->createTOTPCredMessage(service, login, qjobject["totp"].toObject());
+                    }
                 }
             }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
@@ -7386,6 +7396,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     if (keyAfterPwd != nodeBle->getKeyAfterPwd())
                     {
                         nodeBle->setKeyAfterPwd(keyAfterPwd);
+                        packet_send_needed = true;
+                    }
+                    if (removeTOTP)
+                    {
+                        nodeBle->resetTOTPCredential();
                         packet_send_needed = true;
                     }
                 }

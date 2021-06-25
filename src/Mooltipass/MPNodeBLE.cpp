@@ -224,3 +224,11 @@ int MPNodeBLE::getTOTPCodeSize() const
     if (!isValid()) return 0;
     return data[TOTP_CODE_SIZE];
 }
+
+void MPNodeBLE::resetTOTPCredential()
+{
+    for (int i = TOTP_ADDR_START; i < TOTP_ADDR_START + TOTP_LENGTH; ++i)
+    {
+        data[i] = static_cast<char>(0x00);
+    }
+}
