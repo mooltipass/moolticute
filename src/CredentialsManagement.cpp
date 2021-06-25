@@ -52,6 +52,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonEnterMMM->setIcon(AppGui::qtAwesome()->icon(fa::unlock, whiteButtons));
     ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonTOTP->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDeleteTOTP->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->buttonExit->setText(tr("Exit Credential Management"));
     ui->buttonExit->setStyleSheet(CSS_BLUE_BUTTON);
@@ -921,11 +922,13 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
                     m_pTOTPCred->setCodeSize(pLoginItem->totpCodeSize());
                     ui->pushButtonTOTP->setEnabled(false);
                     ui->toolButtonTOTPService->show();
+                    ui->pushButtonDeleteTOTP->show();
                 }
                 else
                 {
                     ui->pushButtonTOTP->setEnabled(true);
                     ui->toolButtonTOTPService->hide();
+                    ui->pushButtonDeleteTOTP->hide();
                 }
             }
         }
@@ -1200,6 +1203,7 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
         ui->addCredPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
         ui->pushButtonTOTP->show();
+        ui->pushButtonDeleteTOTP->hide();
     }
     else
     {
@@ -1212,6 +1216,7 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
         ui->addCredPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
         ui->credDisplayPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
         ui->pushButtonTOTP->hide();
+        ui->pushButtonDeleteTOTP->hide();
     }
 }
 
@@ -1292,5 +1297,32 @@ void CredentialsManagement::on_pushButtonTOTP_clicked()
     {
         m_pTOTPCred->show();
         return;
+    }
+}
+
+void CredentialsManagement::on_pushButtonDeleteTOTP_clicked()
+{
+    if (QMessageBox::question(this, "Moolticute",
+                              tr("TOTP Secret key is going to be removed for the credential.\nContinue?")) != QMessageBox::Yes)
+    {
+        return;
+    }
+
+    const QItemSelectionModel *pSelectionModel = ui->credentialTreeView->selectionModel();
+    const QModelIndex currentSelectionIndex = pSelectionModel->currentIndex();
+
+    if (currentSelectionIndex.isValid())
+    {
+        QModelIndex srcIndex = getSourceIndexFromProxyIndex(currentSelectionIndex);
+
+        LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
+        if (pLoginItem != nullptr) {
+            pLoginItem->setTOTPCredential("", 0, 0);
+            pLoginItem->setTotpCodeSize(0);
+            pLoginItem->setTotpTimeStep(0);
+            pLoginItem->setTOTPDeleted(true);
+            credentialDataChanged();
+            updateLoginDescription(srcIndex);
+        }
     }
 }

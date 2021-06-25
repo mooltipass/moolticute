@@ -27,6 +27,7 @@ public:
     bool hasBlankPwdChanged() const;
     virtual TreeType treeType()  const Q_DECL_OVERRIDE;
     void setTOTPCredential(QString secretKey, int timeStep, int codeSize);
+    void setTOTPDeleted(bool deleted) { m_totpDeleted = deleted; }
 private:    
     QByteArray m_bAddress;
     qint8 m_iFavorite;
@@ -53,6 +54,7 @@ private:
     };
 
     TOTPCredential m_totpCred;
+    bool m_totpDeleted = false;
 };
 
 #endif // LOGINITEM_H
