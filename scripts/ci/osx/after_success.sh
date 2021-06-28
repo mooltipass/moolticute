@@ -29,12 +29,10 @@ if [ "$NAME" != "Darwin" ]; then
     exit 1
 fi
 
-cat build/$APP.app/Contents/Info.plist
 
-echo "Changing bundle identifier"
-sed -i -e 's/com.yourcompany.Moolticute/com.Mooltipass.Moolticute/g' build/$APP.app/Contents/Info.plist
-# removing backup plist
-rm -f build/$APP.app/Contents/Info.plist-e
+echo "Copy plist from script directory"
+cp $SCRIPTDIR/Info.plist build/$APP.app/Contents/Info.plist
+cat build/$APP.app/Contents/Info.plist
 
 # Copy daemon to bundle
 cp build/moolticuted build/$APP.app/Contents/MacOS/
