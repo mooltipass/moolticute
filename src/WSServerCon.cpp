@@ -605,6 +605,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::userCategoriesFetched, this, &WSServerCon::sendUserCategories);
         connect(mpBle, &MPDeviceBleImpl::bundleVersionChanged, this, &WSServerCon::sendVersion);
         connect(mpBle, &MPDeviceBleImpl::notesFetched, this, &WSServerCon::sendNotes);
+        connect(mpBle, &MPDeviceBleImpl::chargingStatusChanged, this, &WSServerCon::sendChargingStatus);
         connect(mpdevice, &MPDevice::displayMiniImportWarning, this, &WSServerCon::sendMiniImportWarning);
     }
 }
@@ -656,6 +657,7 @@ void WSServerCon::sendInitialStatus()
         if (mpdevice->isBLE())
         {
             sendIsConnectedWithBluetooth();
+            sendChargingStatus(mpdevice->ble()->get_chargingStatus());
         }
     }
 }
@@ -900,6 +902,15 @@ void WSServerCon::sendBatteryPercent(int batteryPct)
     QJsonObject oroot = { {"msg", "send_battery"} };
     QJsonObject data;
     data.insert("battery", batteryPct);
+    oroot["data"] = data;
+    sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendChargingStatus(bool charging)
+{
+    QJsonObject oroot = { {"msg", "send_charging_status"} };
+    QJsonObject data;
+    data.insert("charging_status", charging);
     oroot["data"] = data;
     sendJsonMessage(oroot);
 }

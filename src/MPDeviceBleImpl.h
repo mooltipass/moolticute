@@ -26,6 +26,7 @@ class MPDeviceBleImpl: public QObject
     QT_WRITABLE_PROPERTY(bool, advancedMenu, false)
     QT_WRITABLE_PROPERTY(bool, bluetoothEnabled, false)
     QT_WRITABLE_PROPERTY(bool, knockDisabled, false)
+    QT_WRITABLE_PROPERTY(bool, chargingStatus, false)
 
     enum UserSettingsMask : quint8
     {
@@ -252,6 +253,7 @@ private:
     const static int FIRST_DATA_STARTING_ADDR = 10;
     const static int STATUS_MSG_SIZE_WITH_BATTERY = 5;
     const static int BATTERY_BYTE = 1;
+    const static int BATTERY_CHARGING_BIT = 0x80;
     const static int SECRET_KEY_LENGTH = 64;
     static constexpr int UPLOAD_PASSWORD_BYTE_SIZE = 16;
     static constexpr int DATA_FETCH_NO_NEXT_ADDR_SIZE = 2;

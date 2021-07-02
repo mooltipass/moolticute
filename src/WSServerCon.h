@@ -71,6 +71,7 @@ private slots:
     void sendUserCategories(QJsonObject categories);
 
     void sendBatteryPercent(int batteryPct);
+    void sendChargingStatus(bool charging);
 
     void sendMiniImportWarning();
 private:

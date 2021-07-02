@@ -525,6 +525,11 @@ void WSClient::onTextMessageReceived(const QString &message)
         QJsonObject o = rootobj["data"].toObject();
         emit updateBatteryPercent(o["battery"].toInt());
     }
+    else if (rootobj["msg"] == "send_charging_status")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit updateChargingStatus(o["charging_status"].toBool());
+    }
     else if (rootobj["msg"] == "request_security_challenge")
     {
         QJsonObject o = rootobj["data"].toObject();

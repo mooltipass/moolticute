@@ -280,6 +280,13 @@ QWidget {background-color: #EFEFEF;}</string>
           <number>5</number>
          </property>
          <item>
+          <widget class="QLabel" name="label_charging">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QProgressBar" name="pbBleBattery">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -4724,6 +4731,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
   <include location="../img/images.qrc"/>
  </resources>
