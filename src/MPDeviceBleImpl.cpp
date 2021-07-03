@@ -1084,7 +1084,7 @@ void MPDeviceBleImpl::readBatteryPercent(const QByteArray& statusData)
     if (STATUS_MSG_SIZE_WITH_BATTERY == bleProt->getMessageSize(statusData))
     {
         quint8 batteryPct = bleProt->getPayloadByteAt(statusData, BATTERY_BYTE);
-        bool charging = batteryPct|BATTERY_CHARGING_BIT;
+        bool charging = batteryPct&BATTERY_CHARGING_BIT;
         if (charging)
         {
             // Unset charging bit for battery percent
