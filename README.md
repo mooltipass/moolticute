@@ -54,6 +54,13 @@ curl https://raw.githubusercontent.com/mooltipass/mooltipass-udev/master/udev/69
 sudo udevadm control --reload-rules
 ```
 
+##### Fedora Linux (33 and >)
+```bash
+sudo dnf install gcc-c++ qt5-qtbase qt5-qtwebsockets qt5-qtwebsockets-devel qt5-qttools-devel systemd-devel
+curl https://raw.githubusercontent.com/mooltipass/mooltipass-udev/master/udev/69-mooltipass.rules | sudo tee /etc/udev/rules.d/69-mooltipass.rules
+sudo udevadm control --reload-rules
+```
+
 ### How to build
 
 For now, no binary releases are out yet. You will need to build the software by following the next step.
