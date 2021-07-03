@@ -163,6 +163,7 @@ signals:
     void updateBLEDeviceLanguage(const QJsonObject& langs);
     void updateBLEKeyboardLayout(const QJsonObject& layouts);
     void updateBatteryPercent(int battery);
+    void updateChargingStatus(int charging);
     void challengeResultReceived(QString result);
     void challengeResultFailed();
     void reconditionFinished(bool success, double dischargeTime);

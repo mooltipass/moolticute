@@ -278,6 +278,19 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->pbBleBattery->setValue(battery);
             });
 
+    connect(wsClient, &WSClient::updateChargingStatus,
+            [this](bool charging)
+            {
+                if (charging)
+                {
+                    ui->label_charging->show();
+                }
+                else
+                {
+                    ui->label_charging->hide();
+                }
+            });
+
     connect(wsClient, &WSClient::reconditionFinished, this, &MainWindow::onReconditionFinished);
 
     // temporary hide 'CSV Export' until it will be implemented
@@ -616,6 +629,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     // hide widget with prompts by default
     ui->promptWidget->setVisible(false);
+
+    ui->label_charging->setPixmap(QString::fromUtf8(":/charge.png"));
+    ui->label_charging->setMaximumSize(13,25);
+    ui->label_charging->setPixmap(ui->label_charging->pixmap()->scaled(13,25, Qt::KeepAspectRatio));
+    ui->label_charging->hide();
 
     updateSerialInfos();
     updatePage();
@@ -2030,6 +2048,7 @@ void MainWindow::onDeviceDisconnected()
     if (wsClient->isMPBLE())
     {
         ui->pbBleBattery->hide();
+        ui->label_charging->hide();
         if (wsClient->get_status() == Common::NoBundle)
         {
             handleNoBundleDisconnected();

@@ -30,5 +30,6 @@
         <file>systray_white.png</file>
         <file>uid_spinner.gif</file>
         <file>note.png</file>
+        <file>charge.png</file>
     </qresource>
 </RCC>
