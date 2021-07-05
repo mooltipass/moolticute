@@ -38,9 +38,10 @@ cat build/$APP.app/Contents/Info.plist
 cp build/moolticuted build/$APP.app/Contents/MacOS/
 
 #Get 3rd party tools
-wget_retry https://calaos.fr/mooltipass/tools/macos/mc-agent -O build/$APP.app/Contents/MacOS/mc-agent
-wget_retry https://calaos.fr/mooltipass/tools/macos/mc-cli -O build/$APP.app/Contents/MacOS/mc-cli
-chmod +x build/$APP.app/Contents/MacOS/mc-agent build/$APP.app/Contents/MacOS/mc-cli
+mkdir -p build/$APP.app/Contents/MacOS/cli
+wget_retry https://calaos.fr/mooltipass/tools/macos/mc-agent -O build/$APP.app/Contents/MacOS/cli/mc-agent
+wget_retry https://calaos.fr/mooltipass/tools/macos/mc-cli -O build/$APP.app/Contents/MacOS/cli/mc-cli
+chmod +x build/$APP.app/Contents/MacOS/cli/mc-agent build/$APP.app/Contents/MacOS/cli/mc-cli
 
 # use macdeployqt to deploy the application
 echo "Calling macdeployqt"
