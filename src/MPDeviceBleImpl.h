@@ -114,7 +114,7 @@ public:
     void readBatteryPercent(const QByteArray& statusData);
     void getBattery();
 
-    void nihmReconditioning(const MessageHandlerCb &cb);
+    void nihmReconditioning();
     void getSecurityChallenge(const QString& key, const MessageHandlerCb &cb);
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
@@ -175,6 +175,7 @@ signals:
     void batteryPercentChanged(int batteryPct);
     void userCategoriesFetched(QJsonObject categories);
     void notesFetched();
+    void nimhReconditionFinished(bool success, QString response);
 
 private slots:
     void handleLongMessageTimeout();
@@ -195,6 +196,8 @@ private:
     QByteArray createCredentialMessage(const CredMap &credMap);
     QByteArray createChangePasswordMsg(const QByteArray& address, QString pwd);
     QByteArray createUploadPasswordMessage(const QString& uploadPassword);
+
+    void createAndAddCustomJob(QString name, std::function<void()> fn);
 
     inline void flipBit();
     void resetFlipBit();
@@ -227,6 +230,7 @@ private:
     QList<QString> m_notes;
 
     bool m_enforceLayout = false;
+    QString m_nimhResponse = "";
 
     int m_miniFilePartCounter = 0;
 

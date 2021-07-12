@@ -606,6 +606,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::bundleVersionChanged, this, &WSServerCon::sendVersion);
         connect(mpBle, &MPDeviceBleImpl::notesFetched, this, &WSServerCon::sendNotes);
         connect(mpBle, &MPDeviceBleImpl::chargingStatusChanged, this, &WSServerCon::sendChargingStatus);
+        connect(mpBle, &MPDeviceBleImpl::nimhReconditionFinished, this, &WSServerCon::sendNimhReconditionFinished);
         connect(mpdevice, &MPDevice::displayMiniImportWarning, this, &WSServerCon::sendMiniImportWarning);
     }
 }
@@ -911,6 +912,16 @@ void WSServerCon::sendChargingStatus(bool charging)
     QJsonObject oroot = { {"msg", "send_charging_status"} };
     QJsonObject data;
     data.insert("charging_status", charging);
+    oroot["data"] = data;
+    sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendNimhReconditionFinished(bool success, QString resposne)
+{
+    QJsonObject oroot = { {"msg", "nimh_reconditioning"} };
+    QJsonObject data;
+    data.insert("success", success);
+    data.insert("discharge_time", resposne);
     oroot["data"] = data;
     sendJsonMessage(oroot);
 }
@@ -1341,15 +1352,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "nimh_reconditioning")
     {
-        bleImpl->nihmReconditioning([this, root](bool success, QString response)
-        {
-            QJsonObject ores;
-            QJsonObject oroot = root;
-            ores["success"] = success;
-            ores["discharge_time"] = response;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        });
+        bleImpl->nihmReconditioning();
     }
     else if (root["msg"] == "request_security_challenge")
     {

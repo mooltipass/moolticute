@@ -72,6 +72,7 @@ private slots:
 
     void sendBatteryPercent(int batteryPct);
     void sendChargingStatus(bool charging);
+    void sendNimhReconditionFinished(bool success, QString resposne);
 
     void sendMiniImportWarning();
 private:

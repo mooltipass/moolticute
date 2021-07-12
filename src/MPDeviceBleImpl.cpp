@@ -1108,39 +1108,45 @@ void MPDeviceBleImpl::getBattery()
     }
 }
 
-void MPDeviceBleImpl::nihmReconditioning(const MessageHandlerCb &cb)
+void MPDeviceBleImpl::nihmReconditioning()
 {
     auto *jobs = new AsyncJobs("NiMH Reconditioning", mpDev);
+    m_nimhResponse = "";
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, [this, cb](const QByteArray &data, bool &)
+    jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, [this](const QByteArray &data, bool &)
     {
         const auto payload = bleProt->getFullPayload(data);
         if (RECONDITION_RESPONSE_SIZE != payload.size())
         {
             qWarning() << "Invalid nimh recondition response size";
-            cb(false, "");
             return false;
         }
         const auto dischargeTimeLower = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[0]), static_cast<quint8>(payload[1]));
         const auto dischargeTimeUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[2]), static_cast<quint8>(payload[3]));
         quint32 dischargeTime = dischargeTimeLower;
         dischargeTime |= static_cast<quint32>((dischargeTimeUpper<<16));
-        QString responseString = QString::number(dischargeTime/1000.0);
+        m_nimhResponse = QString::number(dischargeTime/1000.0);
         if (std::numeric_limits<quint32>::max() == dischargeTime)
         {
             qCritical() << "NiMH Recondition failed";
-            cb(false, responseString);
             return false;
         }
-        qDebug() << "Recondition finished in " << dischargeTime << " msec";
-        cb(true, responseString);
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this](const QByteArray &data)
     {
         Q_UNUSED(data)
         qDebug() << "NiMH Reconditioning finished";
+        createAndAddCustomJob("NiMH Reconditioning finished job",
+                        [this](){emit nimhReconditionFinished(true, m_nimhResponse);});
+    });
+
+    connect(jobs, &AsyncJobs::failed, [this](AsyncJob *)
+    {
+        qDebug() << "NiMH Reconditioning failed";
+        createAndAddCustomJob("NiMH Reconditioning failed job",
+                        [this](){emit nimhReconditionFinished(false, m_nimhResponse);});
     });
 
     mpDev->enqueueAndRunJob(jobs);
@@ -1856,6 +1862,15 @@ QByteArray MPDeviceBleImpl::createUploadPasswordMessage(const QString &uploadPas
     }
 
     return passwordArray;
+}
+
+void MPDeviceBleImpl::createAndAddCustomJob(QString name, std::function<void ()> fn)
+{
+    auto *jobs = new AsyncJobs(QString(name), this);
+    auto *customJob = new CustomJob{this};
+    customJob->setWork(std::move(fn));
+    jobs->append(customJob);
+    mpDev->jobsQueue.enqueue(jobs);
 }
 
 void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *timer, AsyncJobs *jobs, QString filePath, const MPDeviceProgressCb &cbProgress)
