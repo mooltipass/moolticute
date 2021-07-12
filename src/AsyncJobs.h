@@ -87,6 +87,7 @@ public slots:
     virtual void start(const QByteArray &)
     {
         work();
+        emit this->done(QByteArray());
     }
 
 private:
