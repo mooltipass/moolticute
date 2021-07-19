@@ -340,6 +340,7 @@ private:
     void checkLoadedDataNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::DataAddressType addrType);
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX,
                          Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
+    bool tagCredentialNodes(NodeList& nodes, NodeList& childNodes, Common::AddressType addrType, bool repairAllowed);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX,
                                  Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);

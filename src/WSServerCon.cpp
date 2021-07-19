@@ -544,6 +544,33 @@ void WSServerCon::processMessage(const QString &message)
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "start_memcheck")
+    {
+        //start integrity check
+        mpdevice->startIntegrityCheck(
+                    [=](bool success, int freeBlocks, int totalBlocks, QString errstr)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject oroot = root;
+            oroot["msg"] = "memcheck";
+
+            if (!success)
+            {
+                sendFailedJson(oroot, errstr);
+                return;
+            }
+
+            QJsonObject ores;
+            ores["memcheck_status"] = "done"; //TODO: add return info here about the result of memcheck?
+            ores["free_blocks"] = freeBlocks;
+            ores["total_blocks"] = totalBlocks;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        },
+        defaultProgressCb);
+    }
     else if (mpdevice->isBLE())
     {
         processMessageBLE(root, defaultProgressCb);
@@ -977,34 +1004,7 @@ void WSServerCon::checkHaveIBeenPwned(const QString &service, const QString &log
 
 void WSServerCon::processMessageMini(QJsonObject root, const MPDeviceProgressCb &cbProgress)
 {
-    if (root["msg"] == "start_memcheck")
-    {
-        //start integrity check
-        mpdevice->startIntegrityCheck(
-                    [=](bool success, int freeBlocks, int totalBlocks, QString errstr)
-        {
-            if (!WSServer::Instance()->checkClientExists(this))
-                return;
-
-            QJsonObject oroot = root;
-            oroot["msg"] = "memcheck";
-
-            if (!success)
-            {
-                sendFailedJson(oroot, errstr);
-                return;
-            }
-
-            QJsonObject ores;
-            ores["memcheck_status"] = "done"; //TODO: add return info here about the result of memcheck?
-            ores["free_blocks"] = freeBlocks;
-            ores["total_blocks"] = totalBlocks;
-            oroot["data"] = ores;
-            sendJsonMessage(oroot);
-        },
-        cbProgress);
-    }
-    else if (root["msg"] == "ask_password" ||
+    if (root["msg"] == "ask_password" ||
              root["msg"] == "get_credential")
     {
         QJsonObject o = root["data"].toObject();
