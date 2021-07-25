@@ -6945,48 +6945,52 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
         if (isBLE())
         {
             detagPointedNodes();
-            // Tag webauthn nodes from loginNodes, loginChildNodes, where every credentials/fido2 fetched
+            /**
+              * CREDENTIALS
+              * Every credentials are fetched to loginNodes/loginChildNodes,
+              * first go through Webauthn linked list and move webauthn nodes
+              * to the correct list.
+              */
             tagCredentialNodes(loginNodes, loginChildNodes, Common::WEBAUTHN_ADDR_IDX, false);
             // Move tagged nodes to webauthn nodes
-            auto it = loginNodes.begin();
+            moveFetchedNodes(loginNodes, loginNodesClone, webAuthnLoginNodes, webAuthnLoginNodesClone, true);
+            moveFetchedNodes(loginChildNodes, loginChildNodesClone, webAuthnLoginChildNodes, webAuthnLoginChildNodesClone, false);
+
+            // Tag credentials
+            tagCredentialNodes(loginNodes, loginChildNodes, Common::CRED_ADDR_IDX, false);
+            /**
+             * After tagging credential nodes remaining nodes, which are not in neither linked list,
+             * need to check if they are credential or webauthn ones.
+             */
+            for (auto* node : loginNodes)
+            {
+                if (!node->getPointedToCheck())
+                {
+                    // Not in the linked list
+                    qCritical() << node->getService() << " is not in the linked list";
+                }
+            }
+
+            auto it = loginChildNodes.begin();
             bool removed = false;
-            while (it != loginNodes.end())
-            {
-                MPNode *node = *it;
-                if (node->getPointedToCheck())
-                {
-                    qCritical() << "Webauthn : " << node->getService();
-                    node->removePointedToCheck();
-                    webAuthnLoginNodes.append(node);
-                    webAuthnLoginNodesClone.append(node);
-                    it = loginNodes.erase(it);
-                    removed = true;
-                }
-                else
-                {
-                    ++it;
-                }
-            }
-
-            if (removed)
-            {
-                clearAndDelete(loginNodesClone);
-                loginNodesClone = loginNodes;
-                removed = false;
-            }
-
-            it = loginChildNodes.begin();
+            constexpr int CRED_TERMINATING_ZERO_BYTE = 398;
             while (it != loginChildNodes.end())
             {
                 MPNode *node = *it;
-                if (node->getPointedToCheck())
+                if (!node->getPointedToCheck())
                 {
-                    qCritical() << "Webauthn name: " << node->getLogin();
-                    node->removePointedToCheck();
-                    webAuthnLoginChildNodes.append(node);
-                    webAuthnLoginChildNodesClone.append(node);
-                    it = loginChildNodes.erase(it);
-                    removed = true;
+                    qCritical() << node->getLogin() << " child is not in the linked list";
+                    if (node->getNodeData()[CRED_TERMINATING_ZERO_BYTE] != static_cast<char>(0x00))
+                    {
+                        webAuthnLoginNodes.append(node);
+                        webAuthnLoginNodesClone.append(node);
+                        it = loginChildNodes.erase(it);
+                        removed = true;
+                    }
+                    else
+                    {
+                        ++it;
+                    }
                 }
                 else
                 {
@@ -6998,125 +7002,27 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
             {
                 clearAndDelete(loginChildNodesClone);
                 loginChildNodesClone = loginChildNodes;
-                removed = false;
-            }
-
-            // Tag credentials
-            tagCredentialNodes(loginNodes, loginChildNodes, Common::CRED_ADDR_IDX, false);
-
-            // Check remaining not tagged credential
-            for (auto* node : loginNodes)
-            {
-                if (!node->getPointedToCheck())
-                {
-                    // Not in the linked list
-                    qCritical() << node->getService() << " is not in the linked list";
-                }
-            }
-
-            for (auto* node : loginChildNodes)
-            {
-                if (!node->getPointedToCheck())
-                {
-                    // Not in the linked list
-                    qCritical() << node->getLogin() << " child is not in the linked list";
-                    if (node->getNodeData()[398] == static_cast<char>(0x00))
-                    {
-                        qCritical() << "Credential";
-                    }
-                    else
-                    {
-                        qCritical() << "WEBAUTNH";
-                    }
-                }
             }
 
 
-            // DATA
+            /**
+              * DATA
+              * Every credentials are fetched to dataNodes/dataChildNodes,
+              * first go through Note linked list and move note nodes
+              * to the correct list.
+              */
             detagPointedNodes();
             // Tag note nodes from dataNodes, dataChildNodes, where every data/note fetched
             tagDataNodes(dataNodes, dataChildNodes, Common::NOTE_ADDR_IDX, false);
             // Move tagged data nodes to note nodes
-            it = dataNodes.begin();
-            while (it != dataNodes.end())
-            {
-                MPNode *node = *it;
-                if (node->getPointedToCheck())
-                {
-                    qCritical() << "Node : " << node->getService();
-                    node->removePointedToCheck();
-                    notesLoginNodes.append(node);
-                    notesLoginNodesClone.append(node);
-                    it = dataNodes.erase(it);
-                    removed = true;
-                }
-                else
-                {
-                    ++it;
-                }
-            }
+            moveFetchedNodes(dataNodes, dataNodesClone, notesLoginNodes, notesLoginNodesClone, true);
+            moveFetchedNodes(dataChildNodes, dataChildNodesClone, notesLoginChildNodes, notesLoginChildNodesClone, false);
 
-            if (removed)
-            {
-                clearAndDelete(dataNodesClone);
-                dataNodesClone = dataNodes;
-                removed = false;
-            }
+            /**
+             * Remaining data nodes, which are not in neither linked list,
+             * handled as dataNodes, so nothing to do here.
+             */
 
-            it = dataChildNodes.begin();
-            while (it != dataChildNodes.end())
-            {
-                MPNode *node = *it;
-                if (node->getPointedToCheck())
-                {
-                    node->removePointedToCheck();
-                    notesLoginChildNodes.append(node);
-                    notesLoginChildNodesClone.append(node);
-                    it = dataChildNodes.erase(it);
-                    removed = true;
-                }
-                else
-                {
-                    ++it;
-                }
-            }
-
-            if (removed)
-            {
-                clearAndDelete(dataChildNodesClone);
-                dataChildNodesClone = dataChildNodes;
-                removed = false;
-            }
-
-            // Tag datas
-            tagDataNodes(dataNodes, dataChildNodes, Common::DATA_ADDR_IDX, false);
-
-            // Check remaining not tagged credential
-            for (auto* node : dataNodes)
-            {
-                if (!node->getPointedToCheck())
-                {
-                    // Not in the linked list
-                    qCritical() << node->getService() << " is not in the linked list";
-                }
-            }
-
-            for (auto* node : dataChildNodes)
-            {
-                if (!node->getPointedToCheck())
-                {
-                    // Not in the linked list
-                    qCritical() << "DATA child is not in the linked list";
-                    if (node->getNodeData()[398] == static_cast<char>(0x00))
-                    {
-                        qCritical() << "DATA";
-                    }
-                    else
-                    {
-                        qCritical() << "NOTE";
-                    }
-                }
-            }
             detagPointedNodes();
         }
 
@@ -7172,6 +7078,46 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
 
     jobsQueue.enqueue(jobs);
     runAndDequeueJobs();
+}
+
+void MPDevice::moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClone, NodeList &destNodes, NodeList &destNodesClone, bool isParent)
+{
+    auto it = sourceNodes.begin();
+    bool removed = false;
+    while (it != sourceNodes.end())
+    {
+        MPNode *node = *it;
+        if (node->getPointedToCheck())
+        {
+            if (isParent)
+            {
+                qCritical() << "Service: " << node->getService();
+            }
+            else if (MPNode::NodeChild == node->getType())
+            {
+                qCritical() << "Login name: " << node->getLogin();
+            }
+            node->removePointedToCheck();
+            destNodes.append(node);
+            destNodesClone.append(node);
+            it = sourceNodes.erase(it);
+            removed = true;
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    if (removed)
+    {
+        /**
+         * If a node is removed from source list, we need to
+         * update the clone list too.
+         */
+        clearAndDelete(sourceNodesClone);
+        sourceNodesClone = sourceNodes;
+    }
 }
 
 void MPDevice::serviceExists(bool isDatanode, QString service, const QString &reqid,

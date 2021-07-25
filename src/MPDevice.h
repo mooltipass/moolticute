@@ -109,6 +109,7 @@ public:
     void exitMemMgmtMode(bool setMMMBool = true);
     void startIntegrityCheck(const std::function<void(bool success, int freeBlocks, int totalBlocks, QString errstr)> &cb,
                              const MPDeviceProgressCb &cbProgress);
+    void moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClone, NodeList &destNodes, NodeList &destNodesClone, bool isParent);
 
     //Send current date to MP
     void setCurrentDate();
