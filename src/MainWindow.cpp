@@ -1596,6 +1596,8 @@ void MainWindow::updateTabButtons()
 
         ui->pushButtonCred->setEnabled(false);
         ui->pushButtonFiles->setEnabled(false);
+        ui->pushButtonFido->setEnabled(false);
+        ui->pushButtonNotes->setEnabled(false);
         ui->pushButtonSSH->setEnabled(false);
 
         return;
