@@ -5334,8 +5334,16 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Breaking parent linked list: test failed!";return false;} else qInfo() << "Breaking parent linked list: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Changing valid address for virtual address";
-    freeAddresses.append(QByteArray());
-    freeAddresses.append(loginNodes[1]->getAddress());
+    if (isBLE())
+    {
+        bleImpl->getFreeAddressProvider().addTestParentAddress(1, loginNodes[1]->getAddress());
+    }
+    else
+    {
+        freeAddresses.clear();
+        freeAddresses.append(QByteArray());
+        freeAddresses.append(loginNodes[1]->getAddress());
+    }
     loginNodes[1]->setAddress(QByteArray(), 1);
     loginNodes[0]->setNextParentAddress(QByteArray(), 1);
     loginNodes[2]->setPreviousParentAddress(QByteArray(), 1);
@@ -5379,9 +5387,16 @@ bool MPDevice::testCodeAgainstCleanDBChanges(AsyncJobs *jobs)
     if (generateSavePackets(jobs, true, true, ignoreProgressCb)) {qCritical() << "Breaking data parent linked list: test failed!";return false;} else qInfo() << "Breaking data parent linked list: passed!";
 
     qInfo() << "testCodeAgainstCleanDBChanges: Changing valid address for virtual address";
-    freeAddresses.clear();
-    freeAddresses.append(QByteArray());
-    freeAddresses.append(dataNodes[1]->getAddress());
+    if (isBLE())
+    {
+        bleImpl->getFreeAddressProvider().addTestParentAddress(1, dataNodes[1]->getAddress());
+    }
+    else
+    {
+        freeAddresses.clear();
+        freeAddresses.append(QByteArray());
+        freeAddresses.append(dataNodes[1]->getAddress());
+    }
     dataNodes[1]->setAddress(QByteArray(), 1);
     dataNodes[0]->setNextParentAddress(QByteArray(), 1);
     dataNodes[2]->setPreviousParentAddress(QByteArray(), 1);
@@ -5924,7 +5939,10 @@ void MPDevice::cleanMMMVars(void)
         clearAndDelete(notesLoginChildNodesClone);
         clearAndDelete(notesLoginNodes);
         clearAndDelete(notesLoginNodesClone);
-        bleImpl->getFreeAddressProvider().cleanFreeAddresses();
+        if (!m_isIntegrityCheck)
+        {
+            bleImpl->getFreeAddressProvider().cleanFreeAddresses();
+        }
     }
     startDataNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     startNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
@@ -6913,8 +6931,17 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
     jobs->append(new MPCommandJob(this, MPCmd::START_MEMORYMGMT, pMesProt->getDefaultFuncDone()));
 
     /* Ask one free address just in case we need it for creating a _recovered_ service */
-    newAddressesNeededCounter = 1;
     newAddressesReceivedCounter = 0;
+    if (isBLE())
+    {
+        incrementNeededAddresses(MPNode::NodeParent);
+    }
+    else
+    {
+        newAddressesNeededCounter = 1;
+    }
+    m_isIntegrityCheck = true;
+
     loadFreeAddresses(jobs, MPNode::EmptyAddress, false, cbProgress);
 
     /* Setup global vars dedicated to speed diagnostics */
@@ -7046,6 +7073,8 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
         {
             Q_UNUSED(data);
 
+            m_isIntegrityCheck = false;
+
             if (packets_generated)
             {
                 qInfo() << "Found and Corrected Errors in Database";
@@ -7062,6 +7091,7 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
         {
             Q_UNUSED(failedJob);
             qCritical() << "Couldn't check memory contents";
+            m_isIntegrityCheck = false;
             cb(false, diagFreeBlocks, diagTotalBlocks, "Error While Correcting Database (Device Disconnected?)");
         });
 
@@ -7073,6 +7103,7 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
     {
         Q_UNUSED(failedJob);
         qCritical() << "Failed scanning the flash memory";
+        m_isIntegrityCheck = false;
         cb(false, diagFreeBlocks, diagTotalBlocks, "Couldn't scan the complete memory (Device Disconnected?)");
     });
 

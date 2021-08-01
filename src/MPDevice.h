@@ -500,6 +500,7 @@ private:
     FilesCache filesCache;
 
     bool m_isDebugMsg = false;
+    bool m_isIntegrityCheck = false;
     //Message Protocol
     MPDeviceBleImpl *bleImpl = nullptr;
     DeviceSettings *pSettings = nullptr;
