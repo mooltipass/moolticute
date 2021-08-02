@@ -1047,7 +1047,6 @@ QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
             constexpr int NODEMGMT_ADDR_PAGE_BITSHIFT = 1;
             val = val + (1 << NODEMGMT_ADDR_PAGE_BITSHIFT);
         }
-        qCritical() << "Address: " << val;
         return pMesProt->toLittleEndianFromInt(val);
     }
     /* Address format is 2 bytes little endian. last 3 bits are node number and first 13 bits are page address */
@@ -1071,7 +1070,6 @@ QByteArray MPDevice::getNextNodeAddressInMemory(const QByteArray &address)
 void MPDevice::loadSingleNodeAndScan(AsyncJobs *jobs, const QByteArray &address, const MPDeviceProgressCb &cbProgress)
 {
     /* Because of recursive calls, make sure we haven't reached the end of the memory */
-    qCritical() << "Flash page from address: " << getFlashPageFromAddress(address) << " getNumberOfPages: " << getNumberOfPages();
     if (getFlashPageFromAddress(address) == getNumberOfPages())
     {
         qDebug() << "Reached the end of flash memory";
@@ -6994,7 +6992,7 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
                 if (!node->getPointedToCheck())
                 {
                     // Not in the linked list
-                    qCritical() << node->getService() << " is not in the linked list";
+                    qWarning() << node->getService() << " is not in the linked list";
                 }
             }
 
@@ -7122,11 +7120,11 @@ void MPDevice::moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClon
         {
             if (isParent)
             {
-                qCritical() << "Service: " << node->getService();
+                qDebug() << "Service to move: " << node->getService();
             }
             else if (MPNode::NodeChild == node->getType())
             {
-                qCritical() << "Login name: " << node->getLogin();
+                qDebug() << "Login name to move: " << node->getLogin();
             }
             node->removePointedToCheck();
             destNodes.append(node);
