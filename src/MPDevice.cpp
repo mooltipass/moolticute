@@ -816,7 +816,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                     qInfo() << "No parent nodes to load.";
                 }
 
-                if (isBLE() && getFido)
+                if (isBLE() && getFido && !fullScan)
                 {
                     bleImpl->loadWebAuthnNodes(jobs, cbProgress);
                 }
@@ -873,7 +873,7 @@ void MPDevice::memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan,
                     qInfo() << "No parent data nodes to load.";
                 }
 
-                if (isBLE() && bleImpl->isNoteAvailable())
+                if (isBLE() && bleImpl->isNoteAvailable() && !fullScan)
                 {
                     bleImpl->loadNotes(jobs, cbProgress);
                 }
