@@ -6987,48 +6987,7 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
              * After tagging credential nodes remaining nodes, which are not in neither linked list,
              * need to check if they are credential or webauthn ones.
              */
-            for (auto* node : loginNodes)
-            {
-                if (!node->getPointedToCheck())
-                {
-                    // Not in the linked list
-                    qWarning() << node->getService() << " is not in the linked list";
-                }
-            }
-
-            auto it = loginChildNodes.begin();
-            bool removed = false;
-            constexpr int CRED_TERMINATING_ZERO_BYTE = 398;
-            while (it != loginChildNodes.end())
-            {
-                MPNode *node = *it;
-                if (!node->getPointedToCheck())
-                {
-                    qCritical() << node->getLogin() << " child is not in the linked list";
-                    if (node->getNodeData()[CRED_TERMINATING_ZERO_BYTE] != static_cast<char>(0x00))
-                    {
-                        webAuthnLoginNodes.append(node);
-                        webAuthnLoginNodesClone.append(node);
-                        it = loginChildNodes.erase(it);
-                        removed = true;
-                    }
-                    else
-                    {
-                        ++it;
-                    }
-                }
-                else
-                {
-                    ++it;
-                }
-            }
-
-            if (removed)
-            {
-                clearAndDelete(loginChildNodesClone);
-                loginChildNodesClone = loginChildNodes;
-            }
-
+            moveFetchedFido2Nodes();
 
             /**
               * DATA
@@ -7112,7 +7071,6 @@ void MPDevice::startIntegrityCheck(const std::function<void(bool success, int fr
 void MPDevice::moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClone, NodeList &destNodes, NodeList &destNodesClone, bool isParent)
 {
     auto it = sourceNodes.begin();
-    bool removed = false;
     while (it != sourceNodes.end())
     {
         MPNode *node = *it;
@@ -7128,24 +7086,77 @@ void MPDevice::moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClon
             }
             node->removePointedToCheck();
             destNodes.append(node);
-            destNodesClone.append(node);
+            /*
+             * Find cloneNode based on address from source,
+             * add it to destination clone list
+             * and remove from source clone
+             */
+            auto nodeAddr = node->getAddress();
+            auto cloneNode = std::find_if(sourceNodesClone.begin(), sourceNodesClone.end(),
+                                          [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()); });
+            if (cloneNode != sourceNodesClone.end())
+            {
+                destNodesClone.append(*cloneNode);
+                sourceNodesClone.erase(cloneNode);
+            }
+            else
+            {
+                qCritical() << "Cannot find clone node with address: " << nodeAddr.toHex();
+            }
             it = sourceNodes.erase(it);
-            removed = true;
         }
         else
         {
             ++it;
         }
     }
+}
 
-    if (removed)
+void MPDevice::moveFetchedFido2Nodes()
+{
+    for (auto* node : loginNodes)
     {
-        /**
-         * If a node is removed from source list, we need to
-         * update the clone list too.
-         */
-        clearAndDelete(sourceNodesClone);
-        sourceNodesClone = sourceNodes;
+        if (!node->getPointedToCheck())
+        {
+            // Not in the linked list
+            qWarning() << node->getService() << " is not in the linked list";
+        }
+    }
+
+    auto it = loginChildNodes.begin();
+    constexpr int CRED_TERMINATING_ZERO_BYTE = 398;
+    while (it != loginChildNodes.end())
+    {
+        MPNode *node = *it;
+        if (!node->getPointedToCheck())
+        {
+            qWarning() << node->getLogin() << " child is not in the linked list";
+            if (node->getNodeData()[CRED_TERMINATING_ZERO_BYTE] != static_cast<char>(0x00))
+            {
+                webAuthnLoginNodes.append(node);
+                auto nodeAddr = node->getAddress();
+                auto cloneNode = std::find_if(loginChildNodesClone.begin(), loginChildNodesClone.end(),
+                                              [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()); });
+                if (cloneNode != loginChildNodesClone.end())
+                {
+                    webAuthnLoginNodesClone.append(*cloneNode);
+                    loginChildNodesClone.erase(cloneNode);
+                }
+                else
+                {
+                    qCritical() << "Cannot find clone node";
+                }
+                it = loginChildNodes.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+        else
+        {
+            ++it;
+        }
     }
 }
 
