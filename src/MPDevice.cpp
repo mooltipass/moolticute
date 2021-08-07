@@ -7093,7 +7093,7 @@ void MPDevice::moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClon
              */
             auto nodeAddr = node->getAddress();
             auto cloneNode = std::find_if(sourceNodesClone.begin(), sourceNodesClone.end(),
-                                          [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()); });
+                                          [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
             if (cloneNode != sourceNodesClone.end())
             {
                 destNodesClone.append(*cloneNode);
@@ -7136,7 +7136,7 @@ void MPDevice::moveFetchedFido2Nodes()
                 webAuthnLoginNodes.append(node);
                 auto nodeAddr = node->getAddress();
                 auto cloneNode = std::find_if(loginChildNodesClone.begin(), loginChildNodesClone.end(),
-                                              [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()); });
+                                              [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
                 if (cloneNode != loginChildNodesClone.end())
                 {
                     webAuthnLoginNodesClone.append(*cloneNode);
