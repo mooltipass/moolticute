@@ -7114,15 +7114,7 @@ void MPDevice::moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClon
 
 void MPDevice::moveFetchedFido2Nodes()
 {
-    for (auto* node : loginNodes)
-    {
-        if (!node->getPointedToCheck())
-        {
-            // Not in the linked list
-            qWarning() << node->getService() << " is not in the linked list";
-        }
-    }
-
+    /* First categorize the remaining child nodes */
     auto it = loginChildNodes.begin();
     constexpr int CRED_TERMINATING_ZERO_BYTE = 398;
     while (it != loginChildNodes.end())
@@ -7133,13 +7125,13 @@ void MPDevice::moveFetchedFido2Nodes()
             qWarning() << node->getLogin() << " child is not in the linked list";
             if (node->getNodeData()[CRED_TERMINATING_ZERO_BYTE] != static_cast<char>(0x00))
             {
-                webAuthnLoginNodes.append(node);
+                webAuthnLoginChildNodes.append(node);
                 auto nodeAddr = node->getAddress();
                 auto cloneNode = std::find_if(loginChildNodesClone.begin(), loginChildNodesClone.end(),
                                               [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
                 if (cloneNode != loginChildNodesClone.end())
                 {
-                    webAuthnLoginNodesClone.append(*cloneNode);
+                    webAuthnLoginChildNodesClone.append(*cloneNode);
                     loginChildNodesClone.erase(cloneNode);
                 }
                 else
@@ -7156,6 +7148,56 @@ void MPDevice::moveFetchedFido2Nodes()
         else
         {
             ++it;
+        }
+    }
+
+    /* From the remaining parent nodes we look for the first child address
+     * in loginChildNodes and webAuthnLoginChildNodes, based on that we can
+     * decide if that is a credential or fido2 parent.
+     */
+    auto parentNodeIt = loginNodes.begin();
+    while (parentNodeIt != loginNodes.end())
+    {
+        MPNode *parentNode = *parentNodeIt;
+        if (!parentNode->getPointedToCheck())
+        {
+            // Not in the linked list
+            qWarning() << parentNode->getService() << " is not in the linked list";
+            auto firstChildNode = parentNode->getStartChildAddress();
+            // Search parent's first child in webauthn child list
+            auto webAuthNode = std::find_if(webAuthnLoginChildNodes.begin(), webAuthnLoginChildNodes.end(),
+                                          [firstChildNode](MPNode *n) { return firstChildNode.compare(n->getAddress()) == 0; });
+            if (webAuthNode != webAuthnLoginChildNodes.end())
+            {
+                // Need to move parent to webAuthnLoginNodes
+                webAuthnLoginNodes.append(parentNode);
+                auto nodeAddr = parentNode->getAddress();
+                auto cloneNode = std::find_if(loginNodesClone.begin(), loginNodesClone.end(),
+                                              [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
+                if (cloneNode != loginNodesClone.end())
+                {
+                    webAuthnLoginNodesClone.append(*cloneNode);
+                    loginNodesClone.erase(cloneNode);
+                }
+                else
+                {
+                    qCritical() << "Cannot find clone parent node";
+                }
+                parentNodeIt = loginNodes.erase(parentNodeIt);
+            }
+            else
+            {
+                /*
+                 * If first child node is not a webauthn child node, there is 2 option
+                 * -> It is a login node and nothing to do
+                 * -> It is in neither list, nothing to do, it will be deleted later
+                 */
+                ++parentNodeIt;
+            }
+        }
+        else
+        {
+            ++parentNodeIt;
         }
     }
 }
