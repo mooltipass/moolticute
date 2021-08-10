@@ -7093,7 +7093,7 @@ void MPDevice::moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClon
              */
             auto nodeAddr = node->getAddress();
             auto cloneNode = std::find_if(sourceNodesClone.begin(), sourceNodesClone.end(),
-                                          [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
+                                          [nodeAddr](MPNode *n) { return nodeAddr == n->getAddress(); });
             if (cloneNode != sourceNodesClone.end())
             {
                 destNodesClone.append(*cloneNode);
@@ -7128,7 +7128,7 @@ void MPDevice::moveFetchedFido2Nodes()
                 webAuthnLoginChildNodes.append(node);
                 auto nodeAddr = node->getAddress();
                 auto cloneNode = std::find_if(loginChildNodesClone.begin(), loginChildNodesClone.end(),
-                                              [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
+                                              [nodeAddr](MPNode *n) { return nodeAddr == n->getAddress(); });
                 if (cloneNode != loginChildNodesClone.end())
                 {
                     webAuthnLoginChildNodesClone.append(*cloneNode);
@@ -7166,14 +7166,14 @@ void MPDevice::moveFetchedFido2Nodes()
             auto firstChildNode = parentNode->getStartChildAddress();
             // Search parent's first child in webauthn child list
             auto webAuthNode = std::find_if(webAuthnLoginChildNodes.begin(), webAuthnLoginChildNodes.end(),
-                                          [firstChildNode](MPNode *n) { return firstChildNode.compare(n->getAddress()) == 0; });
+                                          [firstChildNode](MPNode *n) { return firstChildNode == n->getAddress(); });
             if (webAuthNode != webAuthnLoginChildNodes.end())
             {
                 // Need to move parent to webAuthnLoginNodes
                 webAuthnLoginNodes.append(parentNode);
                 auto nodeAddr = parentNode->getAddress();
                 auto cloneNode = std::find_if(loginNodesClone.begin(), loginNodesClone.end(),
-                                              [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
+                                              [nodeAddr](MPNode *n) { return nodeAddr == n->getAddress(); });
                 if (cloneNode != loginNodesClone.end())
                 {
                     webAuthnLoginNodesClone.append(*cloneNode);
