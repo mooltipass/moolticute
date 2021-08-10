@@ -968,7 +968,15 @@ QByteArray MPDevice::getMemoryFirstNodeAddress(void)
     if (isBLE())
     {
         /* BLE: Address format is 2 bytes little endian. last 1 bit is node number (for pages that can accomodate 2 nodes) and first 15 bits are page address */
-        return QByteArray::fromHex("0200");
+        auto flashMbSize = get_flashMbSize();
+        if (1 == flashMbSize || 2 == flashMbSize || 32 == flashMbSize)
+        {
+            return QByteArray::fromHex("0100");
+        }
+        else
+        {
+            return QByteArray::fromHex("0200");
+        }
     }
     /* Address format is 2 bytes little endian. last 3 bits are node number and first 13 bits are page address */
     switch(get_flashMbSize())
@@ -7093,7 +7101,7 @@ void MPDevice::moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClon
              */
             auto nodeAddr = node->getAddress();
             auto cloneNode = std::find_if(sourceNodesClone.begin(), sourceNodesClone.end(),
-                                          [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
+                                          [nodeAddr](MPNode *n) { return nodeAddr == n->getAddress(); });
             if (cloneNode != sourceNodesClone.end())
             {
                 destNodesClone.append(*cloneNode);
@@ -7128,7 +7136,7 @@ void MPDevice::moveFetchedFido2Nodes()
                 webAuthnLoginChildNodes.append(node);
                 auto nodeAddr = node->getAddress();
                 auto cloneNode = std::find_if(loginChildNodesClone.begin(), loginChildNodesClone.end(),
-                                              [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
+                                              [nodeAddr](MPNode *n) { return nodeAddr == n->getAddress(); });
                 if (cloneNode != loginChildNodesClone.end())
                 {
                     webAuthnLoginChildNodesClone.append(*cloneNode);
@@ -7166,14 +7174,14 @@ void MPDevice::moveFetchedFido2Nodes()
             auto firstChildNode = parentNode->getStartChildAddress();
             // Search parent's first child in webauthn child list
             auto webAuthNode = std::find_if(webAuthnLoginChildNodes.begin(), webAuthnLoginChildNodes.end(),
-                                          [firstChildNode](MPNode *n) { return firstChildNode.compare(n->getAddress()) == 0; });
+                                          [firstChildNode](MPNode *n) { return firstChildNode == n->getAddress(); });
             if (webAuthNode != webAuthnLoginChildNodes.end())
             {
                 // Need to move parent to webAuthnLoginNodes
                 webAuthnLoginNodes.append(parentNode);
                 auto nodeAddr = parentNode->getAddress();
                 auto cloneNode = std::find_if(loginNodesClone.begin(), loginNodesClone.end(),
-                                              [nodeAddr](MPNode *n) { return nodeAddr.compare(n->getAddress()) == 0; });
+                                              [nodeAddr](MPNode *n) { return nodeAddr == n->getAddress(); });
                 if (cloneNode != loginNodesClone.end())
                 {
                     webAuthnLoginNodesClone.append(*cloneNode);
