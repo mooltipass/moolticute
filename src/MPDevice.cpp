@@ -968,7 +968,15 @@ QByteArray MPDevice::getMemoryFirstNodeAddress(void)
     if (isBLE())
     {
         /* BLE: Address format is 2 bytes little endian. last 1 bit is node number (for pages that can accomodate 2 nodes) and first 15 bits are page address */
-        return QByteArray::fromHex("0200");
+        auto flashMbSize = get_flashMbSize();
+        if (1 == flashMbSize || 2 == flashMbSize || 32 == flashMbSize)
+        {
+            return QByteArray::fromHex("0100");
+        }
+        else
+        {
+            return QByteArray::fromHex("0200");
+        }
     }
     /* Address format is 2 bytes little endian. last 3 bits are node number and first 13 bits are page address */
     switch(get_flashMbSize())
