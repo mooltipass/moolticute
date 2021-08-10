@@ -22,6 +22,7 @@ public:
     QByteArray getFreeAddress(const int virtualAddr);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, const MPDeviceProgressCb &cbProgress);
     void cleanFreeAddresses();
+    void addTestParentAddress(const int virtualAddr, QByteArray addr) { m_parentAddrMapping[virtualAddr] = addr; }
 
 private:
     /**

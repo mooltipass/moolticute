@@ -109,6 +109,8 @@ public:
     void exitMemMgmtMode(bool setMMMBool = true);
     void startIntegrityCheck(const std::function<void(bool success, int freeBlocks, int totalBlocks, QString errstr)> &cb,
                              const MPDeviceProgressCb &cbProgress);
+    void moveFetchedNodes(NodeList &sourceNodes, NodeList &sourceNodesClone, NodeList &destNodes, NodeList &destNodesClone, bool isParent);
+    void moveFetchedFido2Nodes();
 
     //Send current date to MP
     void setCurrentDate();
@@ -340,6 +342,8 @@ private:
     void checkLoadedDataNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::DataAddressType addrType);
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX,
                          Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
+    bool tagCredentialNodes(NodeList& nodes, NodeList& childNodes, Common::AddressType addrType, bool repairAllowed);
+    bool tagDataNodes(NodeList& dataNodes, NodeList& dataChildNodes, Common::DataAddressType addrType, bool repairAllowed);
     bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX,
                                  Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
@@ -497,6 +501,7 @@ private:
     FilesCache filesCache;
 
     bool m_isDebugMsg = false;
+    bool m_isIntegrityCheck = false;
     //Message Protocol
     MPDeviceBleImpl *bleImpl = nullptr;
     DeviceSettings *pSettings = nullptr;

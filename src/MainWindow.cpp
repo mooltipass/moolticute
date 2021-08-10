@@ -807,7 +807,7 @@ void MainWindow::updatePage()
     ui->label_exportDBHelp->setVisible(!isCardUnknown);
     ui->label_MooltiAppHelp->setVisible(!isCardUnknown);
 
-    const bool integrityVisible = !isCardUnknown&& !wsClient->isMPBLE();
+    const bool integrityVisible = !isCardUnknown;
     ui->label_integrityCheck->setVisible(integrityVisible);
     ui->label_integrityCheckDesc->setVisible(integrityVisible);
     ui->pushButtonIntegrity->setVisible(integrityVisible);
