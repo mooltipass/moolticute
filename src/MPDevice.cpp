@@ -1543,7 +1543,7 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
             //Load next child
             if (cnode->getNextChildDataAddress() != MPNode::EmptyAddress)
             {
-                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress(), cbProgress, nbBytesFetched + dataEncSize);
+                loadDataChildNode(jobs, parent, parentClone, cnode->getNextChildDataAddress(), cbProgress, nbBytesFetched + dataEncSize, addrType);
             }
             else
             {
