@@ -465,13 +465,13 @@ private:
     QList<QByteArray> importedCpzCtrValue;
     QList<QByteArray> importedFavoritesAddrs;
     NodeList importedLoginNodes;         //list of all parent nodes for credentials
-    NodeList importedLoginChildNodes;    //list of all parent nodes for credentials
+    NodeList importedLoginChildNodes;    //list of all parent child for credentials
     NodeList importedDataNodes;          //list of all parent nodes for data nodes
-    NodeList importedDataChildNodes;     //list of all parent nodes for data nodes
-    NodeList importedWebauthnLoginNodes;         //list of all parent nodes for credentials
-    NodeList importedWebauthnLoginChildNodes;    //list of all parent nodes for credentials
+    NodeList importedDataChildNodes;     //list of all parent child for data nodes
+    NodeList importedWebauthnLoginNodes;         //list of all parent nodes for webauthn
+    NodeList importedWebauthnLoginChildNodes;    //list of all child nodes for webauthn
     NodeList importedNoteNodes;          //list of all parent nodes for note nodes
-    NodeList importedNoteChildNodes;     //list of all parent nodes for note nodes
+    NodeList importedNoteChildNodes;     //list of all child nodes for note nodes
     QMap<ExportPayloadData, NodeList*> importNodeMap;
 
     //WebAuthn datas
