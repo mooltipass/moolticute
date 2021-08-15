@@ -1549,6 +1549,34 @@ void MPDeviceBleImpl::generateExportData(QJsonArray &exportTopArray)
     exportTopArray.append(QJsonValue(bleSettings->get_user_language()));
     exportTopArray.append(QJsonValue(bleSettings->get_keyboard_bt_layout()));
     exportTopArray.append(QJsonValue(bleSettings->get_keyboard_usb_layout()));
+
+    if (isNoteAvailable())
+    {
+        /* Notes parent nodes */
+        QJsonArray notesJsonArray = QJsonArray{};
+        auto& note = mpDev->notesLoginNodes;
+        for (qint32 i = 0; i < note.size(); i++)
+        {
+            QJsonObject noteObject = QJsonObject();
+            noteObject["address"] = QJsonValue(Common::bytesToJson(note[i]->getAddress()));
+            noteObject["name"] = QJsonValue(note[i]->getService());
+            noteObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(note[i]->getNodeData()));
+            notesJsonArray.append(QJsonValue(noteObject));
+        }
+        exportTopArray.append(QJsonValue(notesJsonArray));
+        /* Notes child nodes */
+        notesJsonArray = QJsonArray{};
+        auto& noteChild = mpDev->notesLoginChildNodes;
+        for (qint32 i = 0; i < noteChild.size(); i++)
+        {
+            QJsonObject noteChildObject = QJsonObject();
+            noteChildObject["address"] = QJsonValue(Common::bytesToJson(noteChild[i]->getAddress()));
+            noteChildObject["data"] = QJsonValue(Common::bytesToJsonObjectArray(noteChild[i]->getNodeData()));
+            noteChildObject["pointed"] = QJsonValue(false);
+            notesJsonArray.append(QJsonValue(noteChildObject));
+        }
+        exportTopArray.append(QJsonValue(notesJsonArray));
+    }
 }
 
 void MPDeviceBleImpl::addUnknownCardPayload(const QJsonValue &val)

@@ -247,7 +247,9 @@ protected:
         EXPORT_SECURITY_SETTINGS_INDEX = 18,
         EXPORT_USER_LANG_INDEX = 19,
         EXPORT_BT_LAYOUT_INDEX = 20,
-        EXPORT_USB_LAYOUT_INDEX = 21
+        EXPORT_USB_LAYOUT_INDEX = 21,
+        EXPORT_NOTES_NODES_INDEX = 22,
+        EXPORT_NOTES_CHILD_NODES_INDEX = 23
     };
 
     void resetCommunication();
@@ -316,7 +318,7 @@ private:
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
     void startImportFileMerging(const MPDeviceProgressCb &progressCb, MessageHandlerCb cb, bool noDelete);
     bool checkImportedLoginNodes(const MessageHandlerCb &cb, Common::AddressType addrType);
-    bool checkImportedDataNodes(const MessageHandlerCb &cb);
+    bool checkImportedDataNodes(const MessageHandlerCb &cb, Common::DataAddressType addrType);
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress);
     void incrementNeededAddresses(MPNode::NodeType type);
     MPNode *findNodeWithAddressWithGivenParentInList(NodeList list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr);
@@ -336,7 +338,8 @@ private:
     bool tagFavoriteNodes(void);
 
     // Functions added by mathieu for MMM : checks & repairs
-    bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    bool addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool addPossibleChildren, Common::AddressType addrType = Common::CRED_ADDR_IDX,
+                             Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido = false, bool checkNotes = false);
     void checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::AddressType addrType);
     void checkLoadedDataNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::DataAddressType addrType);
@@ -344,7 +347,8 @@ private:
                          Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool tagCredentialNodes(NodeList& nodes, NodeList& childNodes, Common::AddressType addrType, bool repairAllowed);
     bool tagDataNodes(NodeList& dataNodes, NodeList& dataChildNodes, Common::DataAddressType addrType, bool repairAllowed);
-    bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    bool addOrphanParentChildsToDB(MPNode *parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX,
+                                   Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX,
                                  Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool readExportFile(const QByteArray &fileData, QString &errorString);
@@ -466,6 +470,8 @@ private:
     NodeList importedDataChildNodes;     //list of all parent nodes for data nodes
     NodeList importedWebauthnLoginNodes;         //list of all parent nodes for credentials
     NodeList importedWebauthnLoginChildNodes;    //list of all parent nodes for credentials
+    NodeList importedNoteNodes;          //list of all parent nodes for note nodes
+    NodeList importedNoteChildNodes;     //list of all parent nodes for note nodes
     QMap<ExportPayloadData, NodeList*> importNodeMap;
 
     //WebAuthn datas
