@@ -21,6 +21,10 @@ public:
     void setWsClient(WSClient *c);
     void clearWidgets();
 
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void keyReleaseEvent(QKeyEvent *event) override;
+
 private slots:
     void on_btnFileBrowser_clicked();
 

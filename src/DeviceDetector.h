@@ -37,6 +37,9 @@ public:
     void setIsConnectedWithBluetooth(bool bt) { m_isConnectedWithBluetooth = bt; }
     quint8 getBattery() const { return m_battery; }
     void setBattery(quint8 battery) { m_battery = battery; }
+    void ctrlPressed() { m_isCtrlPressed = true; }
+    void ctrlReleased() { m_isCtrlPressed = false; }
+    bool isCtrlPressed() const { return m_isCtrlPressed; }
 
 signals:
     void deviceChanged(Common::MPHwVersion newDevType);
@@ -49,6 +52,7 @@ private:
     bool m_advancedMode = false;
     bool m_isConnectedWithBluetooth = false;
     quint8 m_battery = 0;
+    bool m_isCtrlPressed = false;
 };
 
 #endif // DEVICEDETECTOR_H
