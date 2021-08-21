@@ -61,6 +61,22 @@ void BleDev::clearWidgets()
     ui->label_UploadProgress->hide();
 }
 
+void BleDev::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Control)
+    {
+        DeviceDetector::instance().ctrlPressed();
+    }
+}
+
+void BleDev::keyReleaseEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Control)
+    {
+        DeviceDetector::instance().ctrlReleased();
+    }
+}
+
 void BleDev::initUITexts()
 {
     const auto browseText = tr("Browse");
@@ -122,7 +138,7 @@ void BleDev::on_btnFileBrowser_clicked()
 {
     if (wsClient->get_status() != Common::NoBundle &&
         (DeviceDetector::instance().isConnectedWithBluetooth() ||
-        DeviceDetector::instance().getBattery() < MIN_BATTERY_PCT_FOR_UPLOAD))
+        (DeviceDetector::instance().getBattery() < MIN_BATTERY_PCT_FOR_UPLOAD && !DeviceDetector::instance().isCtrlPressed())))
     {
         QMessageBox::warning(this, tr("Battery too low for bundle upload"),
                              tr("Please have your device connected through USB and fully charged"));
@@ -133,6 +149,8 @@ void BleDev::on_btnFileBrowser_clicked()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select bundle file"),
                                             s.value("last_used_path/bundle_dir", QDir::homePath()).toString(),
                                             "*.img");
+
+    DeviceDetector::instance().ctrlReleased();
 
     if (fileName.isEmpty())
     {

@@ -2197,3 +2197,19 @@ void MainWindow::displayNotePage()
     ui->stackedWidget->setCurrentWidget(ui->pageNotes);
     updateTabButtons();
 }
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Control)
+    {
+        DeviceDetector::instance().ctrlPressed();
+    }
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Control)
+    {
+        DeviceDetector::instance().ctrlReleased();
+    }
+}

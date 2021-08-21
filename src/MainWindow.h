@@ -191,6 +191,10 @@ private slots:
 
     void displayNotePage();
 
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void keyReleaseEvent(QKeyEvent *event) override;
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
     void setSecurityChallengeText(const QString &id = "XXXX");
