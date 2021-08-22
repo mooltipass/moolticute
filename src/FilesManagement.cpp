@@ -590,7 +590,7 @@ void FilesManagement::addUpdateFile(QString service, QString filename, QProgress
     }
 
     QFile f(filename);
-    if (!f.open(QFile::ReadWrite))
+    if (!f.open(QFile::ReadOnly))
     {
         QMessageBox::warning(this, tr("Failure"), tr("Unable to open file '%1' for read!").arg(filename));
         return;
