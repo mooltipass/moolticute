@@ -63,7 +63,6 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     setFilterCredLayout();
 
     ui->pushButtonCancel->setText(tr("Discard changes"));
-    ui->pushButtonCancel->setFixedWidth(108);
     connect(ui->pushButtonCancel, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::on_pushButtonCancel_clicked);
 
     ui->pushButtonDelete->setStyleSheet(CSS_BLUE_BUTTON);
