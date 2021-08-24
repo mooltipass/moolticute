@@ -284,6 +284,9 @@ private:
     static constexpr int SECURITY_CHALLENGE_LENGTH = 40;
 
     const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
+    static const QString MANUAL_STRING;
+    static const QString BLE_MANUAL_URL;
+    static const QString MINI_MANUAL_URL;
 #ifdef Q_OS_MAC
     static constexpr int MAC_DEFAULT_HEIGHT = 500;
 #endif
