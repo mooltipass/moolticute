@@ -568,6 +568,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         ui->labelSecurityChallengeIcon->setVisible(false);
     });
 
+    ui->UIDRequestGB->hide();
+    ui->groupBoxSecurityChallenge->hide();
+
     ui->lineEditChallengeString->setValidator(new QRegularExpressionValidator(
                                                   QRegularExpression(Common::HEX_REGEXP.arg(SECURITY_CHALLENGE_LENGTH)),
                                                   ui->UIDRequestKeyInput));
