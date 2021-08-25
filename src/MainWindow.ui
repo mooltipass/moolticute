@@ -3148,6 +3148,18 @@ Hint: keep your mouse positioned over an option to get more details.</string>
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label_UserManual">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>User Manual</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="verticalSpacer_15">
           <property name="orientation">
            <enum>Qt::Vertical</enum>

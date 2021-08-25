@@ -36,7 +36,9 @@ const QString MainWindow::TAB_STRING = tr("Tab");
 const QString MainWindow::ENTER_STRING = tr("Enter");
 const QString MainWindow::SPACE_STRING = tr("Space");
 const QString MainWindow::DEFAULT_KEY_STRING = tr("Default Key");
-
+const QString MainWindow::MANUAL_STRING = "<a href=\"%1\">" + tr("User Manual") + "</a>";
+const QString MainWindow::BLE_MANUAL_URL = "https://raw.githubusercontent.com/mooltipass/minible/master/MooltipassMiniBLEUserManual.pdf";
+const QString MainWindow::MINI_MANUAL_URL = "https://raw.githubusercontent.com/limpkin/mooltipass/master/user_manual_mini.pdf";
 void MainWindow::initHelpLabels()
 {
     auto getFontAwesomeIconPixmap = [=](int character, QSize size = QSize(20, 20))
@@ -635,6 +637,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->label_charging->setPixmap(ui->label_charging->pixmap()->scaled(13,25, Qt::KeepAspectRatio));
     ui->label_charging->hide();
 
+    ui->label_UserManual->hide();
+    ui->label_UserManual->setTextFormat(Qt::RichText);
+    ui->label_UserManual->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    ui->label_UserManual->setOpenExternalLinks(true);
+
     updateSerialInfos();
     updatePage();
 
@@ -911,6 +918,8 @@ void MainWindow::updateSerialInfos() {
         //When ble is detected not displaying fw version
         ui->labelAboutFwVers->setVisible(!wsClient->isMPBLE());
         ui->labelAboutFwVersValue->setVisible(!wsClient->isMPBLE());
+        ui->label_UserManual->setText(MANUAL_STRING.arg(wsClient->isMPBLE() ? BLE_MANUAL_URL : MINI_MANUAL_URL));
+        ui->label_UserManual->show();
     }
     else
     {
@@ -923,6 +932,7 @@ void MainWindow::updateSerialInfos() {
         wsClient->set_auxMCUVersion(NONE_STRING);
         wsClient->set_mainMCUVersion(NONE_STRING);
         wsClient->set_bundleVersion(0);
+        ui->label_UserManual->hide();
     }
 }
 
