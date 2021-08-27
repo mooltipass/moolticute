@@ -654,6 +654,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->checkBoxDebugHttp->setChecked(s.value("settings/http_dev_server").toBool());
     ui->checkBoxDebugLog->setChecked(s.value("settings/enable_dev_log").toBool());
+    ui->checkBoxBackupNotification->setChecked(s.value("settings/backup_notification", true).toBool());
     ui->spinBoxDefaultPwdLength->setValue(s.value("settings/default_password_length", Common::DEFAULT_PASSWORD_LENGTH).toInt());
 #ifdef Q_OS_MAC
     resize(width(), MAC_DEFAULT_HEIGHT);
@@ -1365,6 +1366,11 @@ bool MainWindow::isHttpDebugChecked()
 bool MainWindow::isDebugLogChecked()
 {
     return ui->checkBoxDebugLog->isChecked();
+}
+
+bool MainWindow::isBackupNotification() const
+{
+    return ui->checkBoxBackupNotification->isChecked();
 }
 
 void MainWindow::on_checkBoxSSHAgent_stateChanged(int)
@@ -2225,4 +2231,10 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
     {
         DeviceDetector::instance().ctrlReleased();
     }
+}
+
+void MainWindow::on_checkBoxBackupNotification_stateChanged(int)
+{
+    QSettings s;
+    s.setValue("settings/backup_notification", isBackupNotification());
 }

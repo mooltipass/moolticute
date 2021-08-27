@@ -97,6 +97,11 @@ void DbBackupsTrackerController::handleCardDbMetadataChanged(QString cardId,
 
 void DbBackupsTrackerController::askForImportBackup()
 {
+    if (!window->isBackupNotification())
+    {
+        qDebug() << "Backup notification is disabled";
+        return;
+    }
     askImportMessage = new QMessageBox(window);
     askImportMessage->setWindowTitle(tr("Import db backup"));
     askImportMessage->setText(tr("Credentials in the backup file are more recent. "
@@ -133,6 +138,11 @@ void DbBackupsTrackerController::importDbBackup(QString data)
 void DbBackupsTrackerController::handleGreaterDbBackupChangeNumber()
 {
     qDebug() << "Backup file is greater than device";
+    if (!window->isBackupNotification())
+    {
+        qDebug() << "Backup notification is disabled";
+        return;
+    }
 
     hideExportRequestIfVisible();
     hideImportRequestIfVisible();
@@ -141,6 +151,12 @@ void DbBackupsTrackerController::handleGreaterDbBackupChangeNumber()
 
 void DbBackupsTrackerController::askForExportBackup()
 {
+    if (!window->isBackupNotification())
+    {
+        qDebug() << "Backup notification is disabled";
+        return;
+    }
+
     std::function<void()> onAccept = [this]()
     {
         exportDbBackup();
@@ -183,6 +199,11 @@ void DbBackupsTrackerController::exportDbBackup()
 void DbBackupsTrackerController::handleLowerDbBackupChangeNumber()
 {
     qDebug() << "Device is newer than backup";
+    if (!window->isBackupNotification())
+    {
+        qDebug() << "Backup notification is disabled";
+        return;
+    }
 
     hideImportRequestIfVisible();
     hideExportRequestIfVisible();

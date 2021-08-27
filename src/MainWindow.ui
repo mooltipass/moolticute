@@ -4058,6 +4058,37 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </layout>
             </item>
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_66">
+              <item>
+               <widget class="QLabel" name="label_DisableBackup">
+                <property name="text">
+                 <string>Backup Notification Banner</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_57">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxBackupNotification">
+                <property name="text">
+                 <string>Enable Backup Notification</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
              <spacer name="horizontalSpacer_44">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
