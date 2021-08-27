@@ -57,6 +57,7 @@ public:
 
     bool isHttpDebugChecked();
     bool isDebugLogChecked();
+    bool isBackupNotification() const;
     bool getOriginalBTKeyboardLayout() const { return m_keyboardBTLayoutOrigValue; }
     bool getOriginalUsbKeyboardLayout() const { return m_keyboardUsbLayoutOrigValue; }
     bool getActualBTKeyboardLayout() const { return m_keyboardBTLayoutActualValue; }
@@ -190,6 +191,8 @@ private slots:
     void on_pushButtonSettingsSetToDefault_clicked();
 
     void displayNotePage();
+
+    void on_checkBoxBackupNotification_stateChanged(int arg1);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
