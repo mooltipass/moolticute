@@ -27,6 +27,7 @@
 #include "PromptWidget.h"
 #include "SettingsGuiHelper.h"
 #include "DeviceDetector.h"
+#include "SystemNotifications/SystemNotification.h"
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -278,6 +279,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             {
                 DeviceDetector::instance().setBattery(battery);
                 ui->pbBleBattery->setValue(battery);
+                if (battery < BATTERY_WARNING_LIMIT && !ui->label_charging->isVisible())
+                {
+                    SystemNotification::instance().createNotification(tr("Low Battery"), tr("Battery is below %1%, please charge your device.").arg(BATTERY_WARNING_LIMIT));
+                }
             });
 
     connect(wsClient, &WSClient::updateChargingStatus,

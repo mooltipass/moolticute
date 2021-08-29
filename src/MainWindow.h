@@ -285,6 +285,7 @@ private:
     static constexpr quint16 NO_PWD_PROMPT_MASK = 0x20;
     static constexpr int UID_REQUEST_LENGTH = 32;
     static constexpr int SECURITY_CHALLENGE_LENGTH = 40;
+    static constexpr int BATTERY_WARNING_LIMIT = 30;
 
     const QString HIBP_URL = "https://haveibeenpwned.com/Passwords";
     static const QString MANUAL_STRING;
