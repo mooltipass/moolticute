@@ -281,7 +281,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->pbBleBattery->setValue(battery);
                 if (battery < BATTERY_WARNING_LIMIT && !ui->label_charging->isVisible())
                 {
-                    SystemNotification::instance().createNotification(tr("Low Battery"), tr("Battery is bellow %1%, please charge your device.").arg(BATTERY_WARNING_LIMIT));
+                    SystemNotification::instance().createNotification(tr("Low Battery"), tr("Battery is below %1%, please charge your device.").arg(BATTERY_WARNING_LIMIT));
                 }
             });
 
