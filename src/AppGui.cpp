@@ -230,7 +230,7 @@ bool AppGui::initialize()
 
         dRunning = false;
 
-        if (needRestart)
+        if (needRestart || QProcess::CrashExit == exitStatus)
         {
             QTimer::singleShot(1500, [=]()
             {
