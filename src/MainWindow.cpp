@@ -1768,7 +1768,6 @@ void MainWindow::displayBundleVersion()
         ui->pushButtonNotes->setVisible(wsClient->get_bundleVersion() >= 1);
         if (wsClient->get_bundleVersion() < Common::BLE_LATEST_BUNDLE_VERSION)
         {
-            qCritical() << "Serial: " << wsClient->get_hwSerial();
             ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(wsClient->get_hwSerial()));
             ui->labelBundleOutdatedText->show();
             ui->labelBundleOutdatedWarning->show();
