@@ -40,6 +40,8 @@ const QString MainWindow::DEFAULT_KEY_STRING = tr("Default Key");
 const QString MainWindow::MANUAL_STRING = "<a href=\"%1\">" + tr("User Manual") + "</a>";
 const QString MainWindow::BLE_MANUAL_URL = "https://raw.githubusercontent.com/mooltipass/minible/master/MooltipassMiniBLEUserManual.pdf";
 const QString MainWindow::MINI_MANUAL_URL = "https://raw.githubusercontent.com/limpkin/mooltipass/master/user_manual_mini.pdf";
+const QString MainWindow::BUNDLE_OUTDATED_TEXT = tr("New bundle update available <a href=\"https://www.themooltipass.com/updates/index.php?sn=%1\">here.</a>");
+
 void MainWindow::initHelpLabels()
 {
     auto getFontAwesomeIconPixmap = [=](int character, QSize size = QSize(20, 20))
@@ -494,6 +496,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         if (wsClient->isMPBLE())
         {
             setSecurityChallengeText(serialStr);
+            ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(serial));
         }
         else
         {
@@ -649,6 +652,13 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->label_UserManual->setTextFormat(Qt::RichText);
     ui->label_UserManual->setTextInteractionFlags(Qt::TextBrowserInteraction);
     ui->label_UserManual->setOpenExternalLinks(true);
+
+    ui->labelBundleOutdatedWarning->hide();
+    ui->labelBundleOutdatedWarning->setPixmap(AppGui::qtAwesome()->icon(fa::warning).pixmap(QSize(20, 20)));
+    ui->labelBundleOutdatedText->hide();
+    ui->labelBundleOutdatedText->setTextFormat(Qt::RichText);
+    ui->labelBundleOutdatedText->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    ui->labelBundleOutdatedText->setOpenExternalLinks(true);
 
     updateSerialInfos();
     updatePage();
@@ -1756,11 +1766,24 @@ void MainWindow::displayBundleVersion()
         ui->labelBundleVersion->setVisible(displayBundle);
         ui->labelBundleVersionValue->setVisible(displayBundle);
         ui->pushButtonNotes->setVisible(wsClient->get_bundleVersion() >= 1);
+        if (wsClient->get_bundleVersion() < Common::BLE_LATEST_BUNDLE_VERSION)
+        {
+            ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(wsClient->get_hwSerial()));
+            ui->labelBundleOutdatedText->show();
+            ui->labelBundleOutdatedWarning->show();
+        }
+        else
+        {
+            ui->labelBundleOutdatedText->hide();
+            ui->labelBundleOutdatedWarning->hide();
+        }
     }
     else
     {
         ui->labelBundleVersion->hide();
         ui->labelBundleVersionValue->hide();
+        ui->labelBundleOutdatedText->hide();
+        ui->labelBundleOutdatedWarning->hide();
     }
 }
 
