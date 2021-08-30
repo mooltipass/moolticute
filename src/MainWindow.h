@@ -291,6 +291,7 @@ private:
     static const QString MANUAL_STRING;
     static const QString BLE_MANUAL_URL;
     static const QString MINI_MANUAL_URL;
+    static const QString BUNDLE_OUTDATED_TEXT;
 #ifdef Q_OS_MAC
     static constexpr int MAC_DEFAULT_HEIGHT = 500;
 #endif
