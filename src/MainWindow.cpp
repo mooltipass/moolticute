@@ -40,7 +40,7 @@ const QString MainWindow::DEFAULT_KEY_STRING = tr("Default Key");
 const QString MainWindow::MANUAL_STRING = "<a href=\"%1\">" + tr("User Manual") + "</a>";
 const QString MainWindow::BLE_MANUAL_URL = "https://raw.githubusercontent.com/mooltipass/minible/master/MooltipassMiniBLEUserManual.pdf";
 const QString MainWindow::MINI_MANUAL_URL = "https://raw.githubusercontent.com/limpkin/mooltipass/master/user_manual_mini.pdf";
-const QString MainWindow::BUNDLE_OUTDATED_TEXT = tr("New bundle update available <a href=\"https://www.themooltipass.com/updates/index.php?sn=%1\">here.</a>");
+const QString MainWindow::BUNDLE_OUTDATED_TEXT = tr("New bundle update available <a href=\"https://www.themooltipass.com/updates/index.php?sn=%1&bundlev=%2\">here.</a>");
 
 void MainWindow::initHelpLabels()
 {
@@ -496,13 +496,19 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         if (wsClient->isMPBLE())
         {
             setSecurityChallengeText(serialStr);
-            ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(serial));
+            ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(serial).arg(wsClient->get_bundleVersion()));
         }
         else
         {
             setUIDRequestInstructionsWithId(serialStr);
         }
     });
+    connect(wsClient, &WSClient::bundleVersionChanged, [this](int bundleVersion)
+    {
+        ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(wsClient->get_hwSerial()).arg(bundleVersion));
+    });
+
+
     connect(wsClient, &WSClient::connectedChanged, [this] ()
     {
         if (wsClient->isMPBLE())
@@ -1768,7 +1774,7 @@ void MainWindow::displayBundleVersion()
         ui->pushButtonNotes->setVisible(wsClient->get_bundleVersion() >= 1);
         if (wsClient->get_bundleVersion() < Common::BLE_LATEST_BUNDLE_VERSION)
         {
-            ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(wsClient->get_hwSerial()));
+            ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(wsClient->get_hwSerial()).arg(wsClient->get_bundleVersion()));
             ui->labelBundleOutdatedText->show();
             ui->labelBundleOutdatedWarning->show();
         }
