@@ -44,6 +44,8 @@ private slots:
 
     void on_pushButtonClear_clicked();
 
+    void on_pushButtonSaveLog_clicked();
+
 private:
     Ui::WindowLog *ui;
 };

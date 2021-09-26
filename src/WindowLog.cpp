@@ -53,3 +53,40 @@ void WindowLog::changeEvent(QEvent *event)
         ui->retranslateUi(this);
     QMainWindow::changeEvent(event);
 }
+
+void WindowLog::on_pushButtonSaveLog_clicked()
+{
+    QSettings s;
+    QString fname = QFileDialog::getSaveFileName(this, tr("Save logs to file"),
+                                                 s.value("last_used_path/save_logs_dir", QDir::homePath()).toString(),
+                                                 "Text file (*.txt);;All files (*.*)");
+    if (!fname.isEmpty())
+    {
+#if defined(Q_OS_LINUX)
+        /**
+         * getSaveFileName is using native dialog
+         * On Linux it is not saving the choosen extension,
+         * so need to add it from code.
+         */
+        const QString TXT_EXT = ".txt";
+        if (!fname.endsWith(TXT_EXT))
+        {
+            fname += TXT_EXT;
+        }
+#endif
+        QFile f(fname);
+        if (!f.open(QFile::WriteOnly | QFile::Truncate))
+        {
+            QMessageBox::warning(this, tr("Error"), tr("Unable to write to file %1").arg(fname));
+        }
+        else
+        {
+            f.write(ui->plainTextEdit->toPlainText().toUtf8());
+            QMessageBox::information(this, tr("Moolticute"), tr("Successfully wrote logs to selected file."));
+        }
+        f.close();
+
+        s.setValue("last_used_path/save_logs_dir", QFileInfo(fname).canonicalPath());
+    }
+}
+
