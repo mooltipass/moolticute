@@ -243,6 +243,15 @@ void MPDevice::newDataRead(const QByteArray &data)
     bool isFirstBlePacket = isBLE() && bleImpl->isFirstPacket(data);
     if (isBLE())
     {
+        auto isFFCondition = [](char c) { return c == static_cast<char>(0xFF);};
+        if (std::all_of(data.begin(), data.end(), isFFCondition))
+        {
+            qCritical() << "Only 0xFF received as response, restore communication.";
+            // Flip message bit and resend the last message
+            bleImpl->flipMessageBit(commandQueue.head().data);
+            sendDataDequeue();
+            return;
+        }
         isDebugStartMsg = isFirstBlePacket && pMesProt->getCommand(data) == MPCmd::DEBUG;
     }
     else
