@@ -246,7 +246,7 @@ void MPDevice::newDataRead(const QByteArray &data)
         auto isFFCondition = [](char c) { return c == static_cast<char>(0xFF);};
         if (std::all_of(data.begin(), data.end(), isFFCondition))
         {
-            qCritical() << "Only 0xFF received as response, restore communication.";
+            qCritical() << "Only 0xFF received as response, resend last message.";
             // Flip message bit and resend the last message
             bleImpl->flipMessageBit(commandQueue.head().data);
             sendDataDequeue();
