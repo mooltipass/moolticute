@@ -254,6 +254,8 @@ void NotesManagement::onEditingFinished()
         ui->labelError->hide();
         m_validNoteName = true;
     }
+    // Check save condition after note name entered
+    on_textEditNote_textChanged();
 }
 
 void NotesManagement::on_textEditNote_textChanged()
