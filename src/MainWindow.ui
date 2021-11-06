@@ -4753,6 +4753,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="TutorialWidget" name="tutorialWidget">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
@@ -4798,6 +4808,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
    <class>PromptWidget</class>
    <extends>QFrame</extends>
    <header>PromptWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TutorialWidget</class>
+   <extends>QFrame</extends>
+   <header>TutorialWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
