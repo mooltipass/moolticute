@@ -77,6 +77,7 @@ public:
     friend class SettingsGuiHelper;
     friend class SettingsGuiMini;
     friend class SettingsGuiBLE;
+    friend class TutorialWidget;
 
 signals:
     void windowCloseRequested();
