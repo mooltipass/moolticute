@@ -92,13 +92,14 @@ void TutorialWidget::onNextClicked()
 {
     if (m_current_index != -1)
     {
-        m_mw->ui->widgetHeader->setEnabled(true);
         m_tabs[m_current_index].button()->setEnabled(false);
     }
+    m_mw->ui->widgetHeader->setEnabled(true);
     m_current_index++;
     if (m_current_index >= m_tabs.size())
     {
         qCritical() << "No more tutorial page";
+        QMessageBox::information(this, tr("Tutorial finished"), tr("Congratulation, you have completed the tutorial..."));
         onExitClicked();
         return;
     }
