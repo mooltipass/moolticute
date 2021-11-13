@@ -2,7 +2,8 @@
 #define TUTORIALWIDGET_H
 
 #include <QFrame>
-#include <functional>
+
+#include "Common.h"
 
 class QLabel;
 class QPushButton;
@@ -20,8 +21,6 @@ class TutorialWidget : public QFrame
             m_tabButton {button},
             m_text{text}
         {}
-
-        TutorialPage operator=(TutorialPage other) { return TutorialPage{other.button(), other.text()};}
 
         QPushButton* button() const { return m_tabButton; }
         QString text() const { return m_text; }
@@ -46,6 +45,7 @@ public slots:
     void onNextClicked();
     void onDeviceConnected();
     void onDeviceDisconnected();
+    void onStatusChanged(Common::MPStatus status);
 
 
 private:

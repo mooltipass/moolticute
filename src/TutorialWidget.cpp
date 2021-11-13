@@ -7,8 +7,6 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-#include "Common.h"
-
 const QString TutorialWidget::TUTORIAL_HEADER_TEXT = tr("<b>Moolticute Tutorial - %1</b><br><br>");
 
 TutorialWidget::TutorialWidget(QWidget *parent) :
@@ -63,6 +61,7 @@ TutorialWidget::TutorialWidget(QWidget *parent) :
     {
         connect(m_mw->wsClient, &WSClient::deviceConnected, this, &TutorialWidget::onDeviceConnected);
         connect(m_mw->wsClient, &WSClient::deviceDisconnected, this, &TutorialWidget::onDeviceDisconnected);
+        connect(m_mw->wsClient, &WSClient::statusChanged, this, &TutorialWidget::onStatusChanged);
     }
 }
 
@@ -91,6 +90,9 @@ void TutorialWidget::onExitClicked()
     s.setValue("settings/tutorial_finished", true);
     m_tutorialFinished = true;
     hide();
+    disconnect(m_mw->wsClient, &WSClient::deviceConnected, this, &TutorialWidget::onDeviceConnected);
+    disconnect(m_mw->wsClient, &WSClient::deviceDisconnected, this, &TutorialWidget::onDeviceDisconnected);
+    disconnect(m_mw->wsClient, &WSClient::statusChanged, this, &TutorialWidget::onStatusChanged);
     m_mw->updateTabButtons();
 }
 
@@ -105,7 +107,7 @@ void TutorialWidget::onNextClicked()
     if (m_current_index >= m_tabs.size())
     {
         qCritical() << "No more tutorial page";
-        QMessageBox::information(this, tr("Tutorial finished"), tr("Congratulation, you have completed the tutorial..."));
+        QMessageBox::information(this, tr("Tutorial finished"), tr("Congratulation, you have completed the tutorial."));
         onExitClicked();
         return;
     }
@@ -134,10 +136,14 @@ void TutorialWidget::onDeviceConnected()
 {
     if (!m_tutorialFinished)
     {
-        bool connected = m_mw->wsClient->isConnected();
-        m_nextButton->setEnabled(connected);
-        if (!connected)
+        bool connected = m_mw->wsClient->isMPBLE();
+        if (connected)
         {
+            m_nextButton->setEnabled(Common::MPStatus::Unlocked == m_mw->wsClient->get_status());
+        }
+        else
+        {
+            m_nextButton->setEnabled(false);
             QMessageBox::warning(this, tr("Tutorial warning"), tr("Tutorial is only available for BLE device, please attach one or Exit tutorial."));
         }
     }
@@ -147,9 +153,17 @@ void TutorialWidget::onDeviceDisconnected()
 {
     if (!m_tutorialFinished)
     {
-        m_nextButton->setEnabled(true);
+        m_nextButton->setEnabled(false);
+        // Display connect device again
+        startTutorial();
+    }
+}
 
-        //TODO: Restart tutorial?
+void TutorialWidget::onStatusChanged(Common::MPStatus status)
+{
+    if (!m_tutorialFinished)
+    {
+        m_nextButton->setEnabled(Common::MPStatus::Unlocked == status);
     }
 }
 
@@ -176,5 +190,5 @@ void TutorialWidget::startTutorial()
     {
         m_nextButton->setEnabled(false);
     }
-    m_messageLabel->setText(TUTORIAL_HEADER_TEXT.arg("WELCOME") + tr("Welcome to Mooltice tutorial! Please connect your device and unlock it to continue the tutorial."));
+    m_messageLabel->setText(TUTORIAL_HEADER_TEXT.arg("Welcome") + tr("Welcome to Mooltice tutorial! Please connect your device and unlock it to continue the tutorial."));
 }
