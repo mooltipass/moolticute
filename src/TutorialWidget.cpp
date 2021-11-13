@@ -58,6 +58,12 @@ TutorialWidget::TutorialWidget(QWidget *parent) :
         startTutorial();
         show();
     }
+
+    if (!m_tutorialFinished)
+    {
+        connect(m_mw->wsClient, &WSClient::deviceConnected, this, &TutorialWidget::onDeviceConnected);
+        connect(m_mw->wsClient, &WSClient::deviceDisconnected, this, &TutorialWidget::onDeviceDisconnected);
+    }
 }
 
 TutorialWidget::~TutorialWidget()
@@ -106,10 +112,13 @@ void TutorialWidget::onNextClicked()
     QPushButton *button = m_tabs[m_current_index].button();
     button->setEnabled(true);
     QWidget* page = nullptr;
-    foreach (QPushButton* v, m_mw->m_tabMap) {
-            if (v == button)
-               page = m_mw->m_tabMap.key(button);
+    for (auto* tabButton : m_mw->m_tabMap)
+    {
+        if (tabButton == button)
+        {
+           page = m_mw->m_tabMap.key(button);
         }
+    }
     if (page)
     {
         m_mw->ui->stackedWidget->setCurrentWidget(page);
@@ -121,23 +130,51 @@ void TutorialWidget::onNextClicked()
     m_messageLabel->setText(TUTORIAL_HEADER_TEXT.arg(button->text()) + m_tabs[m_current_index].text());
 }
 
+void TutorialWidget::onDeviceConnected()
+{
+    if (!m_tutorialFinished)
+    {
+        bool connected = m_mw->wsClient->isConnected();
+        m_nextButton->setEnabled(connected);
+        if (!connected)
+        {
+            QMessageBox::warning(this, tr("Tutorial warning"), tr("Tutorial is only available for BLE device, please attach one or Exit tutorial."));
+        }
+    }
+}
+
+void TutorialWidget::onDeviceDisconnected()
+{
+    if (!m_tutorialFinished)
+    {
+        m_nextButton->setEnabled(true);
+
+        //TODO: Restart tutorial?
+    }
+}
+
 void TutorialWidget::initTutorial()
 {
     Ui::MainWindow* ui = m_mw->ui;
     m_tabs = {
-        {ui->pushButtonDevSettings, tr("test Device Settings") + "<br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum venenatis sollicitudin erat, eget gravida mi elementum vel.<br>Integer sit amet faucibus lorem. Pellentesque mattis congue massa, vel laoreet ligula vulputate nec.<br>Curabitur pellentesque vitae neque vel placerat. Suspendisse erat ipsum, sodales et pulvinar non, iaculis eget ligula.<br>Sed vitae velit ultricies, dapibus nisl eu, malesuada magna. Phasellus sit amet pellentesque dolor, quis suscipit eros."},
-        {ui->pushButtonCred, tr("test Credentials")},
-        {ui->pushButtonNotes, tr("test Notes")},
-        {ui->pushButtonFiles, tr("test Files")},
-        {ui->pushButtonFido, tr("test Fido")},
-        {ui->pushButtonSync, tr("test Sync")},
-        {ui->pushButtonAppSettings, tr("test App Settigns")},
-        {ui->pushButtonAbout, tr("test About")}
+        {ui->pushButtonDevSettings, tr("You can use the ‘Device Settings’ tab to change parameters on your Mooltipass device.<br>Hovering the mouse pointer over an option will gives a short description of what that option does.")},
+        {ui->pushButtonCred, tr("In case you aren't using our browser extensions, this tab allows you to manually add credentials to your database.<br>By clicking the \"Enter Credentials Management Mode\" button, you will be able to visualize and<br>modify the credentials stored on your database.")},
+        {ui->pushButtonNotes, tr("This tab allows you to securely store text on your device. Simply add a new note, set a title and type its contents.")},
+        {ui->pushButtonFiles, tr("The Mooltipass device can operate as a flash drive.<br>The ‘Files’ tab allows you to add, store and access small files on your Mooltipass.")},
+        {ui->pushButtonFido, tr("Similarly to the credentials tab, the FIDO2 tab allows you to visualize and delete FIDO2 credentials stored on your device.")},
+        {ui->pushButtonSync, tr("The different buttons in the synchronization tab will allow you to backup and<br>restore the credentials you have stored inside the memory of your Mooltipass.<br>You can also select a backup monitoring file to make sure your Mooltipass database is always in sync with it.")},
+        {ui->pushButtonAppSettings, tr("The ‘Settings’ tab lets you change parameters on the Moolticute app.")},
+        {ui->pushButtonAbout, tr("Finally, the ‘About’ tab provides you with general information about your device and app.<br>It allows you to check that you are running the latest version of Moolticute.")}
     };
 }
 
 void TutorialWidget::startTutorial()
 {
     m_current_index = -1;
+    auto connected = m_mw->wsClient->isConnected();
+    if (!connected)
+    {
+        m_nextButton->setEnabled(false);
+    }
     m_messageLabel->setText(TUTORIAL_HEADER_TEXT.arg("WELCOME") + tr("Welcome to Mooltice tutorial! Please connect your device and unlock it to continue the tutorial."));
 }

@@ -44,6 +44,8 @@ signals:
 public slots:
     void onExitClicked();
     void onNextClicked();
+    void onDeviceConnected();
+    void onDeviceDisconnected();
 
 
 private:
