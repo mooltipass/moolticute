@@ -2274,3 +2274,8 @@ void MainWindow::on_checkBoxBackupNotification_stateChanged(int)
     QSettings s;
     s.setValue("settings/backup_notification", isBackupNotification());
 }
+
+void MainWindow::on_checkBoxTutorial_stateChanged(int arg1)
+{
+    ui->tutorialWidget->changeTutorialFinished(Qt::Checked == arg1);
+}

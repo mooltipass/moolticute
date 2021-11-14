@@ -37,6 +37,7 @@ public:
     void setText(const QString &text);
     bool isTutorialFinished() const { return m_tutorialFinished; }
     void displayCurrentTab();
+    void changeTutorialFinished(bool enabled);
 
 signals:
 
@@ -62,6 +63,7 @@ private:
     int m_current_index = 0;
 
     static const QString TUTORIAL_HEADER_TEXT;
+    static const QString TUTORIAL_FINISHED_SETTING;
 };
 
 #endif // TUTORIALWIDGET_H

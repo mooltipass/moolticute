@@ -8,6 +8,7 @@
 #include "ui_MainWindow.h"
 
 const QString TutorialWidget::TUTORIAL_HEADER_TEXT = tr("<b>Moolticute Tutorial - %1</b><br><br>");
+const QString TutorialWidget::TUTORIAL_FINISHED_SETTING = "settings/tutorial_finished";
 
 TutorialWidget::TutorialWidget(QWidget *parent) :
     QFrame(parent),
@@ -44,7 +45,7 @@ TutorialWidget::TutorialWidget(QWidget *parent) :
     connect(m_nextButton, &QPushButton::clicked, this, &TutorialWidget::onNextClicked);
 
     QSettings s;
-    m_tutorialFinished = s.value("settings/tutorial_finished", false).toBool();
+    m_tutorialFinished = s.value(TUTORIAL_FINISHED_SETTING, false).toBool();
     m_mw = static_cast<MainWindow*>(parent->parent());
     if (m_tutorialFinished)
     {
@@ -84,10 +85,16 @@ void TutorialWidget::displayCurrentTab()
     }
 }
 
+void TutorialWidget::changeTutorialFinished(bool enabled)
+{
+    QSettings s;
+    s.setValue(TUTORIAL_FINISHED_SETTING, !enabled);
+}
+
 void TutorialWidget::onExitClicked()
 {
     QSettings s;
-    s.setValue("settings/tutorial_finished", true);
+    s.setValue(TUTORIAL_FINISHED_SETTING, true);
     m_tutorialFinished = true;
     hide();
     disconnect(m_mw->wsClient, &WSClient::deviceConnected, this, &TutorialWidget::onDeviceConnected);

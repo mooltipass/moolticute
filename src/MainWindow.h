@@ -195,6 +195,8 @@ private slots:
 
     void on_checkBoxBackupNotification_stateChanged(int arg1);
 
+    void on_checkBoxTutorial_stateChanged(int arg1);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
