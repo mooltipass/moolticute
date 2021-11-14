@@ -39,8 +39,6 @@ public:
     void displayCurrentTab();
     void changeTutorialFinished(bool enabled);
 
-signals:
-
 public slots:
     void onExitClicked();
     void onNextClicked();

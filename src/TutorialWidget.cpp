@@ -34,7 +34,6 @@ TutorialWidget::TutorialWidget(QWidget *parent) :
     m_messageLabel->setTextFormat(Qt::RichText);
     m_messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     m_messageLabel->setOpenExternalLinks(true);
-    //m_messageLabel->setWordWrap(true);
 
     m_nextButton->setText(tr("Next"));
     m_nextButton->setStyleSheet(CSS_BLUE_BUTTON);
