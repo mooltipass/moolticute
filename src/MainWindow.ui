@@ -4107,6 +4107,49 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </layout>
             </item>
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_37">
+              <item>
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Display Moolticute Tutorial</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="labelTutorialRestart">
+                <property name="font">
+                 <font>
+                  <italic>true</italic>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>(Restart Needed)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_36">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxTutorial">
+                <property name="text">
+                 <string>Display tutorial</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
              <spacer name="horizontalSpacer_44">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -4753,6 +4796,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="TutorialWidget" name="tutorialWidget">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
@@ -4798,6 +4851,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
    <class>PromptWidget</class>
    <extends>QFrame</extends>
    <header>PromptWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TutorialWidget</class>
+   <extends>QFrame</extends>
+   <header>TutorialWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

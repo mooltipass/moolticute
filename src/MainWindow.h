@@ -77,6 +77,7 @@ public:
     friend class SettingsGuiHelper;
     friend class SettingsGuiMini;
     friend class SettingsGuiBLE;
+    friend class TutorialWidget;
 
 signals:
     void windowCloseRequested();
@@ -193,6 +194,8 @@ private slots:
     void displayNotePage();
 
     void on_checkBoxBackupNotification_stateChanged(int arg1);
+
+    void on_checkBoxTutorial_stateChanged(int arg1);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;

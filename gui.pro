@@ -29,6 +29,7 @@ SOURCES += src/main_gui.cpp \
     src/ParseDomain.cpp \
     src/Common.cpp \
     src/TOTPCredential.cpp \
+    src/TutorialWidget.cpp \
     src/WSClient.cpp \
     src/RotateSpinner.cpp \
     src/AppGui.cpp \
@@ -82,6 +83,7 @@ HEADERS  += src/MainWindow.h \
     src/Common.h \
     src/QtHelper.h \
     src/TOTPCredential.h \
+    src/TutorialWidget.h \
     src/WSClient.h \
     src/RotateSpinner.h \
     src/utils/GridLayoutUtil.h \

@@ -1149,8 +1149,11 @@ void MainWindow::handleBackupImported()
 
 void MainWindow::showPrompt(PromptMessage * message)
 {
-    ui->promptWidget->setPromptMessage(message);
-    ui->promptWidget->show();
+    if (ui->tutorialWidget->isTutorialFinished())
+    {
+        ui->promptWidget->setPromptMessage(message);
+        ui->promptWidget->show();
+    }
 }
 
 void MainWindow::hidePrompt()
@@ -1607,6 +1610,13 @@ void MainWindow::updateTabButtons()
             }
         }
     };
+
+    if (!ui->tutorialWidget->isTutorialFinished())
+    {
+        setEnabledToAllTabButtons(false);
+        ui->tutorialWidget->displayCurrentTab();
+        return;
+    }
 
     if (ui->stackedWidget->currentWidget() == ui->pageWaiting)
     {
@@ -2263,4 +2273,9 @@ void MainWindow::on_checkBoxBackupNotification_stateChanged(int)
 {
     QSettings s;
     s.setValue("settings/backup_notification", isBackupNotification());
+}
+
+void MainWindow::on_checkBoxTutorial_stateChanged(int arg1)
+{
+    ui->tutorialWidget->changeTutorialFinished(Qt::Checked == arg1);
 }
