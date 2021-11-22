@@ -2257,7 +2257,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Control)
     {
-        DeviceDetector::instance().ctrlPressed();
+        DeviceDetector::instance().shiftPressed();
     }
 }
 
@@ -2265,7 +2265,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Control)
     {
-        DeviceDetector::instance().ctrlReleased();
+        DeviceDetector::instance().shiftReleased();
     }
 }
 
