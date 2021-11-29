@@ -477,7 +477,10 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
                                         qWarning() << "Credential get failed";
                                         cb(false, "Get credential failed", QByteArray{});
                                     }
-                                    getFallbackServiceCredential(jobs, fallbackService, login, cb);
+                                    else
+                                    {
+                                        getFallbackServiceCredential(jobs, fallbackService, login, cb);
+                                    }
                                     return true;
                                 }
                                 qDebug() << "Credential got successfully";
