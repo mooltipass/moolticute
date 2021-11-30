@@ -2259,6 +2259,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     {
         DeviceDetector::instance().shiftPressed();
     }
+    if (!ui->tutorialWidget->isTutorialFinished() && event->key() == Qt::Key_Escape)
+    {
+        ui->tutorialWidget->onExitClicked();
+    }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
