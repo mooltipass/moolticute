@@ -50,10 +50,12 @@ public slots:
 private:
     void initTutorial();
     void startTutorial();
+    void setupLabel(QLabel* label);
 
 
     MainWindow *m_mw;
     QLabel *m_messageLabel;
+    QLabel *m_titleLabel;
     QPushButton *m_nextButton;
     QPushButton *m_exitButton;
     QList<TutorialPage> m_tabs;
@@ -62,6 +64,10 @@ private:
 
     static const QString TUTORIAL_HEADER_TEXT;
     static const QString TUTORIAL_FINISHED_SETTING;
+    static constexpr int TUTORIAL_MAX_HEIGHT = 200;
+    static constexpr int TUTORIAL_LABEL_WIDTH = 700;
+    static constexpr int TUTORIAL_TEXT_SPACING = 12;
+    static constexpr int TUTORIAL_FONT_SIZE = 12;
 };
 
 #endif // TUTORIALWIDGET_H

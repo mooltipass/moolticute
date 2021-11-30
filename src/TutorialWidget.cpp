@@ -7,33 +7,38 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-const QString TutorialWidget::TUTORIAL_HEADER_TEXT = tr("<b>Moolticute Tutorial - %1</b><br><br>");
+const QString TutorialWidget::TUTORIAL_HEADER_TEXT = tr("<b>Moolticute Tutorial - %1</b>");
 const QString TutorialWidget::TUTORIAL_FINISHED_SETTING = "settings/tutorial_finished";
 
 TutorialWidget::TutorialWidget(QWidget *parent) :
     QFrame(parent),
     m_messageLabel{new QLabel},
+    m_titleLabel{new QLabel},
     m_nextButton{new QPushButton},
     m_exitButton{new QPushButton}
 {
+    setMaximumHeight(TUTORIAL_MAX_HEIGHT);
     QHBoxLayout *lay = new QHBoxLayout(this);
     setLayout(lay);
 
-    m_messageLabel->setMinimumWidth(600);
+    setupLabel(m_titleLabel);
+    setupLabel(m_messageLabel);
 
-    lay->addStretch();
-    lay->addWidget(m_messageLabel);
+    QVBoxLayout *tutorialTextLayout = new QVBoxLayout(this);
+    tutorialTextLayout->addStretch();
+    tutorialTextLayout->addWidget(m_titleLabel);
+    tutorialTextLayout->addWidget(m_messageLabel);
+    tutorialTextLayout->setSpacing(TUTORIAL_TEXT_SPACING);
+    tutorialTextLayout->addStretch();
+    m_messageLabel->setWordWrap(true);
+
+    lay->addLayout(tutorialTextLayout);
     lay->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
     lay->addWidget(m_nextButton);
     lay->addWidget(m_exitButton);
     lay->addStretch();
 
-    setStyleSheet("TutorialWidget {border: 15px solid #60B1C7;}");
-
-    m_messageLabel->setAlignment(Qt::AlignCenter);
-    m_messageLabel->setTextFormat(Qt::RichText);
-    m_messageLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    m_messageLabel->setOpenExternalLinks(true);
+    setStyleSheet("TutorialWidget {border: 15px solid #60B1C7; border-color: red;} ");
 
     m_nextButton->setText(tr("Next"));
     m_nextButton->setStyleSheet(CSS_BLUE_BUTTON);
@@ -135,7 +140,8 @@ void TutorialWidget::onNextClicked()
     {
         qCritical() << "Cannot find page!";
     }
-    m_messageLabel->setText(TUTORIAL_HEADER_TEXT.arg(button->text()) + m_tabs[m_current_index].text());
+    m_titleLabel->setText(TUTORIAL_HEADER_TEXT.arg(button->text()));
+    m_messageLabel->setText(m_tabs[m_current_index].text());
 }
 
 void TutorialWidget::onDeviceConnected()
@@ -177,14 +183,14 @@ void TutorialWidget::initTutorial()
 {
     Ui::MainWindow* ui = m_mw->ui;
     m_tabs = {
-        {ui->pushButtonDevSettings, tr("You can use the ‘Device Settings’ tab to change parameters on your Mooltipass device.<br>Hovering the mouse pointer over an option will gives a short description of what that option does.")},
-        {ui->pushButtonCred, tr("In case you aren't using our browser extensions, this tab allows you to manually add credentials to your database.<br>By clicking the \"Enter Credentials Management Mode\" button, you will be able to visualize and<br>modify the credentials stored on your database.")},
+        {ui->pushButtonDevSettings, tr("You can use the ‘Device Settings’ tab to change parameters on your Mooltipass device. Hovering the mouse pointer over an option will gives a short description of what that option does.")},
+        {ui->pushButtonCred, tr("In case you aren't using our browser extensions, this tab allows you to manually add credentials to your database. By clicking the \"Enter Credentials Management Mode\" button, you will be able to visualize and modify the credentials stored on your database.")},
         {ui->pushButtonNotes, tr("This tab allows you to securely store text on your device. Simply add a new note, set a title and type its contents.")},
-        {ui->pushButtonFiles, tr("The Mooltipass device can operate as a flash drive.<br>The ‘Files’ tab allows you to add, store and access small files on your Mooltipass.")},
+        {ui->pushButtonFiles, tr("The Mooltipass device can operate as a flash drive. The ‘Files’ tab allows you to add, store and access small files on your Mooltipass.")},
         {ui->pushButtonFido, tr("Similarly to the credentials tab, the FIDO2 tab allows you to visualize and delete FIDO2 credentials stored on your device.")},
-        {ui->pushButtonSync, tr("The different buttons in the synchronization tab will allow you to backup and<br>restore the credentials you have stored inside the memory of your Mooltipass.<br>You can also select a backup monitoring file to make sure your Mooltipass database is always in sync with it.")},
+        {ui->pushButtonSync, tr("The different buttons in the synchronization tab will allow you to backup and restore the credentials you have stored inside the memory of your Mooltipass. You can also select a backup monitoring file to make sure your Mooltipass database is always in sync with it.")},
         {ui->pushButtonAppSettings, tr("The ‘Settings’ tab lets you change parameters on the Moolticute app.")},
-        {ui->pushButtonAbout, tr("Finally, the ‘About’ tab provides you with general information about your device and app.<br>It allows you to check that you are running the latest version of Moolticute.")}
+        {ui->pushButtonAbout, tr("Finally, the ‘About’ tab provides you with general information about your device and app. It allows you to check that you are running the latest version of Moolticute.")}
     };
 }
 
@@ -196,5 +202,18 @@ void TutorialWidget::startTutorial()
     {
         m_nextButton->setEnabled(false);
     }
-    m_messageLabel->setText(TUTORIAL_HEADER_TEXT.arg("Welcome") + tr("Welcome to Mooltice tutorial! Please connect your device and unlock it to continue the tutorial."));
+    m_titleLabel->setText(TUTORIAL_HEADER_TEXT.arg("Welcome"));
+    m_messageLabel->setText(tr("Welcome to Mooltice tutorial! Please connect your device and unlock it to continue the tutorial."));
+}
+
+void TutorialWidget::setupLabel(QLabel *label)
+{
+    label->setMinimumWidth(TUTORIAL_LABEL_WIDTH);
+    label->setAlignment(Qt::AlignCenter);
+    label->setTextFormat(Qt::RichText);
+    label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    label->setOpenExternalLinks(true);
+    QFont font = label->font();
+    font.setPointSize(TUTORIAL_FONT_SIZE);
+    label->setFont(font);
 }
