@@ -29,6 +29,7 @@ TutorialWidget::TutorialWidget(QWidget *parent) :
     tutorialTextLayout->addWidget(m_titleLabel);
     tutorialTextLayout->addWidget(m_messageLabel);
     tutorialTextLayout->setSpacing(TUTORIAL_TEXT_SPACING);
+    tutorialTextLayout->setContentsMargins(-1, -1, -1, TUTORIAL_BOTTOM_MARGIN);
     tutorialTextLayout->addStretch();
     m_messageLabel->setWordWrap(true);
 
@@ -38,7 +39,7 @@ TutorialWidget::TutorialWidget(QWidget *parent) :
     lay->addWidget(m_exitButton);
     lay->addStretch();
 
-    setStyleSheet("TutorialWidget {border: 15px solid #60B1C7; border-color: red;} ");
+    setStyleSheet("TutorialWidget {border: solid; border-width: 5px 0 5px 0; border-color: red;} ");
 
     m_nextButton->setText(tr("Next"));
     m_nextButton->setStyleSheet(CSS_BLUE_BUTTON);
