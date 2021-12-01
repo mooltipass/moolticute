@@ -65,9 +65,10 @@ private:
     static const QString TUTORIAL_HEADER_TEXT;
     static const QString TUTORIAL_FINISHED_SETTING;
     static constexpr int TUTORIAL_MAX_HEIGHT = 200;
-    static constexpr int TUTORIAL_LABEL_WIDTH = 700;
+    static constexpr int TUTORIAL_LABEL_WIDTH = 800;
     static constexpr int TUTORIAL_TEXT_SPACING = 12;
-    static constexpr int TUTORIAL_FONT_SIZE = 12;
+    static constexpr int TUTORIAL_BOTTOM_MARGIN = 6;
+    static constexpr int TUTORIAL_FONT_SIZE = 11;
 };
 
 #endif // TUTORIALWIDGET_H
