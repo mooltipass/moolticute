@@ -648,7 +648,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->label_charging->setPixmap(QString::fromUtf8(":/charge.png"));
     ui->label_charging->setMaximumSize(13,25);
-    ui->label_charging->setPixmap(ui->label_charging->pixmap().scaled(13,25, Qt::KeepAspectRatio)); //AKOSTODO: change from -> to .
+    ui->label_charging->setPixmap(ui->label_charging->pixmap().scaled(13,25, Qt::KeepAspectRatio));
     ui->label_charging->hide();
 
     ui->label_UserManual->hide();

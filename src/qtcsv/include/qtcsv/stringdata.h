@@ -5,7 +5,6 @@
 #include "qtcsv/abstractdata.h"
 
 class QString;
-//AKOSTODO: class QStringList;
 
 namespace QtCSV
 {

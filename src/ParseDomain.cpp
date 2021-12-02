@@ -25,7 +25,7 @@ ParseDomain::ParseDomain(const QString &url) :
         return;
     }
 
-    _tld = ""; //AKOSTODO: _url.topLevelDomain();
+    _tld = ""; //TODO: _url.topLevelDomain();
 
     // domain suffix is NOT recognized as one of public suffix list
     if (_tld.isEmpty()) {

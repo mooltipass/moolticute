@@ -158,7 +158,7 @@ bool WriterPrivate::writeToIODevice(QIODevice& ioDevice,
     }
 
     QTextStream stream(&ioDevice);
-    //AKOSTODO: stream.setCodec(codec);
+    //TODO: stream.setCodec(codec);
     while( content.hasNext() )
     {
         stream << content.getNext();

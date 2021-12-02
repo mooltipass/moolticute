@@ -7,7 +7,6 @@
 #include "qtcsv/qtcsv_global.h"
 
 class QVariant;
-//AKOSTODO: class QStringList;
 
 namespace QtCSV
 {

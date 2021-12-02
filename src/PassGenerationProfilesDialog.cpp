@@ -115,7 +115,7 @@ PassGenerationProfilesDialog::PassGenerationProfilesDialog(QWidget *parent) :
     });
 
     //connect(m_specialSymbolsGroup, static_cast<void(QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled),
-    //AKOSTODO        this, &PassGenerationProfilesDialog::onSymbolButtonToggled);
+    //TODO:        this, &PassGenerationProfilesDialog::onSymbolButtonToggled);
 }
 
 PassGenerationProfilesDialog::~PassGenerationProfilesDialog()

@@ -3,7 +3,6 @@
 #include <QStringList>
 
 class QString;
-//AKOSTODO: class QStringList;
 
 namespace QtCSV
 {

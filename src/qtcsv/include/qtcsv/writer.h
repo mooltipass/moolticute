@@ -4,7 +4,6 @@
 #include <QString>
 #include <QStringList>
 #include <QStringConverter>
-//AKOSTODO: #include <QtCore5Compat/QTextCodec>
 
 #include "qtcsv/qtcsv_global.h"
 

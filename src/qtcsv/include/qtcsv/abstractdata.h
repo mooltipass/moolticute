@@ -3,8 +3,6 @@
 
 #include "qtcsv_global.h"
 
-//AKOSTODO: class QStringList;
-
 namespace QtCSV
 {
     // AbstractData is a pure abstract container class. Its main purpouse is to

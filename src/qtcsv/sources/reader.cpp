@@ -108,7 +108,7 @@ bool ReaderPrivate::read(QIODevice& ioDevice,
     }
 
     QTextStream stream(&ioDevice);
-    //AKOSTODO: stream.setCodec(codec);
+    //TODO: stream.setCodec(codec);
     stream.setEncoding(QStringConverter::Utf8);
 
     // This list will contain elements of the row if its elements

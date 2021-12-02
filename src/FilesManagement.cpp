@@ -318,7 +318,7 @@ void FilesManagement::loadFilesCacheModel(bool isInSync)
             });
             rowLayout->addWidget(buttonRemove);
         }
-        //AKOSTODO: rowLayout->setMargin(0);
+        //TODO: rowLayout->setMargin(0);
         rowLayout->setContentsMargins(6,1,4,1);
         w->setLayout(rowLayout);
 
