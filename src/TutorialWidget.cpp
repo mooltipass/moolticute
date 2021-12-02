@@ -184,7 +184,7 @@ void TutorialWidget::initTutorial()
 {
     Ui::MainWindow* ui = m_mw->ui;
     m_tabs = {
-        {ui->pushButtonDevSettings, tr("You can use the ‘Device Settings’ tab to change parameters on your Mooltipass device. Hovering the mouse pointer over an option will gives a short description of what that option does.")},
+        {ui->pushButtonDevSettings, tr("You can use the ‘Device Settings’ tab to change parameters on your Mooltipass device. Hovering the mouse pointer over an option will give a short description of what that option does.")},
         {ui->pushButtonCred, tr("In case you aren't using our browser extensions, this tab allows you to manually add credentials to your database. By clicking the \"Enter Credentials Management Mode\" button, you will be able to visualize and modify the credentials stored on your database.")},
         {ui->pushButtonNotes, tr("This tab allows you to securely store text on your device. Simply add a new note, set a title and type its contents.")},
         {ui->pushButtonFiles, tr("The Mooltipass device can operate as a flash drive. The ‘Files’ tab allows you to add, store and access small files on your Mooltipass.")},
@@ -204,7 +204,7 @@ void TutorialWidget::startTutorial()
         m_nextButton->setEnabled(false);
     }
     m_titleLabel->setText(TUTORIAL_HEADER_TEXT.arg("Welcome"));
-    m_messageLabel->setText(tr("Welcome to Moolticute tutorial! Please connect your device and unlock it to continue the tutorial."));
+    m_messageLabel->setText(tr("Welcome to the Moolticute tutorial! Please connect your device and unlock it to continue the tutorial."));
 }
 
 void TutorialWidget::setupLabel(QLabel *label)
