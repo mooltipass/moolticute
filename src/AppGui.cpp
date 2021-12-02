@@ -54,7 +54,7 @@ AppGui::AppGui(int & argc, char ** argv) :
 
 bool AppGui::initialize()
 {
-    qsrand(time(NULL));
+    srand(time(NULL));
 
     QCoreApplication::setOrganizationName("mooltipass");
     QCoreApplication::setOrganizationDomain("themooltipass.com");
@@ -544,7 +544,7 @@ void AppGui::searchDaemonTick()
 bool AppGui::createSingleApplication()
 {
     QString serverName = QApplication::organizationName() + QApplication::applicationName();
-    serverName.replace(QRegExp("[^\\w\\-. ]"), "");
+    serverName.replace(QRegularExpression("[^\\w\\-. ]"), "");
 
     // Attempt to connect to the LocalServer
     QLocalSocket *localSocket = new QLocalSocket();
@@ -736,7 +736,7 @@ void AppGui::checkUpdate(bool displayMessage)
 
     //Recheck in at least 30minutes plus some random time
     if (!displayMessage)
-        QTimer::singleShot(1000 * 60 * 60 * 30 + qrand() % 240, [this]() { checkUpdate(false); });
+        QTimer::singleShot(1000 * 60 * 60 * 30 + rand() % 240, [this]() { checkUpdate(false); });
 }
 
 QString AppGui::getDataDirPath()

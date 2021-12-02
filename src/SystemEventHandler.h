@@ -19,7 +19,7 @@ public:
     void emitEvent(const SystemEvent event);
     static void triggerEvent(const int type, void *instance);
 
-    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
+    bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
 
 signals:
     void screenLocked();

@@ -2,7 +2,7 @@
 
 #include <QFile>
 #include <QStringList>
-#include <QStringRef>
+
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
@@ -48,7 +48,7 @@ public:
                      Reader::AbstractProcessor& processor,
                      const QString& separator,
                      const QString& textDelimiter,
-                     QTextCodec* codec);
+                     QStringConverter::Encoding codec);
 
 
 private:
@@ -92,7 +92,7 @@ bool ReaderPrivate::read(QIODevice& ioDevice,
                          Reader::AbstractProcessor& processor,
                          const QString& separator,
                          const QString& textDelimiter,
-                         QTextCodec* codec)
+                         QStringConverter::Encoding codec)
 {
     if ( false == checkParams(separator) )
     {
@@ -108,7 +108,8 @@ bool ReaderPrivate::read(QIODevice& ioDevice,
     }
 
     QTextStream stream(&ioDevice);
-    stream.setCodec(codec);
+    //AKOSTODO: stream.setCodec(codec);
+    stream.setEncoding(QStringConverter::Utf8);
 
     // This list will contain elements of the row if its elements
     // are located on several lines
@@ -389,8 +390,8 @@ int ReaderPrivate::findMiddleElementPositioin(const QString& str,
         int numOfDelimiters = 0;
         for (int pos = elemEndPos; startPos <= pos; --pos, ++numOfDelimiters)
         {
-            QStringRef strRef = str.midRef(pos, txtDelim.size());
-            if (QStringRef::compare(strRef, txtDelim) != 0)
+            QStringView strRef = str.mid(pos, txtDelim.size());
+            if (strRef.compare(txtDelim) != 0)
             {
                 break;
             }
@@ -451,8 +452,8 @@ bool ReaderPrivate::isElementLast(const QString& str,
     int numOfDelimiters = 0;
     for (int pos = str.size() - 1; startPos <= pos; --pos, ++numOfDelimiters)
     {
-        QStringRef strRef = str.midRef(pos, txtDelim.size());
-        if (QStringRef::compare(strRef, txtDelim) != 0)
+        QStringView strRef = str.mid(pos, txtDelim.size());
+        if (strRef.compare(txtDelim) != 0)
         {
             break;
         }
@@ -484,7 +485,7 @@ void ReaderPrivate::removeExtraSymbols(QStringList& elements,
     const QString doubleTextDelim = textDelimiter + textDelimiter;
     for (int i = 0; i < elements.size(); ++i)
     {
-        QStringRef str(&elements.at(i));
+        QStringView str = elements.at(i);
         if (str.isEmpty())
         {
             continue;
@@ -507,15 +508,16 @@ void ReaderPrivate::removeExtraSymbols(QStringList& elements,
         if (false == textDelimiter.isEmpty())
         {
             // Skip text delimiter symbol if element starts with it
-            QStringRef strStart(&elements.at(i), startPos, textDelimiter.size());
+            QStringView strStart = elements.at(i);
+            strStart = strStart.sliced((startPos, textDelimiter.size()));
             if ( strStart == textDelimiter)
             {
                 startPos += textDelimiter.size();
             }
 
             // Skip text delimiter symbol if element ends with it
-            QStringRef strEnd(&elements.at(i), endPos - textDelimiter.size() + 1,
-                              textDelimiter.size());
+            QStringView strEnd = elements.at(i);
+            strEnd = strEnd.sliced(endPos - textDelimiter.size() + 1, textDelimiter.size());
             if (strEnd == textDelimiter)
             {
                 endPos -= textDelimiter.size();
@@ -557,7 +559,7 @@ public:
 QList<QStringList> Reader::readToList(const QString& filePath,
                                       const QString& separator,
                                       const QString& textDelimiter,
-                                      QTextCodec* codec)
+                                      enum QStringConverter::Encoding codec)
 {
     QFile file;
     if (false == openFile(filePath, file))
@@ -573,7 +575,7 @@ QList<QStringList> Reader::readToList(const QString& filePath,
 QList<QStringList> Reader::readToList(QIODevice &ioDevice,
                                       const QString &separator,
                                       const QString &textDelimiter,
-                                      QTextCodec *codec)
+                                      QStringConverter::Encoding codec)
 {
     ReadToListProcessor processor;
     ReaderPrivate::read(ioDevice, processor, separator, textDelimiter, codec);
@@ -593,7 +595,7 @@ bool Reader::readToData(const QString& filePath,
                         AbstractData& data,
                         const QString& separator,
                         const QString& textDelimiter,
-                        QTextCodec* codec)
+                        enum QStringConverter::Encoding codec)
 {
     QFile file;
     if (false == openFile(filePath, file))
@@ -610,7 +612,7 @@ bool Reader::readToData(QIODevice& ioDevice,
                         AbstractData& data,
                         const QString& separator,
                         const QString& textDelimiter,
-                        QTextCodec* codec)
+                        QStringConverter::Encoding codec)
 {
     ReadToListProcessor processor;
     if (false == ReaderPrivate::read(
@@ -641,7 +643,7 @@ bool Reader::readToProcessor(const QString& filePath,
                              Reader::AbstractProcessor& processor,
                              const QString& separator,
                              const QString& textDelimiter,
-                             QTextCodec* codec)
+                             QStringConverter::Encoding codec)
 {
     QFile file;
     if (false == openFile(filePath, file))
@@ -657,7 +659,7 @@ bool Reader::readToProcessor(QIODevice& ioDevice,
                              Reader::AbstractProcessor& processor,
                              const QString& separator,
                              const QString& textDelimiter,
-                             QTextCodec* codec)
+                             QStringConverter::Encoding codec)
 {
     return ReaderPrivate::read(
                 ioDevice, processor, separator, textDelimiter, codec);

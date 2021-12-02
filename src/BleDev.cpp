@@ -260,7 +260,7 @@ void BleDev::on_lineEditBundlePassword_textChanged(const QString &arg1)
 {
     auto size = arg1.size();
     if ((size == 0 || size == UPLOAD_PASSWORD_SIZE) &&
-            !arg1.contains(QRegExp(HEXA_CHAR_REGEXP)))
+            !arg1.contains(QRegularExpression(HEXA_CHAR_REGEXP)))
     {
         ui->btnFileBrowser->setEnabled(true);
         ui->labelInvalidBundle->hide();

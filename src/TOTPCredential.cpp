@@ -51,7 +51,7 @@ bool TOTPCredential::validateInput()
 {
     QString secretKey = getSecretKey().toUpper().remove(' ');
     ui->lineEditSecretKey->setText(secretKey);
-    if (!getSecretKey().contains(QRegExp(BASE32_REGEXP)))
+    if (!getSecretKey().contains(QRegularExpression(BASE32_REGEXP)))
     {
         QMessageBox::warning(this, tr("Invalid Secret Key"), tr("The entered Secret Key is not a valid Base32 string"));
         ui->lineEditSecretKey->clear();
@@ -69,7 +69,7 @@ void TOTPCredential::clearFields()
 
 void TOTPCredential::on_lineEditSecretKey_textChanged(const QString &arg1)
 {
-    if (arg1.contains(QRegExp(BASE32_CHAR_REGEXP)))
+    if (arg1.contains(QRegularExpression(BASE32_CHAR_REGEXP)))
     {
         ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
         ui->labelError->show();

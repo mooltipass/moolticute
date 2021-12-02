@@ -77,7 +77,7 @@ private:
 
 private:
     QString m_url;
-    uint m_startTime;
+    qint64 m_startTime;
     QString m_fileName;
     Ui::Downloader* m_ui;
     QNetworkReply* m_reply;

@@ -148,7 +148,7 @@ void CredentialView::onSelectionTimerTimeOut()
                 int nVisibleChilds = pCredModelFilter->rowCount(proxyIndex);
                 if (nVisibleChilds > 0)
                 {
-                    QModelIndex firstLoginIndex = proxyIndex.child(0, 0);
+                    QModelIndex firstLoginIndex;//AKOSTODO:  = proxyIndex.child(0, 0);
                     if (firstLoginIndex.isValid())
                         setCurrentIndex(firstLoginIndex);
                 }

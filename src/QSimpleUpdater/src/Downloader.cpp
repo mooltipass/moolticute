@@ -114,7 +114,7 @@ void Downloader::startDownload (const QUrl& url)
     m_ui->timeLabel->setText (tr ("Time remaining") + ": " + tr ("unknown"));
 
     /* Start download */
-    m_startTime = QDateTime::currentDateTime().toTime_t();
+    m_startTime = QDateTime::currentDateTime().toSecsSinceEpoch();
     m_reply = m_manager->get (QNetworkRequest (url));
 
     /* Ensure that downloads directory exists */
@@ -355,7 +355,7 @@ void Downloader::updateProgress (qint64 received, qint64 total)
  */
 void Downloader::calculateTimeRemaining (qint64 received, qint64 total)
 {
-    uint difference = QDateTime::currentDateTime().toTime_t() - m_startTime;
+    qint64 difference = QDateTime::currentDateTime().toSecsSinceEpoch() - m_startTime;
 
     if (difference > 0) {
         QString timeString;

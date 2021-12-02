@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QStringConverter>
 
 #include "include/qtcsv/abstractdata.h"
 #include "sources/filechecker.h"
@@ -38,17 +39,17 @@ public:
     // Append information to the file
     static bool appendToFile(const QString& filePath,
                              ContentIterator& content,
-                             QTextCodec* codec);
+                             QStringConverter::Encoding codec);
 
     // Overwrite file with new information
     static bool overwriteFile(const QString& filePath,
                               ContentIterator& content,
-                              QTextCodec* codec);
+                              QStringConverter::Encoding codec);
 
     // Write to IO Device
     static bool writeToIODevice(QIODevice& ioDevice,
                                 ContentIterator& content,
-                                QTextCodec* codec);
+                                QStringConverter::Encoding codec);
 
     // Create unique name for the temporary file
     static QString getTempFileName();
@@ -63,7 +64,7 @@ public:
 // - bool - True if data was appended to the file, otherwise False
 bool WriterPrivate::appendToFile(const QString& filePath,
                                  ContentIterator& content,
-                                 QTextCodec* codec)
+                                 QStringConverter::Encoding codec)
 {
     if ( filePath.isEmpty() || content.isEmpty() )
     {
@@ -94,7 +95,7 @@ bool WriterPrivate::appendToFile(const QString& filePath,
 // - bool - True if file was overwritten with new data, otherwise False
 bool WriterPrivate::overwriteFile(const QString& filePath,
                                   ContentIterator& content,
-                                  QTextCodec* codec)
+                                  QStringConverter::Encoding codec)
 {
     // Create path to the unique temporary file
     QString tempFileName = getTempFileName();
@@ -141,7 +142,7 @@ bool WriterPrivate::overwriteFile(const QString& filePath,
 // - bool - True if data could be written to the IO Device
 bool WriterPrivate::writeToIODevice(QIODevice& ioDevice,
                                     ContentIterator& content,
-                                    QTextCodec* codec) {
+                                    QStringConverter::Encoding codec) {
     if ( content.isEmpty() )
     {
         qDebug() << __FUNCTION__ << "Error - invalid arguments";
@@ -157,7 +158,7 @@ bool WriterPrivate::writeToIODevice(QIODevice& ioDevice,
     }
 
     QTextStream stream(&ioDevice);
-    stream.setCodec(codec);
+    //AKOSTODO: stream.setCodec(codec);
     while( content.hasNext() )
     {
         stream << content.getNext();
@@ -180,7 +181,7 @@ QString WriterPrivate::getTempFileName()
 
     for (int counter = 0; counter < std::numeric_limits<int>::max(); ++counter)
     {
-        QString name = nameTemplate.arg(QString::number(qrand()));
+        QString name = nameTemplate.arg(QString::number(rand()));
         if ( false == QFile::exists(name) )
         {
             return name;
@@ -213,7 +214,7 @@ bool Writer::write(const QString& filePath,
                    const WriteMode& mode,
                    const QStringList& header,
                    const QStringList& footer,
-                   QTextCodec* codec)
+                   QStringConverter::Encoding codec)
 {
     if ( filePath.isEmpty() )
     {
@@ -269,7 +270,7 @@ bool Writer::write(QIODevice& ioDevice,
                    const QString& textDelimiter,
                    const QStringList& header,
                    const QStringList& footer,
-                   QTextCodec* codec)
+                   QStringConverter::Encoding codec)
 {
     if ( data.isEmpty() )
     {

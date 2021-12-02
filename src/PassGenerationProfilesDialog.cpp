@@ -114,8 +114,8 @@ PassGenerationProfilesDialog::PassGenerationProfilesDialog(QWidget *parent) :
             button->setEnabled(enable);
     });
 
-    connect(m_specialSymbolsGroup, static_cast<void(QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled),
-            this, &PassGenerationProfilesDialog::onSymbolButtonToggled);
+    //connect(m_specialSymbolsGroup, static_cast<void(QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled),
+    //AKOSTODO        this, &PassGenerationProfilesDialog::onSymbolButtonToggled);
 }
 
 PassGenerationProfilesDialog::~PassGenerationProfilesDialog()

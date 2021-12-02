@@ -29,7 +29,7 @@ OutputLog::OutputLog(QWidget *parent):
     m_scrollTimer.setSingleShot(true);
     connect(&m_scrollTimer, &QTimer::timeout,
             this, &OutputLog::scrollToBottom);
-    m_lastMessage.start();
+    m_lastMessage = QTime::currentTime().addMSecs(5);
 
     cursor = textCursor();
 
@@ -132,7 +132,7 @@ void OutputLog::appendMessage(const QString &output, const QTextCharFormat &form
 
     if (atBottom)
     {
-        if (m_lastMessage.elapsed() < 5)
+        if (m_lastMessage < QTime::currentTime())
         {
             m_scrollTimer.start();
         }
@@ -143,7 +143,7 @@ void OutputLog::appendMessage(const QString &output, const QTextCharFormat &form
         }
     }
 
-    m_lastMessage.start();
+    m_lastMessage = QTime::currentTime().addMSecs(5);
 }
 
 void OutputLog::append(QTextCursor &cursor, const QString &text, const QTextCharFormat &format)

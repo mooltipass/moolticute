@@ -209,7 +209,7 @@ QByteArray HttpClient::buildHttpResponse(QString code, QHash<QString,QString> &h
 
     foreach(QString key, headers.keys())
     {
-        res +=  key + ": " + headers[key] + "\r\n";
+        res +=  key.toUtf8() + ": " + headers[key].toUtf8() + "\r\n";
     }
     res += "\r\n";
     res += body;

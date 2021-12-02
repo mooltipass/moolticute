@@ -102,7 +102,7 @@ QVariant CredentialModel::headerData(int section, Qt::Orientation orientation, i
 Qt::ItemFlags CredentialModel::flags(const QModelIndex &idx) const
 {
     if (!idx.isValid())
-        return 0;
+        return Qt::NoItemFlags;
 
     return QAbstractItemModel::flags(idx);
 }

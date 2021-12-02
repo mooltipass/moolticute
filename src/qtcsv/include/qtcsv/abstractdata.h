@@ -3,7 +3,7 @@
 
 #include "qtcsv_global.h"
 
-class QStringList;
+//AKOSTODO: class QStringList;
 
 namespace QtCSV
 {

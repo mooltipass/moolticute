@@ -1,8 +1,9 @@
 #ifndef QTCSVCONTENTITERATOR_H
 #define QTCSVCONTENTITERATOR_H
+#include <QStringList>
 
 class QString;
-class QStringList;
+//AKOSTODO: class QStringList;
 
 namespace QtCSV
 {

@@ -3,7 +3,8 @@
 
 #include <QString>
 #include <QStringList>
-#include <QTextCodec>
+#include <QStringConverter>
+//AKOSTODO: #include <QtCore5Compat/QTextCodec>
 
 #include "qtcsv/qtcsv_global.h"
 
@@ -41,7 +42,7 @@ namespace QtCSV
                         const WriteMode& mode = REWRITE,
                         const QStringList& header = QStringList(),
                         const QStringList& footer = QStringList(),
-                        QTextCodec* codec = QTextCodec::codecForName("UTF-8"));
+                        QStringConverter::Encoding codec = QStringConverter::Utf8);
 
         // Write data to IO Device
         static bool write(QIODevice& ioDevice,
@@ -50,7 +51,7 @@ namespace QtCSV
                         const QString& textDelimiter = QString("\""),
                         const QStringList& header = QStringList(),
                         const QStringList& footer = QStringList(),
-                        QTextCodec* codec = QTextCodec::codecForName("UTF-8"));
+                        QStringConverter::Encoding codec = QStringConverter::Utf8);
     };
 }
 

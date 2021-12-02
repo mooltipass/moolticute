@@ -192,7 +192,7 @@ void CredentialsManagement::setFilterCredLayout()
 {
     ui->toolButtonFavFilter->setIcon(AppGui::qtAwesome()->icon(fa::staro));
     QHBoxLayout *filterLayout = new QHBoxLayout(ui->lineEditFilterCred);
-    filterLayout->setMargin(0);
+    //AKOSTODO: filterLayout->setMargin(0);
     filterLayout->addStretch();
     filterLayout->addWidget(ui->toolButtonClearFilter);
 
@@ -903,8 +903,8 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
             ui->credDisplayLoginInput->setText(pLoginItem->name());
             ui->credDisplayPasswordInput->setText(pLoginItem->password());
             ui->credDisplayDescriptionInput->setText(pLoginItem->description());
-            ui->credDisplayCreationDateInput->setText(pLoginItem->updatedDate().toString(Qt::DefaultLocaleShortDate));
-            ui->credDisplayModificationDateInput->setText(pLoginItem->accessedDate().toString(Qt::DefaultLocaleShortDate));
+            ui->credDisplayCreationDateInput->setText(pLoginItem->updatedDate().toString());
+            ui->credDisplayModificationDateInput->setText(pLoginItem->accessedDate().toString());
             ui->credDisplayPasswordInput->setLocked(pLoginItem->passwordLocked());
             if (wsClient->isMPBLE())
             {
