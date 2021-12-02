@@ -204,7 +204,7 @@ void TutorialWidget::startTutorial()
         m_nextButton->setEnabled(false);
     }
     m_titleLabel->setText(TUTORIAL_HEADER_TEXT.arg("Welcome"));
-    m_messageLabel->setText(tr("Welcome to Mooltice tutorial! Please connect your device and unlock it to continue the tutorial."));
+    m_messageLabel->setText(tr("Welcome to Moolticute tutorial! Please connect your device and unlock it to continue the tutorial."));
 }
 
 void TutorialWidget::setupLabel(QLabel *label)
