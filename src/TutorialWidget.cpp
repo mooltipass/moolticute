@@ -156,8 +156,8 @@ void TutorialWidget::onDeviceConnected()
         }
         else
         {
-            m_nextButton->setEnabled(false);
-            QMessageBox::warning(this, tr("Tutorial warning"), tr("Tutorial is only available for BLE device, please attach one or Exit tutorial."));
+            qDebug() << "Tutorial is not available for Mini.";
+            onExitClicked();
         }
     }
 }
