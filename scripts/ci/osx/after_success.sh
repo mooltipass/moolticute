@@ -45,7 +45,7 @@ chmod +x build/$APP.app/Contents/MacOS/cli/mc-agent build/$APP.app/Contents/MacO
 
 # use macdeployqt to deploy the application
 echo "Calling macdeployqt"
-$QTDIR/bin/macdeployqt build/$APP.app -hardened-runtime
+$QTDIR/bin/macdeployqt build/$APP.app
 if [ "$?" -ne "0" ]; then
     echo "Failed to run macdeployqt"
     exit 1
@@ -73,7 +73,7 @@ export ID=$(security find-identity -v $KEYCHAIN | grep "1)" | sed "s/^ *1) *\([^
 echo "Using ID: $ID"
 
 #Sign binaries!
-codesign --deep --force --verbose --sign $ID --keychain $KEYCHAIN build/$APP.app
+codesign --deep --force --options runtime --verbose --sign $ID --keychain $KEYCHAIN build/$APP.app
 
 echo "Verifying code signed app"
 codesign --verify --verbose=4 build/$APP.app
