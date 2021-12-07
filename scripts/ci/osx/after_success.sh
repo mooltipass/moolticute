@@ -45,7 +45,7 @@ chmod +x build/$APP.app/Contents/MacOS/cli/mc-agent build/$APP.app/Contents/MacO
 
 # use macdeployqt to deploy the application
 echo "Calling macdeployqt"
-$QTDIR/bin/macdeployqt -hardened-runtime build/$APP.app
+$QTDIR/bin/macdeployqt build/$APP.app -hardened-runtime
 if [ "$?" -ne "0" ]; then
     echo "Failed to run macdeployqt"
     exit 1
