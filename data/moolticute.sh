@@ -16,6 +16,7 @@ Arguments:
 -i --install        Install moolticute UDev rules
 -c --check          Check moolticute UDev rules
 -u --uninstall      Uninstall moolticute UDev rules
+--autolaunched      Run Moolticute with autolaunched option
 -h --help           This help
 
 Example:
@@ -85,6 +86,7 @@ SINGLE_EXE=""
 INSTALL=0
 UNINSTALL=0
 CHECK=0
+AUTOLAUNCHED=0
 
 case "$1" in
     -d|--daemon)
@@ -104,6 +106,9 @@ case "$1" in
     ;;
     -u|--uninstall)
         UNINSTALL=1
+    ;;
+    --autolaunched)
+        AUTOLAUNCHED=1
     ;;
     -h|-\?|--help)
         printf "$help_msg"
@@ -185,7 +190,12 @@ then
     $APPDIR/usr/bin/$SINGLE_EXE "$@"
 elif (( $INSTALL == 0 )) && (( $UNINSTALL == 0 )) && (( $CHECK == 0 ));
 then
-    $APPDIR/usr/bin/moolticute
+    if (( $AUTOLAUNCHED == 0 ))
+    then
+        $APPDIR/usr/bin/moolticute
+    else
+        $APPDIR/usr/bin/moolticute --autolaunched
+    fi
 elif (( $INSTALL == 1 ));
 then
     echo "Installing moolticute UDEV rules"
