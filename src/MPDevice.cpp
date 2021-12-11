@@ -5293,7 +5293,7 @@ quint64 MPDevice::getUInt64EncryptionKey(const QString &encryption)
 quint64 MPDevice::getUInt64EncryptionKey()
 {
     quint64 key = 0;
-    for (int i = 0; i < std::min(8, m_cardCPZ.size()) ; i ++)
+    for (int i = 0; i < std::min(8, static_cast<int>(m_cardCPZ.size())) ; i++)
     {
         key += ((static_cast<quint64>(m_cardCPZ[i]) & 0xFF) << (i*8));
     }
@@ -5304,7 +5304,7 @@ quint64 MPDevice::getUInt64EncryptionKey()
 quint64 MPDevice::getUInt64EncryptionKeyOld()
 {
     qint64 key = 0;
-    for (int i = 0; i < std::min(8, m_cardCPZ.size()) ; i ++)
+    for (int i = 0; i < std::min(8, static_cast<int>(m_cardCPZ.size())) ; i++)
     {
         key += (static_cast<unsigned int>(m_cardCPZ[i]) & 0xFF) << (i*8);
     }

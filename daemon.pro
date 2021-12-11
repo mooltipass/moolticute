@@ -27,10 +27,11 @@ win32 {
 win32 {
     #Private header qwinoverlappedionotifier_p.h removed from Qt5.10 SDK
     #so need to include files explicitly.
-    greaterThan(QT_MAJOR_VERSION, 4):greaterThan(QT_MINOR_VERSION, 9) {
+    if (equals(QT_MAJOR_VERSION, 5):greaterThan(QT_MINOR_VERSION, 9)|greaterThan(QT_MAJOR_VERSION, 5)){
         SOURCES += src/qwinoverlappedionotifier.cpp
         HEADERS += src/qwinoverlappedionotifier.h
     }
+
     SOURCES += src/UsbMonitor_win.cpp \
                src/MPDevice_win.cpp \
                src/HIDLoader.cpp

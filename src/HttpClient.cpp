@@ -19,6 +19,7 @@
 #include <QFile>
 #include "HttpClient.h"
 #include <QDir>
+#include "Common.h"
 
 int onMessageBeginCb(http_parser *parser)
 {
@@ -148,7 +149,7 @@ HttpClient::HttpClient(QTcpSocket *socket, QObject *parent) :
 
         QFile fp(QString(":/debug/dist%1").arg(QString(m_parseUrl)));
 
-        if (fp.exists() && fp.open(QIODevice::ReadOnly))
+        if (fp.exists() && fp.open(DeviceOpenModeFlag::ReadOnly))
         {
             QString extension = QFileInfo(fp.fileName()).suffix().toLower();
 
@@ -209,7 +210,7 @@ QByteArray HttpClient::buildHttpResponse(QString code, QHash<QString,QString> &h
 
     foreach(QString key, headers.keys())
     {
-        res +=  key + ": " + headers[key] + "\r\n";
+        res += key.toUtf8() + ": " + headers[key].toUtf8() + "\r\n";
     }
     res += "\r\n";
     res += body;

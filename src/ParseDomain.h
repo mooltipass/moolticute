@@ -61,6 +61,8 @@ public:
 
     QString getManuallyEnteredDomainName(const QString &service);
 
+    QString getTopLevel() const;
+
 private:
     ParseDomain();
 

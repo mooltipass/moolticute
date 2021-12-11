@@ -25,7 +25,7 @@ ParseDomain::ParseDomain(const QString &url) :
         return;
     }
 
-    _tld = _url.topLevelDomain();
+    _tld = getTopLevel();
 
     // domain suffix is NOT recognized as one of public suffix list
     if (_tld.isEmpty()) {
@@ -73,4 +73,21 @@ QString ParseDomain::getManuallyEnteredDomainName(const QString &service)
     }
 
     return getFullSubdomain();
+}
+
+/**
+ * @brief ParseDomain::getTopLevel
+ * @return QString, Top Level Domain of the URL
+ * @example http://www.test.co.uk -> ".co.uk"
+ *          http://www.test.com -> ".com"
+ */
+QString ParseDomain::getTopLevel() const
+{
+    QString host = _url.host();
+    int pos = host.indexOf('.');
+    if (-1 != pos)
+    {
+        return host.right(host.size() - pos);
+    }
+    return "";
 }

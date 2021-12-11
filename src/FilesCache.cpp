@@ -11,6 +11,7 @@
 #include <QJsonDocument>
 #include <QStandardPaths>
 #include <QCryptographicHash>
+#include "Common.h"
 
 
 FilesCache::FilesCache(QObject *parent) : QObject(parent)
@@ -27,7 +28,7 @@ bool FilesCache::save(QList<QVariantMap> files)
     m_isFileCacheInSync = true;
     QFile file(m_filePath);
 
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    if (!file.open(DeviceOpenModeFlag::WriteOnly | DeviceOpenModeFlag::Text))
         return false;
 
     QJsonObject json;
@@ -61,7 +62,7 @@ QList<QVariantMap> FilesCache::load()
         QList<QVariantMap> files;
 
         QFile file(m_filePath);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        if (!file.open(DeviceOpenModeFlag::ReadOnly | DeviceOpenModeFlag::Text))
             return files;
 
 
@@ -155,7 +156,7 @@ bool FilesCache::setCardCPZ(QByteArray cardCPZ)
     m_filePath = dataDir.absoluteFilePath(fileName);
 
     qint64 m_key = 0;
-    for (int i = 0;i < std::min(8, cardCPZ.size());i++)
+    for (int i = 0;i < std::min(8, static_cast<int>(cardCPZ.size()));i++)
         m_key += (static_cast<unsigned int>(cardCPZ[i]) & 0xFF) << (i * 8);
 
     m_simpleCrypt.setKey(m_key);
