@@ -20,7 +20,12 @@ linux {
 
 include(src/QtAwesome/QtAwesome/QtAwesome.pri)
 include (src/QSimpleUpdater/QSimpleUpdater.pri)
-include (src/qtcsv/qtcsv.pri)
+
+greaterThan(QT_MAJOR_VERSION, 5) {
+    include (src/qtcsv6/qtcsv.pri)
+} else {
+    include (src/qtcsv/qtcsv.pri)
+}
 
 SOURCES += src/main_gui.cpp \
     src/ClickableLabel.cpp \

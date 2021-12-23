@@ -145,7 +145,7 @@ void SystemEventHandler::triggerEvent(const int type, void *instance)
     }
 }
 
-bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool SystemEventHandler::nativeEventFilter(const QByteArray &eventType, void *message, ResultType *result)
 {
     Q_UNUSED(result);
 

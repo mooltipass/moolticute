@@ -192,8 +192,12 @@ void clearAndDelete(Container& cont)
 
 #if QT_VERSION < 0x060000
     using DeviceOpenModeFlag = QIODevice;
+#include <QRegExp>
+    using RegExp = QRegExp;
 #else
     using DeviceOpenModeFlag = QIODeviceBase;
+#include <QRegularExpression>
+    using RegExp = QRegularExpression;
 #endif
 
 class Common

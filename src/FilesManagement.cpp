@@ -317,8 +317,10 @@ void FilesManagement::loadFilesCacheModel(bool isInSync)
                 }
             });
             rowLayout->addWidget(buttonRemove);
-        }
+        }     
+#if QT_VERSION < 0x060000
         rowLayout->setMargin(0);
+#endif
         rowLayout->setContentsMargins(6,1,4,1);
         w->setLayout(rowLayout);
 

@@ -9,6 +9,7 @@ class PassGenerationProfilesDialog;
 }
 
 class QButtonGroup;
+class QAbstractButton;
 class PasswordProfilesModel;
 
 /*!
@@ -46,7 +47,7 @@ protected slots:
     void updateControls(const QModelIndex &index);
     void createNewProfile();
     void deleteProfile();
-    void onSymbolButtonToggled(int id, bool checked);
+    void onSymbolButtonToggled(QAbstractButton* id, bool checked);
 
 private:
     Ui::PassGenerationProfilesDialog *ui;
