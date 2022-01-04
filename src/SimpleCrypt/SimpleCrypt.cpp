@@ -31,7 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QDataStream>
-#include "Common.h"
+
+#if QT_VERSION < 0x060000
+    using DeviceOpenModeFlag = QIODevice;
+#else
+    using DeviceOpenModeFlag = QIODeviceBase;
+#endif
 
 SimpleCrypt::SimpleCrypt():
     m_key(0),
