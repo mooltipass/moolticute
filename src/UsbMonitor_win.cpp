@@ -40,7 +40,7 @@ UsbMonitor_win::~UsbMonitor_win()
         qWarning() << "Unable to unregister for device notifications";
 }
 
-bool UsbMonitor_win::nativeEvent(const QByteArray &eventType, void *message, long *result)
+bool UsbMonitor_win::nativeEvent(const QByteArray &eventType, void *message, ResultType *result)
 {
     Q_UNUSED(eventType);
     Q_UNUSED(result);

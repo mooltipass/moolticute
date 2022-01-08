@@ -28,6 +28,13 @@
 class UsbMonitor_win: public QWidget
 {
     Q_OBJECT
+
+#if QT_VERSION < 0x060000
+    using ResultType = long;
+#else
+    using ResultType = qintptr;
+#endif
+
 public:
     static UsbMonitor_win *Instance()
     {
@@ -45,7 +52,7 @@ private:
 
     HDEVNOTIFY notifyHandle = nullptr;
 
-    virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result);
+    virtual bool nativeEvent(const QByteArray &eventType, void *message, ResultType *result);
 };
 
 #endif // USBMONITOR_WIN_H
