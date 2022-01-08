@@ -78,13 +78,13 @@ QString ParseDomain::getManuallyEnteredDomainName(const QString &service)
 /**
  * @brief ParseDomain::getTopLevel
  * @return QString, Top Level Domain of the URL
- * @example http://www.test.co.uk -> ".co.uk"
+ * @example http://www.test.co.uk -> ".uk"
  *          http://www.test.com -> ".com"
  */
 QString ParseDomain::getTopLevel() const
 {
     QString host = _url.host();
-    int pos = host.indexOf('.');
+    int pos = host.lastIndexOf('.');
     if (-1 != pos)
     {
         return host.right(host.size() - pos);
