@@ -280,7 +280,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->pbBleBattery->setValue(battery);
                 if (battery < BATTERY_WARNING_LIMIT && !ui->label_charging->isVisible())
                 {
-                    SystemNotification::instance().createNotification(tr("Low Battery"), tr("Battery is below %1%, please charge your device.").arg(BATTERY_WARNING_LIMIT));
+                    SystemNotification::instance().createNotification(tr("Low Battery"), tr("Battery is below %1%, please charge your Mooltipass.").arg(BATTERY_WARNING_LIMIT));
                 }
             });
 
@@ -492,8 +492,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         QString serialStr = serial > 0 ? QString::number(serial) : "XXXX";
         if (wsClient->isMPBLE())
         {
-            setSecurityChallengeText(serialStr);
-            ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(serial).arg(wsClient->get_bundleVersion()));
+            QString bundleStr = QString::number(wsClient->get_bundleVersion());
+            setSecurityChallengeText(serialStr, bundleStr);
+            ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(serial).arg(bundleStr));
         }
         else
         {
@@ -502,7 +503,13 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     });
     connect(wsClient, &WSClient::bundleVersionChanged, [this](int bundleVersion)
     {
-        ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(wsClient->get_hwSerial()).arg(bundleVersion));
+        auto serial = wsClient->get_hwSerial();
+        ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(serial).arg(bundleVersion));
+        if (wsClient->isMPBLE())
+        {
+            QString serialStr = serial > 0 ? QString::number(serial) : "XXXX";
+            setSecurityChallengeText(serialStr, QString::number(bundleVersion));
+        }
     });
 
 
@@ -510,7 +517,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     {
         if (wsClient->isMPBLE())
         {
-            setSecurityChallengeText("XXXX");
+            setSecurityChallengeText("XXXX", "XXXX");
         }
         else
         {
@@ -1575,12 +1582,12 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
                                     "<li>Enter the password you received from us</li></ol>").arg(id));
 }
 
-void MainWindow::setSecurityChallengeText(const QString &id)
+void MainWindow::setSecurityChallengeText(const QString &id, const QString &bundleVersion)
 {
     ui->labelSecurityChallenge->setText(tr("To be sure that no one has tampered with your device, you can request a challenge string and enter it below.<ol>"
                                     "<li>Get the serial number from the back of your device.</li>"
-                                    "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=UID Request Code&body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO\">Send us an email</a> with the serial number and your order number, requesting the challenge string.</li>"
-                                    "<li>Enter the string you received from us</li></ol>").arg(id));
+                                    "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME\">Send us an email</a> with the serial number and your order number, requesting the challenge string.</li>"
+                                    "<li>Enter the string you received from us</li></ol>").arg(id).arg(bundleVersion));
 }
 
 void MainWindow::enableCredentialsManagement(bool enable)
