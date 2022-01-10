@@ -511,8 +511,11 @@ void MPDeviceBleImpl::getFallbackServiceCredential(AsyncJobs *jobs, const QStrin
             qWarning() << "Credential get for fallback service failed";
             cb(false, "Get credential failed", QByteArray{});
         }
-        qDebug() << "Credential for fallback service got successfully";
-        cb(true, "", bleProt->getFullPayload(data));
+        else
+        {
+            qDebug() << "Credential for fallback service got successfully";
+            cb(true, "", bleProt->getFullPayload(data));
+        }
         return true;
     }));
 }
