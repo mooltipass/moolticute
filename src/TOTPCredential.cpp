@@ -3,6 +3,8 @@
 
 #include <QPushButton>
 #include <QMessageBox>
+#include <QRegularExpression>
+#include "Common.h"
 
 const QString TOTPCredential::BASE32_REGEXP = "^(?:[A-Z2-7]{8})*(?:[A-Z2-7]{2}={0,6}|[A-Z2-7]{4}={0,4}|[A-Z2-7]{5}={0,3}|[A-Z2-7]{7}={0,1})?$";
 const QString TOTPCredential::BASE32_CHAR_REGEXP = "[^A-Za-z 2-7=*]";
@@ -51,7 +53,7 @@ bool TOTPCredential::validateInput()
 {
     QString secretKey = getSecretKey().toUpper().remove(' ');
     ui->lineEditSecretKey->setText(secretKey);
-    if (!getSecretKey().contains(QRegExp(BASE32_REGEXP)))
+    if (!getSecretKey().contains(RegExp(BASE32_REGEXP)))
     {
         QMessageBox::warning(this, tr("Invalid Secret Key"), tr("The entered Secret Key is not a valid Base32 string"));
         ui->lineEditSecretKey->clear();
@@ -69,7 +71,7 @@ void TOTPCredential::clearFields()
 
 void TOTPCredential::on_lineEditSecretKey_textChanged(const QString &arg1)
 {
-    if (arg1.contains(QRegExp(BASE32_CHAR_REGEXP)))
+    if (arg1.contains(RegExp(BASE32_CHAR_REGEXP)))
     {
         ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
         ui->labelError->show();

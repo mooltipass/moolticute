@@ -19,7 +19,13 @@ public:
     void emitEvent(const SystemEvent event);
     static void triggerEvent(const int type, void *instance);
 
-    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
+#if QT_VERSION < 0x060000
+    using ResultType = long;
+#else
+    using ResultType = qintptr;
+#endif
+
+    bool nativeEventFilter(const QByteArray &eventType, void *message, ResultType *result) override;
 
 signals:
     void screenLocked();

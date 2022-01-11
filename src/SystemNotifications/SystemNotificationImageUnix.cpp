@@ -3,12 +3,20 @@
 #include <QDBusMetaType>
 #include <QImage>
 
+#if QT_VERSION < 0x060000
 int SystemNotificationImageUnix::imageHintID = qDBusRegisterMetaType<SystemNotificationImageUnix>();
+#else
+int SystemNotificationImageUnix::imageHintID = qDBusRegisterMetaType<SystemNotificationImageUnix>().id();
+#endif
 
 SystemNotificationImageUnix::SystemNotificationImageUnix(const QImage &img)
 {
     QImage image(img.convertToFormat(QImage::Format_ARGB32).rgbSwapped());
+#if QT_VERSION < 0x060000
     imageData = QByteArray((char *)image.bits(), image.byteCount());
+#else
+    imageData = QByteArray((char *)image.bits(), image.sizeInBytes());
+#endif
     width = image.width();
     height = image.height();
     rowstride = image.bytesPerLine();

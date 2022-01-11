@@ -47,7 +47,11 @@ void RotateSpinner::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
+#if QT_VERSION < 0x060000
     p.setRenderHint(QPainter::HighQualityAntialiasing);
+#else
+    p.setRenderHint(QPainter::Antialiasing);
+#endif
     p.setRenderHint(QPainter::SmoothPixmapTransform);
     p.translate(width() / 2.0, height() / 2.0);
     if (!pix.isNull())

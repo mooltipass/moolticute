@@ -160,12 +160,12 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonNotes->setIcon(AppGui::qtAwesome()->icon(fa::newspapero));
     ui->pushButtonNotes->setVisible(false);
 
-    m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F1), this);
+    m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F1), this);
     setKeysTabVisibleOnDemand(bSSHKeysTabVisibleOnDemand);
     connect(ui->radioButtonSSHTabAlways, &QRadioButton::toggled, this, &MainWindow::onRadioButtonSSHTabsAlwaysToggled);
-    m_advancedTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F2), this);
+    m_advancedTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F2), this);
     connect(m_advancedTabShortcut, SIGNAL(activated()), this, SLOT(onAdvancedTabShortcutActivated()));
-    m_BleDevTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F3), this);
+    m_BleDevTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F3), this);
     ui->pushButtonBleDev->setIcon(AppGui::qtAwesome()->icon(fa::wrench));
     ui->pushButtonBleDev->setVisible(false);
     connect(m_BleDevTabShortcut, SIGNAL(activated()), this, SLOT(onBleDevTabShortcutActivated()));
@@ -655,7 +655,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->label_charging->setPixmap(QString::fromUtf8(":/charge.png"));
     ui->label_charging->setMaximumSize(13,25);
+#if QT_VERSION < 0x060000
     ui->label_charging->setPixmap(ui->label_charging->pixmap()->scaled(13,25, Qt::KeepAspectRatio));
+#else
+    ui->label_charging->setPixmap(ui->label_charging->pixmap().scaled(13,25, Qt::KeepAspectRatio));
+#endif
     ui->label_charging->hide();
 
     ui->label_UserManual->hide();

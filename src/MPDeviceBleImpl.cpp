@@ -172,7 +172,7 @@ void MPDeviceBleImpl::fetchData(QString filePath, MPCmd::Command cmd)
                     [this, filePath, cmd](const QByteArray &data, bool &) -> bool
                     {
                         QFile *file = new QFile(filePath);
-                        if (file->open(QIODevice::WriteOnly))
+                        if (file->open(DeviceOpenModeFlag::WriteOnly))
                         {
                             file->write(bleProt->getFullPayload(data));
                         }
@@ -1930,7 +1930,7 @@ void MPDeviceBleImpl::checkDataFlash(const QByteArray &data, QElapsedTimer *time
 void MPDeviceBleImpl::sendBundleToDevice(QString filePath, AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress)
 {
     QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly))
+    if (!file.open(DeviceOpenModeFlag::ReadOnly))
     {
         qCritical() << "Error opening bundle file: " << filePath;
         return;
@@ -2009,5 +2009,5 @@ void MPDeviceBleImpl::writeFetchData(QFile *file, MPCmd::Command cmd)
 
 bool MPDeviceBleImpl::isBundleFileReadable(const QString &filePath)
 {
-    return QFile{filePath}.open(QIODevice::ReadOnly);
+    return QFile{filePath}.open(DeviceOpenModeFlag::ReadOnly);
 }

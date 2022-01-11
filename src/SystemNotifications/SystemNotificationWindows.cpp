@@ -1,9 +1,9 @@
 #include "SystemNotificationWindows.h"
 #include <QDebug>
-#include <QRegExp>
 #include <QSysInfo>
 #include <QSettings>
 
+#include "Common.h"
 #include "RequestLoginNameDialog.h"
 #include "RequestDomainSelectionDialog.h"
 
@@ -146,13 +146,23 @@ bool SystemNotificationWindows::processResult(const QString &toastResponse, QStr
 {
     constexpr int RESULT_REGEX_NUM = 2;
     constexpr int ID_REGEX_NUM = 4;
-    const QRegExp rx("(Result:\\[)(.*)(\\]\\[)(.*)(\\])(\r\n)");
-
-    if (rx.indexIn(toastResponse) != -1) {
+    const RegExp rx("(Result:\\[)(.*)(\\]\\[)(.*)(\\])(\r\n)");
+#if QT_VERSION < 0x060000
+    if (rx.indexIn(toastResponse) != -1)
+    {
         result = rx.cap(RESULT_REGEX_NUM).trimmed();
         id = rx.cap(ID_REGEX_NUM).toUInt();
         return true;
     }
+#else
+    auto match = rx.match(toastResponse);
+    if (match.hasMatch())
+    {
+        result = match.captured(RESULT_REGEX_NUM).trimmed();
+        id = match.captured(ID_REGEX_NUM).toUInt();
+        return true;
+    }
+#endif
     return false;
 }
 

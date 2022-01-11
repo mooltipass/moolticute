@@ -114,7 +114,7 @@ PassGenerationProfilesDialog::PassGenerationProfilesDialog(QWidget *parent) :
             button->setEnabled(enable);
     });
 
-    connect(m_specialSymbolsGroup, static_cast<void(QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled),
+    connect(m_specialSymbolsGroup, static_cast<void(QButtonGroup::*)(QAbstractButton*, bool)>(&QButtonGroup::buttonToggled),
             this, &PassGenerationProfilesDialog::onSymbolButtonToggled);
 }
 
@@ -203,16 +203,18 @@ void PassGenerationProfilesDialog::deleteProfile()
     updateControls(ui->listViewProfiles->currentIndex());
 }
 
-void PassGenerationProfilesDialog::onSymbolButtonToggled(int id, bool checked)
+void PassGenerationProfilesDialog::onSymbolButtonToggled(QAbstractButton* btn, bool checked)
 {
-    if(id < 0 || id >= kSymbols.size())
-        return;
-
     QModelIndex index = ui->listViewProfiles->currentIndex();
     if(!index.isValid())
         return;
 
-    QChar symbol = kSymbols.at(id);
+    const auto text = btn->text();
+    if (text.isEmpty())
+    {
+        return;
+    }
+    QChar symbol = text[0];
 
     PasswordProfilesModel::Roles role = checked ? PasswordProfilesModel::ADD_SYMBOL : PasswordProfilesModel::REMOVE_SYMBOL;
     m_filterModel->setData(index, symbol, role);

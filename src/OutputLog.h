@@ -53,7 +53,11 @@ private slots:
 
 private:
     QTimer m_scrollTimer;
+#if QT_VERSION < 0x060000
     QTime m_lastMessage;
+#else
+    QElapsedTimer m_lastMessage;
+#endif
 
     bool m_enforceNewline = false;
     bool m_scrollToBottom = false;

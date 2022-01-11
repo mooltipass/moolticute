@@ -72,7 +72,12 @@ void NotesManagement::addNewIcon(const QString &name)
     labelIcon->setAlignment(Qt::AlignCenter);
     labelIcon->setPixmap(QString::fromUtf8(":/note.png"));
     labelIcon->setMaximumSize(160,200);
+
+#if QT_VERSION < 0x060000
     labelIcon->setPixmap(labelIcon->pixmap()->scaled(160,200, Qt::KeepAspectRatio));
+#else
+    labelIcon->setPixmap(labelIcon->pixmap().scaled(160,200, Qt::KeepAspectRatio));
+#endif
     labelIcon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     labelIcon->setAlignment(Qt::AlignCenter);
 

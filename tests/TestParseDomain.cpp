@@ -24,7 +24,7 @@ void TestParseDomain::test_URLs()
     ParseDomain url(url_str);
 
     QCOMPARE(url.qurl().isValid(), url_valid);
-    QCOMPARE(!url.qurl().topLevelDomain().isEmpty(), tld_valid); // has valid TLD, but may not have domain part
+    QCOMPARE(!url.getTopLevel().isEmpty(), tld_valid); // has valid TLD, but may not have domain part
     QCOMPARE(url.isWebsite(), isWebsite);  // has valid TLD and non-empty domain part
 
     QCOMPARE(url.tld(), tld);
