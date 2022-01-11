@@ -62,7 +62,7 @@ sudo udevadm control --reload-rules
 ```
 
 ##### NixOS
-Listed in Nixpkgs [here](https://search.nixos.org/packages?channel=unstable&show=moolticute&from=0&size=50&sort=relevance&type=packages&query=moolticute). Udev rules require extra step. Below sufficient if [this](https://github.com/NixOS/nixpkgs/pull/154355) is merged.
+Udev rules are lifted from the package if [this](https://github.com/NixOS/nixpkgs/pull/154355) is merged, otherwise paste them in as `extraRules`.
 ```
 environment.systemPackages = with pkgs; [
   ...
