@@ -61,6 +61,21 @@ curl https://raw.githubusercontent.com/mooltipass/mooltipass-udev/master/udev/69
 sudo udevadm control --reload-rules
 ```
 
+##### NixOS
+Listed in Nixpkgs [here](https://search.nixos.org/packages?channel=unstable&show=moolticute&from=0&size=50&sort=relevance&type=packages&query=moolticute). Udev rules require extra step. Below sufficient if [this](https://github.com/NixOS/nixpkgs/pull/154355) is merged.
+```
+environment.systemPackages = with pkgs; [
+  ...
+  moolticute
+  ];
+};
+
+services.udev.packages = [ pkgs.moolticute.udev ]; # if linked PR is merged
+services.udev.extraRules = '' # if not slip rules in manually
+  <the udev rules from data/moolticute.sh>
+            '';
+```
+
 ### How to build
 
 For now, no binary releases are out yet. You will need to build the software by following the next step.
