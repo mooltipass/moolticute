@@ -130,7 +130,8 @@ HEADERS  += \
     src/Settings/DeviceSettings.h \
     src/Settings/DeviceSettingsMini.h \
     src/Settings/DeviceSettingsBLE.h \
-    src/Mooltipass/MPBLEFreeAddressProvider.h
+    src/Mooltipass/MPBLEFreeAddressProvider.h \
+    src/utils/qurltlds_p.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \
