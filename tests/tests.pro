@@ -8,7 +8,7 @@ QT       += testlib
 
 QT       -= gui
 
-QMAKE_CXXFLAGS += -std=c++0x
+CONFIG += c++11
 
 TARGET = tests
 CONFIG   += console
@@ -74,6 +74,7 @@ HEADERS += \
     TestCredentialModel.h \
     TestCredentialModelFilter.h \
     TestDbExportsRegistry.h \
-    TestParseDomain.h
+    TestParseDomain.h \
+    ../src/utils/qurltlds_p.h \
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"

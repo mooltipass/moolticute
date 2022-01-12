@@ -1,5 +1,5 @@
 #include "ParseDomain.h"
-
+#include "utils/qurltlds_p.h"
 
 ParseDomain::ParseDomain(const QString &url) :
     _url(QUrl::fromUserInput(url))
@@ -60,6 +60,49 @@ ParseDomain::ParseDomain(const QString &url) :
     }
 }
 
+bool ParseDomain::containsTLDEntry(QStringView entry, TLDMatchType match)
+{
+    const QStringView matchSymbols[] = {
+            u"",
+            u"*",
+            u"!",
+        };
+        const auto symbol = matchSymbols[match];
+        int index = qt_hash(entry, qt_hash(symbol)) % tldCount;
+        // select the right chunk from the big table
+        short chunk = 0;
+        uint chunkIndex = tldIndices[index], offset = 0;
+        while (chunk < tldChunkCount && tldIndices[index] >= tldChunks[chunk]) {
+            chunkIndex -= tldChunks[chunk];
+            offset += tldChunks[chunk];
+            chunk++;
+        }
+        // check all the entries from the given index
+        while (chunkIndex < tldIndices[index+1] - offset) {
+            const auto utf8 = tldData[chunk] + chunkIndex;
+            if ((symbol.isEmpty() || QLatin1Char(*utf8) == symbol) && entry == QString::fromUtf8(utf8 + symbol.size()))
+                return true;
+            chunkIndex += qstrlen(utf8) + 1; // +1 for the ending \0
+        }
+        return false;
+}
+
+bool ParseDomain::qIsEffectiveTLD(const QString &domain)
+{
+    // for domain 'foo.bar.com':
+    // 1. return if TLD table contains 'foo.bar.com'
+    // 2. else if table contains '*.bar.com',
+    // 3. test that table does not contain '!foo.bar.com'
+    if (containsTLDEntry(domain, ExactMatch)) // 1
+        return true;
+    const int dot = domain.indexOf(QLatin1Char('.'));
+    if (dot >= 0) {
+        if (containsTLDEntry(domain.mid(dot), SuffixMatch))   // 2
+            return !containsTLDEntry(domain, ExceptionMatch); // 3
+    }
+    return false;
+}
+
 QString ParseDomain::getManuallyEnteredDomainName(const QString &service)
 {
     if (!isWebsite())
@@ -83,11 +126,16 @@ QString ParseDomain::getManuallyEnteredDomainName(const QString &service)
  */
 QString ParseDomain::getTopLevel() const
 {
-    QString host = _url.host();
-    int pos = host.lastIndexOf('.');
-    if (-1 != pos)
-    {
-        return host.right(host.size() - pos);
-    }
-    return "";
+    QString domain = _url.host();
+    const QString domainLower = domain.toLower();
+        QStringList sections = domainLower.split(QLatin1Char('.'));
+        if (sections.isEmpty())
+            return QString();
+        QString level, tld;
+        for (int j = sections.count() - 1; j >= 0; --j) {
+            level.prepend(QLatin1Char('.') + sections.at(j));
+            if (qIsEffectiveTLD(level.right(level.size() - 1)))
+                tld = level;
+        }
+        return tld;
 }

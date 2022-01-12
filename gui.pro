@@ -92,6 +92,7 @@ HEADERS  += src/MainWindow.h \
     src/WSClient.h \
     src/RotateSpinner.h \
     src/utils/GridLayoutUtil.h \
+    src/utils/qurltlds_p.h \
     src/version.h \
     src/AppGui.h \
     src/DaemonMenuAction.h \

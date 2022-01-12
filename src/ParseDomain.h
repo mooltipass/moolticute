@@ -66,6 +66,19 @@ public:
 private:
     ParseDomain();
 
+
+    enum TLDMatchType {
+        ExactMatch,
+        SuffixMatch,
+        ExceptionMatch,
+    };
+
+    /**
+     * Functions from qtldurl.cpp
+     */
+    static bool containsTLDEntry(QStringView entry, TLDMatchType match);
+    static bool qIsEffectiveTLD(const QString &domain);
+
     QUrl _url;
     bool _isWebsite;
     QString _tld;
