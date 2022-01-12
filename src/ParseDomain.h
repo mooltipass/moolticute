@@ -66,7 +66,7 @@ public:
 private:
     ParseDomain();
 
-
+#if QT_VERSION >= 0x051000
     enum TLDMatchType {
         ExactMatch,
         SuffixMatch,
@@ -78,6 +78,7 @@ private:
      */
     static bool containsTLDEntry(QStringView entry, TLDMatchType match);
     static bool qIsEffectiveTLD(const QString &domain);
+#endif
 
     QUrl _url;
     bool _isWebsite;

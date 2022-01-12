@@ -1,5 +1,7 @@
 #include "ParseDomain.h"
+#if QT_VERSION >= 0x051000
 #include "utils/qurltlds_p.h"
+#endif
 
 ParseDomain::ParseDomain(const QString &url) :
     _url(QUrl::fromUserInput(url))
@@ -60,6 +62,7 @@ ParseDomain::ParseDomain(const QString &url) :
     }
 }
 
+#if QT_VERSION >= 0x051000
 bool ParseDomain::containsTLDEntry(QStringView entry, TLDMatchType match)
 {
     const QStringView matchSymbols[] = {
@@ -102,6 +105,7 @@ bool ParseDomain::qIsEffectiveTLD(const QString &domain)
     }
     return false;
 }
+#endif
 
 QString ParseDomain::getManuallyEnteredDomainName(const QString &service)
 {
@@ -126,6 +130,7 @@ QString ParseDomain::getManuallyEnteredDomainName(const QString &service)
  */
 QString ParseDomain::getTopLevel() const
 {
+#if QT_VERSION >= 0x051000
     QString domain = _url.host();
     const QString domainLower = domain.toLower();
         QStringList sections = domainLower.split(QLatin1Char('.'));
@@ -138,4 +143,7 @@ QString ParseDomain::getTopLevel() const
                 tld = level;
         }
         return tld;
+#else
+    return _url.topLevelDomain();
+#endif
 }
