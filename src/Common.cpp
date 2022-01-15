@@ -364,7 +364,9 @@ QString Common::createUid(QString prefix)
     if (!commonUidInit)
     {
         commonUidInit = true;
+#if QT_VERSION < 0x051000
         srand(time(NULL));
+#endif
     }
 
     //try to generate a unique id based on
@@ -373,11 +375,11 @@ QString Common::createUid(QString prefix)
     {
         s = QStringLiteral("%1%2%3%4%5%6")
             .arg(prefix)
-            .arg(rand())
-            .arg(rand())
-            .arg(rand())
-            .arg(rand())
-            .arg(rand());
+            .arg(getRand())
+            .arg(getRand())
+            .arg(getRand())
+            .arg(getRand())
+            .arg(getRand());
     } while (commonExistingUid.contains(s));
 
     return s;
@@ -467,4 +469,13 @@ QByteArray Common::reverse(const QByteArray &array)
         res.append(array[i]);
     }
     return res;
+}
+
+int Common::getRand()
+{
+#if QT_VERSION < 0x051000
+    return rand();
+#else
+    return QRandomGenerator::global()->generate();
+#endif
 }
