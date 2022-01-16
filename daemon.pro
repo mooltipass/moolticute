@@ -11,7 +11,7 @@ CONFIG -= app_bundle
 
 CONFIG += c++11
 
-INCLUDEPATH += $$PWD/src $$PWD/src/MessageProtocol $$PWD/src/Mooltipass $$PWD/src/Settings $$PWD/src/CyoEncode
+INCLUDEPATH += $$PWD/src $$PWD/src/MessageProtocol $$PWD/src/Mooltipass $$PWD/src/Settings $$PWD/src/CyoEncode $$PWD/src/SimpleCrypt
 
 win32 {
     LIBS += -lsetupapi -luser32

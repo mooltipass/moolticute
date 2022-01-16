@@ -54,7 +54,9 @@ AppGui::AppGui(int & argc, char ** argv) :
 
 bool AppGui::initialize()
 {
+#if QT_VERSION < 0x051000
     srand(time(NULL));
+#endif
 
     QCoreApplication::setOrganizationName("mooltipass");
     QCoreApplication::setOrganizationDomain("themooltipass.com");
@@ -736,7 +738,7 @@ void AppGui::checkUpdate(bool displayMessage)
 
     //Recheck in at least 30minutes plus some random time
     if (!displayMessage)
-        QTimer::singleShot(1000 * 60 * 60 * 30 + rand() % 240, [this]() { checkUpdate(false); });
+        QTimer::singleShot(1000 * 60 * 60 * 30 + Common::getRand() % 240, [this]() { checkUpdate(false); });
 }
 
 QString AppGui::getDataDirPath()

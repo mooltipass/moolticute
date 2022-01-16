@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QDataStream>
+#include "Common.h"
 
 #if QT_VERSION < 0x060000
     using DeviceOpenModeFlag = QIODevice;
@@ -44,7 +45,9 @@ SimpleCrypt::SimpleCrypt():
     m_protectionMode(ProtectionChecksum),
     m_lastError(ErrorNoError)
 {
+#if QT_VERSION < 0x051000
     srand(uint(QDateTime::currentMSecsSinceEpoch() & 0xFFFF));
+#endif
 }
 
 SimpleCrypt::SimpleCrypt(quint64 key):
@@ -53,7 +56,9 @@ SimpleCrypt::SimpleCrypt(quint64 key):
     m_protectionMode(ProtectionChecksum),
     m_lastError(ErrorNoError)
 {
+#if QT_VERSION < 0x051000
     srand(uint(QDateTime::currentMSecsSinceEpoch() & 0xFFFF));
+#endif
     splitKey();
 }
 
@@ -119,7 +124,7 @@ QByteArray SimpleCrypt::encryptToByteArray(QByteArray plaintext)
     }
 
     //prepend a random char to the string
-    char randomChar = char(rand() & 0xFF);
+    char randomChar = char(Common::getRand() & 0xFF);
     ba = randomChar + integrityProtection + ba;
 
     int pos(0);

@@ -19,7 +19,7 @@
 #include "MPDevice_emul.h"
 #include "MooltipassCmds.h"
 
-#define CLEAN_MEMORY_QBYTEARRAY(d) do {for (int i = 0; i < d.size(); i++){d[i] = rand() % 256;}} while(0);
+#define CLEAN_MEMORY_QBYTEARRAY(d) do {for (int i = 0; i < d.size(); i++){d[i] = Common::getRand() % 256;}} while(0);
 
 
 MPDevice_emul::MPDevice_emul(QObject *parent):
@@ -209,7 +209,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
          d[0] = 32;
          d[1] = commandData;
          for (int i = 0; i < 32; i++)
-             d[2 + i] = rand() % 255;
+             d[2 + i] = Common::getRand() % 255;
          d.resize(64);
          sendReadSignal(d);
          break;

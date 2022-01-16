@@ -260,6 +260,8 @@ public:
 
     static QByteArray reverse(const QByteArray& array);
 
+    static int getRand();
+
     typedef enum
     {
         MP_Classic = 0,
