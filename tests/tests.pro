@@ -29,7 +29,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 include (../src/QSimpleUpdater/QSimpleUpdater.pri)
 
+INCLUDEPATH += $$PWD/../src $$PWD/../src/SimpleCrypt
+
 SOURCES += \
+    ../src/Common.cpp \
     ../src/SimpleCrypt/SimpleCrypt.cpp \
     ../src/FilesCache.cpp \
     ../src/DbBackupsTracker.cpp \
@@ -54,6 +57,7 @@ SOURCES += \
     TestParseDomain.cpp
 
 HEADERS += \
+    ../src/Common.h \
     ../src/SimpleCrypt/SimpleCrypt.h \
     ../src/FilesCache.h \
     ../src/DbBackupsTracker.h\

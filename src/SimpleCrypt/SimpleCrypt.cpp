@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QDataStream>
-#include "src/Common.h"
+#include "Common.h"
 
 #if QT_VERSION < 0x060000
     using DeviceOpenModeFlag = QIODevice;

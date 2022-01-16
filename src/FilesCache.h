@@ -4,7 +4,7 @@
 #include <QList>
 #include <QVariantHash>
 #include <QObject>
-#include "SimpleCrypt/SimpleCrypt.h"
+#include "SimpleCrypt.h"
 
 class FilesCache : public QObject
 {
