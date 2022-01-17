@@ -792,6 +792,12 @@ void AppGui::createMainWindow()
     Q_ASSERT(dbMasterController);
 
     win = new MainWindow(wsClient, dbMasterController);
+
+    // Force resize and reset maximumWidth
+    // This fixes a crash on some Gnome+Wayland platforms
+    win->resize(0,0);
+    win->setMaximumWidth(win->width());
+
     connect(win, &MainWindow::destroyed, [this](QObject *)
     {
         win = nullptr;
