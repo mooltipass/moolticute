@@ -419,8 +419,8 @@ void MPDeviceBleImpl::storeCredential(const BleCredential &cred, MessageHandlerC
            }
            else
            {
-               qWarning() << "Credential store failed";
-               cb(false, "Credential store failed");
+               qWarning() << Common::MMM_CREDENTIAL_STORE_FAILED;
+               cb(false, Common::MMM_CREDENTIAL_STORE_FAILED);
            }
            return true;
        }));

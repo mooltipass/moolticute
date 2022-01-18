@@ -385,7 +385,7 @@ void CredentialsManagement::on_addCredentialButton_clicked()
                                         ui->addCredPasswordInput->text());
 
         auto conn = std::make_shared<QMetaObject::Connection>();
-        *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & service, const QString & login, const QString &, bool success)
+        *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & service, const QString & login, const QString &, bool success, const QString &)
         {
             disconnect(*conn);
             ui->addCredentialButton->setEnabled(true);

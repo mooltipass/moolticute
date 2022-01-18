@@ -1102,12 +1102,21 @@ void MainWindow::wantSaveCredentialManagement()
     connect(wsClient, &WSClient::progressChanged, this, &MainWindow::loadingProgress);
 
     auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & , const QString &, const QString &, bool success)
+    *conn = connect(wsClient, &WSClient::credentialsUpdated, [this, conn](const QString & , const QString &, const QString &, bool success, const QString& msg)
     {
         disconnect(*conn);
         if (!success)
         {
-            QMessageBox::warning(this, tr("Failure"), tr("Couldn't save credentials, please contact the support team with moolticute's log"));
+            QString errorMessage;
+            if (Common::MMM_CREDENTIAL_STORE_FAILED == msg)
+            {
+                errorMessage = tr("Couldn't change all passwords, please approve prompts on the device");
+            }
+            else
+            {
+                errorMessage = tr("Couldn't change all passwords, please approve prompts on the device");
+            }
+            QMessageBox::warning(this, tr("Failure"), errorMessage);
             ui->stackedWidget->setCurrentWidget(ui->pageCredentials);
         }
 
