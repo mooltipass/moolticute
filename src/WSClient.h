@@ -136,7 +136,7 @@ signals:
     void wsDisconnected();
     void memoryDataChanged();
     void passwordUnlocked(const QString & service, const QString & login, const QString & password, bool success);
-    void credentialsUpdated(const QString & service, const QString & login, const QString & description, bool success);
+    void credentialsUpdated(const QString & service, const QString & login, const QString & description, bool success, const QString& msg);
     void showAppRequested();
     void progressChanged(int total, int current, QString statusMsg);
     void memcheckFinished(bool success, int freeBlocks = 0, int totalBlocks = 0);

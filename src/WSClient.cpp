@@ -272,14 +272,14 @@ void WSClient::onTextMessageReceived(const QString &message)
         {
             emit showExportPrompt();
         }
-        emit credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
+        emit credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success, message);
     }
     else if (rootobj["msg"] == "set_credentials")
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = !o.contains("failed") || !o["failed"].toBool();
         auto message = success ? o["description"].toString() : o["error_message"].toString();
-        emit credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success);
+        emit credentialsUpdated(o["service"].toString(), o["login"].toString(), o["description"].toString(), success, message);
     }
     else if (rootobj["msg"] == "show_app")
     {
