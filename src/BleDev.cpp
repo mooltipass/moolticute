@@ -84,8 +84,6 @@ void BleDev::initUITexts()
     const auto browseText = tr("Browse");
     ui->label_DevTab->setText(tr("BLE Developer Tab"));
 
-    ui->groupBoxUploadBundle->setTitle(tr("Bundle Settings"));
-
     ui->groupBoxFetchData->setTitle(tr("Data Fetch"));
     ui->label_FetchDataFile->setText(tr("Storage file:"));
     ui->btnFetchDataBrowse->setText(browseText);
