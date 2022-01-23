@@ -41,11 +41,10 @@ sudo udevadm control --reload-rules
 ```
 
 ##### Arch Linux
-```bash
-sudo pacman -S --needed qt5-websockets qt5-base
-curl https://raw.githubusercontent.com/mooltipass/mooltipass-udev/master/udev/69-mooltipass.rules | sudo tee /etc/udev/rules.d/69-mooltipass.rules
-sudo udevadm control --reload-rules
-```
+
+There are packages in AUR both for udev rules and for the Moolticute:
+  - [udev rules](https://aur.archlinux.org/packages/mooltipass-udev/)
+  - [Moolticute](https://aur.archlinux.org/packages/moolticute/)
 
 ##### Fedora Linux
 ```bash
