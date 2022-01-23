@@ -7,6 +7,11 @@
 
 const QString BleDev::HEXA_CHAR_REGEXP = "[^A-Fa-f0-9*]";
 const QByteArray BleDev::START_BUNDLE_BYTES = "\x78\x56\x34\x12";
+const QStringList BleDev::ACCEPTED_BUNDLE_FILENAMES = {
+    "bundle_not_numbered.img",
+    "bundle_numbered_with_white_silkscreen.img",
+    "miniblebundle.img"
+  };
 
 BleDev::BleDev(QWidget *parent) :
     QWidget(parent),
@@ -34,8 +39,6 @@ BleDev::BleDev(QWidget *parent) :
     ui->horizontalLayout_Fetch->setAlignment(Qt::AlignLeft);
     ui->progressBarFetchData->setMinimum(0);
     ui->progressBarFetchData->setMaximum(0);
-    ui->labelInvalidBundle->setStyleSheet("QLabel { color : red; }");
-    ui->labelInvalidBundle->hide();
 
 #if defined(Q_OS_LINUX)
     ui->label_FetchDataFile->setMaximumWidth(150);
@@ -56,7 +59,6 @@ void BleDev::setWsClient(WSClient *c)
 
 void BleDev::clearWidgets()
 {
-    ui->lineEditBundlePassword->clear();
     ui->progressBarUpload->hide();
     ui->label_UploadProgress->hide();
 }
@@ -81,8 +83,6 @@ void BleDev::initUITexts()
 {
     const auto browseText = tr("Browse");
     ui->label_DevTab->setText(tr("BLE Developer Tab"));
-
-    ui->groupBoxUploadBundle->setTitle(tr("Bundle Settings"));
 
     ui->groupBoxFetchData->setTitle(tr("Data Fetch"));
     ui->label_FetchDataFile->setText(tr("Storage file:"));
@@ -134,6 +134,39 @@ bool BleDev::isValidBundleFile(QFile* file) const
     return true;
 }
 
+bool BleDev::checkBundleFilePassword(const QFileInfo& fileInfo, QString &password)
+{
+    const auto baseFilename = fileInfo.baseName();
+    const auto baseNameWithExt = fileInfo.fileName();
+    if (!ACCEPTED_BUNDLE_FILENAMES.contains(baseNameWithExt))
+    {
+        const auto INVALID_BUNDLE_TEXT = tr("Invalid bundle file is selected");
+        auto fileParts = baseFilename.split("_");
+        if (fileParts.size() != BUNDLE_FILE_PARTS_SIZE)
+        {
+            QMessageBox::warning(this, INVALID_BUNDLE_TEXT,
+                                 tr("The given bundle file name is not correct."));
+            return false;
+        }
+        const auto serial = fileParts[SERIAL_FILE_PART].toUInt();
+        if (wsClient->get_hwSerial() != serial)
+        {
+            QMessageBox::warning(this, INVALID_BUNDLE_TEXT,
+                                 tr("The device serial number is not correct in bundle filename."));
+            return false;
+        }
+        const auto bundleVersion = fileParts[BUNDLE_FILE_PART].toInt();
+        if (wsClient->get_bundleVersion() != bundleVersion)
+        {
+            QMessageBox::warning(this, INVALID_BUNDLE_TEXT,
+                                 tr("The bundle version is not correct in bundle filename."));
+            return false;
+        }
+        password = fileParts.last();
+    }
+    return true;
+}
+
 void BleDev::on_btnFileBrowser_clicked()
 {
     if (wsClient->get_status() != Common::NoBundle &&
@@ -177,6 +210,12 @@ void BleDev::on_btnFileBrowser_clicked()
         return;
     }
 
+    QString password = "";
+    if (!checkBundleFilePassword(QFileInfo{file}, password))
+    {
+        return;
+    }
+
     connect(wsClient, &WSClient::progressChanged, this, &BleDev::updateProgress);
     ui->progressBarUpload->show();
     ui->progressBarUpload->setMinimum(0);
@@ -184,7 +223,7 @@ void BleDev::on_btnFileBrowser_clicked()
     ui->progressBarUpload->setValue(0);
     ui->label_UploadProgress->setText(tr("Starting upload bundle file."));
     ui->label_UploadProgress->show();
-    wsClient->sendUploadBundle(fileName, ui->lineEditBundlePassword->text());
+    wsClient->sendUploadBundle(fileName, password);
 }
 
 void BleDev::displayUploadBundleResultReceived(bool success)
@@ -254,20 +293,4 @@ void BleDev::on_btnFetchAccData_clicked()
 void BleDev::on_btnFetchRandomData_clicked()
 {
     fetchData(Common::FetchType::RANDOM_BYTES);
-}
-
-void BleDev::on_lineEditBundlePassword_textChanged(const QString &arg1)
-{
-    auto size = arg1.size();
-    if ((size == 0 || size == UPLOAD_PASSWORD_SIZE) &&
-            !arg1.contains(RegExp(HEXA_CHAR_REGEXP)))
-    {
-        ui->btnFileBrowser->setEnabled(true);
-        ui->labelInvalidBundle->hide();
-    }
-    else
-    {
-        ui->btnFileBrowser->setEnabled(false);
-        ui->labelInvalidBundle->show();
-    }
 }
