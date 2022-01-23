@@ -38,12 +38,11 @@ private slots:
 
     void on_btnFetchRandomData_clicked();
 
-    void on_lineEditBundlePassword_textChanged(const QString &arg1);
-
 private:
     void initUITexts();
     void fetchData(const Common::FetchType &fetchType);
     bool isValidBundleFile(QFile* file) const;
+    bool checkBundleFilePassword(const QFileInfo& fileInfo, QString& password);
 
     Ui::BleDev *ui;
     WSClient *wsClient = nullptr;
@@ -54,6 +53,10 @@ private:
     static const QByteArray START_BUNDLE_BYTES;
     static constexpr int UPLOAD_PASSWORD_SIZE = 32;
     static constexpr int MIN_BATTERY_PCT_FOR_UPLOAD = 60;
+    static constexpr int BUNDLE_FILE_PARTS_SIZE = 8;
+    static constexpr int SERIAL_FILE_PART = 1;
+    static constexpr int BUNDLE_FILE_PART = 4;
+    const static QStringList ACCEPTED_BUNDLE_FILENAMES;
 };
 
 #endif // BLEDEV_H
