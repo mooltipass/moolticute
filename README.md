@@ -33,6 +33,27 @@ Packages are build and available here: https://github.com/mooltipass/moolticute/
  - Requires the qt-dbus module
  - Requires to install [udev rule](https://github.com/mooltipass/mooltipass-udev) for it
 
+Moolticute comes in two part on Linux:
+  - A daemon that runs in background named moolticuted that proxy
+    command between device and GUI
+  - A GUI application for user to interact with the device using moolticuted
+
+One way of using Moolticute is allowing systemd to manage the daemon
+as a system service and your desktop environment execing the GUI when
+you need it. In such setup it is best to disable the option found in
+the GUI called "Start Moolticute with the computer"
+The default build recipe will drop a systemd system unit
+`moolticuted.service`, after build and installation:
+
+```bash
+systemctl daemon-reload
+systemctl enable --now moolticuted.service
+```
+
+At this point the Moolticute daemon should be running. As the build
+also drop an `moolticute.desktop` you should be able to launch the GUI
+using your environment application launcher and searching for "moolticute".
+
 ##### Ubuntu 16.04
 ```bash
 sudo apt install libqt5websockets5-dev qt-sdk qt5-qmake qt5-default libudev-dev
