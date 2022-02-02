@@ -648,7 +648,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->lineEditSshArgs->setText(s.value("settings/ssh_args").toString());
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
+    ui->scrollAreaMCSettings->setStyleSheet("QScrollArea { background-color:transparent; }");
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents { background-color:transparent; }");
+    ui->scrollAreaMCSettingsContents->setStyleSheet("#scrollAreaMCSettingsContents { background-color:transparent; }");
 
     // hide widget with prompts by default
     ui->promptWidget->setVisible(false);
