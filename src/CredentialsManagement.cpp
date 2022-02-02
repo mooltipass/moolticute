@@ -79,7 +79,6 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->toolButtonTOTPService->setEnabled(false);
     ui->toolButtonTOTPService->hide();
 
-    ui->label_UserCategories->setText(tr("Set user categories"));
     ui->labelCategory1->setText(tr("Category 1:"));
     ui->labelCategory2->setText(tr("Category 2:"));
     ui->labelCategory3->setText(tr("Category 3:"));
@@ -1169,13 +1168,11 @@ void CredentialsManagement::checkDeviceType()
 {
     if (wsClient->isMPBLE() && !wsClient->get_memMgmtMode() && wsClient->get_advancedMenu())
     {
-        ui->label_UserCategories->show();
         ui->widget_UserCategories->show();
         sendGetUserCategories();
     }
     else
     {
-        ui->label_UserCategories->hide();
         ui->widget_UserCategories->hide();
     }
 }
