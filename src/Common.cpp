@@ -480,3 +480,30 @@ int Common::getRand()
     return QRandomGenerator::global()->generate();
 #endif
 }
+
+QString Common::getMcAgent()
+{
+    QString program = QCoreApplication::applicationDirPath () + "/cli/mc-agent";
+    if (QFileInfo{program}.exists())
+    {
+        return program;
+    }
+
+    // mc-agent is not installed with MC, try if it was added to a PATH folder
+    QString pathString = qgetenv("PATH");
+#ifdef Q_OS_WIN
+    constexpr QChar PATH_SEPARATOR = ';';
+#else
+    constexpr QChar PATH_SEPARATOR = ':';
+#endif
+    const auto pathFolders = pathString.split(PATH_SEPARATOR);
+    for (QString folder : pathFolders)
+    {
+        program = folder + "/mc-agent";
+        if (QFileInfo{program}.exists())
+        {
+            return program;
+        }
+    }
+    return "";
+}
