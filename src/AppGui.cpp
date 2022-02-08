@@ -296,7 +296,7 @@ void AppGui::startSSHAgent()
     if (s.value("settings/auto_start_ssh").toBool())
     {
         sshAgentProcess = new QProcess(this);
-        QString program = QCoreApplication::applicationDirPath () + "/cli/mc-agent";
+        QString program = Common::getMcAgent();
         QStringList arguments;
 #ifndef Q_OS_WIN
         arguments << "--no-fork";

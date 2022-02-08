@@ -101,7 +101,7 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
     if (exists)
     {
         sshProcess = new QProcess(this);
-        const auto program = QCoreApplication::applicationDirPath () + "/cli/mc-agent";
+        const auto program = Common::getMcAgent();
         auto actualProg = program;
 #ifdef Q_OS_WIN
         actualProg += ".exe";
@@ -386,7 +386,7 @@ void SSHManagement::on_pushButtonImport_clicked()
     currentAction = Action::ImportKey;
 
     sshProcess = new QProcess(this);
-    QString program = QCoreApplication::applicationDirPath () + "/cli/mc-agent";
+    QString program = Common::getMcAgent();
     QStringList arguments;
     arguments << "--output_progress"
               << "cli"
@@ -432,7 +432,7 @@ void SSHManagement::on_pushButtonDelete_clicked()
     currentAction = Action::DeleteKey;
 
     sshProcess = new QProcess(this);
-    QString program = QCoreApplication::applicationDirPath () + "/cli/mc-agent";
+    QString program = Common::getMcAgent();
     QStringList arguments;
     arguments << "--output_progress"
               << "cli"

@@ -262,6 +262,8 @@ public:
 
     static int getRand();
 
+    static QString getMcAgent();
+
     typedef enum
     {
         MP_Classic = 0,
