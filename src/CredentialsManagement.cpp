@@ -471,6 +471,12 @@ void CredentialsManagement::saveCredential(const QModelIndex currentSelectionInd
         {
             pLoginItem->parentItem()->setName(newServiceName);
             const QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(newServiceName);
+            const auto filterText = ui->lineEditFilterCred->text();
+            if (!filterText.isEmpty() && !newServiceName.contains(filterText))
+            {
+                //Remove filter if new service name does not contain filter text
+                ui->lineEditFilterCred->clear();
+            }
             //Service name changed, sort to the correct order
             m_pCredModel->dataChanged(serviceIdx, serviceIdx);
         }
@@ -1019,6 +1025,11 @@ void CredentialsManagement::clearMMMUi()
 
 void CredentialsManagement::updateBleFavs(const QModelIndex &srcIndex)
 {
+    if (!srcIndex.isValid())
+    {
+        qCritical() << "Invalid ModelIndex, cannot update BLE favorites";
+        return;
+    }
     const auto category = getCategory(srcIndex);
     int i = 0;
     int from = category * MAX_BLE_CAT_NUM  + 1;
