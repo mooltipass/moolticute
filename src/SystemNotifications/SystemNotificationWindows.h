@@ -10,6 +10,15 @@ class SystemNotificationWindows : public ISystemNotification
     using MessageMap = QMap<size_t, QString>;
     using CallbackType = void(QProcess::*)(int, QProcess::ExitStatus);
 
+    enum FocusAssistResult
+    {
+        NOT_SUPPORTED = -2,
+        FAILED = -1,
+        OFF = 0,
+        PRIORITY_ONLY = 1,
+        ALARMS_ONLY = 2
+    };
+
     Q_OBJECT
 public:
     explicit SystemNotificationWindows(QObject *parent = nullptr);
@@ -39,6 +48,7 @@ public slots:
 protected:
     bool processResult(const QString &toastResponse, QString &result, size_t &id) const;
     bool isDoNotDisturbEnabled() const;
+    bool isFocusAssistEnabled() const;
     void installSnoreToast();
 
     QProcess* process = nullptr;
