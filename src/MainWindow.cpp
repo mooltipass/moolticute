@@ -160,12 +160,17 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonNotes->setIcon(AppGui::qtAwesome()->icon(fa::newspapero));
     ui->pushButtonNotes->setVisible(false);
 
-    m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F1), this);
+    unsigned int keyModifiers = Qt::SHIFT;
+#ifndef Q_OS_MACOS
+    keyModifiers |= Qt::CTRL;
+#endif
+
+    m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(keyModifiers | Qt::Key_F1), this);
     setKeysTabVisibleOnDemand(bSSHKeysTabVisibleOnDemand);
     connect(ui->radioButtonSSHTabAlways, &QRadioButton::toggled, this, &MainWindow::onRadioButtonSSHTabsAlwaysToggled);
-    m_advancedTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F2), this);
+    m_advancedTabShortcut = new QShortcut(QKeySequence(keyModifiers | Qt::Key_F2), this);
     connect(m_advancedTabShortcut, SIGNAL(activated()), this, SLOT(onAdvancedTabShortcutActivated()));
-    m_BleDevTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F3), this);
+    m_BleDevTabShortcut = new QShortcut(QKeySequence(keyModifiers | Qt::Key_F3), this);
     ui->pushButtonBleDev->setIcon(AppGui::qtAwesome()->icon(fa::wrench));
     ui->pushButtonBleDev->setVisible(false);
     connect(m_BleDevTabShortcut, SIGNAL(activated()), this, SLOT(onBleDevTabShortcutActivated()));
