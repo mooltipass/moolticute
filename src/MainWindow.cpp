@@ -160,7 +160,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonNotes->setIcon(AppGui::qtAwesome()->icon(fa::newspapero));
     ui->pushButtonNotes->setVisible(false);
 
-    auto keyModifiers = Qt::SHIFT;
+    unsigned int keyModifiers = Qt::SHIFT;
 #ifndef Q_OS_MACOS
     keyModifiers |= Qt::CTRL;
 #endif
