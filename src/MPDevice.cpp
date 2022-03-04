@@ -7514,6 +7514,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     newAddressesReceivedCounter = 0;
     bool packet_send_needed = false;
     bool onlyChangePwd = isBLE() && isCsv && !bleImpl->get_advancedMenu();
+    //New node ptr and parent address for potentially changed nodes
+    QHash<MPNode*, QByteArray> potentialChangedNodes;
     AsyncJobs *jobs = new AsyncJobs("Merging credentials changes", this);
 
     /// TODO: sanitize inputs (or not, as it is done at the mpnode.cpp level)
@@ -7768,7 +7770,12 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     newNode->setNotDeletedTagged();
                     loginChildNodes.append(newNode);
                     removeChildFromDB(parentNodePtr, nodePtr, false, true);
-                    addChildToDB(parentNodePtr, newNode);
+                    if (!addChildToDB(parentNodePtr, newNode))
+                    {
+                        loginChildNodes.removeOne(newNode);
+                        // Check later if a credential with the same name was deleted
+                        potentialChangedNodes.insert(newNode, parentNodePtr->getAddress());
+                    }
                     packet_send_needed = true;
 
                     /* Set favorite */
@@ -7835,10 +7842,38 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             /* Marked for deletion? */
             if (!noDelete && !curNode->getNotDeletedTagged())
             {
-                removeChildFromDB(nodeItem, curNode, true, true);
+                MPNode* renamedNode = nullptr;
+                QMutableHashIterator<MPNode*, QByteArray> it(potentialChangedNodes);
+                while (it.hasNext()) {
+                    it.next();
+                    auto* node = it.key();
+                    QByteArray parentAddr = it.value();
+                    // Check if it has the same parent and login name
+                    if (parentAddr == nodeItem->getAddress() &&
+                            curNode->getLogin() == node->getLogin())
+                    {
+                        renamedNode = node;
+                        it.remove();
+                        break;
+                    }
+                }
+                removeChildFromDB(nodeItem, curNode, false, true);
                 packet_send_needed = true;
+                if (renamedNode)
+                {
+                    loginChildNodes.append(renamedNode);
+                    addChildToDB(nodeItem, renamedNode);
+                }
             }
         }
+    }
+
+    if (!potentialChangedNodes.isEmpty())
+    {
+        qCritical() << "Could not add all credentials from potentially changed list";
+        cb(false, "Moolticute Internal Error");
+        exitMemMgmtMode(true);
+        return;
     }
 
     /* Double check our work */
