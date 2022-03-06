@@ -549,7 +549,7 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
 
             if ((!sPassword.isEmpty() && (sPassword != pLoginItem->password())) ||
                     (!sDescription.isEmpty() && (sDescription != pLoginItem->description())) ||
-                    (!sLogin.isEmpty() && (sLogin != pLoginItem->name())) ||
+                    (sLogin != pLoginItem->name()) ||
                     (wsClient->isMPBLE() && iCategory != 0 && iCategory != pLoginItem->category()) ||
                     (wsClient->isMPBLE() && iKeyAfterLogin != SettingsGuiBLE::DEFAULT_INDEX && iKeyAfterLogin != pLoginItem->keyAfterLogin()) ||
                     (wsClient->isMPBLE() && iKeyAfterPwd != SettingsGuiBLE::DEFAULT_INDEX && iKeyAfterPwd != pLoginItem->keyAfterPwd()))
@@ -698,7 +698,7 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
             bool bServiceCondition = sService != pLoginItem->parentItem()->name();
             bool bPasswordCondition = !sPassword.isEmpty() && (sPassword != pLoginItem->password());
             bool bDescriptionCondition = !sDescription.isEmpty() && (sDescription != pLoginItem->description());
-            bool bLoginCondition = !sLogin.isEmpty() && (sLogin != pLoginItem->name());
+            bool bLoginCondition = sLogin != pLoginItem->name();
             bool bCategoryCondition = wsClient->isMPBLE() && iCategory != pLoginItem->category();
             bool bKeyAfterLoginCondition = wsClient->isMPBLE() && iKeyAfterLogin != pLoginItem->keyAfterLogin();
             bool bKeyAfterPwdCondition = wsClient->isMPBLE() && iKeyAfterPwd != pLoginItem->keyAfterPwd();
