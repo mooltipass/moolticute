@@ -109,7 +109,9 @@ private:
     void disableNonCredentialEditWidgets();
     void enableNonCredentialEditWidgets();
     bool isServiceNameExist(const QString& serviceName) const;
+    bool isLoginNameExistForService(const QString& loginName, const QString& serviceName) const;
     void setServiceInputAttributes(const QString& tooltipText, Qt::GlobalColor col);
+    void setLoginInputAttributes(const QString& tooltipText, Qt::GlobalColor col);
     void clearMMMUi();
     void updateBleFavs(const QModelIndex &srcIndex);
     void sendGetUserCategories();
