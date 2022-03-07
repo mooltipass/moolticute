@@ -719,7 +719,23 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
                 setServiceInputAttributes("", Qt::black);
             }
 
-            if (!isServiceExist && !sService.isEmpty() &&
+            bool isLoginExist = false;
+            if (bLoginCondition)
+            {
+                isLoginExist = isLoginNameExistForService(sLogin, sService);
+
+                if (isLoginExist)
+                {
+                    setLoginInputAttributes(tr("Login already exists"), Qt::red);
+                }
+            }
+
+            if (!bLoginCondition || !isLoginExist)
+            {
+                setLoginInputAttributes("", Qt::black);
+            }
+
+            if (!isLoginExist && !isServiceExist && !sService.isEmpty() &&
                     (bServiceCondition || bPasswordCondition ||
                      bDescriptionCondition || bLoginCondition || bCategoryCondition ||
                      bKeyAfterLoginCondition || bKeyAfterPwdCondition))
@@ -1007,12 +1023,33 @@ bool CredentialsManagement::isServiceNameExist(const QString &serviceName) const
     return found != m_loadedModelSerialiation.end();
 }
 
+bool CredentialsManagement::isLoginNameExistForService(const QString &loginName, const QString &serviceName) const
+{
+    auto found = std::find_if(m_loadedModelSerialiation.begin(), m_loadedModelSerialiation.end(),
+                 [&loginName, &serviceName] (const QJsonValue &cred)
+                    {
+                        auto credObj = cred.toObject();
+                        return loginName == credObj.value("login").toString() &&
+                                serviceName == credObj.value("service").toString();
+                    }
+                 );
+    return found != m_loadedModelSerialiation.end();
+}
+
 void CredentialsManagement::setServiceInputAttributes(const QString &tooltipText, Qt::GlobalColor col)
 {
     QPalette pal;
     pal.setColor(QPalette::Text, col);
     ui->credDisplayServiceInput->setPalette(pal);
     ui->credDisplayServiceInput->setToolTip(tooltipText);
+}
+
+void CredentialsManagement::setLoginInputAttributes(const QString &tooltipText, Qt::GlobalColor col)
+{
+    QPalette pal;
+    pal.setColor(QPalette::Text, col);
+    ui->credDisplayLoginInput->setPalette(pal);
+    ui->credDisplayLoginInput->setToolTip(tooltipText);
 }
 
 void CredentialsManagement::clearMMMUi()
