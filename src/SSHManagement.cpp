@@ -103,9 +103,6 @@ void SSHManagement::onServiceExists(const QString service, bool exists)
         sshProcess = new QProcess(this);
         const auto program = Common::getMcAgent();
         auto actualProg = program;
-#ifdef Q_OS_WIN
-        actualProg += ".exe";
-#endif
         if (!QFile::exists(actualProg))
         {
             QMessageBox::critical(this, "Moolticute",
