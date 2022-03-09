@@ -484,6 +484,9 @@ int Common::getRand()
 QString Common::getMcAgent()
 {
     QString program = QCoreApplication::applicationDirPath () + "/cli/mc-agent";
+#ifdef Q_OS_WIN
+    program += ".exe";
+#endif
     if (QFileInfo{program}.exists())
     {
         return program;
@@ -500,6 +503,9 @@ QString Common::getMcAgent()
     for (QString folder : pathFolders)
     {
         program = folder + "/mc-agent";
+#ifdef Q_OS_WIN
+        program += ".exe";
+#endif
         if (QFileInfo{program}.exists())
         {
             return program;
