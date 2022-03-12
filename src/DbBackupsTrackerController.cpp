@@ -72,9 +72,13 @@ void DbBackupsTrackerController::setBackupFilePath(const QString &path)
     {
         dbBackupsTracker.track(path);
     }
-    catch (DbBackupsTrackerNoCardIdSet)
+    catch (const DbBackupsTrackerNoCardIdSet&)
     {
         // Just ignore it
+    }
+    if (path.isEmpty())
+    {
+        disconnectDbBackupsTracker();
     }
 }
 
@@ -198,12 +202,11 @@ void DbBackupsTrackerController::exportDbBackup()
 
 void DbBackupsTrackerController::handleLowerDbBackupChangeNumber()
 {
-    qDebug() << "Device is newer than backup";
-    if (!window->isBackupNotification())
+    if (!window->isBackupNotification() || !dbBackupsTracker.hasBackup())
     {
-        qDebug() << "Backup notification is disabled";
         return;
     }
+    qDebug() << "Device is newer than backup";
 
     hideImportRequestIfVisible();
     hideExportRequestIfVisible();

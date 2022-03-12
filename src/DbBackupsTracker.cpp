@@ -229,12 +229,23 @@ void DbBackupsTracker::track(const QString path)
     }
     else
     {
-        watchPath(path);
+        if (path.isEmpty())
+        {
+            if (tracks.contains(cardId))
+            {
+                qCritical() << "Track path is empty, remove cardId's backup path";
+                tracks.remove(cardId);
+            }
+        }
+        else
+        {
+            watchPath(path);
 
-        tracks.insert(cardId, path);
-        emit newTrack(cardId, path);
+            tracks.insert(cardId, path);
+            emit newTrack(cardId, path);
 
-        checkDbBackupSynchronization();
+            checkDbBackupSynchronization();
+        }
         saveTracks();
     }
 }
@@ -330,6 +341,7 @@ void DbBackupsTracker::refreshTracking()
 void DbBackupsTracker::saveTracks()
 {
     QSettings s(settingsFilePath, QSettings::IniFormat);
+    s.clear();
     s.beginGroup("BackupsTracks");
     for (QString k : tracks.keys())
         s.setValue(k, tracks.value(k));
