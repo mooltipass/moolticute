@@ -76,10 +76,6 @@ void DbBackupsTrackerController::setBackupFilePath(const QString &path)
     {
         // Just ignore it
     }
-    if (path.isEmpty())
-    {
-        disconnectDbBackupsTracker();
-    }
 }
 
 void DbBackupsTrackerController::handleCardDbMetadataChanged(QString cardId,
