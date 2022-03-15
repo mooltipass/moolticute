@@ -313,6 +313,8 @@ void CredentialsManagement::on_buttonDiscard_pressed()
         wsClient->sendLeaveMMRequest();
         m_pCredModel->clear();
     }
+    // Enable add credential fields when exiting MMM
+    enableNonCredentialEditWidgets();
 }
 
 void CredentialsManagement::onButtonDiscard_confirmed()
@@ -323,12 +325,12 @@ void CredentialsManagement::onButtonDiscard_confirmed()
 
 void CredentialsManagement::on_buttonSaveChanges_clicked()
 {
-    saveSelectedCredential();
-
     ui->stackedWidget->setCurrentWidget(ui->pageLocked);
     wsClient->sendCredentialsMM(m_pCredModel->getJsonChanges());
     emit wantSaveMemMode(); //waits for the daemon to process the data
     m_pCredModel->clear();
+    // Enable add credential fields when exiting MMM
+    enableNonCredentialEditWidgets();
 }
 
 void CredentialsManagement::requestPasswordForSelectedItem()
