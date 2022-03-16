@@ -6,7 +6,7 @@
 #include "Common.h"
 #include "RequestLoginNameDialog.h"
 #include "RequestDomainSelectionDialog.h"
-#include <Windows.h>
+#include <windows.h>
 
 // from ntdef.h
 #define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
