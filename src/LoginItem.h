@@ -28,12 +28,15 @@ public:
     virtual TreeType treeType()  const Q_DECL_OVERRIDE;
     void setTOTPCredential(QString secretKey, int timeStep, int codeSize);
     void setTOTPDeleted(bool deleted) { m_totpDeleted = deleted; }
+    void setDeleted(bool val) { m_bDeleted = val; }
+    bool isDeleted() const { return m_bDeleted; }
 private:    
     QByteArray m_bAddress;
     qint8 m_iFavorite;
     QString m_sPassword;
     QString m_sPasswordOrig;
     bool m_bPasswordLocked;
+    bool m_bDeleted = false;
 
     struct TOTPCredential
     {

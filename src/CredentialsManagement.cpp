@@ -313,6 +313,8 @@ void CredentialsManagement::on_buttonDiscard_pressed()
         wsClient->sendLeaveMMRequest();
         m_pCredModel->clear();
     }
+    // Enable add credential fields when exiting MMM
+    enableNonCredentialEditWidgets();
 }
 
 void CredentialsManagement::onButtonDiscard_confirmed()
@@ -323,12 +325,12 @@ void CredentialsManagement::onButtonDiscard_confirmed()
 
 void CredentialsManagement::on_buttonSaveChanges_clicked()
 {
-    saveSelectedCredential();
-
     ui->stackedWidget->setCurrentWidget(ui->pageLocked);
     wsClient->sendCredentialsMM(m_pCredModel->getJsonChanges());
     emit wantSaveMemMode(); //waits for the daemon to process the data
     m_pCredModel->clear();
+    // Enable add credential fields when exiting MMM
+    enableNonCredentialEditWidgets();
 }
 
 void CredentialsManagement::requestPasswordForSelectedItem()
@@ -535,6 +537,11 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
 
     if (pLoginItem != nullptr)
     {
+        if (pLoginItem->isDeleted())
+        {
+            // Do not need to check for discard, login is deleted
+            return true;
+        }
         // Retrieve parent item
         TreeItem *pServiceItem = pLoginItem->parentItem();
         if (pServiceItem != nullptr)
@@ -549,7 +556,7 @@ bool CredentialsManagement::confirmDiscardUneditedCredentialChanges(const QModel
 
             if ((!sPassword.isEmpty() && (sPassword != pLoginItem->password())) ||
                     (!sDescription.isEmpty() && (sDescription != pLoginItem->description())) ||
-                    (sLogin != pLoginItem->name()) ||
+                    (!sLogin.isEmpty() && sLogin != pLoginItem->name()) ||
                     (wsClient->isMPBLE() && iCategory != 0 && iCategory != pLoginItem->category()) ||
                     (wsClient->isMPBLE() && iKeyAfterLogin != SettingsGuiBLE::DEFAULT_INDEX && iKeyAfterLogin != pLoginItem->keyAfterLogin()) ||
                     (wsClient->isMPBLE() && iKeyAfterPwd != SettingsGuiBLE::DEFAULT_INDEX && iKeyAfterPwd != pLoginItem->keyAfterPwd()))
@@ -826,6 +833,7 @@ void CredentialsManagement::on_pushButtonDelete_clicked()
         {
             ui->credDisplayFrame->setEnabled(false);
             clearLoginDescription();
+            pLoginItem->setDeleted(true);
 
             QModelIndexList nextRow = m_pCredModelFilter->getNextRow(lIndexes.at(0));
             auto selectionModel = ui->credentialTreeView->selectionModel();
