@@ -2635,7 +2635,7 @@ bool MPDevice::addOrphanParentToDB(MPNode *parentNodePt, bool isDataParent, bool
     }
 }
 
-MPNode* MPDevice::addNewServiceToDB(const QString &service, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
+MPNode* MPDevice::addNewServiceToDB(const QString &service, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/, bool incrementNeededAddr /*= true*/)
 {
     MPNode* tempNodePt;
     MPNode* newNodePt;
@@ -2650,8 +2650,11 @@ MPNode* MPDevice::addNewServiceToDB(const QString &service, Common::AddressType 
         return nullptr;
     }
 
-    /* Increment new addresses counter */
-    incrementNeededAddresses(MPNode::NodeParent);
+    if (incrementNeededAddr)
+    {
+        /* Increment new addresses counter */
+        incrementNeededAddresses(MPNode::NodeParent);
+    }
 
     /* Create new node with null address and virtual address set to our counter value */
     newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
@@ -3137,7 +3140,9 @@ bool MPDevice::addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrT
     if (!tempNodePt)
     {
         qInfo() << "No" << recovered_service_name << "service in DB, adding it...";
-        tempNodePt = addNewServiceToDB(recovered_service_name, addrType);
+         /* During integrity check a free address was requested for _recovered_ service,
+          * therefor we do not need to incrementNeededAddress here */
+        tempNodePt = addNewServiceToDB(recovered_service_name, addrType, !m_isIntegrityCheck);
     }
 
     /* Add child to DB */

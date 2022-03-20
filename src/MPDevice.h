@@ -358,7 +358,7 @@ private:
     bool removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool addChildToDB(MPNode* parentNodePt, MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     bool deleteDataParentChilds(MPNode *parentNodePt, Common::DataAddressType addrType = Common::DATA_ADDR_IDX);
-    MPNode* addNewServiceToDB(const QString &service, Common::AddressType addrType = Common::CRED_ADDR_IDX);
+    MPNode* addNewServiceToDB(const QString &service, Common::AddressType addrType = Common::CRED_ADDR_IDX, bool incrementNeededAddr = true);
     bool addOrphanChildToDB(MPNode* childNodePt, Common::AddressType addrType = Common::CRED_ADDR_IDX);
     QByteArray generateExportFileData(const QString &encryption = "none");
     void cleanImportedVars(void);
