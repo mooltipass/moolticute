@@ -1,6 +1,12 @@
-Use one of the two templates below and delete the other. All issues not following this template will be directly closed.
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
 
-8<------------------------ BUG REPORT -----------------------------------------
+---
+
 ### Expected behavior
 
 ### Actual behavior
@@ -29,16 +35,3 @@ Mention if you are using either:
 - The Mooltipass Mini
 - The Mooltipass Mini BLE
 
-8<------------------------ END BUG REPORT -------------------------------------
-
-
-8<------------------------ FEATURE REQUEST ------------------------------------
-### Missing feature
-
-### Justification
-Tell us why you would like to see this feature added.
-
-### Workarounds
-Are there any workarounds you currently have in place because the feature is missing?
-
-8<------------------------ END FEATURE REQUEST --------------------------------
