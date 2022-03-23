@@ -343,6 +343,7 @@ private:
     bool checkLoadedNodes(bool checkCredentials, bool checkData, bool repairAllowed, bool checkFido = false, bool checkNotes = false);
     void checkLoadedLoginNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::AddressType addrType);
     void checkLoadedDataNodes(quint32 &parentNum, quint32 &childNum, bool repairAllowed, Common::DataAddressType addrType);
+    bool checkDuplicateParentNode();
     bool tagPointedNodes(bool tagCredentials, bool tagData, bool repairAllowed, Common::AddressType addrType = Common::CRED_ADDR_IDX,
                          Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool tagCredentialNodes(NodeList& nodes, NodeList& childNodes, Common::AddressType addrType, bool repairAllowed);
@@ -508,6 +509,7 @@ private:
 
     bool m_isDebugMsg = false;
     bool m_isIntegrityCheck = false;
+    bool m_isDuplicateServiceDetected = false;
     //Message Protocol
     MPDeviceBleImpl *bleImpl = nullptr;
     DeviceSettings *pSettings = nullptr;

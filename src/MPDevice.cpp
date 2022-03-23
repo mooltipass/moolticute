@@ -940,6 +940,7 @@ void MPDevice::startMemMgmtMode(bool wantData, bool wantFido,
         {
             qInfo() << "Mem management mode enabled, DB checked";
             force_memMgmtMode(true);
+            m_isDuplicateServiceDetected = checkDuplicateParentNode();
             cb(true, 0, QString());
         }
         else
@@ -3371,6 +3372,58 @@ void MPDevice::checkLoadedDataNodes(quint32 &parentNum, quint32 &childNum, bool 
             childNum++;
         }
     }
+}
+
+bool MPDevice::checkDuplicateParentNode()
+{
+    /* first, detag all nodes */
+    detagPointedNodes(Common::CRED_ADDR_IDX);
+    /* start with start node (duh) */
+    QByteArray tempParentAddress = startNode[Common::CRED_ADDR_IDX];
+    MPNode* tempNextParentNodePt = nullptr;
+    MPNode* tempParentNodePt = nullptr;
+    quint32 tempVirtualParentAddress = virtualStartNode[Common::CRED_ADDR_IDX];
+
+    /* Loop through the parent nodes */
+    while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
+    {
+        /* Get pointer to next parent node */
+        tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress, tempVirtualParentAddress);
+
+        /* Check that we could actually find it */
+        if (!tempNextParentNodePt)
+        {
+            qCritical() << "Error during checking duplicate service: next parent is null";
+            return false;
+        }
+        else if (tempNextParentNodePt->getPointedToCheck())
+        {
+            /* Linked chain loop detected */
+            qCritical() << "Error during checking duplicate service: loop in the linked list";
+            return false;
+        }
+        else
+        {
+            if (tempParentNodePt != nullptr)
+            {
+                if (tempParentNodePt->getService() == tempNextParentNodePt->getService())
+                {
+                    qCritical() << "Duplicate service detected: " << tempParentNodePt->getService();
+                    return true;
+                }
+            }
+            /* Set correct pointed node */
+            tempParentNodePt = tempNextParentNodePt;
+
+            /* tag parent */
+            tempParentNodePt->setPointedToCheck();
+
+            /* Set next parent address */
+            tempParentAddress = tempParentNodePt->getNextParentAddress();
+            tempVirtualParentAddress = tempParentNodePt->getNextParentVirtualAddress();
+        }
+    }
+    return false;
 }
 
 void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& address, const QByteArray& data, std::function<void(void)> writeCallback)
@@ -6010,6 +6063,7 @@ void MPDevice::cleanMMMVars(void)
     }
     startDataNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     startNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
+    m_isDuplicateServiceDetected = false;
 }
 
 void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, MessageHandlerCb cb, bool noDelete)
@@ -7888,6 +7942,19 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         cb(false, "Moolticute Internal Error (SMMC#2)");
         exitMemMgmtMode(true);
         return;
+    }
+
+    if (!m_isDuplicateServiceDetected)
+    {
+        // Only send error if duplicate service was not detected when starting MMM
+        if (checkDuplicateParentNode())
+        {
+            // TODO implement specific error message
+            qCritical() << "Duplicate service detected";
+            cb(false, "Duplicate service detected");
+            exitMemMgmtMode(true);
+            return;
+        }
     }
 
     /* Generate save passwords */
