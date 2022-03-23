@@ -7950,8 +7950,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         if (checkDuplicateParentNode())
         {
             // TODO implement specific error message
-            qCritical() << "Duplicate service detected";
-            cb(false, "Duplicate service detected");
+            qCritical() << Common::MMM_DUPLICATE_SERVICE;
+            cb(false, Common::MMM_DUPLICATE_SERVICE);
             exitMemMgmtMode(true);
             return;
         }

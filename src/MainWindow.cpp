@@ -1119,6 +1119,10 @@ void MainWindow::wantSaveCredentialManagement()
             {
                 errorMessage = tr("Couldn't change all passwords, please approve prompts on the device");
             }
+            else if (Common::MMM_DUPLICATE_SERVICE == msg)
+            {
+                errorMessage = tr("Duplicated service detected, please contact support");
+            }
             else
             {
                 errorMessage = tr("Couldn't change all passwords, please approve prompts on the device");
