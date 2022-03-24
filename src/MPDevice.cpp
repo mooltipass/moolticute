@@ -6089,6 +6089,8 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
         /* Tag favorites */
         tagFavoriteNodes();
 
+        m_isDuplicateServiceDetected = checkDuplicateParentNode();
+
         /* We arrive here knowing that the CPZ is in the CPZ/CTR list */
         qInfo() << "Starting File Merging...";
 
@@ -6234,7 +6236,14 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 {
                     cleanImportedVars();
                     exitMemMgmtMode(false);
-                    cb(false, "Couldn't Import Database: Corrupted Database File");
+                    if (stringError == Common::DUPLICATE_SERVICE_DETECTED)
+                    {
+                        cb(false, stringError);
+                    }
+                    else
+                    {
+                        cb(false, "Couldn't Import Database: Corrupted Database File");
+                    }
                     return;
                 }
             });
@@ -6891,6 +6900,14 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
     {
         qCritical() << "Error in merging algorithm... please contact the devs";
         stringError = "Moolticute Internal Error: Please Contact The Team (IFM#3)";
+        cleanImportedVars();
+        return false;
+    }
+
+    if (!m_isDuplicateServiceDetected && checkDuplicateParentNode())
+    {
+        qCritical() << Common::DUPLICATE_SERVICE_DETECTED;
+        stringError = Common::DUPLICATE_SERVICE_DETECTED;
         cleanImportedVars();
         return false;
     }
@@ -7944,17 +7961,12 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         return;
     }
 
-    if (!m_isDuplicateServiceDetected)
+    if (!m_isDuplicateServiceDetected && checkDuplicateParentNode())
     {
-        // Only send error if duplicate service was not detected when starting MMM
-        if (checkDuplicateParentNode())
-        {
-            // TODO implement specific error message
-            qCritical() << Common::MMM_DUPLICATE_SERVICE;
-            cb(false, Common::MMM_DUPLICATE_SERVICE);
-            exitMemMgmtMode(true);
-            return;
-        }
+        qCritical() << Common::DUPLICATE_SERVICE_DETECTED;
+        cb(false, Common::DUPLICATE_SERVICE_DETECTED);
+        exitMemMgmtMode(true);
+        return;
     }
 
     /* Generate save passwords */

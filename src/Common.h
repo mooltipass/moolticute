@@ -340,7 +340,7 @@ public:
     static const QString SETTING_BT_LAYOUT_ENFORCE;
     static const QString SETTING_BT_LAYOUT_ENFORCE_VALUE;
     static const QString MMM_CREDENTIAL_STORE_FAILED;
-    static const QString MMM_DUPLICATE_SERVICE;
+    static const QString DUPLICATE_SERVICE_DETECTED;
     static const int DEFAULT_PASSWORD_LENGTH = 16;
     static const int BLE_LATEST_BUNDLE_VERSION = 7;
 };
