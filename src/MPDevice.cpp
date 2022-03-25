@@ -940,6 +940,7 @@ void MPDevice::startMemMgmtMode(bool wantData, bool wantFido,
         {
             qInfo() << "Mem management mode enabled, DB checked";
             force_memMgmtMode(true);
+            m_isDuplicateServiceDetected = checkDuplicateParentNode();
             cb(true, 0, QString());
         }
         else
@@ -3371,6 +3372,58 @@ void MPDevice::checkLoadedDataNodes(quint32 &parentNum, quint32 &childNum, bool 
             childNum++;
         }
     }
+}
+
+bool MPDevice::checkDuplicateParentNode()
+{
+    /* first, detag all nodes */
+    detagPointedNodes(Common::CRED_ADDR_IDX);
+    /* start with start node (duh) */
+    QByteArray tempParentAddress = startNode[Common::CRED_ADDR_IDX];
+    MPNode* tempNextParentNodePt = nullptr;
+    MPNode* tempParentNodePt = nullptr;
+    quint32 tempVirtualParentAddress = virtualStartNode[Common::CRED_ADDR_IDX];
+
+    /* Loop through the parent nodes */
+    while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
+    {
+        /* Get pointer to next parent node */
+        tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress, tempVirtualParentAddress);
+
+        /* Check that we could actually find it */
+        if (!tempNextParentNodePt)
+        {
+            qCritical() << "Error during checking duplicate service: next parent is null";
+            return false;
+        }
+        else if (tempNextParentNodePt->getPointedToCheck())
+        {
+            /* Linked chain loop detected */
+            qCritical() << "Error during checking duplicate service: loop in the linked list";
+            return false;
+        }
+        else
+        {
+            if (tempParentNodePt != nullptr)
+            {
+                if (tempParentNodePt->getService() == tempNextParentNodePt->getService())
+                {
+                    qCritical() << "Duplicate service detected: " << tempParentNodePt->getService();
+                    return true;
+                }
+            }
+            /* Set correct pointed node */
+            tempParentNodePt = tempNextParentNodePt;
+
+            /* tag parent */
+            tempParentNodePt->setPointedToCheck();
+
+            /* Set next parent address */
+            tempParentAddress = tempParentNodePt->getNextParentAddress();
+            tempVirtualParentAddress = tempParentNodePt->getNextParentVirtualAddress();
+        }
+    }
+    return false;
 }
 
 void MPDevice::addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray& address, const QByteArray& data, std::function<void(void)> writeCallback)
@@ -6010,6 +6063,7 @@ void MPDevice::cleanMMMVars(void)
     }
     startDataNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     startNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
+    m_isDuplicateServiceDetected = false;
 }
 
 void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, MessageHandlerCb cb, bool noDelete)
@@ -6034,6 +6088,8 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
 
         /* Tag favorites */
         tagFavoriteNodes();
+
+        m_isDuplicateServiceDetected = checkDuplicateParentNode();
 
         /* We arrive here knowing that the CPZ is in the CPZ/CTR list */
         qInfo() << "Starting File Merging...";
@@ -6180,7 +6236,14 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 {
                     cleanImportedVars();
                     exitMemMgmtMode(false);
-                    cb(false, "Couldn't Import Database: Corrupted Database File");
+                    if (stringError == Common::DUPLICATE_SERVICE_DETECTED)
+                    {
+                        cb(false, stringError);
+                    }
+                    else
+                    {
+                        cb(false, "Couldn't Import Database: Corrupted Database File");
+                    }
                     return;
                 }
             });
@@ -6837,6 +6900,14 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
     {
         qCritical() << "Error in merging algorithm... please contact the devs";
         stringError = "Moolticute Internal Error: Please Contact The Team (IFM#3)";
+        cleanImportedVars();
+        return false;
+    }
+
+    if (!m_isDuplicateServiceDetected && checkDuplicateParentNode())
+    {
+        qCritical() << Common::DUPLICATE_SERVICE_DETECTED;
+        stringError = Common::DUPLICATE_SERVICE_DETECTED;
         cleanImportedVars();
         return false;
     }
@@ -7886,6 +7957,14 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     {
         qCritical() << "Error in our local DB (algo PB?)";
         cb(false, "Moolticute Internal Error (SMMC#2)");
+        exitMemMgmtMode(true);
+        return;
+    }
+
+    if (!m_isDuplicateServiceDetected && checkDuplicateParentNode())
+    {
+        qCritical() << Common::DUPLICATE_SERVICE_DETECTED;
+        cb(false, Common::DUPLICATE_SERVICE_DETECTED);
         exitMemMgmtMode(true);
         return;
     }
