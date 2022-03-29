@@ -25,6 +25,9 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(int, information_time_delay, 0, MPParams::INFORMATION_TIME_DELAY)
     QT_SETTINGS_PROPERTY(bool, bluetooth_shortcuts, false, MPParams::BLUETOOTH_SHORTCUTS)
     QT_SETTINGS_PROPERTY(int, screen_saver_id, 0, MPParams::SCREEN_SAVER_ID)
+    QT_SETTINGS_PROPERTY(bool, display_totp_after_recall, false, MPParams::DISP_TOTP_AFTER_RECALL)
+    QT_SETTINGS_PROPERTY(bool, start_last_accessed_service, false, MPParams::START_LAST_ACCESSED_SERVICE)
+    QT_SETTINGS_PROPERTY(bool, switch_off_after_bt_disc, false, MPParams::SWITCH_OFF_AFTER_BT_DISC)
 
 
 public:
@@ -57,7 +60,10 @@ public:
         HASH_DISPLAY_BYTE = 22,
         INFORMATION_TIME_DELAY_BYTE = 23,
         BLUETOOTH_SHORTCUTS_BYTE = 24,
-        SCREEN_SAVER_ID_BYTE = 25
+        SCREEN_SAVER_ID_BYTE = 25,
+        START_LAST_ACCESSED_SERVICE = 26,
+        DISP_TOTP_AFTER_RECALL = 27,
+        SWITCH_OFF_AFTER_BT_DISC = 30
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;

@@ -64,6 +64,11 @@ void SettingsGuiBLE::updateUI()
     ui->settings_screen_saver_id->show();
     ui->checkBoxBTShortcuts->show();
 
+    // Bundle 9
+    ui->checkBoxDispTOTPAfterRecall->show();
+    ui->checkBoxStartWithLastAccessedService->show();
+    ui->checkBoxSwitchOffBTDisc->show();
+
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();
 

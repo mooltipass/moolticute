@@ -24,7 +24,10 @@ DeviceSettingsBLE::DefaultValues DeviceSettingsBLE::m_bleDefaultValues =
         {MPParams::HASH_DISPLAY_FEATURE_PARAM, 0},
         {MPParams::INFORMATION_TIME_DELAY, 30},
         {MPParams::BLUETOOTH_SHORTCUTS, 0},
-        {MPParams::SCREEN_SAVER_ID, 0}
+        {MPParams::SCREEN_SAVER_ID, 0},
+        {MPParams::DISP_TOTP_AFTER_RECALL, 0},
+        {MPParams::START_LAST_ACCESSED_SERVICE, 1},
+        {MPParams::SWITCH_OFF_AFTER_BT_DISC, 0}
     };
 
 DeviceSettingsBLE::DeviceSettingsBLE(QObject *parent)
@@ -82,5 +85,11 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::BLUETOOTH_SHORTCUTS] = BLUETOOTH_SHORTCUTS_BYTE;
     m_paramMap.insert(MPParams::SCREEN_SAVER_ID, "screen_saver_id");
     m_bleByteMapping[MPParams::SCREEN_SAVER_ID] = SCREEN_SAVER_ID_BYTE;
+    m_paramMap.insert(MPParams::DISP_TOTP_AFTER_RECALL, "display_totp_after_recall");
+    m_bleByteMapping[MPParams::DISP_TOTP_AFTER_RECALL] = DISP_TOTP_AFTER_RECALL;
+    m_paramMap.insert(MPParams::START_LAST_ACCESSED_SERVICE, "start_last_accessed_service");
+    m_bleByteMapping[MPParams::START_LAST_ACCESSED_SERVICE] = START_LAST_ACCESSED_SERVICE;
+    m_paramMap.insert(MPParams::SWITCH_OFF_AFTER_BT_DISC, "switch_off_after_bt_disc");
+    m_bleByteMapping[MPParams::SWITCH_OFF_AFTER_BT_DISC] = SWITCH_OFF_AFTER_BT_DISC;
 }
 

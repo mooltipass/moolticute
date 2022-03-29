@@ -1729,6 +1729,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="checkBoxSwitchOffBTDisc">
+                 <property name="toolTip">
+                  <string>Switch off the device after Bluetooth disconnection</string>
+                 </property>
+                 <property name="text">
+                  <string>Switch Off Device After Bluetooth Disconnection</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="checkBoxDisableBleOnCardRemove">
                  <property name="toolTip">
                   <string>Disable Bluetooth when a user card is removed from the device</string>
@@ -1745,6 +1755,20 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                  <property name="text">
                   <string>Disable BLE on Device Lock</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxDispTOTPAfterRecall">
+                 <property name="text">
+                  <string>Display TOTP after login into website</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxStartWithLastAccessedService">
+                 <property name="text">
+                  <string>Login menu: Start with last accessed service</string>
                  </property>
                 </widget>
                </item>

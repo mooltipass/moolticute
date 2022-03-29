@@ -62,6 +62,11 @@ void SettingsGuiMini::updateUI()
     ui->settings_screen_saver_id->hide();
     ui->checkBoxBTShortcuts->hide();
 
+    //Bundle 9
+    ui->checkBoxDispTOTPAfterRecall->hide();
+    ui->checkBoxStartWithLastAccessedService->hide();
+    ui->checkBoxSwitchOffBTDisc->hide();
+
     ui->groupBox_BLESettings->hide();
 
     // Inactivity groupbox

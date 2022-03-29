@@ -48,6 +48,9 @@ void MPSettingsBLE::loadParameters()
                         set_information_time_delay(m_lastDeviceSettings.at(DeviceSettingsBLE::INFORMATION_TIME_DELAY_BYTE));
                         set_bluetooth_shortcuts(m_lastDeviceSettings.at(DeviceSettingsBLE::BLUETOOTH_SHORTCUTS_BYTE) != 0);
                         set_screen_saver_id(m_lastDeviceSettings.at(DeviceSettingsBLE::SCREEN_SAVER_ID_BYTE));
+                        set_display_totp_after_recall(m_lastDeviceSettings.at(DeviceSettingsBLE::DISP_TOTP_AFTER_RECALL));
+                        set_start_last_accessed_service(m_lastDeviceSettings.at(DeviceSettingsBLE::START_LAST_ACCESSED_SERVICE));
+                        set_switch_off_after_bt_disc(m_lastDeviceSettings.at(DeviceSettingsBLE::SWITCH_OFF_AFTER_BT_DISC));
                         return true;
                     }
     ));

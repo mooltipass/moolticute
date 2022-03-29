@@ -59,7 +59,10 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::NB_20MINS_TICKS_FOR_LOCK, ui->comboBoxInactivityTimer},
         {MPParams::INFORMATION_TIME_DELAY, ui->comboBoxInformationTimeDelay},
         {MPParams::BLUETOOTH_SHORTCUTS, ui->checkBoxBTShortcuts},
-        {MPParams::SCREEN_SAVER_ID, ui->comboBoxScreensaverId}
+        {MPParams::SCREEN_SAVER_ID, ui->comboBoxScreensaverId},
+        {MPParams::DISP_TOTP_AFTER_RECALL, ui->checkBoxDispTOTPAfterRecall},
+        {MPParams::START_LAST_ACCESSED_SERVICE, ui->checkBoxStartWithLastAccessedService},
+        {MPParams::SWITCH_OFF_AFTER_BT_DISC, ui->checkBoxSwitchOffBTDisc},
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)
