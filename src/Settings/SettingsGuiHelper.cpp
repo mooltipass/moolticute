@@ -63,6 +63,8 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::DISP_TOTP_AFTER_RECALL, ui->checkBoxDispTOTPAfterRecall},
         {MPParams::START_LAST_ACCESSED_SERVICE, ui->checkBoxStartWithLastAccessedService},
         {MPParams::SWITCH_OFF_AFTER_BT_DISC, ui->checkBoxSwitchOffBTDisc},
+        {MPParams::MC_SUBDOMAIN_FORCE_STATUS, ui->checkBoxMCSubdomainForceStatus},
+        {MPParams::FAV_LAST_USED_SORTED, ui->checkBoxSortFavsByLastUsed},
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)

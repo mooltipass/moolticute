@@ -27,7 +27,9 @@ DeviceSettingsBLE::DefaultValues DeviceSettingsBLE::m_bleDefaultValues =
         {MPParams::SCREEN_SAVER_ID, 0},
         {MPParams::DISP_TOTP_AFTER_RECALL, 0},
         {MPParams::START_LAST_ACCESSED_SERVICE, 1},
-        {MPParams::SWITCH_OFF_AFTER_BT_DISC, 0}
+        {MPParams::SWITCH_OFF_AFTER_BT_DISC, 0},
+        {MPParams::MC_SUBDOMAIN_FORCE_STATUS, 0},
+        {MPParams::FAV_LAST_USED_SORTED, 0}
     };
 
 DeviceSettingsBLE::DeviceSettingsBLE(QObject *parent)
@@ -91,5 +93,9 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::START_LAST_ACCESSED_SERVICE] = START_LAST_ACCESSED_SERVICE;
     m_paramMap.insert(MPParams::SWITCH_OFF_AFTER_BT_DISC, "switch_off_after_bt_disc");
     m_bleByteMapping[MPParams::SWITCH_OFF_AFTER_BT_DISC] = SWITCH_OFF_AFTER_BT_DISC;
+    m_paramMap.insert(MPParams::MC_SUBDOMAIN_FORCE_STATUS, "mc_subdomain_force_status");
+    m_bleByteMapping[MPParams::MC_SUBDOMAIN_FORCE_STATUS] = MC_SUBDOMAIN_FORCE_STATUS;
+    m_paramMap.insert(MPParams::FAV_LAST_USED_SORTED, "fav_last_used_sorted");
+    m_bleByteMapping[MPParams::FAV_LAST_USED_SORTED] = FAV_LAST_USED_SORTED;
 }
 

@@ -28,6 +28,8 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(bool, display_totp_after_recall, false, MPParams::DISP_TOTP_AFTER_RECALL)
     QT_SETTINGS_PROPERTY(bool, start_last_accessed_service, false, MPParams::START_LAST_ACCESSED_SERVICE)
     QT_SETTINGS_PROPERTY(bool, switch_off_after_bt_disc, false, MPParams::SWITCH_OFF_AFTER_BT_DISC)
+    QT_SETTINGS_PROPERTY(bool, mc_subdomain_force_status, false, MPParams::MC_SUBDOMAIN_FORCE_STATUS)
+    QT_SETTINGS_PROPERTY(bool, fav_last_used_sorted, false, MPParams::FAV_LAST_USED_SORTED)
 
 
 public:
@@ -63,7 +65,9 @@ public:
         SCREEN_SAVER_ID_BYTE = 25,
         START_LAST_ACCESSED_SERVICE = 26,
         DISP_TOTP_AFTER_RECALL = 27,
-        SWITCH_OFF_AFTER_BT_DISC = 30
+        SWITCH_OFF_AFTER_BT_DISC = 30,
+        MC_SUBDOMAIN_FORCE_STATUS = 31,
+        FAV_LAST_USED_SORTED = 32
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;

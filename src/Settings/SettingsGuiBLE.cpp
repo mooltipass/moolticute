@@ -68,6 +68,8 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxDispTOTPAfterRecall->show();
     ui->checkBoxStartWithLastAccessedService->show();
     ui->checkBoxSwitchOffBTDisc->show();
+    ui->checkBoxMCSubdomainForceStatus->show();
+    ui->checkBoxSortFavsByLastUsed->show();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();

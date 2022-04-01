@@ -66,6 +66,8 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxDispTOTPAfterRecall->hide();
     ui->checkBoxStartWithLastAccessedService->hide();
     ui->checkBoxSwitchOffBTDisc->hide();
+    ui->checkBoxMCSubdomainForceStatus->hide();
+    ui->checkBoxSortFavsByLastUsed->hide();
 
     ui->groupBox_BLESettings->hide();
 
