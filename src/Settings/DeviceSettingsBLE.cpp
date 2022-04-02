@@ -97,5 +97,7 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::MC_SUBDOMAIN_FORCE_STATUS] = MC_SUBDOMAIN_FORCE_STATUS;
     m_paramMap.insert(MPParams::FAV_LAST_USED_SORTED, "fav_last_used_sorted");
     m_bleByteMapping[MPParams::FAV_LAST_USED_SORTED] = FAV_LAST_USED_SORTED;
+    m_paramMap.insert(MPParams::DELAY_BEF_UNLOCK_LOGIN, "delay_bef_unlock_login");
+    m_bleByteMapping[MPParams::DELAY_BEF_UNLOCK_LOGIN] = DELAY_BEF_UNLOCK_LOGIN;
 }
 

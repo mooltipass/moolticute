@@ -30,6 +30,7 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(bool, switch_off_after_bt_disc, false, MPParams::SWITCH_OFF_AFTER_BT_DISC)
     QT_SETTINGS_PROPERTY(bool, mc_subdomain_force_status, false, MPParams::MC_SUBDOMAIN_FORCE_STATUS)
     QT_SETTINGS_PROPERTY(bool, fav_last_used_sorted, false, MPParams::FAV_LAST_USED_SORTED)
+    QT_SETTINGS_PROPERTY(int, delay_bef_unlock_login, 0, MPParams::DELAY_BEF_UNLOCK_LOGIN)
 
 
 public:
@@ -65,6 +66,7 @@ public:
         SCREEN_SAVER_ID_BYTE = 25,
         START_LAST_ACCESSED_SERVICE = 26,
         DISP_TOTP_AFTER_RECALL = 27,
+        DELAY_BEF_UNLOCK_LOGIN = 29,
         SWITCH_OFF_AFTER_BT_DISC = 30,
         MC_SUBDOMAIN_FORCE_STATUS = 31,
         FAV_LAST_USED_SORTED = 32

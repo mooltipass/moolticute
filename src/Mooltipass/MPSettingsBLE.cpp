@@ -53,6 +53,7 @@ void MPSettingsBLE::loadParameters()
                         set_switch_off_after_bt_disc(m_lastDeviceSettings.at(DeviceSettingsBLE::SWITCH_OFF_AFTER_BT_DISC));
                         set_mc_subdomain_force_status(m_lastDeviceSettings.at(DeviceSettingsBLE::MC_SUBDOMAIN_FORCE_STATUS));
                         set_fav_last_used_sorted(m_lastDeviceSettings.at(DeviceSettingsBLE::FAV_LAST_USED_SORTED));
+                        set_delay_bef_unlock_login(m_lastDeviceSettings.at(DeviceSettingsBLE::DELAY_BEF_UNLOCK_LOGIN));
                         return true;
                     }
     ));

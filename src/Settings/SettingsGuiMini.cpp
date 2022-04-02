@@ -68,6 +68,7 @@ void SettingsGuiMini::updateUI()
     ui->checkBoxSwitchOffBTDisc->hide();
     ui->checkBoxMCSubdomainForceStatus->hide();
     ui->checkBoxSortFavsByLastUsed->hide();
+    ui->settings_delay_bef_unlock_login->hide();
 
     ui->groupBox_BLESettings->hide();
 

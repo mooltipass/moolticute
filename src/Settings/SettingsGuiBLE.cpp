@@ -70,6 +70,7 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxSwitchOffBTDisc->show();
     ui->checkBoxMCSubdomainForceStatus->show();
     ui->checkBoxSortFavsByLastUsed->show();
+    ui->settings_delay_bef_unlock_login->show();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();
