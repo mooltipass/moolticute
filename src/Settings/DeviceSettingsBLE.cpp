@@ -29,7 +29,10 @@ DeviceSettingsBLE::DefaultValues DeviceSettingsBLE::m_bleDefaultValues =
         {MPParams::START_LAST_ACCESSED_SERVICE, 1},
         {MPParams::SWITCH_OFF_AFTER_BT_DISC, 0},
         {MPParams::MC_SUBDOMAIN_FORCE_STATUS, 0},
-        {MPParams::FAV_LAST_USED_SORTED, 0}
+        {MPParams::FAV_LAST_USED_SORTED, 0},
+        {MPParams::DELAY_BEF_UNLOCK_LOGIN, 60},
+        {MPParams::SCREEN_BRIGHTNESS_USB, 0x90},
+        {MPParams::SCREEN_BRIGHTNESS_BAT, 0x90}
     };
 
 DeviceSettingsBLE::DeviceSettingsBLE(QObject *parent)
@@ -99,5 +102,9 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::FAV_LAST_USED_SORTED] = FAV_LAST_USED_SORTED;
     m_paramMap.insert(MPParams::DELAY_BEF_UNLOCK_LOGIN, "delay_bef_unlock_login");
     m_bleByteMapping[MPParams::DELAY_BEF_UNLOCK_LOGIN] = DELAY_BEF_UNLOCK_LOGIN;
+    m_paramMap.insert(MPParams::SCREEN_BRIGHTNESS_USB, "screen_brightness_usb");
+    m_bleByteMapping[MPParams::SCREEN_BRIGHTNESS_USB] = SCREEN_BRIGHTNESS_USB;
+    m_paramMap.insert(MPParams::SCREEN_BRIGHTNESS_BAT, "screen_brightness_bat");
+    m_bleByteMapping[MPParams::SCREEN_BRIGHTNESS_BAT] = SCREEN_BRIGHTNESS_BAT;
 }
 

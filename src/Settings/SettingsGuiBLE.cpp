@@ -71,6 +71,8 @@ void SettingsGuiBLE::updateUI()
     ui->checkBoxMCSubdomainForceStatus->show();
     ui->checkBoxSortFavsByLastUsed->show();
     ui->settings_delay_bef_unlock_login->show();
+    ui->settings_screen_brightness_bat->show();
+    ui->settings_screen_brightness_usb->show();
 
     ui->groupBox_BLESettings->show();
     ui->checkBoxBLEReserved->hide();

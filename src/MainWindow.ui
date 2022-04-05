@@ -1105,11 +1105,14 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   </item>
                   <item>
                    <widget class="QSpinBox" name="spinBoxDelayBefUnlockLogin">
+                    <property name="minimum">
+                     <number>10</number>
+                    </property>
                     <property name="maximum">
-                     <number>120</number>
+                     <number>250</number>
                     </property>
                     <property name="singleStep">
-                     <number>5</number>
+                     <number>10</number>
                     </property>
                    </widget>
                   </item>
@@ -1616,6 +1619,88 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_28">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="settings_screen_brightness_usb" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_67">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_UsbScreenBrightness">
+                    <property name="text">
+                     <string>USB Screen Brightness</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxUsbScreenBrightness"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_38">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="settings_screen_brightness_bat" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_68">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_BatteryScreenBrightness">
+                    <property name="text">
+                     <string>Battery Screen Brightness</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxBatteryScreenBrightness"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_44">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
