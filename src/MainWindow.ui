@@ -1081,6 +1081,57 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </layout>
                 </widget>
                </item>
+               <item>
+                <widget class="QWidget" name="settings_delay_bef_unlock_login" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_38">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_delayBefUnlockLogin">
+                    <property name="toolTip">
+                     <string>Custom delay between enter key and password for _unlock_</string>
+                    </property>
+                    <property name="text">
+                     <string>Custom delay between enter key and password for _unlock_</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBoxDelayBefUnlockLogin">
+                    <property name="minimum">
+                     <number>10</number>
+                    </property>
+                    <property name="maximum">
+                     <number>250</number>
+                    </property>
+                    <property name="singleStep">
+                     <number>10</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_37">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
@@ -1583,6 +1634,88 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
+                <widget class="QWidget" name="settings_screen_brightness_usb" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_67">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_UsbScreenBrightness">
+                    <property name="text">
+                     <string>USB Screen Brightness</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxUsbScreenBrightness"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_38">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="settings_screen_brightness_bat" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_68">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_BatteryScreenBrightness">
+                    <property name="text">
+                     <string>Battery Screen Brightness</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxBatteryScreenBrightness"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_44">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="hashDisplayFeatureCheckBox">
                  <property name="toolTip">
                   <string>A hash will be displayed before and after your card is unlocked. Make sure this hash doesn't change to know that your firmware hasn't been tampered with.</string>
@@ -1729,6 +1862,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="checkBoxSwitchOffBTDisc">
+                 <property name="toolTip">
+                  <string>Switch off the device after Bluetooth disconnection</string>
+                 </property>
+                 <property name="text">
+                  <string>Switch Off Device After Bluetooth Disconnection</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="checkBoxDisableBleOnCardRemove">
                  <property name="toolTip">
                   <string>Disable Bluetooth when a user card is removed from the device</string>
@@ -1745,6 +1888,40 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                  <property name="text">
                   <string>Disable BLE on Device Lock</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxDispTOTPAfterRecall">
+                 <property name="text">
+                  <string>Display TOTP after login into website</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxStartWithLastAccessedService">
+                 <property name="text">
+                  <string>Login menu: Start with last accessed service</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMCSubdomainForceStatus">
+                 <property name="toolTip">
+                  <string>Specify subdomain status on device</string>
+                 </property>
+                 <property name="text">
+                  <string>Specify subdomain status on device</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxSortFavsByLastUsed">
+                 <property name="toolTip">
+                  <string>Sort Favorites by last used date</string>
+                 </property>
+                 <property name="text">
+                  <string>Sort Favorites by last used date</string>
                  </property>
                 </widget>
                </item>

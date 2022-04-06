@@ -8,6 +8,7 @@ SettingsGuiBLE::SettingsGuiBLE(QObject *parent, MainWindow *mw)
 {
     ui = mw->ui;
     connect(this, &DeviceSettings::lock_unlock_modeChanged, mw, &MainWindow::lockUnlockChanged);
+    connect(mw->wsClient, &WSClient::bundleVersionChanged, this, &SettingsGuiBLE::checkDeviceSettingsForBundle9);
 }
 
 void SettingsGuiBLE::loadParameters()
@@ -92,5 +93,31 @@ void SettingsGuiBLE::checkEnforceLayout(MPParams::Param param, int &val)
     {
         val = s.value(Common::SETTING_BT_LAYOUT_ENFORCE_VALUE).toInt();
         qDebug() << "Using bt layout value from enforce: " << val;
+    }
+}
+
+void SettingsGuiBLE::checkDeviceSettingsForBundle9(int bundleVersion)
+{
+    if (bundleVersion >= 9)
+    {
+        ui->checkBoxDispTOTPAfterRecall->show();
+        ui->checkBoxStartWithLastAccessedService->show();
+        ui->checkBoxSwitchOffBTDisc->show();
+        ui->checkBoxMCSubdomainForceStatus->show();
+        ui->checkBoxSortFavsByLastUsed->show();
+        ui->settings_delay_bef_unlock_login->show();
+        ui->settings_screen_brightness_bat->show();
+        ui->settings_screen_brightness_usb->show();
+    }
+    else
+    {
+        ui->checkBoxDispTOTPAfterRecall->hide();
+        ui->checkBoxStartWithLastAccessedService->hide();
+        ui->checkBoxSwitchOffBTDisc->hide();
+        ui->checkBoxMCSubdomainForceStatus->hide();
+        ui->checkBoxSortFavsByLastUsed->hide();
+        ui->settings_delay_bef_unlock_login->hide();
+        ui->settings_screen_brightness_bat->hide();
+        ui->settings_screen_brightness_usb->hide();
     }
 }

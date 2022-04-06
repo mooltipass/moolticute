@@ -351,6 +351,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxKnock->addItem(tr("Medium"), 2);
     ui->comboBoxKnock->addItem(tr("High"), 3);
 
+    fillBLEBrightnessComboBox(ui->comboBoxUsbScreenBrightness);
+    fillBLEBrightnessComboBox(ui->comboBoxBatteryScreenBrightness);
+
     ui->comboBoxInactivityTimer->addItem(tr("No Inactivity"), 0);
     ui->comboBoxInactivityTimer->addItem(tr("5 minutes"), 5);
     ui->comboBoxInactivityTimer->addItem(tr("10 minutes"), 10);
@@ -1883,6 +1886,15 @@ void MainWindow::displayMiniImportWarning()
     PromptMessage *message = new PromptMessage("<b>"+tr("Import Warning") + "</b><br>" +
                                                   tr("Files were not imported from mini backup."));
     showPrompt(message);
+}
+
+void MainWindow::fillBLEBrightnessComboBox(QComboBox *cb)
+{
+    cb->addItem("10%", 16);
+    cb->addItem("25%", 36);
+    cb->addItem("50%", 72);
+    cb->addItem("75%", 108);
+    cb->addItem("100%", 144);
 }
 
 void MainWindow::on_toolButton_clearBackupFilePath_released()

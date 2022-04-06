@@ -24,7 +24,15 @@ DeviceSettingsBLE::DefaultValues DeviceSettingsBLE::m_bleDefaultValues =
         {MPParams::HASH_DISPLAY_FEATURE_PARAM, 0},
         {MPParams::INFORMATION_TIME_DELAY, 30},
         {MPParams::BLUETOOTH_SHORTCUTS, 0},
-        {MPParams::SCREEN_SAVER_ID, 0}
+        {MPParams::SCREEN_SAVER_ID, 0},
+        {MPParams::DISP_TOTP_AFTER_RECALL, 0},
+        {MPParams::START_LAST_ACCESSED_SERVICE, 1},
+        {MPParams::SWITCH_OFF_AFTER_BT_DISC, 0},
+        {MPParams::MC_SUBDOMAIN_FORCE_STATUS, 0},
+        {MPParams::FAV_LAST_USED_SORTED, 0},
+        {MPParams::DELAY_BEF_UNLOCK_LOGIN, 60},
+        {MPParams::SCREEN_BRIGHTNESS_USB, 0x90},
+        {MPParams::SCREEN_BRIGHTNESS_BAT, 0x90}
     };
 
 DeviceSettingsBLE::DeviceSettingsBLE(QObject *parent)
@@ -82,5 +90,21 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::BLUETOOTH_SHORTCUTS] = BLUETOOTH_SHORTCUTS_BYTE;
     m_paramMap.insert(MPParams::SCREEN_SAVER_ID, "screen_saver_id");
     m_bleByteMapping[MPParams::SCREEN_SAVER_ID] = SCREEN_SAVER_ID_BYTE;
+    m_paramMap.insert(MPParams::DISP_TOTP_AFTER_RECALL, "display_totp_after_recall");
+    m_bleByteMapping[MPParams::DISP_TOTP_AFTER_RECALL] = DISP_TOTP_AFTER_RECALL;
+    m_paramMap.insert(MPParams::START_LAST_ACCESSED_SERVICE, "start_last_accessed_service");
+    m_bleByteMapping[MPParams::START_LAST_ACCESSED_SERVICE] = START_LAST_ACCESSED_SERVICE;
+    m_paramMap.insert(MPParams::SWITCH_OFF_AFTER_BT_DISC, "switch_off_after_bt_disc");
+    m_bleByteMapping[MPParams::SWITCH_OFF_AFTER_BT_DISC] = SWITCH_OFF_AFTER_BT_DISC;
+    m_paramMap.insert(MPParams::MC_SUBDOMAIN_FORCE_STATUS, "mc_subdomain_force_status");
+    m_bleByteMapping[MPParams::MC_SUBDOMAIN_FORCE_STATUS] = MC_SUBDOMAIN_FORCE_STATUS;
+    m_paramMap.insert(MPParams::FAV_LAST_USED_SORTED, "fav_last_used_sorted");
+    m_bleByteMapping[MPParams::FAV_LAST_USED_SORTED] = FAV_LAST_USED_SORTED;
+    m_paramMap.insert(MPParams::DELAY_BEF_UNLOCK_LOGIN, "delay_bef_unlock_login");
+    m_bleByteMapping[MPParams::DELAY_BEF_UNLOCK_LOGIN] = DELAY_BEF_UNLOCK_LOGIN;
+    m_paramMap.insert(MPParams::SCREEN_BRIGHTNESS_USB, "screen_brightness_usb");
+    m_bleByteMapping[MPParams::SCREEN_BRIGHTNESS_USB] = SCREEN_BRIGHTNESS_USB;
+    m_paramMap.insert(MPParams::SCREEN_BRIGHTNESS_BAT, "screen_brightness_bat");
+    m_bleByteMapping[MPParams::SCREEN_BRIGHTNESS_BAT] = SCREEN_BRIGHTNESS_BAT;
 }
 

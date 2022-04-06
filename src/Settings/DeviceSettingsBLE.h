@@ -25,6 +25,14 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(int, information_time_delay, 0, MPParams::INFORMATION_TIME_DELAY)
     QT_SETTINGS_PROPERTY(bool, bluetooth_shortcuts, false, MPParams::BLUETOOTH_SHORTCUTS)
     QT_SETTINGS_PROPERTY(int, screen_saver_id, 0, MPParams::SCREEN_SAVER_ID)
+    QT_SETTINGS_PROPERTY(bool, display_totp_after_recall, false, MPParams::DISP_TOTP_AFTER_RECALL)
+    QT_SETTINGS_PROPERTY(bool, start_last_accessed_service, false, MPParams::START_LAST_ACCESSED_SERVICE)
+    QT_SETTINGS_PROPERTY(bool, switch_off_after_bt_disc, false, MPParams::SWITCH_OFF_AFTER_BT_DISC)
+    QT_SETTINGS_PROPERTY(bool, mc_subdomain_force_status, false, MPParams::MC_SUBDOMAIN_FORCE_STATUS)
+    QT_SETTINGS_PROPERTY(bool, fav_last_used_sorted, false, MPParams::FAV_LAST_USED_SORTED)
+    QT_SETTINGS_PROPERTY(int, delay_bef_unlock_login, 0, MPParams::DELAY_BEF_UNLOCK_LOGIN)
+    QT_SETTINGS_PROPERTY(int, screen_brightness_usb, 0x90, MPParams::SCREEN_BRIGHTNESS_USB)
+    QT_SETTINGS_PROPERTY(int, screen_brightness_bat, 0x90, MPParams::SCREEN_BRIGHTNESS_BAT)
 
 
 public:
@@ -44,6 +52,7 @@ public:
         DEFAULT_CHAR_AFTER_PASS = 6,
         DELAY_BETWEEN_KEY_PRESS = 7,
         BOOT_ANIMATION_BYTE = 8,
+        SCREEN_BRIGHTNESS_USB = 9,
         DEVICE_LOCK_USB_BYTE = 10,
         KNOCK_DET_BYTE = 11,
         PIN_SHOWN_ON_BACK_BYTE = 14,
@@ -57,7 +66,14 @@ public:
         HASH_DISPLAY_BYTE = 22,
         INFORMATION_TIME_DELAY_BYTE = 23,
         BLUETOOTH_SHORTCUTS_BYTE = 24,
-        SCREEN_SAVER_ID_BYTE = 25
+        SCREEN_SAVER_ID_BYTE = 25,
+        START_LAST_ACCESSED_SERVICE = 26,
+        DISP_TOTP_AFTER_RECALL = 27,
+        SCREEN_BRIGHTNESS_BAT = 28,
+        DELAY_BEF_UNLOCK_LOGIN = 29,
+        SWITCH_OFF_AFTER_BT_DISC = 30,
+        MC_SUBDOMAIN_FORCE_STATUS = 31,
+        FAV_LAST_USED_SORTED = 32
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;

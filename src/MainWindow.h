@@ -236,6 +236,8 @@ private:
 
     void displayMiniImportWarning();
 
+    void fillBLEBrightnessComboBox(QComboBox * cb);
+
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
 

@@ -32,6 +32,9 @@ private:
      * @param val Fetched value from device
      */
     inline void checkEnforceLayout(MPParams::Param param, int &val);
+
+private slots:
+    void checkDeviceSettingsForBundle9(int bundleVersion);
 };
 
 #endif // SETTINGSGUIBLE_H
