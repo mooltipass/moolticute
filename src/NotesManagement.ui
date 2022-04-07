@@ -53,7 +53,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageListNotes">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -83,7 +83,7 @@ border-right: none;
             <x>0</x>
             <y>0</y>
             <width>572</width>
-            <height>396</height>
+            <height>418</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -205,7 +205,13 @@ border-right: none;
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="textEditNote"/>
+        <widget class="QPlainTextEdit" name="textEditNote">
+         <property name="font">
+          <font>
+           <family>Courier</family>
+          </font>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
