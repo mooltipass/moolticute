@@ -1534,8 +1534,22 @@ bool WSServerCon::processSetCredential(QJsonObject &root, QJsonObject &o)
     ParseDomain url(originalService);
     QSettings s;
     bool isSubdomainSelectionEnabled = s.value("settings/enable_subdomain_selection").toBool() && url.isWebsite();
+    Common::SubdomainSelection forceSubdomain = Common::MC_DECIDE;
+    if (url.isWebsite() && mpdevice->isBLE())
+    {
+        forceSubdomain = mpdevice->ble()->getForceSubdomainSelection();
+        if (forceSubdomain == Common::FORCE_SUBDOMAIN)
+        {
+            o["service"] = url.getFullSubdomain();
+        } else if (forceSubdomain == Common::IGNORE_SUBDOMAIN)
+        {
+            o["service"] = url.getFullDomain();
+        }
+    }
     bool isManualCredential = o.contains("saveManualCredential");
-    if (!url.subdomain().isEmpty() && isMsgContainsExtInfo && isSubdomainSelectionEnabled && !isManualCredential && !o.contains("saveDomainConfirmed"))
+    if (!url.subdomain().isEmpty() && isMsgContainsExtInfo &&
+            isSubdomainSelectionEnabled && forceSubdomain == Common::MC_DECIDE &&
+            !isManualCredential && !o.contains("saveDomainConfirmed"))
     {
         root["msg"] = "request_domain";
         o["domain"] = url.getFullDomain();
@@ -1550,7 +1564,7 @@ bool WSServerCon::processSetCredential(QJsonObject &root, QJsonObject &o)
         qDebug() << "GUI is not running, saving credential with subdomain";
     }
 
-    if (!o.contains("saveDomainConfirmed") && url.isWebsite())
+    if (!o.contains("saveDomainConfirmed") && url.isWebsite() && forceSubdomain == Common::MC_DECIDE)
     {
         o["service"] = url.getFullDomain();
     }

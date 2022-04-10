@@ -28,7 +28,7 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(bool, display_totp_after_recall, false, MPParams::DISP_TOTP_AFTER_RECALL)
     QT_SETTINGS_PROPERTY(bool, start_last_accessed_service, false, MPParams::START_LAST_ACCESSED_SERVICE)
     QT_SETTINGS_PROPERTY(bool, switch_off_after_bt_disc, false, MPParams::SWITCH_OFF_AFTER_BT_DISC)
-    QT_SETTINGS_PROPERTY(bool, mc_subdomain_force_status, false, MPParams::MC_SUBDOMAIN_FORCE_STATUS)
+    QT_SETTINGS_PROPERTY(int, mc_subdomain_force_status, false, MPParams::MC_SUBDOMAIN_FORCE_STATUS)
     QT_SETTINGS_PROPERTY(bool, fav_last_used_sorted, false, MPParams::FAV_LAST_USED_SORTED)
     QT_SETTINGS_PROPERTY(int, delay_bef_unlock_login, 0, MPParams::DELAY_BEF_UNLOCK_LOGIN)
     QT_SETTINGS_PROPERTY(int, screen_brightness_usb, 0x90, MPParams::SCREEN_BRIGHTNESS_USB)

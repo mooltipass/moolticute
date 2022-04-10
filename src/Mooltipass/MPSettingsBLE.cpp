@@ -51,7 +51,7 @@ void MPSettingsBLE::loadParameters()
                         set_display_totp_after_recall(m_lastDeviceSettings.at(DeviceSettingsBLE::DISP_TOTP_AFTER_RECALL) != 0);
                         set_start_last_accessed_service(m_lastDeviceSettings.at(DeviceSettingsBLE::START_LAST_ACCESSED_SERVICE) != 0);
                         set_switch_off_after_bt_disc(m_lastDeviceSettings.at(DeviceSettingsBLE::SWITCH_OFF_AFTER_BT_DISC) != 0);
-                        set_mc_subdomain_force_status(m_lastDeviceSettings.at(DeviceSettingsBLE::MC_SUBDOMAIN_FORCE_STATUS) != 0);
+                        set_mc_subdomain_force_status(static_cast<quint8>(m_lastDeviceSettings.at(DeviceSettingsBLE::MC_SUBDOMAIN_FORCE_STATUS)));
                         set_fav_last_used_sorted(m_lastDeviceSettings.at(DeviceSettingsBLE::FAV_LAST_USED_SORTED) != 0);
                         set_delay_bef_unlock_login(static_cast<quint8>(m_lastDeviceSettings.at(DeviceSettingsBLE::DELAY_BEF_UNLOCK_LOGIN)));
                         set_screen_brightness_usb(static_cast<quint8>(m_lastDeviceSettings.at(DeviceSettingsBLE::SCREEN_BRIGHTNESS_USB)));

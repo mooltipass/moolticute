@@ -370,6 +370,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxScreensaverId->addItem(tr("None"), 0);
     ui->comboBoxScreensaverId->addItem(tr("Nyancat"), 1);
 
+    ui->comboBoxMCSubdomainForceStatus->addItem(tr("Let moolticute decide"), 0);
+    ui->comboBoxMCSubdomainForceStatus->addItem(tr("Force subdomain support"), 1);
+    ui->comboBoxMCSubdomainForceStatus->addItem(tr("Force subdomain ignore"), 2);
+
     // Close behavior
 #ifdef Q_OS_MAC
     ui->closeBehaviorComboBox->addItem(
