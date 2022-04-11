@@ -65,7 +65,7 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::SWITCH_OFF_AFTER_BT_DISC, ui->checkBoxSwitchOffBTDisc},
         {MPParams::MC_SUBDOMAIN_FORCE_STATUS, ui->comboBoxMCSubdomainForceStatus},
         {MPParams::FAV_LAST_USED_SORTED, ui->checkBoxSortFavsByLastUsed},
-        {MPParams::DELAY_BEF_UNLOCK_LOGIN, ui->spinBoxDelayBefUnlockLogin},
+        {MPParams::DELAY_BEF_UNLOCK_LOGIN, ui->comboBoxDelayBefUnlockLogin},
         {MPParams::SCREEN_BRIGHTNESS_USB, ui->comboBoxUsbScreenBrightness},
         {MPParams::SCREEN_BRIGHTNESS_BAT, ui->comboBoxBatteryScreenBrightness}
     };

@@ -1104,15 +1104,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="spinBoxDelayBefUnlockLogin">
-                    <property name="minimum">
-                     <number>10</number>
-                    </property>
-                    <property name="maximum">
-                     <number>250</number>
-                    </property>
-                    <property name="singleStep">
-                     <number>10</number>
+                   <widget class="QComboBox" name="comboBoxDelayBefUnlockLogin"/>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_delayBefUnlockUnit">
+                    <property name="text">
+                     <string>ms</string>
                     </property>
                    </widget>
                   </item>
@@ -1539,50 +1536,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="settings_screen_saver_id" native="true">
-                 <property name="toolTip">
-                  <string>Screen saver displayed when device is idle, connected to USB</string>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_62">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_ScreensaverId">
-                    <property name="text">
-                     <string>Screensaver</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="comboBoxScreensaverId"/>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_56">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
                 <widget class="QWidget" name="settings_miscellaneous_brightness" native="true">
                  <property name="toolTip">
                   <string>Mooltipass screen brightness</string>
@@ -1634,6 +1587,47 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
+                <widget class="QWidget" name="settings_screen_brightness_bat" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_68">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_BatteryScreenBrightness">
+                    <property name="text">
+                     <string>Brightness when battery powered</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxBatteryScreenBrightness"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_44">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <widget class="QWidget" name="settings_screen_brightness_usb" native="true">
                  <layout class="QHBoxLayout" name="horizontalLayout_67">
                   <property name="leftMargin">
@@ -1651,7 +1645,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QLabel" name="label_UsbScreenBrightness">
                     <property name="text">
-                     <string>USB Screen Brightness</string>
+                     <string>Brightness when USB powered</string>
                     </property>
                    </widget>
                   </item>
@@ -1675,8 +1669,11 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="settings_screen_brightness_bat" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_68">
+                <widget class="QWidget" name="settings_screen_saver_id" native="true">
+                 <property name="toolTip">
+                  <string>Screen saver displayed when device is idle, connected to USB</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_62">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -1690,17 +1687,17 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QLabel" name="label_BatteryScreenBrightness">
+                   <widget class="QLabel" name="label_ScreensaverId">
                     <property name="text">
-                     <string>Battery Screen Brightness</string>
+                     <string>Screensaver</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxBatteryScreenBrightness"/>
+                   <widget class="QComboBox" name="comboBoxScreensaverId"/>
                   </item>
                   <item>
-                   <spacer name="horizontalSpacer_44">
+                   <spacer name="horizontalSpacer_56">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
@@ -1849,6 +1846,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxDispTOTPAfterRecall">
+                 <property name="text">
+                  <string>Display TOTP after login into website</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
@@ -1932,13 +1936,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                  <property name="text">
                   <string>Disable BLE on Device Lock</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBoxDispTOTPAfterRecall">
-                 <property name="text">
-                  <string>Display TOTP after login into website</string>
                  </property>
                 </widget>
                </item>
