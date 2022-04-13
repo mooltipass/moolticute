@@ -168,6 +168,8 @@ public:
 
     bool resetDefaultSettings();
 
+    Common::SubdomainSelection getForceSubdomainSelection() const;
+
 signals:
     void userSettingsChanged(QJsonObject settings);
     void bleDeviceLanguage(const QJsonObject& langs);
@@ -265,6 +267,7 @@ private:
     static constexpr int NEXT_ADDRESS_STARTING = 2;
     static constexpr int MINI_FILE_FULL_SIZE_LENGTH = 4;
     static constexpr int MINI_FILE_BLOCK_SIZE = 128;
+    static constexpr int FORCE_SUBDOMAIN_BUNDLE_VERSION = 8;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
 };
 

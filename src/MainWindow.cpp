@@ -370,6 +370,17 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->comboBoxScreensaverId->addItem(tr("None"), 0);
     ui->comboBoxScreensaverId->addItem(tr("Nyancat"), 1);
 
+    ui->comboBoxMCSubdomainForceStatus->addItem(tr("Let moolticute decide"), 0);
+    ui->comboBoxMCSubdomainForceStatus->addItem(tr("Force subdomain support"), 1);
+    ui->comboBoxMCSubdomainForceStatus->addItem(tr("Force subdomain ignore"), 2);
+
+    ui->comboBoxDelayBefUnlockLogin->addItem("100", 10);
+    ui->comboBoxDelayBefUnlockLogin->addItem("250", 25);
+    ui->comboBoxDelayBefUnlockLogin->addItem("500", 50);
+    ui->comboBoxDelayBefUnlockLogin->addItem("1000", 100);
+    ui->comboBoxDelayBefUnlockLogin->addItem("1500", 150);
+    ui->comboBoxDelayBefUnlockLogin->addItem("2000", 200);
+
     // Close behavior
 #ifdef Q_OS_MAC
     ui->closeBehaviorComboBox->addItem(

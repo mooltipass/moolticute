@@ -1081,57 +1081,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </layout>
                 </widget>
                </item>
-               <item>
-                <widget class="QWidget" name="settings_delay_bef_unlock_login" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_38">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_delayBefUnlockLogin">
-                    <property name="toolTip">
-                     <string>Custom delay between enter key and password for _unlock_</string>
-                    </property>
-                    <property name="text">
-                     <string>Custom delay between enter key and password for _unlock_</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="spinBoxDelayBefUnlockLogin">
-                    <property name="minimum">
-                     <number>10</number>
-                    </property>
-                    <property name="maximum">
-                     <number>250</number>
-                    </property>
-                    <property name="singleStep">
-                     <number>10</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_37">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
               </layout>
              </widget>
             </item>
@@ -1401,6 +1350,98 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
+                <widget class="QWidget" name="settings_delay_bef_unlock_login" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_38">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_delayBefUnlockLogin">
+                    <property name="toolTip">
+                     <string>Custom delay between enter key and password for _unlock_</string>
+                    </property>
+                    <property name="text">
+                     <string>Custom delay between enter key and password for _unlock_</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxDelayBefUnlockLogin"/>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_delayBefUnlockUnit">
+                    <property name="text">
+                     <string>ms</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_37">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="settings_subdomain_specification" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_69">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_MCSubdomainForceStatus">
+                    <property name="toolTip">
+                     <string>Specify subdomain status on device</string>
+                    </property>
+                    <property name="text">
+                     <string>Specify subdomain status on device</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxMCSubdomainForceStatus"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_59">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <widget class="QWidget" name="knockSettingsWidget" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -1539,50 +1580,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="settings_screen_saver_id" native="true">
-                 <property name="toolTip">
-                  <string>Screen saver displayed when device is idle, connected to USB</string>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_62">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_ScreensaverId">
-                    <property name="text">
-                     <string>Screensaver</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="comboBoxScreensaverId"/>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_56">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
                 <widget class="QWidget" name="settings_miscellaneous_brightness" native="true">
                  <property name="toolTip">
                   <string>Mooltipass screen brightness</string>
@@ -1634,47 +1631,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="settings_screen_brightness_usb" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_67">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_UsbScreenBrightness">
-                    <property name="text">
-                     <string>USB Screen Brightness</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="comboBoxUsbScreenBrightness"/>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_38">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
                 <widget class="QWidget" name="settings_screen_brightness_bat" native="true">
                  <layout class="QHBoxLayout" name="horizontalLayout_68">
                   <property name="leftMargin">
@@ -1692,7 +1648,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QLabel" name="label_BatteryScreenBrightness">
                     <property name="text">
-                     <string>Battery Screen Brightness</string>
+                     <string>Brightness when battery powered</string>
                     </property>
                    </widget>
                   </item>
@@ -1716,12 +1672,104 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
+                <widget class="QWidget" name="settings_screen_brightness_usb" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_67">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_UsbScreenBrightness">
+                    <property name="text">
+                     <string>Brightness when USB powered</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxUsbScreenBrightness"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_38">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="settings_screen_saver_id" native="true">
+                 <property name="toolTip">
+                  <string>Screen saver displayed when device is idle, connected to USB</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_62">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_ScreensaverId">
+                    <property name="text">
+                     <string>Screensaver</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBoxScreensaverId"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_56">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="hashDisplayFeatureCheckBox">
                  <property name="toolTip">
                   <string>A hash will be displayed before and after your card is unlocked. Make sure this hash doesn't change to know that your firmware hasn't been tampered with.</string>
                  </property>
                  <property name="text">
                   <string>Display the security hash before &amp;&amp; after the card is unlocked</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxDispTOTPAfterRecall">
+                 <property name="text">
+                  <string>Display TOTP After Login Into Website</string>
                  </property>
                 </widget>
                </item>
@@ -1786,22 +1834,22 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBoxTuto">
-                 <property name="toolTip">
-                  <string>Display the device tutorial after the next Mooltipass start</string>
-                 </property>
-                 <property name="text">
-                  <string>Enable Device Tutorial</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QCheckBox" name="checkBoxBTShortcuts">
                  <property name="toolTip">
                   <string>Scroll wheel shortcuts for bluetooth actions</string>
                  </property>
                  <property name="text">
                   <string>Bluetooth Shortcuts</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxTuto">
+                 <property name="toolTip">
+                  <string>Display the device tutorial after the next Mooltipass start</string>
+                 </property>
+                 <property name="text">
+                  <string>Device Tutorial</string>
                  </property>
                 </widget>
                </item>
@@ -1892,26 +1940,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBoxDispTOTPAfterRecall">
-                 <property name="text">
-                  <string>Display TOTP after login into website</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QCheckBox" name="checkBoxStartWithLastAccessedService">
                  <property name="text">
-                  <string>Login menu: Start with last accessed service</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBoxMCSubdomainForceStatus">
-                 <property name="toolTip">
-                  <string>Specify subdomain status on device</string>
-                 </property>
-                 <property name="text">
-                  <string>Specify subdomain status on device</string>
+                  <string>Login Menu: Start with Last Accessed Service</string>
                  </property>
                 </widget>
                </item>
@@ -1921,7 +1952,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <string>Sort Favorites by last used date</string>
                  </property>
                  <property name="text">
-                  <string>Sort Favorites by last used date</string>
+                  <string>Sort Favorites by Last Used Date</string>
                  </property>
                 </widget>
                </item>

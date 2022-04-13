@@ -331,6 +331,13 @@ public:
         NOTE_ADDR_IDX = 1
     };
 
+    enum SubdomainSelection
+    {
+        MC_DECIDE = 0,
+        FORCE_SUBDOMAIN = 1,
+        IGNORE_SUBDOMAIN = 2
+    };
+
     static const QString ISODateWithMsFormat;
     static const QString SIMPLE_CRYPT;
     static const QString SIMPLE_CRYPT_V2;

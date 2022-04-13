@@ -8,6 +8,7 @@ SettingsGuiBLE::SettingsGuiBLE(QObject *parent, MainWindow *mw)
 {
     ui = mw->ui;
     connect(this, &DeviceSettings::lock_unlock_modeChanged, mw, &MainWindow::lockUnlockChanged);
+    connect(this, &DeviceSettingsBLE::mc_subdomain_force_statusChanged, this, &SettingsGuiBLE::handleSubdomainForceChanged);
     connect(mw->wsClient, &WSClient::bundleVersionChanged, this, &SettingsGuiBLE::checkDeviceSettingsForBundle9);
 }
 
@@ -103,21 +104,29 @@ void SettingsGuiBLE::checkDeviceSettingsForBundle9(int bundleVersion)
         ui->checkBoxDispTOTPAfterRecall->show();
         ui->checkBoxStartWithLastAccessedService->show();
         ui->checkBoxSwitchOffBTDisc->show();
-        ui->checkBoxMCSubdomainForceStatus->show();
         ui->checkBoxSortFavsByLastUsed->show();
         ui->settings_delay_bef_unlock_login->show();
         ui->settings_screen_brightness_bat->show();
         ui->settings_screen_brightness_usb->show();
+        ui->settings_subdomain_specification->show();
     }
     else
     {
         ui->checkBoxDispTOTPAfterRecall->hide();
         ui->checkBoxStartWithLastAccessedService->hide();
         ui->checkBoxSwitchOffBTDisc->hide();
-        ui->checkBoxMCSubdomainForceStatus->hide();
         ui->checkBoxSortFavsByLastUsed->hide();
         ui->settings_delay_bef_unlock_login->hide();
         ui->settings_screen_brightness_bat->hide();
         ui->settings_screen_brightness_usb->hide();
+        ui->settings_subdomain_specification->hide();
     }
+}
+
+void SettingsGuiBLE::handleSubdomainForceChanged(int value)
+{
+    ui->pushButtonSubDomain->setEnabled(value == 0);
+    QSettings s;
+    s.setValue("settings/force_subdomain_selection", value);
+    s.sync();
 }

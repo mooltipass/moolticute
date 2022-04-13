@@ -1798,6 +1798,16 @@ bool MPDeviceBleImpl::resetDefaultSettings()
     return true;
 }
 
+Common::SubdomainSelection MPDeviceBleImpl::getForceSubdomainSelection() const
+{
+    QSettings s;
+    if (get_bundleVersion() >= FORCE_SUBDOMAIN_BUNDLE_VERSION)
+    {
+        return static_cast<Common::SubdomainSelection>(s.value("settings/force_subdomain_selection", 0).toInt());
+    }
+    return Common::MC_DECIDE;
+}
+
 void MPDeviceBleImpl::handleLongMessageTimeout()
 {
     qWarning() << "Timout for multiple packet expired";
