@@ -3988,10 +3988,6 @@ void MPDevice::processStatusChange(const QByteArray &data)
             {
                 bleImpl->fetchDataFiles();
                 bleImpl->activateEnforceLayout();
-                if (bleImpl->isNoteAvailable())
-                {
-                    bleImpl->fetchNotes();
-                }
             }
 
             /*

@@ -350,6 +350,7 @@ public:
     static const QString DUPLICATE_SERVICE_DETECTED;
     static const int DEFAULT_PASSWORD_LENGTH = 16;
     static const int BLE_LATEST_BUNDLE_VERSION = 7;
+    static const int BLE_BUNDLE_WITH_NOTES = 1;
 };
 
 struct FidoCredential
