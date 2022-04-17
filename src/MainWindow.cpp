@@ -218,6 +218,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 ui->settings_bt_layout->show();
                 ui->settings_usb_layout->show();
                 wsClient->sendLoadParams();
+                if (!m_notesFetched && wsClient->get_bundleVersion() > Common::BLE_BUNDLE_WITH_NOTES)
+                {
+                    m_notesFetched = true;
+                    wsClient->sendFetchNotes();
+                }
             }
             else
             {
@@ -492,6 +497,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwMemoryChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::displayBundleVersion);
+    connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::sendRequestNotes);
 
     connect(wsClient, &WSClient::memMgmtModeFailed, this, &MainWindow::memMgmtModeFailed);
 
@@ -2141,7 +2147,6 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
-        wsClient->sendFetchNotes();
     }
     displayBundleVersion();
     updateDeviceDependentUI();
@@ -2161,6 +2166,7 @@ void MainWindow::onDeviceDisconnected()
         ui->pushButtonNotes->setVisible(false);
         noPasswordPromptChanged(false);
         ui->pushButtonSettingsSetToDefault->setVisible(false);
+        m_notesFetched = false;
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");
@@ -2329,4 +2335,13 @@ void MainWindow::on_checkBoxBackupNotification_stateChanged(int)
 void MainWindow::on_checkBoxTutorial_stateChanged(int arg1)
 {
     ui->tutorialWidget->changeTutorialFinished(Qt::Checked == arg1);
+}
+
+void MainWindow::sendRequestNotes(int bundle)
+{
+    if (!m_notesFetched && bundle >= Common::BLE_BUNDLE_WITH_NOTES && wsClient->isMPBLE())
+    {
+        m_notesFetched = true;
+        wsClient->sendFetchNotes();
+    }
 }

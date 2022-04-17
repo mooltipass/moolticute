@@ -362,7 +362,7 @@ void MPDeviceBleImpl::getNoteNode(QString note, std::function<void (bool, QStrin
 
 bool MPDeviceBleImpl::isNoteAvailable() const
 {
-    return get_bundleVersion() >= 1;
+    return get_bundleVersion() >= Common::BLE_BUNDLE_WITH_NOTES;
 }
 
 void MPDeviceBleImpl::loadNotes(AsyncJobs *jobs, const MPDeviceProgressCb &cbProgress)

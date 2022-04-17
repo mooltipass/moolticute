@@ -197,6 +197,8 @@ private slots:
 
     void on_checkBoxTutorial_stateChanged(int arg1);
 
+    void sendRequestNotes(int bundle);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -273,6 +275,8 @@ private:
     bool m_keyboardBTLayoutOrigValue = false;
     bool m_keyboardUsbLayoutActualValue = false;
     bool m_keyboardBTLayoutActualValue = false;
+
+    bool m_notesFetched = false;
 
     bool m_computerUnlocked = true;
     struct LockUnlockItem
