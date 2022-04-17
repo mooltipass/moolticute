@@ -2339,7 +2339,8 @@ void MainWindow::on_checkBoxTutorial_stateChanged(int arg1)
 
 void MainWindow::sendRequestNotes(int bundle)
 {
-    if (!m_notesFetched && bundle >= Common::BLE_BUNDLE_WITH_NOTES && wsClient->isMPBLE())
+    if (!m_notesFetched && bundle >= Common::BLE_BUNDLE_WITH_NOTES &&
+            wsClient->isMPBLE() && wsClient->get_status() == Common::Unlocked)
     {
         m_notesFetched = true;
         wsClient->sendFetchNotes();
