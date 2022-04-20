@@ -518,7 +518,7 @@ void MPDeviceBleImpl::getTotpCode(const QString &service, const QString &login, 
                                     cb(false, "Get TOTP code failed", QByteArray{});
                                     return true;
                                 }
-                                qDebug() << "Credential got successfully";
+                                qDebug() << "TOTP code got successfully";
 
                                 if (AppDaemon::isDebugDev())
                                 {
