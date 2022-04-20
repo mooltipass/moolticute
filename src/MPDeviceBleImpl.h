@@ -78,8 +78,10 @@ public:
     void storeCredential(const BleCredential &cred, MessageHandlerCb cb, AsyncJobs *jobs = nullptr);
     void changePassword(const QByteArray& address, const QString& pwd, MessageHandlerCb cb);
     void getCredential(const QString& service, const QString& login, const QString& reqid, const QString& fallbackService, const MessageHandlerCbData &cb);
+    void getTotpCode(const QString& service, const QString& login, const MessageHandlerCbData &cb);
     void getFallbackServiceCredential(AsyncJobs *jobs, const QString& fallbackService, const QString& login, const MessageHandlerCbData &cb);
     BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;
+    QString retrieveTotpCodeFromResponse(const QByteArray& response);
 
     void sendResetFlipBit();
     void setCurrentFlipBit(QByteArray &msg);

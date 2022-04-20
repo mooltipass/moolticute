@@ -1231,6 +1231,33 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
                     sendJsonMessage(oroot);
                 });
     }
+    else if (root["msg"] == "get_totp_code")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString service = o["service"].toString();
+        QString login = o["login"].toString();
+        QString reqid;
+        bleImpl->getTotpCode(service, login,
+                [this, root, bleImpl, service, login](bool success, QString errstr, QByteArray data)
+                {
+                    if (!WSServer::Instance()->checkClientExists(this))
+                        return;
+
+                    if (!success)
+                    {
+                        sendFailedJson(root, errstr);
+                        return;
+                    }
+
+                    auto totpCode = bleImpl->retrieveTotpCodeFromResponse(data);
+
+                    QJsonObject ores;
+                    QJsonObject oroot = root;
+                    ores["totp_code"] = totpCode;
+                    oroot["data"] = ores;
+                    sendJsonMessage(oroot);
+                });
+    }
     else if (root["msg"] == "set_credential")
     {
         QJsonObject o = root["data"].toObject();
