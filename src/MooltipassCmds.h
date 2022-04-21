@@ -168,6 +168,7 @@ public:
             AUTH_CHALLENGE      ,
             DELETE_DATA_FILE    ,
             DELETE_NOTE_FILE    ,
+            GET_TOTP_CODE       ,
             CMD_DBG_MESSAGE     ,
             CMD_DBG_OPEN_DISP_BUFFER    ,
             CMD_DBG_SEND_TO_DISP_BUFFER ,

@@ -501,6 +501,43 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
     mpDev->enqueueAndRunJob(jobs);
 }
 
+void MPDeviceBleImpl::getTotpCode(const QString &service, const QString &login, const MessageHandlerCbData &cb)
+{
+    static constexpr int GET_TOP_CODE_SUPPORT_FW = 8;
+    if (get_bundleVersion() < GET_TOP_CODE_SUPPORT_FW)
+    {
+        cb(false, "Bundle version is not supporting get TOTP code command", QByteArray{});
+        return;
+    }
+    AsyncJobs *jobs = new AsyncJobs("Get TOTP code", this);
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_TOTP_CODE, createGetCredMessage(service, login),
+                            [this, service, login, cb](const QByteArray &data, bool &)
+                            {
+                                if (MSG_FAILED == bleProt->getMessageSize(data))
+                                {
+                                    cb(false, "Get TOTP code failed", QByteArray{});
+                                    return true;
+                                }
+                                qDebug() << "TOTP code got successfully";
+
+                                if (AppDaemon::isDebugDev())
+                                {
+                                    qDebug() << data.toHex();
+                                }
+
+                                cb(true, "", bleProt->getFullPayload(data));
+                                return true;
+                            }));
+
+    connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
+    {
+        qCritical() << "Failed getting totp code: " << failedJob->getErrorStr();
+        cb(false, failedJob->getErrorStr(), QByteArray{});
+    });
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 void MPDeviceBleImpl::getFallbackServiceCredential(AsyncJobs *jobs, const QString &fallbackService, const QString &login, const MessageHandlerCbData &cb)
 {
     jobs->prepend(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(fallbackService, login),
@@ -552,6 +589,22 @@ BleCredential MPDeviceBleImpl::retrieveCredentialFromResponse(QByteArray respons
     }
 
     return cred;
+}
+
+QString MPDeviceBleImpl::retrieveTotpCodeFromResponse(const QByteArray &response)
+{
+    QString totpCode = "";
+    bool isNum = true;
+    // Received as ASCII so only need to append every second char for TOTP code
+    for (QChar c : response)
+    {
+        if (isNum)
+        {
+            totpCode.append(c);
+        }
+        isNum = !isNum;
+    }
+    return totpCode;
 }
 
 void MPDeviceBleImpl::flipBit()
