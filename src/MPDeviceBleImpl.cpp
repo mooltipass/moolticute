@@ -467,7 +467,7 @@ void MPDeviceBleImpl::getCredential(const QString& service, const QString& login
         jobs = new AsyncJobs(getCred, reqid, this);
     }
 
-    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_TOTP_CODE, createGetCredMessage(service, login),
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_CREDENTIAL, createGetCredMessage(service, login),
                             [this, service, login, cb, fallbackService, jobs](const QByteArray &data, bool &)
                             {
                                 if (MSG_FAILED == bleProt->getMessageSize(data))
