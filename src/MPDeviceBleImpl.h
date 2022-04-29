@@ -53,6 +53,7 @@ public:
     bool isLastPacket(const QByteArray &data);
 
     void getPlatInfo();
+    void enforceCategory(int category);
     void getDebugPlatInfo(const MessageHandlerCbData &cb);
     QVector<int> calcDebugPlatInfo(const QByteArray &platInfo);
 

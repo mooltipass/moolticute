@@ -68,6 +68,17 @@ void MPDeviceBleImpl::getPlatInfo()
     mpDev->enqueueAndRunJob(jobs);
 }
 
+void MPDeviceBleImpl::enforceCategory(int category)
+{
+    auto *jobs = new AsyncJobs("Set current category", mpDev);
+
+    QByteArray catArr;
+    catArr.append(static_cast<char>(category));
+    jobs->append(new MPCommandJob(mpDev, MPCmd::SET_CUR_CATEGORY, catArr, bleProt->getDefaultSizeCheckFuncDone()));
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 void MPDeviceBleImpl::getDebugPlatInfo(const MessageHandlerCbData &cb)
 {
     auto *jobs = new AsyncJobs("Get Debug PlatInfo", mpDev);

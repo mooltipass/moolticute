@@ -4075,6 +4075,33 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </layout>
               </item>
               <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_70">
+                <item>
+                 <widget class="QLabel" name="label_bleCurrentCategory">
+                  <property name="text">
+                   <string>BLE current category</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_60">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBoxBleCurrentCategory"/>
+                </item>
+               </layout>
+              </item>
+              <item>
                <layout class="QHBoxLayout" name="horizontalLayout_43">
                 <item>
                  <widget class="QLabel" name="label_11">

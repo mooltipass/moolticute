@@ -114,6 +114,7 @@ public:
     void sendUserSettingsRequest();
     void sendLoadParams();
     void sendBatteryRequest();
+    void sendCurrentCategory(int category);
     void sendNiMHReconditioning();
     void sendSecurityChallenge(QString str);
 

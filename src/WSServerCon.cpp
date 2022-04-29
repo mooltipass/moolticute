@@ -1523,6 +1523,11 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "enforce_current_category")
+    {
+        QJsonObject o = root["data"].toObject();
+        bleImpl->enforceCategory(o["category"].toInt());
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

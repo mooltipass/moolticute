@@ -373,6 +373,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::DELETE_DATA_FILE      , 0x003B},
         {MPCmd::DELETE_NOTE_FILE      , 0x003C},
         {MPCmd::GET_TOTP_CODE         , 0x0041},
+        {MPCmd::SET_CUR_CATEGORY      , 0x003E},
         {MPCmd::CMD_DBG_OPEN_DISP_BUFFER    , 0x8001},
         {MPCmd::CMD_DBG_SEND_TO_DISP_BUFFER , 0x8002},
         {MPCmd::CMD_DBG_CLOSE_DISP_BUFFER   , 0x8003},

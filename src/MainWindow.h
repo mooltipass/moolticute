@@ -199,6 +199,8 @@ private slots:
 
     void sendRequestNotes(int bundle);
 
+    void on_comboBoxBleCurrentCategory_currentIndexChanged(int index);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;

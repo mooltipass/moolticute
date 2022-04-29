@@ -408,6 +408,15 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     }
     ui->comboBoxSystrayIcon->blockSignals(false);
 
+    ui->comboBoxBleCurrentCategory->blockSignals(true);
+    ui->comboBoxBleCurrentCategory->addItem(tr("Disable"), 0);
+    ui->comboBoxBleCurrentCategory->addItem("1", 1);
+    ui->comboBoxBleCurrentCategory->addItem("2", 2);
+    ui->comboBoxBleCurrentCategory->addItem("3", 3);
+    ui->comboBoxBleCurrentCategory->addItem("4", 4);
+    ui->comboBoxBleCurrentCategory->setCurrentIndex(s.value("settings/current_category", 0).toInt());
+    ui->comboBoxBleCurrentCategory->blockSignals(false);
+
     ui->cbLoginPrompt->setDisabled(true);
     ui->cbPinForMMM->setDisabled(true);
     ui->cbStoragePrompt->setDisabled(true);
@@ -2125,6 +2134,11 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
+        auto currentCategoryIndex = ui->comboBoxBleCurrentCategory->currentIndex();
+        if (currentCategoryIndex != 0)
+        {
+            wsClient->sendCurrentCategory(currentCategoryIndex);
+        }
     }
     displayBundleVersion();
     updateDeviceDependentUI();
@@ -2323,4 +2337,11 @@ void MainWindow::sendRequestNotes(int bundle)
         m_notesFetched = true;
         wsClient->sendFetchNotes();
     }
+}
+
+void MainWindow::on_comboBoxBleCurrentCategory_currentIndexChanged(int index)
+{
+    QSettings s;
+    s.setValue("settings/current_category", index);
+    qCritical() << "Category index: " << index;
 }
