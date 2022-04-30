@@ -415,6 +415,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     fillInitialCurrentCategories();
     connect(wsClient, &WSClient::displayUserCategories, this, &MainWindow::setCurrentCategoryOptions);
+    connect(wsClient, &WSClient::updateCurrentCategories, this, &MainWindow::setCurrentCategoryOptions);
 
     ui->cbLoginPrompt->setDisabled(true);
     ui->cbPinForMMM->setDisabled(true);
