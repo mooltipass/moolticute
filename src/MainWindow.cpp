@@ -223,6 +223,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                     m_notesFetched = true;
                     wsClient->sendFetchNotes();
                 }
+                auto currentCategoryIndex = ui->comboBoxBleCurrentCategory->currentIndex();
+                if (currentCategoryIndex != 0)
+                {
+                    wsClient->sendCurrentCategory(currentCategoryIndex);
+                }
             }
             else
             {
@@ -408,14 +413,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     }
     ui->comboBoxSystrayIcon->blockSignals(false);
 
-    ui->comboBoxBleCurrentCategory->blockSignals(true);
-    ui->comboBoxBleCurrentCategory->addItem(tr("Disable"), 0);
-    ui->comboBoxBleCurrentCategory->addItem("1", 1);
-    ui->comboBoxBleCurrentCategory->addItem("2", 2);
-    ui->comboBoxBleCurrentCategory->addItem("3", 3);
-    ui->comboBoxBleCurrentCategory->addItem("4", 4);
-    ui->comboBoxBleCurrentCategory->setCurrentIndex(s.value("settings/current_category", 0).toInt());
-    ui->comboBoxBleCurrentCategory->blockSignals(false);
+    fillInitialCurrentCategories();
+    connect(wsClient, &WSClient::displayUserCategories, this, &MainWindow::setCurrentCategoryOptions);
 
     ui->cbLoginPrompt->setDisabled(true);
     ui->cbPinForMMM->setDisabled(true);
@@ -1890,6 +1889,20 @@ void MainWindow::fillBLEBrightnessComboBox(QComboBox *cb)
     cb->addItem("100%", 144);
 }
 
+void MainWindow::fillInitialCurrentCategories()
+{
+    QSettings s;
+    ui->comboBoxBleCurrentCategory->blockSignals(true);
+    ui->comboBoxBleCurrentCategory->clear();
+    ui->comboBoxBleCurrentCategory->addItem(tr("Disable"), 0);
+    ui->comboBoxBleCurrentCategory->addItem("1", 1);
+    ui->comboBoxBleCurrentCategory->addItem("2", 2);
+    ui->comboBoxBleCurrentCategory->addItem("3", 3);
+    ui->comboBoxBleCurrentCategory->addItem("4", 4);
+    ui->comboBoxBleCurrentCategory->setCurrentIndex(s.value("settings/current_category", 0).toInt());
+    ui->comboBoxBleCurrentCategory->blockSignals(false);
+}
+
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
@@ -2134,11 +2147,6 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
-        auto currentCategoryIndex = ui->comboBoxBleCurrentCategory->currentIndex();
-        if (currentCategoryIndex != 0)
-        {
-            wsClient->sendCurrentCategory(currentCategoryIndex);
-        }
     }
     displayBundleVersion();
     updateDeviceDependentUI();
@@ -2159,6 +2167,7 @@ void MainWindow::onDeviceDisconnected()
         noPasswordPromptChanged(false);
         ui->pushButtonSettingsSetToDefault->setVisible(false);
         m_notesFetched = false;
+        fillInitialCurrentCategories();
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");
@@ -2343,5 +2352,23 @@ void MainWindow::on_comboBoxBleCurrentCategory_currentIndexChanged(int index)
 {
     QSettings s;
     s.setValue("settings/current_category", index);
-    qCritical() << "Category index: " << index;
+}
+
+void MainWindow::setCurrentCategoryOptions(const QString &cat1, const QString &cat2, const QString &cat3, const QString &cat4)
+{
+    if (cat1.isEmpty() && cat2.isEmpty() && cat3.isEmpty() && cat4.isEmpty())
+    {
+        // When BLE device is connected, but not unlocked daemon is sending categories with empty string
+        return;
+    }
+    QSettings s;
+    ui->comboBoxBleCurrentCategory->blockSignals(true);
+    ui->comboBoxBleCurrentCategory->clear();
+    ui->comboBoxBleCurrentCategory->addItem(tr("Disable"), 0);
+    ui->comboBoxBleCurrentCategory->addItem(cat1, 1);
+    ui->comboBoxBleCurrentCategory->addItem(cat2, 2);
+    ui->comboBoxBleCurrentCategory->addItem(cat3, 3);
+    ui->comboBoxBleCurrentCategory->addItem(cat4, 4);
+    ui->comboBoxBleCurrentCategory->setCurrentIndex(s.value("settings/current_category", 0).toInt());
+    ui->comboBoxBleCurrentCategory->blockSignals(false);
 }
