@@ -4097,7 +4097,14 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBoxBleCurrentCategory"/>
+                 <widget class="QComboBox" name="comboBoxBleCurrentCategory">
+                  <property name="minimumSize">
+                   <size>
+                    <width>80</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
