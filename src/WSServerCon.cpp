@@ -1523,6 +1523,17 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             sendJsonMessage(oroot);
         });
     }
+    else if (root["msg"] == "enforce_current_category")
+    {
+        static constexpr int ENFORCE_CATEGORY_SUPPORT_FW = 9;
+        if (bleImpl->get_bundleVersion() < ENFORCE_CATEGORY_SUPPORT_FW)
+        {
+            qWarning() << "Enforce category is not supported in the current bundle version";
+            return;
+        }
+        QJsonObject o = root["data"].toObject();
+        bleImpl->enforceCategory(o["category"].toInt());
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

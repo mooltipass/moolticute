@@ -877,6 +877,14 @@ void WSClient::sendBatteryRequest()
     sendJsonData({{ "msg", "get_battery" }});
 }
 
+void WSClient::sendCurrentCategory(int category)
+{
+    QJsonObject o;
+    o["category"] = category;
+    sendJsonData({{ "msg", "enforce_current_category" },
+                  {"data", o}});
+}
+
 void WSClient::sendNiMHReconditioning()
 {
     sendJsonData({{ "msg", "nimh_reconditioning" }});

@@ -114,6 +114,7 @@ public:
     void sendUserSettingsRequest();
     void sendLoadParams();
     void sendBatteryRequest();
+    void sendCurrentCategory(int category);
     void sendNiMHReconditioning();
     void sendSecurityChallenge(QString str);
 
@@ -156,6 +157,7 @@ signals:
     void displayUploadBundleResult(bool success);
     void displayAvailableUsers(const QString& num);
     void displayUserCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
+    void updateCurrentCategories(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
     void updateUserSettingsOnUI(const QJsonObject& userSettings);
     void deviceConnected();
     void deviceDisconnected();

@@ -1315,6 +1315,7 @@ void CredentialsManagement::on_pushButtonSaveCategories_clicked()
     wsClient->sendSetUserCategories(cat1, cat2, cat3, cat4);
     ui->pushButtonSaveCategories->hide();
     m_pCredModel->updateCategories(cat1, cat2, cat3, cat4);
+    emit wsClient->updateCurrentCategories(cat1, cat2, cat3, cat4);
     ui->credDisplayCategoryInput->setItemText(1, cat1);
     ui->credDisplayCategoryInput->setItemText(2, cat2);
     ui->credDisplayCategoryInput->setItemText(3, cat3);

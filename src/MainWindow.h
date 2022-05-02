@@ -199,6 +199,10 @@ private slots:
 
     void sendRequestNotes(int bundle);
 
+    void on_comboBoxBleCurrentCategory_currentIndexChanged(int index);
+
+    void setCurrentCategoryOptions(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -239,6 +243,8 @@ private:
     void displayMiniImportWarning();
 
     void fillBLEBrightnessComboBox(QComboBox * cb);
+
+    void fillInitialCurrentCategories();
 
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
