@@ -226,6 +226,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 auto currentCategoryIndex = ui->comboBoxBleCurrentCategory->currentIndex();
                 if (currentCategoryIndex != 0)
                 {
+                    // When enforce current category is set sending category number to device
                     wsClient->sendCurrentCategory(currentCategoryIndex);
                 }
             }
@@ -1895,12 +1896,12 @@ void MainWindow::fillInitialCurrentCategories()
     QSettings s;
     ui->comboBoxBleCurrentCategory->blockSignals(true);
     ui->comboBoxBleCurrentCategory->clear();
-    ui->comboBoxBleCurrentCategory->addItem(tr("Disable"), 0);
+    ui->comboBoxBleCurrentCategory->addItem(tr("Disabled"), 0);
     ui->comboBoxBleCurrentCategory->addItem("1", 1);
     ui->comboBoxBleCurrentCategory->addItem("2", 2);
     ui->comboBoxBleCurrentCategory->addItem("3", 3);
     ui->comboBoxBleCurrentCategory->addItem("4", 4);
-    ui->comboBoxBleCurrentCategory->setCurrentIndex(s.value("settings/current_category", 0).toInt());
+    ui->comboBoxBleCurrentCategory->setCurrentIndex(s.value("settings/enforced_category", 0).toInt());
     ui->comboBoxBleCurrentCategory->blockSignals(false);
 }
 
@@ -2352,7 +2353,7 @@ void MainWindow::sendRequestNotes(int bundle)
 void MainWindow::on_comboBoxBleCurrentCategory_currentIndexChanged(int index)
 {
     QSettings s;
-    s.setValue("settings/current_category", index);
+    s.setValue("settings/enforced_category", index);
 }
 
 void MainWindow::setCurrentCategoryOptions(const QString &cat1, const QString &cat2, const QString &cat3, const QString &cat4)
@@ -2365,11 +2366,11 @@ void MainWindow::setCurrentCategoryOptions(const QString &cat1, const QString &c
     QSettings s;
     ui->comboBoxBleCurrentCategory->blockSignals(true);
     ui->comboBoxBleCurrentCategory->clear();
-    ui->comboBoxBleCurrentCategory->addItem(tr("Disable"), 0);
+    ui->comboBoxBleCurrentCategory->addItem(tr("Disabled"), 0);
     ui->comboBoxBleCurrentCategory->addItem(cat1, 1);
     ui->comboBoxBleCurrentCategory->addItem(cat2, 2);
     ui->comboBoxBleCurrentCategory->addItem(cat3, 3);
     ui->comboBoxBleCurrentCategory->addItem(cat4, 4);
-    ui->comboBoxBleCurrentCategory->setCurrentIndex(s.value("settings/current_category", 0).toInt());
+    ui->comboBoxBleCurrentCategory->setCurrentIndex(s.value("settings/enforced_category", 0).toInt());
     ui->comboBoxBleCurrentCategory->blockSignals(false);
 }

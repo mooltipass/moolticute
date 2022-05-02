@@ -4078,8 +4078,11 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <layout class="QHBoxLayout" name="horizontalLayout_70">
                 <item>
                  <widget class="QLabel" name="label_bleCurrentCategory">
+                  <property name="toolTip">
+                   <string>when selected, you can set moolticute to set a given category upon device connection</string>
+                  </property>
                   <property name="text">
-                   <string>BLE current category</string>
+                   <string>Upon connection, force category:</string>
                   </property>
                  </widget>
                 </item>
@@ -4103,6 +4106,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                     <width>80</width>
                     <height>0</height>
                    </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>when selected, you can set moolticute to set a given category upon device connection</string>
                   </property>
                  </widget>
                 </item>
