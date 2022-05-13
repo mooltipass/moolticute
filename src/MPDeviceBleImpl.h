@@ -171,6 +171,10 @@ public:
 
     bool resetDefaultSettings();
 
+    void setBleName(QString name, std::function<void(bool)> cb);
+    void getBleName(const MessageHandlerCbData &cb);
+    QString getBleNameFromArray(const QByteArray& arr) const;
+
     Common::SubdomainSelection getForceSubdomainSelection() const;
 
 signals:

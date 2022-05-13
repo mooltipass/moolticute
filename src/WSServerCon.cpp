@@ -1534,6 +1534,39 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         QJsonObject o = root["data"].toObject();
         bleImpl->enforceCategory(o["category"].toInt());
     }
+    else if (root["msg"] == "set_ble_name")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString name = o["name"].toString();
+        bleImpl->setBleName(name,
+                [this, root, name](bool success)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            ores["name"] = name;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "get_ble_name")
+    {
+        bleImpl->getBleName([this, root, bleImpl](bool success, QString, QByteArray data)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            ores["name"] = bleImpl->getBleNameFromArray(data);
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
     else
     {
         qDebug() << root["msg"] << " message have not implemented yet for BLE";

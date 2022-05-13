@@ -1862,6 +1862,49 @@ bool MPDeviceBleImpl::resetDefaultSettings()
     return true;
 }
 
+void MPDeviceBleImpl::setBleName(QString name, std::function<void (bool)> cb)
+{
+    QByteArray nameArray = bleProt->toByteArray(name);
+    nameArray.append(ZERO_BYTE);
+    nameArray.append(ZERO_BYTE);
+    auto *jobs = new AsyncJobs(QString("Set BLE name"), this);
+    jobs->append(new MPCommandJob(mpDev, MPCmd::SET_BLE_NAME,
+                                  nameArray,
+                                  [this, name, cb](const QByteArray &data, bool &) -> bool
+    {
+        if (bleProt->getFirstPayloadByte(data) != MSG_SUCCESS)
+        {
+            qWarning() << "Set ble name to: " << name << " failed";
+            cb(false);
+            return false;
+        }
+        cb(true);
+        return true;
+    }));
+    mpDev->enqueueAndRunJob(jobs);
+}
+
+void MPDeviceBleImpl::getBleName(const MessageHandlerCbData &cb)
+{
+    auto *jobs = new AsyncJobs("Get Ble Name", mpDev);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::GET_BLE_NAME, bleProt->getDefaultSizeCheckFuncDone()));
+
+    connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &data)
+    {
+        Q_UNUSED(data);
+        /* Callback */
+        cb(true, "", bleProt->getFullPayload(data));
+    });
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
+QString MPDeviceBleImpl::getBleNameFromArray(const QByteArray &arr) const
+{
+    return bleProt->toQString(arr);
+}
+
 Common::SubdomainSelection MPDeviceBleImpl::getForceSubdomainSelection() const
 {
     QSettings s;

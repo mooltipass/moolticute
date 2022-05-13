@@ -877,6 +877,11 @@ void WSClient::sendBatteryRequest()
     sendJsonData({{ "msg", "get_battery" }});
 }
 
+void WSClient::sendBleNameRequest()
+{
+    sendJsonData({{ "msg", "get_ble_name" }});
+}
+
 void WSClient::sendCurrentCategory(int category)
 {
     QJsonObject o;
@@ -894,6 +899,13 @@ void WSClient::sendSecurityChallenge(QString str)
 {
     sendJsonData({{ "msg", "request_security_challenge" },
                   { "data", QJsonObject{ {"key", str } } }
+                 });
+}
+
+void WSClient::sendSetBleName(QString name)
+{
+    sendJsonData({{ "msg", "set_ble_name" },
+                  { "data", QJsonObject{ {"name", name } } }
                  });
 }
 
