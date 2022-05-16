@@ -64,6 +64,10 @@ public:
     bool getActualUsbKeyboardLayout() const { return m_keyboardUsbLayoutActualValue; }
     void setOriginalBTKeyboardLayout(bool val) { m_keyboardBTLayoutOrigValue = val; }
     void setOriginalUsbKeyboardLayout(bool val) { m_keyboardUsbLayoutOrigValue = val; }
+    QString getActualBleName() const { return m_bleNameActual; }
+    QString getOriginalBleName() const { return m_bleNameOriginal; }
+    void setActualBleName(const QString& name) { m_bleNameActual = name; }
+    void setOriginalBleName(const QString& name) { m_bleNameOriginal = name; }
 
     void updateBackupControlsVisibility(bool visible);
 
@@ -203,6 +207,10 @@ private slots:
 
     void setCurrentCategoryOptions(const QString& cat1, const QString& cat2, const QString& cat3, const QString& cat4);
 
+    void on_lineEditBleName_textEdited(const QString &arg1);
+
+    void onBleNameChanged(const QString& name);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -281,6 +289,8 @@ private:
     bool m_keyboardBTLayoutOrigValue = false;
     bool m_keyboardUsbLayoutActualValue = false;
     bool m_keyboardBTLayoutActualValue = false;
+    QString m_bleNameOriginal = "";
+    QString m_bleNameActual = "";
 
     bool m_notesFetched = false;
 

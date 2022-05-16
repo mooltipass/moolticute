@@ -182,6 +182,8 @@ signals:
 
     void fileDeleted(bool success, const QString& file);
 
+    void bleNameChanged(const QString& name);
+
 public slots:
     void sendJsonData(const QJsonObject &data);
     void queryRandomNumbers();
