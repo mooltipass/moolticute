@@ -589,7 +589,7 @@ void WSClient::onTextMessageReceived(const QString &message)
         bool success = o.value("success").toBool();
         emit noteDeleted(success, o.value("note").toString());
     }
-    else if (rootobj["msg"] == "get_ble_name")
+    else if (rootobj["msg"] == "get_ble_name" || rootobj["msg"] == "set_ble_name")
     {
          QJsonObject o = rootobj["data"].toObject();
          emit bleNameChanged(o.value("name").toString());

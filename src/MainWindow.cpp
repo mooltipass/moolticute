@@ -2388,4 +2388,5 @@ void MainWindow::onBleNameChanged(const QString &name)
     m_bleNameActual = name;
     m_bleNameOriginal = name;
     ui->lineEditBleName->setText(name);
+    checkSettingsChanged();
 }

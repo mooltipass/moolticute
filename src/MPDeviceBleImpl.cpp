@@ -1864,8 +1864,7 @@ bool MPDeviceBleImpl::resetDefaultSettings()
 
 void MPDeviceBleImpl::setBleName(QString name, std::function<void (bool)> cb)
 {
-    QByteArray nameArray = bleProt->toByteArray(name);
-    nameArray.append(ZERO_BYTE);
+    QByteArray nameArray = name.toUtf8();
     nameArray.append(ZERO_BYTE);
     auto *jobs = new AsyncJobs(QString("Set BLE name"), this);
     jobs->append(new MPCommandJob(mpDev, MPCmd::SET_BLE_NAME,

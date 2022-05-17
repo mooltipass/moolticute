@@ -1562,7 +1562,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             QJsonObject ores;
             QJsonObject oroot = root;
             ores["success"] = success;
-            ores["name"] = bleImpl->getBleNameFromArray(data);
+            ores["name"] = QString{data};
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });

@@ -1774,7 +1774,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <item>
                    <widget class="QLabel" name="label_BleName">
                     <property name="text">
-                     <string>BLE Name:</string>
+                     <string>Device Bluetooth Name</string>
                     </property>
                    </widget>
                   </item>
@@ -1782,9 +1782,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    <widget class="QLineEdit" name="lineEditBleName">
                     <property name="maximumSize">
                      <size>
-                      <width>200</width>
+                      <width>180</width>
                       <height>16777215</height>
                      </size>
+                    </property>
+                    <property name="maxLength">
+                     <number>22</number>
                     </property>
                    </widget>
                   </item>
