@@ -1859,6 +1859,11 @@ bool MPDeviceBleImpl::resetDefaultSettings()
     }
 
     bleSettings->resetDefaultSettings();
+    if (get_bundleVersion() >= SET_BLE_NAME_BUNDLE_VERSION)
+    {
+        setBleName(DEFAULT_BLE_NAME, [](bool){});
+        emit changeBleName(DEFAULT_BLE_NAME);
+    }
     return true;
 }
 

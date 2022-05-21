@@ -634,6 +634,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::notesFetched, this, &WSServerCon::sendNotes);
         connect(mpBle, &MPDeviceBleImpl::chargingStatusChanged, this, &WSServerCon::sendChargingStatus);
         connect(mpBle, &MPDeviceBleImpl::nimhReconditionFinished, this, &WSServerCon::sendNimhReconditionFinished);
+        connect(mpBle, &MPDeviceBleImpl::changeBleName, this, &WSServerCon::sendBleName);
         connect(mpdevice, &MPDevice::displayMiniImportWarning, this, &WSServerCon::sendMiniImportWarning);
     }
 }
@@ -956,6 +957,15 @@ void WSServerCon::sendNimhReconditionFinished(bool success, QString resposne)
 void WSServerCon::sendMiniImportWarning()
 {
     QJsonObject oroot = { {"msg", "display_mini_import_warning"} };
+    sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendBleName(const QString &name)
+{
+    QJsonObject oroot = { {"msg", "get_ble_name"} };
+    QJsonObject data;
+    data.insert("name", name);
+    oroot["data"] = data;
     sendJsonMessage(oroot);
 }
 

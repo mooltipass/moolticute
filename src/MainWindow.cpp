@@ -387,7 +387,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->comboBoxDelayBefUnlockLogin->addItem("100", 10);
     ui->comboBoxDelayBefUnlockLogin->addItem("250", 25);
-    ui->comboBoxDelayBefUnlockLogin->addItem("500", 50);
+    ui->comboBoxDelayBefUnlockLogin->addItem("600", 60);
     ui->comboBoxDelayBefUnlockLogin->addItem("1000", 100);
     ui->comboBoxDelayBefUnlockLogin->addItem("1500", 150);
     ui->comboBoxDelayBefUnlockLogin->addItem("2000", 200);
