@@ -318,16 +318,15 @@ bool SettingsGuiHelper::checkEnforceLayoutChanged()
 
 bool SettingsGuiHelper::checkBleNameChanged()
 {
-    return m_mw->getActualBleName() != m_mw->getOriginalBleName();
+    return m_mw->ui->lineEditBleName->text() != m_mw->getOriginalBleName();
 }
 
 void SettingsGuiHelper::resetBleName()
 {
     QString bleName = m_mw->getOriginalBleName();
-    if (bleName != m_mw->getActualBleName())
+    if (bleName != m_mw->ui->lineEditBleName->text())
     {
         m_mw->ui->lineEditBleName->setText(bleName);
-        m_mw->setActualBleName(bleName);
     }
 }
 

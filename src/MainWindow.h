@@ -64,9 +64,7 @@ public:
     bool getActualUsbKeyboardLayout() const { return m_keyboardUsbLayoutActualValue; }
     void setOriginalBTKeyboardLayout(bool val) { m_keyboardBTLayoutOrigValue = val; }
     void setOriginalUsbKeyboardLayout(bool val) { m_keyboardUsbLayoutOrigValue = val; }
-    QString getActualBleName() const { return m_bleNameActual; }
     QString getOriginalBleName() const { return m_bleNameOriginal; }
-    void setActualBleName(const QString& name) { m_bleNameActual = name; }
     void setOriginalBleName(const QString& name) { m_bleNameOriginal = name; }
 
     void updateBackupControlsVisibility(bool visible);
