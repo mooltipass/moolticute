@@ -1861,8 +1861,17 @@ bool MPDeviceBleImpl::resetDefaultSettings()
     bleSettings->resetDefaultSettings();
     if (get_bundleVersion() >= SET_BLE_NAME_BUNDLE_VERSION)
     {
-        setBleName(DEFAULT_BLE_NAME, [](bool){});
-        emit changeBleName(DEFAULT_BLE_NAME);
+        setBleName(DEFAULT_BLE_NAME, [this](bool success)
+            {
+                if (success)
+                {
+                    emit changeBleName(DEFAULT_BLE_NAME);
+                }
+                else
+                {
+                    qCritical() << "Setting default Device Bluetooth Name failed";
+                }
+            });
     }
     return true;
 }
