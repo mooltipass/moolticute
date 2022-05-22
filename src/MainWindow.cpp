@@ -387,7 +387,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->comboBoxDelayBefUnlockLogin->addItem("100", 10);
     ui->comboBoxDelayBefUnlockLogin->addItem("250", 25);
-    ui->comboBoxDelayBefUnlockLogin->addItem("500", 50);
+    ui->comboBoxDelayBefUnlockLogin->addItem("600", 60);
     ui->comboBoxDelayBefUnlockLogin->addItem("1000", 100);
     ui->comboBoxDelayBefUnlockLogin->addItem("1500", 150);
     ui->comboBoxDelayBefUnlockLogin->addItem("2000", 200);
@@ -625,6 +625,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     m_keyboardUsbLayoutActualValue = m_keyboardUsbLayoutOrigValue;
     ui->checkBoxEnforceUSBLayout->setChecked(m_keyboardUsbLayoutOrigValue);
 
+    connect(wsClient, &WSClient::bleNameChanged, this, &MainWindow::onBleNameChanged);
+
     wsClient->settingsHelper()->setMainWindow(this);
 #ifdef Q_OS_WIN
     const auto keyboardLayoutWidth = 150;
@@ -818,6 +820,12 @@ void MainWindow::updateBackupControlsVisibility(bool visible)
     ui->lineEdit_dbBackupFilePath->setVisible(visible);
     ui->toolButton_clearBackupFilePath->setVisible(visible);
     ui->toolButton_setBackupFilePath->setVisible(visible);
+}
+
+void MainWindow::displayBLENameChangedDialog()
+{
+    QMessageBox::information(this, tr("Device Bluetooth Name Changed"),
+                             tr("Please disable and re-enable bluetooth for your changes to take effect"));
 }
 
 void MainWindow::updatePage()
@@ -2149,6 +2157,7 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
+        wsClient->sendBleNameRequest();
     }
     displayBundleVersion();
     updateDeviceDependentUI();
@@ -2373,4 +2382,17 @@ void MainWindow::setCurrentCategoryOptions(const QString &cat1, const QString &c
     ui->comboBoxBleCurrentCategory->addItem(cat4, 4);
     ui->comboBoxBleCurrentCategory->setCurrentIndex(s.value("settings/enforced_category", 0).toInt());
     ui->comboBoxBleCurrentCategory->blockSignals(false);
+}
+
+void MainWindow::on_lineEditBleName_textEdited(const QString &arg1)
+{
+    m_bleNameActual = arg1;
+}
+
+void MainWindow::onBleNameChanged(const QString &name)
+{
+    m_bleNameActual = name;
+    m_bleNameOriginal = name;
+    ui->lineEditBleName->setText(name);
+    checkSettingsChanged();
 }

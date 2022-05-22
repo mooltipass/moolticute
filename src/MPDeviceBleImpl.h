@@ -171,6 +171,10 @@ public:
 
     bool resetDefaultSettings();
 
+    void setBleName(QString name, std::function<void(bool)> cb);
+    void getBleName(const MessageHandlerCbData &cb);
+    QString getBleNameFromArray(const QByteArray& arr) const;
+
     Common::SubdomainSelection getForceSubdomainSelection() const;
 
 signals:
@@ -181,6 +185,7 @@ signals:
     void userCategoriesFetched(QJsonObject categories);
     void notesFetched();
     void nimhReconditionFinished(bool success, QString response);
+    void changeBleName(const QString& name);
 
 private slots:
     void handleLongMessageTimeout();
@@ -271,7 +276,9 @@ private:
     static constexpr int MINI_FILE_FULL_SIZE_LENGTH = 4;
     static constexpr int MINI_FILE_BLOCK_SIZE = 128;
     static constexpr int FORCE_SUBDOMAIN_BUNDLE_VERSION = 8;
+    static constexpr int SET_BLE_NAME_BUNDLE_VERSION = 9;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
+    const QString DEFAULT_BLE_NAME = "Mooltipass Mini BLE";
 };
 
 #endif // MPDEVICEBLEIMPL_H

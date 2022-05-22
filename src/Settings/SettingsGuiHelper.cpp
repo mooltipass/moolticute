@@ -85,6 +85,7 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         }
         connect(widget, signal.c_str(), m_mw, SLOT(checkSettingsChanged()));
     }
+    connect(ui->lineEditBleName, SIGNAL(textEdited(const QString&)), m_mw, SLOT(checkSettingsChanged()));
 }
 
 void SettingsGuiHelper::createSettingUIMapping()
@@ -129,7 +130,7 @@ bool SettingsGuiHelper::checkSettingsChanged()
     auto* metaObj = m_settings->getMetaObject();
     if (m_wsClient->isMPBLE())
     {
-        if (checkEnforceLayoutChanged())
+        if (checkEnforceLayoutChanged() || checkBleNameChanged())
         {
             return true;
         }
@@ -178,6 +179,7 @@ void SettingsGuiHelper::resetSettings()
     if (m_wsClient->isMPBLE())
     {
         resetEnforceLayout();
+        resetBleName();
     }
     auto* metaObj = m_settings->getMetaObject();
     while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
@@ -210,6 +212,7 @@ void SettingsGuiHelper::getChangedSettings(QJsonObject &o)
     if (m_wsClient->isMPBLE())
     {
         saveEnforceLayout();
+        saveBleName();
     }
     while (nullptr != metaObj && QString{metaObj->className()} != "QObject")
     {
@@ -311,6 +314,31 @@ bool SettingsGuiHelper::checkEnforceLayoutChanged()
     bool btLayoutEnforceChanged = m_mw->getActualBTKeyboardLayout() != m_mw->getOriginalBTKeyboardLayout();
     bool usbLayoutEnforceChanged = m_mw->getActualUsbKeyboardLayout() != m_mw->getOriginalUsbKeyboardLayout();
     return btLayoutEnforceChanged || usbLayoutEnforceChanged;
+}
+
+bool SettingsGuiHelper::checkBleNameChanged()
+{
+    return m_mw->ui->lineEditBleName->text() != m_mw->getOriginalBleName();
+}
+
+void SettingsGuiHelper::resetBleName()
+{
+    QString bleName = m_mw->getOriginalBleName();
+    if (bleName != m_mw->ui->lineEditBleName->text())
+    {
+        m_mw->ui->lineEditBleName->setText(bleName);
+    }
+}
+
+void SettingsGuiHelper::saveBleName()
+{
+    QString bleName = m_mw->ui->lineEditBleName->text();
+    if (bleName != m_mw->getOriginalBleName())
+    {
+        m_wsClient->sendSetBleName(bleName);
+        m_mw->setOriginalBleName(bleName);
+        m_mw->displayBLENameChangedDialog();
+    }
 }
 
 void SettingsGuiHelper::resetEnforceLayout()

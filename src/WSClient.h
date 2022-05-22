@@ -114,9 +114,11 @@ public:
     void sendUserSettingsRequest();
     void sendLoadParams();
     void sendBatteryRequest();
+    void sendBleNameRequest();
     void sendCurrentCategory(int category);
     void sendNiMHReconditioning();
     void sendSecurityChallenge(QString str);
+    void sendSetBleName(QString name);
 
     void sendChangedParam(const QString& paramName, int value);
 
@@ -179,6 +181,8 @@ signals:
     void noteDeleted(bool success, const QString& note);
 
     void fileDeleted(bool success, const QString& file);
+
+    void bleNameChanged(const QString& name);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

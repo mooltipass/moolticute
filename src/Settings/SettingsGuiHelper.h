@@ -36,6 +36,9 @@ private:
     bool checkEnforceLayoutChanged();
     void resetEnforceLayout();
     void saveEnforceLayout();
+    bool checkBleNameChanged();
+    void resetBleName();
+    void saveBleName();
 
     WSClient* m_wsClient = nullptr;
     DeviceSettings* m_settings = nullptr;

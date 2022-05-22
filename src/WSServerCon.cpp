@@ -634,6 +634,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::notesFetched, this, &WSServerCon::sendNotes);
         connect(mpBle, &MPDeviceBleImpl::chargingStatusChanged, this, &WSServerCon::sendChargingStatus);
         connect(mpBle, &MPDeviceBleImpl::nimhReconditionFinished, this, &WSServerCon::sendNimhReconditionFinished);
+        connect(mpBle, &MPDeviceBleImpl::changeBleName, this, &WSServerCon::sendBleName);
         connect(mpdevice, &MPDevice::displayMiniImportWarning, this, &WSServerCon::sendMiniImportWarning);
     }
 }
@@ -956,6 +957,15 @@ void WSServerCon::sendNimhReconditionFinished(bool success, QString resposne)
 void WSServerCon::sendMiniImportWarning()
 {
     QJsonObject oroot = { {"msg", "display_mini_import_warning"} };
+    sendJsonMessage(oroot);
+}
+
+void WSServerCon::sendBleName(const QString &name)
+{
+    QJsonObject oroot = { {"msg", "get_ble_name"} };
+    QJsonObject data;
+    data.insert("name", name);
+    oroot["data"] = data;
     sendJsonMessage(oroot);
 }
 
@@ -1533,6 +1543,39 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         }
         QJsonObject o = root["data"].toObject();
         bleImpl->enforceCategory(o["category"].toInt());
+    }
+    else if (root["msg"] == "set_ble_name")
+    {
+        QJsonObject o = root["data"].toObject();
+        QString name = o["name"].toString();
+        bleImpl->setBleName(name,
+                [this, root, name](bool success)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            ores["name"] = name;
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "get_ble_name")
+    {
+        bleImpl->getBleName([this, root, bleImpl](bool success, QString, QByteArray data)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            ores["name"] = QString{data};
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
     }
     else
     {

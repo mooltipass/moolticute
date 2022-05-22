@@ -75,6 +75,7 @@ private slots:
     void sendNimhReconditionFinished(bool success, QString resposne);
 
     void sendMiniImportWarning();
+    void sendBleName(const QString& name);
 private:
     bool checkMemModeEnabled(const QJsonObject &root);
     bool processSetCredential(QJsonObject &root, QJsonObject &o);
