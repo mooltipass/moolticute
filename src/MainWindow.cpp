@@ -822,6 +822,12 @@ void MainWindow::updateBackupControlsVisibility(bool visible)
     ui->toolButton_setBackupFilePath->setVisible(visible);
 }
 
+void MainWindow::displayBLENameChangedDialog()
+{
+    QMessageBox::information(this, tr("Device Bluetooth Name Changed"),
+                             tr("Please disable and re-enable bluetooth for your changes to take effect"));
+}
+
 void MainWindow::updatePage()
 {
     const auto status = wsClient->get_status();

@@ -333,8 +333,12 @@ void SettingsGuiHelper::resetBleName()
 void SettingsGuiHelper::saveBleName()
 {
     QString bleName = m_mw->ui->lineEditBleName->text();
-    m_wsClient->sendSetBleName(bleName);
-    m_mw->setOriginalBleName(bleName);
+    if (bleName != m_mw->getOriginalBleName())
+    {
+        m_wsClient->sendSetBleName(bleName);
+        m_mw->setOriginalBleName(bleName);
+        m_mw->displayBLENameChangedDialog();
+    }
 }
 
 void SettingsGuiHelper::resetEnforceLayout()

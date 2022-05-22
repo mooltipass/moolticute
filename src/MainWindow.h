@@ -69,6 +69,8 @@ public:
 
     void updateBackupControlsVisibility(bool visible);
 
+    void displayBLENameChangedDialog();
+
 
     const static QString NONE_STRING;
     const static QString TAB_STRING;
