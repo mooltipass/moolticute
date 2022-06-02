@@ -98,6 +98,12 @@ private slots:
 
     void on_pushButtonDeleteTOTP_clicked();
 
+    void onCredentialLink();
+
+    void on_pushButtonDiscardLinking_clicked();
+
+    void on_pushButtonLinkTo_clicked();
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);
@@ -135,6 +141,7 @@ private:
     bool m_isClean = true;
     bool m_isSetCategoryClean = true;
     bool m_altKeyPressed = false;
+    bool m_linkingMode = false;
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 

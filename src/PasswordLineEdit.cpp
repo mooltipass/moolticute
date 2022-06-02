@@ -440,3 +440,32 @@ std::vector<char> PasswordOptionsPopup::generateCustomPasswordPool()
 
     return pool;
 }
+
+PasswordLinkLineEdit::PasswordLinkLineEdit(QWidget *parent):
+    PasswordLineEdit(parent)
+{
+    AppGui *appGui = dynamic_cast<AppGui*> qApp;
+    QtAwesome *awesome = appGui->qtAwesome();
+    m_linkPassword = new QAction(awesome->icon(fa::paperclip), tr("Link Password"), this);
+    connect(m_linkPassword, &QAction::triggered, [this]()
+    {
+       emit linkRequested();
+    });
+    QAction* action = nullptr;
+    if (actions().contains(m_showPassword))
+    {
+        action = m_showPassword;
+    } else if (actions().contains(m_hidePassword))
+    {
+        action = m_hidePassword;
+    }
+    if (action)
+    {
+        removeAction(action);
+    }
+    addAction(m_linkPassword, QLineEdit::TrailingPosition);
+    if (action)
+    {
+        addAction(action, QLineEdit::TrailingPosition);
+    }
+}

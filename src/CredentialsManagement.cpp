@@ -53,6 +53,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     ui->pushButtonConfirm->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonTOTP->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonDeleteTOTP->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonDiscardLinking->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->pushButtonLinkTo->setStyleSheet(CSS_BLUE_BUTTON);
 
     ui->buttonExit->setText(tr("Exit Credential Management"));
     ui->buttonExit->setStyleSheet(CSS_BLUE_BUTTON);
@@ -103,6 +105,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->lineEditCategory4, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
 
     ui->pushButtonFavorite->setMenu(&m_favMenu);
+
+    ui->framePasswordLink->hide();
 
     m_pCredModel = new CredentialModel(this);
 
@@ -185,6 +189,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     m_tSelectLoginTimer.setInterval(50);
     m_tSelectLoginTimer.setSingleShot(true);
     connect(&m_tSelectLoginTimer, &QTimer::timeout, this, &CredentialsManagement::onSelectLoginTimerTimeOut);
+
+    connect(ui->addCredPasswordInput, &PasswordLinkLineEdit::linkRequested, this, &CredentialsManagement::onCredentialLink);
 }
 
 void CredentialsManagement::setFilterCredLayout()
@@ -901,7 +907,7 @@ void CredentialsManagement::onCredentialSelected(const QModelIndex &current, con
 
 void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 {
-    ui->credDisplayFrame->setEnabled(true);
+    ui->credDisplayFrame->setEnabled(!m_linkingMode);
     updateLoginDescription(srcIndex);
     if (wsClient->isMPBLE())
     {
@@ -1066,6 +1072,7 @@ void CredentialsManagement::clearMMMUi()
     ui->credDisplayFrame->setEnabled(false);
     m_pCredModel->clear();
     ui->credentialTreeView->repaint();
+    m_linkingMode = false;
 }
 
 void CredentialsManagement::updateBleFavs(const QModelIndex &srcIndex)
@@ -1384,6 +1391,43 @@ void CredentialsManagement::on_pushButtonDeleteTOTP_clicked()
             pLoginItem->setTOTPDeleted(true);
             credentialDataChanged();
             updateLoginDescription(srcIndex);
+        }
+    }
+}
+
+void CredentialsManagement::onCredentialLink()
+{
+    ui->credDisplayFrame->setEnabled(false);
+    ui->framePasswordLink->show();
+    ui->quickInsertWidget->setEnabled(false);
+    m_linkingMode = true;
+}
+
+void CredentialsManagement::on_pushButtonDiscardLinking_clicked()
+{
+    ui->credDisplayFrame->setEnabled(true);
+    ui->framePasswordLink->hide();
+    ui->quickInsertWidget->setEnabled(true);
+    m_linkingMode = false;
+}
+
+
+void CredentialsManagement::on_pushButtonLinkTo_clicked()
+{
+    ui->credDisplayFrame->setEnabled(true);
+    ui->framePasswordLink->hide();
+    ui->quickInsertWidget->setEnabled(true);
+    m_linkingMode = false;
+    //TODO: Set linking
+    const QModelIndex currentSelectionIndex = ui->credentialTreeView->selectionModel()->currentIndex();
+    if (currentSelectionIndex.isValid())
+    {
+        QModelIndex srcIndex = getSourceIndexFromProxyIndex(currentSelectionIndex);
+        LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
+        if (pLoginItem != nullptr)
+        {
+            ui->addCredPasswordInput->setPasswordVisible(true);
+            ui->addCredPasswordInput->setText("<" + pLoginItem->parentItem()->name() + "/" + pLoginItem->name() + ">");
         }
     }
 }
