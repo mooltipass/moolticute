@@ -7,7 +7,7 @@ source $SCRIPTDIR/../funcs.sh
 mkdir build
 pushd build
 
-QTDIR="/usr/local/opt/qt5"
+QTDIR="/usr/local/opt/qt6"
 PATH="$QTDIR/bin:$PATH"
 LDFLAGS=-L$QTDIR/lib
 CPPFLAGS=-I$QTDIR/include
