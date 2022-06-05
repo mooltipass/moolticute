@@ -115,9 +115,17 @@ public:
 
 Q_SIGNALS:
     void linkRequested();
+    void linkRemoved();
+
+public slots:
+    void onCredentialLinked();
 
 private:
+    void addLinkAction(bool isLink = true);
+
+
     QAction* m_linkPassword;
+    QAction* m_removePasswordLink;
 };
 
 #endif // PASSWORDLINEEDIT_H

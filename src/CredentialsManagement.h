@@ -99,6 +99,7 @@ private slots:
     void on_pushButtonDeleteTOTP_clicked();
 
     void onCredentialLink();
+    void onCredentialLinkRemoved();
 
     void on_pushButtonDiscardLinking_clicked();
 
@@ -161,6 +162,7 @@ signals:
     void loginSelected(const QModelIndex &srcIndex);
     void serviceSelected(const QModelIndex &srcIndex);
     void selectLoginItem(const QModelIndex &proxyIndex);
+    void credentialLinked();
 };
 
 #endif // CREDENTIALSMANAGEMENT_H

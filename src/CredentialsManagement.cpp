@@ -191,6 +191,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(&m_tSelectLoginTimer, &QTimer::timeout, this, &CredentialsManagement::onSelectLoginTimerTimeOut);
 
     connect(ui->addCredPasswordInput, &PasswordLinkLineEdit::linkRequested, this, &CredentialsManagement::onCredentialLink);
+    connect(ui->addCredPasswordInput, &PasswordLinkLineEdit::linkRemoved, this, &CredentialsManagement::onCredentialLinkRemoved);
+    connect(this, &CredentialsManagement::credentialLinked, ui->addCredPasswordInput, &PasswordLinkLineEdit::onCredentialLinked);
 }
 
 void CredentialsManagement::setFilterCredLayout()
@@ -1403,6 +1405,13 @@ void CredentialsManagement::onCredentialLink()
     m_linkingMode = true;
 }
 
+void CredentialsManagement::onCredentialLinkRemoved()
+{
+    ui->addCredPasswordInput->setPasswordVisible(false);
+    ui->addCredPasswordInput->setText("");
+    // TODO handle removed link
+}
+
 void CredentialsManagement::on_pushButtonDiscardLinking_clicked()
 {
     ui->credDisplayFrame->setEnabled(true);
@@ -1428,6 +1437,7 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
         {
             ui->addCredPasswordInput->setPasswordVisible(true);
             ui->addCredPasswordInput->setText("<" + pLoginItem->parentItem()->name() + "/" + pLoginItem->name() + ">");
+            emit credentialLinked();
         }
     }
 }

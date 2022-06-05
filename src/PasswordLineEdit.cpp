@@ -447,25 +447,56 @@ PasswordLinkLineEdit::PasswordLinkLineEdit(QWidget *parent):
     AppGui *appGui = dynamic_cast<AppGui*> qApp;
     QtAwesome *awesome = appGui->qtAwesome();
     m_linkPassword = new QAction(awesome->icon(fa::paperclip), tr("Link Password"), this);
+    m_removePasswordLink = new QAction(awesome->icon(fa::remove), tr("Remove Link Password"), this);
     connect(m_linkPassword, &QAction::triggered, [this]()
     {
        emit linkRequested();
     });
-    QAction* action = nullptr;
+    connect(m_removePasswordLink, &QAction::triggered, [this]()
+    {
+       addLinkAction();
+       emit linkRemoved();
+    });
+    addLinkAction();
+}
+
+void PasswordLinkLineEdit::onCredentialLinked()
+{
+    addLinkAction(false);
+}
+
+/**
+ * @brief PasswordLinkLineEdit::addLinkAction
+ * @param isLink if true add link password icon,
+ * otherwise add remove link password icon
+ */
+void PasswordLinkLineEdit::addLinkAction(bool isLink /*= true*/)
+{
+    if (actions().contains(m_linkPassword))
+    {
+        removeAction(m_linkPassword);
+    }
+    if (actions().contains(m_removePasswordLink))
+    {
+        removeAction(m_removePasswordLink);
+    }
+    //Need to remove password action first and add later again to keep the order
+    QAction* pwdAction = nullptr;
     if (actions().contains(m_showPassword))
     {
-        action = m_showPassword;
+        pwdAction = m_showPassword;
     } else if (actions().contains(m_hidePassword))
     {
-        action = m_hidePassword;
+        pwdAction = m_hidePassword;
     }
-    if (action)
+    if (pwdAction)
     {
-        removeAction(action);
+        removeAction(pwdAction);
     }
-    addAction(m_linkPassword, QLineEdit::TrailingPosition);
-    if (action)
+
+    addAction(isLink ? m_linkPassword : m_removePasswordLink, QLineEdit::TrailingPosition);
+    if (pwdAction)
     {
-        addAction(action, QLineEdit::TrailingPosition);
+        addAction(pwdAction, QLineEdit::TrailingPosition);
     }
 }
