@@ -454,23 +454,33 @@ PasswordLinkLineEdit::PasswordLinkLineEdit(QWidget *parent):
     });
     connect(m_removePasswordLink, &QAction::triggered, [this]()
     {
-       addLinkAction();
+       modifyLinkAction();
        emit linkRemoved();
     });
-    addLinkAction();
 }
 
 void PasswordLinkLineEdit::onCredentialLinked()
 {
-    addLinkAction(false);
+    modifyLinkAction(false);
+}
+
+void PasswordLinkLineEdit::onDisplayLink()
+{
+    modifyLinkAction();
+}
+
+void PasswordLinkLineEdit::onHideLink()
+{
+    modifyLinkAction(true, true);
 }
 
 /**
- * @brief PasswordLinkLineEdit::addLinkAction
- * @param isLink if true add link password icon,
- * otherwise add remove link password icon
+ * @brief PasswordLinkLineEdit::modifyLinkAction
+ * @param isLink if true add link password icon, otherwise add remove link password icon
+ * @param remove if true remove link icon, otherwise add icon
+ *
  */
-void PasswordLinkLineEdit::addLinkAction(bool isLink /*= true*/)
+void PasswordLinkLineEdit::modifyLinkAction(bool isLink /*= true*/, bool remove /*= false*/)
 {
     if (actions().contains(m_linkPassword))
     {
@@ -494,7 +504,10 @@ void PasswordLinkLineEdit::addLinkAction(bool isLink /*= true*/)
         removeAction(pwdAction);
     }
 
-    addAction(isLink ? m_linkPassword : m_removePasswordLink, QLineEdit::TrailingPosition);
+    if (!remove)
+    {
+        addAction(isLink ? m_linkPassword : m_removePasswordLink, QLineEdit::TrailingPosition);
+    }
     if (pwdAction)
     {
         addAction(pwdAction, QLineEdit::TrailingPosition);

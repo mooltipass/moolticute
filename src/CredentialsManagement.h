@@ -163,6 +163,8 @@ signals:
     void serviceSelected(const QModelIndex &srcIndex);
     void selectLoginItem(const QModelIndex &proxyIndex);
     void credentialLinked();
+    void displayCredentialLink();
+    void hideCredentialLink();
 };
 
 #endif // CREDENTIALSMANAGEMENT_H

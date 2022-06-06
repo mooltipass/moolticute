@@ -119,9 +119,11 @@ Q_SIGNALS:
 
 public slots:
     void onCredentialLinked();
+    void onDisplayLink();
+    void onHideLink();
 
 private:
-    void addLinkAction(bool isLink = true);
+    void modifyLinkAction(bool isLink = true, bool remove = false);
 
 
     QAction* m_linkPassword;

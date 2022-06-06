@@ -193,6 +193,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->addCredPasswordInput, &PasswordLinkLineEdit::linkRequested, this, &CredentialsManagement::onCredentialLink);
     connect(ui->addCredPasswordInput, &PasswordLinkLineEdit::linkRemoved, this, &CredentialsManagement::onCredentialLinkRemoved);
     connect(this, &CredentialsManagement::credentialLinked, ui->addCredPasswordInput, &PasswordLinkLineEdit::onCredentialLinked);
+    connect(this, &CredentialsManagement::displayCredentialLink, ui->addCredPasswordInput, &PasswordLinkLineEdit::onDisplayLink);
+    connect(this, &CredentialsManagement::hideCredentialLink, ui->addCredPasswordInput, &PasswordLinkLineEdit::onHideLink);
 }
 
 void CredentialsManagement::setFilterCredLayout()
@@ -285,10 +287,20 @@ void CredentialsManagement::enableCredentialsManagement(bool enable)
     {
         ui->stackedWidget->setCurrentWidget(ui->pageUnlocked);
         setCredentialsClean();
+        if (wsClient->isMPBLE())
+        {
+            emit displayCredentialLink();
+        }
     }
     else
     {
         ui->stackedWidget->setCurrentWidget(ui->pageLocked);
+        if (wsClient->isMPBLE())
+        {
+            emit hideCredentialLink();
+        }
+        m_linkingMode = false;
+        enableNonCredentialEditWidgets();
     }
 
     ui->pageUnlocked->setFocus();
@@ -1023,9 +1035,12 @@ void CredentialsManagement::disableNonCredentialEditWidgets()
 
 void CredentialsManagement::enableNonCredentialEditWidgets()
 {
-    ui->quickInsertWidget->setEnabled(true);
-    ui->credentialsListWdiget->setEnabled(true);
+    if (!m_linkingMode)
+    {
+        ui->quickInsertWidget->setEnabled(true);
+    }
     ui->pushButtonFavorite->setEnabled(true);
+    ui->credentialsListWdiget->setEnabled(true);
 }
 
 bool CredentialsManagement::isServiceNameExist(const QString &serviceName) const
