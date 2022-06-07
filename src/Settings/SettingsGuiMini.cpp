@@ -72,6 +72,7 @@ void SettingsGuiMini::updateUI()
     ui->settings_screen_brightness_usb->hide();
     ui->settings_subdomain_specification->hide();
     ui->settings_ble_name->hide();
+    ui->checkBoxInvertLoginAndFav->hide();
 
     ui->groupBox_BLESettings->hide();
 
