@@ -67,7 +67,8 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::FAV_LAST_USED_SORTED, ui->checkBoxSortFavsByLastUsed},
         {MPParams::DELAY_BEF_UNLOCK_LOGIN, ui->comboBoxDelayBefUnlockLogin},
         {MPParams::SCREEN_BRIGHTNESS_USB, ui->comboBoxUsbScreenBrightness},
-        {MPParams::SCREEN_BRIGHTNESS_BAT, ui->comboBoxBatteryScreenBrightness}
+        {MPParams::SCREEN_BRIGHTNESS_BAT, ui->comboBoxBatteryScreenBrightness},
+        {MPParams::LOGIN_AND_FAV_INVERTED, ui->checkBoxInvertLoginAndFav}
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)
