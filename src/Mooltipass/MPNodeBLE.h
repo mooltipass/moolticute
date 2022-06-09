@@ -42,6 +42,8 @@ public:
     int getTOTPCodeSize() const;
     void resetTOTPCredential();
 
+    QByteArray getPointedToChildAddr() const;
+
     static constexpr int PARENT_NODE_LENGTH = 264;
     static constexpr int CHILD_NODE_LENGTH = 528;
     static constexpr int SERVICE_LENGTH = 252;
@@ -65,6 +67,7 @@ protected:
     static constexpr int TOTP_TIME_STEP = 466;
     static constexpr int TOTP_CODE_SIZE = 468;
     static constexpr int KEY_AFTER_LENGTH = 2;
+    static constexpr int POINTED_TO_CHILD_START = 6;
     static constexpr char BLANK_CHAR = 0x01;
 };
 

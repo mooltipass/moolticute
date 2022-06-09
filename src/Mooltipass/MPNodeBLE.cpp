@@ -232,3 +232,10 @@ void MPNodeBLE::resetTOTPCredential()
         data[i] = static_cast<char>(0x00);
     }
 }
+
+QByteArray MPNodeBLE::getPointedToChildAddr() const
+{
+    if (!isValid()) return QByteArray();
+    if (nextVirtualAddressSet) return QByteArray();
+    return data.mid(POINTED_TO_CHILD_START, ADDRESS_LENGTH);
+}
