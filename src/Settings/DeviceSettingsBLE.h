@@ -33,6 +33,7 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(int, delay_bef_unlock_login, 0, MPParams::DELAY_BEF_UNLOCK_LOGIN)
     QT_SETTINGS_PROPERTY(int, screen_brightness_usb, 0x90, MPParams::SCREEN_BRIGHTNESS_USB)
     QT_SETTINGS_PROPERTY(int, screen_brightness_bat, 0x90, MPParams::SCREEN_BRIGHTNESS_BAT)
+    QT_SETTINGS_PROPERTY(bool, login_and_fav_inverted, false, MPParams::LOGIN_AND_FAV_INVERTED)
 
 
 public:
@@ -73,7 +74,8 @@ public:
         DELAY_BEF_UNLOCK_LOGIN = 29,
         SWITCH_OFF_AFTER_BT_DISC = 30,
         MC_SUBDOMAIN_FORCE_STATUS = 31,
-        FAV_LAST_USED_SORTED = 32
+        FAV_LAST_USED_SORTED = 32,
+        LOGIN_AND_FAV_INVERTED = 33
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;
