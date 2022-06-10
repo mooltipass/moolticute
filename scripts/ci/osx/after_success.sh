@@ -44,12 +44,12 @@ wget_retry https://calaos.fr/mooltipass/tools/macos/mc-cli -O build/$APP.app/Con
 chmod +x build/$APP.app/Contents/MacOS/cli/mc-agent build/$APP.app/Contents/MacOS/cli/mc-cli
 
 # use macdeployqt to deploy the application
-echo "Calling macdeployqt"
-$QTDIR/bin/macdeployqt build/$APP.app
-if [ "$?" -ne "0" ]; then
-    echo "Failed to run macdeployqt"
-    exit 1
-fi
+#echo "Calling macdeployqt"
+#$QTDIR/bin/macdeployqt build/$APP.app
+#if [ "$?" -ne "0" ]; then
+#    echo "Failed to run macdeployqt"
+#    exit 1
+#fi
 
 #Call fix to change all rpath
 wget_retry https://raw.githubusercontent.com/mooltipass/macdeployqtfix/master/macdeployqtfix.py
