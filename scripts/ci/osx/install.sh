@@ -5,5 +5,5 @@ echo "install.sh"
 
 brew update > /dev/null
 brew upgrade wget
-brew install qt6 jq lftp
+brew install qt6 jq lftp python3
 networksetup -setv6off Ethernet
