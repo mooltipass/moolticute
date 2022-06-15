@@ -1564,7 +1564,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "get_ble_name")
     {
-        bleImpl->getBleName([this, root, bleImpl](bool success, QString, QByteArray data)
+        bleImpl->getBleName([this, root](bool success, QString, QByteArray data)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
