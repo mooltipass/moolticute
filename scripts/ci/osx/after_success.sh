@@ -17,7 +17,7 @@ if [ "$(git rev-list -n 1 $VERSION)" != "$(git rev-parse HEAD)"  ]; then
     exit 0
 fi
 
-QTDIR="/usr/local/opt/qt6"
+QTDIR="/opt/Qt/6.2.4/macos"
 APP=Moolticute
 # this directory name will also be shown in the title when the DMG is mounted
 TEMPDIR=build/$APP
