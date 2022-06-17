@@ -52,9 +52,9 @@ if [ "$?" -ne "0" ]; then
 fi
 
 #Call fix to change all rpath
-wget_retry https://raw.githubusercontent.com/mooltipass/macdeployqtfix/master/macdeployqtfix.py
-python3 macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticute /Users/travis/Qt/6.2.4/macos/
-python3 macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /Users/travis/Qt/6.2.4/macos/
+#wget_retry https://raw.githubusercontent.com/mooltipass/macdeployqtfix/master/macdeployqtfix.py
+#python3 macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticute /Users/travis/Qt/6.2.4/macos/
+#python3 macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /Users/travis/Qt/6.2.4/macos/
 
 #setup keychain
 KEYCHAIN="travis.keychain"
