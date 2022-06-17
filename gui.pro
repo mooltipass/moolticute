@@ -42,7 +42,7 @@ SOURCES += src/main_gui.cpp \
     src/AutoStartup.cpp \
     src/WindowLog.cpp \
     src/OutputLog.cpp \
-    src/AnsiEscapeCodeHandler.cpp \
+    src/AnsiEscapeCodeHandler/AnsiEscapeCodeHandler.cpp \
     src/PasswordLineEdit.cpp \
     src/CredentialsManagement.cpp \
     src/utils/GridLayoutUtil.cpp \
@@ -99,7 +99,7 @@ HEADERS  += src/MainWindow.h \
     src/AutoStartup.h \
     src/WindowLog.h \
     src/OutputLog.h \
-    src/AnsiEscapeCodeHandler.h \
+    src/AnsiEscapeCodeHandler/AnsiEscapeCodeHandler.h \
     src/PasswordLineEdit.h \
     src/CredentialsManagement.h \
     src/zxcvbn-c/dict-src.h \

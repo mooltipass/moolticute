@@ -1906,8 +1906,14 @@ void MPDeviceBleImpl::getBleName(const MessageHandlerCbData &cb)
     connect(jobs, &AsyncJobs::finished, [this, cb](const QByteArray &data)
     {
         Q_UNUSED(data);
-        /* Callback */
-        cb(true, "", bleProt->getFullPayload(data));
+        QByteArray bleNameArr = bleProt->getFullPayload(data);
+        if (ZERO_BYTE == bleNameArr[0] || static_cast<char>(0xFF) == bleNameArr[0])
+        {
+            // Handle invalid character in BLE name (starts with 0x00 or 0xFF)
+            bleNameArr = DEFAULT_BLE_NAME.toUtf8();
+            qWarning() << "Invalid character in BLE name";
+        }
+        cb(true, "", bleNameArr);
     });
 
     mpDev->enqueueAndRunJob(jobs);

@@ -110,6 +110,7 @@ void SettingsGuiBLE::checkDeviceSettingsForBundle9(int bundleVersion)
         ui->settings_screen_brightness_usb->show();
         ui->settings_subdomain_specification->show();
         ui->settings_ble_name->show();
+        ui->checkBoxInvertLoginAndFav->show();
     }
     else
     {
@@ -122,6 +123,7 @@ void SettingsGuiBLE::checkDeviceSettingsForBundle9(int bundleVersion)
         ui->settings_screen_brightness_usb->hide();
         ui->settings_subdomain_specification->hide();
         ui->settings_ble_name->hide();
+        ui->checkBoxInvertLoginAndFav->hide();
     }
 }
 

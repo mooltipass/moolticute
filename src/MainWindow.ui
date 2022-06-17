@@ -2007,6 +2007,13 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxInvertLoginAndFav">
+                 <property name="text">
+                  <string>Invert Login and Favorites Icons</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
