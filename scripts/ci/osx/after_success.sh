@@ -53,8 +53,8 @@ fi
 
 #Call fix to change all rpath
 wget_retry https://raw.githubusercontent.com/mooltipass/macdeployqtfix/master/macdeployqtfix.py
-python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticute /usr/local/Cellar/qt6/6.*/
-python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /usr/local/Cellar/qt6/6.*/
+python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticute /Users/travis/Qt/6.2.4/macos/*
+python macdeployqtfix.py build/$APP.app/Contents/MacOS/moolticuted /Users/travis/Qt/6.2.4/macos/*
 
 #setup keychain
 KEYCHAIN="travis.keychain"
