@@ -7,7 +7,7 @@ source $SCRIPTDIR/../funcs.sh
 mkdir build
 pushd build
 
-QTDIR="/opt/Qt/6.2.4/macos"
+QTDIR="/Users/travis/Qt/6.2.4/macos"
 PATH="$QTDIR/bin:$PATH"
 LDFLAGS=-L$QTDIR/lib
 CPPFLAGS=-I$QTDIR/include
