@@ -2157,7 +2157,10 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
-        wsClient->sendBleNameRequest();
+        if (wsClient->get_bundleVersion() >= Common::BLE_BUNDLE_WITH_BLE_NAME)
+        {
+            wsClient->sendBleNameRequest();
+        }
     }
     displayBundleVersion();
     updateDeviceDependentUI();
