@@ -486,6 +486,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::hwMemoryChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::displayBundleVersion);
     connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::sendRequestNotes);
+    connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::onBundleVersionChanged);
 
     connect(wsClient, &WSClient::memMgmtModeFailed, this, &MainWindow::memMgmtModeFailed);
 
@@ -1835,6 +1836,14 @@ void MainWindow::displayBundleVersion()
     }
 }
 
+void MainWindow::onBundleVersionChanged(int bundle)
+{
+    if (wsClient->isMPBLE() && bundle >= Common::BLE_BUNDLE_WITH_BLE_NAME)
+    {
+        wsClient->sendBleNameRequest();
+    }
+}
+
 void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)
 {
     cb->clear();
@@ -2157,7 +2166,6 @@ void MainWindow::onDeviceConnected()
         }
         wsClient->sendUserSettingsRequest();
         wsClient->sendBatteryRequest();
-        wsClient->sendBleNameRequest();
     }
     displayBundleVersion();
     updateDeviceDependentUI();

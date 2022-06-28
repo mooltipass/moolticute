@@ -240,6 +240,8 @@ private:
 
     void displayBundleVersion();
 
+    void onBundleVersionChanged(int bundle);
+
     void updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items);
 
     bool shouldUpdateItems(QJsonObject& cache, const QJsonObject& received);

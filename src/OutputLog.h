@@ -21,7 +21,7 @@
 
 #include <QtWidgets>
 #include <QtCore>
-#include "AnsiEscapeCodeHandler.h"
+#include "AnsiEscapeCodeHandler/AnsiEscapeCodeHandler.h"
 
 class OutputLog : public QPlainTextEdit
 {
