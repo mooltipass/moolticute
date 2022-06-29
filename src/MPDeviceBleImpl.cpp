@@ -1913,6 +1913,11 @@ void MPDeviceBleImpl::getBleName(const MessageHandlerCbData &cb)
             bleNameArr = DEFAULT_BLE_NAME.toUtf8();
             qWarning() << "Invalid character in BLE name";
         }
+        if (bleNameArr.contains(ZERO_BYTE))
+        {
+            // Cut zero bytes from the end of the array
+            bleNameArr = bleNameArr.left(bleNameArr.indexOf(ZERO_BYTE));
+        }
         cb(true, "", bleNameArr);
     });
 
