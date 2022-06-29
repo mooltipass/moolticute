@@ -514,3 +514,12 @@ QString Common::getMcAgent()
     }
     return "";
 }
+
+QByteArray Common::getUntilNullByte(const QByteArray &arr)
+{
+    if (arr.contains(ZERO_BYTE))
+    {
+        return arr.left(arr.indexOf(ZERO_BYTE));
+    }
+    return arr;
+}
