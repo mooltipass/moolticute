@@ -143,6 +143,7 @@ private:
     bool m_isSetCategoryClean = true;
     bool m_altKeyPressed = false;
     bool m_linkingMode = false;
+    QByteArray m_credentialLinkedAddr;
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 

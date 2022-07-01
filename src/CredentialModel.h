@@ -45,7 +45,8 @@ public:
     void load(const QJsonArray &json, bool isFido = false);
     void setClearTextPassword(const QString &sServiceName, const QString &sLoginName, const QString &sPassword);
     QJsonArray getJsonChanges();
-    void addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription="");
+    void addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword,
+                       const QString &sDescription = "", const QByteArray& pointedTo = QByteArray{});
     bool removeCredential(const QModelIndex &idx);
     TreeItem *getItemByIndex(const QModelIndex &idx) const;
     void updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat, int iLoginKey, int iPwdKey);

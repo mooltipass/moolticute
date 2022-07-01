@@ -42,6 +42,8 @@ public:
     int getTOTPCodeSize() const;
     void resetTOTPCredential();
 
+    void setPointedToChildAddr(const QByteArray &d, const quint32 virt_addr = 0);
+    quint32 getPointedToChildVirtualAddress() const;
     QByteArray getPointedToChildAddr() const;
 
     static constexpr int PARENT_NODE_LENGTH = 264;
@@ -50,6 +52,10 @@ public:
     static constexpr int LOGIN_LENGTH = 128;
 
 protected:
+    quint32 pointedToChildVirtualAddr = 0;
+    bool pointedToChildVirtualAddrSet = false;
+
+
     static constexpr int CTR_DATA_ADDR_START = 261;
     static constexpr int CTR_ADDR_START = 395;
     static constexpr int DESC_ADDR_START = 140;

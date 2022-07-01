@@ -538,7 +538,7 @@ QJsonArray CredentialModel::getJsonChanges()
     return jarr;
 }
 
-void CredentialModel::addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription)
+void CredentialModel::addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription, const QByteArray& pointedTo)
 {
     //Force all service names to lowercase
     sServiceName = ParseDomain(sServiceName).getManuallyEnteredDomainName(sServiceName);
@@ -562,7 +562,16 @@ void CredentialModel::addCredential(QString sServiceName, const QString &sLoginN
                 beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
                 pAddedLoginItem = pTargetService->addLogin(sLoginName);
                 pAddedLoginItem->setPasswordLocked(false);
-                pAddedLoginItem->setPassword(sPassword);
+                if (pointedTo.isEmpty())
+                {
+                    pAddedLoginItem->setPassword(sPassword);
+                }
+                else
+                {
+                    //TODO what to do with password???
+                    pAddedLoginItem->setPassword("");
+                    pAddedLoginItem->setPointedToChildAddress(pointedTo);
+                }
                 pAddedLoginItem->setDescription(sDescription);
                 pAddedLoginItem->setCategory(0);
                 endInsertRows();
@@ -582,7 +591,16 @@ void CredentialModel::addCredential(QString sServiceName, const QString &sLoginN
             beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
             pAddedLoginItem = pAddedService->addLogin(sLoginName);
             pAddedLoginItem->setPasswordLocked(false);
-            pAddedLoginItem->setPassword(sPassword);
+            if (pointedTo.isEmpty())
+            {
+                pAddedLoginItem->setPassword(sPassword);
+            }
+            else
+            {
+                //TODO what to do with password???
+                pAddedLoginItem->setPassword("");
+                pAddedLoginItem->setPointedToChildAddress(pointedTo);
+            }
             pAddedLoginItem->setDescription(sDescription);
             pAddedLoginItem->setCategory(0);
             endInsertRows();

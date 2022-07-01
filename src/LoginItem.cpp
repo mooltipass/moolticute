@@ -95,6 +95,16 @@ QJsonObject LoginItem::toJson() const
             }
             ret.insert("totp", totp);
         }
+        QJsonArray pointedTo;
+        if (m_bPointedToChildAddress.size() == 2)
+        {
+            pointedTo = QJsonArray({{m_bPointedToChildAddress.at(0)},{m_bPointedToChildAddress.at(1)}});
+        }
+        else
+        {
+            pointedTo = QJsonArray({{0},{0}});
+        }
+        ret.insert("pointed_to_child", pointedTo);
     }
     return ret;
 }
@@ -122,4 +132,14 @@ TreeItem::TreeType LoginItem::treeType() const
 void LoginItem::setTOTPCredential(QString secretKey, int timeStep, int codeSize)
 {
     m_totpCred = TOTPCredential{secretKey, timeStep, codeSize};
+}
+
+const QByteArray &LoginItem::pointedToChildAddress() const
+{
+    return m_bPointedToChildAddress;
+}
+
+void LoginItem::setPointedToChildAddress(const QByteArray &bAddress)
+{
+    m_bPointedToChildAddress = bAddress;
 }

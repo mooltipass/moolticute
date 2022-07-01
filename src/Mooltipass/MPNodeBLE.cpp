@@ -233,6 +233,26 @@ void MPNodeBLE::resetTOTPCredential()
     }
 }
 
+void MPNodeBLE::setPointedToChildAddr(const QByteArray &d, const quint32 virt_addr)
+{
+    if (d.isNull())
+    {
+        pointedToChildVirtualAddr = virt_addr;
+        pointedToChildVirtualAddrSet = true;
+    }
+    else
+    {
+        pointedToChildVirtualAddrSet = false;
+        data[POINTED_TO_CHILD_START] = d[0];
+        data[POINTED_TO_CHILD_START+1] = d[1];
+    }
+}
+
+quint32 MPNodeBLE::getPointedToChildVirtualAddress() const
+{
+    return pointedToChildVirtualAddr;
+}
+
 QByteArray MPNodeBLE::getPointedToChildAddr() const
 {
     if (!isValid()) return QByteArray();

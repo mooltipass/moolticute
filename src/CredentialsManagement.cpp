@@ -391,8 +391,9 @@ void CredentialsManagement::on_addCredentialButton_clicked()
         m_pCredModel->addCredential(ui->addCredServiceInput->text(),
                                     ui->addCredLoginInput->text(),
                                     ui->addCredPasswordInput->text(),
-                                    QString());
-
+                                    QString{},
+                                    m_credentialLinkedAddr);
+        m_credentialLinkedAddr.clear();
         ui->addCredServiceInput->clear();
         ui->addCredLoginInput->clear();
         ui->addCredPasswordInput->clear();
@@ -1452,6 +1453,8 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
         {
             ui->addCredPasswordInput->setPasswordVisible(true);
             ui->addCredPasswordInput->setText("<" + pLoginItem->parentItem()->name() + "/" + pLoginItem->name() + ">");
+            qCritical() << "Link to Address: " << pLoginItem->address().toHex();
+            m_credentialLinkedAddr = pLoginItem->address();
             emit credentialLinked();
         }
     }

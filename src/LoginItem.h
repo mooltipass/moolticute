@@ -30,8 +30,12 @@ public:
     void setTOTPDeleted(bool deleted) { m_totpDeleted = deleted; }
     void setDeleted(bool val) { m_bDeleted = val; }
     bool isDeleted() const { return m_bDeleted; }
+
+    const QByteArray &pointedToChildAddress() const;
+    void setPointedToChildAddress(const QByteArray &bAddress);
 private:    
     QByteArray m_bAddress;
+    QByteArray m_bPointedToChildAddress;
     qint8 m_iFavorite;
     QString m_sPassword;
     QString m_sPasswordOrig;
