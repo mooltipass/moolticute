@@ -7617,6 +7617,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             QString password = qjobject["password"].toString();
             QString description = qjobject["description"].toString();
             QJsonArray addrArray = qjobject["address"].toArray();
+            QByteArray pointedToAddrArray;
+
             int category = 0;
             int keyAfterLogin = 0;
             int keyAfterPwd = 0;
@@ -7638,6 +7640,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                         bleImpl->createTOTPCredMessage(service, login, qjobject["totp"].toObject());
                     }
                 }
+                QJsonArray pointedToAddr = qjobject["pointed_to_child"].toArray();
+                for (qint32 j = 0; j < pointedToAddr.size(); j++) { pointedToAddrArray.append(pointedToAddr[j].toInt()); }
             }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
@@ -7696,7 +7700,12 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     bleImpl->setNodeCategory(newNodePt, category);
                     bleImpl->setNodeKeyAfterLogin(newNodePt, keyAfterLogin);
                     bleImpl->setNodeKeyAfterPwd(newNodePt, keyAfterPwd);
-                    bleImpl->setNodePwdBlankFlag(newNodePt);
+                    bool isPointedNode = bleImpl->setNodePointedToAddr(newNodePt, pointedToAddrArray);
+                    // For pointed to node we do not need to set blank flag
+                    if (!isPointedNode)
+                    {
+                        bleImpl->setNodePwdBlankFlag(newNodePt);
+                    }
                 }
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
