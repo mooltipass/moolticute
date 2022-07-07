@@ -61,6 +61,7 @@ public:
     void setUserCategoryClean(bool clean) { m_categoryClean = clean; }
     void setTOTP(const QModelIndex &idx, QString secretKey, int timeStep, int codeSize);
     QSet<qint8> getTakenFavorites() const;
+    QString getCredentialNameForAddress(QByteArray addr) const;
 
 private:
     ServiceItem *addService(const QString &sServiceName);

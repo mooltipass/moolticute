@@ -972,6 +972,11 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
                 ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
                 auto keyAfterPwdIdx = ui->credDisplayKeyAfterPwdInput->findData(pLoginItem->keyAfterPwd());
                 ui->credDisplayKeyAfterPwdInput->setCurrentIndex(keyAfterPwdIdx);
+                if (pLoginItem->isPointedPassword())
+                {
+                    QByteArray pointedTo = pLoginItem->pointedToChildAddress();
+                    ui->credDisplayPasswordInput->setPlaceholderText(m_pCredModel->getCredentialNameForAddress(pointedTo));
+                }
                 ui->pushButtonTOTP->setText(tr("Setup TOTP Credential"));
                 if (pLoginItem->totpTimeStep() != 0)
                 {

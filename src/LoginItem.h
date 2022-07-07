@@ -33,6 +33,7 @@ public:
 
     const QByteArray &pointedToChildAddress() const;
     void setPointedToChildAddress(const QByteArray &bAddress);
+    bool isPointedPassword() const { return m_bIsPointedNode; }
 private:    
     QByteArray m_bAddress;
     QByteArray m_bPointedToChildAddress;
@@ -41,6 +42,7 @@ private:
     QString m_sPasswordOrig;
     bool m_bPasswordLocked;
     bool m_bDeleted = false;
+    bool m_bIsPointedNode = false;
 
     struct TOTPCredential
     {

@@ -248,6 +248,16 @@ void CredentialModel::load(const QJsonArray &json, bool isFido)
                         pLoginItem->setTotpTimeStep(cnode["totp_time_step"].toVariant().toInt());
                         pLoginItem->setTotpCodeSize(cnode["totp_code_size"].toVariant().toInt());
                     }
+                    QJsonArray pointedJsonArr = cnode["pointed_to_child"].toArray();
+                    if (pointedJsonArr.size() < 2)
+                    {
+                        qWarning() << "Invalid pointed to node address.";
+                        continue;
+                    }
+                    QByteArray pointedToAddress;
+                    pointedToAddress.append(static_cast<char>(pointedJsonArr.at(0).toInt()));
+                    pointedToAddress.append(static_cast<char>(pointedJsonArr.at(1).toInt()));
+                    pLoginItem->setPointedToChildAddress(pointedToAddress);
                 }
 
                 // Update login favorite
@@ -361,6 +371,27 @@ QSet<qint8> CredentialModel::getTakenFavorites() const
         }
     }
     return favorites;
+}
+
+QString CredentialModel::getCredentialNameForAddress(QByteArray addr) const
+{
+    int services = rowCount();
+    for (int i = 0; i < services; ++i)
+    {
+        auto service_index = index(i,0);
+        int logins = rowCount(service_index);
+        for (int j = 0; j < logins; ++j)
+        {
+            auto login_index = index(j, 0, service_index);
+            auto login = getLoginItemByIndex(login_index);
+            if (login->address() == addr)
+            {
+                QString service = getServiceItemByIndex(service_index)->name();
+                return "<" + service + "/" + login->name() + ">";
+            }
+        }
+    }
+    return "";
 }
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat, int iLoginKey, int iPwdKey)

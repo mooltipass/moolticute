@@ -142,4 +142,7 @@ const QByteArray &LoginItem::pointedToChildAddress() const
 void LoginItem::setPointedToChildAddress(const QByteArray &bAddress)
 {
     m_bPointedToChildAddress = bAddress;
+    static const char ZERO_BYTE = static_cast<char>(0x00);
+    const bool isPointedZero = ZERO_BYTE == bAddress.at(0) && ZERO_BYTE == bAddress.at(1);
+    m_bIsPointedNode = !isPointedZero;
 }
