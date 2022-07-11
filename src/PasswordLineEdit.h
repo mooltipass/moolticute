@@ -99,33 +99,22 @@ public:
     LockedPasswordLineEdit(QWidget* parent = nullptr);
     void setLocked(bool);
     void checkPwdBlankFlag(int flag);
-
-Q_SIGNALS:
-    void unlockRequested();
-
-private:
-    bool m_locked;
-};
-
-class PasswordLinkLineEdit : public PasswordLineEdit
-{
-    Q_OBJECT
-public:
-    PasswordLinkLineEdit(QWidget* parent = nullptr);
-
-Q_SIGNALS:
-    void linkRequested();
-    void linkRemoved();
+    void displayLinkedIcon(bool isLinked);
 
 public slots:
     void onCredentialLinked();
     void onDisplayLink();
     void onHideLink();
 
+Q_SIGNALS:
+    void unlockRequested();
+    void linkRequested();
+    void linkRemoved();
+
 private:
     void modifyLinkAction(bool isLink = true, bool remove = false);
 
-
+    bool m_locked;
     QAction* m_linkPassword;
     QAction* m_removePasswordLink;
 };

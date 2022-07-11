@@ -294,6 +294,21 @@ LockedPasswordLineEdit::LockedPasswordLineEdit(QWidget* parent):
     PasswordLineEdit(parent),
     m_locked(false)
 {
+    AppGui *appGui = dynamic_cast<AppGui*> qApp;
+    QtAwesome *awesome = appGui->qtAwesome();
+    m_linkPassword = new QAction(awesome->icon(fa::paperclip), tr("Link Password"), this);
+    m_removePasswordLink = new QAction(awesome->icon(fa::remove), tr("Remove Link Password"), this);
+    connect(m_linkPassword, &QAction::triggered, [this]()
+    {
+       emit linkRequested();
+    });
+    connect(m_removePasswordLink, &QAction::triggered, [this]()
+    {
+       setReadOnly(false);
+       modifyLinkAction();
+       emit linkRemoved();
+    });
+
     disconnect(m_showPassword, 0, 0, 0);
 
     connect(m_showPassword, &QAction::triggered, [this]()
@@ -330,6 +345,11 @@ void LockedPasswordLineEdit::checkPwdBlankFlag(int flag)
         setPasswordVisible(true);
         setReadOnly(m_locked);
     }
+}
+
+void LockedPasswordLineEdit::displayLinkedIcon(bool isLinked)
+{
+    modifyLinkAction(!isLinked);
 }
 
 
@@ -441,46 +461,28 @@ std::vector<char> PasswordOptionsPopup::generateCustomPasswordPool()
     return pool;
 }
 
-PasswordLinkLineEdit::PasswordLinkLineEdit(QWidget *parent):
-    PasswordLineEdit(parent)
-{
-    AppGui *appGui = dynamic_cast<AppGui*> qApp;
-    QtAwesome *awesome = appGui->qtAwesome();
-    m_linkPassword = new QAction(awesome->icon(fa::paperclip), tr("Link Password"), this);
-    m_removePasswordLink = new QAction(awesome->icon(fa::remove), tr("Remove Link Password"), this);
-    connect(m_linkPassword, &QAction::triggered, [this]()
-    {
-       emit linkRequested();
-    });
-    connect(m_removePasswordLink, &QAction::triggered, [this]()
-    {
-       modifyLinkAction();
-       emit linkRemoved();
-    });
-}
-
-void PasswordLinkLineEdit::onCredentialLinked()
+void LockedPasswordLineEdit::onCredentialLinked()
 {
     modifyLinkAction(false);
 }
 
-void PasswordLinkLineEdit::onDisplayLink()
+void LockedPasswordLineEdit::onDisplayLink()
 {
     modifyLinkAction();
 }
 
-void PasswordLinkLineEdit::onHideLink()
+void LockedPasswordLineEdit::onHideLink()
 {
     modifyLinkAction(true, true);
 }
 
 /**
- * @brief PasswordLinkLineEdit::modifyLinkAction
+ * @brief LockedPasswordLineEdit::modifyLinkAction
  * @param isLink if true add link password icon, otherwise add remove link password icon
  * @param remove if true remove link icon, otherwise add icon
  *
  */
-void PasswordLinkLineEdit::modifyLinkAction(bool isLink /*= true*/, bool remove /*= false*/)
+void LockedPasswordLineEdit::modifyLinkAction(bool isLink /*= true*/, bool remove /*= false*/)
 {
     if (actions().contains(m_linkPassword))
     {

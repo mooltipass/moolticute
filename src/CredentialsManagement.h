@@ -100,6 +100,7 @@ private slots:
 
     void onCredentialLink();
     void onCredentialLinkRemoved();
+    void onSelectedCredentialLinkRemoved();
 
     void on_pushButtonDiscardLinking_clicked();
 
