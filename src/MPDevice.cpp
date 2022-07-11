@@ -7760,6 +7760,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     bleImpl->setNodeCategory(nodePtr, category);
                     bleImpl->setNodeKeyAfterLogin(nodePtr, keyAfterLogin);
                     bleImpl->setNodeKeyAfterPwd(nodePtr, keyAfterPwd);
+                    bleImpl->setNodePointedToAddr(nodePtr, pointedToAddrArray);
                 }
                 addChildToDB(parentPtr, nodePtr);
 
@@ -7826,6 +7827,12 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     if (removeTOTP)
                     {
                         nodeBle->resetTOTPCredential();
+                        packet_send_needed = true;
+                    }
+                    if (pointedToAddrArray != nodeBle->getPointedToChildAddr())
+                    {
+                        nodeBle->setPointedToChildAddr(pointedToAddrArray);
+                        bleImpl->setNodePwdBlankFlag(nodeBle);
                         packet_send_needed = true;
                     }
                 }
