@@ -38,6 +38,12 @@ class CredentialsManagement : public QWidget
 {
     Q_OBJECT
 
+    enum class LinkingMode {
+        OFF,
+        NEW_CREDENTIAL,
+        CREDENTIAL_EDIT
+    };
+
 public:    
     explicit CredentialsManagement(QWidget *parent = 0);
     ~CredentialsManagement();
@@ -100,6 +106,7 @@ private slots:
 
     void onCredentialLink();
     void onCredentialLinkRemoved();
+    void onSelectedCredentialLink();
     void onSelectedCredentialLinkRemoved();
 
     void on_pushButtonDiscardLinking_clicked();
@@ -143,8 +150,10 @@ private:
     bool m_isClean = true;
     bool m_isSetCategoryClean = true;
     bool m_altKeyPressed = false;
-    bool m_linkingMode = false;
+
+    LinkingMode m_linkingMode = LinkingMode::OFF;
     QByteArray m_credentialLinkedAddr;
+    QModelIndex m_credentialToLinkIndex;
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 

@@ -196,6 +196,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(this, &CredentialsManagement::displayCredentialLink, ui->addCredPasswordInput, &LockedPasswordLineEdit::onDisplayLink);
     connect(this, &CredentialsManagement::hideCredentialLink, ui->addCredPasswordInput, &LockedPasswordLineEdit::onHideLink);
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::linkRemoved, this, &CredentialsManagement::onSelectedCredentialLinkRemoved);
+    connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::linkRequested, this, &CredentialsManagement::onSelectedCredentialLink);
 }
 
 void CredentialsManagement::setFilterCredLayout()
@@ -300,7 +301,7 @@ void CredentialsManagement::enableCredentialsManagement(bool enable)
         {
             emit hideCredentialLink();
         }
-        m_linkingMode = false;
+        m_linkingMode = LinkingMode::OFF;
         enableNonCredentialEditWidgets();
     }
 
@@ -931,7 +932,13 @@ void CredentialsManagement::onCredentialSelected(const QModelIndex &current, con
 
 void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 {
-    ui->credDisplayFrame->setEnabled(!m_linkingMode);
+    bool isLinking = m_linkingMode != LinkingMode::OFF;
+    ui->credDisplayFrame->setEnabled(!isLinking);
+    if (isLinking)
+    {
+        LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
+        ui->pushButtonLinkTo->setEnabled(!pLoginItem->isPointedPassword());
+    }
     updateLoginDescription(srcIndex);
     if (wsClient->isMPBLE())
     {
@@ -1054,7 +1061,7 @@ void CredentialsManagement::disableNonCredentialEditWidgets()
 
 void CredentialsManagement::enableNonCredentialEditWidgets()
 {
-    if (!m_linkingMode)
+    if (m_linkingMode == LinkingMode::OFF)
     {
         ui->quickInsertWidget->setEnabled(true);
     }
@@ -1108,7 +1115,7 @@ void CredentialsManagement::clearMMMUi()
     ui->credDisplayFrame->setEnabled(false);
     m_pCredModel->clear();
     ui->credentialTreeView->repaint();
-    m_linkingMode = false;
+    m_linkingMode = LinkingMode::OFF;
 }
 
 void CredentialsManagement::updateBleFavs(const QModelIndex &srcIndex)
@@ -1436,7 +1443,7 @@ void CredentialsManagement::onCredentialLink()
     ui->credDisplayFrame->setEnabled(false);
     ui->framePasswordLink->show();
     ui->quickInsertWidget->setEnabled(false);
-    m_linkingMode = true;
+    m_linkingMode = LinkingMode::NEW_CREDENTIAL;
 }
 
 void CredentialsManagement::onCredentialLinkRemoved()
@@ -1444,6 +1451,16 @@ void CredentialsManagement::onCredentialLinkRemoved()
     ui->addCredPasswordInput->setPasswordVisible(false);
     ui->addCredPasswordInput->setText("");
     // TODO handle removed link
+}
+
+void CredentialsManagement::onSelectedCredentialLink()
+{
+    qCritical() << "onSelectedCredentialLink";
+    ui->credDisplayFrame->setEnabled(false);
+    ui->framePasswordLink->show();
+    ui->quickInsertWidget->setEnabled(false);
+    m_linkingMode = LinkingMode::CREDENTIAL_EDIT;
+    m_credentialToLinkIndex = ui->credentialTreeView->selectionModel()->currentIndex();
 }
 
 void CredentialsManagement::onSelectedCredentialLinkRemoved()
@@ -1472,16 +1489,20 @@ void CredentialsManagement::on_pushButtonDiscardLinking_clicked()
     ui->credDisplayFrame->setEnabled(true);
     ui->framePasswordLink->hide();
     ui->quickInsertWidget->setEnabled(true);
-    m_linkingMode = false;
+    m_linkingMode = LinkingMode::OFF;
 }
 
 
 void CredentialsManagement::on_pushButtonLinkTo_clicked()
 {
+    if (LinkingMode::CREDENTIAL_EDIT == m_linkingMode)
+    {
+        qCritical() << "Correct credential selected";
+        ui->credentialTreeView->selectionModel()->setCurrentIndex(m_credentialToLinkIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    }
     ui->credDisplayFrame->setEnabled(true);
     ui->framePasswordLink->hide();
     ui->quickInsertWidget->setEnabled(true);
-    m_linkingMode = false;
     //TODO: Set linking
     const QModelIndex currentSelectionIndex = ui->credentialTreeView->selectionModel()->currentIndex();
     if (currentSelectionIndex.isValid())
@@ -1490,11 +1511,16 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
         LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
         if (pLoginItem != nullptr)
         {
-            ui->addCredPasswordInput->setPasswordVisible(true);
-            ui->addCredPasswordInput->setText("<" + pLoginItem->parentItem()->name() + "/" + pLoginItem->name() + ">");
+            LockedPasswordLineEdit * pwdInput = m_linkingMode == LinkingMode::NEW_CREDENTIAL ?
+                                                    ui->addCredPasswordInput :  ui->credDisplayPasswordInput;
+            pwdInput->setPasswordVisible(true);
+            pwdInput->setText("<" + pLoginItem->parentItem()->name() + "/" + pLoginItem->name() + ">");
+            ui->credDisplayPasswordInput->setPasswordVisible(true);
             qCritical() << "Link to Address: " << pLoginItem->address().toHex();
             m_credentialLinkedAddr = pLoginItem->address();
             emit credentialLinked();
+
         }
     }
+    m_linkingMode = LinkingMode::OFF;
 }
