@@ -682,7 +682,20 @@ void CredentialsManagement::on_pushButtonCancel_clicked()
         ui->credDisplayKeyAfterLoginInput->setCurrentIndex(keyAfterLoginIdx);
         auto keyAfterPwdIdx = ui->credDisplayKeyAfterPwdInput->findData(pLoginItem->keyAfterPwd());
         ui->credDisplayKeyAfterPwdInput->setCurrentIndex(keyAfterPwdIdx);
-        pLoginItem->setPointedToChildAddressTmp(pLoginItem->pointedToChildAddress());
+        if (pLoginItem->pointedToChildAddressTmp() != pLoginItem->pointedToChildAddress())
+        {
+            pLoginItem->setPointedToChildAddressTmp(pLoginItem->pointedToChildAddress());
+            if (pLoginItem->isPointedPassword())
+            {
+                ui->credDisplayPasswordInput->displayLinkedIcon(true);
+                ui->credDisplayPasswordInput->setPlaceholderText(m_pCredModel->getCredentialNameForAddress(pLoginItem->pointedToChildAddress()));
+            }
+            else
+            {
+                ui->credDisplayPasswordInput->displayLinkedIcon(false);
+                ui->credDisplayPasswordInput->setLocked(true);
+            }
+        }
         auto *serviceItem = pLoginItem->parentItem();
         if (nullptr != serviceItem)
         {
