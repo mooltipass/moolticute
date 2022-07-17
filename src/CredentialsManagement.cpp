@@ -952,6 +952,17 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
     {
         LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
         ui->pushButtonLinkTo->setEnabled(!pLoginItem->isPointedPassword());
+        if (!pLoginItem->isPointedPassword())
+        {
+            // Check if the selected login is the same that we want to link
+            QModelIndex originalIndex = getSourceIndexFromProxyIndex(m_credentialToLinkIndex);
+            LoginItem *originalLogin = m_pCredModel->getLoginItemByIndex(originalIndex);
+            if (pLoginItem->address() == originalLogin->address())
+            {
+                // Cannot link the actual credential
+                ui->pushButtonLinkTo->setEnabled(false);
+            }
+        }
     }
     updateLoginDescription(srcIndex);
     if (wsClient->isMPBLE())
@@ -963,6 +974,10 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 void CredentialsManagement::onServiceSelected(const QModelIndex &srcIndex)
 {
     Q_UNUSED(srcIndex);
+    if (m_linkingMode != LinkingMode::OFF)
+    {
+        ui->pushButtonLinkTo->setEnabled(false);
+    }
     ui->credDisplayFrame->setEnabled(false);
     clearLoginDescription();
 }
@@ -1473,6 +1488,7 @@ void CredentialsManagement::onSelectedCredentialLink()
     ui->credDisplayFrame->setEnabled(false);
     ui->framePasswordLink->show();
     ui->quickInsertWidget->setEnabled(false);
+    ui->pushButtonLinkTo->setEnabled(false);
     m_linkingMode = LinkingMode::CREDENTIAL_EDIT;
     m_credentialToLinkIndex = ui->credentialTreeView->selectionModel()->currentIndex();
 }
