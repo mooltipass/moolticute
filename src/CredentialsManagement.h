@@ -173,7 +173,8 @@ signals:
     void loginSelected(const QModelIndex &srcIndex);
     void serviceSelected(const QModelIndex &srcIndex);
     void selectLoginItem(const QModelIndex &proxyIndex);
-    void credentialLinked();
+    void newCredentialLinked();
+    void editedCredentialLinked();
     void displayCredentialLink();
     void hideCredentialLink();
 };

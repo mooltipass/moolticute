@@ -192,12 +192,12 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     connect(ui->addCredPasswordInput, &LockedPasswordLineEdit::linkRequested, this, &CredentialsManagement::onCredentialLink);
     connect(ui->addCredPasswordInput, &LockedPasswordLineEdit::linkRemoved, this, &CredentialsManagement::onCredentialLinkRemoved);
-    connect(this, &CredentialsManagement::credentialLinked, ui->addCredPasswordInput, &LockedPasswordLineEdit::onCredentialLinked);
+    connect(this, &CredentialsManagement::newCredentialLinked, ui->addCredPasswordInput, &LockedPasswordLineEdit::onCredentialLinked);
     connect(this, &CredentialsManagement::displayCredentialLink, ui->addCredPasswordInput, &LockedPasswordLineEdit::onDisplayLink);
     connect(this, &CredentialsManagement::hideCredentialLink, ui->addCredPasswordInput, &LockedPasswordLineEdit::onHideLink);
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::linkRemoved, this, &CredentialsManagement::onSelectedCredentialLinkRemoved);
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::linkRequested, this, &CredentialsManagement::onSelectedCredentialLink);
-    connect(this, &CredentialsManagement::credentialLinked, ui->credDisplayPasswordInput, &LockedPasswordLineEdit::onCredentialLinked);
+    connect(this, &CredentialsManagement::editedCredentialLinked, ui->credDisplayPasswordInput, &LockedPasswordLineEdit::onCredentialLinked);
 }
 
 void CredentialsManagement::setFilterCredLayout()
@@ -1539,7 +1539,7 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
             {
                 ui->addCredPasswordInput->setPasswordVisible(true);
                 ui->addCredPasswordInput->setText(linkToName);
-                emit credentialLinked();
+                emit newCredentialLinked();
             }
         }
     }
@@ -1554,7 +1554,7 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
         }
         ui->credDisplayPasswordInput->setPasswordVisible(true);
         ui->credDisplayPasswordInput->setPlaceholderText(linkToName);
-        emit credentialLinked();
+        emit editedCredentialLinked();
         updateSaveDiscardState();
     }
     qDebug() << "Link to Address: " << m_credentialLinkedAddr.toHex();
