@@ -264,6 +264,8 @@ public:
 
     static QString getMcAgent();
 
+    static QByteArray getUntilNullByte(const QByteArray& arr);
+
     typedef enum
     {
         MP_Classic = 0,
@@ -353,6 +355,7 @@ public:
     static const int BLE_BUNDLE_WITH_NOTES = 1;
     static const int BLE_BUNDLE_WITH_BLE_NAME = 9;
     static const int BLE_BUNDLE_WITH_MIRRORING = 11;
+    static const char ZERO_BYTE = static_cast<char>(0x00);
 };
 
 struct FidoCredential
