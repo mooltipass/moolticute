@@ -7945,6 +7945,24 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                         break;
                     }
                 }
+                if (isBLE() && bleImpl->get_bundleVersion() >= Common::BLE_BUNDLE_WITH_MIRRORING)
+                {
+                    auto curAddr = curNode->getAddress();
+                    for (auto* childNode : loginChildNodes)
+                    {
+                        /* Check if the deleted login was used as a pointed to password.
+                           If yes, then remove the pointed to address and set password blank flag. */
+                        auto* nodeBle = dynamic_cast<MPNodeBLE*>(childNode);
+                        if (nodeBle->getPointedToChildAddr() == curAddr)
+                        {
+                            nodeBle->setPwdBlankFlag();
+                            const char ZERO_BYTE = static_cast<char>(0x00);
+                            QByteArray noPointedTo;
+                            noPointedTo.append(2, ZERO_BYTE);
+                            nodeBle->setPointedToChildAddr(noPointedTo);
+                        }
+                    }
+                }
                 removeChildFromDB(nodeItem, curNode, false, true);
                 packet_send_needed = true;
                 if (renamedNode)

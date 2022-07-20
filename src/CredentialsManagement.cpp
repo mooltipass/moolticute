@@ -952,7 +952,7 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
     {
         LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
         ui->pushButtonLinkTo->setEnabled(!pLoginItem->isPointedPassword());
-        if (!pLoginItem->isPointedPassword())
+        if (LinkingMode::CREDENTIAL_EDIT == m_linkingMode && !pLoginItem->isPointedPassword())
         {
             // Check if the selected login is the same that we want to link
             QModelIndex originalIndex = getSourceIndexFromProxyIndex(m_credentialToLinkIndex);
@@ -1021,8 +1021,16 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
                 {
                     if (pLoginItem->isPointedPassword())
                     {
-                        QByteArray pointedTo = pLoginItem->pointedToChildAddress();
-                        ui->credDisplayPasswordInput->setPlaceholderText(m_pCredModel->getCredentialNameForAddress(pointedTo));
+                        QString pointToName = m_pCredModel->getCredentialNameForAddress(pLoginItem->pointedToChildAddress());
+                        if (pointToName.isEmpty())
+                        {
+                            /* If pointed to address's credential is not available then it was deleted. */
+                            ui->credDisplayPasswordInput->setPlaceholderText(tr("Pointed to credential is deleted"));
+                        }
+                        else
+                        {
+                            ui->credDisplayPasswordInput->setPlaceholderText(pointToName);
+                        }
                     }
                     ui->credDisplayPasswordInput->displayLinkedIcon(pLoginItem->isPointedPassword());
                 }

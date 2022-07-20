@@ -103,7 +103,7 @@ bool WSClient::isDeviceConnected() const
 
 bool WSClient::isCredMirroringAvailable() const
 {
-    return isMPBLE() && get_bundleVersion() >= 11;
+    return isMPBLE() && get_bundleVersion() >= Common::BLE_BUNDLE_WITH_MIRRORING;
 }
 
 void WSClient::onWsDisconnected()
