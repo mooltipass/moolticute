@@ -957,9 +957,9 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
             // Check if the selected login is the same that we want to link
             QModelIndex originalIndex = getSourceIndexFromProxyIndex(m_credentialToLinkIndex);
             LoginItem *originalLogin = m_pCredModel->getLoginItemByIndex(originalIndex);
-            if (pLoginItem->address() == originalLogin->address())
+            if (pLoginItem->address() == originalLogin->address() /* Cannot link the actual credential */
+                    || pLoginItem->address().isEmpty()) /* Or when credential's address is empty (new credential) */
             {
-                // Cannot link the actual credential
                 ui->pushButtonLinkTo->setEnabled(false);
             }
         }
