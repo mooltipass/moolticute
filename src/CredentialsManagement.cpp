@@ -1029,6 +1029,7 @@ void CredentialsManagement::updateLoginDescription(LoginItem *pLoginItem)
                         }
                         else
                         {
+                            ui->credDisplayPasswordInput->setLocked(true);
                             ui->credDisplayPasswordInput->setPlaceholderText(pointToName);
                         }
                     }
