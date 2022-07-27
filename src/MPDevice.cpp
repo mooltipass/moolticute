@@ -7956,10 +7956,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                         if (nodeBle->getPointedToChildAddr() == curAddr)
                         {
                             nodeBle->setPwdBlankFlag();
-                            const char ZERO_BYTE = static_cast<char>(0x00);
-                            QByteArray noPointedTo;
-                            noPointedTo.append(2, ZERO_BYTE);
-                            nodeBle->setPointedToChildAddr(noPointedTo);
+                            nodeBle->setPointedToChildAddr(QByteArray{2, Common::ZERO_BYTE});
                         }
                     }
                 }

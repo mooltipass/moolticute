@@ -1377,7 +1377,7 @@ void MPDeviceBleImpl::setNodePwdBlankFlag(MPNode *node)
 
 bool MPDeviceBleImpl::setNodePointedToAddr(MPNode *node, QByteArray addr)
 {
-    if (addr.size() != 2)
+    if (addr.size() != POINTED_TO_ADDR_SIZE)
     {
         // Pointed to is not a valid node address
         return false;
@@ -1389,10 +1389,6 @@ bool MPDeviceBleImpl::setNodePointedToAddr(MPNode *node, QByteArray addr)
     }
     if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
     {
-        if (AppDaemon::isDebugDev())
-        {
-            qDebug() << "Setting NodePointedToAddr";
-        }
         nodeBle->setPointedToChildAddr(addr);
         return true;
     }

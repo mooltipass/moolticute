@@ -68,6 +68,8 @@ private:
 
     TOTPCredential m_totpCred;
     bool m_totpDeleted = false;
+
+    static constexpr int POINTED_TO_ADDR_SIZE = 2;
 };
 
 #endif // LOGINITEM_H

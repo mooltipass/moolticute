@@ -96,7 +96,7 @@ QJsonObject LoginItem::toJson() const
             ret.insert("totp", totp);
         }
         QJsonArray pointedTo;
-        if (m_bPointedToChildAddress.size() == 2)
+        if (m_bPointedToChildAddress.size() == POINTED_TO_ADDR_SIZE)
         {
             pointedTo = QJsonArray({{m_bPointedToChildAddress.at(0)},{m_bPointedToChildAddress.at(1)}});
         }
@@ -143,7 +143,6 @@ void LoginItem::setPointedToChildAddress(const QByteArray &bAddress)
 {
     m_bPointedToChildAddress = bAddress;
     m_bPointedToChildAddressTmp = bAddress;
-    static const char ZERO_BYTE = static_cast<char>(0x00);
-    const bool isPointedZero = ZERO_BYTE == bAddress.at(0) && ZERO_BYTE == bAddress.at(1);
+    const bool isPointedZero = Common::ZERO_BYTE == bAddress.at(0) && Common::ZERO_BYTE == bAddress.at(1);
     m_bIsPointedNode = !isPointedZero;
 }

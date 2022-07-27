@@ -278,6 +278,7 @@ private:
     static constexpr int MINI_FILE_BLOCK_SIZE = 128;
     static constexpr int FORCE_SUBDOMAIN_BUNDLE_VERSION = 8;
     static constexpr int SET_BLE_NAME_BUNDLE_VERSION = 9;
+    static constexpr int POINTED_TO_ADDR_SIZE = 2;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
     const QString DEFAULT_BLE_NAME = "Mooltipass Mini BLE";
 };

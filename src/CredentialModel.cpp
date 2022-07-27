@@ -599,7 +599,6 @@ void CredentialModel::addCredential(QString sServiceName, const QString &sLoginN
                 }
                 else
                 {
-                    //TODO what to do with password???
                     pAddedLoginItem->setPassword("");
                     pAddedLoginItem->setPointedToChildAddress(pointedTo);
                 }
@@ -628,7 +627,6 @@ void CredentialModel::addCredential(QString sServiceName, const QString &sLoginN
             }
             else
             {
-                //TODO what to do with password???
                 pAddedLoginItem->setPassword("");
                 pAddedLoginItem->setPointedToChildAddress(pointedTo);
             }

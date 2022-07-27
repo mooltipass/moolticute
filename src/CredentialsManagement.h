@@ -136,6 +136,8 @@ private:
     virtual void changeEvent(QEvent *event);
     int getCategory(const QModelIndex &srcIndex);
 
+    void checkLinkingOnLoginSelected(const QModelIndex &srcIndex);
+
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;

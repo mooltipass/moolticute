@@ -494,6 +494,7 @@ void CredentialsManagement::saveCredential(const QModelIndex currentSelectionInd
                                       ui->credDisplayKeyAfterPwdInput->currentData().toInt());
         if (wsClient->isCredMirroringAvailable() && pLoginItem->pointedToChildAddress() != pLoginItem->pointedToChildAddressTmp())
         {
+            // Save pointed to address if it was changed
             pLoginItem->setPointedToChildAddress(pLoginItem->pointedToChildAddressTmp());
             credentialDataChanged();
         }
@@ -946,24 +947,11 @@ void CredentialsManagement::onCredentialSelected(const QModelIndex &current, con
 
 void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
 {
-    bool isLinking = m_linkingMode != LinkingMode::OFF;
-    ui->credDisplayFrame->setEnabled(!isLinking);
-    if (isLinking)
+    if (wsClient->isCredMirroringAvailable())
     {
-        LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
-        ui->pushButtonLinkTo->setEnabled(!pLoginItem->isPointedPassword());
-        if (LinkingMode::CREDENTIAL_EDIT == m_linkingMode && !pLoginItem->isPointedPassword())
-        {
-            // Check if the selected login is the same that we want to link
-            QModelIndex originalIndex = getSourceIndexFromProxyIndex(m_credentialToLinkIndex);
-            LoginItem *originalLogin = m_pCredModel->getLoginItemByIndex(originalIndex);
-            if (pLoginItem->address() == originalLogin->address() /* Cannot link the actual credential */
-                    || pLoginItem->address().isEmpty()) /* Or when credential's address is empty (new credential) */
-            {
-                ui->pushButtonLinkTo->setEnabled(false);
-            }
-        }
+        checkLinkingOnLoginSelected(srcIndex);
     }
+
     updateLoginDescription(srcIndex);
     if (wsClient->isMPBLE())
     {
@@ -1380,6 +1368,28 @@ int CredentialsManagement::getCategory(const QModelIndex &srcIndex)
     return m_pCredModel->getLoginItemByIndex(srcIndex)->category();
 }
 
+void CredentialsManagement::checkLinkingOnLoginSelected(const QModelIndex &srcIndex)
+{
+    bool isLinking = m_linkingMode != LinkingMode::OFF;
+    ui->credDisplayFrame->setEnabled(!isLinking);
+    if (isLinking)
+    {
+        LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
+        ui->pushButtonLinkTo->setEnabled(!pLoginItem->isPointedPassword());
+        if (LinkingMode::CREDENTIAL_EDIT == m_linkingMode && !pLoginItem->isPointedPassword())
+        {
+            // Check if the selected login is the same that we want to link
+            QModelIndex originalIndex = getSourceIndexFromProxyIndex(m_credentialToLinkIndex);
+            LoginItem *originalLogin = m_pCredModel->getLoginItemByIndex(originalIndex);
+            if (pLoginItem->address() == originalLogin->address() /* Cannot link the actual credential */
+                    || pLoginItem->address().isEmpty()) /* Or when credential's address is empty (new credential) */
+            {
+                ui->pushButtonLinkTo->setEnabled(false);
+            }
+        }
+    }
+}
+
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
 {
     bool favFilter = m_pCredModelFilter->switchFavFilter();
@@ -1488,12 +1498,10 @@ void CredentialsManagement::onCredentialLinkRemoved()
 {
     ui->addCredPasswordInput->setPasswordVisible(false);
     ui->addCredPasswordInput->setText("");
-    // TODO handle removed link
 }
 
 void CredentialsManagement::onSelectedCredentialLink()
 {
-    qCritical() << "onSelectedCredentialLink";
     ui->credDisplayFrame->setEnabled(false);
     ui->framePasswordLink->show();
     ui->quickInsertWidget->setEnabled(false);
@@ -1517,9 +1525,7 @@ void CredentialsManagement::onSelectedCredentialLinkRemoved()
 
     // Do we have a login item?
     LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
-    QByteArray noPointedAddr;
-    noPointedAddr.append(2, static_cast<char>(0x00));
-    pLoginItem->setPointedToChildAddressTmp(noPointedAddr);
+    pLoginItem->setPointedToChildAddressTmp(QByteArray{2, Common::ZERO_BYTE});
     updateSaveDiscardState();
 }
 
