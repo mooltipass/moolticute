@@ -584,56 +584,36 @@ void CredentialModel::addCredential(QString sServiceName, const QString &sLoginN
         // Retrieve target login
         LoginItem *pTargetLogin = pTargetService->findLoginByName(sLoginName);
         if (pTargetLogin != nullptr)
-            return;
-        else
         {
-            QModelIndex serviceIndex = getServiceIndexByName(pTargetService->name());
-            if (serviceIndex.isValid())
-            {
-                beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
-                pAddedLoginItem = pTargetService->addLogin(sLoginName);
-                pAddedLoginItem->setPasswordLocked(false);
-                if (pointedTo.isEmpty())
-                {
-                    pAddedLoginItem->setPassword(sPassword);
-                }
-                else
-                {
-                    pAddedLoginItem->setPassword("");
-                    pAddedLoginItem->setPointedToChildAddress(pointedTo);
-                }
-                pAddedLoginItem->setDescription(sDescription);
-                pAddedLoginItem->setCategory(0);
-                endInsertRows();
-            }
+            return;
         }
     }
     // No matching service
     else
     {
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
-        ServiceItem *pAddedService = m_pRootItem->addService(sServiceName);
+        pTargetService = m_pRootItem->addService(sServiceName);
         endInsertRows();
+    }
 
-        QModelIndex serviceIndex = getServiceIndexByName(pAddedService->name());
-        if (serviceIndex.isValid())
+    QModelIndex serviceIndex = getServiceIndexByName(pTargetService->name());
+    if (serviceIndex.isValid())
+    {
+        beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
+        pAddedLoginItem = pTargetService->addLogin(sLoginName);
+        pAddedLoginItem->setPasswordLocked(false);
+        if (pointedTo.isEmpty())
         {
-            beginInsertRows(serviceIndex, rowCount(serviceIndex), rowCount(serviceIndex));
-            pAddedLoginItem = pAddedService->addLogin(sLoginName);
-            pAddedLoginItem->setPasswordLocked(false);
-            if (pointedTo.isEmpty())
-            {
-                pAddedLoginItem->setPassword(sPassword);
-            }
-            else
-            {
-                pAddedLoginItem->setPassword("");
-                pAddedLoginItem->setPointedToChildAddress(pointedTo);
-            }
-            pAddedLoginItem->setDescription(sDescription);
-            pAddedLoginItem->setCategory(0);
-            endInsertRows();
+            pAddedLoginItem->setPassword(sPassword);
         }
+        else
+        {
+            pAddedLoginItem->setPassword("");
+            pAddedLoginItem->setPointedToChildAddress(pointedTo);
+        }
+        pAddedLoginItem->setDescription(sDescription);
+        pAddedLoginItem->setCategory(0);
+        endInsertRows();
     }
 
     if (pAddedLoginItem)
