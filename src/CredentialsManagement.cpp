@@ -396,6 +396,11 @@ void CredentialsManagement::on_addCredentialButton_clicked()
                                     ui->addCredPasswordInput->text(),
                                     QString{},
                                     m_credentialLinkedAddr);
+        if (m_credentialLinkedAddr.size() > 0)
+        {
+            // Reset password input to default state after save
+            ui->addCredPasswordInput->displayLinkedIcon(false);
+        }
         m_credentialLinkedAddr.clear();
         ui->addCredServiceInput->clear();
         ui->addCredLoginInput->clear();
@@ -1572,7 +1577,6 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
         emit editedCredentialLinked();
         updateSaveDiscardState();
     }
-    qDebug() << "Link to Address: " << m_credentialLinkedAddr.toHex();
     ui->credDisplayFrame->setEnabled(true);
     ui->framePasswordLink->hide();
     ui->quickInsertWidget->setEnabled(true);
