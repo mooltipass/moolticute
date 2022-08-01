@@ -290,7 +290,7 @@ void CredentialsManagement::enableCredentialsManagement(bool enable)
     {
         ui->stackedWidget->setCurrentWidget(ui->pageUnlocked);
         setCredentialsClean();
-        if (wsClient->isMPBLE())
+        if (wsClient->isCredMirroringAvailable())
         {
             emit displayCredentialLink();
         }
@@ -298,7 +298,7 @@ void CredentialsManagement::enableCredentialsManagement(bool enable)
     else
     {
         ui->stackedWidget->setCurrentWidget(ui->pageLocked);
-        if (wsClient->isMPBLE())
+        if (wsClient->isCredMirroringAvailable())
         {
             emit hideCredentialLink();
         }
@@ -955,6 +955,10 @@ void CredentialsManagement::onLoginSelected(const QModelIndex &srcIndex)
     if (wsClient->isCredMirroringAvailable())
     {
         checkLinkingOnLoginSelected(srcIndex);
+    }
+    else
+    {
+        ui->credDisplayFrame->setEnabled(true);
     }
 
     updateLoginDescription(srcIndex);
