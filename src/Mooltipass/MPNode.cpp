@@ -457,6 +457,9 @@ QJsonObject MPNode::toJson(bool isFido /*= false*/) const
                 obj["totp_time_step"] = QString::number(totpTimeStep);
                 obj["totp_code_size"] = QString::number(bleNode->getTOTPCodeSize());
             }
+            auto pointedToChild = bleNode->getPointedToChildAddr();
+            obj["pointed_to_child"] = QJsonArray({{ pointedToChild.at(0) },
+                                                  { pointedToChild.at(1) }});
         }
     }
     else if (getType() == NodeChildData)

@@ -1375,6 +1375,26 @@ void MPDeviceBleImpl::setNodePwdBlankFlag(MPNode *node)
     }
 }
 
+bool MPDeviceBleImpl::setNodePointedToAddr(MPNode *node, QByteArray addr)
+{
+    if (addr.size() != POINTED_TO_ADDR_SIZE)
+    {
+        // Pointed to is not a valid node address
+        return false;
+    }
+    if (addr.at(0) == ZERO_BYTE && addr.at(1) == ZERO_BYTE)
+    {
+        // Not pointed to other node
+        return false;
+    }
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        nodeBle->setPointedToChildAddr(addr);
+        return true;
+    }
+    return false;
+}
+
 QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
 {
     QList<QByteArray> res;

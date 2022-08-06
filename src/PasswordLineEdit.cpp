@@ -294,6 +294,21 @@ LockedPasswordLineEdit::LockedPasswordLineEdit(QWidget* parent):
     PasswordLineEdit(parent),
     m_locked(false)
 {
+    AppGui *appGui = dynamic_cast<AppGui*> qApp;
+    QtAwesome *awesome = appGui->qtAwesome();
+    m_linkPassword = new QAction(awesome->icon(fa::paperclip), tr("Link Password"), this);
+    m_removePasswordLink = new QAction(awesome->icon(fa::remove), tr("Remove Link Password"), this);
+    connect(m_linkPassword, &QAction::triggered, [this]()
+    {
+       emit linkRequested();
+    });
+    connect(m_removePasswordLink, &QAction::triggered, [this]()
+    {
+       setReadOnly(false);
+       modifyLinkAction();
+       emit linkRemoved();
+    });
+
     disconnect(m_showPassword, 0, 0, 0);
 
     connect(m_showPassword, &QAction::triggered, [this]()
@@ -330,6 +345,11 @@ void LockedPasswordLineEdit::checkPwdBlankFlag(int flag)
         setPasswordVisible(true);
         setReadOnly(m_locked);
     }
+}
+
+void LockedPasswordLineEdit::displayLinkedIcon(bool isLinked)
+{
+    modifyLinkAction(!isLinked);
 }
 
 
@@ -439,4 +459,59 @@ std::vector<char> PasswordOptionsPopup::generateCustomPasswordPool()
     std::shuffle(std::begin(pool), std::end(pool), random_generator);
 
     return pool;
+}
+
+void LockedPasswordLineEdit::onCredentialLinked()
+{
+    modifyLinkAction(false);
+}
+
+void LockedPasswordLineEdit::onDisplayLink()
+{
+    modifyLinkAction();
+}
+
+void LockedPasswordLineEdit::onHideLink()
+{
+    modifyLinkAction(true, true);
+}
+
+/**
+ * @brief LockedPasswordLineEdit::modifyLinkAction
+ * @param isLink if true add link password icon, otherwise add remove link password icon
+ * @param remove if true remove link icon, otherwise add icon
+ *
+ */
+void LockedPasswordLineEdit::modifyLinkAction(bool isLink /*= true*/, bool remove /*= false*/)
+{
+    if (actions().contains(m_linkPassword))
+    {
+        removeAction(m_linkPassword);
+    }
+    if (actions().contains(m_removePasswordLink))
+    {
+        removeAction(m_removePasswordLink);
+    }
+    //Need to remove password action first and add later again to keep the order
+    QAction* pwdAction = nullptr;
+    if (actions().contains(m_showPassword))
+    {
+        pwdAction = m_showPassword;
+    } else if (actions().contains(m_hidePassword))
+    {
+        pwdAction = m_hidePassword;
+    }
+    if (pwdAction)
+    {
+        removeAction(pwdAction);
+    }
+
+    if (!remove)
+    {
+        addAction(isLink ? m_linkPassword : m_removePasswordLink, QLineEdit::TrailingPosition);
+    }
+    if (pwdAction)
+    {
+        addAction(pwdAction, QLineEdit::TrailingPosition);
+    }
 }

@@ -73,7 +73,7 @@ private:
     static constexpr quint8 FIRST_PAYLOAD_BYTE_MESSAGE = 6;
     static constexpr quint8 FIRST_PAYLOAD_BYTE_PACKET = 2;
     static constexpr uint MAX_FAVORITE_NUM = 10;
-    static constexpr uint CRED_PACKAGE_SIZE = 9;
+    static constexpr uint CRED_PACKAGE_SIZE = 10;
     static constexpr uint DATA_NODE_ENC_SIZE = 512;
     static constexpr int PWD_MAX_LENGTH = 64;
     static constexpr int LOGIN_MAX_LENGTH = 64;

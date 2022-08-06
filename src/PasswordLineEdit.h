@@ -77,11 +77,12 @@ public:
     PasswordLineEdit(QWidget* parent = nullptr);
     void setPasswordProfilesModel(PasswordProfilesModel *passwordProfilesModel);
     void setMaxPasswordLength(int length);
+    void setPasswordVisible(bool visible);
+
     static constexpr int INVALID_LENGTH = -1;
 
 protected:
     QAction *m_showPassword, *m_hidePassword;
-    void setPasswordVisible(bool visible);
 
 private:
     QAction *m_generateRandom;
@@ -98,12 +99,24 @@ public:
     LockedPasswordLineEdit(QWidget* parent = nullptr);
     void setLocked(bool);
     void checkPwdBlankFlag(int flag);
+    void displayLinkedIcon(bool isLinked);
+
+public slots:
+    void onCredentialLinked();
+    void onDisplayLink();
+    void onHideLink();
 
 Q_SIGNALS:
     void unlockRequested();
+    void linkRequested();
+    void linkRemoved();
 
 private:
+    void modifyLinkAction(bool isLink = true, bool remove = false);
+
     bool m_locked;
+    QAction* m_linkPassword;
+    QAction* m_removePasswordLink;
 };
 
 #endif // PASSWORDLINEEDIT_H

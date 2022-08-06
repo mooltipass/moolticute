@@ -38,6 +38,12 @@ class CredentialsManagement : public QWidget
 {
     Q_OBJECT
 
+    enum class LinkingMode {
+        OFF,
+        NEW_CREDENTIAL,
+        CREDENTIAL_EDIT
+    };
+
 public:    
     explicit CredentialsManagement(QWidget *parent = 0);
     ~CredentialsManagement();
@@ -98,6 +104,15 @@ private slots:
 
     void on_pushButtonDeleteTOTP_clicked();
 
+    void onCredentialLink();
+    void onCredentialLinkRemoved();
+    void onSelectedCredentialLink();
+    void onSelectedCredentialLinkRemoved();
+
+    void on_pushButtonDiscardLinking_clicked();
+
+    void on_pushButtonLinkTo_clicked();
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);
@@ -121,6 +136,8 @@ private:
     virtual void changeEvent(QEvent *event);
     int getCategory(const QModelIndex &srcIndex);
 
+    void checkLinkingOnLoginSelected(const QModelIndex &srcIndex);
+
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;
@@ -135,6 +152,10 @@ private:
     bool m_isClean = true;
     bool m_isSetCategoryClean = true;
     bool m_altKeyPressed = false;
+
+    LinkingMode m_linkingMode = LinkingMode::OFF;
+    QByteArray m_credentialLinkedAddr;
+    QModelIndex m_credentialToLinkIndex;
 
     void saveCredential(const QModelIndex currentSelectionIndex);
 
@@ -154,6 +175,10 @@ signals:
     void loginSelected(const QModelIndex &srcIndex);
     void serviceSelected(const QModelIndex &srcIndex);
     void selectLoginItem(const QModelIndex &proxyIndex);
+    void newCredentialLinked();
+    void editedCredentialLinked();
+    void displayCredentialLink();
+    void hideCredentialLink();
 };
 
 #endif // CREDENTIALSMANAGEMENT_H

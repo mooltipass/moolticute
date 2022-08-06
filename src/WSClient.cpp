@@ -101,6 +101,11 @@ bool WSClient::isDeviceConnected() const
     return get_connected();
 }
 
+bool WSClient::isCredMirroringAvailable() const
+{
+    return isMPBLE() && get_bundleVersion() >= Common::BLE_BUNDLE_WITH_MIRRORING;
+}
+
 void WSClient::onWsDisconnected()
 {
     qDebug() << "Websocket disconnect";
