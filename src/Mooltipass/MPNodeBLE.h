@@ -15,6 +15,11 @@ public:
     bool isDataLengthValid() const override;
     bool isValid() const override;
 
+    QByteArray getLoginNodeData() const override;
+    void setLoginNodeData(const QByteArray &flags, const QByteArray &d) override;
+    QByteArray getLoginChildNodeData() const override;
+    int getLoginChildNodeDataAddrStart() override { return LOGIN_CHILD_NODE_DATA_ADDR_START; }
+
     QString getService() const override;
     void setService(const QString& service) override;
     QByteArray getStartDataCtr() const override;
@@ -74,6 +79,8 @@ protected:
     static constexpr int TOTP_CODE_SIZE = 468;
     static constexpr int KEY_AFTER_LENGTH = 2;
     static constexpr int POINTED_TO_CHILD_START = 6;
+    static constexpr int LAST_CHILD_NODE_USED_ADDR_START = 260;
+    static constexpr int LOGIN_CHILD_NODE_DATA_ADDR_START = 8;
     static constexpr char BLANK_CHAR = 0x01;
 };
 

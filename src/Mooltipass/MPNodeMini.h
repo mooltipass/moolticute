@@ -16,6 +16,11 @@ public:
     bool isDataLengthValid() const override;
     bool isValid() const override;
 
+    QByteArray getLoginNodeData() const override;
+    void setLoginNodeData(const QByteArray &flags, const QByteArray &d) override;
+    QByteArray getLoginChildNodeData() const override;
+    int getLoginChildNodeDataAddrStart() override { return LOGIN_CHILD_NODE_DATA_ADDR_START; }
+
     QString getService() const override;
     void setService(const QString& service) override;
     QByteArray getStartDataCtr() const override;
@@ -39,6 +44,7 @@ protected:
     static constexpr int PWD_ENC_LENGTH = 32;
     static constexpr int DATE_CREATED_ADDR_START = 30;
     static constexpr int DATE_LASTUSED_ADDR_START = 32;
+    static constexpr int LOGIN_CHILD_NODE_DATA_ADDR_START = 6;
 };
 
 #endif // MPNODEMINI_H

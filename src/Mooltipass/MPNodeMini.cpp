@@ -37,6 +37,30 @@ bool MPNodeMini::isValid() const
             (static_cast<quint8>(data[1]) & 0x20) == 0;
 }
 
+QByteArray MPNodeMini::getLoginNodeData() const
+{
+    // return core data, excluding linked lists and flags
+    if (!isValid()) return QByteArray();
+    return data.mid(DATA_ADDR_START);
+}
+
+void MPNodeMini::setLoginNodeData(const QByteArray &flags, const QByteArray &d)
+{
+    // overwrite core data, excluding linked lists
+    if (isValid())
+    {
+        data.replace(DATA_ADDR_START, pMesProt->getParentNodeSize()-DATA_ADDR_START, d);
+        data.replace(0, ADDRESS_LENGTH, flags);
+    }
+}
+
+QByteArray MPNodeMini::getLoginChildNodeData() const
+{
+    // return core data, excluding linked lists and flags
+    if (!isValid()) return QByteArray();
+    return data.mid(LOGIN_CHILD_NODE_DATA_ADDR_START);
+}
+
 QString MPNodeMini::getService() const
 {
     if (!isValid()) return QString();

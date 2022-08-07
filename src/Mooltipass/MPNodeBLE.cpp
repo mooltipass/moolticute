@@ -35,7 +35,33 @@ bool MPNodeBLE::isValid() const
     }
 
     return (data.size() == PARENT_NODE_LENGTH && (NodeParent == type || NodeParentData == type)) ||
-           (data.size() == CHILD_NODE_LENGTH && (NodeChild == type || NodeChildData == type));
+            (data.size() == CHILD_NODE_LENGTH && (NodeChild == type || NodeChildData == type));
+}
+
+QByteArray MPNodeBLE::getLoginNodeData() const
+{
+    // return core data, excluding linked lists, flags and last child node used address
+    if (!isValid()) return QByteArray();
+    return data.mid(DATA_ADDR_START, LAST_CHILD_NODE_USED_ADDR_START - DATA_ADDR_START);
+}
+
+void MPNodeBLE::setLoginNodeData(const QByteArray &flags, const QByteArray &d)
+{
+    // overwrite core data, excluding linked lists and last child node used address
+    if (isValid())
+    {
+        const auto parentNodeSize = pMesProt->getParentNodeSize();
+        const auto bytesAfterLastUsed = parentNodeSize - LAST_CHILD_NODE_USED_ADDR_START;
+        data.replace(DATA_ADDR_START, parentNodeSize - DATA_ADDR_START - bytesAfterLastUsed, d);
+        data.replace(0, ADDRESS_LENGTH, flags);
+    }
+}
+
+QByteArray MPNodeBLE::getLoginChildNodeData() const
+{
+    // return core data, excluding linked lists, flags and pointed to child address
+    if (!isValid()) return QByteArray();
+    return data.mid(LOGIN_CHILD_NODE_DATA_ADDR_START);
 }
 
 QString MPNodeBLE::getService() const
