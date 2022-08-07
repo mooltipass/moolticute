@@ -110,10 +110,11 @@ public:
     QByteArray getNodeFlags() const;
 
     // Access node core data
-    void setLoginNodeData(const QByteArray &flags, const QByteArray &d);
-    QByteArray getLoginNodeData() const;
+    virtual void setLoginNodeData(const QByteArray &flags, const QByteArray &d) = 0;
+    virtual QByteArray getLoginNodeData() const = 0;
     void setLoginChildNodeData(const QByteArray &flags, const QByteArray &d);
-    QByteArray getLoginChildNodeData() const;
+    virtual QByteArray getLoginChildNodeData() const = 0;
+    virtual int getLoginChildNodeDataAddrStart() = 0;
     void setDataNodeData(const QByteArray &flags, const QByteArray &d);
     QByteArray getDataNodeData() const;
     void setDataChildNodeData(const QByteArray &flags, const QByteArray &d);
@@ -170,7 +171,6 @@ protected:
 
     static constexpr int NEXT_DATA_ADDR_START = 2;
     static constexpr int DATA_CHILD_DATA_ADDR_START = 4;
-    static constexpr int LOGIN_CHILD_NODE_DATA_ADDR_START = 6;
     static constexpr int DATA_ADDR_START = 8;
 
     static constexpr int SERVICE_ADDR_START = 8;

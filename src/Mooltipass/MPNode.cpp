@@ -334,36 +334,13 @@ QByteArray MPNode::getNodeFlags() const
     return data.mid(NODE_FLAG_ADDR_START, ADDRESS_LENGTH);
 }
 
-QByteArray MPNode::getLoginNodeData() const
-{
-    // return core data, excluding linked lists and flags
-    if (!isValid()) return QByteArray();
-    return data.mid(DATA_ADDR_START);
-}
-
-void MPNode::setLoginNodeData(const QByteArray &flags, const QByteArray &d)
-{
-    // overwrite core data, excluding linked lists
-    if (isValid())
-    {
-        data.replace(DATA_ADDR_START, pMesProt->getParentNodeSize()-DATA_ADDR_START, d);
-        data.replace(0, ADDRESS_LENGTH, flags);
-    }
-}
-
-QByteArray MPNode::getLoginChildNodeData() const
-{
-    // return core data, excluding linked lists and flags
-    if (!isValid()) return QByteArray();
-    return data.mid(LOGIN_CHILD_NODE_DATA_ADDR_START);
-}
-
 void MPNode::setLoginChildNodeData(const QByteArray &flags, const QByteArray &d)
 {
     // overwrite core data, excluding linked lists
     if (isValid())
     {
-        data.replace(LOGIN_CHILD_NODE_DATA_ADDR_START, pMesProt->getChildNodeSize()-LOGIN_CHILD_NODE_DATA_ADDR_START, d);
+        const int childNodeDataAddrStart = getLoginChildNodeDataAddrStart();
+        data.replace(childNodeDataAddrStart, pMesProt->getChildNodeSize()-childNodeDataAddrStart, d);
         data.replace(0, ADDRESS_LENGTH, flags);
     }
 }
