@@ -319,6 +319,7 @@ private:
     void startImportFileMerging(const MPDeviceProgressCb &progressCb, MessageHandlerCb cb, bool noDelete);
     bool checkImportedLoginNodes(const MessageHandlerCb &cb, Common::AddressType addrType);
     bool checkImportedDataNodes(const MessageHandlerCb &cb, Common::DataAddressType addrType);
+    bool checkImportedLoginLastChildNodeUsedAddr();
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress);
     void incrementNeededAddresses(MPNode::NodeType type);
     MPNode *findNodeWithAddressWithGivenParentInList(NodeList list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr);

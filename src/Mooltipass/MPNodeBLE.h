@@ -51,6 +51,9 @@ public:
     quint32 getPointedToChildVirtualAddress() const;
     QByteArray getPointedToChildAddr() const;
 
+    QByteArray getLastChildNodeUsedAddr() const;
+    void setLastChildNodeUsedAddr(const QByteArray &d);
+
     static constexpr int PARENT_NODE_LENGTH = 264;
     static constexpr int CHILD_NODE_LENGTH = 528;
     static constexpr int SERVICE_LENGTH = 252;

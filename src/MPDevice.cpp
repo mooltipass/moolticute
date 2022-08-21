@@ -6176,6 +6176,11 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 /* We got all the addresses, change virtual addrs for real addrs and finish merging */
                 changeVirtualAddressesToFreeAddresses();
 
+                if (isBLE())
+                {
+                    checkImportedLoginLastChildNodeUsedAddr();
+                }
+
                 /* Finish import file merging */
                 QString stringError;
                 if(finishImportFileMerging(stringError, noDelete))
@@ -6255,6 +6260,10 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
         }
         else
         {
+            if (isBLE())
+            {
+                checkImportedLoginLastChildNodeUsedAddr();
+            }
             /* Finish import file merging */
             QString stringError;
             if(finishImportFileMerging(stringError, noDelete))
@@ -6761,6 +6770,53 @@ bool MPDevice::checkImportedDataNodes(const MessageHandlerCb &cb, Common::DataAd
 
            /* Update data size property */
            newNodePt->setEncDataSize(encDataSize);
+        }
+    }
+    return true;
+}
+
+bool MPDevice::checkImportedLoginLastChildNodeUsedAddr()
+{
+    if (!isBLE())
+    {
+        qCritical() << "Last child node used address is only available for BLE";
+        return false;
+    }
+    for (auto* loginNode : qAsConst(loginNodes))
+    {
+        // If service is not tagged for merge it will be removed, so do not need to check
+        if (loginNode->getMergeTagged())
+        {
+            auto* bleLoginNode = static_cast<MPNodeBLE*>(loginNode);
+            const auto serviceName = bleLoginNode->getService();
+            qDebug() << "Service name: " << serviceName;
+            for (int i = 0; i < importedLoginNodes.size(); ++i)
+            {
+                // Credential parent node is found in the imported list
+                if (serviceName == importedLoginNodes[i]->getService())
+                {
+                    auto* importedLoginNode = static_cast<MPNodeBLE*>(importedLoginNodes[i]);
+                    // If last child node used address is different, need to find and set the correct address
+                    if (bleLoginNode->getLastChildNodeUsedAddr() != importedLoginNode->getLastChildNodeUsedAddr())
+                    {
+                        // First find the login name of the last child node used from imported list
+                        auto* importedLastUsedChildNode = findNodeWithAddressWithGivenParentInList(importedLoginChildNodes, importedLoginNode, importedLoginNode->getLastChildNodeUsedAddr(), 0);
+                        if (importedLastUsedChildNode)
+                        {
+                            auto lastUsedChildName = importedLastUsedChildNode->getLogin();
+                            qDebug() << "Last used child name: " << lastUsedChildName;
+                            // Find the node with the same login name for the given service
+                            auto* lastUsedChild = findNodeWithLoginWithGivenParentInList(loginChildNodes, loginNode, lastUsedChildName);
+                            if (lastUsedChild)
+                            {
+                                // Set the last child node used address to the correct login
+                                bleLoginNode->setLastChildNodeUsedAddr(lastUsedChild->getAddress());
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
         }
     }
     return true;
