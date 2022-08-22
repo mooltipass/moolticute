@@ -6782,6 +6782,9 @@ bool MPDevice::checkImportedLoginLastChildNodeUsedAddr()
         qCritical() << "Last child node used address is only available for BLE";
         return false;
     }
+
+    static QByteArray NOT_SET_ADDR = QByteArray{2, Common::ZERO_BYTE};
+
     for (auto* loginNode : qAsConst(loginNodes))
     {
         // If service is not tagged for merge it will be removed, so do not need to check
@@ -6796,8 +6799,8 @@ bool MPDevice::checkImportedLoginLastChildNodeUsedAddr()
                 if (serviceName == importedLoginNodes[i]->getService())
                 {
                     auto* importedLoginNode = static_cast<MPNodeBLE*>(importedLoginNodes[i]);
-                    // If last child node used address is different, need to find and set the correct address
-                    if (bleLoginNode->getLastChildNodeUsedAddr() != importedLoginNode->getLastChildNodeUsedAddr())
+                    // If the imported last child node used address is set, find the same login in local list
+                    if (NOT_SET_ADDR != importedLoginNode->getLastChildNodeUsedAddr())
                     {
                         // First find the login name of the last child node used from imported list
                         auto* importedLastUsedChildNode = findNodeWithAddressWithGivenParentInList(importedLoginChildNodes, importedLoginNode, importedLoginNode->getLastChildNodeUsedAddr(), 0);
@@ -6813,6 +6816,10 @@ bool MPDevice::checkImportedLoginLastChildNodeUsedAddr()
                                 bleLoginNode->setLastChildNodeUsedAddr(lastUsedChild->getAddress());
                             }
                         }
+                    }
+                    else if (NOT_SET_ADDR != bleLoginNode->getLastChildNodeUsedAddr())
+                    {
+                        bleLoginNode->setLastChildNodeUsedAddr(NOT_SET_ADDR);
                     }
                     break;
                 }
