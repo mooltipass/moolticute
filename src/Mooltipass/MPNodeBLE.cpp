@@ -285,3 +285,21 @@ QByteArray MPNodeBLE::getPointedToChildAddr() const
     if (nextVirtualAddressSet) return QByteArray();
     return data.mid(POINTED_TO_CHILD_START, ADDRESS_LENGTH);
 }
+
+QByteArray MPNodeBLE::getLastChildNodeUsedAddr() const
+{
+    if (!isValid()) return QByteArray();
+    if (nextVirtualAddressSet) return QByteArray();
+    return data.mid(LAST_CHILD_NODE_USED_ADDR_START, ADDRESS_LENGTH);
+}
+
+void MPNodeBLE::setLastChildNodeUsedAddr(const QByteArray &d)
+{
+    if (d.size() < 2)
+    {
+        qCritical() << "Invalid address for setLastChildNodeUsedAddr";
+        return;
+    }
+    data[LAST_CHILD_NODE_USED_ADDR_START] = d[0];
+    data[LAST_CHILD_NODE_USED_ADDR_START + 1] = d[1];
+}

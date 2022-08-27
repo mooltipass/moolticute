@@ -356,6 +356,7 @@ public:
     static const int BLE_BUNDLE_WITH_BLE_NAME = 9;
     static const int BLE_BUNDLE_WITH_MIRRORING = 11;
     static const char ZERO_BYTE = static_cast<char>(0x00);
+    static QByteArray NOT_SET_ADDR;
 };
 
 struct FidoCredential
