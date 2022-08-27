@@ -1589,9 +1589,11 @@ void MPDevice::loadDataChildNode(AsyncJobs *jobs, MPNode *parent, MPNode *parent
 }
 
 /* Find a credential parent node given a child address */
-MPNode* MPDevice::findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr)
+MPNode* MPDevice::findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr, bool isImportedList /*= false */)
 {
-    QListIterator<MPNode*> i(loginNodes);
+    NodeList& nodes = isImportedList ? importedLoginNodes : loginNodes;
+    NodeList& childNodes = isImportedList? importedLoginChildNodes : loginChildNodes;
+    QListIterator<MPNode*> i(nodes);
     while (i.hasNext())
     {
         MPNode* nodeItem = i.next();
@@ -1603,7 +1605,7 @@ MPNode* MPDevice::findCredParentNodeGivenChildNodeAddr(const QByteArray &address
         /* Check every children */
         while ((curChildNodeAddr != MPNode::EmptyAddress) || (curChildNodeAddr.isNull() && curChildNodeAddr_v != 0))
         {
-            MPNode* curNode = findNodeWithAddressInList(loginChildNodes, curChildNodeAddr, curChildNodeAddr_v);
+            MPNode* curNode = findNodeWithAddressInList(childNodes, curChildNodeAddr, curChildNodeAddr_v);
 
             /* Safety checks */
             if (!curNode)
@@ -6179,6 +6181,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 if (isBLE())
                 {
                     checkImportedLoginLastChildNodeUsedAddr();
+                    checkImportedPointedToAddresses();
                 }
 
                 /* Finish import file merging */
@@ -6263,6 +6266,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
             if (isBLE())
             {
                 checkImportedLoginLastChildNodeUsedAddr();
+                checkImportedPointedToAddresses();
             }
             /* Finish import file merging */
             QString stringError;
@@ -6783,8 +6787,6 @@ bool MPDevice::checkImportedLoginLastChildNodeUsedAddr()
         return false;
     }
 
-    static QByteArray NOT_SET_ADDR = QByteArray{2, Common::ZERO_BYTE};
-
     for (auto* loginNode : qAsConst(loginNodes))
     {
         // If service is not tagged for merge it will be removed, so do not need to check
@@ -6800,7 +6802,7 @@ bool MPDevice::checkImportedLoginLastChildNodeUsedAddr()
                 {
                     auto* importedLoginNode = static_cast<MPNodeBLE*>(importedLoginNodes[i]);
                     // If the imported last child node used address is set, find the same login in local list
-                    if (NOT_SET_ADDR != importedLoginNode->getLastChildNodeUsedAddr())
+                    if (Common::NOT_SET_ADDR != importedLoginNode->getLastChildNodeUsedAddr())
                     {
                         // First find the login name of the last child node used from imported list
                         auto* importedLastUsedChildNode = findNodeWithAddressWithGivenParentInList(importedLoginChildNodes, importedLoginNode, importedLoginNode->getLastChildNodeUsedAddr(), 0);
@@ -6810,19 +6812,80 @@ bool MPDevice::checkImportedLoginLastChildNodeUsedAddr()
                             qDebug() << "Last used child name: " << lastUsedChildName;
                             // Find the node with the same login name for the given service
                             auto* lastUsedChild = findNodeWithLoginWithGivenParentInList(loginChildNodes, loginNode, lastUsedChildName);
-                            if (lastUsedChild)
+                            if (lastUsedChild && lastUsedChild->getAddress() != bleLoginNode->getLastChildNodeUsedAddr())
                             {
                                 // Set the last child node used address to the correct login
                                 bleLoginNode->setLastChildNodeUsedAddr(lastUsedChild->getAddress());
                             }
                         }
                     }
-                    else if (NOT_SET_ADDR != bleLoginNode->getLastChildNodeUsedAddr())
+                    else if (Common::NOT_SET_ADDR != bleLoginNode->getLastChildNodeUsedAddr())
                     {
-                        bleLoginNode->setLastChildNodeUsedAddr(NOT_SET_ADDR);
+                        bleLoginNode->setLastChildNodeUsedAddr(Common::NOT_SET_ADDR);
                     }
                     break;
                 }
+            }
+        }
+    }
+    return true;
+}
+
+bool MPDevice::checkImportedPointedToAddresses()
+{
+    if (!isBLE())
+    {
+        qCritical() << "Last child node used address is only available for BLE";
+        return false;
+    }
+
+    for (auto* loginNode : qAsConst(loginNodes))
+    {
+        // If service is not tagged for merge it will be removed, so do not need to check
+        if (loginNode->getMergeTagged())
+        {
+            const auto serviceName = loginNode->getService();
+            auto childAddr = loginNode->getStartChildAddress();
+            // Find the parent node for the same service in imported list
+            auto* importedLoginNode = findNodeWithNameInList(importedLoginNodes, serviceName, true);
+            // Iterating through all the parent's children
+            while (childAddr != Common::NOT_SET_ADDR)
+            {
+                auto* childNode = findNodeWithAddressInList(loginChildNodes, childAddr);
+                // If login is tagged for merge check the pointed to address for the node
+                if (childNode && childNode->getMergeTagged())
+                {
+                    auto* bleChildNode = static_cast<MPNodeBLE*>(childNode);
+                    // Find the child node for the same login name in imported list
+                    auto* importedChildNode = findNodeWithLoginWithGivenParentInList(importedLoginChildNodes, importedLoginNode, childNode->getLogin());
+                    if (importedChildNode)
+                    {
+                        auto* importedBLEChildNode = static_cast<MPNodeBLE*>(importedChildNode);
+                        // If the imported child node's pointed to address is set need to findin  the local child node list
+                        if (importedBLEChildNode->getPointedToChildAddr() != Common::NOT_SET_ADDR)
+                        {
+                            // Find the service/login name for the imported pointed to address
+                            auto* importedPointedToChildNode = findNodeWithAddressInList(importedLoginChildNodes, importedBLEChildNode->getPointedToChildAddr());
+                            auto* importedPointedToParentNode = findCredParentNodeGivenChildNodeAddr(importedPointedToChildNode->getAddress(), 0, true);
+                            QString importedPointedToServiceName = importedPointedToParentNode->getService();
+                            QString importedPointedToLoginName = importedPointedToChildNode->getLogin();
+                            // Find the parent/child local nodes for the same service/login
+                            auto* pointedToParentNode = findNodeWithNameInList(loginNodes, importedPointedToServiceName, true);
+                            auto* pointedToChildNode = findNodeWithLoginWithGivenParentInList(loginChildNodes, pointedToParentNode, importedPointedToLoginName);
+                            // If the found pointed to address different than the original change it
+                            if (pointedToChildNode->getAddress() != bleChildNode->getPointedToChildAddr())
+                            {
+                                bleChildNode->setPointedToChildAddr(pointedToChildNode->getAddress());
+                            }
+                        }
+                        else if (bleChildNode->getPointedToChildAddr() != Common::NOT_SET_ADDR)
+                        {
+                            bleChildNode->setPointedToChildAddr(Common::NOT_SET_ADDR);
+                        }
+                    }
+                }
+
+                childAddr = childNode->getNextChildAddress();
             }
         }
     }
@@ -8019,7 +8082,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                         if (nodeBle->getPointedToChildAddr() == curAddr)
                         {
                             nodeBle->setPwdBlankFlag();
-                            nodeBle->setPointedToChildAddr(QByteArray{2, Common::ZERO_BYTE});
+                            nodeBle->setPointedToChildAddr(Common::NOT_SET_ADDR);
                         }
                     }
                 }

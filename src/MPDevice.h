@@ -314,12 +314,13 @@ private:
     // Functions added by mathieu for MMM
     void memMgmtModeReadFlash(AsyncJobs *jobs, bool fullScan, const MPDeviceProgressCb &cbProgress, bool getCreds, bool getData, bool getDataChilds, bool getFido = false);
     MPNode *findNodeWithAddressInList(NodeList list, const QByteArray &address, const quint32 virt_addr = 0);
-    MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr);
+    MPNode* findCredParentNodeGivenChildNodeAddr(const QByteArray &address, const quint32 virt_addr, bool isImportedList = false);
     void addWriteNodePacketToJob(AsyncJobs *jobs, const QByteArray &address, const QByteArray &data, std::function<void(void)> writeCallback);
     void startImportFileMerging(const MPDeviceProgressCb &progressCb, MessageHandlerCb cb, bool noDelete);
     bool checkImportedLoginNodes(const MessageHandlerCb &cb, Common::AddressType addrType);
     bool checkImportedDataNodes(const MessageHandlerCb &cb, Common::DataAddressType addrType);
     bool checkImportedLoginLastChildNodeUsedAddr();
+    bool checkImportedPointedToAddresses();
     void loadFreeAddresses(AsyncJobs *jobs, const QByteArray &addressFrom, bool discardFirstAddr, const MPDeviceProgressCb &cbProgress);
     void incrementNeededAddresses(MPNode::NodeType type);
     MPNode *findNodeWithAddressWithGivenParentInList(NodeList list,  MPNode *parent, const QByteArray &address, const quint32 virt_addr);
