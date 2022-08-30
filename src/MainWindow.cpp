@@ -713,11 +713,12 @@ void MainWindow::fillLockUnlockItems()
         {tr("Disabled"), (uint)LF::Disabled},
         {tr("Password Only"), (uint)LF::Password},
         {tr("Login + Password"), (uint)LF::Password|(uint)LF::Login},
-        {tr("Enter + Password"), (uint)LF::Password|(uint)LF::SendEnter},
-        {tr("Password / Win + L"), (uint)LF::Password|(uint)LF::SendWin_L},
-        {tr("Login + Pass / Win + L"), (uint)LF::Password|(uint)LF::Login|(uint)LF::SendWin_L},
-        {tr("Enter + Pass / Win + L"), (uint)LF::Password|(uint)LF::SendEnter|(uint)LF::SendWin_L},
-        {tr("Ctrl + Alt + Del / Win + L"), (uint)LF::SendCtrl_Alt_Del|(uint)LF::Password|(uint)LF::SendWin_L}
+        {tr("[Enter] + Password"), (uint)LF::Password|(uint)LF::SendEnter},
+        {tr("[Ctrl+Alt+Del] + Pass"), (uint)LF::SendCtrl_Alt_Del|(uint)LF::Password},
+        {tr("Password / [Win+L]"), (uint)LF::Password|(uint)LF::SendWin_L},
+        {tr("Login + Pass / [Win+L]"), (uint)LF::Password|(uint)LF::Login|(uint)LF::SendWin_L},
+        {tr("[Enter] + Pass / [Win+L]"), (uint)LF::Password|(uint)LF::SendEnter|(uint)LF::SendWin_L},
+        {tr("[Ctrl+Alt+Del] + Pass / [Win+L]"), (uint)LF::SendCtrl_Alt_Del|(uint)LF::Password|(uint)LF::SendWin_L}
     };
 
     for (auto &item : m_lockUnlockItems)
