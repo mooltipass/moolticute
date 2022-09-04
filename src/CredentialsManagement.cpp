@@ -198,6 +198,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::linkRemoved, this, &CredentialsManagement::onSelectedCredentialLinkRemoved);
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::linkRequested, this, &CredentialsManagement::onSelectedCredentialLink);
     connect(this, &CredentialsManagement::editedCredentialLinked, ui->credDisplayPasswordInput, &LockedPasswordLineEdit::onCredentialLinked);
+    ui->credentialTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->credentialTreeView, &CredentialView::customContextMenuRequested, this, &CredentialsManagement::onTreeViewContextMenuRequested);
 }
 
 void CredentialsManagement::setFilterCredLayout()
@@ -1585,4 +1587,40 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
     ui->framePasswordLink->hide();
     ui->quickInsertWidget->setEnabled(true);
     m_linkingMode = LinkingMode::OFF;
+}
+
+void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
+{
+    auto sourceIndex = getSourceIndexFromProxyIndex(ui->credentialTreeView->indexAt(pos));
+    auto* pServiceItem = m_pCredModel->getServiceItemByIndex(sourceIndex);
+    if (pServiceItem)
+    {
+        m_enableMultipleDomainMenu.clear();
+        auto multipleDomainsDialogFunc = [this, pServiceItem](){
+                        bool ok = false;
+                        QString text = QInputDialog::getText(this, tr("Multiple Domains for %1").arg(pServiceItem->name()),
+                                                                 tr("Domains:"), QLineEdit::Normal,
+                                                                 pServiceItem->multipleDomains(), &ok);
+                        if (ok)
+                        {
+                            pServiceItem->setMultipleDomains(text);
+                        }
+                    };
+        if (pServiceItem->isMultipleDomainSet())
+        {
+            auto* action = m_enableMultipleDomainMenu.addAction("Edit multiple domains");
+            connect(action, &QAction::triggered, multipleDomainsDialogFunc);
+            auto* actionRemove = m_enableMultipleDomainMenu.addAction(tr("Remove multiple domains"));
+            connect(actionRemove, &QAction::triggered, [pServiceItem](){
+                pServiceItem->setMultipleDomains("");
+            });
+        }
+        else
+        {
+            auto* action = m_enableMultipleDomainMenu.addAction("Enable multiple domains");
+            connect(action, &QAction::triggered, multipleDomainsDialogFunc);
+        }
+
+        m_enableMultipleDomainMenu.popup(ui->credentialTreeView->mapToGlobal(pos));
+    }
 }

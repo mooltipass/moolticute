@@ -113,6 +113,8 @@ private slots:
 
     void on_pushButtonLinkTo_clicked();
 
+    void onTreeViewContextMenuRequested(const QPoint& pos);
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);
@@ -145,6 +147,7 @@ private:
     QTimer m_tSelectLoginTimer;
     LoginItem *m_pAddedLoginItem;
     TOTPCredential *m_pTOTPCred = nullptr;
+    QMenu m_enableMultipleDomainMenu;
 
     QMenu m_favMenu;
     QJsonArray m_loadedModelSerialiation;
