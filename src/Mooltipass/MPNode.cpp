@@ -384,6 +384,11 @@ QJsonObject MPNode::toJson(bool isFido /*= false*/) const
     if (getType() == NodeParent)
     {
         obj["service"] = getService();
+        if (isBLE)
+        {
+            auto* bleNode = static_cast<const MPNodeBLE*>(this);
+            obj["multiple_domains"] = bleNode->getMultipleDomains();
+        }
 
         QJsonArray childs;
         foreach (MPNode *cnode, childNodes)

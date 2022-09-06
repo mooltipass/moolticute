@@ -303,3 +303,20 @@ void MPNodeBLE::setLastChildNodeUsedAddr(const QByteArray &d)
     data[LAST_CHILD_NODE_USED_ADDR_START] = d[0];
     data[LAST_CHILD_NODE_USED_ADDR_START + 1] = d[1];
 }
+
+QString MPNodeBLE::getMultipleDomains() const
+{
+    QString ret = "";
+    if (getType() != NodeParent)
+    {
+        qCritical() << "Multiple domains is only set for node parents!";
+        return ret;
+    }
+    if (data[0] & (1 << MULTIPLE_DOMAINS_BIT))
+    {
+        qCritical() << "Multiple domain is set";
+        ret = pMesProt->toQString(data.mid(SERVICE_ADDR_START + SERVICE_LENGTH - MULTIPLE_DOMAINS_LENGTH, MULTIPLE_DOMAINS_LENGTH));
+        qCritical() << "Multiple domains: " << ret;
+    }
+    return ret;
+}

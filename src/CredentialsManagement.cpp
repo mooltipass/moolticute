@@ -1599,7 +1599,7 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
         auto multipleDomainsDialogFunc = [this, pServiceItem](){
                         bool ok = false;
                         QString text = QInputDialog::getText(this, tr("Multiple Domains for %1").arg(pServiceItem->name()),
-                                                                 tr("Domains:"), QLineEdit::Normal,
+                                                                 tr("Enter comma separated domain extensions:"), QLineEdit::Normal,
                                                                  pServiceItem->multipleDomains(), &ok);
                         if (ok)
                         {
