@@ -7748,6 +7748,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             int category = 0;
             int keyAfterLogin = 0;
             int keyAfterPwd = 0;
+            QString multipleDomains = "";
             if (isBLE())
             {
                 category = qjobject["category"].toInt();
@@ -7768,6 +7769,8 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 }
                 QJsonArray pointedToAddr = qjobject["pointed_to_child"].toArray();
                 for (qint32 j = 0; j < pointedToAddr.size(); j++) { pointedToAddrArray.append(pointedToAddr[j].toInt()); }
+
+                multipleDomains = qjobject["multiple_domains"].toString();
             }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
@@ -7832,6 +7835,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     {
                         bleImpl->setNodePwdBlankFlag(newNodePt);
                     }
+                    bleImpl->setNodeMultipleDomains(parentPtr, multipleDomains);
                 }
                 addChildToDB(parentPtr, newNodePt);
                 packet_send_needed = true;
@@ -7887,6 +7891,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     bleImpl->setNodeKeyAfterLogin(nodePtr, keyAfterLogin);
                     bleImpl->setNodeKeyAfterPwd(nodePtr, keyAfterPwd);
                     bleImpl->setNodePointedToAddr(nodePtr, pointedToAddrArray);
+                    bleImpl->setNodeMultipleDomains(parentPtr, multipleDomains);
                 }
                 addChildToDB(parentPtr, nodePtr);
 
@@ -7959,6 +7964,11 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     {
                         nodeBle->setPointedToChildAddr(pointedToAddrArray);
                         bleImpl->setNodePwdBlankFlag(nodeBle);
+                        packet_send_needed = true;
+                    }
+                    auto* parentBleNodePtr = dynamic_cast<MPNodeBLE*>(parentNodePtr);
+                    if (parentBleNodePtr && parentBleNodePtr->setMultipleDomains(multipleDomains))
+                    {
                         packet_send_needed = true;
                     }
                 }

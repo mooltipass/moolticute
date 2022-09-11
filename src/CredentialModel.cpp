@@ -258,6 +258,7 @@ void CredentialModel::load(const QJsonArray &json, bool isFido)
                     pointedToAddress.append(static_cast<char>(pointedJsonArr.at(0).toInt()));
                     pointedToAddress.append(static_cast<char>(pointedJsonArr.at(1).toInt()));
                     pLoginItem->setPointedToChildAddress(pointedToAddress);
+                    pServiceItem->setMultipleDomains(pnode["multiple_domains"].toString());
                 }
 
                 // Update login favorite

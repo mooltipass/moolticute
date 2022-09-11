@@ -315,8 +315,55 @@ QString MPNodeBLE::getMultipleDomains() const
     if (data[0] & (1 << MULTIPLE_DOMAINS_BIT))
     {
         qCritical() << "Multiple domain is set";
-        ret = pMesProt->toQString(data.mid(SERVICE_ADDR_START + SERVICE_LENGTH - MULTIPLE_DOMAINS_LENGTH, MULTIPLE_DOMAINS_LENGTH));
+        ret = pMesProt->toQString(data.mid(MULTIPLE_DOMAINS_START, MULTIPLE_DOMAINS_LENGTH));
         qCritical() << "Multiple domains: " << ret;
     }
     return ret;
+}
+
+bool MPNodeBLE::setMultipleDomains(const QString &domains)
+{
+    bool changed = false;
+    QString oldDomains = getMultipleDomains();
+    if (domains.isEmpty())
+    {
+        if (!oldDomains.isEmpty())
+        {
+            // If old domains were not empty, need to unset the flag
+            quint8 flag = data[0];
+            flag &= ~(1 << MULTIPLE_DOMAINS_BIT);
+            data[0] = static_cast<char>(flag);
+            // And fill domains bytes with zero bytes
+            QByteArray zeroBytes(MULTIPLE_DOMAINS_LENGTH, Common::ZERO_BYTE);
+            data.replace(MULTIPLE_DOMAINS_START, MULTIPLE_DOMAINS_LENGTH, zeroBytes);
+            changed = true;
+        }
+    }
+    else
+    {
+        if (domains != oldDomains)
+        {
+            // If domains value is changed, need to replace the old value with the new bytes
+            QByteArray domainsBytes = pMesProt->toByteArray(domains);
+            const auto domainsSize = domainsBytes.size();
+            if (domainsSize > MULTIPLE_DOMAINS_LENGTH)
+            {
+                qCritical() << "Multiple domains length is longer than allowed!";
+                domainsBytes.resize(MULTIPLE_DOMAINS_LENGTH);
+            } else if (domainsSize < MULTIPLE_DOMAINS_LENGTH)
+            {
+                Common::fill(domainsBytes, MULTIPLE_DOMAINS_LENGTH - domainsSize, Common::ZERO_BYTE);
+            }
+            data.replace(MULTIPLE_DOMAINS_START, MULTIPLE_DOMAINS_LENGTH, domainsBytes);
+        }
+        if (oldDomains.isEmpty())
+        {
+            // If old domains were empty, need to set the multiple domains bit
+            quint8 flag = data[0];
+            flag |= 1 << MULTIPLE_DOMAINS_BIT;
+            data[0] = static_cast<char>(flag);
+        }
+        changed = true;
+    }
+    return changed;
 }

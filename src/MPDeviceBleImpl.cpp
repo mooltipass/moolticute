@@ -1395,6 +1395,21 @@ bool MPDeviceBleImpl::setNodePointedToAddr(MPNode *node, QByteArray addr)
     return false;
 }
 
+bool MPDeviceBleImpl::setNodeMultipleDomains(MPNode *node, const QString &domains)
+{
+    bool changed = false;
+    if (auto* nodeBle = dynamic_cast<MPNodeBLE*>(node))
+    {
+        QString oldDomains = nodeBle->getMultipleDomains();
+        if (AppDaemon::isDebugDev())
+        {
+            qDebug() << "Setting multiple domains to: " << domains;
+        }
+        changed = nodeBle->setMultipleDomains(domains);
+    }
+    return changed;
+}
+
 QList<QByteArray> MPDeviceBleImpl::getFavorites(const QByteArray &data)
 {
     QList<QByteArray> res;

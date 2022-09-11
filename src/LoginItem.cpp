@@ -105,6 +105,13 @@ QJsonObject LoginItem::toJson() const
             pointedTo = QJsonArray({{0},{0}});
         }
         ret.insert("pointed_to_child", pointedTo);
+        ServiceItem* serviceItem = nullptr;
+        if (m_pParentItem)
+        {
+            serviceItem = dynamic_cast<ServiceItem*>(m_pParentItem);
+        }
+        QString multDomains = (serviceItem != nullptr) ? serviceItem->multipleDomains() : "";
+        ret.insert("multiple_domains", multDomains);
     }
     return ret;
 }
