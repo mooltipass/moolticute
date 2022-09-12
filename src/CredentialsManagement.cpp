@@ -1604,6 +1604,7 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
                         if (ok)
                         {
                             pServiceItem->setMultipleDomains(text);
+                            credentialDataChanged();
                         }
                     };
         if (pServiceItem->isMultipleDomainSet())
@@ -1611,8 +1612,9 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
             auto* action = m_enableMultipleDomainMenu.addAction("Edit multiple domains");
             connect(action, &QAction::triggered, multipleDomainsDialogFunc);
             auto* actionRemove = m_enableMultipleDomainMenu.addAction(tr("Remove multiple domains"));
-            connect(actionRemove, &QAction::triggered, [pServiceItem](){
+            connect(actionRemove, &QAction::triggered, [pServiceItem, this](){
                 pServiceItem->setMultipleDomains("");
+                credentialDataChanged();
             });
         }
         else
