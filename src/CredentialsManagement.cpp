@@ -29,6 +29,7 @@
 #include "ServiceItem.h"
 #include "DeviceDetector.h"
 #include "SettingsGuiBLE.h"
+#include "ParseDomain.h"
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
@@ -1401,6 +1402,47 @@ void CredentialsManagement::checkLinkingOnLoginSelected(const QModelIndex &srcIn
     }
 }
 
+QString CredentialsManagement::processMultipleDomainsInput(const QString& service, const QString &domains)
+{
+    auto domainList = domains.split(',', Qt::SkipEmptyParts);
+    QStringList validDomains;
+    QString result = "";
+    auto serviceDomain = service;
+    if (serviceDomain.contains('.'))
+    {
+        ParseDomain parsedService{service};
+        serviceDomain = parsedService.domain();
+        validDomains.append(parsedService.tld());
+    }
+    for (auto domain : domainList)
+    {
+        if (!domain.startsWith('.'))
+        {
+            domain.prepend('.');
+        }
+        ParseDomain dom{serviceDomain + domain};
+        if (domain == dom.tld())
+        {
+            validDomains.append(domain);
+        }
+        else
+        {
+            qWarning() << "The following domain is not valid: " << domain;
+        }
+    }
+    return validDomains.join(',');
+}
+
+QString CredentialsManagement::getDomainName(const QString &service)
+{
+    if (!service.contains('.'))
+    {
+        return service;
+    }
+    ParseDomain parsedService{service};
+    return parsedService.domain();
+}
+
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
 {
     bool favFilter = m_pCredModelFilter->switchFavFilter();
@@ -1603,8 +1645,19 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
                                                                  pServiceItem->multipleDomains(), &ok);
                         if (ok)
                         {
-                            pServiceItem->setMultipleDomains(text);
-                            credentialDataChanged();
+                            QString serviceName = pServiceItem->name();
+                            text = processMultipleDomainsInput(serviceName, text);
+                            if (!text.isEmpty())
+                            {
+                                pServiceItem->setMultipleDomains(text);
+                                credentialDataChanged();
+                                QString serviceDomain = getDomainName(serviceName);
+                                if (serviceName != serviceDomain)
+                                {
+                                    // Need to change service name (remove tld)
+                                    pServiceItem->setName(serviceDomain);
+                                }
+                            }
                         }
                     };
         if (pServiceItem->isMultipleDomainSet())

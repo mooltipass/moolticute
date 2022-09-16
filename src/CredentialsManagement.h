@@ -140,6 +140,9 @@ private:
 
     void checkLinkingOnLoginSelected(const QModelIndex &srcIndex);
 
+    QString processMultipleDomainsInput(const QString& service, const QString &domains);
+    QString getDomainName(const QString& service);
+
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;
