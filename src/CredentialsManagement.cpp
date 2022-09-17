@@ -1404,7 +1404,7 @@ void CredentialsManagement::checkLinkingOnLoginSelected(const QModelIndex &srcIn
 
 QString CredentialsManagement::processMultipleDomainsInput(const QString& service, const QString &domains)
 {
-    auto domainList = domains.split(',', Qt::SkipEmptyParts);
+    auto domainList = domains.split(MULT_DOMAIN_SEPARATOR, Qt::SkipEmptyParts);
     QStringList validDomains;
     QString result = "";
     auto serviceDomain = service;
@@ -1430,7 +1430,7 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
             qWarning() << "The following domain is not valid: " << domain;
         }
     }
-    return validDomains.join(',');
+    return validDomains.join(MULT_DOMAIN_SEPARATOR);
 }
 
 QString CredentialsManagement::getDomainName(const QString &service)
@@ -1662,10 +1662,14 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
                     };
         if (pServiceItem->isMultipleDomainSet())
         {
+            // Context menu, if there are multiple domains set
             auto* action = m_enableMultipleDomainMenu.addAction("Edit multiple domains");
             connect(action, &QAction::triggered, multipleDomainsDialogFunc);
             auto* actionRemove = m_enableMultipleDomainMenu.addAction(tr("Remove multiple domains"));
             connect(actionRemove, &QAction::triggered, [pServiceItem, this](){
+                QString multipleDomains = pServiceItem->multipleDomains();
+                QString domain = multipleDomains.split(MULT_DOMAIN_SEPARATOR).first();
+                pServiceItem->setName(pServiceItem->name() + domain);
                 pServiceItem->setMultipleDomains("");
                 credentialDataChanged();
             });

@@ -174,6 +174,7 @@ private:
     static constexpr int BLE_FAVORITE_NUM = 50;
     static constexpr int MINI_PASSWORD_LENGTH = 31;
     static constexpr int BLE_PASSWORD_LENGTH = 64;
+    static constexpr char MULT_DOMAIN_SEPARATOR = ',';
 
 signals:
     void wantEnterMemMode();
