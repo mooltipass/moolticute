@@ -17,6 +17,7 @@ public:
     void setExpanded(bool bExpanded);
     QString logins() const;
     QString multipleDomains() const { return m_sMultipleDomains; }
+    QString multipleDomainsDisplay() const;
     void setMultipleDomains(const QString& domains) { m_sMultipleDomains = domains; }
     bool isMultipleDomainSet() { return !m_sMultipleDomains.isEmpty(); }
 

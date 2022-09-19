@@ -62,6 +62,7 @@ public:
     void setTOTP(const QModelIndex &idx, QString secretKey, int timeStep, int codeSize);
     QSet<qint8> getTakenFavorites() const;
     QString getCredentialNameForAddress(QByteArray addr) const;
+    static QFont serviceFont();
 
 private:
     ServiceItem *addService(const QString &sServiceName);

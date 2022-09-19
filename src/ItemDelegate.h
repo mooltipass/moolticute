@@ -26,6 +26,8 @@ private:
     bool paintCategoryIcon(QPainter *painter, const QStyleOptionViewItem &option, int catId) const;
     QFont loginFont() const;
     QFont favFont() const;
+
+    QFontMetrics m_serviceFontMetrics;
 };
 
 
