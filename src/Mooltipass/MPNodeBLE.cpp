@@ -314,9 +314,7 @@ QString MPNodeBLE::getMultipleDomains() const
     }
     if (data[0] & (1 << MULTIPLE_DOMAINS_BIT))
     {
-        qCritical() << "Multiple domain is set";
         ret = pMesProt->toQString(data.mid(MULTIPLE_DOMAINS_START, MULTIPLE_DOMAINS_LENGTH));
-        qCritical() << "Multiple domains: " << ret;
     }
     return ret;
 }

@@ -1663,7 +1663,7 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
         if (pServiceItem->isMultipleDomainSet())
         {
             // Context menu, if there are multiple domains set
-            auto* action = m_enableMultipleDomainMenu.addAction("Edit multiple domains");
+            auto* action = m_enableMultipleDomainMenu.addAction(tr("Edit multiple domains"));
             connect(action, &QAction::triggered, multipleDomainsDialogFunc);
             auto* actionRemove = m_enableMultipleDomainMenu.addAction(tr("Remove multiple domains"));
             connect(actionRemove, &QAction::triggered, [pServiceItem, this](){
@@ -1676,7 +1676,7 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
         }
         else
         {
-            auto* action = m_enableMultipleDomainMenu.addAction("Enable multiple domains");
+            auto* action = m_enableMultipleDomainMenu.addAction(tr("Enable multiple domains"));
             connect(action, &QAction::triggered, multipleDomainsDialogFunc);
         }
 
