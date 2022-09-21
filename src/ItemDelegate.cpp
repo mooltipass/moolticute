@@ -53,7 +53,7 @@ void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewIte
             painter->drawText(option.rect, Qt::AlignRight, sLogins);
         }
 
-        if (!pServiceItem->multipleDomains().isEmpty())
+        if (DeviceDetector::instance().isBle() && !pServiceItem->multipleDomains().isEmpty())
         {
             pen.setColor(QColor{0x66, 0x66, 0x66});
             painter->setFont(f);

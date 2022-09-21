@@ -71,6 +71,8 @@ public:
 
     bool isCredMirroringAvailable() const;
 
+    bool isMultipleDomainsAvailable() const;
+
     bool requestDeviceUID(const QByteArray &key);
 
     void sendEnterMMRequest(bool wantData = false, bool wantFido = false);

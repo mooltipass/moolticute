@@ -1633,6 +1633,10 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
 
 void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
 {
+    if (!wsClient->isMultipleDomainsAvailable())
+    {
+        return;
+    }
     auto sourceIndex = getSourceIndexFromProxyIndex(ui->credentialTreeView->indexAt(pos));
     auto* pServiceItem = m_pCredModel->getServiceItemByIndex(sourceIndex);
     if (pServiceItem)
