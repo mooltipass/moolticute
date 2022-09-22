@@ -53,7 +53,7 @@ border-right: none;
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageListNotes">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -83,7 +83,7 @@ border-right: none;
             <x>0</x>
             <y>0</y>
             <width>572</width>
-            <height>418</height>
+            <height>396</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
