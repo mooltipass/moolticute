@@ -88,6 +88,14 @@ QString ServiceItem::logins() const
     return sLogins;
 }
 
+QString ServiceItem::multipleDomainsDisplay() const
+{
+    auto domains = m_sMultipleDomains.split(',');
+    QString displayDomains = domains.join("/");
+    displayDomains.prepend('[').append(']');
+    return displayDomains;
+}
+
 QDate ServiceItem::bestUpdateDate(Qt::SortOrder order) const
 {
     QDate bestDate = m_dUpdatedDate;

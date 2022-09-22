@@ -303,3 +303,65 @@ void MPNodeBLE::setLastChildNodeUsedAddr(const QByteArray &d)
     data[LAST_CHILD_NODE_USED_ADDR_START] = d[0];
     data[LAST_CHILD_NODE_USED_ADDR_START + 1] = d[1];
 }
+
+QString MPNodeBLE::getMultipleDomains() const
+{
+    QString ret = "";
+    if (getType() != NodeParent)
+    {
+        qCritical() << "Multiple domains is only set for node parents!";
+        return ret;
+    }
+    if (data[0] & (1 << MULTIPLE_DOMAINS_BIT))
+    {
+        ret = pMesProt->toQString(data.mid(MULTIPLE_DOMAINS_START, MULTIPLE_DOMAINS_LENGTH));
+    }
+    return ret;
+}
+
+bool MPNodeBLE::setMultipleDomains(const QString &domains)
+{
+    bool changed = false;
+    QString oldDomains = getMultipleDomains();
+    if (domains.isEmpty())
+    {
+        if (!oldDomains.isEmpty())
+        {
+            // If old domains were not empty, need to unset the flag
+            quint8 flag = data[0];
+            flag &= ~(1 << MULTIPLE_DOMAINS_BIT);
+            data[0] = static_cast<char>(flag);
+            // And fill domains bytes with zero bytes
+            QByteArray zeroBytes(MULTIPLE_DOMAINS_LENGTH, Common::ZERO_BYTE);
+            data.replace(MULTIPLE_DOMAINS_START, MULTIPLE_DOMAINS_LENGTH, zeroBytes);
+            changed = true;
+        }
+    }
+    else
+    {
+        if (domains != oldDomains)
+        {
+            // If domains value is changed, need to replace the old value with the new bytes
+            QByteArray domainsBytes = pMesProt->toByteArray(domains);
+            const auto domainsSize = domainsBytes.size();
+            if (domainsSize > MULTIPLE_DOMAINS_LENGTH)
+            {
+                qCritical() << "Multiple domains length is longer than allowed!";
+                domainsBytes.resize(MULTIPLE_DOMAINS_LENGTH);
+            } else if (domainsSize < MULTIPLE_DOMAINS_LENGTH)
+            {
+                Common::fill(domainsBytes, MULTIPLE_DOMAINS_LENGTH - domainsSize, Common::ZERO_BYTE);
+            }
+            data.replace(MULTIPLE_DOMAINS_START, MULTIPLE_DOMAINS_LENGTH, domainsBytes);
+        }
+        if (oldDomains.isEmpty())
+        {
+            // If old domains were empty, need to set the multiple domains bit
+            quint8 flag = data[0];
+            flag |= 1 << MULTIPLE_DOMAINS_BIT;
+            data[0] = static_cast<char>(flag);
+        }
+        changed = true;
+    }
+    return changed;
+}

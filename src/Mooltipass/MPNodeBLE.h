@@ -54,6 +54,9 @@ public:
     QByteArray getLastChildNodeUsedAddr() const;
     void setLastChildNodeUsedAddr(const QByteArray &d);
 
+    QString getMultipleDomains() const;
+    bool setMultipleDomains(const QString& domains);
+
     static constexpr int PARENT_NODE_LENGTH = 264;
     static constexpr int CHILD_NODE_LENGTH = 528;
     static constexpr int SERVICE_LENGTH = 252;
@@ -84,6 +87,9 @@ protected:
     static constexpr int POINTED_TO_CHILD_START = 6;
     static constexpr int LAST_CHILD_NODE_USED_ADDR_START = 260;
     static constexpr int LOGIN_CHILD_NODE_DATA_ADDR_START = 8;
+    static constexpr int MULTIPLE_DOMAINS_BIT = 4;
+    static constexpr int MULTIPLE_DOMAINS_LENGTH = 50;
+    static constexpr int MULTIPLE_DOMAINS_START = SERVICE_ADDR_START + SERVICE_LENGTH - MULTIPLE_DOMAINS_LENGTH;
     static constexpr char BLANK_CHAR = 0x01;
 };
 

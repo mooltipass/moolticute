@@ -1,4 +1,5 @@
 // Qt
+#include "CredentialModel.h"
 #include "CredentialModelFilter.h"
 #include <QApplication>
 #include <QPen>
@@ -13,7 +14,8 @@
 #include "DeviceDetector.h"
 
 ItemDelegate::ItemDelegate(QWidget* parent):
-    QStyledItemDelegate(parent)
+    QStyledItemDelegate(parent),
+    m_serviceFontMetrics{CredentialModel::serviceFont()}
 {
 }
 
@@ -45,10 +47,21 @@ void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewIte
 
         if (!pServiceItem->isExpanded())
         {
-            pen.setColor(QColor("#666666"));
+            pen.setColor(QColor{0x66, 0x66, 0x66});
             painter->setFont(f);
             painter->setPen(pen);
             painter->drawText(option.rect, Qt::AlignRight, sLogins);
+        }
+
+        if (DeviceDetector::instance().isBle() && !pServiceItem->multipleDomains().isEmpty())
+        {
+            pen.setColor(QColor{0x66, 0x66, 0x66});
+            painter->setFont(f);
+            painter->setPen(pen);
+            QPoint domainsPos(option.rect.topLeft() + QPoint(m_serviceFontMetrics.horizontalAdvance(pServiceItem->name()) + 10, 0));
+            QSize domainsSz(QSize(option.rect.width(), option.rect.height()));
+            QRect domainsRec(domainsPos, domainsSz);
+            painter->drawText(domainsRec, Qt::AlignLeft|Qt::AlignVCenter, pServiceItem->multipleDomainsDisplay());
         }
     }
 }
@@ -198,8 +211,7 @@ void ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         }
         painter->fillRect(option.rect, bkgColor);
 
-        if ((pServiceItem != nullptr)
-                && (!pServiceItem->isExpanded())
+        if (pServiceItem != nullptr
                 && index.column() == 0)
         {
             paintServiceItem(painter, option, pServiceItem);

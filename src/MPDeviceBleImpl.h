@@ -136,6 +136,7 @@ public:
     void setNodeKeyAfterPwd(MPNode* node, int key);
     void setNodePwdBlankFlag(MPNode* node);
     bool setNodePointedToAddr(MPNode* node, QByteArray addr);
+    bool setNodeMultipleDomains(MPNode* node, const QString& domains);
 
     QList<QByteArray> getFavorites(const QByteArray& data);
 

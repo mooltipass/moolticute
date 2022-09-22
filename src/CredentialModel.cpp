@@ -53,10 +53,7 @@ QVariant CredentialModel::data(const QModelIndex &idx, int role) const
     {
         if (pServiceItem != nullptr)
         {
-            QFont font = qApp->font();
-            font.setBold(false);
-            font.setPointSize(10);
-            return font;
+            return serviceFont();
         }
 
         return qApp->font();
@@ -258,6 +255,7 @@ void CredentialModel::load(const QJsonArray &json, bool isFido)
                     pointedToAddress.append(static_cast<char>(pointedJsonArr.at(0).toInt()));
                     pointedToAddress.append(static_cast<char>(pointedJsonArr.at(1).toInt()));
                     pLoginItem->setPointedToChildAddress(pointedToAddress);
+                    pServiceItem->setMultipleDomains(pnode["multiple_domains"].toString());
                 }
 
                 // Update login favorite
@@ -392,6 +390,14 @@ QString CredentialModel::getCredentialNameForAddress(QByteArray addr) const
         }
     }
     return "";
+}
+
+QFont CredentialModel::serviceFont()
+{
+    QFont font = qApp->font();
+    font.setBold(false);
+    font.setPointSize(10);
+    return font;
 }
 
 void CredentialModel::updateLoginItem(const QModelIndex &idx, const QString &sPassword, const QString &sDescription, const QString &sName, int iCat, int iLoginKey, int iPwdKey)

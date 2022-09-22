@@ -113,6 +113,8 @@ private slots:
 
     void on_pushButtonLinkTo_clicked();
 
+    void onTreeViewContextMenuRequested(const QPoint& pos);
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);
@@ -138,6 +140,8 @@ private:
 
     void checkLinkingOnLoginSelected(const QModelIndex &srcIndex);
 
+    QString processMultipleDomainsInput(const QString& service, const QString &domains);
+
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;
@@ -145,6 +149,7 @@ private:
     QTimer m_tSelectLoginTimer;
     LoginItem *m_pAddedLoginItem;
     TOTPCredential *m_pTOTPCred = nullptr;
+    QMenu m_enableMultipleDomainMenu;
 
     QMenu m_favMenu;
     QJsonArray m_loadedModelSerialiation;
@@ -168,6 +173,7 @@ private:
     static constexpr int BLE_FAVORITE_NUM = 50;
     static constexpr int MINI_PASSWORD_LENGTH = 31;
     static constexpr int BLE_PASSWORD_LENGTH = 64;
+    static constexpr char MULT_DOMAIN_SEPARATOR = ',';
 
 signals:
     void wantEnterMemMode();

@@ -29,6 +29,7 @@
 #include "ServiceItem.h"
 #include "DeviceDetector.h"
 #include "SettingsGuiBLE.h"
+#include "ParseDomain.h"
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
@@ -198,6 +199,8 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::linkRemoved, this, &CredentialsManagement::onSelectedCredentialLinkRemoved);
     connect(ui->credDisplayPasswordInput, &LockedPasswordLineEdit::linkRequested, this, &CredentialsManagement::onSelectedCredentialLink);
     connect(this, &CredentialsManagement::editedCredentialLinked, ui->credDisplayPasswordInput, &LockedPasswordLineEdit::onCredentialLinked);
+    ui->credentialTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->credentialTreeView, &CredentialView::customContextMenuRequested, this, &CredentialsManagement::onTreeViewContextMenuRequested);
 }
 
 void CredentialsManagement::setFilterCredLayout()
@@ -1399,6 +1402,36 @@ void CredentialsManagement::checkLinkingOnLoginSelected(const QModelIndex &srcIn
     }
 }
 
+QString CredentialsManagement::processMultipleDomainsInput(const QString& service, const QString &domains)
+{
+    auto domainList = domains.split(MULT_DOMAIN_SEPARATOR, Qt::SkipEmptyParts);
+    QStringList validDomains;
+    QString result = "";
+    auto serviceDomain = service;
+    if (serviceDomain.contains('.'))
+    {
+        ParseDomain parsedService{service};
+        serviceDomain = parsedService.domain();
+    }
+    for (auto domain : domainList)
+    {
+        if (!domain.startsWith('.'))
+        {
+            domain.prepend('.');
+        }
+        ParseDomain dom{serviceDomain + domain};
+        if (domain == dom.tld())
+        {
+            validDomains.append(domain);
+        }
+        else
+        {
+            qWarning() << "The following domain is not valid: " << domain;
+        }
+    }
+    return validDomains.join(MULT_DOMAIN_SEPARATOR);
+}
+
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
 {
     bool favFilter = m_pCredModelFilter->switchFavFilter();
@@ -1585,4 +1618,76 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
     ui->framePasswordLink->hide();
     ui->quickInsertWidget->setEnabled(true);
     m_linkingMode = LinkingMode::OFF;
+}
+
+void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
+{
+    if (!wsClient->isMultipleDomainsAvailable())
+    {
+        return;
+    }
+    auto sourceIndex = getSourceIndexFromProxyIndex(ui->credentialTreeView->indexAt(pos));
+    auto* pServiceItem = m_pCredModel->getServiceItemByIndex(sourceIndex);
+    if (pServiceItem)
+    {
+        m_enableMultipleDomainMenu.clear();
+        auto multipleDomainsDialogFunc = [this, pServiceItem](){
+                        QString defaultDomains = pServiceItem->multipleDomains();
+                        QString serviceName = pServiceItem->name();
+                        QString serviceDomain = serviceName;
+                        bool serviceNameChanged = false;
+                        if (defaultDomains.isEmpty())
+                        {
+                            /* During enabling multiple domains cut the tld
+                             * from service name and display it on the dialog
+                             */
+                            if (serviceDomain.contains('.'))
+                            {
+                                ParseDomain parsedService{serviceDomain};
+                                serviceDomain = parsedService.domain();
+                                defaultDomains = parsedService.tld() + MULT_DOMAIN_SEPARATOR;
+                                serviceNameChanged = true;
+                            }
+                        }
+                        bool ok = false;
+                        QString text = QInputDialog::getText(this, tr("Multiple Domains for %1").arg(pServiceItem->name()),
+                                                                 tr("Enter comma separated domain extensions:"), QLineEdit::Normal,
+                                                                 defaultDomains, &ok);
+                        if (ok)
+                        {
+                            text = processMultipleDomainsInput(serviceName, text);
+                            if (!text.isEmpty())
+                            {
+                                pServiceItem->setMultipleDomains(text);
+                                credentialDataChanged();
+                                if (serviceNameChanged)
+                                {
+                                    // Need to change service name (remove tld)
+                                    pServiceItem->setName(serviceDomain);
+                                }
+                            }
+                        }
+                    };
+        if (pServiceItem->isMultipleDomainSet())
+        {
+            // Context menu, if there are multiple domains set
+            auto* action = m_enableMultipleDomainMenu.addAction(tr("Edit multiple domains"));
+            connect(action, &QAction::triggered, multipleDomainsDialogFunc);
+            auto* actionRemove = m_enableMultipleDomainMenu.addAction(tr("Remove multiple domains"));
+            connect(actionRemove, &QAction::triggered, [pServiceItem, this](){
+                QString multipleDomains = pServiceItem->multipleDomains();
+                QString domain = multipleDomains.split(MULT_DOMAIN_SEPARATOR).first();
+                pServiceItem->setName(pServiceItem->name() + domain);
+                pServiceItem->setMultipleDomains("");
+                credentialDataChanged();
+            });
+        }
+        else
+        {
+            auto* action = m_enableMultipleDomainMenu.addAction(tr("Enable multiple domains"));
+            connect(action, &QAction::triggered, multipleDomainsDialogFunc);
+        }
+
+        m_enableMultipleDomainMenu.popup(ui->credentialTreeView->mapToGlobal(pos));
+    }
 }
