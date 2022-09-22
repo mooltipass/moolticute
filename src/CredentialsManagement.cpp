@@ -1412,7 +1412,6 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
     {
         ParseDomain parsedService{service};
         serviceDomain = parsedService.domain();
-        validDomains.append(parsedService.tld());
     }
     for (auto domain : domainList)
     {
@@ -1431,16 +1430,6 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
         }
     }
     return validDomains.join(MULT_DOMAIN_SEPARATOR);
-}
-
-QString CredentialsManagement::getDomainName(const QString &service)
-{
-    if (!service.contains('.'))
-    {
-        return service;
-    }
-    ParseDomain parsedService{service};
-    return parsedService.domain();
 }
 
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
@@ -1643,20 +1632,35 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
     {
         m_enableMultipleDomainMenu.clear();
         auto multipleDomainsDialogFunc = [this, pServiceItem](){
+                        QString defaultDomains = pServiceItem->multipleDomains();
+                        QString serviceName = pServiceItem->name();
+                        QString serviceDomain = serviceName;
+                        bool serviceNameChanged = false;
+                        if (defaultDomains.isEmpty())
+                        {
+                            /* During enabling multiple domains cut the tld
+                             * from service name and display it on the dialog
+                             */
+                            if (serviceDomain.contains('.'))
+                            {
+                                ParseDomain parsedService{serviceDomain};
+                                serviceDomain = parsedService.domain();
+                                defaultDomains = parsedService.tld() + MULT_DOMAIN_SEPARATOR;
+                                serviceNameChanged = true;
+                            }
+                        }
                         bool ok = false;
                         QString text = QInputDialog::getText(this, tr("Multiple Domains for %1").arg(pServiceItem->name()),
                                                                  tr("Enter comma separated domain extensions:"), QLineEdit::Normal,
-                                                                 pServiceItem->multipleDomains(), &ok);
+                                                                 defaultDomains, &ok);
                         if (ok)
                         {
-                            QString serviceName = pServiceItem->name();
                             text = processMultipleDomainsInput(serviceName, text);
                             if (!text.isEmpty())
                             {
                                 pServiceItem->setMultipleDomains(text);
                                 credentialDataChanged();
-                                QString serviceDomain = getDomainName(serviceName);
-                                if (serviceName != serviceDomain)
+                                if (serviceNameChanged)
                                 {
                                     // Need to change service name (remove tld)
                                     pServiceItem->setName(serviceDomain);
