@@ -1971,6 +1971,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="checkBoxSwitchOffLock">
+                 <property name="toolTip">
+                  <string>When device connected through Bluetooth switch the device off on lock</string>
+                 </property>
+                 <property name="text">
+                  <string>Switch Off on Lock When Connected with Bluetooth</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="checkBoxDisableBleOnCardRemove">
                  <property name="toolTip">
                   <string>Disable Bluetooth when a user card is removed from the device</string>

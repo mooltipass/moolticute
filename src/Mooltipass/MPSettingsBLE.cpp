@@ -57,6 +57,7 @@ void MPSettingsBLE::loadParameters()
                         set_screen_brightness_usb(static_cast<quint8>(m_lastDeviceSettings.at(DeviceSettingsBLE::SCREEN_BRIGHTNESS_USB)));
                         set_screen_brightness_bat(static_cast<quint8>(m_lastDeviceSettings.at(DeviceSettingsBLE::SCREEN_BRIGHTNESS_BAT)));
                         set_login_and_fav_inverted(m_lastDeviceSettings.at(DeviceSettingsBLE::LOGIN_AND_FAV_INVERTED) != 0);
+                        set_switch_off_on_lock(m_lastDeviceSettings.at(DeviceSettingsBLE::SWITCH_OFF_ON_LOCK) != 0);
                         return true;
                     }
     ));
