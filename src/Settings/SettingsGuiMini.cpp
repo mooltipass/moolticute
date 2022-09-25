@@ -74,6 +74,9 @@ void SettingsGuiMini::updateUI()
     ui->settings_ble_name->hide();
     ui->checkBoxInvertLoginAndFav->hide();
 
+    //Bundle 11
+    ui->checkBoxSwitchOffLock->hide();
+
     ui->groupBox_BLESettings->hide();
 
     // Inactivity groupbox

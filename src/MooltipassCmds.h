@@ -262,7 +262,8 @@ public:
         DELAY_BEF_UNLOCK_LOGIN,
         SCREEN_BRIGHTNESS_USB,
         SCREEN_BRIGHTNESS_BAT,
-        LOGIN_AND_FAV_INVERTED
+        LOGIN_AND_FAV_INVERTED,
+        SWITCH_OFF_ON_LOCK
     };
     Q_ENUM(Param)
 };

@@ -33,7 +33,8 @@ DeviceSettingsBLE::DefaultValues DeviceSettingsBLE::m_bleDefaultValues =
         {MPParams::DELAY_BEF_UNLOCK_LOGIN, 60},
         {MPParams::SCREEN_BRIGHTNESS_USB, 0x90},
         {MPParams::SCREEN_BRIGHTNESS_BAT, 0x90},
-        {MPParams::LOGIN_AND_FAV_INVERTED, 0}
+        {MPParams::LOGIN_AND_FAV_INVERTED, 0},
+        {MPParams::SWITCH_OFF_ON_LOCK, 0}
     };
 
 DeviceSettingsBLE::DeviceSettingsBLE(QObject *parent)
@@ -109,5 +110,7 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::SCREEN_BRIGHTNESS_BAT] = SCREEN_BRIGHTNESS_BAT;
     m_paramMap.insert(MPParams::LOGIN_AND_FAV_INVERTED, "login_and_fav_inverted");
     m_bleByteMapping[MPParams::LOGIN_AND_FAV_INVERTED] = LOGIN_AND_FAV_INVERTED;
+    m_paramMap.insert(MPParams::SWITCH_OFF_ON_LOCK, "switch_off_on_lock");
+    m_bleByteMapping[MPParams::SWITCH_OFF_ON_LOCK] = SWITCH_OFF_ON_LOCK;
 }
 

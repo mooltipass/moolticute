@@ -10,6 +10,7 @@ SettingsGuiBLE::SettingsGuiBLE(QObject *parent, MainWindow *mw)
     connect(this, &DeviceSettings::lock_unlock_modeChanged, mw, &MainWindow::lockUnlockChanged);
     connect(this, &DeviceSettingsBLE::mc_subdomain_force_statusChanged, this, &SettingsGuiBLE::handleSubdomainForceChanged);
     connect(mw->wsClient, &WSClient::bundleVersionChanged, this, &SettingsGuiBLE::checkDeviceSettingsForBundle9);
+    connect(mw->wsClient, &WSClient::bundleVersionChanged, this, &SettingsGuiBLE::checkDeviceSettingsForBundle11);
 }
 
 void SettingsGuiBLE::loadParameters()
@@ -124,6 +125,18 @@ void SettingsGuiBLE::checkDeviceSettingsForBundle9(int bundleVersion)
         ui->settings_subdomain_specification->hide();
         ui->settings_ble_name->hide();
         ui->checkBoxInvertLoginAndFav->hide();
+    }
+}
+
+void SettingsGuiBLE::checkDeviceSettingsForBundle11(int bundleVersion)
+{
+    if (bundleVersion >= 11)
+    {
+        ui->checkBoxSwitchOffLock->show();
+    }
+    else
+    {
+        ui->checkBoxSwitchOffLock->hide();
     }
 }
 
