@@ -751,6 +751,7 @@ void WSServerCon::sendVersion()
             data["aux_mcu_version"] = bleImpl->get_auxMCUVersion();
             data["main_mcu_version"] = bleImpl->get_mainMCUVersion();
             data["bundle_version"] = bleImpl->get_bundleVersion();
+            data["platform_serial_number"] = static_cast<qint64>(bleImpl->get_platformSerialNumber());
         }
     }
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
