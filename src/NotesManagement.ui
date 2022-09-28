@@ -237,7 +237,7 @@ border-right: none;
             </size>
            </property>
            <property name="text">
-            <string>Discard</string>
+            <string>Exit</string>
            </property>
           </widget>
          </item>

@@ -6,6 +6,9 @@
 
 #include <QListWidget>
 
+const QString NotesManagement::EXIT_TEXT = tr("Exit");
+const QString NotesManagement::DISCARD_TEXT = tr("Discard Changes and Exit");
+
 NotesManagement::NotesManagement(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NotesManagement)
@@ -15,6 +18,8 @@ NotesManagement::NotesManagement(QWidget *parent) :
     ui->pushButtonAddNote->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSave->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonDiscard->setStyleSheet(CSS_BLUE_BUTTON);
+
+    ui->pushButtonDiscard->setText(EXIT_TEXT);
 
     ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
@@ -190,6 +195,7 @@ void NotesManagement::on_pushButtonDiscard_clicked()
     m_isNewFile = false;
     m_isNoteEditing = false;
     emit updateTabs();
+    ui->pushButtonDiscard->setText(EXIT_TEXT);
 }
 
 void NotesManagement::on_pushButtonSave_clicked()
@@ -200,6 +206,7 @@ void NotesManagement::on_pushButtonSave_clicked()
     ui->stackedWidget->setCurrentWidget(ui->pageListNotes);
     ui->labelError->hide();
     m_isNoteEditing = false;
+    ui->pushButtonDiscard->setText(EXIT_TEXT);
 }
 
 void NotesManagement::on_toolButtonEditNote_clicked()
@@ -269,10 +276,12 @@ void NotesManagement::on_textEditNote_textChanged()
     if (note == m_noteContentClone || note.isEmpty() || (m_isNewFile && !m_validNoteName))
     {
         ui->pushButtonSave->hide();
+        ui->pushButtonDiscard->setText(EXIT_TEXT);
     }
     else
     {
         ui->pushButtonSave->show();
+        ui->pushButtonDiscard->setText(DISCARD_TEXT);
     }
 }
 
