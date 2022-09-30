@@ -322,6 +322,7 @@ private:
 #ifdef Q_OS_MAC
     static constexpr int MAC_DEFAULT_HEIGHT = 500;
 #endif
+    static constexpr int STARTING_NOT_FLASHED_SERIAL = 2000;
 };
 
 #endif // MAINWINDOW_H

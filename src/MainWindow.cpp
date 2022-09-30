@@ -130,6 +130,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->labelAboutAuxMCU->setText(tr("Aux MCU version:"));
     ui->labelAboutMainMCU->setText(tr("Main MCU version:"));
 
+    ui->widgetNotFlashedWarning->hide();
+    ui->labelNotFlashedWarningIcon->setPixmap(AppGui::qtAwesome()->icon(fa::warning).pixmap(QSize(20, 20)));
+
     ui->pbBleBattery->setStyleSheet("border: 1px solid black");
     ui->pbBleBattery->hide();
 
@@ -957,7 +960,8 @@ void MainWindow::updateSerialInfos() {
     if(connected)
     {
         ui->labelAboutFwVersValue->setText(wsClient->get_fwVersion());
-        ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? QString::number(wsClient->get_hwSerial()) : NONE_STRING);
+        auto serialNum = QString::number(wsClient->get_hwSerial());
+        ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? serialNum : NONE_STRING);
         ui->labelAbouHwMemoryValue->setText(wsClient->get_hwMemory() > 0 ? tr("%1Mb").arg(wsClient->get_hwMemory()): NONE_STRING);
         displayMCUVersion(wsClient->isMPBLE());
         //When ble is detected not displaying fw version
@@ -965,6 +969,14 @@ void MainWindow::updateSerialInfos() {
         ui->labelAboutFwVersValue->setVisible(!wsClient->isMPBLE());
         ui->label_UserManual->setText(MANUAL_STRING.arg(wsClient->isMPBLE() ? BLE_MANUAL_URL : MINI_MANUAL_URL));
         ui->label_UserManual->show();
+        if (wsClient->isMPBLE() && serialNum > STARTING_NOT_FLASHED_SERIAL)
+        {
+            ui->widgetNotFlashedWarning->show();
+        }
+        else
+        {
+            ui->widgetNotFlashedWarning->hide();
+        }
     }
     else
     {
