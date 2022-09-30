@@ -3345,10 +3345,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="labelSerialNumberIncorrect">
+                 <widget class="ClickableLabel" name="labelSerialNumberIncorrect">
                   <property name="font">
                    <font>
                     <pointsize>10</pointsize>
+                    <italic>false</italic>
+                    <underline>true</underline>
                    </font>
                   </property>
                   <property name="text">
@@ -5237,6 +5239,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
    <class>NotesManagement</class>
    <extends>QWidget</extends>
    <header>NotesManagement.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ClickableLabel</class>
+   <extends>QLabel</extends>
+   <header>ClickableLabel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

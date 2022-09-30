@@ -211,6 +211,8 @@ private slots:
 
     void onBleNameChanged(const QString& name);
 
+    void onIncorrectSerialNumberClicked();
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;

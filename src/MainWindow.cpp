@@ -28,6 +28,7 @@
 #include "SettingsGuiHelper.h"
 #include "DeviceDetector.h"
 #include "SystemNotifications/SystemNotification.h"
+#include <limits>
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -132,6 +133,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->widgetNotFlashedWarning->hide();
     ui->labelNotFlashedWarningIcon->setPixmap(AppGui::qtAwesome()->icon(fa::warning).pixmap(QSize(20, 20)));
+    ui->labelSerialNumberIncorrect->setStyleSheet("QLabel {color: blue;}");
+    connect(ui->labelSerialNumberIncorrect, &ClickableLabel::clicked, this, &MainWindow::onIncorrectSerialNumberClicked);
 
     ui->pbBleBattery->setStyleSheet("border: 1px solid black");
     ui->pbBleBattery->hide();
@@ -2416,4 +2419,17 @@ void MainWindow::onBleNameChanged(const QString &name)
     m_bleNameOriginal = name;
     ui->lineEditBleName->setText(name);
     checkSettingsChanged();
+}
+
+void MainWindow::onIncorrectSerialNumberClicked()
+{
+    bool ok = false;
+    int serialNum = QInputDialog::getInt(this, tr("Incorrect Serial Number"),
+                             tr("It looks like your device serial number doesn't match the one present on your device's case.\n") +
+                             tr("Please reach out to support@themooltipass.com for the right code to enter below"),
+                             0, 0, std::numeric_limits<int>::max(), 1, &ok);
+    if (ok)
+    {
+        qCritical() << "Serial num: " << serialNum;
+    }
 }
