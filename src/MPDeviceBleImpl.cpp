@@ -1971,6 +1971,26 @@ QString MPDeviceBleImpl::getBleNameFromArray(const QByteArray &arr) const
     return bleProt->toQString(arr);
 }
 
+void MPDeviceBleImpl::setSerialNumber(quint32 serialNum, std::function<void (bool)> cb)
+{
+    QByteArray serialNumArr = bleProt->toLittleEndianFromInt32(serialNum);
+    auto *jobs = new AsyncJobs(QString("Set Serial number"), this);
+    jobs->append(new MPCommandJob(mpDev, MPCmd::SET_SERIAL_NUMBER,
+                                  serialNumArr,
+                                  [this, serialNum, cb](const QByteArray &data, bool &) -> bool
+    {
+        if (bleProt->getFirstPayloadByte(data) != MSG_SUCCESS)
+        {
+            qWarning() << "Set serial number to: " << serialNum << " failed";
+            cb(false);
+            return false;
+        }
+        cb(true);
+        return true;
+    }));
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 Common::SubdomainSelection MPDeviceBleImpl::getForceSubdomainSelection() const
 {
     QSettings s;

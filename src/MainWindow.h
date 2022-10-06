@@ -213,6 +213,8 @@ private slots:
 
     void onIncorrectSerialNumberClicked();
 
+    void onSerialNumberChanged(bool success);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;

@@ -377,6 +377,7 @@ void MessageProtocolBLE::fillCommandMapping()
         {MPCmd::WAKE_UP_DEVICE        , 0x003F},
         {MPCmd::SET_BLE_NAME          , 0x0040},
         {MPCmd::GET_BLE_NAME          , 0x0042},
+        {MPCmd::SET_SERIAL_NUMBER     , 0x003A},
         {MPCmd::CMD_DBG_OPEN_DISP_BUFFER    , 0x8001},
         {MPCmd::CMD_DBG_SEND_TO_DISP_BUFFER , 0x8002},
         {MPCmd::CMD_DBG_CLOSE_DISP_BUFFER   , 0x8003},

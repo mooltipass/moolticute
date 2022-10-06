@@ -601,8 +601,13 @@ void WSClient::onTextMessageReceived(const QString &message)
     }
     else if (rootobj["msg"] == "get_ble_name" || rootobj["msg"] == "set_ble_name")
     {
-         QJsonObject o = rootobj["data"].toObject();
-         emit bleNameChanged(o.value("name").toString());
+        QJsonObject o = rootobj["data"].toObject();
+        emit bleNameChanged(o.value("name").toString());
+    }
+    else if (rootobj["msg"] == "set_serial_number")
+    {
+        QJsonObject o = rootobj["data"].toObject();
+        emit serialNumberChanged(o.value("success").toBool());
     }
 }
 
@@ -920,6 +925,13 @@ void WSClient::sendSetBleName(QString name)
 {
     sendJsonData({{ "msg", "set_ble_name" },
                   { "data", QJsonObject{ {"name", name } } }
+                 });
+}
+
+void WSClient::sendSetSerialNumber(uint serialNum)
+{
+    sendJsonData({{ "msg", "set_serial_number" },
+                  { "data", QJsonObject{ {"serial_number", static_cast<double>(serialNum) } } }
                  });
 }
 

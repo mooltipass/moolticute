@@ -123,6 +123,7 @@ public:
     void sendNiMHReconditioning();
     void sendSecurityChallenge(QString str);
     void sendSetBleName(QString name);
+    void sendSetSerialNumber(uint serialNum);
 
     void sendChangedParam(const QString& paramName, int value);
 
@@ -187,6 +188,8 @@ signals:
     void fileDeleted(bool success, const QString& file);
 
     void bleNameChanged(const QString& name);
+
+    void serialNumberChanged(bool success);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

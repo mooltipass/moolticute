@@ -634,6 +634,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     connect(wsClient, &WSClient::bleNameChanged, this, &MainWindow::onBleNameChanged);
 
+    connect(wsClient, &WSClient::serialNumberChanged, this, &MainWindow::onSerialNumberChanged);
+
     wsClient->settingsHelper()->setMainWindow(this);
 #ifdef Q_OS_WIN
     const auto keyboardLayoutWidth = 150;
@@ -2424,12 +2426,35 @@ void MainWindow::onBleNameChanged(const QString &name)
 void MainWindow::onIncorrectSerialNumberClicked()
 {
     bool ok = false;
-    int serialNum = QInputDialog::getInt(this, tr("Incorrect Serial Number"),
+    QString serialNumStr = QInputDialog::getText(this, tr("Incorrect Serial Number"),
                              tr("It looks like your device serial number doesn't match the one present on your device's case.\n") +
                              tr("Please reach out to support@themooltipass.com for the right code to enter below"),
-                             0, 0, std::numeric_limits<int>::max(), 1, &ok);
+                             QLineEdit::Normal, "", &ok);
     if (ok)
     {
-        qCritical() << "Serial num: " << serialNum;
+        auto serialNum = serialNumStr.toUInt(&ok);
+        if (ok)
+        {
+            wsClient->sendSetSerialNumber(serialNum);
+        }
+        else
+        {
+            qCritical() << "The entered serial number is incorrect: " << serialNumStr;
+            QMessageBox::critical(this, tr("Incorrect Serial Number"),
+                                  tr("The entered serial number is incorrect!"));
+        }
+    }
+}
+
+void MainWindow::onSerialNumberChanged(bool success)
+{
+    auto title = tr("Serial number change");
+    if (success)
+    {
+        QMessageBox::information(this, title, tr("Set serial number successfully."));
+    }
+    else
+    {
+        QMessageBox::critical(this, title, tr("Set serial number failed."));
     }
 }

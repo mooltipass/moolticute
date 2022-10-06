@@ -178,6 +178,8 @@ public:
     void getBleName(const MessageHandlerCbData &cb);
     QString getBleNameFromArray(const QByteArray& arr) const;
 
+    void setSerialNumber(quint32 serialNum, std::function<void(bool)> cb);
+
     Common::SubdomainSelection getForceSubdomainSelection() const;
 
 signals:
