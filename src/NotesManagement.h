@@ -64,6 +64,9 @@ private:
     Ui::NotesManagement *ui;
 
     WSClient *wsClient;
+
+    static const QString EXIT_TEXT;
+    static const QString DISCARD_TEXT;
 };
 
 #endif // NOTESMANAGEMENT_H
