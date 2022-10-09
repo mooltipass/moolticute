@@ -56,8 +56,6 @@ public:
 
     QByteArray getCpzValue(const QByteArray &cpzCtr) const override { return cpzCtr.mid(CPZ_START, CPZ_LENGTH); }
 
-    static constexpr uint TOTP_PACKAGE_SIZE = 10;
-
 private:
     virtual void fillCommandMapping() override;
     int getStartingPayloadPosition(const QByteArray &data) const;
@@ -78,6 +76,9 @@ private:
     static constexpr int PWD_MAX_LENGTH = 64;
     static constexpr int LOGIN_MAX_LENGTH = 64;
     static constexpr int CPZ_START = 2;
+
+public:
+    static constexpr uint TOTP_PACKAGE_SIZE = CRED_PACKAGE_SIZE + 1;
 };
 
 #endif // MESSAGEPROTOCOLBLE_H

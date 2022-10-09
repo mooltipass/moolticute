@@ -205,7 +205,13 @@ border-right: none;
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="textEditNote"/>
+        <widget class="QPlainTextEdit" name="textEditNote">
+         <property name="font">
+          <font>
+           <family>Courier</family>
+          </font>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -231,7 +237,7 @@ border-right: none;
             </size>
            </property>
            <property name="text">
-            <string>Discard</string>
+            <string>Exit</string>
            </property>
           </widget>
          </item>
