@@ -2455,7 +2455,7 @@ void MainWindow::onSerialNumberChanged(bool success, int serialNumber)
     if (success)
     {
         wsClient->set_hwSerial(serialNumber);
-        if (wsClient->get_hwSerial() != wsClient->get_platformSerial())
+        if (wsClient->get_hwSerial() == wsClient->get_platformSerial())
         {
             QMessageBox::information(this, title, tr("Set serial number successfully."));
             ui->widgetNotFlashedWarning->hide();
