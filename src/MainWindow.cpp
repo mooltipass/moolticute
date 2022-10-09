@@ -974,7 +974,9 @@ void MainWindow::updateSerialInfos() {
         ui->labelAboutFwVersValue->setVisible(!wsClient->isMPBLE());
         ui->label_UserManual->setText(MANUAL_STRING.arg(wsClient->isMPBLE() ? BLE_MANUAL_URL : MINI_MANUAL_URL));
         ui->label_UserManual->show();
-        if (wsClient->isMPBLE() && serialNum > STARTING_NOT_FLASHED_SERIAL)
+        qCritical() << "Platform serial: " << wsClient->get_platformSerial();
+        if (wsClient->isMPBLE() && serialNum > STARTING_NOT_FLASHED_SERIAL &&
+                wsClient->get_hwSerial() != wsClient->get_platformSerial())
         {
             ui->widgetNotFlashedWarning->show();
         }
@@ -994,6 +996,7 @@ void MainWindow::updateSerialInfos() {
         wsClient->set_auxMCUVersion(NONE_STRING);
         wsClient->set_mainMCUVersion(NONE_STRING);
         wsClient->set_bundleVersion(0);
+        wsClient->set_platformSerial(0);
         ui->label_UserManual->hide();
     }
 }
@@ -2446,12 +2449,21 @@ void MainWindow::onIncorrectSerialNumberClicked()
     }
 }
 
-void MainWindow::onSerialNumberChanged(bool success)
+void MainWindow::onSerialNumberChanged(bool success, int serialNumber)
 {
     auto title = tr("Serial number change");
     if (success)
     {
-        QMessageBox::information(this, title, tr("Set serial number successfully."));
+        wsClient->set_hwSerial(serialNumber);
+        if (wsClient->get_hwSerial() != wsClient->get_platformSerial())
+        {
+            QMessageBox::information(this, title, tr("Set serial number successfully."));
+            ui->widgetNotFlashedWarning->hide();
+        }
+        else
+        {
+            QMessageBox::critical(this, title, tr("Serial number still does not match platform serial."));
+        }
     }
     else
     {

@@ -1583,7 +1583,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
         QJsonObject o = root["data"].toObject();
         auto serialNum = o["serial_number"].toDouble();
         bleImpl->setSerialNumber(serialNum,
-                [this, root](bool success)
+                [this, root, serialNum](bool success)
         {
             if (!WSServer::Instance()->checkClientExists(this))
                 return;
@@ -1591,6 +1591,7 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             QJsonObject ores;
             QJsonObject oroot = root;
             ores["success"] = success;
+            ores["serial_number"] = serialNum;
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });

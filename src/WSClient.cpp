@@ -206,6 +206,10 @@ void WSClient::onTextMessageReceived(const QString &message)
             set_auxMCUVersion(o["aux_mcu_version"].toString());
             set_mainMCUVersion(o["main_mcu_version"].toString());
             set_bundleVersion(o["bundle_version"].toInt());
+            if (o.contains("platform_serial_number"))
+            {
+                set_platformSerial(o["platform_serial_number"].toInt());
+            }
         }
         else
         {
@@ -607,7 +611,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     else if (rootobj["msg"] == "set_serial_number")
     {
         QJsonObject o = rootobj["data"].toObject();
-        emit serialNumberChanged(o.value("success").toBool());
+        emit serialNumberChanged(o.value("success").toBool(), o["serial_number"].toInt());
     }
 }
 

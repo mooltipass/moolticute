@@ -51,6 +51,8 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(int, bundleVersion, 0)
     QT_WRITABLE_PROPERTY(bool, advancedMenu, false)
 
+    QT_WRITABLE_PROPERTY(quint32, platformSerial, 0)
+
 public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();
@@ -189,7 +191,7 @@ signals:
 
     void bleNameChanged(const QString& name);
 
-    void serialNumberChanged(bool success);
+    void serialNumberChanged(bool success, int serialNumber);
 
 public slots:
     void sendJsonData(const QJsonObject &data);
