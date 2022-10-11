@@ -42,6 +42,7 @@ const QString MainWindow::MANUAL_STRING = "<a href=\"%1\">" + tr("User Manual") 
 const QString MainWindow::BLE_MANUAL_URL = "https://raw.githubusercontent.com/mooltipass/minible/master/MooltipassMiniBLEUserManual.pdf";
 const QString MainWindow::MINI_MANUAL_URL = "https://raw.githubusercontent.com/limpkin/mooltipass/master/user_manual_mini.pdf";
 const QString MainWindow::BUNDLE_OUTDATED_TEXT = tr("New bundle update available <a href=\"https://www.themooltipass.com/updates/index.php?sn=%1&bundlev=%2\">here.</a>");
+const QString MainWindow::SERIAL_STR_START = "MOOLTIP";
 
 void MainWindow::initHelpLabels()
 {
@@ -1943,6 +1944,46 @@ void MainWindow::fillInitialCurrentCategories()
     ui->comboBoxBleCurrentCategory->blockSignals(false);
 }
 
+bool MainWindow::validateSerialString(const QString &serialStr, uint &serialNum)
+{
+    /*
+     *  Correct serial string: MOOLTIPXXXXY,
+     *  XXXX is the new serial number
+     *  Y is a char which is 'A' + (XXXX)%26
+     */
+
+    const int serialStartSize = SERIAL_STR_START.size();
+    const int serialStringSize = serialStartSize + SERIAL_NUM_LENGTH + 1;
+    if (serialStr.size() != serialStringSize)
+    {
+        qCritical() << "Serial string has an incorrect size";
+        return false;
+    }
+
+    if (!serialStr.startsWith(SERIAL_STR_START))
+    {
+        qCritical() << "Serial string is not started with " << SERIAL_STR_START;
+        return false;
+    }
+    QString serialPart = serialStr.mid(serialStartSize, SERIAL_NUM_LENGTH);
+    bool ok = false;
+    serialNum = serialPart.toUInt(&ok);
+    if (!ok)
+    {
+        qCritical() << "Serial number part is not a number";
+        return false;
+    }
+
+    int hash = serialStr.toStdString()[serialStringSize - 1] - 'A';
+    if (hash != serialNum % Common::ALPHABET_SIZE)
+    {
+        serialNum = 0;
+        qCritical() << "Incorrect hash in serial string";
+        return false;
+    }
+    return true;
+}
+
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
@@ -2435,8 +2476,8 @@ void MainWindow::onIncorrectSerialNumberClicked()
                              QLineEdit::Normal, "", &ok);
     if (ok)
     {
-        auto serialNum = serialNumStr.toUInt(&ok);
-        if (ok)
+        uint serialNum = 0;
+        if (validateSerialString(serialNumStr, serialNum))
         {
             wsClient->sendSetSerialNumber(serialNum);
         }
