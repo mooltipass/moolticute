@@ -28,7 +28,6 @@
 #include "SettingsGuiHelper.h"
 #include "DeviceDetector.h"
 #include "SystemNotifications/SystemNotification.h"
-#include <limits>
 
 #include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
@@ -491,6 +490,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::fwVersionChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwMemoryChanged, this, &MainWindow::updateSerialInfos);
+    connect(wsClient, &WSClient::platformSerialChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::displayBundleVersion);
     connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::sendRequestNotes);
     connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::onBundleVersionChanged);
@@ -975,7 +975,6 @@ void MainWindow::updateSerialInfos() {
         ui->labelAboutFwVersValue->setVisible(!wsClient->isMPBLE());
         ui->label_UserManual->setText(MANUAL_STRING.arg(wsClient->isMPBLE() ? BLE_MANUAL_URL : MINI_MANUAL_URL));
         ui->label_UserManual->show();
-        qCritical() << "Platform serial: " << wsClient->get_platformSerial();
         if (wsClient->isMPBLE() && serialNum > STARTING_NOT_FLASHED_SERIAL &&
                 wsClient->get_hwSerial() != wsClient->get_platformSerial())
         {

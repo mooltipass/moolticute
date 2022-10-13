@@ -635,6 +635,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::chargingStatusChanged, this, &WSServerCon::sendChargingStatus);
         connect(mpBle, &MPDeviceBleImpl::nimhReconditionFinished, this, &WSServerCon::sendNimhReconditionFinished);
         connect(mpBle, &MPDeviceBleImpl::changeBleName, this, &WSServerCon::sendBleName);
+        connect(mpBle, &MPDeviceBleImpl::platformSerialNumberChanged, this, &WSServerCon::sendVersion);
         connect(mpdevice, &MPDevice::displayMiniImportWarning, this, &WSServerCon::sendMiniImportWarning);
     }
 }

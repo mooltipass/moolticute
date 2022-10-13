@@ -3917,8 +3917,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>487</width>
-               <height>590</height>
+               <width>646</width>
+               <height>874</height>
               </rect>
              </property>
              <property name="autoFillBackground">
