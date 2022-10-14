@@ -1404,7 +1404,12 @@ void CredentialsManagement::checkLinkingOnLoginSelected(const QModelIndex &srcIn
 
 QString CredentialsManagement::processMultipleDomainsInput(const QString& service, const QString &domains)
 {
-    auto domainList = domains.split(MULT_DOMAIN_SEPARATOR, Qt::SkipEmptyParts);
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    auto splitBehavior = QString::SkipEmptyParts;
+#else
+    auto splitBehavior = Qt::SkipEmptyParts;
+#endif
+    auto domainList = domains.split(MULT_DOMAIN_SEPARATOR, splitBehavior);
     QStringList validDomains;
     QString result = "";
     auto serviceDomain = service;
@@ -1413,13 +1418,13 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
         ParseDomain parsedService{service};
         serviceDomain = parsedService.domain();
     }
-    for (auto domain : domainList)
+    for (auto& domain : domainList)
     {
         if (!domain.startsWith('.'))
         {
             domain.prepend('.');
         }
-        ParseDomain dom{serviceDomain + domain};
+        ParseDomain dom(serviceDomain + domain);
         if (domain == dom.tld())
         {
             validDomains.append(domain);
