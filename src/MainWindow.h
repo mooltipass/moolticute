@@ -211,6 +211,10 @@ private slots:
 
     void onBleNameChanged(const QString& name);
 
+    void onIncorrectSerialNumberClicked();
+
+    void onSerialNumberChanged(bool success, int serialNumber);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -255,6 +259,8 @@ private:
     void fillBLEBrightnessComboBox(QComboBox * cb);
 
     void fillInitialCurrentCategories();
+
+    bool validateSerialString(const QString& serialStr, uint& serialNum);
 
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;
@@ -319,9 +325,12 @@ private:
     static const QString BLE_MANUAL_URL;
     static const QString MINI_MANUAL_URL;
     static const QString BUNDLE_OUTDATED_TEXT;
+    static const QString SERIAL_STR_START;
+    static constexpr int SERIAL_NUM_LENGTH = 4;
 #ifdef Q_OS_MAC
     static constexpr int MAC_DEFAULT_HEIGHT = 500;
 #endif
+    static constexpr int STARTING_NOT_FLASHED_SERIAL = 2000;
 };
 
 #endif // MAINWINDOW_H

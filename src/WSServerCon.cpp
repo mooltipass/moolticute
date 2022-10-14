@@ -635,6 +635,7 @@ void WSServerCon::resetDevice(MPDevice *dev)
         connect(mpBle, &MPDeviceBleImpl::chargingStatusChanged, this, &WSServerCon::sendChargingStatus);
         connect(mpBle, &MPDeviceBleImpl::nimhReconditionFinished, this, &WSServerCon::sendNimhReconditionFinished);
         connect(mpBle, &MPDeviceBleImpl::changeBleName, this, &WSServerCon::sendBleName);
+        connect(mpBle, &MPDeviceBleImpl::platformSerialNumberChanged, this, &WSServerCon::sendVersion);
         connect(mpdevice, &MPDevice::displayMiniImportWarning, this, &WSServerCon::sendMiniImportWarning);
     }
 }
@@ -751,6 +752,7 @@ void WSServerCon::sendVersion()
             data["aux_mcu_version"] = bleImpl->get_auxMCUVersion();
             data["main_mcu_version"] = bleImpl->get_mainMCUVersion();
             data["bundle_version"] = bleImpl->get_bundleVersion();
+            data["platform_serial_number"] = static_cast<qint64>(bleImpl->get_platformSerialNumber());
         }
     }
     sendJsonMessage({{ "msg", "version_changed" }, { "data", data }});
@@ -1573,6 +1575,24 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
             QJsonObject oroot = root;
             ores["success"] = success;
             ores["name"] = QString{data};
+            oroot["data"] = ores;
+            sendJsonMessage(oroot);
+        });
+    }
+    else if (root["msg"] == "set_serial_number")
+    {
+        QJsonObject o = root["data"].toObject();
+        auto serialNum = o["serial_number"].toDouble();
+        bleImpl->setSerialNumber(serialNum,
+                [this, root, serialNum](bool success)
+        {
+            if (!WSServer::Instance()->checkClientExists(this))
+                return;
+
+            QJsonObject ores;
+            QJsonObject oroot = root;
+            ores["success"] = success;
+            ores["serial_number"] = serialNum;
             oroot["data"] = ores;
             sendJsonMessage(oroot);
         });

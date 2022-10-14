@@ -51,6 +51,8 @@ class WSClient: public QObject
     QT_WRITABLE_PROPERTY(int, bundleVersion, 0)
     QT_WRITABLE_PROPERTY(bool, advancedMenu, false)
 
+    QT_WRITABLE_PROPERTY(quint32, platformSerial, 0)
+
 public:
     explicit WSClient(QObject *parent = nullptr);
     ~WSClient();
@@ -123,6 +125,7 @@ public:
     void sendNiMHReconditioning();
     void sendSecurityChallenge(QString str);
     void sendSetBleName(QString name);
+    void sendSetSerialNumber(uint serialNum);
 
     void sendChangedParam(const QString& paramName, int value);
 
@@ -187,6 +190,8 @@ signals:
     void fileDeleted(bool success, const QString& file);
 
     void bleNameChanged(const QString& name);
+
+    void serialNumberChanged(bool success, int serialNumber);
 
 public slots:
     void sendJsonData(const QJsonObject &data);

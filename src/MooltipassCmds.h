@@ -173,6 +173,7 @@ public:
             WAKE_UP_DEVICE      ,
             SET_BLE_NAME        ,
             GET_BLE_NAME        ,
+            SET_SERIAL_NUMBER   ,
             CMD_DBG_MESSAGE     ,
             CMD_DBG_OPEN_DISP_BUFFER    ,
             CMD_DBG_SEND_TO_DISP_BUFFER ,

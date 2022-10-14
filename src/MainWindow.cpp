@@ -41,6 +41,7 @@ const QString MainWindow::MANUAL_STRING = "<a href=\"%1\">" + tr("User Manual") 
 const QString MainWindow::BLE_MANUAL_URL = "https://raw.githubusercontent.com/mooltipass/minible/master/MooltipassMiniBLEUserManual.pdf";
 const QString MainWindow::MINI_MANUAL_URL = "https://raw.githubusercontent.com/limpkin/mooltipass/master/user_manual_mini.pdf";
 const QString MainWindow::BUNDLE_OUTDATED_TEXT = tr("New bundle update available <a href=\"https://www.themooltipass.com/updates/index.php?sn=%1&bundlev=%2\">here.</a>");
+const QString MainWindow::SERIAL_STR_START = "MOOLTIP";
 
 void MainWindow::initHelpLabels()
 {
@@ -129,6 +130,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->labelAboutAuxMCU->setText(tr("Aux MCU version:"));
     ui->labelAboutMainMCU->setText(tr("Main MCU version:"));
+
+    ui->widgetNotFlashedWarning->hide();
+    ui->labelNotFlashedWarningIcon->setPixmap(AppGui::qtAwesome()->icon(fa::warning).pixmap(QSize(20, 20)));
+    ui->labelSerialNumberIncorrect->setStyleSheet("QLabel {color: blue;}");
+    connect(ui->labelSerialNumberIncorrect, &ClickableLabel::clicked, this, &MainWindow::onIncorrectSerialNumberClicked);
 
     ui->pbBleBattery->setStyleSheet("border: 1px solid black");
     ui->pbBleBattery->hide();
@@ -484,6 +490,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     connect(wsClient, &WSClient::fwVersionChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwSerialChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::hwMemoryChanged, this, &MainWindow::updateSerialInfos);
+    connect(wsClient, &WSClient::platformSerialChanged, this, &MainWindow::updateSerialInfos);
     connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::displayBundleVersion);
     connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::sendRequestNotes);
     connect(wsClient, &WSClient::bundleVersionChanged, this, &MainWindow::onBundleVersionChanged);
@@ -627,6 +634,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->checkBoxEnforceUSBLayout->setChecked(m_keyboardUsbLayoutOrigValue);
 
     connect(wsClient, &WSClient::bleNameChanged, this, &MainWindow::onBleNameChanged);
+
+    connect(wsClient, &WSClient::serialNumberChanged, this, &MainWindow::onSerialNumberChanged);
 
     wsClient->settingsHelper()->setMainWindow(this);
 #ifdef Q_OS_WIN
@@ -957,7 +966,8 @@ void MainWindow::updateSerialInfos() {
     if(connected)
     {
         ui->labelAboutFwVersValue->setText(wsClient->get_fwVersion());
-        ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? QString::number(wsClient->get_hwSerial()) : NONE_STRING);
+        auto serialNum = QString::number(wsClient->get_hwSerial());
+        ui->labelAbouHwSerialValue->setText(wsClient->get_hwSerial() > 0 ? serialNum : NONE_STRING);
         ui->labelAbouHwMemoryValue->setText(wsClient->get_hwMemory() > 0 ? tr("%1Mb").arg(wsClient->get_hwMemory()): NONE_STRING);
         displayMCUVersion(wsClient->isMPBLE());
         //When ble is detected not displaying fw version
@@ -965,6 +975,15 @@ void MainWindow::updateSerialInfos() {
         ui->labelAboutFwVersValue->setVisible(!wsClient->isMPBLE());
         ui->label_UserManual->setText(MANUAL_STRING.arg(wsClient->isMPBLE() ? BLE_MANUAL_URL : MINI_MANUAL_URL));
         ui->label_UserManual->show();
+        if (wsClient->isMPBLE() && serialNum > STARTING_NOT_FLASHED_SERIAL &&
+                wsClient->get_hwSerial() != wsClient->get_platformSerial())
+        {
+            ui->widgetNotFlashedWarning->show();
+        }
+        else
+        {
+            ui->widgetNotFlashedWarning->hide();
+        }
     }
     else
     {
@@ -977,6 +996,7 @@ void MainWindow::updateSerialInfos() {
         wsClient->set_auxMCUVersion(NONE_STRING);
         wsClient->set_mainMCUVersion(NONE_STRING);
         wsClient->set_bundleVersion(0);
+        wsClient->set_platformSerial(0);
         ui->label_UserManual->hide();
     }
 }
@@ -1923,6 +1943,46 @@ void MainWindow::fillInitialCurrentCategories()
     ui->comboBoxBleCurrentCategory->blockSignals(false);
 }
 
+bool MainWindow::validateSerialString(const QString &serialStr, uint &serialNum)
+{
+    /*
+     *  Correct serial string: MOOLTIPXXXXY,
+     *  XXXX is the new serial number
+     *  Y is a char which is 'A' + (XXXX)%26
+     */
+
+    const int serialStartSize = SERIAL_STR_START.size();
+    const int serialStringSize = serialStartSize + SERIAL_NUM_LENGTH + 1;
+    if (serialStr.size() != serialStringSize)
+    {
+        qCritical() << "Serial string has an incorrect size";
+        return false;
+    }
+
+    if (!serialStr.startsWith(SERIAL_STR_START))
+    {
+        qCritical() << "Serial string is not started with " << SERIAL_STR_START;
+        return false;
+    }
+    QString serialPart = serialStr.mid(serialStartSize, SERIAL_NUM_LENGTH);
+    bool ok = false;
+    serialNum = serialPart.toUInt(&ok);
+    if (!ok)
+    {
+        qCritical() << "Serial number part is not a number";
+        return false;
+    }
+
+    int hash = serialStr.toStdString()[serialStringSize - 1] - 'A';
+    if (hash != serialNum % Common::ALPHABET_SIZE)
+    {
+        serialNum = 0;
+        qCritical() << "Incorrect hash in serial string";
+        return false;
+    }
+    return true;
+}
+
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
@@ -2404,4 +2464,49 @@ void MainWindow::onBleNameChanged(const QString &name)
     m_bleNameOriginal = name;
     ui->lineEditBleName->setText(name);
     checkSettingsChanged();
+}
+
+void MainWindow::onIncorrectSerialNumberClicked()
+{
+    bool ok = false;
+    QString serialNumStr = QInputDialog::getText(this, tr("Incorrect Serial Number"),
+                             tr("It looks like your device serial number doesn't match the one present on your device's case.\n") +
+                             tr("Please reach out to support@themooltipass.com for the right code to enter below"),
+                             QLineEdit::Normal, "", &ok);
+    if (ok)
+    {
+        uint serialNum = 0;
+        if (validateSerialString(serialNumStr, serialNum))
+        {
+            wsClient->sendSetSerialNumber(serialNum);
+        }
+        else
+        {
+            qCritical() << "The entered serial number is incorrect: " << serialNumStr;
+            QMessageBox::critical(this, tr("Incorrect Serial Number"),
+                                  tr("The entered serial number is incorrect!"));
+        }
+    }
+}
+
+void MainWindow::onSerialNumberChanged(bool success, int serialNumber)
+{
+    auto title = tr("Serial number change");
+    if (success)
+    {
+        wsClient->set_hwSerial(serialNumber);
+        if (wsClient->get_hwSerial() == wsClient->get_platformSerial())
+        {
+            QMessageBox::information(this, title, tr("Set serial number successfully."));
+            ui->widgetNotFlashedWarning->hide();
+        }
+        else
+        {
+            QMessageBox::critical(this, title, tr("Serial number still does not match platform serial."));
+        }
+    }
+    else
+    {
+        QMessageBox::critical(this, title, tr("Set serial number failed."));
+    }
 }

@@ -48,6 +48,7 @@ void MPDeviceBleImpl::getPlatInfo()
     connect(jobs, &AsyncJobs::finished, [this](const QByteArray &data)
     {
         QByteArray response = bleProt->getFullPayload(data);
+        const auto messageSize = bleProt->getMessageSize(data);
         const auto mainMajor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[0]), static_cast<quint8>(response[1]));
         const auto mainMinor = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[2]), static_cast<quint8>(response[3]));
         set_mainMCUVersion(QString::number(mainMajor) + "." + QString::number(mainMinor));
@@ -63,6 +64,16 @@ void MPDeviceBleImpl::getPlatInfo()
         mpDev->set_flashMbSize(memorySize);
         const auto bundleVersion = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[14]), static_cast<quint8>(response[15]));
         set_bundleVersion(bundleVersion);
+        if (messageSize > PLATFORM_SERIAL_NUM_FIRST_BYTE)
+        {
+            const auto serialPlatformLower = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[PLATFORM_SERIAL_NUM_FIRST_BYTE]),
+                                                                            static_cast<quint8>(response[PLATFORM_SERIAL_NUM_FIRST_BYTE+1]));
+            const auto serialPlatformUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(response[PLATFORM_SERIAL_NUM_FIRST_BYTE+2]),
+                                                                            static_cast<quint8>(response[PLATFORM_SERIAL_NUM_FIRST_BYTE+3]));
+            quint32 serialPlatformNum = serialPlatformLower;
+            serialPlatformNum |= static_cast<quint32>((serialPlatformUpper<<16));
+            set_platformSerialNumber(serialPlatformNum);
+        }
     });
 
     mpDev->enqueueAndRunJob(jobs);
@@ -1958,6 +1969,26 @@ void MPDeviceBleImpl::getBleName(const MessageHandlerCbData &cb)
 QString MPDeviceBleImpl::getBleNameFromArray(const QByteArray &arr) const
 {
     return bleProt->toQString(arr);
+}
+
+void MPDeviceBleImpl::setSerialNumber(quint32 serialNum, std::function<void (bool)> cb)
+{
+    QByteArray serialNumArr = bleProt->toLittleEndianFromInt32(serialNum);
+    auto *jobs = new AsyncJobs(QString("Set Serial number"), this);
+    jobs->append(new MPCommandJob(mpDev, MPCmd::SET_SERIAL_NUMBER,
+                                  serialNumArr,
+                                  [this, serialNum, cb](const QByteArray &data, bool &) -> bool
+    {
+        if (bleProt->getFirstPayloadByte(data) != MSG_SUCCESS)
+        {
+            qWarning() << "Set serial number to: " << serialNum << " failed";
+            cb(false);
+            return false;
+        }
+        cb(true);
+        return true;
+    }));
+    mpDev->enqueueAndRunJob(jobs);
 }
 
 Common::SubdomainSelection MPDeviceBleImpl::getForceSubdomainSelection() const

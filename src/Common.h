@@ -357,6 +357,7 @@ public:
     static const int BLE_BUNDLE_WITH_MIRRORING = 11;
     static const int BLE_BUNDLE_WITH_MULT_DOMAINS = 11;
     static const char ZERO_BYTE = static_cast<char>(0x00);
+    static const int ALPHABET_SIZE = 26;
     static QByteArray NOT_SET_ADDR;
 };
 
