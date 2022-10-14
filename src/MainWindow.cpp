@@ -975,7 +975,7 @@ void MainWindow::updateSerialInfos() {
         ui->labelAboutFwVersValue->setVisible(!wsClient->isMPBLE());
         ui->label_UserManual->setText(MANUAL_STRING.arg(wsClient->isMPBLE() ? BLE_MANUAL_URL : MINI_MANUAL_URL));
         ui->label_UserManual->show();
-        if (wsClient->isMPBLE() && serialNum > STARTING_NOT_FLASHED_SERIAL &&
+        if (wsClient->isMPBLE() && wsClient->get_hwSerial() > STARTING_NOT_FLASHED_SERIAL &&
                 wsClient->get_hwSerial() != wsClient->get_platformSerial())
         {
             ui->widgetNotFlashedWarning->show();
