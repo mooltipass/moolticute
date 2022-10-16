@@ -4042,7 +4042,10 @@ void MPDevice::getCurrentCardCPZ()
     connect(cpzjobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
         qCritical() << "Loading card CPZ failed";
-        getCurrentCardCPZ();
+        if (!isBLE())
+        {
+            getCurrentCardCPZ();
+        }
     });
 
     jobsQueue.enqueue(cpzjobs);
@@ -4129,7 +4132,10 @@ void MPDevice::getChangeNumbers()
     connect(v12jobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
         qCritical() << "Loading change numbers failed";
-        getChangeNumbers(); // memory: does it get piled on?
+        if (!isBLE())
+        {
+            getChangeNumbers(); // memory: does it get piled on?
+        }
     });
 
     jobsQueue.enqueue(v12jobs);
