@@ -4129,7 +4129,6 @@ void MPDevice::getChangeNumbers()
     connect(v12jobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
         qCritical() << "Loading change numbers failed";
-        getChangeNumbers(); // memory: does it get piled on?
     });
 
     jobsQueue.enqueue(v12jobs);
