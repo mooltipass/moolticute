@@ -58,7 +58,13 @@ void ItemDelegate::paintServiceItem(QPainter *painter, const QStyleOptionViewIte
             pen.setColor(QColor{0x66, 0x66, 0x66});
             painter->setFont(f);
             painter->setPen(pen);
-            QPoint domainsPos(option.rect.topLeft() + QPoint(m_serviceFontMetrics.horizontalAdvance(pServiceItem->name()) + 10, 0));
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+            static constexpr int DOMAIN_DIST_MULT = 6;
+            int textSize = pServiceItem->name().length() * DOMAIN_DIST_MULT;
+#else
+            int textSize = m_serviceFontMetrics.horizontalAdvance(pServiceItem->name());
+#endif
+            QPoint domainsPos(option.rect.topLeft() + QPoint(textSize + 10, 0));
             QSize domainsSz(QSize(option.rect.width(), option.rect.height()));
             QRect domainsRec(domainsPos, domainsSz);
             painter->drawText(domainsRec, Qt::AlignLeft|Qt::AlignVCenter, pServiceItem->multipleDomainsDisplay());
