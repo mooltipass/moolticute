@@ -208,7 +208,10 @@ void CredentialsManagement::setFilterCredLayout()
     ui->toolButtonFavFilter->setIcon(AppGui::qtAwesome()->icon(fa::staro));
     QHBoxLayout *filterLayout = new QHBoxLayout(ui->lineEditFilterCred);
 #if QT_VERSION < 0x060000
+    // Margin is obsolate property for layout
     filterLayout->setMargin(0);
+#else
+    filterLayout->setContentsMargins(0,0,0,0);
 #endif
     filterLayout->addStretch();
     filterLayout->addWidget(ui->toolButtonClearFilter);
