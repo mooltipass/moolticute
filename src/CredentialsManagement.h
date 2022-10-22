@@ -142,6 +142,8 @@ private:
 
     QString processMultipleDomainsInput(const QString& service, const QString &domains);
 
+    bool isUICategoryClean() const;
+
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;
