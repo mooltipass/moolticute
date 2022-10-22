@@ -1440,6 +1440,14 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
     return validDomains.join(MULT_DOMAIN_SEPARATOR);
 }
 
+bool CredentialsManagement::isUICategoryClean() const
+{
+    return ui->lineEditCategory1->text() == m_pCredModel->getCategoryName(1) &&
+           ui->lineEditCategory2->text() == m_pCredModel->getCategoryName(2) &&
+           ui->lineEditCategory3->text() == m_pCredModel->getCategoryName(3) &&
+           ui->lineEditCategory4->text() == m_pCredModel->getCategoryName(4);
+}
+
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
 {
     bool favFilter = m_pCredModelFilter->switchFavFilter();
@@ -1478,6 +1486,11 @@ void CredentialsManagement::onCategoryEdited(const QString &edited)
     {
         ui->pushButtonSaveCategories->show();
         m_isSetCategoryClean = false;
+    }
+    else if (isUICategoryClean())
+    {
+        m_isSetCategoryClean = true;
+        ui->pushButtonSaveCategories->hide();
     }
 }
 
