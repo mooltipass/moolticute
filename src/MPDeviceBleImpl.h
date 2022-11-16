@@ -70,6 +70,7 @@ public:
 
     void fetchNotes();
     void fetchNotes(AsyncJobs *jobs, QByteArray addr);
+    void fetchNotesLater();
     QList<QString> getNotes() const { return m_notes; }
     void getNoteNode(QString note, std::function<void(bool, QString, QString, QByteArray)> cb);
 

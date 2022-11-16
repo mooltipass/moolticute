@@ -4110,6 +4110,7 @@ void MPDevice::getChangeNumbers()
             if (isBLE())
             {
                 bleImpl->fetchDataFiles();
+                bleImpl->fetchNotes();
             }
             else
             {
@@ -5034,7 +5035,7 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services, QStringList notes,
 
         /* Generate save packets */
         AsyncJobs* saveJobs = new AsyncJobs("Starting save operations...", this);
-        connect(saveJobs, &AsyncJobs::finished, [this, services, cb](const QByteArray &data)
+        connect(saveJobs, &AsyncJobs::finished, [this, services, cb, notes](const QByteArray &data)
         {
             Q_UNUSED(data);
             exitMemMgmtMode(true);
@@ -5046,6 +5047,15 @@ void  MPDevice::deleteDataNodesAndLeave(QStringList services, QStringList notes,
             {
                 /// Improvement: only trigger file storage after we have removed all files
                 removeFileFromCache(services[i]);
+            }
+
+            if (isBLE() && !notes.isEmpty())
+            {
+                /* If a note was deleted fetch notes again,
+                 * fetchNotesLater ensures this happens only
+                 * after exitMMM run.
+                 */
+                bleImpl->fetchNotesLater();
             }
 
             return;
@@ -6212,6 +6222,10 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                         filesCache.save(list);
                         filesCache.setDbChangeNumber(importedDataDbChangeNumber);
                         emit filesCacheChanged();
+                        if (isBLE())
+                        {
+                            emit bleImpl->notesFetched();
+                        }
 
                         cleanImportedVars();
                         exitMemMgmtMode(false);
@@ -6296,6 +6310,11 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                     filesCache.save(list);
                     filesCache.setDbChangeNumber(importedDataDbChangeNumber);
                     emit filesCacheChanged();
+
+                    if (isBLE())
+                    {
+                        emit bleImpl->notesFetched();
+                    }
 
                     cleanImportedVars();
                     exitMemMgmtMode(false);

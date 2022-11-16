@@ -290,7 +290,7 @@ void MPDeviceBleImpl::deleteFile(QString file, bool isNote, std::function<void (
 
 void MPDeviceBleImpl::fetchNotes()
 {
-    if (mpDev->get_status() != Common::Unlocked)
+    if (mpDev->get_status() != Common::Unlocked && mpDev->get_status() != Common::MMMMode)
     {
         if (AppDaemon::isDebugDev())
         {
@@ -336,6 +336,11 @@ void MPDeviceBleImpl::fetchNotes(AsyncJobs *jobs, QByteArray addr)
                             return true;
                         }
     ));
+}
+
+void MPDeviceBleImpl::fetchNotesLater()
+{
+    createAndAddCustomJob("Fetch notes", [this](){fetchNotes();});
 }
 
 void MPDeviceBleImpl::getNoteNode(QString note, std::function<void (bool, QString, QString, QByteArray)> cb)
