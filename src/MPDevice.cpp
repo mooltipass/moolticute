@@ -7752,7 +7752,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
         /* Check format */
         bool isTotpCred = isBLE() && (MessageProtocolBLE::TOTP_PACKAGE_SIZE == qjobject.size());
         bool removeTOTP = false;
-        if (qjobject.size() != pMesProt->getCredentialPackageSize() && !isTotpCred)
+        if (qjobject.size() != pMesProt->getCredentialPackageSize() && !isTotpCred && !isCsv)
         {
             qCritical() << "Unknown JSON return format:" << qjobject;
             cb(false, "Wrong JSON formated credential list");
