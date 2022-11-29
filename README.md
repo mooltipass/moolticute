@@ -32,6 +32,8 @@ Packages are build and available here: https://github.com/mooltipass/moolticute/
 ##### Linux
  - Requires the qt-dbus module
  - Requires to install [udev rule](https://github.com/mooltipass/mooltipass-udev) for it
+   - Note: For Linux system without systemd (eg: Void Linux) please
+     refer to [dedicated section](#non-systemd-linux).
 
 Moolticute comes in two part on Linux:
   - A daemon that runs in background named moolticuted that proxy
@@ -96,6 +98,24 @@ services.udev.extraRules = '' # if not slip rules in manually
             '';
 ```
 
+##### Non systemd Linux
+Main [udev rules](https://aur.archlinux.org/packages/mooltipass-udev/)
+relies on integration between systemd, systemd-login and systemd-udevd
+to automatically allow user logged in to access mooltipass devices.
+This will not works on Linux ecosystem without systemd and one
+workaround might be to change the `TAG+="uaccess"` to
+`GROUP="plugdev"` and add your interactive user to this group.
+
+So please apply the following patch to the official udev rules:
+```
+TODO PATCH
+```
+Or use home made pkg recipe from PoroCYon. TODO add this
+
+Refer to this issue if needed https://github.com/mooltipass/mooltipass-udev/pull/3
+
+
+
 ### How to build
 
 For now, no binary releases are out yet. You will need to build the software by following the next step.
@@ -108,7 +128,7 @@ Two method can be used to build, by using QtCreator IDE, or from command line (t
 
  - Download and install the Qt SDK from their [website](http://qt.io)
  - Start Qt-Creator
- - Open the main Moolticute.pro project file 
+ - Open the main Moolticute.pro project file
     - Note for Windows users: make sure that you select a "kit" that uses the MinGW compiler.
       Moolticute currently won't compile successfully when using the Microsoft Visual C++ compiler.
  - Click on the "play" button to build and run
@@ -143,6 +163,4 @@ qmake-qt5 ../Moolticute.pro
 
 ### Licensing
 
-Moolticute is free software: you can redistribute it and/or modify it under the terms of the GNU Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. 
-       
- 
+Moolticute is free software: you can redistribute it and/or modify it under the terms of the GNU Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
