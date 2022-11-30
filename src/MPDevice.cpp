@@ -4271,7 +4271,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
             return false;
         }
 
-        QString l = pMesProt->getFullPayload(data);
+        QString l = Common::getUntilNullByte(pMesProt->getFullPayload(data));
         if (!login.isEmpty() && l != login)
         {
             jobs->setCurrentJobError("login mismatch");
@@ -4298,7 +4298,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
                 return true; //Do not fail if description is not available for this node
             }*/
             QVariantMap m = jobs->user_data.toMap();
-            m["description"] = pMesProt->getFullPayload(data);
+            m["description"] = Common::getUntilNullByte(pMesProt->getFullPayload(data));
             jobs->user_data = m;
             return true;
         }));
@@ -4321,7 +4321,7 @@ void MPDevice::getCredential(QString service, const QString &login, const QStrin
         //all jobs finished success
 
         qInfo() << "Password retreived ok";
-        QString pass = pMesProt->getFullPayload(data);
+        QString pass = Common::getUntilNullByte(pMesProt->getFullPayload(data));
 
         QVariantMap m = jobs->user_data.toMap();
         cb(true, QString(), m["service"].toString(), m["login"].toString(), pass, m["description"].toString());

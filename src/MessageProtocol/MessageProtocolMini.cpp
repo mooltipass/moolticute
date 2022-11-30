@@ -124,7 +124,7 @@ QByteArray MessageProtocolMini::toByteArray(const QString &input)
 
 QString MessageProtocolMini::toQString(const QByteArray &data)
 {
-    return QString::fromUtf8(data);
+    return QString::fromUtf8(Common::getUntilNullByte(data));
 }
 
 QByteArray MessageProtocolMini::convertDate(const QDateTime& dateTime)
