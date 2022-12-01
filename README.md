@@ -32,8 +32,7 @@ Packages are build and available here: https://github.com/mooltipass/moolticute/
 ##### Linux
  - Requires the qt-dbus module
  - Requires to install [udev rule](https://github.com/mooltipass/mooltipass-udev) for it
-   - Note: For Linux system without systemd (eg: Void Linux) please
-     refer to [dedicated section](#non-systemd-linux).
+   - Note: For Linux systems without systemd please refer to [dedicated section](#non-systemd-linux)
 
 Moolticute comes in two part on Linux:
   - A daemon that runs in background named moolticuted that proxy
@@ -99,22 +98,15 @@ services.udev.extraRules = '' # if not slip rules in manually
 ```
 
 ##### Non systemd Linux
-Main [udev rules](https://aur.archlinux.org/packages/mooltipass-udev/)
+The main [udev rules](https://aur.archlinux.org/packages/mooltipass-udev/)
 relies on integration between systemd, systemd-login and systemd-udevd
-to automatically allow user logged in to access mooltipass devices.
-This will not works on Linux ecosystem without systemd and one
-workaround might be to change the `TAG+="uaccess"` to
+to automatically allow any user logged in to access mooltipass devices.
+This will not work on Linux ecosystem without systemd, one
+workaround is to change the `TAG+="uaccess"` to
 `GROUP="plugdev"` and add your interactive user to this group.
 
-So please apply the following patch to the official udev rules:
-```
-TODO PATCH
-```
-Or use home made pkg recipe from PoroCYon. TODO add this
-
-Refer to this issue if needed https://github.com/mooltipass/mooltipass-udev/pull/3
-
-
+Refer to [this
+issue](https://github.com/mooltipass/mooltipass-udev/pull/3) for more information.
 
 ### How to build
 
