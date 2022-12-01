@@ -98,7 +98,7 @@ services.udev.extraRules = '' # if not slip rules in manually
 ```
 
 ##### Non systemd Linux
-The main [udev rules](https://aur.archlinux.org/packages/mooltipass-udev/)
+The main [udev rules](https://github.com/mooltipass/mooltipass-udev)
 relies on integration between systemd, systemd-login and systemd-udevd
 to automatically allow any user logged in to access mooltipass devices.
 This will not work on Linux ecosystem without systemd, one
