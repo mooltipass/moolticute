@@ -4917,7 +4917,7 @@ void MPDevice::setDataNode(QString service, const QByteArray &nodeData,
     if (!isBLE())
     {
         currentDataNode.resize(MP_DATA_HEADER_SIZE);
-        qToBigEndian(nodeData.size(), (quint8 *)currentDataNode.data());
+        qToBigEndian<quint32>(nodeData.size(), (quint8 *)currentDataNode.data());
     }
     currentDataNode.append(nodeData);
 
