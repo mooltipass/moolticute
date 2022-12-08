@@ -185,7 +185,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->credentialTreeView, &CredentialView::collapsed, this, &CredentialsManagement::onItemCollapsed);
     connect(ui->pushButtonExpandAll, &QPushButton::clicked, ui->credentialTreeView, &CredentialView::onChangeExpandedState);
     connect(ui->credentialTreeView, &CredentialView::expandedStateChanged, this, &CredentialsManagement::onExpandedStateChanged);
-    connect(m_pCredModel, &CredentialModel::selectLoginItem, this, &CredentialsManagement::onSelectLoginItem, Qt::QueuedConnection);
+    connect(m_pCredModel, &CredentialModel::selectLoginItem, this, &CredentialsManagement::onSelectLoginItem);
 
     m_tSelectLoginTimer.setInterval(50);
     m_tSelectLoginTimer.setSingleShot(true);
@@ -533,6 +533,11 @@ void CredentialsManagement::saveSelectedCredential()
 
     if (currentSelectionIndex.isValid())
         saveCredential(currentSelectionIndex);
+
+    if (!m_credentialLinkedAddr.isEmpty())
+    {
+        m_credentialLinkedAddr.clear();
+    }
 }
 
 void CredentialsManagement::saveSelectedTOTP()
