@@ -1412,7 +1412,7 @@ void MainWindow::daemonLogAppend(const QByteArray &logdata)
         dialogLog->appendData(logdata);
     logBuffer.append(logdata);
 
-    const int maxsz = 100 * 1024;
+    const int maxsz = 1000 * 1024;
 
     if (logBuffer.size() > maxsz)
         logBuffer = logBuffer.right(maxsz);
