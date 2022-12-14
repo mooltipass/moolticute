@@ -167,9 +167,6 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonNotes->setVisible(false);
 
     unsigned int keyModifiers = Qt::SHIFT;
-#ifndef Q_OS_MACOS
-    keyModifiers |= Qt::CTRL;
-#endif
 
     m_FilesAndSSHKeysTabsShortcut = new QShortcut(QKeySequence(keyModifiers | Qt::Key_F1), this);
     setKeysTabVisibleOnDemand(bSSHKeysTabVisibleOnDemand);
