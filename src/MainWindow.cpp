@@ -40,7 +40,7 @@ const QString MainWindow::DEFAULT_KEY_STRING = tr("Default Key");
 const QString MainWindow::MANUAL_STRING = "<a href=\"%1\">" + tr("User Manual") + "</a>";
 const QString MainWindow::BLE_MANUAL_URL = "https://raw.githubusercontent.com/mooltipass/minible/master/MooltipassMiniBLEUserManual.pdf";
 const QString MainWindow::MINI_MANUAL_URL = "https://raw.githubusercontent.com/limpkin/mooltipass/master/user_manual_mini.pdf";
-const QString MainWindow::BUNDLE_OUTDATED_TEXT = tr("Bundle v%1 update available <a href=\"https://www.themooltipass.com/updates/index.php?sn=%2&bundlev=%3\">here.</a>");
+const QString MainWindow::BUNDLE_OUTDATED_TEXT = tr("Bundle v%1 is available <a href=\"https://www.themooltipass.com/updates/index.php?sn=%2&bundlev=%3\">here</a>");
 const QString MainWindow::SERIAL_STR_START = "MOOLTIP";
 
 void MainWindow::initHelpLabels()
@@ -682,6 +682,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     ui->labelBundleOutdatedWarning->hide();
     ui->labelBundleOutdatedWarning->setPixmap(AppGui::qtAwesome()->icon(fa::warning).pixmap(QSize(20, 20)));
+    ui->labelBundleOutdatedWarning2->hide();
+    ui->labelBundleOutdatedWarning2->setPixmap(AppGui::qtAwesome()->icon(fa::warning).pixmap(QSize(20, 20)));
     ui->labelBundleOutdatedText->hide();
     ui->labelBundleOutdatedText->setTextFormat(Qt::RichText);
     ui->labelBundleOutdatedText->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -1838,11 +1840,13 @@ void MainWindow::displayBundleVersion()
             ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(Common::BLE_LATEST_BUNDLE_VERSION).arg(wsClient->get_hwSerial()).arg(wsClient->get_bundleVersion()));
             ui->labelBundleOutdatedText->show();
             ui->labelBundleOutdatedWarning->show();
+            ui->labelBundleOutdatedWarning2->show();
         }
         else
         {
             ui->labelBundleOutdatedText->hide();
             ui->labelBundleOutdatedWarning->hide();
+            ui->labelBundleOutdatedWarning2->hide();
         }
     }
     else
@@ -1851,6 +1855,7 @@ void MainWindow::displayBundleVersion()
         ui->labelBundleVersionValue->hide();
         ui->labelBundleOutdatedText->hide();
         ui->labelBundleOutdatedWarning->hide();
+        ui->labelBundleOutdatedWarning2->hide();
     }
 }
 
