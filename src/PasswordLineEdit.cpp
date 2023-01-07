@@ -48,7 +48,7 @@
     "}"
 
 PasswordLineEdit::PasswordLineEdit(QWidget* parent):
-    QLineEdit(parent),
+    SimpleLineEdit(parent),
     m_passwordProfilesModel(nullptr),
     m_passwordOptionsPopup(nullptr)
 
@@ -514,4 +514,18 @@ void LockedPasswordLineEdit::modifyLinkAction(bool isLink /*= true*/, bool remov
     {
         addAction(pwdAction, QLineEdit::TrailingPosition);
     }
+}
+
+SimpleLineEdit::SimpleLineEdit(QWidget *parent)
+    : QLineEdit{parent}
+{
+
+}
+
+void SimpleLineEdit::keyReleaseEvent(QKeyEvent *event)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QLineEdit::keyReleaseEvent(event);
+#endif
+    QWidget::keyReleaseEvent(event);
 }

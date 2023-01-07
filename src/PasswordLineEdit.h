@@ -70,7 +70,24 @@ private:
 
 
 class PasswordOptionsPopup;
-class PasswordLineEdit : public QLineEdit
+
+/**
+ * @brief The SimpleLineEdit class
+ * keyReleaseEvent is overwritten for QLineEdit in Qt6, but overwritten
+ * parent function is not called, so event is not delegated from QLineEdit,
+ * to fix this we call keyReleaseEvent for parent (QWidget) here.
+ */
+class SimpleLineEdit : public QLineEdit
+{
+    Q_OBJECT
+public:
+    SimpleLineEdit(QWidget* parent = nullptr);
+
+protected:
+    virtual void keyReleaseEvent(QKeyEvent *event) override;
+};
+
+class PasswordLineEdit : public SimpleLineEdit
 {
     Q_OBJECT
 public:
