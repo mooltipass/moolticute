@@ -639,6 +639,7 @@ void CredentialsManagement::saveChanges()
 
 void CredentialsManagement::keyPressEvent(QKeyEvent *event)
 {
+    QWidget::keyPressEvent(event);
     if (wsClient->get_memMgmtMode() || !wsClient->isMPBLE())
     {
         return;
@@ -652,6 +653,7 @@ void CredentialsManagement::keyPressEvent(QKeyEvent *event)
 
 void CredentialsManagement::keyReleaseEvent(QKeyEvent *event)
 {
+    QWidget::keyReleaseEvent(event);
     if (wsClient->get_memMgmtMode() || !wsClient->isMPBLE())
     {
         return;

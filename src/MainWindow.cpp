@@ -2391,6 +2391,7 @@ void MainWindow::displayNotePage()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    QMainWindow::keyPressEvent(event);
     if (event->key() == Qt::Key_Control)
     {
         DeviceDetector::instance().shiftPressed();
@@ -2403,6 +2404,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
+    QMainWindow::keyReleaseEvent(event);
     if (event->key() == Qt::Key_Control)
     {
         DeviceDetector::instance().shiftReleased();

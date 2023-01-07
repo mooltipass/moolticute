@@ -54,8 +54,10 @@ public:
 public slots:
     bool confirmDiscardUneditedCredentialChanges(const QModelIndex &proxyIndex = {});
     void saveChanges();
-    void keyPressEvent(QKeyEvent* event);
-    void keyReleaseEvent(QKeyEvent* event);
+
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void keyReleaseEvent(QKeyEvent *event) override;
 
 private slots:
     void enableCredentialsManagement(bool);
