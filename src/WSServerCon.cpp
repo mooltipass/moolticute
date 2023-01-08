@@ -401,7 +401,8 @@ void WSServerCon::processMessage(const QString &message)
             return;
         }
 
-        int maxSize = MP_MAX_FILE_SIZE;
+        // For BLE increase max file size to 20kB
+        int maxSize = mpdevice->isBLE() ? 2*MP_MAX_FILE_SIZE : MP_MAX_FILE_SIZE;
         if (service.toLower() == MC_SSH_SERVICE)
             maxSize = MP_MAX_SSH_SIZE;
         if (data.size() > maxSize)

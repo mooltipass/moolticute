@@ -578,7 +578,8 @@ void FilesManagement::addUpdateFile(QString service, QString filename, QProgress
     //Force all service names to lowercase
     service = service.toLower();
 
-    qint64 maxSize = MP_MAX_FILE_SIZE;
+    // For BLE increase max file size to 20kB
+    qint64 maxSize = DeviceDetector::instance().isBle() ? 2*MP_MAX_FILE_SIZE : MP_MAX_FILE_SIZE;
     if (service == MC_SSH_SERVICE)
         maxSize = MP_MAX_SSH_SIZE;
     QFileInfo fi(filename);
