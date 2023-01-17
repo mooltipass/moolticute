@@ -137,7 +137,14 @@ bool AppGui::initialize()
     });
 
     QAction* quitAction = new QAction(tr("&Quit"), this);
+
+#ifdef Q_OS_MAC
+    // Since Qt6 quit is not exiting application properly on Mac
+    // daemon keeps running and prepareToQuit is not called
+    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::exit, Qt::QueuedConnection);
+#else
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit, Qt::QueuedConnection);
+#endif
 
     QMenu *systrayMenu = new QMenu();
 
