@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>946</width>
-    <height>632</height>
+    <height>1120</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -576,8 +576,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>770</width>
-             <height>882</height>
+             <width>1014</width>
+             <height>1721</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -3879,35 +3879,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
            <number>120</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_31">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Moolticute Settings</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_17">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>10</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
            <widget class="QScrollArea" name="scrollAreaMCSettings">
             <property name="styleSheet">
              <string notr="true">QScrollArea { background-color:red }</string>
@@ -3930,7 +3901,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <x>0</x>
                <y>0</y>
                <width>646</width>
-               <height>874</height>
+               <height>941</height>
               </rect>
              </property>
              <property name="autoFillBackground">
@@ -3982,19 +3953,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_17">
                 <item>
-                 <widget class="QLabel" name="labelAutoStart">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Start Moolticute with the computer: Enabled</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
                  <spacer name="horizontalSpacer_21">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
@@ -4024,6 +3982,19 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_16">
+                <item>
+                 <widget class="QLabel" name="labelAutoStart">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Start Moolticute with the computer: Enabled</string>
+                  </property>
+                 </widget>
+                </item>
                 <item>
                  <widget class="QLabel" name="label_32">
                   <property name="sizePolicy">
@@ -4060,6 +4031,37 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   </property>
                   <property name="text">
                    <string>View</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_15">
+                <item>
+                 <widget class="QLabel" name="label_27">
+                  <property name="text">
+                   <string>Allow to use invalid or private TLDs</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_63">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBoxTLDCheck">
+                  <property name="text">
+                   <string>Disable TLD check</string>
                   </property>
                  </widget>
                 </item>
@@ -4581,6 +4583,35 @@ Hint: keep your mouse positioned over an option to get more details.</string>
              </layout>
             </widget>
            </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_31">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Moolticute Settings</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_17">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>10</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>

@@ -656,6 +656,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
 
     //Check is ssh agent opt has to be checked
     ui->checkBoxSSHAgent->setChecked(s.value("settings/auto_start_ssh").toBool());
+    ui->checkBoxTLDCheck->setChecked(s.value("settings/disable_tld_check").toBool());
     ui->lineEditSshArgs->setText(s.value("settings/ssh_args").toString());
 
     ui->scrollArea->setStyleSheet("QScrollArea { background-color:transparent; }");
@@ -1453,6 +1454,12 @@ void MainWindow::on_checkBoxSSHAgent_stateChanged(int)
 {
     QSettings s;
     s.setValue("settings/auto_start_ssh", ui->checkBoxSSHAgent->isChecked());
+}
+
+void MainWindow::on_checkBoxTLDCheck_stateChanged(int)
+{
+    QSettings s;
+    s.setValue("settings/disable_tld_check", ui->checkBoxTLDCheck->isChecked()); 
 }
 
 void MainWindow::on_pushButtonExportFile_clicked()
