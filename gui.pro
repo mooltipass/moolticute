@@ -211,8 +211,9 @@ unix {
     INSTALLS += target
 
     # install the desktop files
+
     xdgdesktop.path = $$PREFIX/share/applications
-    xdgdesktop.files += $$PWD/data/moolticute.desktop
+    xdgdesktop.extra = "sed 's|PREFIX|$${PREFIX}|' $$PWD/data/moolticute.desktop > $(INSTALL_ROOT)$$xdgdesktop.path/moolticute.desktop"
     INSTALLS += xdgdesktop
 
     # install icons
