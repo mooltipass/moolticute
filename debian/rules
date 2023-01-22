@@ -3,3 +3,9 @@
 %:
 	dh $@ 
 
+override_dh_auto_configure:
+	# qmake looks for either a single .pro or a .pro with
+	# the same name as the cwd. Since there are multiple .pro
+	# files, we copy the main one to the name qmake expects
+	cp Moolticute.pro $(shell basename $(CURDIR)).pro
+	dh_auto_configure
