@@ -178,6 +178,7 @@ private:
     static constexpr int MINI_PASSWORD_LENGTH = 31;
     static constexpr int BLE_PASSWORD_LENGTH = 64;
     static constexpr char MULT_DOMAIN_SEPARATOR = ',';
+    static const QString INVALID_DOMAIN_TEXT;
 
 signals:
     void wantEnterMemMode();

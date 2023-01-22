@@ -31,6 +31,9 @@
 #include "SettingsGuiBLE.h"
 #include "ParseDomain.h"
 
+const QString CredentialsManagement::INVALID_DOMAIN_TEXT =
+        tr("The following domains are invalid or private: <b><ul><li>%1</li></ul></b>They are not saved.");
+
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
 {
@@ -1421,6 +1424,7 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
 #endif
     auto domainList = domains.split(MULT_DOMAIN_SEPARATOR, splitBehavior);
     QStringList validDomains;
+    QStringList invalidDomains;
     QString result = "";
     auto serviceDomain = service;
     if (serviceDomain.contains('.'))
@@ -1442,7 +1446,13 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
         else
         {
             qWarning() << "The following domain is not valid: " << domain;
+            invalidDomains.append(domain);
         }
+    }
+    if (!invalidDomains.isEmpty())
+    {
+        QMessageBox::information(this, tr("Invalid domain"),
+                                INVALID_DOMAIN_TEXT.arg(invalidDomains.join("</li><li>")));
     }
     return validDomains.join(MULT_DOMAIN_SEPARATOR);
 }
