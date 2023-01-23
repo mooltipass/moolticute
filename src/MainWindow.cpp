@@ -29,7 +29,6 @@
 #include "DeviceDetector.h"
 #include "SystemNotifications/SystemNotification.h"
 
-#include "qtcsv/stringdata.h"
 #include "qtcsv/reader.h"
 
 const QString MainWindow::NONE_STRING = tr("None");
@@ -291,15 +290,23 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             [this]()
             {
                 ui->lineEdit_AvailableUsers->setText("");
+                m_firstBatteryPctReceived = BatteryNotiStatus::NO_STATUS;
             });
     connect(wsClient, &WSClient::updateBatteryPercent,
             [this](int battery)
             {
                 DeviceDetector::instance().setBattery(battery);
                 ui->pbBleBattery->setValue(battery);
-                if (battery < BATTERY_WARNING_LIMIT && !ui->label_charging->isVisible())
+                if (battery < BATTERY_WARNING_LIMIT && !ui->label_charging->isVisible() &&
+                        BatteryNotiStatus::VALID_BATTERY_RECIEVED == m_firstBatteryPctReceived)
                 {
                     SystemNotification::instance().createNotification(tr("Low Battery"), tr("Battery is below %1%, please charge your Mooltipass.").arg(BATTERY_WARNING_LIMIT));
+                    m_firstBatteryPctReceived = BatteryNotiStatus::LOW_BATTERY_DISPLAYED;
+                }
+                // Only display low battery warning after we received a valid battery pct
+                if (BatteryNotiStatus::NO_STATUS == m_firstBatteryPctReceived)
+                {
+                    m_firstBatteryPctReceived = BatteryNotiStatus::VALID_BATTERY_RECIEVED;
                 }
             });
 
@@ -313,6 +320,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 else
                 {
                     ui->label_charging->hide();
+                    m_firstBatteryPctReceived = BatteryNotiStatus::NO_STATUS;
                 }
             });
 
