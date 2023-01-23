@@ -302,6 +302,15 @@ private:
 
     bool m_notesFetched = false;
 
+    enum class BatteryNotiStatus
+    {
+        NO_STATUS,
+        VALID_BATTERY_RECIEVED,
+        LOW_BATTERY_DISPLAYED
+    };
+
+    BatteryNotiStatus m_firstBatteryPctReceived = BatteryNotiStatus::NO_STATUS;
+
     bool m_computerUnlocked = true;
     struct LockUnlockItem
     {
