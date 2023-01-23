@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>946</width>
-    <height>1120</height>
+    <height>632</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -576,8 +576,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1014</width>
-             <height>1721</height>
+             <width>770</width>
+             <height>882</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -3901,7 +3901,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <x>0</x>
                <y>0</y>
                <width>646</width>
-               <height>941</height>
+               <height>874</height>
               </rect>
              </property>
              <property name="autoFillBackground">
