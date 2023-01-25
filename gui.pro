@@ -216,6 +216,11 @@ unix {
     xdgdesktop.extra = "sed 's|PREFIX|$${PREFIX}|' $$PWD/data/moolticute.desktop > $(INSTALL_ROOT)$$xdgdesktop.path/moolticute.desktop"
     INSTALLS += xdgdesktop
 
+    # install metainfo files
+    metainfo.path = $$PREFIX/share/metainfo
+    metainfo.files = $$PWD/data/moolticute.metainfo.xml
+    INSTALLS += metainfo
+
     # install icons
     iconScalable.path = $$PREFIX/share/icons/hicolor/scalable/apps
     iconScalable.extra = cp -f $$PWD/img/AppIcon.svg $(INSTALL_ROOT)$$iconScalable.path/moolticute.svg
