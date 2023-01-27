@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>946</width>
-    <height>632</height>
+    <height>1120</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -576,8 +576,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>770</width>
-             <height>882</height>
+             <width>1014</width>
+             <height>1721</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -3930,7 +3930,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <x>0</x>
                <y>0</y>
                <width>646</width>
-               <height>874</height>
+               <height>941</height>
               </rect>
              </property>
              <property name="autoFillBackground">
@@ -3982,7 +3982,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_17">
                 <item>
-                 <widget class="QLabel" name="label_32">
+                 <widget class="QLabel" name="labelAutoStart">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                     <horstretch>0</horstretch>
@@ -3990,7 +3990,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>View Daemon Logs</string>
+                   <string>Start Moolticute with the computer: Enabled</string>
                   </property>
                  </widget>
                 </item>
@@ -4025,7 +4025,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_16">
                 <item>
-                 <widget class="QLabel" name="labelAutoStart">
+                 <widget class="QLabel" name="label_32">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                     <horstretch>0</horstretch>
@@ -4033,7 +4033,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>Start Moolticute with the computer: Enabled</string>
+                   <string>View Daemon Logs</string>
                   </property>
                  </widget>
                 </item>
