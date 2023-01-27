@@ -1415,7 +1415,7 @@ void CredentialsManagement::checkLinkingOnLoginSelected(const QModelIndex &srcIn
     }
 }
 
-QString CredentialsManagement::processMultipleDomainsInput(const QString& service, const QString &domains)
+QString CredentialsManagement::processMultipleDomainsInput(const QString& service, const QString &domains, const bool disable_tld_check)
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     auto splitBehavior = QString::SkipEmptyParts;
@@ -1439,7 +1439,7 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
             domain.prepend('.');
         }
         ParseDomain dom(serviceDomain + domain);
-        if (domain == dom.tld())
+        if (disable_tld_check || domain == dom.tld())
         {
             validDomains.append(domain);
         }
@@ -1687,13 +1687,15 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
                                 serviceNameChanged = true;
                             }
                         }
+                        QSettings s;
                         bool ok = false;
+                        bool disable_tld_check = s.value("settings/disable_tld_check", false).toBool();
                         QString text = QInputDialog::getText(this, tr("Multiple Domains for %1").arg(pServiceItem->name()),
                                                                  tr("Enter comma separated domain extensions:"), QLineEdit::Normal,
                                                                  defaultDomains, &ok);
                         if (ok)
                         {
-                            text = processMultipleDomainsInput(serviceName, text);
+                            text = processMultipleDomainsInput(serviceName, text, disable_tld_check);
                             if (!text.isEmpty())
                             {
                                 pServiceItem->setMultipleDomains(text);

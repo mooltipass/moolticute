@@ -142,7 +142,7 @@ private:
 
     void checkLinkingOnLoginSelected(const QModelIndex &srcIndex);
 
-    QString processMultipleDomainsInput(const QString& service, const QString &domains);
+    QString processMultipleDomainsInput(const QString& service, const QString &domains, const bool disable_tld_check);
 
     bool isUICategoryClean() const;
 
