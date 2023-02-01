@@ -69,6 +69,10 @@ void BleDev::keyPressEvent(QKeyEvent *event)
     {
         DeviceDetector::instance().shiftPressed();
     }
+    if (event->key() == Qt::Key_Control)
+    {
+        DeviceDetector::instance().ctrlPressed();
+    }
 }
 
 void BleDev::keyReleaseEvent(QKeyEvent *event)
@@ -76,6 +80,10 @@ void BleDev::keyReleaseEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Shift)
     {
         DeviceDetector::instance().shiftReleased();
+    }
+    if (event->key() == Qt::Key_Control)
+    {
+        DeviceDetector::instance().ctrlReleased();
     }
 }
 
@@ -179,11 +187,16 @@ void BleDev::on_btnFileBrowser_clicked()
     }
     QSettings s;
 
+    bool skipFilePwdCheck = wsClient->get_status() == Common::NoBundle &&
+                                DeviceDetector::instance().isCtrlPressed();
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select bundle file"),
                                             s.value("last_used_path/bundle_dir", QDir::homePath()).toString(),
                                             "*.img");
 
+    // Due to file selection dialog opened, release events are not catched
     DeviceDetector::instance().shiftReleased();
+    DeviceDetector::instance().ctrlReleased();
 
     if (fileName.isEmpty())
     {
@@ -211,8 +224,9 @@ void BleDev::on_btnFileBrowser_clicked()
     }
 
     QString password = "";
-    if (!checkBundleFilePassword(QFileInfo{file}, password))
+    if (!skipFilePwdCheck && !checkBundleFilePassword(QFileInfo{file}, password))
     {
+        qCritical() << "Invalid bundle file password";
         return;
     }
 

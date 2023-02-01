@@ -23,8 +23,7 @@ MPDeviceBleImpl::MPDeviceBleImpl(MessageProtocolBLE* mesProt, MPDevice *dev):
         MPCmd::CANCEL_USER_REQUEST,
         MPCmd::INFORM_LOCKED,
         MPCmd::INFORM_UNLOCKED,
-        MPCmd::SET_DATE,
-        MPCmd::GET_PLAT_INFO
+        MPCmd::SET_DATE
     };
 }
 
