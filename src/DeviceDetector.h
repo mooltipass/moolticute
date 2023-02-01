@@ -40,6 +40,9 @@ public:
     void shiftPressed() { m_isShiftPressed = true; }
     void shiftReleased() { m_isShiftPressed = false; }
     bool isShiftPressed() const { return m_isShiftPressed; }
+    void ctrlPressed() { m_isCtrlPressed = true; }
+    void ctrlReleased() { m_isCtrlPressed = false; }
+    bool isCtrlPressed() const { return m_isCtrlPressed; }
 
 signals:
     void deviceChanged(Common::MPHwVersion newDevType);
@@ -53,6 +56,7 @@ private:
     bool m_isConnectedWithBluetooth = false;
     quint8 m_battery = 0;
     bool m_isShiftPressed = false;
+    bool m_isCtrlPressed = false;
 };
 
 #endif // DEVICEDETECTOR_H

@@ -2407,9 +2407,13 @@ void MainWindow::displayNotePage()
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     QMainWindow::keyPressEvent(event);
-    if (event->key() == Qt::Key_Control)
+    if (event->key() == Qt::Key_Shift)
     {
         DeviceDetector::instance().shiftPressed();
+    }
+    if (event->key() == Qt::Key_Control)
+    {
+        DeviceDetector::instance().ctrlPressed();
     }
     if (!ui->tutorialWidget->isTutorialFinished() && event->key() == Qt::Key_Escape)
     {
@@ -2420,9 +2424,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
     QMainWindow::keyReleaseEvent(event);
-    if (event->key() == Qt::Key_Control)
+    if (event->key() == Qt::Key_Shift)
     {
         DeviceDetector::instance().shiftReleased();
+    }
+    if (event->key() == Qt::Key_Control)
+    {
+        DeviceDetector::instance().ctrlReleased();
     }
 }
 
