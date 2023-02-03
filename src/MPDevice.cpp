@@ -6739,7 +6739,7 @@ bool MPDevice::checkImportedDataNodes(const MessageHandlerCb &cb, Common::DataAd
            /* Create new node with null address and virtual address set to our counter value */
            MPNode* newNodePt = pMesProt->createMPNode(QByteArray(getParentNodeSize(), 0), this, QByteArray(), newAddressesNeededCounter);
            newNodePt->setType(MPNode::NodeParent);
-           newNodePt->setLoginNodeData(importNodes[i]->getNodeFlags(), importNodes[i]->getLoginNodeData());
+           newNodePt->setDataNodeData(importNodes[i]->getNodeFlags(), importNodes[i]->getDataNodeData());
            newNodePt->setMergeTagged();
 
            /* Add node to list */
