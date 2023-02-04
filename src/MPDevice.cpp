@@ -6936,62 +6936,16 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
             }
         }
 
-        /* Now we check all our parents and childs for non merge tag */
-        QListIterator<MPNode*> j(dataNodes);
-        while (j.hasNext())
+        if (!finishImportDataNodes(stringError, Common::DATA_ADDR_IDX))
         {
-            MPNode* nodeItem = j.next();
+            return false;
+        }
 
-            /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
-            QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
-            bool deleteDataNode = false;
-
-            /* Special case: no child */
-            if (curChildNodeAddr == MPNode::EmptyAddress)
+        if (isBLE())
+        {
+            if (!finishImportDataNodes(stringError, Common::NOTE_ADDR_IDX))
             {
-                /* Remove parent */
-                qDebug() << "Empty data parent " << nodeItem->getService() << " detected, deleting it...";
-                removeEmptyParentFromDB(nodeItem, true, Common::CRED_ADDR_IDX, Common::DATA_ADDR_IDX);
-            }
-
-            /* Check every children */
-            while (curChildNodeAddr != MPNode::EmptyAddress)
-            {
-                MPNode* curNode = findNodeWithAddressInList(dataChildNodes, curChildNodeAddr);
-
-                /* Safety checks */
-                if (!curNode)
-                {
-                    qCritical() << "Couldn't find child node in list (error in algo?)";
-                    stringError = "Moolticute Internal Error: Please Contact The Team (IFM#2)";
-                    cleanImportedVars();
-                    return false;
-                }
-
-                /* Next item */
-                curChildNodeAddr = curNode->getNextDataAddress();
-
-                /* Marked for deletion? */
-                if (!curNode->getMergeTagged())
-                {
-                    /* First child? */
-                    if (curNode->getAddress() == nodeItem->getStartChildAddress())
-                    {
-                        deleteDataNode = true;
-                    }
-
-                    /* Delete child */
-                    dataChildNodes.removeOne(curNode);
-                    nodeItem->removeChild(curNode);
-                    delete(curNode);
-                }
-            }
-
-            /* If parent node is marked for deletion */
-            if(deleteDataNode)
-            {
-                nodeItem->setStartChildAddress(MPNode::EmptyAddress);
-                removeEmptyParentFromDB(nodeItem, true);
+                return false;
             }
         }
     }
@@ -7113,6 +7067,72 @@ bool MPDevice::finishImportLoginNodes(QString &stringError, Common::AddressType 
             {
                 removeChildFromDB(nodeItem, curNode, true, true, addrType);
             }
+        }
+    }
+    return true;
+}
+
+bool MPDevice::finishImportDataNodes(QString &stringError, Common::DataAddressType addrType)
+{
+    const bool isFile = Common::DATA_ADDR_IDX == addrType;
+    NodeList& nodes = isFile ? dataNodes : notesLoginNodes;
+    NodeList& childNodes = isFile? dataChildNodes : notesLoginChildNodes;
+    /* Now we check all our parents and childs for non merge tag */
+    QListIterator<MPNode*> j(nodes);
+    while (j.hasNext())
+    {
+        MPNode* nodeItem = j.next();
+
+        /* No need to check for merge tagged for parent, as it'll automatically be removed if it doesn't have any child */
+        QByteArray curChildNodeAddr = nodeItem->getStartChildAddress();
+        bool deleteDataNode = false;
+
+        /* Special case: no child */
+        if (curChildNodeAddr == MPNode::EmptyAddress)
+        {
+            /* Remove parent */
+            qDebug() << "Empty data parent " << nodeItem->getService() << " detected, deleting it...";
+            removeEmptyParentFromDB(nodeItem, true, Common::CRED_ADDR_IDX /*not used*/, addrType);
+        }
+
+        /* Check every children */
+        while (curChildNodeAddr != MPNode::EmptyAddress)
+        {
+            MPNode* curNode = findNodeWithAddressInList(childNodes, curChildNodeAddr);
+
+            /* Safety checks */
+            if (!curNode)
+            {
+                qCritical() << "Couldn't find child node in list (error in algo?)";
+                stringError = "Moolticute Internal Error: Please Contact The Team (IFM#2)";
+                cleanImportedVars();
+                return false;
+            }
+
+            /* Next item */
+            curChildNodeAddr = curNode->getNextDataAddress();
+
+            /* Marked for deletion? */
+            if (!curNode->getMergeTagged())
+            {
+                /* First child? */
+                if (curNode->getAddress() == nodeItem->getStartChildAddress())
+                {
+                    deleteDataNode = true;
+                }
+
+                /* Delete child */
+                childNodes.removeOne(curNode);
+                nodeItem->removeChild(curNode);
+                delete(curNode);
+            }
+        }
+
+        /* If parent node is marked for deletion */
+        if(deleteDataNode)
+        {
+            nodeItem->setStartChildAddress(MPNode::EmptyAddress);
+            removeEmptyParentFromDB(nodeItem, true, Common::CRED_ADDR_IDX /*not used*/, Common::NOTE_ADDR_IDX);
         }
     }
     return true;

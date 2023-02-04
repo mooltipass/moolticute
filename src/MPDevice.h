@@ -329,6 +329,7 @@ private:
     void deletePossibleFavorite(QByteArray parentAddr, QByteArray childAddr);
     bool finishImportFileMerging(QString &stringError, bool noDelete);
     bool finishImportLoginNodes(QString &stringError, Common::AddressType addrType);
+    bool finishImportDataNodes(QString &stringError, Common::DataAddressType addrType);
     QByteArray getNextNodeAddressInMemory(const QByteArray &address);
     quint16 getFlashPageFromAddress(const QByteArray &address);
     MPNode *findNodeWithServiceInList(const QString &service, Common::AddressType addrType = Common::CRED_ADDR_IDX);
