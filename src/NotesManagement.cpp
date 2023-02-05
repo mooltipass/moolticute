@@ -45,6 +45,7 @@ void NotesManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::notesFetched, this, &NotesManagement::loadNotes);
     connect(wsClient, &WSClient::noteSaved, this, &NotesManagement::onNoteSaved);
     connect(wsClient, &WSClient::noteDeleted, this, &NotesManagement::onNoteDeleted);
+    connect(wsClient, &WSClient::deviceDisconnected, this, &NotesManagement::onDeviceDisconnected);
 }
 
 void NotesManagement::loadNotes(const QJsonArray &notes)
@@ -223,8 +224,9 @@ void NotesManagement::onNoteSaved(const QString &note, bool success)
     {
         if (m_isNewFile)
         {
-            addNewIcon(note);
             m_noteList.append(note);
+            std::sort(std::begin(m_noteList), std::end(m_noteList));
+            refreshNotes();
         }
     }
     else
@@ -298,5 +300,14 @@ void NotesManagement::onNoteDeleted(bool success, const QString &note)
     else
     {
         QMessageBox::warning(this, tr("Failure"), tr("'%1' note delete failed!").arg(note));
+    }
+}
+
+void NotesManagement::onDeviceDisconnected()
+{
+    if (m_isNoteEditing)
+    {
+        // Exit editing mode when device disconnected
+        on_pushButtonDiscard_clicked();
     }
 }
