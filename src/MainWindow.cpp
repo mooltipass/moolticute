@@ -1563,6 +1563,7 @@ void MainWindow::dbImported(bool success, QString message)
         if (wsClient->isMPBLE())
         {
             wsClient->sendGetUserCategories();
+            wsClient->sendFetchNotes();
         }
         QMessageBox::information(this, tr("Moolticute"), tr("Successfully imported and merged database into the device."));
     }
