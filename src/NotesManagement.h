@@ -44,6 +44,8 @@ private slots:
 
     void onNoteDeleted(bool success, const QString& note);
 
+    void onDeviceDisconnected();
+
 private:
     void loadNotes(const QJsonArray& notes);
     void refreshNotes();

@@ -194,7 +194,7 @@ void BleDev::on_btnFileBrowser_clicked()
                                             s.value("last_used_path/bundle_dir", QDir::homePath()).toString(),
                                             "*.img");
 
-    // Due to file selection dialog opened, release events are not catched
+    // Due to file selection dialog opened, release events are not caught
     DeviceDetector::instance().shiftReleased();
     DeviceDetector::instance().ctrlReleased();
 
