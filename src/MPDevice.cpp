@@ -8606,6 +8606,12 @@ void MPDevice::lockDevice(const MessageHandlerCb &cb)
     const auto afterFn = [](const QByteArray &, bool &) -> bool { return true; };
     jobs->append(new MPCommandJob(this, MPCmd::LOCK_DEVICE, afterFn));
 
+    connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &)
+    {
+        qInfo() << "Lock device was successful.";
+        cb(true, "");
+    });
+
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
@@ -8629,6 +8635,12 @@ void MPDevice::informLocked(const MessageHandlerCb &cb)
         exitMemMgmtMode();
     }
 
+    connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &)
+    {
+        qInfo() << "Inform locked was successful.";
+        cb(true, "");
+    });
+
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
@@ -8646,6 +8658,13 @@ void MPDevice::informUnlocked(const MessageHandlerCb &cb)
 
     const auto afterFn = [](const QByteArray &, bool &) -> bool { return true; };
     jobs->append(new MPCommandJob(this, MPCmd::INFORM_UNLOCKED, afterFn));
+
+    connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &)
+    {
+        qInfo() << "Inform unlock was successful.";
+        cb(true, "");
+    });
+
 
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
