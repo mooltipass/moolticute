@@ -8606,17 +8606,17 @@ void MPDevice::lockDevice(const MessageHandlerCb &cb)
     const auto afterFn = [](const QByteArray &, bool &) -> bool { return true; };
     jobs->append(new MPCommandJob(this, MPCmd::LOCK_DEVICE, afterFn));
 
+    connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &)
+    {
+        qInfo() << "Lock device was successful.";
+        cb(true, "");
+    });
+
     connect(jobs, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
     {
         Q_UNUSED(failedJob);
         qCritical() << "Failed to lock device!";
         cb(false, {});
-    });
-
-    connect(jobs, &AsyncJobs::finished, [cb](const QByteArray &)
-    {
-        qInfo() << "Lock device was successful.";
-        cb(true, "");
     });
 
     jobsQueue.enqueue(jobs);
