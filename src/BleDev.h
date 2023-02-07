@@ -42,7 +42,7 @@ private:
     void initUITexts();
     void fetchData(const Common::FetchType &fetchType);
     bool isValidBundleFile(QFile* file) const;
-    bool checkBundleFilePassword(const QFileInfo& fileInfo, QString& password);
+    bool checkBundleFilePassword(const QFileInfo& fileInfo, QString& password, bool skipDeviceChecks = false);
 
     Ui::BleDev *ui;
     WSClient *wsClient = nullptr;

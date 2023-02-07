@@ -142,7 +142,7 @@ bool BleDev::isValidBundleFile(QFile* file) const
     return true;
 }
 
-bool BleDev::checkBundleFilePassword(const QFileInfo& fileInfo, QString &password)
+bool BleDev::checkBundleFilePassword(const QFileInfo& fileInfo, QString &password, bool skipDeviceChecks /* =false */)
 {
     const auto baseFilename = fileInfo.baseName();
     const auto baseNameWithExt = fileInfo.fileName();
@@ -157,14 +157,14 @@ bool BleDev::checkBundleFilePassword(const QFileInfo& fileInfo, QString &passwor
             return false;
         }
         const auto serial = fileParts[SERIAL_FILE_PART].toUInt();
-        if (wsClient->get_hwSerial() != serial)
+        if (!skipDeviceChecks && wsClient->get_hwSerial() != serial)
         {
             QMessageBox::warning(this, INVALID_BUNDLE_TEXT,
                                  tr("The device serial number is not correct in bundle filename."));
             return false;
         }
         const auto bundleVersion = fileParts[BUNDLE_FILE_PART].toInt();
-        if (wsClient->get_bundleVersion() != bundleVersion)
+        if (!skipDeviceChecks && wsClient->get_bundleVersion() != bundleVersion)
         {
             QMessageBox::warning(this, INVALID_BUNDLE_TEXT,
                                  tr("The bundle version is not correct in bundle filename."));
@@ -187,7 +187,7 @@ void BleDev::on_btnFileBrowser_clicked()
     }
     QSettings s;
 
-    bool skipFilePwdCheck = wsClient->get_status() == Common::NoBundle &&
+    bool skipDeviceChecks = wsClient->get_status() == Common::NoBundle &&
                                 DeviceDetector::instance().isCtrlPressed();
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select bundle file"),
@@ -224,7 +224,7 @@ void BleDev::on_btnFileBrowser_clicked()
     }
 
     QString password = "";
-    if (!skipFilePwdCheck && !checkBundleFilePassword(QFileInfo{file}, password))
+    if (!checkBundleFilePassword(QFileInfo{file}, password, skipDeviceChecks))
     {
         qCritical() << "Invalid bundle file password";
         return;
