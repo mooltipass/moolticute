@@ -512,7 +512,6 @@ private:
 
     bool m_isDebugMsg = false;
     bool m_isIntegrityCheck = false;
-    bool m_isDuplicateServiceDetected = false;
     //Message Protocol
     MPDeviceBleImpl *bleImpl = nullptr;
     DeviceSettings *pSettings = nullptr;

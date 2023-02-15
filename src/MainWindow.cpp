@@ -1154,10 +1154,6 @@ void MainWindow::wantSaveCredentialManagement()
             {
                 errorMessage = tr("Couldn't change all passwords, please approve prompts on the device");
             }
-            else if (Common::DUPLICATE_SERVICE_DETECTED == msg)
-            {
-                errorMessage = tr("Duplicated service detected, please contact support");
-            }
             else
             {
                 errorMessage = tr("Couldn't save credentials, please contact the support team with moolticute's log");
@@ -1569,10 +1565,6 @@ void MainWindow::dbImported(bool success, QString message)
     }
     else
     {
-        if (message == Common::DUPLICATE_SERVICE_DETECTED)
-        {
-            message = tr("Duplicate service detected during import, please contact support");
-        }
         QMessageBox::warning(this, tr("Error"), message);
     }
 
