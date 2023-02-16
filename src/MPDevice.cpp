@@ -940,7 +940,6 @@ void MPDevice::startMemMgmtMode(bool wantData, bool wantFido,
         {
             qInfo() << "Mem management mode enabled, DB checked";
             force_memMgmtMode(true);
-            m_isDuplicateServiceDetected = checkDuplicateParentNode();
             cb(true, 0, QString());
         }
         else
@@ -6077,7 +6076,6 @@ void MPDevice::cleanMMMVars(void)
     }
     startDataNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
     startNode = {{MPNode::EmptyAddress},{MPNode::EmptyAddress}};
-    m_isDuplicateServiceDetected = false;
 }
 
 void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, MessageHandlerCb cb, bool noDelete)
@@ -6102,8 +6100,6 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
 
         /* Tag favorites */
         tagFavoriteNodes();
-
-        m_isDuplicateServiceDetected = checkDuplicateParentNode();
 
         /* We arrive here knowing that the CPZ is in the CPZ/CTR list */
         qInfo() << "Starting File Merging...";
@@ -6260,14 +6256,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 {
                     cleanImportedVars();
                     exitMemMgmtMode(false);
-                    if (stringError == Common::DUPLICATE_SERVICE_DETECTED)
-                    {
-                        cb(false, stringError);
-                    }
-                    else
-                    {
-                        cb(false, "Couldn't Import Database: Corrupted Database File");
-                    }
+                    cb(false, "Couldn't Import Database: Corrupted Database File");
                     return;
                 }
             });
@@ -7001,14 +6990,6 @@ bool MPDevice::finishImportFileMerging(QString &stringError, bool noDelete)
     {
         qCritical() << "Error in merging algorithm... please contact the devs";
         stringError = "Moolticute Internal Error: Please Contact The Team (IFM#3)";
-        cleanImportedVars();
-        return false;
-    }
-
-    if (!m_isDuplicateServiceDetected && checkDuplicateParentNode())
-    {
-        qCritical() << Common::DUPLICATE_SERVICE_DETECTED;
-        stringError = Common::DUPLICATE_SERVICE_DETECTED;
         cleanImportedVars();
         return false;
     }
@@ -8165,14 +8146,6 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
     {
         qCritical() << "Error in our local DB (algo PB?)";
         cb(false, "Moolticute Internal Error (SMMC#2)");
-        exitMemMgmtMode(true);
-        return;
-    }
-
-    if (!m_isDuplicateServiceDetected && checkDuplicateParentNode())
-    {
-        qCritical() << Common::DUPLICATE_SERVICE_DETECTED;
-        cb(false, Common::DUPLICATE_SERVICE_DETECTED);
         exitMemMgmtMode(true);
         return;
     }
