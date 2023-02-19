@@ -355,6 +355,7 @@ private:
                                    Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
     bool removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, Common::AddressType addrType = Common::CRED_ADDR_IDX,
                                  Common::DataAddressType dataAddrType = Common::DATA_ADDR_IDX);
+    bool removeEmptyServiceNode();
     bool readExportFile(const QByteArray &fileData, QString &errorString);
     void readExportNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle = false, bool isData = false);
     void readExportDataChildNodes(QJsonArray &&nodes, ExportPayloadData id, bool fromMiniToBle = false);
