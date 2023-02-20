@@ -17,6 +17,7 @@ docker exec mc-deb bash /scripts/build_source.sh $VERSION xenial
 docker exec mc-deb bash /scripts/build_source.sh $VERSION bionic
 docker exec mc-deb bash /scripts/build_source.sh $VERSION focal
 docker exec mc-deb bash /scripts/build_source.sh $VERSION jammy
+docker exec mc-deb bash /scripts/build_source.sh $VERSION kinetic 
 
 #windows and appimage
 docker exec appimgbuilder bash /scripts/package.sh
