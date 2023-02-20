@@ -2993,6 +2993,35 @@ bool MPDevice::removeEmptyParentFromDB(MPNode* parentNodePt, bool isDataParent, 
     }
 }
 
+bool MPDevice::removeEmptyServiceNode()
+{
+    bool return_bool = true;
+    MPNode* tempNextParentNodePt = nullptr;
+    QByteArray tempParentAddress = startNode[Common::CRED_ADDR_IDX];
+    quint32 tempVirtualParentAddress = virtualStartNode[Common::CRED_ADDR_IDX];
+    /* Loop through the parent nodes */
+    while ((tempParentAddress != MPNode::EmptyAddress) || (tempParentAddress.isNull() && tempVirtualParentAddress != 0))
+    {
+        tempNextParentNodePt = findNodeWithAddressInList(loginNodes, tempParentAddress, tempVirtualParentAddress);
+        if (!tempNextParentNodePt)
+        {
+            break;
+        }
+        if (MPNode::EmptyAddress == tempNextParentNodePt->getStartChildAddress())
+        {
+            qWarning() << "Parent " << tempNextParentNodePt->getService() << " has no children, erasing.";
+            MPNode *toDelete = tempNextParentNodePt;
+            tempParentAddress = tempNextParentNodePt->getNextParentAddress();
+            tempVirtualParentAddress = tempNextParentNodePt->getNextParentVirtualAddress();
+            return_bool = !removeEmptyParentFromDB(toDelete, false);
+            continue;
+        }
+        tempParentAddress = tempNextParentNodePt->getNextParentAddress();
+        tempVirtualParentAddress = tempNextParentNodePt->getNextParentVirtualAddress();
+    }
+    return return_bool;
+}
+
 bool MPDevice::removeChildFromDB(MPNode* parentNodePt, MPNode* childNodePt, bool deleteEmptyParent, bool deleteFromList, Common::AddressType addrType /*= Common::CRED_ADDR_IDX*/)
 {
     if (deleteFromList)
@@ -3161,6 +3190,10 @@ bool MPDevice::checkLoadedNodes(bool checkCredentials, bool checkData, bool repa
     /* Tag pointed nodes, also detects DB errors */
     if (checkCredentials || checkData)
     {
+        if (checkCredentials && repairAllowed)
+        {
+            return_bool &= removeEmptyServiceNode();
+        }
         return_bool &= tagPointedNodes(checkCredentials, checkData, repairAllowed);
     }
 
@@ -8122,13 +8155,19 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                         }
                     }
                 }
-                removeChildFromDB(nodeItem, curNode, false, true);
-                packet_send_needed = true;
+
                 if (renamedNode)
                 {
                     loginChildNodes.append(renamedNode);
                     addChildToDB(nodeItem, renamedNode);
+                    removeChildFromDB(nodeItem, curNode, false, true);
                 }
+                else
+                {
+                    //If not renamed node delete empty parent
+                    removeChildFromDB(nodeItem, curNode, true, true);
+                }
+                packet_send_needed = true;
             }
         }
     }
