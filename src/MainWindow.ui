@@ -2079,7 +2079,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <string>Use Bluetooth Menu to enable/disable the Mooltipass Bluetooth interface</string>
                  </property>
                  <property name="text">
-                  <string>Bluetooth Enabled</string>
+                  <string>Bluetooth</string>
                  </property>
                 </widget>
                </item>
@@ -2089,7 +2089,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   <string>Knock detection can be enabled/disabled on the device.</string>
                  </property>
                  <property name="text">
-                  <string>Knock Detection Disabled</string>
+                  <string>Knock Detection</string>
                  </property>
                 </widget>
                </item>
