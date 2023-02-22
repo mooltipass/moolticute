@@ -2,7 +2,7 @@
 Type=Application
 Name=Moolticute
 Comment=Start Moolticute daemon and App
-Exec=/usr/bin/moolticute
+Exec=PREFIX/bin/moolticute
 Icon=moolticute
 Terminal=false
 Categories=Utility;
