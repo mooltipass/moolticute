@@ -6289,6 +6289,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 {
                     cleanImportedVars();
                     exitMemMgmtMode(false);
+                    qWarning() << "Couldn't Import Database: Corrupted Database File: " << " reason " << stringError;
                     cb(false, "Couldn't Import Database: Corrupted Database File");
                     return;
                 }
@@ -6371,6 +6372,7 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
             {
                 cleanImportedVars();
                 exitMemMgmtMode(false);
+                qCritical() << "Corrupted Database File: " << stringError;
                 cb(false, "Couldn't Import Database: Corrupted Database File");
                 return;
             }
@@ -6419,7 +6421,17 @@ bool MPDevice::checkImportedLoginNodes(const MessageHandlerCb &cb, Common::Addre
                 /* Special case: parent doesn't have children but we do */
                 if (((cur_import_child_node_addr == MPNode::EmptyAddress) || (cur_import_child_node_addr.isNull() && cur_import_child_node_addr_v == 0)) && ((matched_parent_first_child != MPNode::EmptyAddress) || (matched_parent_first_child.isNull() && matched_parent_first_child_v != 0)))
                 {
-                    nodes[j]->setStartChildAddress(MPNode::EmptyAddress);
+                    qDebug() << "Local version of parent " << nodes[j]->getService() << " has children, but import does not. Remove all children to match imported DB.";
+                    QByteArray currentAddr = matched_parent_first_child;
+                    while(currentAddr != MPNode::EmptyAddress)
+                    {
+                        MPNode* childToKill = findNodeWithAddressInList(childNodes, nodes[j]->getStartChildAddress());
+                        if(childToKill)
+                        {
+                            removeChildFromDB(nodes[j], childToKill, false, true, addrType);
+                        }
+                        currentAddr = nodes[j]->getStartChildAddress();
+                    }
                 }
 
                 //qDebug() << "First child address for imported node: " << cur_import_child_node_addr.toHex() << " , for own node: " << matched_parent_first_child.toHex();
