@@ -6,6 +6,8 @@
 #include "MPBLEFreeAddressProvider.h"
 #include "MPMiniToBleNodeConverter.h"
 
+#include <atomic>
+
 class MessageProtocolBLE;
 
 /**
@@ -244,6 +246,7 @@ private:
     bool m_isFirstMessageWritten = false;
     QList<QString> m_dataFiles;
     QList<QString> m_notes;
+    std::atomic<bool> m_fetchingNotes = false;
 
     bool m_enforceLayout = false;
     QString m_nimhResponse = "";

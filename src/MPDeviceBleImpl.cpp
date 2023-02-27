@@ -299,6 +299,12 @@ void MPDeviceBleImpl::fetchNotes()
         }
         return;
     }
+    if (m_fetchingNotes)
+    {
+        qWarning() << "Fetching notes is in progress...";
+        return;
+    }
+    m_fetchingNotes = true;
     auto *jobs = new AsyncJobs(QString("Fetch notes"), this);
     m_notes.clear();
 
@@ -323,6 +329,7 @@ void MPDeviceBleImpl::fetchNotes(AsyncJobs *jobs, QByteArray addr)
                             if (bleProt->getMessageSize(data) < DATA_FETCH_NO_NEXT_ADDR_SIZE)
                             {
                                 qCritical() << "Invalid response size for fetch notes";
+                                m_fetchingNotes = false;
                                 return false;
                             }
 
@@ -332,6 +339,7 @@ void MPDeviceBleImpl::fetchNotes(AsyncJobs *jobs, QByteArray addr)
                             }
                             else
                             {
+                                m_fetchingNotes = false;
                                 emit notesFetched();
                             }
                             return true;
