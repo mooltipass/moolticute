@@ -77,12 +77,12 @@ void NotesManagement::addNewIcon(const QString &name)
     auto* labelIcon = new ClickableLabel();
     labelIcon->setAlignment(Qt::AlignCenter);
     labelIcon->setPixmap(QString::fromUtf8(":/note.png"));
-    labelIcon->setMaximumSize(160,200);
+    labelIcon->setMaximumSize(NOTE_ICON_WIDTH, NOTE_ICON_HEIGHT);
 
 #if QT_VERSION < 0x060000
-    labelIcon->setPixmap(labelIcon->pixmap()->scaled(160,200, Qt::KeepAspectRatio));
+    labelIcon->setPixmap(labelIcon->pixmap()->scaled(NOTE_ICON_WIDTH, NOTE_ICON_HEIGHT, Qt::KeepAspectRatio));
 #else
-    labelIcon->setPixmap(labelIcon->pixmap().scaled(160,200, Qt::KeepAspectRatio));
+    labelIcon->setPixmap(labelIcon->pixmap().scaled(NOTE_ICON_WIDTH, NOTE_ICON_HEIGHT, Qt::KeepAspectRatio));
 #endif
     labelIcon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     labelIcon->setAlignment(Qt::AlignCenter);
@@ -98,6 +98,9 @@ void NotesManagement::addNewIcon(const QString &name)
     auto* labelName = new QLabel();
     labelName->setAlignment(Qt::AlignCenter);
     labelName->setText(name);
+    QFont font = labelName->font();
+    font.setPointSize(16);
+    labelName->setFont(font);
 
     vertIconNameLayout->addWidget(labelName);
     vertIconNameLayout->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
