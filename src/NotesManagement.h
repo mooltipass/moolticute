@@ -67,6 +67,9 @@ private:
 
     WSClient *wsClient;
 
+    static constexpr int NOTE_ICON_WIDTH = 120;
+    static constexpr int NOTE_ICON_HEIGHT = 160;
+    static constexpr int NOTE_FONT_SIZE = 16;
     static const QString EXIT_TEXT;
     static const QString DISCARD_TEXT;
 };
