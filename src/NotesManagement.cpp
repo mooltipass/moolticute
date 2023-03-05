@@ -99,7 +99,7 @@ void NotesManagement::addNewIcon(const QString &name)
     labelName->setAlignment(Qt::AlignCenter);
     labelName->setText(name);
     QFont font = labelName->font();
-    font.setPointSize(16);
+    font.setPointSize(NOTE_FONT_SIZE);
     labelName->setFont(font);
 
     vertIconNameLayout->addWidget(labelName);
