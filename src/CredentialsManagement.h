@@ -33,6 +33,7 @@ class CredentialModel;
 class CredentialModelFilter;
 class LoginItem;
 class PasswordProfilesModel;
+class SimpleLineEdit;
 
 class CredentialsManagement : public QWidget
 {
@@ -84,6 +85,9 @@ private slots:
     void onServiceSelected(const QModelIndex &srcIndex);
     void onItemExpanded(const QModelIndex &proxyIndex);
     void onItemCollapsed(const QModelIndex &proxyIndex);
+    void onLoginEdited(const QString &loginName);
+    void onPasswordEdited(const QString &password);
+    void checkInputLength(SimpleLineEdit *input, bool &isInvalid, const QString& defaultStyle, int nameSize, int maxLength);
     void onExpandedStateChanged(bool bIsExpanded);
     void onModelLoaded(bool bClearLoginDescription);
     void onSelectLoginItem(LoginItem *pLoginItem);
@@ -161,6 +165,8 @@ private:
     bool m_isClean = true;
     bool m_isSetCategoryClean = true;
     bool m_altKeyPressed = false;
+    bool m_invalidLoginName = false;
+    bool m_invalidPassword = false;
 
     LinkingMode m_linkingMode = LinkingMode::OFF;
     QByteArray m_credentialLinkedAddr;
@@ -177,8 +183,11 @@ private:
     static constexpr int BLE_FAVORITE_NUM = 50;
     static constexpr int MINI_PASSWORD_LENGTH = 31;
     static constexpr int BLE_PASSWORD_LENGTH = 64;
+    static constexpr int BLE_LOGIN_LENGTH = 63;
+    static constexpr int MINI_LOGIN_LENGTH = 62;
     static constexpr char MULT_DOMAIN_SEPARATOR = ',';
     static const QString INVALID_DOMAIN_TEXT;
+    static const QString INVALID_INPUT_STYLE;
 
 signals:
     void wantEnterMemMode();

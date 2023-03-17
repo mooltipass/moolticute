@@ -33,6 +33,8 @@
 
 const QString CredentialsManagement::INVALID_DOMAIN_TEXT =
         tr("The following domains are invalid or private: <b><ul><li>%1</li></ul></b>They are not saved.");
+const QString CredentialsManagement::INVALID_INPUT_STYLE =
+        "border: 2px solid red";
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
@@ -107,6 +109,9 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(ui->lineEditCategory2, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory3, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
     connect(ui->lineEditCategory4, &QLineEdit::textEdited, this, &CredentialsManagement::onCategoryEdited);
+
+    connect(ui->addCredLoginInput, &QLineEdit::textEdited, this, &CredentialsManagement::onLoginEdited);
+    connect(ui->addCredPasswordInput, &QLineEdit::textEdited, this, &CredentialsManagement::onPasswordEdited);
 
     ui->pushButtonFavorite->setMenu(&m_favMenu);
 
@@ -321,7 +326,8 @@ void CredentialsManagement::enableCredentialsManagement(bool enable)
 void CredentialsManagement::updateQuickAddCredentialsButtonState()
 {
     bool isValidPasswordInput = (ui->addCredPasswordInput->hasAcceptableInput() && ui->addCredPasswordInput->text().length() > 0) || m_altKeyPressed;
-    ui->addCredentialButton->setEnabled(ui->addCredServiceInput->hasAcceptableInput() && ui->addCredServiceInput->text().length() > 0 && isValidPasswordInput);
+    ui->addCredentialButton->setEnabled(ui->addCredServiceInput->hasAcceptableInput() && ui->addCredServiceInput->text().length() > 0 &&
+                                        isValidPasswordInput && !m_invalidLoginName && !m_invalidPassword);
 }
 
 void CredentialsManagement::onPasswordInputReturnPressed()
@@ -1219,6 +1225,44 @@ void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
         pServiceItem->setExpanded(false);
 }
 
+void CredentialsManagement::onLoginEdited(const QString &loginName)
+{
+    static auto defaultStyle = ui->addCredLoginInput->styleSheet();
+    const int loginNameSize = loginName.size();
+    const int maxLoginLength = wsClient->isMPBLE() ? BLE_LOGIN_LENGTH : MINI_LOGIN_LENGTH;
+    checkInputLength(ui->addCredLoginInput, m_invalidLoginName, defaultStyle, loginNameSize, maxLoginLength);
+}
+
+void CredentialsManagement::onPasswordEdited(const QString &password)
+{
+    static auto defaultStyle = ui->addCredPasswordInput->styleSheet();
+    const auto passwordSize = password.size();
+    const auto maxPasswordLength = wsClient->isMPBLE() ? BLE_PASSWORD_LENGTH : BLE_PASSWORD_LENGTH;
+    checkInputLength(ui->addCredPasswordInput, m_invalidPassword, defaultStyle, passwordSize, maxPasswordLength);
+}
+
+void CredentialsManagement::checkInputLength(SimpleLineEdit *input, bool &isInvalid, const QString& defaultStyle, int nameSize, int maxLength)
+{
+    if (nameSize > maxLength)
+    {
+        if (!isInvalid)
+        {
+            input->setStyleSheet(INVALID_INPUT_STYLE);
+            input->setToolTip(tr("Text is too long, maximum length is %1").arg(maxLength));
+            isInvalid = true;
+        }
+    }
+    else
+    {
+        if (isInvalid)
+        {
+            input->setStyleSheet(defaultStyle);
+            input->setToolTip("");
+            isInvalid = false;
+        }
+    }
+}
+
 void CredentialsManagement::onExpandedStateChanged(bool bIsExpanded)
 {
     ui->pushButtonExpandAll->setText(bIsExpanded ? tr("Collapse All") : tr("Expand All"));
@@ -1361,8 +1405,6 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
             ui->credDisplayKeyAfterPwdInput->show();
             ui->credDisplayKeyAfterPwdLabel->show();
         }
-        ui->addCredPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
-        ui->credDisplayPasswordInput->setMaxPasswordLength(BLE_PASSWORD_LENGTH);
         ui->pushButtonTOTP->show();
         ui->pushButtonDeleteTOTP->hide();
     }
