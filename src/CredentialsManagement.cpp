@@ -1228,26 +1228,9 @@ void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
 void CredentialsManagement::onLoginEdited(const QString &loginName)
 {
     static auto defaultStyle = ui->addCredLoginInput->styleSheet();
-    const auto loginNameSize = loginName.size();
-    const auto maxLoginLength = wsClient->isMPBLE() ? BLE_LOGIN_LENGTH : MINI_LOGIN_LENGTH;
-    if (loginNameSize > maxLoginLength)
-    {
-        if (!m_invalidLoginName)
-        {
-            ui->addCredLoginInput->setStyleSheet(INVALID_INPUT_STYLE);
-            ui->addCredLoginInput->setToolTip(tr("Service name is too long, maximum length is %1").arg(maxLoginLength));
-            m_invalidLoginName = true;
-        }
-    }
-    else
-    {
-        if (m_invalidLoginName)
-        {
-            ui->addCredLoginInput->setStyleSheet(defaultStyle);
-            ui->addCredLoginInput->setToolTip("");
-            m_invalidLoginName = false;
-        }
-    }
+    const int loginNameSize = loginName.size();
+    const int maxLoginLength = wsClient->isMPBLE() ? BLE_LOGIN_LENGTH : MINI_LOGIN_LENGTH;
+    checkInputLength(ui->addCredLoginInput, m_invalidLoginName, defaultStyle, loginNameSize, maxLoginLength);
 }
 
 void CredentialsManagement::onPasswordEdited(const QString &password)
@@ -1255,22 +1238,27 @@ void CredentialsManagement::onPasswordEdited(const QString &password)
     static auto defaultStyle = ui->addCredPasswordInput->styleSheet();
     const auto passwordSize = password.size();
     const auto maxPasswordLength = wsClient->isMPBLE() ? BLE_PASSWORD_LENGTH : BLE_PASSWORD_LENGTH;
-    if (passwordSize > maxPasswordLength)
+    checkInputLength(ui->addCredPasswordInput, m_invalidPassword, defaultStyle, passwordSize, maxPasswordLength);
+}
+
+void CredentialsManagement::checkInputLength(SimpleLineEdit *input, bool &isInvalid, const QString& defaultStyle, int nameSize, int maxLength)
+{
+    if (nameSize > maxLength)
     {
-        if (!m_invalidPassword)
+        if (!isInvalid)
         {
-            ui->addCredPasswordInput->setStyleSheet("border: 2px solid red");
-            ui->addCredPasswordInput->setToolTip(tr("Service name is too long, maximum length is %1").arg(maxPasswordLength));
-            m_invalidPassword = true;
+            input->setStyleSheet(INVALID_INPUT_STYLE);
+            input->setToolTip(tr("Text is too long, maximum length is %1").arg(maxLength));
+            isInvalid = true;
         }
     }
     else
     {
-        if (m_invalidPassword)
+        if (isInvalid)
         {
-            ui->addCredPasswordInput->setStyleSheet(defaultStyle);
-            ui->addCredPasswordInput->setToolTip("");
-            m_invalidPassword = false;
+            input->setStyleSheet(defaultStyle);
+            input->setToolTip("");
+            isInvalid = false;
         }
     }
 }

@@ -33,6 +33,7 @@ class CredentialModel;
 class CredentialModelFilter;
 class LoginItem;
 class PasswordProfilesModel;
+class SimpleLineEdit;
 
 class CredentialsManagement : public QWidget
 {
@@ -86,6 +87,7 @@ private slots:
     void onItemCollapsed(const QModelIndex &proxyIndex);
     void onLoginEdited(const QString &loginName);
     void onPasswordEdited(const QString &password);
+    void checkInputLength(SimpleLineEdit *input, bool &isInvalid, const QString& defaultStyle, int nameSize, int maxLength);
     void onExpandedStateChanged(bool bIsExpanded);
     void onModelLoaded(bool bClearLoginDescription);
     void onSelectLoginItem(LoginItem *pLoginItem);
