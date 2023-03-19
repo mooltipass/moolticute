@@ -163,9 +163,9 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     updateQuickAddCredentialsButtonState();
 
     connect(ui->credDisplayServiceInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
-    connect(ui->credDisplayLoginInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
+    connect(ui->credDisplayLoginInput, &QLineEdit::textChanged, this, &CredentialsManagement::onDisplayLoginTextChanged);
     connect(ui->credDisplayDescriptionInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
-    connect(ui->credDisplayPasswordInput, &QLineEdit::textChanged, [this] { updateSaveDiscardState(); });
+    connect(ui->credDisplayPasswordInput, &QLineEdit::textChanged, this, &CredentialsManagement::onDisplayPasswordTextChanged);
     connect(ui->credDisplayCategoryInput, QOverload<int>::of(&QComboBox::currentIndexChanged),
             [this]
             {
@@ -818,7 +818,8 @@ void CredentialsManagement::updateSaveDiscardState(const QModelIndex &proxyIndex
             if (!isLoginExist && !isServiceExist && !sService.isEmpty() &&
                     (bServiceCondition || bPasswordCondition ||
                      bDescriptionCondition || bLoginCondition || bCategoryCondition ||
-                     bKeyAfterLoginCondition || bKeyAfterPwdCondition || bPointToPwdCondition))
+                     bKeyAfterLoginCondition || bKeyAfterPwdCondition || bPointToPwdCondition)
+                    && !m_invalidDisplayLoginName && !m_invalidDisplayPassword)
             {
                 ui->pushButtonCancel->show();
                 ui->pushButtonConfirm->show();
@@ -1228,20 +1229,30 @@ void CredentialsManagement::onItemCollapsed(const QModelIndex &proxyIndex)
 void CredentialsManagement::onLoginEdited(const QString &loginName)
 {
     static auto defaultStyle = ui->addCredLoginInput->styleSheet();
-    const int loginNameSize = loginName.size();
-    const int maxLoginLength = wsClient->isMPBLE() ? BLE_LOGIN_LENGTH : MINI_LOGIN_LENGTH;
-    checkInputLength(ui->addCredLoginInput, m_invalidLoginName, defaultStyle, loginNameSize, maxLoginLength);
+    checkInputLength(ui->addCredLoginInput, m_invalidLoginName, defaultStyle, loginName.size(), getMaxLoginLength());
+}
+
+void CredentialsManagement::onDisplayLoginTextChanged(const QString &loginName)
+{
+    static auto defaultStyle = ui->addCredLoginInput->styleSheet();
+    checkInputLength(ui->credDisplayLoginInput, m_invalidDisplayLoginName, defaultStyle, loginName.size(), getMaxLoginLength());
+    updateSaveDiscardState();
 }
 
 void CredentialsManagement::onPasswordEdited(const QString &password)
 {
     static auto defaultStyle = ui->addCredPasswordInput->styleSheet();
-    const auto passwordSize = password.size();
-    const auto maxPasswordLength = wsClient->isMPBLE() ? BLE_PASSWORD_LENGTH : BLE_PASSWORD_LENGTH;
-    checkInputLength(ui->addCredPasswordInput, m_invalidPassword, defaultStyle, passwordSize, maxPasswordLength);
+    checkInputLength(ui->addCredPasswordInput, m_invalidPassword, defaultStyle, password.size(), getMaxPasswordLength());
 }
 
-void CredentialsManagement::checkInputLength(SimpleLineEdit *input, bool &isInvalid, const QString& defaultStyle, int nameSize, int maxLength)
+void CredentialsManagement::onDisplayPasswordTextChanged(const QString &password)
+{
+    static auto defaultStyle = ui->addCredLoginInput->styleSheet();
+    checkInputLength(ui->credDisplayPasswordInput, m_invalidDisplayPassword, defaultStyle, password.size(), getMaxPasswordLength());
+    updateSaveDiscardState();
+}
+
+void CredentialsManagement::checkInputLength(QLineEdit *input, bool &isInvalid, const QString& defaultStyle, int nameSize, int maxLength)
 {
     if (nameSize > maxLength)
     {
@@ -1416,8 +1427,6 @@ void CredentialsManagement::updateDeviceType(Common::MPHwVersion newDev)
         ui->credDisplayKeyAfterLoginLabel->hide();
         ui->credDisplayKeyAfterPwdInput->hide();
         ui->credDisplayKeyAfterPwdLabel->hide();
-        ui->addCredPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
-        ui->credDisplayPasswordInput->setMaxPasswordLength(MINI_PASSWORD_LENGTH);
         ui->pushButtonTOTP->hide();
         ui->pushButtonDeleteTOTP->hide();
     }
