@@ -1242,8 +1242,7 @@ void CredentialsManagement::onDisplayLoginTextChanged(const QString &loginName)
 void CredentialsManagement::onPasswordEdited(const QString &password)
 {
     static auto defaultStyle = ui->addCredPasswordInput->styleSheet();
-    const auto passwordSize = password.size();
-    checkInputLength(ui->addCredPasswordInput, m_invalidPassword, defaultStyle, passwordSize, getMaxPasswordLength());
+    checkInputLength(ui->addCredPasswordInput, m_invalidPassword, defaultStyle, password.size(), getMaxPasswordLength());
 }
 
 void CredentialsManagement::onDisplayPasswordTextChanged(const QString &password)
