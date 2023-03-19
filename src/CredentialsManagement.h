@@ -86,8 +86,10 @@ private slots:
     void onItemExpanded(const QModelIndex &proxyIndex);
     void onItemCollapsed(const QModelIndex &proxyIndex);
     void onLoginEdited(const QString &loginName);
+    void onDisplayLoginTextChanged(const QString &loginName);
     void onPasswordEdited(const QString &password);
-    void checkInputLength(SimpleLineEdit *input, bool &isInvalid, const QString& defaultStyle, int nameSize, int maxLength);
+    void onDisplayPasswordTextChanged(const QString &password);
+    void checkInputLength(QLineEdit *input, bool &isInvalid, const QString& defaultStyle, int nameSize, int maxLength);
     void onExpandedStateChanged(bool bIsExpanded);
     void onModelLoaded(bool bClearLoginDescription);
     void onSelectLoginItem(LoginItem *pLoginItem);
@@ -120,6 +122,9 @@ private slots:
     void on_pushButtonLinkTo_clicked();
 
     void onTreeViewContextMenuRequested(const QPoint& pos);
+
+    inline int getMaxLoginLength() const { return wsClient->isMPBLE() ? BLE_LOGIN_LENGTH : MINI_LOGIN_LENGTH; }
+    inline int getMaxPasswordLength() const { return wsClient->isMPBLE() ? BLE_PASSWORD_LENGTH : BLE_PASSWORD_LENGTH; }
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
@@ -166,7 +171,9 @@ private:
     bool m_isSetCategoryClean = true;
     bool m_altKeyPressed = false;
     bool m_invalidLoginName = false;
+    bool m_invalidDisplayLoginName = false;
     bool m_invalidPassword = false;
+    bool m_invalidDisplayPassword = false;
 
     LinkingMode m_linkingMode = LinkingMode::OFF;
     QByteArray m_credentialLinkedAddr;
