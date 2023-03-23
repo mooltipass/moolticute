@@ -4969,7 +4969,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
            <item>
             <widget class="QRadioButton" name="radioButtonSSHTabOnDemand">
              <property name="text">
-              <string>Visible ON DE&amp;MAND  (use CTRL+SHIFT+F1 keyboard shortcut)</string>
+              <string>Visible ON DE&amp;MAND  (use SHIFT+F1 keyboard shortcut)</string>
              </property>
              <property name="checked">
               <bool>true</bool>

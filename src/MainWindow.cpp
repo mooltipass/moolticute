@@ -1396,7 +1396,7 @@ void MainWindow::setKeysTabVisibleOnDemand(bool bValue)
     QSettings s;
     s.setValue("settings/SSHKeysTabsVisibleOnDemand", bValue);
 
-    // SSH keys tab will show up only after activating the CTRL+SHIFT+F1 shortcut
+    // SSH keys tab will show up only after activating the SHIFT+F1 shortcut
     if (bSSHKeysTabVisibleOnDemand) {
         bSSHKeyTabVisible = false;
         connect(m_FilesAndSSHKeysTabsShortcut, &QShortcut::activated, this, &MainWindow::onFilesAndSSHTabsShortcutActivated);
