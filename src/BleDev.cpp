@@ -190,7 +190,7 @@ void BleDev::on_btnFileBrowser_clicked()
     bool skipDeviceChecks = wsClient->get_status() == Common::NoBundle &&
                                 DeviceDetector::instance().isCtrlPressed();
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select bundle file"),
+    QString fileName = AppGui::getFileName(this, tr("Select bundle file"),
                                             s.value("last_used_path/bundle_dir", QDir::homePath()).toString(),
                                             "*.img");
 
@@ -274,7 +274,7 @@ void BleDev::on_btnFetchDataBrowse_clicked()
 {
     QSettings s;
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select file to fetch data"),
+    QString fileName = AppGui::getSaveFileName(this, tr("Select file to fetch data"),
                                             s.value("last_used_path/fetchdata_dir", QDir::homePath()).toString(),
                                             "*.bin");
 

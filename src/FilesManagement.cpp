@@ -132,6 +132,12 @@ FilesManagement::FilesManagement(QWidget *parent) :
 
     ui->filesCacheListWidget->setVisible(false);
     ui->emptyCacheLabel->setVisible(false);
+
+#ifdef Q_OS_LINUX
+    ui->filesCacheListWidget->setStyleSheet("QListView, QToolButton { background-color : white; color : black; }");
+    ui->lineEditFilename->setStyleSheet("QLineEdit { background-color : white; color : black; }");
+    ui->addFileServiceInput->setStyleSheet("QLineEdit { background-color : white; color : black; }");
+#endif
 }
 
 FilesManagement::~FilesManagement()
@@ -418,8 +424,8 @@ void FilesManagement::on_pushButtonUpdateFile_clicked()
 
     QSettings s;
 
-    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."),
-                                            s.value("last_used_path/load_file_dir", QDir::homePath()).toString());
+
+    fileName = AppGui::getFileName(this, tr("Load file to device..."), s.value("last_used_path/load_file_dir", QDir::homePath()).toString());
 
     if (fileName.isEmpty())
         return;
@@ -448,7 +454,7 @@ void FilesManagement::on_pushButtonSaveFile_clicked()
 
     QSettings s;
 
-    fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."),
+    fileName = AppGui::getSaveFileName(this, tr("Save to file..."),
                                             s.value("last_used_path/save_file_dir", QDir::homePath()).toString());
 
     if (fileName.isEmpty())
@@ -528,7 +534,7 @@ void FilesManagement::dataFileRequested(const QString &service, const QByteArray
     QSettings s;
     QDir d = s.value("last_used_path/save_file_dir", QDir::homePath()).toString();
 
-    fileName = QFileDialog::getSaveFileName(this, tr("Save to file..."), d.filePath(service));
+    fileName = AppGui::getSaveFileName(this, tr("Save to file..."), d.filePath(service));
 
     if (fileName.isEmpty())
     {
@@ -661,8 +667,7 @@ void FilesManagement::on_pushButtonFilename_clicked()
 {
     QSettings s;
 
-    fileName = QFileDialog::getOpenFileName(this, tr("Load file to device..."),
-                                            s.value("last_used_path/load_file_dir", QDir::homePath()).toString());
+    fileName = AppGui::getFileName(this, tr("Load file to device..."), s.value("last_used_path/load_file_dir", QDir::homePath()).toString());
 
     if (fileName.isEmpty())
         return;

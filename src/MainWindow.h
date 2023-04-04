@@ -224,8 +224,8 @@ private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
     void setSecurityChallengeText(const QString &id = "XXXX", const QString &bundleVersion = "XXXX");
 
-    virtual void closeEvent(QCloseEvent *event);
-    virtual void changeEvent(QEvent *event);
+    virtual void closeEvent(QCloseEvent *event) override;
+    virtual void changeEvent(QEvent *event) override;
 
     void updateDeviceDependentUI();
 

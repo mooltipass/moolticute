@@ -293,6 +293,15 @@ bool AppGui::initialize()
                           "{ color: black }");
 #endif
 
+#ifdef Q_OS_LINUX
+    // Enforce white background and black text color to fix dark mode on Linux
+    this->setStyleSheet("QCheckBox:unchecked, QCheckBox:checked, QCheckBox, QRadioButton"
+                          "{ color: black; background-color : white; }"
+                        "QGroupBox { color: black; }"
+                        "CredentialView, QTreeView { color: black; background-color: black; }"
+                        );
+#endif
+
     return true;
 }
 
@@ -754,6 +763,37 @@ QString AppGui::getDataDirPath()
     dataDir.mkpath(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).first());
 
     return dataDir.absolutePath();
+}
+
+QString AppGui::getFileName(QWidget* parent, const QString &title, const QString &dir, const QString &filter /* = QString{} */, bool acceptSave /*= false*/)
+{
+    QFileDialog dialog(parent, title, dir, filter);
+#ifdef Q_OS_UNIX
+    // Force white background and black text color to fix dark mode issue
+    dialog.setStyleSheet("QWidget { background-color: white; color: black }");
+#endif
+    if (acceptSave)
+    {
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+    }
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        QUrl url = dialog.selectedUrls().value(0);
+        if (url.isLocalFile() || url.isEmpty())
+        {
+            return url.toLocalFile();
+        }
+        else
+        {
+            return url.toString();
+        }
+    }
+    return QString{};
+}
+
+QString AppGui::getSaveFileName(QWidget *parent, const QString &title, const QString &dir, const QString &filter)
+{
+    return getFileName(parent, title, dir, filter, true);
 }
 
 void AppGui::setupLanguage()

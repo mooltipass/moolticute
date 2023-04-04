@@ -285,7 +285,7 @@ void SSHManagement::onExportPublicKey()
     if (!it) return;
 
     QSettings s;
-    QString fname = QFileDialog::getSaveFileName(this, tr("Save public key"),
+    QString fname = AppGui::getSaveFileName(this, tr("Save public key"),
                                                  s.value("last_used_path/ssh_key_dir", QDir::homePath()).toString(),
                                                  tr("OpenSsh public key (*.pub *.*)"));
     if (fname.isEmpty()) return;
@@ -309,7 +309,7 @@ void SSHManagement::onExportPrivateKey()
     if (!it) return;
 
     QSettings s;
-    QString fname = QFileDialog::getSaveFileName(this, tr("Save private key"),
+    QString fname = AppGui::getSaveFileName(this, tr("Save private key"),
                                                  s.value("last_used_path/ssh_key_dir", QDir::homePath()).toString(),
                                                  tr("OpenSsh private key (*.key *.*)"));
     if (fname.isEmpty()) return;
@@ -346,7 +346,7 @@ void SSHManagement::on_pushButtonImport_clicked()
     }
 
     const auto fname =
-        QFileDialog::getOpenFileName(this, tr("OpenSSH private key"),
+        AppGui::getFileName(this, tr("OpenSSH private key"),
                                      s.value("last_used_path/ssh_key_dir", def_dir).toString(),
                                      tr("OpenSSH private key (*.key *.pem *.* *)"));
     if (fname.isEmpty())

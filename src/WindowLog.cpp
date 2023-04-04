@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "WindowLog.h"
 #include "ui_WindowLog.h"
+#include "AppGui.h"
 
 WindowLog::WindowLog(QWidget *parent) :
     QMainWindow(parent),
@@ -57,7 +58,7 @@ void WindowLog::changeEvent(QEvent *event)
 void WindowLog::on_pushButtonSaveLog_clicked()
 {
     QSettings s;
-    QString fname = QFileDialog::getSaveFileName(this, tr("Save logs to file"),
+    QString fname = AppGui::getSaveFileName(this, tr("Save logs to file"),
                                                  s.value("last_used_path/save_logs_dir", QDir::homePath()).toString(),
                                                  "Text file (*.txt);;All files (*.*)");
     if (!fname.isEmpty())

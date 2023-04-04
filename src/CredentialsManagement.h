@@ -146,7 +146,7 @@ private:
     void initKeyAfterInput(QComboBox * cbKeyAfter);
 
     void changeCurrentFavorite(int iFavorite);
-    virtual void changeEvent(QEvent *event);
+    virtual void changeEvent(QEvent *event) override;
     int getCategory(const QModelIndex &srcIndex);
 
     void checkLinkingOnLoginSelected(const QModelIndex &srcIndex);
