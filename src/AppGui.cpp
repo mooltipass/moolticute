@@ -295,10 +295,9 @@ bool AppGui::initialize()
 
 #ifdef Q_OS_LINUX
     // Enforce white background and black text color to fix dark mode on Linux
-    this->setStyleSheet("QCheckBox:unchecked, QCheckBox:checked, QCheckBox, QRadioButton"
+    this->setStyleSheet("QCheckBox:unchecked, QCheckBox:checked, QCheckBox, QRadioButton, CredentialView, QTreeView"
                           "{ color: black; background-color : white; }"
                         "QGroupBox { color: black; }"
-                        "CredentialView, QTreeView { color: black; background-color: black; }"
                         );
 #endif
 
