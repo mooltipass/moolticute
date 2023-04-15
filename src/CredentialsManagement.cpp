@@ -438,7 +438,7 @@ void CredentialsManagement::on_addCredentialButton_clicked()
             if (success)
                 QMessageBox::information(this, "Moolticute", tr("%1: New Login %2 added.").arg(service, login));
             else
-                QMessageBox::warning(this, tr("Failure"), tr("Couldn't Add New Credential to Device"));
+                QMessageBox::warning(this, tr("Failure"), tr("Couldn't Add This Credential: Please approve the request on the device."));
 
             ui->addCredServiceInput->clear();
             ui->addCredLoginInput->clear();
