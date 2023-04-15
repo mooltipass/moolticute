@@ -1480,7 +1480,7 @@ void MainWindow::on_pushButtonImportFile_clicked()
 {
     QSettings s;
 
-    QString fname = QFileDialog::getOpenFileName(this, tr("Select database export..."),
+    QString fname = AppGui::getFileName(this, tr("Select database export..."),
                                                  s.value("last_used_path/import_dir", QDir::homePath()).toString(),
                                                  "Memory exports (*.bin);;All files (*.*)");
     if (fname.isEmpty())
@@ -1513,7 +1513,7 @@ void MainWindow::dbExported(const QByteArray &d, bool success)
         QMessageBox::warning(this, tr("Error"), tr(d));
     else
     {
-        QString fname = QFileDialog::getSaveFileName(this, tr("Save database export..."),
+        QString fname = AppGui::getSaveFileName(this, tr("Save database export..."),
                                                      s.value("last_used_path/export_dir", QDir::homePath()).toString(),
                                                      "Memory exports (*.bin);;All files (*.*)");
         if (!fname.isEmpty())
@@ -2043,7 +2043,7 @@ void MainWindow::on_pushButtonImportCSV_clicked()
 {
     QSettings s;
 
-    QString fname = QFileDialog::getOpenFileName(this, tr("Select CSV file to import..."),
+    QString fname = AppGui::getFileName(this, tr("Select CSV file to import..."),
                                                  s.value("last_used_path/import_csv_dir", QDir::homePath()).toString(),
                                                  "CSV files (*.csv);;All files (*.*)");
     if (fname.isEmpty())

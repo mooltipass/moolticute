@@ -38,6 +38,11 @@ FidoManagement::FidoManagement(QWidget *parent) :
     connect(ui->pushButtonDiscard, &AnimatedColorButton::actionValidated, this, &FidoManagement::on_pushButtonDiscard_clicked);
     connect(ui->fidoTreeView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &FidoManagement::onCredentialSelected);
+
+#ifdef Q_OS_LINUX
+    // Force white background and black text color for FidoManagement to make UI visible in dark mode
+    ui->fidoTreeView->setStyleSheet("QWidget { background-color : white; color : black; }");
+#endif
 }
 
 void FidoManagement::setWsClient(WSClient *c)

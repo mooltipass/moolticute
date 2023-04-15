@@ -1,5 +1,6 @@
 #include "DbExportsRegistryController.h"
 #include "PromptWidget.h"
+#include "AppGui.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -134,7 +135,7 @@ void DbExportsRegistryController::handleExportDbResult(const QByteArray &d, bool
         return;
     }
 
-    QString fname = QFileDialog::getSaveFileName(window, tr("Save database export..."),
+    QString fname = AppGui::getSaveFileName(window, tr("Save database export..."),
                                                  s.value("last_used_path/export_dir", QDir::homePath()).toString(),
                                                  "Memory exports (*.bin);;All files (*.*)");
     if (fname.isEmpty())

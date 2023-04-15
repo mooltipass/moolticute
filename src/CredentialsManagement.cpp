@@ -209,6 +209,13 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
     connect(this, &CredentialsManagement::editedCredentialLinked, ui->credDisplayPasswordInput, &LockedPasswordLineEdit::onCredentialLinked);
     ui->credentialTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->credentialTreeView, &CredentialView::customContextMenuRequested, this, &CredentialsManagement::onTreeViewContextMenuRequested);
+
+#ifdef Q_OS_LINUX
+    // Force white background and black text color for CredentialsManagement to make UI visible in dark mode
+    ui->credentialsListWdiget->setStyleSheet("QWidget { background-color : white; color : black; }");
+    ui->pageUnlocked->setStyleSheet("QLineEdit { background-color : white; color : black; }");
+    ui->quickInsertWidget->setStyleSheet("QLineEdit { background-color : white; color : black; }");
+#endif
 }
 
 void CredentialsManagement::setFilterCredLayout()

@@ -54,6 +54,9 @@ public:
 
     static QString getDataDirPath();
 
+    static QString getFileName(QWidget* parent, const QString &title, const QString &dir, const QString &filter = QString{}, bool acceptSave = false);
+    static QString getSaveFileName(QWidget* parent, const QString &title, const QString &dir, const QString &filter = QString{});
+
 private slots:
     void restartDaemon();
     void connectedChanged();
