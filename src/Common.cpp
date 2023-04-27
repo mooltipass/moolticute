@@ -529,5 +529,9 @@ QByteArray Common::getUntilNullByte(const QByteArray &arr)
 bool Common::isEmail(const QString &service)
 {
     RegExp mailREX(EMAIL_REGEXP);
+#if QT_VERSION < 0x060000
+    return mailREX.exactMatch(service);
+#else
     return mailREX.match(service).hasMatch();
+#endif
 }
