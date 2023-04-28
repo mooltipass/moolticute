@@ -2,6 +2,7 @@
 #if QT_VERSION >= 0x051000
 #include "utils/qurltlds_p.h"
 #endif
+#include "Common.h"
 
 ParseDomain::ParseDomain(const QString &url) :
     _url(QUrl::fromUserInput(url))
@@ -109,7 +110,7 @@ bool ParseDomain::qIsEffectiveTLD(const QString &domain)
 
 QString ParseDomain::getManuallyEnteredDomainName(const QString &service)
 {
-    if (!isWebsite())
+    if (!isWebsite() || Common::isEmail(service))
     {
         return service;
     }

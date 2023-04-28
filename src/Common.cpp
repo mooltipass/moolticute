@@ -123,6 +123,7 @@ const QString Common::ISODateWithMsFormat = "yyyy-MM-ddTHH:mm:ss.zzz";
 const QString Common::SIMPLE_CRYPT = "SimpleCrypt";
 const QString Common::SIMPLE_CRYPT_V2 = "SimpleCryptV2";
 const QString Common::HEX_REGEXP = "[0-9A-Fa-f]{%1}";
+const QString Common::EMAIL_REGEXP = "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}\\b";
 const QString Common::SETTING_USB_LAYOUT_ENFORCE = "settings/enforce_usb_layout";
 const QString Common::SETTING_USB_LAYOUT_ENFORCE_VALUE = "settings/enforce_usb_layout_value";
 const QString Common::SETTING_BT_LAYOUT_ENFORCE = "settings/enforce_bt_layout";
@@ -523,4 +524,14 @@ QByteArray Common::getUntilNullByte(const QByteArray &arr)
         return arr.left(arr.indexOf(ZERO_BYTE));
     }
     return arr;
+}
+
+bool Common::isEmail(const QString &service)
+{
+    RegExp mailREX(EMAIL_REGEXP);
+#if QT_VERSION < 0x060000
+    return mailREX.exactMatch(service);
+#else
+    return mailREX.match(service).hasMatch();
+#endif
 }

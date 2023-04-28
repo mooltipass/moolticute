@@ -266,6 +266,8 @@ public:
 
     static QByteArray getUntilNullByte(const QByteArray& arr);
 
+    static bool isEmail(const QString &service);
+
     typedef enum
     {
         MP_Classic = 0,
@@ -344,6 +346,7 @@ public:
     static const QString SIMPLE_CRYPT;
     static const QString SIMPLE_CRYPT_V2;
     static const QString HEX_REGEXP;
+    static const QString EMAIL_REGEXP;
     static const QString SETTING_USB_LAYOUT_ENFORCE;
     static const QString SETTING_USB_LAYOUT_ENFORCE_VALUE;
     static const QString SETTING_BT_LAYOUT_ENFORCE;
