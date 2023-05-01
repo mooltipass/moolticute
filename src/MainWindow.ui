@@ -1983,7 +1983,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QCheckBox" name="checkBoxDisableBleOnCardRemove">
                  <property name="toolTip">
-                  <string>Disable Bluetooth when a user card is removed from the device</string>
+                  <string>Disable Bluetooth when a user card is removed from the device (improve battery life)</string>
                  </property>
                  <property name="text">
                   <string>Disable BLE on Card Removed</string>
@@ -1993,7 +1993,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <item>
                 <widget class="QCheckBox" name="checkBoxDisableBleOnLock">
                  <property name="toolTip">
-                  <string>Disable Bluetooth upon device lock</string>
+                  <string>Disable Bluetooth upon device lock (improve battery life)</string>
                  </property>
                  <property name="text">
                   <string>Disable BLE on Device Lock</string>
