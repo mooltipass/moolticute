@@ -69,7 +69,8 @@ private:
 
     static constexpr int NOTE_ICON_WIDTH = 120;
     static constexpr int NOTE_ICON_HEIGHT = 160;
-    static constexpr int NOTE_FONT_SIZE = 16;
+    static constexpr int NOTE_FONT_SIZE = 14;
+    static constexpr int NOTE_LEFT_ALIGN_SIZE = 15;
     static const QString EXIT_TEXT;
     static const QString DISCARD_TEXT;
 };
