@@ -90,6 +90,11 @@ void WSServerCon::processMessage(const QString &message)
     }
     else if (root["msg"] == "show_status_notification_warning")
     {
+        if (mpdevice && mpdevice->isBLE() && mpdevice->get_status() == Common::Locked)
+        {
+            mpdevice->ble()->sendWakeUp();
+        }
+
         QJsonDocument showWarningDoc(root);
         bool isGuiRunning = false;
         emit sendMessageToGUI(showWarningDoc.toJson(), isGuiRunning);

@@ -643,6 +643,32 @@ QString MPDeviceBleImpl::retrieveTotpCodeFromResponse(const QByteArray &response
     return totpCode;
 }
 
+void MPDeviceBleImpl::sendWakeUp()
+{
+    if (get_bundleVersion() < WAKEUP_DEVICE_BUNDLE_VERSION)
+    {
+        qWarning() << "Wake up device is not available before bundle version " << WAKEUP_DEVICE_BUNDLE_VERSION;
+        return;
+    }
+
+    AsyncJobs *jobs = new AsyncJobs("Send Wake Up", this);
+
+    jobs->append(new MPCommandJob(mpDev, MPCmd::WAKE_UP_DEVICE,
+                                  [this](const QByteArray &data, bool &)
+                                  {
+                                      if (MSG_FAILED == bleProt->getMessageSize(data))
+                                      {
+                                          qWarning() << "Send wake up to device failed";
+                                          return false;
+                                      }
+                                      qDebug() << "Send wake up to device was successfully";
+
+                                      return true;
+                                  }));
+
+    mpDev->enqueueAndRunJob(jobs);
+}
+
 void MPDeviceBleImpl::flipBit()
 {
     m_flipBit = m_flipBit ? 0x00 : MESSAGE_FLIP_BIT;

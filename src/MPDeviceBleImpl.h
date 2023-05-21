@@ -88,6 +88,8 @@ public:
     BleCredential retrieveCredentialFromResponse(QByteArray response, QString service, QString login) const;
     QString retrieveTotpCodeFromResponse(const QByteArray& response);
 
+    void sendWakeUp();
+
     void sendResetFlipBit();
     void setCurrentFlipBit(QByteArray &msg);
     void flipMessageBit(QVector<QByteArray> &msg);
@@ -286,6 +288,7 @@ private:
     static constexpr int MINI_FILE_BLOCK_SIZE = 128;
     static constexpr int FORCE_SUBDOMAIN_BUNDLE_VERSION = 8;
     static constexpr int SET_BLE_NAME_BUNDLE_VERSION = 9;
+    static constexpr int WAKEUP_DEVICE_BUNDLE_VERSION = 10;
     static constexpr int POINTED_TO_ADDR_SIZE = 2;
     static constexpr int PLATFORM_SERIAL_NUM_FIRST_BYTE = 16;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
