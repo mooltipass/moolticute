@@ -1701,14 +1701,26 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
         ui->credentialTreeView->selectionModel()->setCurrentIndex(m_credentialToLinkIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
         QModelIndex srcIndex = getSourceIndexFromProxyIndex(m_credentialToLinkIndex);
         LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
-        if (pLoginItem != nullptr)
+        if (nullptr != pLoginItem)
         {
-            pLoginItem->setPointedToChildAddressTmp(m_credentialLinkedAddr);
+            QString linkName =  "<" + pLoginItem->parentItem()->name() + "/" + pLoginItem->name() + ">";
+            int ret = QMessageBox::warning(this, "Credential link",
+                                           tr("%1 will use %2 password.\n"
+                                              "Do you want to confirm?").arg(linkName).arg(linkToName),
+                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+            if (ret == QMessageBox::Yes)
+            {
+                pLoginItem->setPointedToChildAddressTmp(m_credentialLinkedAddr);
+                ui->credDisplayPasswordInput->setPasswordVisible(true);
+                ui->credDisplayPasswordInput->setPlaceholderText(linkToName);
+                emit editedCredentialLinked();
+                updateSaveDiscardState();
+            }
         }
-        ui->credDisplayPasswordInput->setPasswordVisible(true);
-        ui->credDisplayPasswordInput->setPlaceholderText(linkToName);
-        emit editedCredentialLinked();
-        updateSaveDiscardState();
+        else
+        {
+            qCritical() << "Login item is not available for index";
+        }
     }
     ui->credDisplayFrame->setEnabled(true);
     ui->framePasswordLink->hide();
@@ -1787,5 +1799,16 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
         }
 
         m_enableMultipleDomainMenu.popup(ui->credentialTreeView->mapToGlobal(pos));
+    }
+    else
+    {
+        m_enableMultipleDomainMenu.clear();
+        auto* pLoginItem = m_pCredModel->getLoginItemByIndex(sourceIndex);
+        if (pLoginItem && LinkingMode::OFF == m_linkingMode)
+        {
+            auto* action = m_enableMultipleDomainMenu.addAction(tr("Use other credential password"));
+            connect(action, &QAction::triggered, this, &CredentialsManagement::onSelectedCredentialLink);
+            m_enableMultipleDomainMenu.popup(ui->credentialTreeView->mapToGlobal(pos));
+        }
     }
 }
