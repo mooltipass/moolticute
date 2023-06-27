@@ -51,12 +51,13 @@ private Q_SLOTS:
     void updatePasswordLength(int);
     void emitPassword();
     void onPasswordProfileChanged(int index);
+    void onCopyButtonClicked();
 
 protected:
     void showEvent(QShowEvent* e) override;
 
 private:
-    QPushButton* m_refreshBtn, *m_fillBtn;
+    QPushButton* m_refreshBtn, *m_fillBtn, *m_copyBtn;
     QSlider* m_lengthSlider;
     QCheckBox *m_upperCaseCB, *m_lowerCaseCB, *m_digitsCB, *m_symbolsCB;
     QLabel *m_passwordLabel, *m_sliderLengthLabel, *m_passwordProfileLabel;
@@ -66,6 +67,7 @@ private:
     QWidget *m_customPasswordControls;
 
     std::mt19937 m_random_generator;
+    static constexpr int COPY_BTN_WIDTH = 40;
 };
 
 
