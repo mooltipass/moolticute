@@ -183,6 +183,10 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent):
     m_refreshBtn = new QPushButton(tr("Refresh"));
     m_refreshBtn->setShortcut(QKeySequence(Qt::Key_F5));
 
+    m_copyBtn = new QPushButton("");
+    m_copyBtn->setIcon(AppGui::qtAwesome()->icon(fa::copy));
+    m_copyBtn->setMaximumWidth(COPY_BTN_WIDTH);
+
     m_passwordLabel = new QLabel;
     m_passwordLabel->setMinimumWidth(QFontMetrics(m_passwordLabel->font()).averageCharWidth() * 40 );
     m_passwordLabel->setAlignment(Qt::AlignCenter);
@@ -204,6 +208,7 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent):
 
     buttonLayout->addWidget(m_refreshBtn);
     buttonLayout->addWidget(m_fillBtn);
+    buttonLayout->addWidget(m_copyBtn);
 
     mainLayout->addLayout(buttonLayout);
     mainLayout->addSpacing(10);
@@ -242,6 +247,8 @@ PasswordOptionsPopup::PasswordOptionsPopup(QWidget* parent):
 
     connect(m_fillBtn, &QPushButton::clicked, this, &PasswordOptionsPopup::emitPassword);
 
+    connect(m_copyBtn, &QPushButton::clicked, this, &PasswordOptionsPopup::onCopyButtonClicked);
+
     connect(m_passwordProfileCMB, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &PasswordOptionsPopup::onPasswordProfileChanged);
 
     auto p = this->palette();
@@ -279,6 +286,12 @@ void PasswordOptionsPopup::onPasswordProfileChanged(int index)
     adjustSize();
 
     generatePassword();
+}
+
+void PasswordOptionsPopup::onCopyButtonClicked()
+{
+    QGuiApplication::clipboard()->setText(m_passwordLabel->text());
+    QToolTip::showText(QCursor::pos(), tr("Password copied to clipboard"));
 }
 
 void PasswordOptionsPopup::showEvent(QShowEvent* e)
