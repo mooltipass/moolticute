@@ -11,6 +11,7 @@ SettingsGuiBLE::SettingsGuiBLE(QObject *parent, MainWindow *mw)
     connect(this, &DeviceSettingsBLE::mc_subdomain_force_statusChanged, this, &SettingsGuiBLE::handleSubdomainForceChanged);
     connect(mw->wsClient, &WSClient::bundleVersionChanged, this, &SettingsGuiBLE::checkDeviceSettingsForBundle9);
     connect(mw->wsClient, &WSClient::bundleVersionChanged, this, &SettingsGuiBLE::checkDeviceSettingsForBundle11);
+    connect(mw->wsClient, &WSClient::bundleVersionChanged, this, &SettingsGuiBLE::checkDeviceSettingsForBundle13);
 }
 
 void SettingsGuiBLE::loadParameters()
@@ -137,6 +138,20 @@ void SettingsGuiBLE::checkDeviceSettingsForBundle11(int bundleVersion)
     else
     {
         ui->checkBoxSwitchOffLock->hide();
+    }
+}
+
+void SettingsGuiBLE::checkDeviceSettingsForBundle13(int bundleVersion)
+{
+    if (bundleVersion >= 13)
+    {
+        ui->paranoidPinEntryCheckBox->show();
+        ui->disableBatChargingCheckBox->show();
+    }
+    else
+    {
+        ui->paranoidPinEntryCheckBox->hide();
+        ui->disableBatChargingCheckBox->hide();
     }
 }
 

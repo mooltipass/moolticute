@@ -264,7 +264,9 @@ public:
         SCREEN_BRIGHTNESS_USB,
         SCREEN_BRIGHTNESS_BAT,
         LOGIN_AND_FAV_INVERTED,
-        SWITCH_OFF_ON_LOCK
+        SWITCH_OFF_ON_LOCK,
+        PARANOID_PIN_ENTRY,
+        DISABLE_BAT_CHARGE
     };
     Q_ENUM(Param)
 };

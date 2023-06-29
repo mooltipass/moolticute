@@ -34,7 +34,9 @@ DeviceSettingsBLE::DefaultValues DeviceSettingsBLE::m_bleDefaultValues =
         {MPParams::SCREEN_BRIGHTNESS_USB, 0x90},
         {MPParams::SCREEN_BRIGHTNESS_BAT, 0x90},
         {MPParams::LOGIN_AND_FAV_INVERTED, 0},
-        {MPParams::SWITCH_OFF_ON_LOCK, 0}
+        {MPParams::SWITCH_OFF_ON_LOCK, 0},
+        {MPParams::PARANOID_PIN_ENTRY, 0},
+        {MPParams::DISABLE_BAT_CHARGE, 0}
     };
 
 DeviceSettingsBLE::DeviceSettingsBLE(QObject *parent)
@@ -112,5 +114,9 @@ void DeviceSettingsBLE::fillParameterMapping()
     m_bleByteMapping[MPParams::LOGIN_AND_FAV_INVERTED] = LOGIN_AND_FAV_INVERTED;
     m_paramMap.insert(MPParams::SWITCH_OFF_ON_LOCK, "switch_off_on_lock");
     m_bleByteMapping[MPParams::SWITCH_OFF_ON_LOCK] = SWITCH_OFF_ON_LOCK;
+    m_paramMap.insert(MPParams::PARANOID_PIN_ENTRY, "paranoid_pin_entry");
+    m_bleByteMapping[MPParams::PARANOID_PIN_ENTRY] = PARANOID_PIN_ENTRY;
+    m_paramMap.insert(MPParams::DISABLE_BAT_CHARGE, "disable_bat_charge");
+    m_bleByteMapping[MPParams::DISABLE_BAT_CHARGE] = DISABLE_BAT_CHARGE;
 }
 

@@ -70,6 +70,8 @@ void SettingsGuiHelper::setMainWindow(MainWindow *mw)
         {MPParams::SCREEN_BRIGHTNESS_BAT, ui->comboBoxBatteryScreenBrightness},
         {MPParams::LOGIN_AND_FAV_INVERTED, ui->checkBoxInvertLoginAndFav},
         {MPParams::SWITCH_OFF_ON_LOCK, ui->checkBoxSwitchOffLock},
+        {MPParams::PARANOID_PIN_ENTRY, ui->paranoidPinEntryCheckBox},
+        {MPParams::DISABLE_BAT_CHARGE, ui->disableBatChargingCheckBox}
     };
     //When something changed in GUI, show save/reset buttons
     for (const auto& widget : m_widgetMapping)

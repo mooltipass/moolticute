@@ -1885,6 +1885,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="paranoidPinEntryCheckBox">
+                 <property name="toolTip">
+                  <string>Only shows digits when pressing and scrolling</string>
+                 </property>
+                 <property name="text">
+                  <string>Paranoid Pin Entry</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="checkBoxBTShortcuts">
                  <property name="toolTip">
                   <string>Scroll wheel shortcuts for bluetooth actions</string>
@@ -1997,6 +2007,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </property>
                  <property name="text">
                   <string>Disable BLE on Device Lock</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="disableBatChargingCheckBox">
+                 <property name="toolTip">
+                  <string>Only enable it if you don't use your Mini BLE on the go</string>
+                 </property>
+                 <property name="text">
+                  <string>Disable Battery Charging</string>
                  </property>
                 </widget>
                </item>

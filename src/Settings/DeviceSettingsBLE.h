@@ -35,6 +35,8 @@ class DeviceSettingsBLE : public DeviceSettings
     QT_SETTINGS_PROPERTY(int, screen_brightness_bat, 0x90, MPParams::SCREEN_BRIGHTNESS_BAT)
     QT_SETTINGS_PROPERTY(bool, login_and_fav_inverted, false, MPParams::LOGIN_AND_FAV_INVERTED)
     QT_SETTINGS_PROPERTY(bool, switch_off_on_lock, false, MPParams::SWITCH_OFF_ON_LOCK)
+    QT_SETTINGS_PROPERTY(bool, paranoid_pin_entry, false, MPParams::PARANOID_PIN_ENTRY)
+    QT_SETTINGS_PROPERTY(bool, disable_bat_charge, false, MPParams::DISABLE_BAT_CHARGE)
 
 
 public:
@@ -77,7 +79,9 @@ public:
         MC_SUBDOMAIN_FORCE_STATUS = 31,
         FAV_LAST_USED_SORTED = 32,
         LOGIN_AND_FAV_INVERTED = 33,
-        SWITCH_OFF_ON_LOCK = 34
+        SWITCH_OFF_ON_LOCK = 34,
+        PARANOID_PIN_ENTRY = 35,
+        DISABLE_BAT_CHARGE = 36
     };
 
     static constexpr char USB_LAYOUT_ID = 0x01;
