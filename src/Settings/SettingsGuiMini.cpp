@@ -77,6 +77,10 @@ void SettingsGuiMini::updateUI()
     //Bundle 11
     ui->checkBoxSwitchOffLock->hide();
 
+    //Bundle 13
+    ui->paranoidPinEntryCheckBox->hide();
+    ui->disableBatChargingCheckBox->hide();
+
     ui->groupBox_BLESettings->hide();
 
     // Inactivity groupbox

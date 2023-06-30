@@ -36,6 +36,7 @@ private:
 private slots:
     void checkDeviceSettingsForBundle9(int bundleVersion);
     void checkDeviceSettingsForBundle11(int bundleVersion);
+    void checkDeviceSettingsForBundle13(int bundleVersion);
     void handleSubdomainForceChanged(int value);
 };
 
