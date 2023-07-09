@@ -34,6 +34,7 @@ class CredentialModelFilter;
 class LoginItem;
 class PasswordProfilesModel;
 class SimpleLineEdit;
+class TreeItem;
 
 class CredentialsManagement : public QWidget
 {
@@ -154,6 +155,8 @@ private:
     QString processMultipleDomainsInput(const QString& service, const QString &domains, const bool disable_tld_check);
 
     bool isUICategoryClean() const;
+
+    QString getFirstDomain(TreeItem *pItem) const;
 
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;

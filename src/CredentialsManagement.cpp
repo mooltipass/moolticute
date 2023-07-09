@@ -400,8 +400,16 @@ void CredentialsManagement::requestPasswordForSelectedItem()
     {
         // Retrieve parent
         TreeItem *pItem = pLoginItem->parentItem();
+        QString serviceName = pItem->name();
+        QString domain = getFirstDomain(pItem);
+        if (!domain.isEmpty())
+        {
+            // For multiple domains add first domain to service name
+            serviceName += domain;
+        }
+
         if (pItem != nullptr) {
-            wsClient->requestPassword(pItem->name(), pLoginItem->name());
+            wsClient->requestPassword(serviceName, pLoginItem->name());
             ui->credDisplayPasswordInput->setPlaceholderText(tr("Please Approve On Device"));
 
             setEnabled(false);
@@ -483,9 +491,18 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
 
         if (selectedLogin && serviceItem)
         {
-            if (service == serviceItem->name() && login == selectedLogin->name())
+            bool serviceMatch = (service == serviceItem->name());
+            auto parsedService = service;
+            if (!serviceMatch)
             {
-                m_pCredModel->setClearTextPassword(service, login, password);
+                // If service is not a match, test with multiple domain if available
+                ParseDomain parsedDomain(service);
+                parsedService = parsedDomain.domain();
+                serviceMatch = (parsedService == serviceItem->name());
+            }
+            if (serviceMatch && login == selectedLogin->name())
+            {
+                m_pCredModel->setClearTextPassword(parsedService, login, password);
                 ui->credDisplayPasswordInput->setText(password);
                 ui->credDisplayPasswordInput->setLocked(false);
             }
@@ -1521,6 +1538,22 @@ bool CredentialsManagement::isUICategoryClean() const
            ui->lineEditCategory2->text() == m_pCredModel->getCategoryName(2) &&
            ui->lineEditCategory3->text() == m_pCredModel->getCategoryName(3) &&
            ui->lineEditCategory4->text() == m_pCredModel->getCategoryName(4);
+}
+
+QString CredentialsManagement::getFirstDomain(TreeItem *pItem) const
+{
+    if (!pItem)
+    {
+        return "";
+    }
+
+    ServiceItem* serviceItem = dynamic_cast<ServiceItem*>(pItem);
+    QString multDomains = (serviceItem != nullptr) ? serviceItem->multipleDomains() : "";
+    if (!multDomains.isEmpty())
+    {
+        return multDomains.split(',').at(0);
+    }
+    return "";
 }
 
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
