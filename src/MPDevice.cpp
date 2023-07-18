@@ -7843,6 +7843,13 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 
                 multipleDomains = qjobject["multiple_domains"].toString();
             }
+            QString servicePwd = service;
+            // For multiple domain we need the add the first domain to service name for password save
+            if (!multipleDomains.isEmpty())
+            {
+                //TODO Only add if it does not contain
+                servicePwd += Common::getFirstDomain(multipleDomains);
+            }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
 
@@ -7922,7 +7929,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 else
                 {
                     QStringList changeList;
-                    changeList << service << login << password;
+                    changeList << servicePwd << login << password;
                     mmmPasswordChangeArray.append(changeList);
                 }
                 qDebug() << "Queing password change as well";
@@ -7977,7 +7984,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     }
                     {
                         QStringList changeList;
-                        changeList << service << login << password;
+                        changeList << servicePwd << login << password;
                         mmmPasswordChangeArray.append(changeList);
                     }
                 }
@@ -8089,7 +8096,7 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                     else
                     {
                         QStringList changeList;
-                        changeList << service << login << password;
+                        changeList << servicePwd << login << password;
                         mmmPasswordChangeArray.append(changeList);
                     }
                     packet_send_needed = true;

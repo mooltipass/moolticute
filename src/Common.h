@@ -268,6 +268,8 @@ public:
 
     static bool isEmail(const QString &service);
 
+    static QString getFirstDomain(const QString& domains);
+
     typedef enum
     {
         MP_Classic = 0,
@@ -360,6 +362,7 @@ public:
     static const int BLE_BUNDLE_WITH_MIRRORING = 11;
     static const int BLE_BUNDLE_WITH_MULT_DOMAINS = 11;
     static const char ZERO_BYTE = static_cast<char>(0x00);
+    static const char MULT_DOMAIN_SEPARATOR = ',';
     static const int ALPHABET_SIZE = 26;
     static QByteArray NOT_SET_ADDR;
 };

@@ -535,3 +535,12 @@ bool Common::isEmail(const QString &service)
     return mailREX.match(service).hasMatch();
 #endif
 }
+
+QString Common::getFirstDomain(const QString &domains)
+{
+    if (!domains.isEmpty())
+    {
+        return domains.split(MULT_DOMAIN_SEPARATOR).at(0);
+    }
+    return "";
+}

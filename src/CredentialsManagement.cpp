@@ -1549,11 +1549,7 @@ QString CredentialsManagement::getFirstDomain(TreeItem *pItem) const
 
     ServiceItem* serviceItem = dynamic_cast<ServiceItem*>(pItem);
     QString multDomains = (serviceItem != nullptr) ? serviceItem->multipleDomains() : "";
-    if (!multDomains.isEmpty())
-    {
-        return multDomains.split(',').at(0);
-    }
-    return "";
+    return Common::getFirstDomain(multDomains);
 }
 
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
