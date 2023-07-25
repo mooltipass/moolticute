@@ -7847,7 +7847,6 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             // For multiple domain we need the add the first domain to service name for password save
             if (!multipleDomains.isEmpty())
             {
-                //TODO Only add if it does not contain
                 servicePwd += Common::getFirstDomain(multipleDomains);
             }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
