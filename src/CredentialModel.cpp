@@ -588,7 +588,22 @@ void CredentialModel::addCredential(QString sServiceName, const QString &sLoginN
     if (nullptr == pTargetService)
     {
         pTargetService = m_pRootItem->findServiceByName(parsedDomain.domain());
-        // TODO check for multiple domain
+        if (pTargetService)
+        {
+            if (!pTargetService->isMultipleDomainSet())
+            {
+                // Found service without domain, but it is not a multiple domain
+                pTargetService = nullptr;
+            }
+            else
+            {
+                if (!pTargetService->multipleDomains().contains(parsedDomain.tld()))
+                {
+                    // Add new tld to multiple domain
+                    pTargetService->setMultipleDomains(pTargetService->multipleDomains() + Common::MULT_DOMAIN_SEPARATOR + parsedDomain.tld());
+                }
+            }
+        }
     }
 
     // Check if a service/login pair already exists
