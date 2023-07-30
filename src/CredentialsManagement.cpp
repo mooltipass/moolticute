@@ -1402,7 +1402,13 @@ void CredentialsManagement::credentialDataChanged()
 
 void CredentialsManagement::checkDeviceType()
 {
-    if (wsClient->isMPBLE() && !wsClient->get_memMgmtMode() && wsClient->get_advancedMenu())
+    // Set max password lengths based on device type
+    const auto isBle = wsClient->isMPBLE();
+    const auto pwdLength = isBle ? BLE_PASSWORD_LENGTH : MINI_PASSWORD_LENGTH;
+    ui->addCredPasswordInput->setMaxPasswordLength(pwdLength);
+    ui->credDisplayPasswordInput->setMaxPasswordLength(pwdLength);
+
+    if (isBle && !wsClient->get_memMgmtMode() && wsClient->get_advancedMenu())
     {
         ui->widget_UserCategories->show();
         sendGetUserCategories();
