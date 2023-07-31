@@ -1503,7 +1503,7 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
 #else
     auto splitBehavior = Qt::SkipEmptyParts;
 #endif
-    auto domainList = domains.split(MULT_DOMAIN_SEPARATOR, splitBehavior);
+    auto domainList = domains.split(Common::MULT_DOMAIN_SEPARATOR, splitBehavior);
     QStringList validDomains;
     QStringList invalidDomains;
     QString result = "";
@@ -1535,7 +1535,7 @@ QString CredentialsManagement::processMultipleDomainsInput(const QString& servic
         QMessageBox::information(this, tr("Invalid domain"),
                                 INVALID_DOMAIN_TEXT.arg(invalidDomains.join("</li><li>")));
     }
-    return validDomains.join(MULT_DOMAIN_SEPARATOR);
+    return validDomains.join(Common::MULT_DOMAIN_SEPARATOR);
 }
 
 bool CredentialsManagement::isUICategoryClean() const
@@ -1555,11 +1555,7 @@ QString CredentialsManagement::getFirstDomain(TreeItem *pItem) const
 
     ServiceItem* serviceItem = dynamic_cast<ServiceItem*>(pItem);
     QString multDomains = (serviceItem != nullptr) ? serviceItem->multipleDomains() : "";
-    if (!multDomains.isEmpty())
-    {
-        return multDomains.split(',').at(0);
-    }
-    return "";
+    return Common::getFirstDomain(multDomains);
 }
 
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
@@ -1792,7 +1788,7 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
                             {
                                 ParseDomain parsedService{serviceDomain};
                                 serviceDomain = parsedService.domain();
-                                defaultDomains = parsedService.tld() + MULT_DOMAIN_SEPARATOR;
+                                defaultDomains = parsedService.tld() + Common::MULT_DOMAIN_SEPARATOR;
                                 serviceNameChanged = true;
                             }
                         }
@@ -1825,7 +1821,7 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
             auto* actionRemove = m_enableMultipleDomainMenu.addAction(tr("Remove multiple domains"));
             connect(actionRemove, &QAction::triggered, [pServiceItem, this](){
                 QString multipleDomains = pServiceItem->multipleDomains();
-                QString domain = multipleDomains.split(MULT_DOMAIN_SEPARATOR).first();
+                QString domain = multipleDomains.split(Common::MULT_DOMAIN_SEPARATOR).first();
                 pServiceItem->setName(pServiceItem->name() + domain);
                 pServiceItem->setMultipleDomains("");
                 credentialDataChanged();

@@ -195,7 +195,6 @@ private:
     static constexpr int BLE_PASSWORD_LENGTH = 64;
     static constexpr int BLE_LOGIN_LENGTH = 63;
     static constexpr int MINI_LOGIN_LENGTH = 62;
-    static constexpr char MULT_DOMAIN_SEPARATOR = ',';
     static const QString INVALID_DOMAIN_TEXT;
     static const QString INVALID_INPUT_STYLE;
 

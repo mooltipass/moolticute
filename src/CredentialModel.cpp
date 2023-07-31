@@ -578,11 +578,33 @@ QJsonArray CredentialModel::getJsonChanges()
 void CredentialModel::addCredential(QString sServiceName, const QString &sLoginName, const QString &sPassword, const QString &sDescription, const QByteArray& pointedTo)
 {
     //Force all service names to lowercase
-    sServiceName = ParseDomain(sServiceName).getManuallyEnteredDomainName(sServiceName);
+    ParseDomain parsedDomain{sServiceName};
+    sServiceName = parsedDomain.getManuallyEnteredDomainName(sServiceName);
 
     // Retrieve target service
     ServiceItem *pTargetService = m_pRootItem->findServiceByName(sServiceName);
     LoginItem *pAddedLoginItem = nullptr;
+
+    if (nullptr == pTargetService)
+    {
+        pTargetService = m_pRootItem->findServiceByName(parsedDomain.domain());
+        if (pTargetService)
+        {
+            if (!pTargetService->isMultipleDomainSet())
+            {
+                // Found service without domain, but it is not a multiple domain
+                pTargetService = nullptr;
+            }
+            else
+            {
+                if (!pTargetService->multipleDomains().contains(parsedDomain.tld()))
+                {
+                    // Add new tld to multiple domain
+                    pTargetService->setMultipleDomains(pTargetService->multipleDomains() + Common::MULT_DOMAIN_SEPARATOR + parsedDomain.tld());
+                }
+            }
+        }
+    }
 
     // Check if a service/login pair already exists
     if (pTargetService != nullptr)
