@@ -952,12 +952,13 @@ void WSServerCon::sendChargingStatus(bool charging)
     sendJsonMessage(oroot);
 }
 
-void WSServerCon::sendNimhReconditionFinished(bool success, QString resposne)
+void WSServerCon::sendNimhReconditionFinished(bool success, QString resposne, bool restarted)
 {
     QJsonObject oroot = { {"msg", "nimh_reconditioning"} };
     QJsonObject data;
     data.insert("success", success);
     data.insert("discharge_time", resposne);
+    data.insert("restarted", restarted);
     oroot["data"] = data;
     sendJsonMessage(oroot);
 }
@@ -1397,7 +1398,9 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     }
     else if (root["msg"] == "nimh_reconditioning")
     {
-        bleImpl->nihmReconditioning();
+        QJsonObject o = root["data"].toObject();
+        auto enableRestart = o.value("enable_restart").toBool();
+        bleImpl->nihmReconditioning(enableRestart);
     }
     else if (root["msg"] == "request_security_challenge")
     {

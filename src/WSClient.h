@@ -122,7 +122,7 @@ public:
     void sendBatteryRequest();
     void sendBleNameRequest();
     void sendCurrentCategory(int category);
-    void sendNiMHReconditioning();
+    void sendNiMHReconditioning(bool enableRestart);
     void sendSecurityChallenge(QString str);
     void sendSetBleName(QString name);
     void sendSetSerialNumber(uint serialNum);
@@ -177,7 +177,7 @@ signals:
     void updateChargingStatus(int charging);
     void challengeResultReceived(QString result);
     void challengeResultFailed();
-    void reconditionFinished(bool success, double dischargeTime);
+    void reconditionFinished(bool success, double dischargeTime, bool restarted);
     void deleteFidoNodesFailed();
     void showExportPrompt();
     void displayMiniImportWarning();

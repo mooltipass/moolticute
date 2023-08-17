@@ -188,7 +188,7 @@ private slots:
 
     void on_pushButtonSecurityValidate_clicked();
 
-    void onReconditionFinished(bool success, double dischargeTime);
+    void onReconditionFinished(bool success, double dischargeTime, bool restarted);
     
     void on_checkBoxEnforceBTLayout_stateChanged(int arg1);
 
@@ -262,6 +262,8 @@ private:
     void fillInitialCurrentCategories();
 
     bool validateSerialString(const QString& serialStr, uint& serialNum);
+
+    void displayReconditionWaitScreen(double lastElapsedTime = 0);
 
     Ui::MainWindow *ui = nullptr;
     QtAwesome* awesome;

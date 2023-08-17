@@ -1993,6 +1993,17 @@ bool MainWindow::validateSerialString(const QString &serialStr, uint &serialNum)
     return true;
 }
 
+void MainWindow::displayReconditionWaitScreen(double lastElapsedTime)
+{
+    QString lastElapsedText = lastElapsedTime > 0 ? QString("<p>Recondition restarted. Last elapsed time: %1 seconds</p>").arg(lastElapsedTime) : "";
+    ui->labelWait->show();
+    ui->labelWait->setText(tr("<html><!--nimh_recondition--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">NiMH Recondition is in progress.</span></p>%1<p>Please wait.</p></body></html>").arg(lastElapsedText));
+    ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
+    ui->progressBarWait->hide();
+    ui->labelProgressMessage->hide();
+    updateTabButtons();
+}
+
 void MainWindow::on_toolButton_clearBackupFilePath_released()
 {
     ui->lineEdit_dbBackupFilePath->clear();
@@ -2310,13 +2321,8 @@ void MainWindow::on_pushButtonNiMHRecondition_clicked()
 
     if (btn == QMessageBox::Ok)
     {
-        wsClient->sendNiMHReconditioning();
-        ui->labelWait->show();
-        ui->labelWait->setText(tr("<html><!--nimh_recondition--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">NiMH Recondition is in progress.</span></p><p>Please wait.</p></body></html>"));
-        ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
-        ui->progressBarWait->hide();
-        ui->labelProgressMessage->hide();
-        updateTabButtons();
+        wsClient->sendNiMHReconditioning(ui->checkBoxContinueRecondition->isChecked());
+        displayReconditionWaitScreen();
     }
 }
 
@@ -2337,15 +2343,22 @@ void MainWindow::on_pushButtonSecurityValidate_clicked()
     wsClient->sendSecurityChallenge(challengeString);
 }
 
-void MainWindow::onReconditionFinished(bool success, double dischargeTime)
+void MainWindow::onReconditionFinished(bool success, double dischargeTime, bool restarted)
 {
     ui->stackedWidget->setCurrentWidget(ui->pageAdvanced);
     updatePage();
     updateTabButtons();
     if (success)
     {
-        QMessageBox::information(this, tr("NiMH Recondition Finished"),
+        if (!restarted)
+        {
+            QMessageBox::information(this, tr("NiMH Recondition Finished"),
                      tr("Recondition finished in %1 seconds").arg(dischargeTime));
+        }
+        else
+        {
+            displayReconditionWaitScreen(dischargeTime);
+        }
     }
     else
     {
