@@ -17,12 +17,13 @@ docker exec mc-deb bash /scripts/build_source.sh $VERSION xenial
 docker exec mc-deb bash /scripts/build_source.sh $VERSION bionic
 docker exec mc-deb bash /scripts/build_source.sh $VERSION focal
 docker exec mc-deb bash /scripts/build_source.sh $VERSION jammy
-docker exec mc-deb bash /scripts/build_source.sh $VERSION kinetic 
 docker exec mc-deb bash /scripts/build_source.sh $VERSION lunar 
 
 #windows and appimage
 docker exec appimgbuilder bash /scripts/package.sh
-docker exec winbuilder bash -c "export CODESIGN_WIN_PASS=${CODESIGN_WIN_PASS}; /scripts/package.sh"
+# windows builds: not using digital certificate anymore
+#docker exec winbuilder bash -c "export CODESIGN_WIN_PASS=${CODESIGN_WIN_PASS}; /scripts/package.sh"
+docker exec winbuilder bash -c "/scripts/package.sh"
 
 #prepare files to upload volume
 mkdir -p $HOME/uploads
