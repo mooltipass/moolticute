@@ -27,12 +27,18 @@ docker exec winbuilder bash -c "/scripts/package.sh"
 
 #prepare files to upload volume
 mkdir -p $HOME/uploads
+
+# windows builds: do not upload .exe as signing is done after zip upload
+#cp -v \
+#    packages/*.{exe,zip} \
+#    build-appimage/*.AppImage \
+#    $HOME/uploads/
 cp -v \
-    packages/*.{exe,zip} \
+    packages/*.zip \
     build-appimage/*.AppImage \
     $HOME/uploads/
 
-EXE_FILE="$(ls $HOME/uploads/*.exe 2> /dev/null | head -n 1)"
+EXE_FILE="$(ls packages/*.exe 2> /dev/null | head -n 1)"
 APPIMAGE_FILE=$(find $HOME/uploads -iname '*.AppImage')
 
 #create json (only used by testing builds)
