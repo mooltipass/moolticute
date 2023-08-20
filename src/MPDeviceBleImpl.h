@@ -123,7 +123,7 @@ public:
     void readBatteryPercent(const QByteArray& statusData);
     void getBattery();
 
-    void nihmReconditioning();
+    void nihmReconditioning(bool enableRestart);
     void getSecurityChallenge(const QString& key, const MessageHandlerCb &cb);
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
@@ -194,7 +194,7 @@ signals:
     void batteryPercentChanged(int batteryPct);
     void userCategoriesFetched(QJsonObject categories);
     void notesFetched();
-    void nimhReconditionFinished(bool success, QString response);
+    void nimhReconditionFinished(bool success, QString response, bool restarted = false);
     void changeBleName(const QString& name);
 
 private slots:
@@ -251,7 +251,7 @@ private:
     std::atomic_bool m_fetchingNotes = {false};
 
     bool m_enforceLayout = false;
-    QString m_nimhResponse = "";
+    quint32 m_nimhResultSec = 0;
 
     int m_miniFilePartCounter = 0;
 
@@ -291,6 +291,7 @@ private:
     static constexpr int WAKEUP_DEVICE_BUNDLE_VERSION = 10;
     static constexpr int POINTED_TO_ADDR_SIZE = 2;
     static constexpr int PLATFORM_SERIAL_NUM_FIRST_BYTE = 16;
+    static constexpr int RECONDITION_RESTART_UNDER_SECS = 2500;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
     const QString DEFAULT_BLE_NAME = "Mooltipass Mini BLE";
 };

@@ -1229,10 +1229,10 @@ void MPDeviceBleImpl::getBattery()
     }
 }
 
-void MPDeviceBleImpl::nihmReconditioning()
+void MPDeviceBleImpl::nihmReconditioning(bool enableRestart)
 {
     auto *jobs = new AsyncJobs("NiMH Reconditioning", mpDev);
-    m_nimhResponse = "";
+    m_nimhResultSec = 0;
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, [this](const QByteArray &data, bool &)
     {
@@ -1246,7 +1246,7 @@ void MPDeviceBleImpl::nihmReconditioning()
         const auto dischargeTimeUpper = bleProt->toIntFromLittleEndian(static_cast<quint8>(payload[2]), static_cast<quint8>(payload[3]));
         quint32 dischargeTime = dischargeTimeLower;
         dischargeTime |= static_cast<quint32>((dischargeTimeUpper<<16));
-        m_nimhResponse = QString::number(dischargeTime/1000.0);
+        m_nimhResultSec = dischargeTime/1000.0;
         if (std::numeric_limits<quint32>::max() == dischargeTime)
         {
             qCritical() << "NiMH Recondition failed";
@@ -1255,19 +1255,28 @@ void MPDeviceBleImpl::nihmReconditioning()
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [this](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, enableRestart](const QByteArray &data)
     {
         Q_UNUSED(data)
         qDebug() << "NiMH Reconditioning finished";
+        bool restarted = false;
+        if (enableRestart && m_nimhResultSec < RECONDITION_RESTART_UNDER_SECS)
+        {
+            restarted = true;
+        }
         createAndAddCustomJob("NiMH Reconditioning finished job",
-                        [this](){emit nimhReconditionFinished(true, m_nimhResponse);});
+                              [this, restarted, result = m_nimhResultSec](){emit nimhReconditionFinished(true, QString::number(result), restarted);});
+        if (restarted)
+        {
+            nihmReconditioning(true);
+        }
     });
 
     connect(jobs, &AsyncJobs::failed, [this](AsyncJob *)
     {
         qDebug() << "NiMH Reconditioning failed";
         createAndAddCustomJob("NiMH Reconditioning failed job",
-                        [this](){emit nimhReconditionFinished(false, m_nimhResponse);});
+                        [this](){emit nimhReconditionFinished(false, QString::number(m_nimhResultSec));});
     });
 
     mpDev->enqueueAndRunJob(jobs);

@@ -569,6 +569,7 @@ void WSClient::onTextMessageReceived(const QString &message)
     {
         QJsonObject o = rootobj["data"].toObject();
         bool success = o["success"].toBool();
+        bool restarted = o["restarted"].toBool();
         bool ok = false;
         double dischargeTime = o["discharge_time"].toString().toDouble(&ok);
         if (!ok)
@@ -576,7 +577,7 @@ void WSClient::onTextMessageReceived(const QString &message)
             qCritical() << "Cannot convert discarge time";
             success = false;
         }
-        emit reconditionFinished(success, dischargeTime);
+        emit reconditionFinished(success, dischargeTime, restarted);
     }
     else if (rootobj["msg"] == "delete_fido_nodes")
     {
@@ -913,9 +914,12 @@ void WSClient::sendCurrentCategory(int category)
                   {"data", o}});
 }
 
-void WSClient::sendNiMHReconditioning()
+void WSClient::sendNiMHReconditioning(bool enableRestart)
 {
-    sendJsonData({{ "msg", "nimh_reconditioning" }});
+    QJsonObject o;
+    o["enable_restart"] = enableRestart;
+    sendJsonData({{ "msg", "nimh_reconditioning" },
+                  {"data", o}});
 }
 
 void WSClient::sendSecurityChallenge(QString str)
