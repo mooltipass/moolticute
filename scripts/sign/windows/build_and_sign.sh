@@ -132,7 +132,7 @@ export PATH=$PATH:"$innosetup_path"
 
 # Sign files
 echo "Signing dlls and exes... feel free to take a coffee"
-#signtool sign //fd SHA256 //td SHA256 //tr http://time.certum.pl $(find . -type f \( -name "*.dll" -o -name "*.exe" \))
+signtool sign //fd SHA256 //td SHA256 //tr http://time.certum.pl $(find . -type f \( -name "*.dll" -o -name "*.exe" \))
 
 # Copy required images
 cp "$innosetup_path\WizClassicSmallImage-IS.bmp" WizModernSmallImage-IS.bmp
