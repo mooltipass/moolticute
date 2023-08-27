@@ -9,5 +9,9 @@ override_dh_auto_configure:
 	# files, we copy the main one to the name qmake expects
 	cp Moolticute.pro $(shell basename $(CURDIR)).pro
 	# launchpad build issue for bionic & xenial
-	if command -v lsb_release >/dev/null 2>&1 && (codename=\$(lsb_release -cs); [ "\$codename" = "bionic" ] || [ "\$codename" = "xenial" ]); then export QT_SELECT=qt5; fi
+	ifeq ($(filter bionic%, $(DEB_BUILD_GNU_TYPE)),bionic)
+		export QT_SELECT=qt5
+	else ifeq ($(filter xenial%, $(DEB_BUILD_GNU_TYPE)),xenial)
+		export QT_SELECT=qt5
+	endif
 	dh_auto_configure
