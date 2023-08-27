@@ -8,8 +8,6 @@ override_dh_auto_configure:
 	# the same name as the cwd. Since there are multiple .pro
 	# files, we copy the main one to the name qmake expects
 	cp Moolticute.pro $(shell basename $(CURDIR)).pro
-	# launch pad build issue
-	if command -v lsb_release >/dev/null 2>&1 && (codename=$(lsb_release -cs); [ "$codename" = "bionic" ] || [ "$codename" = "xenial" ]); then
-		export QT_SELECT=qt5
-	fi
+	# launchpad build issue for bionic & xenial
+	if command -v lsb_release >/dev/null 2>&1 && (codename=$(lsb_release -cs); [ "$codename" = "bionic" ] || [ "$codename" = "xenial" ]); then export QT_SELECT=qt5; fi
 	dh_auto_configure
