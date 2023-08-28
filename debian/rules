@@ -1,9 +1,11 @@
 #!/usr/bin/make -f
 # launchpad build issue for bionic & xenial
-ifeq (bionic,$(OS_CODENAME))
+ifeq ($(shell echo $(DEB_BUILD_ARCH_OS) | grep -c bionic),1)
+@echo Specifying qmake version for bionic
 export QT_SELECT = qt5
 endif
-ifeq (xenial,$(OS_CODENAME))
+ifeq ($(shell echo $(DEB_BUILD_ARCH_OS) | grep -c xenial),1)
+@echo Specifying qmake version for xenial
 export QT_SELECT = qt5
 endif
 
