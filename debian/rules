@@ -16,4 +16,5 @@ override_dh_auto_configure:
 	# the same name as the cwd. Since there are multiple .pro
 	# files, we copy the main one to the name qmake expects
 	cp Moolticute.pro $(shell basename $(CURDIR)).pro
+	qtchooser -print-env
 	dh_auto_configure
