@@ -1,20 +1,20 @@
 #!/usr/bin/make -f
+# launchpad build issue for bionic & xenial
+ifeq (,$(findstring $(DEB_BUILD_ARCH_OS),"bionic"))
+echo Specifying qmake version for bionic
+export QT_SELECT = qt5
+endif
+ifeq (,$(findstring $(DEB_BUILD_ARCH_OS),"xenial"))
+echo Specifying qmake version for xenial
+export QT_SELECT = qt5
+endif
 
 %:
- dh $@ 
+	dh $@ 
 
 override_dh_auto_configure:
-   # qmake looks for either a single .pro or a .pro with
-   # the same name as the cwd. Since there are multiple .pro
-   # files, we copy the main one to the name qmake expects
-   cp Moolticute.pro $(shell basename $(CURDIR)).pro
-   # launchpad build issue for bionic & xenial
-   ifeq (,$(findstring $(DEB_BUILD_ARCH_OS),"bionic"))
-      echo Specifying qmake version for bionic
-      export QT_SELECT = qt5
-   endif
-   ifeq (,$(findstring $(DEB_BUILD_ARCH_OS),"xenial"))
-      echo Specifying qmake version for xenial
-      export QT_SELECT = qt5
-   endif
-   dh_auto_configure
+	# qmake looks for either a single .pro or a .pro with
+	# the same name as the cwd. Since there are multiple .pro
+	# files, we copy the main one to the name qmake expects
+	cp Moolticute.pro $(shell basename $(CURDIR)).pro
+	dh_auto_configure
