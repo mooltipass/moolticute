@@ -29,8 +29,7 @@ if ! [ -d "$innosetup_path" ]; then
 fi
 
 # Prompt the user to select betas or release
-#read -p "1 for betas, 2 for releases: " choice
-choice=1
+read -p "1 for betas, 2 for releases: " choice
 
 # Moolticute beta latest file url contents
 if [ "$choice" == "1" ]; then
