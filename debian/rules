@@ -1,4 +1,11 @@
 #!/usr/bin/make -f
+# launchpad build issue for bionic & xenial
+ifeq (bionic,$(OS_CODENAME))
+export QT_SELECT = qt5
+endif
+ifeq (xenial,$(OS_CODENAME))
+export QT_SELECT = qt5
+endif
 
 %:
 	dh $@ 
@@ -8,11 +15,4 @@ override_dh_auto_configure:
 	# the same name as the cwd. Since there are multiple .pro
 	# files, we copy the main one to the name qmake expects
 	cp Moolticute.pro $(shell basename $(CURDIR)).pro
-	# launchpad build issue for bionic & xenial
-	ifeq ($(shell echo $(DEB_BUILD_ARCH_OS) | grep -c bionic),1)
-		env QT_SELECT=qt5 dh_auto_configure
-	else ifeq ($(shell echo $(DEB_BUILD_ARCH_OS) | grep -c xenial),1)
-		env QT_SELECT=qt5 dh_auto_configure
-	else
-		dh_auto_configure
-	endif
+	dh_auto_configure
