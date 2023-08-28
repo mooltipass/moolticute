@@ -9,9 +9,9 @@ override_dh_auto_configure:
 	# files, we copy the main one to the name qmake expects
 	cp Moolticute.pro $(shell basename $(CURDIR)).pro
 	# launchpad build issue for bionic & xenial
-	ifeq ($(findstring bionic, $(DEB_BUILD_ARCH_OS)),bionic)
+	ifeq ($(shell echo $(DEB_BUILD_ARCH_OS) | grep -c bionic),1)
 		env QT_SELECT=qt5 dh_auto_configure
-	else ifeq ($(findstring xenial, $(DEB_BUILD_ARCH_OS)),xenial)
+	else ifeq ($(shell echo $(DEB_BUILD_ARCH_OS) | grep -c xenial),1)
 		env QT_SELECT=qt5 dh_auto_configure
 	else
 		dh_auto_configure
