@@ -6295,10 +6295,11 @@ void MPDevice::startImportFileMerging(const MPDeviceProgressCb &cbProgress, Mess
                 }
             });
 
-            connect(getFreeAddressesJob, &AsyncJobs::failed, [](AsyncJob *failedJob)
+            connect(getFreeAddressesJob, &AsyncJobs::failed, [cb](AsyncJob *failedJob)
             {
                 Q_UNUSED(failedJob);
                 qCritical() << "Couldn't get enough free addresses";
+                cb(false, "Couldn't Import Database: Couldn't get enough free addresses");
             });
 
             jobsQueue.enqueue(getFreeAddressesJob);
