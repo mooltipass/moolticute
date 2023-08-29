@@ -132,6 +132,7 @@ MPCommandJob* MPBLEFreeAddressProvider::createGetFreeAddressPackage(AsyncJobs *j
                 if (1 == msgSize || !correctMsgSize)
                 {
                     qCritical() << "Not enough address retrieved during loadFreeAddresses";
+                    jobs->failCurrent();
                     return false;
                 }
 
