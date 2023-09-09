@@ -49,7 +49,6 @@ void SettingsGuiMini::updateUI()
     ui->knockSettingsSuffixLabel->show();
     ui->labelRemoveCard->show();
     ui->checkBoxFlash->show();
-    ui->checkBoxLockDevice->show();
     ui->checkBoxPinOnBack->hide();
     ui->checkBoxPinOnEntry->hide();
     ui->checkBoxNoPasswordPrompt->hide();
