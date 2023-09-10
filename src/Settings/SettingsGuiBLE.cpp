@@ -57,7 +57,6 @@ void SettingsGuiBLE::updateUI()
     ui->knockSettingsSuffixLabel->hide();
     ui->labelRemoveCard->hide();
     ui->checkBoxFlash->hide();
-    ui->checkBoxLockDevice->hide();
     ui->checkBoxPinOnBack->show();
     ui->checkBoxPinOnEntry->show();
     ui->checkBoxNoPasswordPrompt->show();

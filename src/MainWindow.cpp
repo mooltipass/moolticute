@@ -628,8 +628,8 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                              tr("Security Challenge Failed"));
     });
 
-    ui->checkBoxLockDevice->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
-    connect(ui->checkBoxLockDevice, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
+    ui->checkBoxLockOnSleep->setChecked(s.value("settings/LockDeviceOnSystemEvents", true).toBool());
+    connect(ui->checkBoxLockOnSleep, &QCheckBox::toggled, this, &MainWindow::onLockDeviceSystemEventsChanged);
 
     m_keyboardBTLayoutOrigValue = s.value(Common::SETTING_BT_LAYOUT_ENFORCE, false).toBool();
     m_keyboardBTLayoutActualValue = m_keyboardBTLayoutOrigValue;
@@ -2146,17 +2146,17 @@ void MainWindow::onLockDeviceSystemEventsChanged(bool checked)
 
 void MainWindow::onSystemEvents()
 {
-    const bool exec = ui->checkBoxLockDevice->isChecked();
-    if (exec && wsClient->get_status() == Common::Unlocked)
+    const bool lockOnSleep = ui->checkBoxLockOnSleep->isChecked();
+    if (lockOnSleep && wsClient->get_status() == Common::Unlocked)
     {
         qDebug() << "System event. Locking device!";
         wsClient->sendLockDevice();
+        m_computerUnlocked = false;
     }
-    if (wsClient->isMPBLE())
+    if (wsClient->isMPBLE() && lockOnSleep)
     {
         wsClient->sendInformLocked();
     }
-    m_computerUnlocked = false;
 
     // In certain cases it is necessary to tell the system that it can proceed closing the
     // application down. It doesn't have any effect if the application wasn't about to be closed

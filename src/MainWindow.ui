@@ -1845,16 +1845,6 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBoxLockDevice">
-                 <property name="text">
-                  <string>Lock device when computer sleeps or shuts down, if screen is locked, or user logs off</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QCheckBox" name="checkBoxPinOnBack">
                  <property name="toolTip">
                   <string>Do not erase characters when going back in the pin entering screen</string>
@@ -4086,6 +4076,61 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </layout>
               </item>
               <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_50">
+                <item>
+                 <widget class="QLabel" name="label_45">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Enable full developer log</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_46">
+                  <property name="font">
+                   <font>
+                    <italic>true</italic>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>(Restart Needed)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_47">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBoxDebugLog">
+                  <property name="text">
+                   <string>Enable Debug Log</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
                <layout class="QHBoxLayout" name="horizontalLayout_15">
                 <item>
                  <widget class="QLabel" name="label_27">
@@ -4236,22 +4281,16 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </layout>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_30">
+               <layout class="QHBoxLayout" name="horizontalLayout_46">
                 <item>
-                 <widget class="QLabel" name="label_38">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
+                 <widget class="QLabel" name="labelHIBPCheck">
                   <property name="text">
-                   <string>Manage Your Password Profiles</string>
+                   <string>Integration with Have I Been Pwned: Enabled</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <spacer name="horizontalSpacer_14">
+                 <spacer name="horizontalSpacer_41">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
@@ -4264,115 +4303,17 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="btnPassGenerationProfiles">
-                  <property name="text">
-                   <string>Password Profiles...</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_23">
-                <item>
-                 <widget class="QLabel" name="label_42">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Delayed Cancel Buttons to Prevent Mistakes</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_33">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkBoxLongPress">
-                  <property name="text">
-                   <string>Enable Long Press Cancel Buttons</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_70">
-                <item>
-                 <widget class="QLabel" name="label_bleCurrentCategory">
-                  <property name="toolTip">
-                   <string>when selected, you can set moolticute to set a given category upon device connection</string>
-                  </property>
-                  <property name="text">
-                   <string>Upon connection, force category:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_60">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBoxBleCurrentCategory">
+                 <widget class="QPushButton" name="pushButtonHIBP">
                   <property name="minimumSize">
                    <size>
-                    <width>80</width>
+                    <width>120</width>
                     <height>0</height>
                    </size>
                   </property>
-                  <property name="toolTip">
-                   <string>when selected, you can set moolticute to set a given category upon device connection</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_43">
-                <item>
-                 <widget class="QLabel" name="label_11">
                   <property name="text">
-                   <string>Systray icon</string>
+                   <string>Change</string>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_43">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBoxSystrayIcon"/>
                 </item>
                </layout>
               </item>
@@ -4420,46 +4361,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                </layout>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_46">
+               <layout class="QHBoxLayout" name="horizontalLayout_30">
                 <item>
-                 <widget class="QLabel" name="labelHIBPCheck">
-                  <property name="text">
-                   <string>Integration with Have I Been Pwned: Enabled</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_41">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="pushButtonHIBP">
-                  <property name="minimumSize">
-                   <size>
-                    <width>120</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Change</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_50">
-                <item>
-                 <widget class="QLabel" name="label_45">
+                 <widget class="QLabel" name="label_38">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                     <horstretch>0</horstretch>
@@ -4467,24 +4371,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>Enable full developer log</string>
+                   <string>Manage Your Password Profiles</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_46">
-                  <property name="font">
-                   <font>
-                    <italic>true</italic>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>(Restart Needed)</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_47">
+                 <spacer name="horizontalSpacer_14">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
@@ -4497,9 +4389,9 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="checkBoxDebugLog">
+                 <widget class="QPushButton" name="btnPassGenerationProfiles">
                   <property name="text">
-                   <string>Enable Debug Log</string>
+                   <string>Password Profiles...</string>
                   </property>
                  </widget>
                 </item>
@@ -4537,6 +4429,74 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                   </property>
                   <property name="value">
                    <number>16</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_75">
+                <item>
+                 <widget class="QLabel" name="label_29">
+                  <property name="text">
+                   <string>Lock device when screen is locked</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_66">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBoxLockOnSleep">
+                  <property name="text">
+                   <string>Enable Device Lock</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_23">
+                <item>
+                 <widget class="QLabel" name="label_42">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Delayed Cancel Buttons to Prevent Mistakes</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_33">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBoxLongPress">
+                  <property name="text">
+                   <string>Enable Long Press Cancel Buttons</string>
                   </property>
                  </widget>
                 </item>
@@ -4613,6 +4573,73 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    <string>Display tutorial</string>
                   </property>
                  </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_70">
+                <item>
+                 <widget class="QLabel" name="label_bleCurrentCategory">
+                  <property name="toolTip">
+                   <string>when selected, you can set moolticute to set a given category upon device connection</string>
+                  </property>
+                  <property name="text">
+                   <string>Upon connection, force category:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_60">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBoxBleCurrentCategory">
+                  <property name="minimumSize">
+                   <size>
+                    <width>80</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>when selected, you can set moolticute to set a given category upon device connection</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_43">
+                <item>
+                 <widget class="QLabel" name="label_11">
+                  <property name="text">
+                   <string>Systray icon</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_43">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBoxSystrayIcon"/>
                 </item>
                </layout>
               </item>
