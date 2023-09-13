@@ -10,5 +10,6 @@
         <file>lang/mc_tr.qm</file>
         <file>lang/mc_sv.qm</file>
         <file>lang/mc_hu.qm</file>
+        <file>lang/mc_ko.qm</file>
     </qresource>
 </RCC>
