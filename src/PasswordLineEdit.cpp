@@ -387,7 +387,7 @@ void PasswordOptionsPopup::generatePassword()
     result.resize(length);
 
     // Create a distribution based on the pool size
-    std::uniform_int_distribution<char> distribution(0, pool.size() - 1);
+    std::uniform_int_distribution<int> distribution(0, static_cast<int>(pool.size() - 1));
 
     //Fill the password with random characters
     for (int i = 0; i < length; i++)
