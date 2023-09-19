@@ -4016,6 +4016,12 @@ void MPDevice::processStatusChange(const QByteArray &data)
             }
         }
 
+        if (s == Common::UnknownSmartcard)
+        {
+            credentialsDbChangeNumberClone = 0;
+            dataDbChangeNumberClone = 0;
+        }
+
         if (s == Common::Unlocked)
         {
             if (isBLE())
