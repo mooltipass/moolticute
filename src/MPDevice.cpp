@@ -7934,9 +7934,12 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
                 }
                 else
                 {
-                    QStringList changeList;
-                    changeList << servicePwd << login << password;
-                    mmmPasswordChangeArray.append(changeList);
+                    if (!password.isEmpty())
+                    {
+                        QStringList changeList;
+                        changeList << servicePwd << login << password;
+                        mmmPasswordChangeArray.append(changeList);
+                    }
                 }
                 qDebug() << "Queing password change as well";
             }
