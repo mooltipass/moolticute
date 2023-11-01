@@ -45,6 +45,8 @@ public:
 
     bool initialize();
 
+    HttpServer* getHttpServer() const { return httpServer; }
+
     static bool isEmulationMode();
     static QHostAddress getListenAddress();
 

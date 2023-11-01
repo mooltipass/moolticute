@@ -34,6 +34,7 @@ public:
     virtual ~HttpServer();
 
     bool start(quint16 port);
+    quint16 getPort() const { return m_tcpServer->serverPort(); }
 
 private:
     QTcpServer *m_tcpServer;
