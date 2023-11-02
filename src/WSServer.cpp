@@ -174,10 +174,23 @@ void WSServer::originAuthenticationRequired(QWebSocketCorsAuthenticator *authent
         return;
     }
 
+    bool allowAuth = false;
     QRegularExpression reg("[a-z]+-extension:\\/\\/");
-    QRegularExpressionMatch match = reg.match(authenticator->origin());
+    allowAuth = reg.match(authenticator->origin()).hasMatch();
 
-    authenticator->setAllowed(match.hasMatch());
+    if (!allowAuth)
+    {
+        // Check if request is from Debug Web Server
+        auto daemon = dynamic_cast<AppDaemon *>(qApp);
+        if (daemon && daemon->getHttpServer())
+        {
+            auto port = daemon->getHttpServer()->getPort();
+            QRegularExpression localhostReg(QString{"(localhost|127.0.0.1):%1"}.arg(port));
+            allowAuth = localhostReg.match(authenticator->origin()).hasMatch();
+        }
+    }
+
+    authenticator->setAllowed(allowAuth);
 
     qDebug() << "QWebSocket origin header: " << (authenticator->allowed()? "Accepted": "Denied");
 }
