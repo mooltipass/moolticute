@@ -157,6 +157,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->pushButtonSSH->setVisible(!bSSHKeysTabVisibleOnDemand || bSSHKeyTabVisible);
 
     ui->labelLogo->setPixmap(QPixmap(":/mp-logo.png").scaledToHeight(ui->widgetHeader->sizeHint().height() - 8, Qt::SmoothTransformation));
+    connect(ui->labelLogo, &ClickableLabel::rightClicked, this, &MainWindow::onDisplayHiddenTabs);
     ui->pushButtonAdvanced->setVisible(bAdvancedTabVisible);
 
     ui->pushButtonFido->setIcon(AppGui::qtAwesome()->icon(fa::usb));
@@ -1100,13 +1101,33 @@ void MainWindow::onBleDevTabShortcutActivated()
     }
     else
     {
-        if (previousWidget != nullptr)
-            ui->stackedWidget->setCurrentWidget(previousWidget);
-        else
-            ui->stackedWidget->setCurrentWidget(ui->pageSettings);
-
+        ui->stackedWidget->setCurrentWidget(previousWidget != nullptr ? previousWidget : ui->pageSettings);
         ui->widgetBleDev->clearWidgets();
     }
+}
+
+void MainWindow::onDisplayHiddenTabs()
+{
+    if ((!wsClient->isMPBLE() || !wsClient->isDeviceConnected()))
+    {
+        // Only show advanced tab, BLE is not connected
+        onAdvancedTabShortcutActivated();
+        return;
+    }
+
+    if (bBleDevTabVisible && bAdvancedTabVisible)
+    {
+        ui->stackedWidget->setCurrentWidget(previousWidget != nullptr ? previousWidget : ui->pageSettings);
+        bBleDevTabVisible = bAdvancedTabVisible = false;
+    }
+    else
+    {
+        previousWidget = ui->stackedWidget->currentWidget();
+        bBleDevTabVisible = bAdvancedTabVisible = true;
+        ui->stackedWidget->setCurrentWidget(ui->pageAdvanced);
+    }
+    ui->pushButtonBleDev->setVisible(bBleDevTabVisible);
+    ui->pushButtonAdvanced->setVisible(bAdvancedTabVisible);
 }
 
 void MainWindow::onCurrentTabChanged(int)

@@ -142,6 +142,7 @@ private slots:
     void onAdvancedTabShortcutActivated();
     void onRadioButtonSSHTabsAlwaysToggled(bool bChecked);
     void onBleDevTabShortcutActivated();
+    void onDisplayHiddenTabs();
     void onCurrentTabChanged(int);
 
     void on_comboBoxAppLang_currentIndexChanged(int index);

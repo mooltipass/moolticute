@@ -311,7 +311,7 @@ QWidget {background-color: #EFEFEF;}</string>
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="labelLogo"/>
+        <widget class="ClickableLabel" name="labelLogo"/>
        </item>
       </layout>
      </widget>
