@@ -12,6 +12,7 @@ public:
 
 signals:
     void clicked();
+    void rightClicked();
 
 protected:
     void mousePressEvent(QMouseEvent* event);

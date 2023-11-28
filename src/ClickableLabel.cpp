@@ -12,4 +12,8 @@ void ClickableLabel::mousePressEvent(QMouseEvent *event)
     {
         emit clicked();
     }
+    else if (event->button() == Qt::RightButton)
+    {
+        emit rightClicked();
+    }
 }
