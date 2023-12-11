@@ -769,7 +769,7 @@ bool MPDeviceBleImpl::processReceivedData(const QByteArray &data, QByteArray &da
 {
     if (data.size() < 2)
     {
-        return {0};
+        return {QByteArray::number(0)};
     }
     QVector<QByteArray> res;
     for (int i = 0; i < data.size() - 1; i += 2)
