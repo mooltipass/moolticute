@@ -6,7 +6,7 @@ TARGET = moolticute
 
 CONFIG += c++11
 
-INCLUDEPATH += $$PWD/src $$PWD/src/Settings
+INCLUDEPATH += $$PWD/src $$PWD/src/Settings $$PWD/src/utils
 
 mac {
     LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation
@@ -47,6 +47,7 @@ SOURCES += src/main_gui.cpp \
     src/PasswordLineEdit.cpp \
     src/CredentialsManagement.cpp \
     src/utils/GridLayoutUtil.cpp \
+    src/utils/TOTPReader.cpp \
     src/zxcvbn-c/zxcvbn.c \
     src/FilesManagement.cpp \
     src/SSHManagement.cpp \
@@ -93,6 +94,7 @@ HEADERS  += src/MainWindow.h \
     src/WSClient.h \
     src/RotateSpinner.h \
     src/utils/GridLayoutUtil.h \
+    src/utils/TOTPReader.h \
     src/utils/qurltlds_p.h \
     src/version.h \
     src/AppGui.h \
