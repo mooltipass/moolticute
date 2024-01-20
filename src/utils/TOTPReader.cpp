@@ -4,6 +4,8 @@ QZXing TOTPReader::m_decoder = QZXing{};
 bool TOTPReader::m_qr_decoder_set = false;
 
 const QString TOTPReader::TOTP_URI_START = "otpauth://totp/";
+const QString TOTPReader::PARAMS_START = "?";
+const QString TOTPReader::PARAMS_SEPARATOR = "&";
 const QString TOTPReader::SECRET = "secret=";
 const QString TOTPReader::DIGITS = "digits=";
 const QString TOTPReader::PERIOD = "period=";
@@ -32,20 +34,23 @@ TOTPReader::TOTPResult TOTPReader::getQRCodeResult(const QString& imgPath)
 
 TOTPReader::TOTPResult TOTPReader::processDecodedQR(const QString &res)
 {
+    // Format: otpauth://totp/Example:test@gmail.com?secret=XXX&issuer=Example&digits=8&period=60
+    // Parsing service, login, secret, digits and period
     TOTPResult totp;
     if (res.startsWith(TOTP_URI_START))
     {
-        QString result = res.mid(TOTP_URI_START.size());
-        result = result.mid(res.indexOf(':') + 1);
-        if (result.contains("@"))
+        QString totp_uri = res.mid(TOTP_URI_START.size());
+        totp_uri = totp_uri.mid(res.indexOf(':') + 1);
+        if (totp_uri.contains("@"))
         {
-            totp.login = result.left(result.indexOf('@'));
-            result = result.mid(result.indexOf('@') + 1);
+            totp.login = totp_uri.left(totp_uri.indexOf('@'));
+            totp_uri = totp_uri.mid(totp_uri.indexOf('@') + 1);
         }
-        auto paramsStartIdx = result.indexOf('?');
-        totp.service = result.left(paramsStartIdx);
-        QString params = result.mid(paramsStartIdx + 1);
+        auto paramsStartIdx = totp_uri.indexOf(PARAMS_START);
+        totp.service = totp_uri.left(paramsStartIdx);
 
+        // Get parameters from totp uri
+        QString params = totp_uri.mid(paramsStartIdx + 1);
         if (params.contains(SECRET))
         {
             totp.secret = getParam(params, SECRET);
@@ -75,9 +80,9 @@ TOTPReader::TOTPResult TOTPReader::processDecodedQR(const QString &res)
 QString TOTPReader::getParam(const QString &params, const QString &selectedParam)
 {
     QString param_part = params.mid(params.indexOf(selectedParam) + selectedParam.size());
-    if(param_part.contains("&"))
+    if(param_part.contains(PARAMS_SEPARATOR))
     {
-        return param_part.left(param_part.indexOf("&"));
+        return param_part.left(param_part.indexOf(PARAMS_SEPARATOR));
     }
     return param_part;
 }

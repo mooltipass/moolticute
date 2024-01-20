@@ -44,6 +44,8 @@ private:
     static QZXing m_decoder;
     static bool m_qr_decoder_set;
     static const QString TOTP_URI_START;
+    static const QString PARAMS_START;
+    static const QString PARAMS_SEPARATOR;
     static const QString SECRET;
     static const QString DIGITS;
     static const QString PERIOD;
