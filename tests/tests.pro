@@ -11,7 +11,7 @@ QT       -= gui
 CONFIG += c++11
 
 TARGET = tests
-CONFIG   += console
+CONFIG   += testcase no_testcase_installs
 CONFIG   -= app_bundle
 
 TEMPLATE = app
