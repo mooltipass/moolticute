@@ -30,6 +30,7 @@
 #include "DeviceDetector.h"
 #include "SettingsGuiBLE.h"
 #include "ParseDomain.h"
+#include "TOTPReader.h"
 
 const QString CredentialsManagement::INVALID_DOMAIN_TEXT =
         tr("The following domains are invalid or private: <b><ul><li>%1</li></ul></b>They are not saved.");
@@ -50,6 +51,7 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     ui->pushButtonEnterMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->addCredentialButton->setStyleSheet(CSS_BLUE_BUTTON);
+    ui->scanQRButton->setStyleSheet(CSS_BLUE_BUTTON);
     ui->buttonDiscard->setText(tr("Discard all changes"));
     connect(ui->buttonDiscard, &AnimatedColorButton::pressed, this, &CredentialsManagement::on_buttonDiscard_pressed);
     connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::onButtonDiscard_confirmed);
@@ -1417,6 +1419,15 @@ void CredentialsManagement::checkDeviceType()
     {
         ui->widget_UserCategories->hide();
     }
+
+    if (isBle && wsClient->get_memMgmtMode())
+    {
+        ui->scanQRButton->show();
+    }
+    else
+    {
+        ui->scanQRButton->hide();
+    }
 }
 
 void CredentialsManagement::updateFavMenuOnDevChanged(Common::MPHwVersion newDev)
@@ -1847,3 +1858,37 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
         }
     }
 }
+
+void CredentialsManagement::on_scanQRButton_clicked()
+{
+    QFileDialog dialog(this);
+    dialog.setNameFilter(tr("Scan QR code (*.png *.jpg)"));
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    QString fname = "";
+
+    TOTPReader::TOTPResult res;
+    if (dialog.exec())
+    {
+        fname = dialog.selectedFiles().first();
+        res = TOTPReader::getQRCodeResult(fname);
+    }
+    qCritical() << res;
+    if (!res.isValid)
+    {
+        qCritical() << "Invalid totp qr";
+        QMessageBox::warning(this, tr("Invalid TOTP QR image"), tr("<b>%1</b> does not contain TOTP infromation.").arg(fname));
+        return;
+    }
+
+    const QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(res.service);
+    if (!serviceIdx.isValid())
+    {
+        qCritical() << "Cannot find service: " << res.service;
+    }
+    else
+    {
+        qCritical() << res.service << " service is available";
+    }
+}
+

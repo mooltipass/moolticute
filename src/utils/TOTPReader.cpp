@@ -1,6 +1,6 @@
 #include "TOTPReader.h"
 
-QZXing TOTPReader::m_decoder = QZXing{};
+QZXing TOTPReader::m_decoder{};
 bool TOTPReader::m_qr_decoder_set = false;
 
 const QString TOTPReader::TOTP_URI_START = "otpauth://totp/";
@@ -54,6 +54,7 @@ TOTPReader::TOTPResult TOTPReader::processDecodedQR(const QString &res)
         if (params.contains(SECRET))
         {
             totp.secret = getParam(params, SECRET);
+            totp.isValid = !totp.secret.isEmpty();
         }
         else
         {

@@ -6,7 +6,6 @@
 
 class TOTPReader : public QObject
 {
-    Q_OBJECT
 
 public:
     TOTPReader(QObject *parent = nullptr);
@@ -21,15 +20,17 @@ public:
         QString secret = "";
         int digits = NOT_SET_VALUE;
         int period = NOT_SET_VALUE;
+        bool isValid = false;
 
-        friend QDebug operator<<(QDebug out, const TOTPResult& totp) {
-            out << "TOTPResult[service = " << totp.service
-                << ", login = " << totp.login
-                << ", secret = " << totp.secret
-                << ", digits = " << totp.digits
-                << ", period = " << totp.period
-                << "]]";
-            return out;
+        operator QString() {
+            QStringView view = "TOTPResult[service = " + service
+                + ", login = " + login
+                + ", secret = " + secret
+                + ", digits = " + QString::number(digits)
+                + ", period = " + QString::number(period)
+                + ", valid = " +  QString::number(isValid)
+                + "]]";
+            return view.toString();
         }
     };
 

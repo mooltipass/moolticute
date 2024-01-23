@@ -127,6 +127,8 @@ private slots:
     inline int getMaxLoginLength() const { return wsClient->isMPBLE() ? BLE_LOGIN_LENGTH : MINI_LOGIN_LENGTH; }
     inline int getMaxPasswordLength() const { return wsClient->isMPBLE() ? BLE_PASSWORD_LENGTH : BLE_PASSWORD_LENGTH; }
 
+    void on_scanQRButton_clicked();
+
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
     void updateLoginDescription(LoginItem *pLoginItem);
