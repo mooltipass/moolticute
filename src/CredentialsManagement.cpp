@@ -1873,6 +1873,12 @@ void CredentialsManagement::on_scanQRButton_clicked()
         fname = dialog.selectedFiles().first();
         res = TOTPReader::getQRCodeResult(fname);
     }
+
+    if (fname.isEmpty())
+    {
+        return;
+    }
+
     qCritical() << res;
     if (!res.isValid)
     {

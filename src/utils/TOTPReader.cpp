@@ -1,4 +1,5 @@
 #include "TOTPReader.h"
+#include <QDebug>
 
 QZXing TOTPReader::m_decoder{};
 bool TOTPReader::m_qr_decoder_set = false;

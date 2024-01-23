@@ -6,6 +6,7 @@
 
 class TOTPReader : public QObject
 {
+    Q_OBJECT
 
 public:
     TOTPReader(QObject *parent = nullptr);
