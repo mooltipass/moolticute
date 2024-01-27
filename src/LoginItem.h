@@ -37,6 +37,8 @@ public:
     // Until Link/Unlink is not confirmed we need to store the edited value
     void setPointedToChildAddressTmp(const QByteArray &bAddress) { m_bPointedToChildAddressTmp = bAddress; };
     const QByteArray &pointedToChildAddressTmp() const { return m_bPointedToChildAddressTmp; };
+
+    QString getDisplayName() const;
 private:    
     QByteArray m_bAddress;
     QByteArray m_bPointedToChildAddress;

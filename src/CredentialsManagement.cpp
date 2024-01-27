@@ -37,6 +37,8 @@ const QString CredentialsManagement::INVALID_DOMAIN_TEXT =
 const QString CredentialsManagement::INVALID_INPUT_STYLE =
         "border: 2px solid red";
 
+const QString CredentialsManagement::TOTP_QR_WARNING = tr("TOTP QR issue");
+
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
 {
@@ -1732,7 +1734,7 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
         LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
         if (pLoginItem != nullptr)
         {
-            linkToName = "<" + pLoginItem->parentItem()->name() + "/" + pLoginItem->name() + ">";
+            linkToName = pLoginItem->getDisplayName();
             m_credentialLinkedAddr = pLoginItem->address();
             if (m_linkingMode == LinkingMode::NEW_CREDENTIAL)
             {
@@ -1749,7 +1751,7 @@ void CredentialsManagement::on_pushButtonLinkTo_clicked()
         LoginItem *pLoginItem = m_pCredModel->getLoginItemByIndex(srcIndex);
         if (nullptr != pLoginItem)
         {
-            QString linkName =  "<" + pLoginItem->parentItem()->name() + "/" + pLoginItem->name() + ">";
+            QString linkName = pLoginItem->getDisplayName();
             int ret = QMessageBox::warning(this, "Credential link",
                                            tr("%1 will use %2 password.\n"
                                               "Do you want to confirm?").arg(linkName).arg(linkToName),
@@ -1879,11 +1881,10 @@ void CredentialsManagement::on_scanQRButton_clicked()
         return;
     }
 
-    qCritical() << res;
     if (!res.isValid)
     {
         qCritical() << "Invalid totp qr";
-        QMessageBox::warning(this, tr("Invalid TOTP QR image"), tr("<b>%1</b> does not contain TOTP infromation.").arg(fname));
+        QMessageBox::warning(this, TOTP_QR_WARNING, tr("<b>%1</b> does not contain TOTP information.").arg(fname));
         return;
     }
 
@@ -1891,10 +1892,36 @@ void CredentialsManagement::on_scanQRButton_clicked()
     if (!serviceIdx.isValid())
     {
         qCritical() << "Cannot find service: " << res.service;
+        QMessageBox::warning(this, TOTP_QR_WARNING, tr("<b>%1</b> service does not exist in the DB.").arg(res.service));
+        return;
+    }
+
+    auto *pServiceItem =  m_pCredModel->getServiceItemByIndex(serviceIdx);
+    if (nullptr != pServiceItem)
+    {
+        auto* pLoginItem = pServiceItem->findLoginByName(res.login);
+        if (nullptr != pLoginItem)
+        {
+            QString credName = pLoginItem->getDisplayName();
+            QModelIndex loginIndex = m_pCredModelFilter->getProxyIndexFromItem(pLoginItem);
+            ui->credentialTreeView->selectionModel()->setCurrentIndex(loginIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+            auto response = QMessageBox::information(this, tr("TOTP Confirmation"),
+                                                     tr("Do you want to set TOTP information for %1").arg(credName),
+                                                     QMessageBox::Yes|QMessageBox::No);
+            if (QMessageBox::Yes == response)
+            {
+                pLoginItem->setTOTPCredential(res.secret, res.period, res.digits);
+                credentialDataChanged();
+            }
+        }
+        else
+        {
+            qCritical() << "Login item not found";
+        }
     }
     else
     {
-        qCritical() << res.service << " service is available";
+        qCritical() << "Service item is not available";
     }
 }
 
