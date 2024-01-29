@@ -594,6 +594,7 @@ void CredentialsManagement::saveSelectedTOTP()
         if (pLoginItem != nullptr) {
             m_pCredModel->setTOTP(srcIndex, m_pTOTPCred->getSecretKey(), m_pTOTPCred->getTimeStep(), m_pTOTPCred->getCodeSize());
             credentialDataChanged();
+            updateLoginDescription(pLoginItem);
         }
     }
 }
@@ -1911,7 +1912,11 @@ void CredentialsManagement::on_scanQRButton_clicked()
             if (QMessageBox::Yes == response)
             {
                 pLoginItem->setTOTPCredential(res.secret, res.period, res.digits);
+                pLoginItem->setTotpTimeStep(res.period);
+                pLoginItem->setTotpCodeSize(res.digits);
+                pLoginItem->setTOTPDeleted(false);
                 credentialDataChanged();
+                updateLoginDescription(pLoginItem);
             }
         }
         else

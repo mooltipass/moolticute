@@ -346,6 +346,9 @@ void CredentialModel::setTOTP(const QModelIndex &idx, QString secretKey, int tim
     if (pLoginItem != nullptr)
     {
         pLoginItem->setTOTPCredential(secretKey, timeStep, codeSize);
+        pLoginItem->setTotpTimeStep(timeStep);
+        pLoginItem->setTotpCodeSize(codeSize);
+        pLoginItem->setTOTPDeleted(false);
     }
 }
 
