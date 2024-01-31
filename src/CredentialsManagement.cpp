@@ -1906,8 +1906,17 @@ void CredentialsManagement::on_scanQRButton_clicked()
             QString credName = pLoginItem->getDisplayName();
             QModelIndex loginIndex = m_pCredModelFilter->getProxyIndexFromItem(pLoginItem);
             ui->credentialTreeView->selectionModel()->setCurrentIndex(loginIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+            QString totpMessage = "";
+            if (pLoginItem->totpCodeSize() != 0)
+            {
+                totpMessage = tr("There is TOTP saved for credential %1\nDo you want to overwrite TOTP information?");
+            }
+            else
+            {
+                totpMessage = tr("Do you want to set TOTP information for %1?");
+            }
             auto response = QMessageBox::information(this, tr("TOTP Confirmation"),
-                                                     tr("Do you want to set TOTP information for %1").arg(credName),
+                                                     totpMessage.arg(credName),
                                                      QMessageBox::Yes|QMessageBox::No);
             if (QMessageBox::Yes == response)
             {
