@@ -219,13 +219,18 @@ unix {
     xdgdesktop.extra = "sed 's|PREFIX|$${PREFIX}|' $$PWD/data/moolticute.desktop > $(INSTALL_ROOT)$$xdgdesktop.path/moolticute.desktop"
     INSTALLS += xdgdesktop
 
+    # install metainfo files
+    metainfo.path = $$PREFIX/share/metainfo
+    metainfo.files = $$PWD/data/moolticute.metainfo.xml
+    INSTALLS += metainfo
+
     # install icons
     iconScalable.path = $$PREFIX/share/icons/hicolor/scalable/apps
-    iconScalable.extra = cp -f $$PWD/img/AppIcon.svg $(INSTALL_ROOT)$$iconScalable.path/moolticute.svg
+    iconScalable.extra = $(INSTALL_FILE) $$PWD/img/AppIcon.svg $(INSTALL_ROOT)$$iconScalable.path/moolticute.svg
     icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps
-    icon32.extra = cp $$PWD/img/AppIcon_32.png $(INSTALL_ROOT)$$icon32.path/moolticute.png
+    icon32.extra = $(INSTALL_FILE) $$PWD/img/AppIcon_32.png $(INSTALL_ROOT)$$icon32.path/moolticute.png
     icon128.path = $$PREFIX/share/icons/hicolor/128x128/apps
-    icon128.extra = cp $$PWD/img/AppIcon_128.png $(INSTALL_ROOT)$$icon128.path/moolticute.png
+    icon128.extra = $(INSTALL_FILE) $$PWD/img/AppIcon_128.png $(INSTALL_ROOT)$$icon128.path/moolticute.png
     INSTALLS += iconScalable icon32 icon128
 }
 
