@@ -1,5 +1,7 @@
 #include "TOTPReader.h"
 #include <QDebug>
+#include <QFileDialog>
+#include <QMessageBox>
 
 QZXing TOTPReader::m_decoder{};
 bool TOTPReader::m_qr_decoder_set = false;
@@ -10,6 +12,7 @@ const QString TOTPReader::PARAMS_SEPARATOR = "&";
 const QString TOTPReader::SECRET = "secret=";
 const QString TOTPReader::DIGITS = "digits=";
 const QString TOTPReader::PERIOD = "period=";
+const QString TOTPReader::TOTP_QR_WARNING = tr("TOTP QR issue");
 
 void TOTPReader::setupDecoder()
 {
@@ -21,6 +24,41 @@ void TOTPReader::setupDecoder()
 
 TOTPReader::TOTPReader(QObject *parent) : QObject(parent)
 {
+}
+
+TOTPReader::TOTPResult TOTPReader::getQRFromFileDialog(QWidget* parent)
+{
+    TOTPResult totp;
+
+    QFileDialog dialog(parent);
+    dialog.setNameFilter(tr("Scan QR code (*.png *.jpg)"));
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    QString fname = "";
+
+    if (dialog.exec())
+    {
+        fname = dialog.selectedFiles().first();
+
+        if (fname.isEmpty())
+        {
+            return totp;
+        }
+
+        totp = TOTPReader::getQRCodeResult(fname);
+    }
+    else
+    {
+        return totp;
+    }
+
+    if (!totp.isValid)
+    {
+        qCritical() << "Invalid totp qr";
+        QMessageBox::warning(parent, TOTP_QR_WARNING, tr("<b>%1</b> does not contain TOTP information.").arg(fname));
+    }
+
+    return totp;
 }
 
 TOTPReader::TOTPResult TOTPReader::getQRCodeResult(const QString& imgPath)

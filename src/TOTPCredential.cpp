@@ -5,6 +5,8 @@
 #include <QMessageBox>
 #include <QRegularExpression>
 #include "Common.h"
+#include "AppGui.h"
+#include "TOTPReader.h"
 
 const QString TOTPCredential::BASE32_REGEXP = "^(?:[A-Z2-7]{8})*(?:[A-Z2-7]{2}={0,6}|[A-Z2-7]{4}={0,4}|[A-Z2-7]{5}={0,3}|[A-Z2-7]{7}={0,1})?$";
 const QString TOTPCredential::BASE32_CHAR_REGEXP = "[^A-Za-z 2-7=*]";
@@ -16,6 +18,7 @@ TOTPCredential::TOTPCredential(QWidget *parent) :
     ui->setupUi(this);
     setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     ui->labelError->setStyleSheet("QLabel { color : red; }");
+    ui->pushButtonQR->setIcon(AppGui::qtAwesome()->icon(fa::qrcode));
     ui->labelError->hide();
 }
 
@@ -82,3 +85,18 @@ void TOTPCredential::on_lineEditSecretKey_textChanged(const QString &arg1)
         ui->labelError->hide();
     }
 }
+
+void TOTPCredential::on_pushButtonQR_clicked()
+{
+    const auto res = TOTPReader::getQRFromFileDialog(this);
+
+    if (!res.isValid)
+    {
+        return;
+    }
+
+    ui->lineEditSecretKey->setText(res.secret);
+    ui->spinBoxTimeStep->setValue(res.period);
+    ui->spinBoxCodeSize->setValue(res.digits);
+}
+

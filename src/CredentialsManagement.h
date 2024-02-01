@@ -199,7 +199,6 @@ private:
     static constexpr int MINI_LOGIN_LENGTH = 62;
     static const QString INVALID_DOMAIN_TEXT;
     static const QString INVALID_INPUT_STYLE;
-    static const QString TOTP_QR_WARNING;
 
 signals:
     void wantEnterMemMode();

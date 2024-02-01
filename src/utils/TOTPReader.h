@@ -35,7 +35,11 @@ public:
         }
     };
 
+    static TOTPResult getQRFromFileDialog(QWidget* parent = nullptr);
     static TOTPResult getQRCodeResult(const QString& imgPath);
+
+
+    static const QString TOTP_QR_WARNING;
 
 private:
     static void setupDecoder();

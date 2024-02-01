@@ -37,8 +37,6 @@ const QString CredentialsManagement::INVALID_DOMAIN_TEXT =
 const QString CredentialsManagement::INVALID_INPUT_STYLE =
         "border: 2px solid red";
 
-const QString CredentialsManagement::TOTP_QR_WARNING = tr("TOTP QR issue");
-
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
 {
@@ -1864,28 +1862,9 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
 
 void CredentialsManagement::on_scanQRButton_clicked()
 {
-    QFileDialog dialog(this);
-    dialog.setNameFilter(tr("Scan QR code (*.png *.jpg)"));
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    QString fname = "";
-
-    TOTPReader::TOTPResult res;
-    if (dialog.exec())
-    {
-        fname = dialog.selectedFiles().first();
-        res = TOTPReader::getQRCodeResult(fname);
-    }
-
-    if (fname.isEmpty())
-    {
-        return;
-    }
-
+    TOTPReader::TOTPResult res = TOTPReader::getQRFromFileDialog(this);
     if (!res.isValid)
     {
-        qCritical() << "Invalid totp qr";
-        QMessageBox::warning(this, TOTP_QR_WARNING, tr("<b>%1</b> does not contain TOTP information.").arg(fname));
         return;
     }
 
@@ -1893,7 +1872,7 @@ void CredentialsManagement::on_scanQRButton_clicked()
     if (!serviceIdx.isValid())
     {
         qCritical() << "Cannot find service: " << res.service;
-        QMessageBox::warning(this, TOTP_QR_WARNING, tr("<b>%1</b> service does not exist in the DB.").arg(res.service));
+        QMessageBox::warning(this, TOTPReader::TOTP_QR_WARNING, tr("<b>%1</b> service does not exist in the DB.").arg(res.service));
         return;
     }
 
