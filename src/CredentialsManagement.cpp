@@ -1868,17 +1868,46 @@ void CredentialsManagement::on_scanQRButton_clicked()
         return;
     }
 
-    const QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(res.service);
+    bool isMultDomain = false;
+    QString multDomainTld = "";
+    QString multDomainService = "";
+    QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(res.service);
     if (!serviceIdx.isValid())
     {
-        qCritical() << "Cannot find service: " << res.service;
-        QMessageBox::warning(this, TOTPReader::TOTP_QR_WARNING, tr("<b>%1</b> service does not exist in the DB.").arg(res.service));
-        return;
+        if (wsClient->isMultipleDomainsAvailable())
+        {
+            ParseDomain parsedService{res.service};
+            multDomainService = parsedService.domain();
+            multDomainTld = parsedService.tld();
+            serviceIdx = m_pCredModel->getServiceIndexByName(multDomainService);
+            isMultDomain = serviceIdx.isValid();
+        }
     }
 
-    auto *pServiceItem =  m_pCredModel->getServiceItemByIndex(serviceIdx);
+    auto *pServiceItem = m_pCredModel->getServiceItemByIndex(serviceIdx);
     if (nullptr != pServiceItem)
     {
+        if (isMultDomain)
+        {
+            qCritical() << pServiceItem->multipleDomains();
+            if (!pServiceItem->multipleDomains().contains(multDomainTld))
+            {
+                auto response = QMessageBox::information(this, tr("Multiple domain does not exist"),
+                                                         tr("<b>%1</b> domain does not exist for <b>%2</b> service. Do you want to add it?").arg(multDomainTld).arg(multDomainService),
+                                                         QMessageBox::Yes|QMessageBox::No);
+                if (QMessageBox::Yes == response)
+                {
+                    QString multDomains = pServiceItem->multipleDomains() + Common::MULT_DOMAIN_SEPARATOR + multDomainTld;
+                    pServiceItem->setMultipleDomains(multDomains);
+                    credentialDataChanged();
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+
         auto* pLoginItem = pServiceItem->findLoginByName(res.login);
         if (nullptr != pLoginItem)
         {
@@ -1914,7 +1943,8 @@ void CredentialsManagement::on_scanQRButton_clicked()
     }
     else
     {
-        qCritical() << "Service item is not available";
+        qCritical() << "Cannot find service: " << res.service;
+        QMessageBox::warning(this, TOTPReader::TOTP_QR_WARNING, tr("<b>%1</b> service does not exist in the DB.").arg(res.service));
     }
 }
 
