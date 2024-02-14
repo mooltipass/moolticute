@@ -307,13 +307,23 @@ qint8 CredentialModel::getAvailableFavorite(qint8 newFav)
     }
 }
 
-QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName, int column) const
+QModelIndex CredentialModel::getServiceIndex(const QString &sServiceName, Qt::MatchFlag flag, int column) const
 {
-    QModelIndexList lMatches = match(index(0, column, QModelIndex()), Qt::DisplayRole, sServiceName, 1, Qt::MatchExactly);
+    QModelIndexList lMatches = match(index(0, column, QModelIndex()), Qt::DisplayRole, sServiceName, 1, flag);
     if (!lMatches.isEmpty())
         return lMatches.first();
 
     return QModelIndex();
+}
+
+QModelIndex CredentialModel::getServiceIndexByName(const QString &sServiceName, int column) const
+{
+    return getServiceIndex(sServiceName, Qt::MatchExactly, column);
+}
+
+QModelIndex CredentialModel::getServiceIndexByNamePart(const QString &sServiceName, int column) const
+{
+    return getServiceIndex(sServiceName, Qt::MatchContains, column);
 }
 
 LoginItem *CredentialModel::getLoginItemByIndex(const QModelIndex &idx) const

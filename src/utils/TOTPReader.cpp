@@ -79,14 +79,15 @@ TOTPReader::TOTPResult TOTPReader::processDecodedQR(const QString &res)
     if (res.startsWith(TOTP_URI_START))
     {
         QString totp_uri = res.mid(TOTP_URI_START.size());
-        totp_uri = totp_uri.mid(res.indexOf(':') + 1);
-        if (totp_uri.contains("@"))
-        {
-            totp.login = totp_uri.left(totp_uri.indexOf('@'));
-            totp_uri = totp_uri.mid(totp_uri.indexOf('@') + 1);
-        }
+        totp.service = totp_uri.left(totp_uri.indexOf(':')).toLower();
+
+        totp_uri = totp_uri.mid(totp_uri.indexOf(':') + 1);
         auto paramsStartIdx = totp_uri.indexOf(PARAMS_START);
-        totp.service = totp_uri.left(paramsStartIdx);
+        totp.login = totp_uri.left(paramsStartIdx);
+        if (totp.login.startsWith('@'))
+        {
+            totp.login = totp.login.mid(1);
+        }
 
         // Get parameters from totp uri
         QString params = totp_uri.mid(paramsStartIdx + 1);

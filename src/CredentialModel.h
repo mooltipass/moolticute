@@ -53,6 +53,7 @@ public:
     void updateLoginItem(const QModelIndex &idx, const ItemRole &role, const QVariant &vValue);
     void clear();
     QModelIndex getServiceIndexByName(const QString &sServiceName, int column = 0) const;
+    QModelIndex getServiceIndexByNamePart(const QString &sServiceName, int column = 0) const;
     LoginItem *getLoginItemByIndex(const QModelIndex &idx) const;
     ServiceItem *getServiceItemByIndex(const QModelIndex &idx) const;
     QString getCategoryName(int catId) const;
@@ -67,6 +68,7 @@ public:
 private:
     ServiceItem *addService(const QString &sServiceName);
     qint8 getAvailableFavorite(qint8 newFav);
+    QModelIndex getServiceIndex(const QString &sServiceName, Qt::MatchFlag flag, int column = 0) const;
 
 private:
     RootItem *m_pRootItem;

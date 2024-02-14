@@ -1868,43 +1868,39 @@ void CredentialsManagement::on_scanQRButton_clicked()
         return;
     }
 
-    bool isMultDomain = false;
-    QString multDomainTld = "";
-    QString multDomainService = "";
+    bool onlyService = false;
+    QString serviceWithoutTld = "";
     QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(res.service);
     if (!serviceIdx.isValid())
     {
-        if (wsClient->isMultipleDomainsAvailable())
+        ParseDomain parsedService{res.service};
+        if (parsedService.isWebsite())
         {
-            ParseDomain parsedService{res.service};
-            multDomainService = parsedService.domain();
-            multDomainTld = parsedService.tld();
-            serviceIdx = m_pCredModel->getServiceIndexByName(multDomainService);
-            isMultDomain = serviceIdx.isValid();
+            serviceWithoutTld = parsedService.domain();
+            serviceIdx = m_pCredModel->getServiceIndexByName(serviceWithoutTld);
         }
+        else
+        {
+            serviceIdx = m_pCredModel->getServiceIndexByNamePart(res.service);
+            if (serviceIdx.isValid())
+            {
+                qCritical() << "Found for: " << res.service;
+            }
+        }
+        onlyService = serviceIdx.isValid();
     }
 
     auto *pServiceItem = m_pCredModel->getServiceItemByIndex(serviceIdx);
     if (nullptr != pServiceItem)
     {
-        if (isMultDomain)
+        if (onlyService)
         {
-            qCritical() << pServiceItem->multipleDomains();
-            if (!pServiceItem->multipleDomains().contains(multDomainTld))
+            auto response = QMessageBox::information(this, tr("Confirm TOTP"),
+                                                     tr("Do you want to add TOTP for <b>%1</b> service?").arg(pServiceItem->name()),
+                                                     QMessageBox::Yes|QMessageBox::No);
+            if (QMessageBox::No == response)
             {
-                auto response = QMessageBox::information(this, tr("Multiple domain does not exist"),
-                                                         tr("<b>%1</b> domain does not exist for <b>%2</b> service. Do you want to add it?").arg(multDomainTld).arg(multDomainService),
-                                                         QMessageBox::Yes|QMessageBox::No);
-                if (QMessageBox::Yes == response)
-                {
-                    QString multDomains = pServiceItem->multipleDomains() + Common::MULT_DOMAIN_SEPARATOR + multDomainTld;
-                    pServiceItem->setMultipleDomains(multDomains);
-                    credentialDataChanged();
-                }
-                else
-                {
-                    return;
-                }
+                return;
             }
         }
 
@@ -1939,6 +1935,14 @@ void CredentialsManagement::on_scanQRButton_clicked()
         else
         {
             qCritical() << "Login item not found";
+            auto response = QMessageBox::information(this, tr("Confirm TOTP"),
+                                                     tr("Do you want to create <b>%1</b> login and add TOTP for <b>%1</b> service?").arg(res.login, pServiceItem->name()),
+                                                     QMessageBox::Yes|QMessageBox::No);
+            if (QMessageBox::Yes == response)
+            {
+                //TODO add login
+                qCritical() << "Adding login";
+            }
         }
     }
     else
@@ -1947,4 +1951,3 @@ void CredentialsManagement::on_scanQRButton_clicked()
         QMessageBox::warning(this, TOTPReader::TOTP_QR_WARNING, tr("<b>%1</b> service does not exist in the DB.").arg(res.service));
     }
 }
-
