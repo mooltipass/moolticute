@@ -30,7 +30,6 @@
 #include "DeviceDetector.h"
 #include "SettingsGuiBLE.h"
 #include "ParseDomain.h"
-#include "TOTPReader.h"
 
 const QString CredentialsManagement::INVALID_DOMAIN_TEXT =
         tr("The following domains are invalid or private: <b><ul><li>%1</li></ul></b>They are not saved.");
@@ -1570,6 +1569,25 @@ QString CredentialsManagement::getFirstDomain(TreeItem *pItem) const
     return Common::getFirstDomain(multDomains);
 }
 
+void CredentialsManagement::addCredAndTOTP(const QString &service, TOTPReader::TOTPResult res)
+{
+    m_pCredModel->addCredential(service,
+                                res.login,
+                                "");
+    QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(service);
+    auto *pServiceItem = m_pCredModel->getServiceItemByIndex(serviceIdx);
+    auto* pLoginItem = pServiceItem->findLoginByName(res.login);
+    QModelIndex loginIndex = m_pCredModelFilter->getProxyIndexFromItem(pLoginItem);
+    ui->credentialTreeView->selectionModel()->setCurrentIndex(loginIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+
+    pLoginItem->setTOTPCredential(res.secret, res.period, res.digits);
+    pLoginItem->setTotpTimeStep(res.period);
+    pLoginItem->setTotpCodeSize(res.digits);
+    pLoginItem->setTOTPDeleted(false);
+    credentialDataChanged();
+    updateLoginDescription(pLoginItem);
+}
+
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
 {
     bool favFilter = m_pCredModelFilter->switchFavFilter();
@@ -1934,20 +1952,23 @@ void CredentialsManagement::on_scanQRButton_clicked()
         }
         else
         {
-            qCritical() << "Login item not found";
             auto response = QMessageBox::information(this, tr("Confirm TOTP"),
-                                                     tr("Do you want to create <b>%1</b> login and add TOTP for <b>%1</b> service?").arg(res.login, pServiceItem->name()),
+                                                     tr("Do you want to create <b>%1</b> login and add TOTP for <b>%2</b> service?").arg(res.login, pServiceItem->name()),
                                                      QMessageBox::Yes|QMessageBox::No);
             if (QMessageBox::Yes == response)
             {
-                //TODO add login
-                qCritical() << "Adding login";
+                addCredAndTOTP(pServiceItem->name(), res);
             }
         }
     }
     else
     {
-        qCritical() << "Cannot find service: " << res.service;
-        QMessageBox::warning(this, TOTPReader::TOTP_QR_WARNING, tr("<b>%1</b> service does not exist in the DB.").arg(res.service));
+        auto response = QMessageBox::information(this, tr("Confirm TOTP"),
+                                                 tr("<b>%1</b> service does not exist. Do you want to create service with <b>%2</b> login and add TOTP for it?").arg(res.service, res.login),
+                                                 QMessageBox::Yes|QMessageBox::No);
+        if (QMessageBox::Yes == response)
+        {
+            addCredAndTOTP(res.service, res);
+        }
     }
 }

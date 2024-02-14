@@ -25,6 +25,7 @@
 // Application
 #include "WSClient.h"
 #include "TOTPCredential.h"
+#include "TOTPReader.h"
 
 namespace Ui {
 class CredentialsManagement;
@@ -159,6 +160,8 @@ private:
     bool isUICategoryClean() const;
 
     QString getFirstDomain(TreeItem *pItem) const;
+
+    void addCredAndTOTP(const QString& service, TOTPReader::TOTPResult res);
 
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
