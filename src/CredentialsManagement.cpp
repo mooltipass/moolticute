@@ -35,6 +35,7 @@ const QString CredentialsManagement::INVALID_DOMAIN_TEXT =
         tr("The following domains are invalid or private: <b><ul><li>%1</li></ul></b>They are not saved.");
 const QString CredentialsManagement::INVALID_INPUT_STYLE =
         "border: 2px solid red";
+const QString CredentialsManagement::TOTP_CONFIRMATION = tr("Confirm TOTP");
 
 CredentialsManagement::CredentialsManagement(QWidget *parent) :
     QWidget(parent), ui(new Ui::CredentialsManagement), m_pAddedLoginItem(nullptr)
@@ -1887,15 +1888,13 @@ void CredentialsManagement::on_scanQRButton_clicked()
     }
 
     bool onlyService = false;
-    QString serviceWithoutTld = "";
     QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(res.service);
     if (!serviceIdx.isValid())
     {
         ParseDomain parsedService{res.service};
         if (parsedService.isWebsite())
         {
-            serviceWithoutTld = parsedService.domain();
-            serviceIdx = m_pCredModel->getServiceIndexByName(serviceWithoutTld);
+            serviceIdx = m_pCredModel->getServiceIndexByName(parsedService.domain());
         }
         else
         {
@@ -1913,7 +1912,7 @@ void CredentialsManagement::on_scanQRButton_clicked()
     {
         if (onlyService)
         {
-            auto response = QMessageBox::information(this, tr("Confirm TOTP"),
+            auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
                                                      tr("Do you want to add TOTP for <b>%1</b> service?").arg(pServiceItem->name()),
                                                      QMessageBox::Yes|QMessageBox::No);
             if (QMessageBox::No == response)
@@ -1937,7 +1936,7 @@ void CredentialsManagement::on_scanQRButton_clicked()
             {
                 totpMessage = tr("Do you want to set TOTP information for %1?");
             }
-            auto response = QMessageBox::information(this, tr("TOTP Confirmation"),
+            auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
                                                      totpMessage.arg(credName),
                                                      QMessageBox::Yes|QMessageBox::No);
             if (QMessageBox::Yes == response)
@@ -1952,7 +1951,7 @@ void CredentialsManagement::on_scanQRButton_clicked()
         }
         else
         {
-            auto response = QMessageBox::information(this, tr("Confirm TOTP"),
+            auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
                                                      tr("Do you want to create <b>%1</b> login and add TOTP for <b>%2</b> service?").arg(res.login, pServiceItem->name()),
                                                      QMessageBox::Yes|QMessageBox::No);
             if (QMessageBox::Yes == response)
@@ -1963,7 +1962,7 @@ void CredentialsManagement::on_scanQRButton_clicked()
     }
     else
     {
-        auto response = QMessageBox::information(this, tr("Confirm TOTP"),
+        auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
                                                  tr("<b>%1</b> service does not exist. Do you want to create service with <b>%2</b> login and add TOTP for it?").arg(res.service, res.login),
                                                  QMessageBox::Yes|QMessageBox::No);
         if (QMessageBox::Yes == response)
