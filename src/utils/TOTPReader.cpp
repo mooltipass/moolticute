@@ -105,10 +105,18 @@ TOTPReader::TOTPResult TOTPReader::processDecodedQR(const QString &res)
         {
             totp.digits = getParam(params, DIGITS).toInt();
         }
+        else if (totp.isValid)
+        {
+            totp.digits = DEFAULT_DIGITS;
+        }
 
         if (params.contains(PERIOD))
         {
             totp.period = getParam(params, PERIOD).toInt();
+        }
+        else if (totp.isValid)
+        {
+            totp.period = DEFAULT_PERIOD;
         }
     }
     else
