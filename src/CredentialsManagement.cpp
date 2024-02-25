@@ -1887,31 +1887,30 @@ void CredentialsManagement::on_scanQRButton_clicked()
         return;
     }
 
-    bool onlyService = false;
+    bool matchService = false;
     QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(res.service);
     if (!serviceIdx.isValid())
     {
         ParseDomain parsedService{res.service};
         if (parsedService.isWebsite())
         {
+            // e.g.: TOTP is for test.com, there is an existing test service.
             serviceIdx = m_pCredModel->getServiceIndexByName(parsedService.domain());
         }
         else
         {
+            // e.g.: TOTP is for test, there is an existing test.com service.
             serviceIdx = m_pCredModel->getServiceIndexByNamePart(res.service);
-            if (serviceIdx.isValid())
-            {
-                qCritical() << "Found for: " << res.service;
-            }
         }
-        onlyService = serviceIdx.isValid();
+        matchService = serviceIdx.isValid();
     }
 
     auto *pServiceItem = m_pCredModel->getServiceItemByIndex(serviceIdx);
     if (nullptr != pServiceItem)
     {
-        if (onlyService)
+        if (matchService)
         {
+            // Found service match, confirm if want to add
             auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
                                                      tr("Do you want to add TOTP for <b>%1</b> service?").arg(pServiceItem->name()),
                                                      QMessageBox::Yes|QMessageBox::No);
@@ -1930,6 +1929,7 @@ void CredentialsManagement::on_scanQRButton_clicked()
             QString totpMessage = "";
             if (pLoginItem->totpCodeSize() != 0)
             {
+                // TOTP already exist, confirm if user wants to overwrite
                 totpMessage = tr("There is TOTP saved for credential %1\nDo you want to overwrite TOTP information?");
             }
             else
@@ -1963,7 +1963,7 @@ void CredentialsManagement::on_scanQRButton_clicked()
     else
     {
         auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
-                                                 tr("<b>%1</b> service does not exist. Do you want to create service with <b>%2</b> login and add TOTP for it?").arg(res.service, res.login),
+                                                 tr("<b>%1</b> service does not exist.\nDo you want to create service with <b>%2</b> login and add TOTP for it?").arg(res.service, res.login),
                                                  QMessageBox::Yes|QMessageBox::No);
         if (QMessageBox::Yes == response)
         {
