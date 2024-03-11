@@ -71,6 +71,16 @@ TOTPReader::TOTPResult TOTPReader::getQRCodeResult(const QString& imgPath)
     return processDecodedQR(result);
 }
 
+TOTPReader::TOTPResult TOTPReader::getQRCodeResult(const QImage &img)
+{
+    if (!m_qr_decoder_set)
+    {
+        setupDecoder();
+    }
+    QString result = m_decoder.decodeImage(img);
+    return processDecodedQR(result);
+}
+
 TOTPReader::TOTPResult TOTPReader::processDecodedQR(const QString &res)
 {
     // Format: otpauth://totp/Example:test@gmail.com?secret=XXX&issuer=Example&digits=8&period=60
@@ -118,10 +128,6 @@ TOTPReader::TOTPResult TOTPReader::processDecodedQR(const QString &res)
         {
             totp.period = DEFAULT_PERIOD;
         }
-    }
-    else
-    {
-        qWarning() << "Not a valid TOTP QR";
     }
     return totp;
 }

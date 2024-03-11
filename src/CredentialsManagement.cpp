@@ -51,7 +51,6 @@ CredentialsManagement::CredentialsManagement(QWidget *parent) :
 
     ui->pushButtonEnterMMM->setStyleSheet(CSS_BLUE_BUTTON);
     ui->addCredentialButton->setStyleSheet(CSS_BLUE_BUTTON);
-    ui->scanQRButton->setStyleSheet(CSS_BLUE_BUTTON);
     ui->buttonDiscard->setText(tr("Discard all changes"));
     connect(ui->buttonDiscard, &AnimatedColorButton::pressed, this, &CredentialsManagement::on_buttonDiscard_pressed);
     connect(ui->buttonDiscard, &AnimatedColorButton::actionValidated, this, &CredentialsManagement::onButtonDiscard_confirmed);
@@ -258,6 +257,7 @@ void CredentialsManagement::setWsClient(WSClient *c)
     connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::checkDeviceType);
     connect(wsClient, &WSClient::deviceConnected, this, &CredentialsManagement::checkDeviceType);
+    connect(wsClient, &WSClient::memMgmtModeChanged, this, &CredentialsManagement::handleTOTPQR);
     connect(wsClient, &WSClient::advancedMenuChanged, this, &CredentialsManagement::handleAdvancedModeChange);
     handleAdvancedModeChange(wsClient->get_advancedMenu());
     connect(wsClient, &WSClient::displayUserCategories, this,
@@ -1420,15 +1420,6 @@ void CredentialsManagement::checkDeviceType()
     {
         ui->widget_UserCategories->hide();
     }
-
-    if (isBle && wsClient->get_memMgmtMode())
-    {
-        ui->scanQRButton->show();
-    }
-    else
-    {
-        ui->scanQRButton->hide();
-    }
 }
 
 void CredentialsManagement::updateFavMenuOnDevChanged(Common::MPHwVersion newDev)
@@ -1587,6 +1578,98 @@ void CredentialsManagement::addCredAndTOTP(const QString &service, TOTPReader::T
     pLoginItem->setTOTPDeleted(false);
     credentialDataChanged();
     updateLoginDescription(pLoginItem);
+}
+
+void CredentialsManagement::processTOTPQR(TOTPReader::TOTPResult res)
+{
+    if (!res.isValid)
+    {
+        return;
+    }
+
+    bool matchService = false;
+    QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(res.service);
+    if (!serviceIdx.isValid())
+    {
+        ParseDomain parsedService{res.service};
+        if (parsedService.isWebsite())
+        {
+            // e.g.: TOTP is for test.com, there is an existing test service.
+            serviceIdx = m_pCredModel->getServiceIndexByName(parsedService.domain());
+        }
+        else
+        {
+            // e.g.: TOTP is for test, there is an existing test.com service.
+            serviceIdx = m_pCredModel->getServiceIndexByNamePart(res.service);
+        }
+        matchService = serviceIdx.isValid();
+    }
+
+    auto *pServiceItem = m_pCredModel->getServiceItemByIndex(serviceIdx);
+    if (nullptr != pServiceItem)
+    {
+        if (matchService)
+        {
+            // Found service match, confirm if want to add
+            auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
+                                                     tr("Do you want to add TOTP for <b>%1</b> service?").arg(pServiceItem->name()),
+                                                     QMessageBox::Yes|QMessageBox::No);
+            if (QMessageBox::No == response)
+            {
+                return;
+            }
+        }
+
+        auto* pLoginItem = pServiceItem->findLoginByName(res.login);
+        if (nullptr != pLoginItem)
+        {
+            QString credName = pLoginItem->getDisplayName();
+            QModelIndex loginIndex = m_pCredModelFilter->getProxyIndexFromItem(pLoginItem);
+            ui->credentialTreeView->selectionModel()->setCurrentIndex(loginIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+            QString totpMessage = "";
+            if (pLoginItem->totpCodeSize() != 0)
+            {
+                // TOTP already exist, confirm if user wants to overwrite
+                totpMessage = tr("There is TOTP saved for credential %1\nDo you want to overwrite TOTP information?");
+            }
+            else
+            {
+                totpMessage = tr("Do you want to set TOTP information for %1?");
+            }
+            auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
+                                                     totpMessage.arg(credName),
+                                                     QMessageBox::Yes|QMessageBox::No);
+            if (QMessageBox::Yes == response)
+            {
+                pLoginItem->setTOTPCredential(res.secret, res.period, res.digits);
+                pLoginItem->setTotpTimeStep(res.period);
+                pLoginItem->setTotpCodeSize(res.digits);
+                pLoginItem->setTOTPDeleted(false);
+                credentialDataChanged();
+                updateLoginDescription(pLoginItem);
+            }
+        }
+        else
+        {
+            auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
+                                                     tr("Do you want to create <b>%1</b> login and add TOTP for <b>%2</b> service?").arg(res.login, pServiceItem->name()),
+                                                     QMessageBox::Yes|QMessageBox::No);
+            if (QMessageBox::Yes == response)
+            {
+                addCredAndTOTP(pServiceItem->name(), res);
+            }
+        }
+    }
+    else
+    {
+        auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
+                                                 tr("<b>%1</b> service does not exist.\nDo you want to create service with <b>%2</b> login and add TOTP for it?").arg(res.service, res.login),
+                                                 QMessageBox::Yes|QMessageBox::No);
+        if (QMessageBox::Yes == response)
+        {
+            addCredAndTOTP(res.service, res);
+        }
+    }
 }
 
 void CredentialsManagement::on_toolButtonFavFilter_clicked()
@@ -1879,95 +1962,38 @@ void CredentialsManagement::onTreeViewContextMenuRequested(const QPoint& pos)
     }
 }
 
-void CredentialsManagement::on_scanQRButton_clicked()
+void CredentialsManagement::handleTOTPQR(bool isMMM)
 {
-    TOTPReader::TOTPResult res = TOTPReader::getQRFromFileDialog(this);
-    if (!res.isValid)
+    if (!wsClient->isMPBLE())
     {
         return;
     }
 
-    bool matchService = false;
-    QModelIndex serviceIdx = m_pCredModel->getServiceIndexByName(res.service);
-    if (!serviceIdx.isValid())
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    if (isMMM)
     {
-        ParseDomain parsedService{res.service};
-        if (parsedService.isWebsite())
-        {
-            // e.g.: TOTP is for test.com, there is an existing test service.
-            serviceIdx = m_pCredModel->getServiceIndexByName(parsedService.domain());
-        }
-        else
-        {
-            // e.g.: TOTP is for test, there is an existing test.com service.
-            serviceIdx = m_pCredModel->getServiceIndexByNamePart(res.service);
-        }
-        matchService = serviceIdx.isValid();
-    }
-
-    auto *pServiceItem = m_pCredModel->getServiceItemByIndex(serviceIdx);
-    if (nullptr != pServiceItem)
-    {
-        if (matchService)
-        {
-            // Found service match, confirm if want to add
-            auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
-                                                     tr("Do you want to add TOTP for <b>%1</b> service?").arg(pServiceItem->name()),
-                                                     QMessageBox::Yes|QMessageBox::No);
-            if (QMessageBox::No == response)
-            {
-                return;
-            }
-        }
-
-        auto* pLoginItem = pServiceItem->findLoginByName(res.login);
-        if (nullptr != pLoginItem)
-        {
-            QString credName = pLoginItem->getDisplayName();
-            QModelIndex loginIndex = m_pCredModelFilter->getProxyIndexFromItem(pLoginItem);
-            ui->credentialTreeView->selectionModel()->setCurrentIndex(loginIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-            QString totpMessage = "";
-            if (pLoginItem->totpCodeSize() != 0)
-            {
-                // TOTP already exist, confirm if user wants to overwrite
-                totpMessage = tr("There is TOTP saved for credential %1\nDo you want to overwrite TOTP information?");
-            }
-            else
-            {
-                totpMessage = tr("Do you want to set TOTP information for %1?");
-            }
-            auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
-                                                     totpMessage.arg(credName),
-                                                     QMessageBox::Yes|QMessageBox::No);
-            if (QMessageBox::Yes == response)
-            {
-                pLoginItem->setTOTPCredential(res.secret, res.period, res.digits);
-                pLoginItem->setTotpTimeStep(res.period);
-                pLoginItem->setTotpCodeSize(res.digits);
-                pLoginItem->setTOTPDeleted(false);
-                credentialDataChanged();
-                updateLoginDescription(pLoginItem);
-            }
-        }
-        else
-        {
-            auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
-                                                     tr("Do you want to create <b>%1</b> login and add TOTP for <b>%2</b> service?").arg(res.login, pServiceItem->name()),
-                                                     QMessageBox::Yes|QMessageBox::No);
-            if (QMessageBox::Yes == response)
-            {
-                addCredAndTOTP(pServiceItem->name(), res);
-            }
-        }
+        connect(clipboard, &QClipboard::dataChanged, this, &CredentialsManagement::onClipboardDataChanged);
+        // When MMM is populated trigger a check for clipboard if QR TOTP image is available
+        QTimer::singleShot(QR_PROCESSING_TIMEOUT, this, [this](){ onClipboardDataChanged(); });
     }
     else
     {
-        auto response = QMessageBox::information(this, TOTP_CONFIRMATION,
-                                                 tr("<b>%1</b> service does not exist.\nDo you want to create service with <b>%2</b> login and add TOTP for it?").arg(res.service, res.login),
-                                                 QMessageBox::Yes|QMessageBox::No);
-        if (QMessageBox::Yes == response)
-        {
-            addCredAndTOTP(res.service, res);
-        }
+        disconnect(clipboard, &QClipboard::dataChanged, 0, 0);
     }
+}
+
+void CredentialsManagement::onClipboardDataChanged()
+{
+    TOTPReader::TOTPResult res;
+    QClipboard *clipboard = QGuiApplication::clipboard();
+
+    QImage clipImage = clipboard->image();
+    if (!clipImage.isNull() && !m_processingQRImage)
+    {
+        m_processingQRImage = true;
+        res = TOTPReader::getQRCodeResult(clipImage);
+        // For image dataChanged is triggered twice, prevent double process with this workaround
+        QTimer::singleShot(QR_PROCESSING_TIMEOUT, this, [this](){m_processingQRImage = false; });
+    }
+    processTOTPQR(res);
 }

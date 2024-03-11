@@ -125,10 +125,9 @@ private slots:
 
     void onTreeViewContextMenuRequested(const QPoint& pos);
 
-    inline int getMaxLoginLength() const { return wsClient->isMPBLE() ? BLE_LOGIN_LENGTH : MINI_LOGIN_LENGTH; }
-    inline int getMaxPasswordLength() const { return wsClient->isMPBLE() ? BLE_PASSWORD_LENGTH : BLE_PASSWORD_LENGTH; }
+    void handleTOTPQR(bool isMMM);
 
-    void on_scanQRButton_clicked();
+    void onClipboardDataChanged();
 
 private:
     void updateLoginDescription(const QModelIndex &srcIndex);
@@ -163,6 +162,11 @@ private:
 
     void addCredAndTOTP(const QString& service, TOTPReader::TOTPResult res);
 
+    void processTOTPQR(TOTPReader::TOTPResult res);
+
+    inline int getMaxLoginLength() const { return wsClient->isMPBLE() ? BLE_LOGIN_LENGTH : MINI_LOGIN_LENGTH; }
+    inline int getMaxPasswordLength() const { return wsClient->isMPBLE() ? BLE_PASSWORD_LENGTH : BLE_PASSWORD_LENGTH; }
+
     Ui::CredentialsManagement *ui;
     CredentialModel *m_pCredModel = nullptr;
     CredentialModelFilter *m_pCredModelFilter = nullptr;
@@ -183,6 +187,8 @@ private:
     bool m_invalidPassword = false;
     bool m_invalidDisplayPassword = false;
 
+    bool m_processingQRImage = false;
+
     LinkingMode m_linkingMode = LinkingMode::OFF;
     QByteArray m_credentialLinkedAddr;
     QModelIndex m_credentialToLinkIndex;
@@ -200,6 +206,7 @@ private:
     static constexpr int BLE_PASSWORD_LENGTH = 64;
     static constexpr int BLE_LOGIN_LENGTH = 63;
     static constexpr int MINI_LOGIN_LENGTH = 62;
+    static constexpr int QR_PROCESSING_TIMEOUT = 500;
     static const QString INVALID_DOMAIN_TEXT;
     static const QString INVALID_INPUT_STYLE;
     static const QString TOTP_CONFIRMATION;

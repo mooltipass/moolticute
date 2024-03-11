@@ -37,6 +37,7 @@ public:
 
     static TOTPResult getQRFromFileDialog(QWidget* parent = nullptr);
     static TOTPResult getQRCodeResult(const QString& imgPath);
+    static TOTPResult getQRCodeResult(const QImage& imgPath);
 
 
     static const QString TOTP_QR_WARNING;
