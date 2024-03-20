@@ -22,17 +22,6 @@ public:
         int digits = NOT_SET_VALUE;
         int period = NOT_SET_VALUE;
         bool isValid = false;
-
-        operator QString() {
-            QStringView view = "TOTPResult[service = " + service
-                + ", login = " + login
-                + ", secret = " + secret
-                + ", digits = " + QString::number(digits)
-                + ", period = " + QString::number(period)
-                + ", valid = " +  QString::number(isValid)
-                + "]]";
-            return view.toString();
-        }
     };
 
     static TOTPResult getQRFromFileDialog(QWidget* parent = nullptr);
