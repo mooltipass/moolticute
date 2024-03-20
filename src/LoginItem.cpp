@@ -153,3 +153,8 @@ void LoginItem::setPointedToChildAddress(const QByteArray &bAddress)
     const bool isPointedZero = Common::ZERO_BYTE == bAddress.at(0) && Common::ZERO_BYTE == bAddress.at(1);
     m_bIsPointedNode = !isPointedZero;
 }
+
+QString LoginItem::getDisplayName() const
+{
+    return "<" + parentItem()->name() + "/" + name() + ">";
+}
