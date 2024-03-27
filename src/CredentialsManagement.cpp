@@ -502,8 +502,15 @@ void CredentialsManagement::onPasswordUnlocked(const QString & service, const QS
             }
             if (serviceMatch && login == selectedLogin->name())
             {
-                m_pCredModel->setClearTextPassword(parsedService, login, password);
-                ui->credDisplayPasswordInput->setText(password);
+                const auto loginPassword = selectedLogin->password();
+                QString passwordToUse = password;
+                if (!loginPassword.isEmpty() && loginPassword != password)
+                {
+                    // Password was changed in MMM, display the changed password
+                    passwordToUse = loginPassword;
+                }
+                m_pCredModel->setClearTextPassword(parsedService, login, passwordToUse);
+                ui->credDisplayPasswordInput->setText(passwordToUse);
                 ui->credDisplayPasswordInput->setLocked(false);
             }
         }
