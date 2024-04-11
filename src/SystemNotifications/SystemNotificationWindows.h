@@ -30,14 +30,15 @@ public:
     virtual bool displayLoginRequestNotification(const QString& service, QString &loginName, QString message) override;
     virtual bool displayDomainSelectionNotification(const QString& domain, const QString& subdomain, QString &serviceName, QString message) override;
 
-    const static QString SNORETOAST_FORMAT;
+    const static QString SNORETOAST;
     const static QString SNORETOAST_INSTALL;
-    const static QString WINDOWS10_VERSION;
     const static QString NOTIFICATIONS_SETTING_REGENTRY;
     const static QString DND_ENABLED_REGENTRY;
     const static QString TOAST_ENABLED_SETTING_REGPATH;
     const static QString TOAST_ENABLED_REGENTRY;
-    const static bool IS_WIN10;
+    const static QString ICON;
+    const static int WINDOWS10_VERSION = 10;
+    const static bool IS_WIN10_OR_ABOVE;
 
 signals:
     void notifySystray(QString title, QString text);
