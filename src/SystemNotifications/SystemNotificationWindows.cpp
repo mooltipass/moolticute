@@ -37,14 +37,14 @@ typedef NTSTATUS (NTAPI *PNTQUERYWNFSTATEDATA)(
     _Out_writes_bytes_to_opt_(*BufferSize, *BufferSize) PVOID Buffer,
     _Inout_ PULONG BufferSize);
 
-const QString SystemNotificationWindows::SNORETOAST_FORMAT= "SnoreToast.exe -t \"%1\" -m \"%2\" %3 %4 -p icon.png %5";
-const QString SystemNotificationWindows::SNORETOAST_INSTALL= "SnoreToast.exe -install";
-const QString SystemNotificationWindows::WINDOWS10_VERSION = "10";
+const QString SystemNotificationWindows::SNORETOAST= "SnoreToast.exe";
+const QString SystemNotificationWindows::SNORETOAST_INSTALL= "-install";
 const QString SystemNotificationWindows::NOTIFICATIONS_SETTING_REGENTRY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
 const QString SystemNotificationWindows::DND_ENABLED_REGENTRY = "NOC_GLOBAL_SETTING_TOASTS_ENABLED";
 const QString SystemNotificationWindows::TOAST_ENABLED_SETTING_REGPATH = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
 const QString SystemNotificationWindows::TOAST_ENABLED_REGENTRY = "ToastEnabled";
-const bool SystemNotificationWindows::IS_WIN10 = QSysInfo::productVersion() == WINDOWS10_VERSION;
+const QString SystemNotificationWindows::ICON = "icon.png";
+const bool SystemNotificationWindows::IS_WIN10_OR_ABOVE = QSysInfo::productVersion().toInt() >= WINDOWS10_VERSION;
 
 
 SystemNotificationWindows::SystemNotificationWindows(QObject *parent)
@@ -79,15 +79,7 @@ SystemNotificationWindows::~SystemNotificationWindows()
 
 void SystemNotificationWindows::createNotification(const QString &title, const QString text)
 {
-    if (IS_WIN10)
-    {
-        QString notification = SNORETOAST_FORMAT.arg(title, text, "", "", "");
-        process->start(notification);
-    }
-    else
-    {
-        emit notifySystray(title, text);
-    }
+    emit notifySystray(title, text);
 }
 
 void SystemNotificationWindows::createButtonChoiceNotification(const QString &title, const QString text, const QStringList &buttons)
@@ -97,34 +89,33 @@ void SystemNotificationWindows::createButtonChoiceNotification(const QString &ti
         qDebug() << "createButtonChoiceNotification called without button text";
         return;
     }
-    QString buttonString = "-b \"";
+    QString buttonString = "";
     for (const auto &piece : buttons)
     {
         buttonString += piece + ";";
     }
 
-    buttonString = buttonString.replace(buttonString.size()-1, 1, "\"");
+    buttonString = buttonString.replace(buttonString.size()-1, 1, "");
 
     QProcess *proc = new QProcess();
     notificationMap->insert(notificationId, proc);
-    QString notification = SNORETOAST_FORMAT.arg(title, text, buttonString, "-id " + QString::number(notificationId++), "-w");
     connect(proc, static_cast<CallbackType>(&QProcess::finished), this, &SystemNotificationWindows::callbackFunction);
-    qDebug() << notification;
-    proc->start(notification);
+    QStringList choiceArgs = { "-t", title, "-m", text, "-b", buttonString, "-id", QString::number(notificationId++), "-p", ICON, "-w"};
+    proc->start(SNORETOAST, choiceArgs);
 }
 
 void SystemNotificationWindows::createTextBoxNotification(const QString &title, const QString text)
 {
     QProcess *proc = new QProcess();
     notificationMap->insert(notificationId, proc);
-    QString notification = SNORETOAST_FORMAT.arg(title, text, "-tb", "-id " + QString::number(notificationId++), "-w");
+    QStringList textNotiArgs = { "-t", title, "-m", text, "-tb", "-id", QString::number(notificationId++), "-p", ICON, "-w"};
     connect(proc, static_cast<CallbackType>(&QProcess::finished), this, &SystemNotificationWindows::callbackFunction);
-    proc->start(notification);
+    proc->start(SNORETOAST, textNotiArgs);
 }
 
 bool SystemNotificationWindows::displayLoginRequestNotification(const QString &service, QString &loginName, QString message)
 {
-    if (IS_WIN10 && !isDoNotDisturbEnabled())
+    if (IS_WIN10_OR_ABOVE && !isDoNotDisturbEnabled())
     {
         // A text box notification is displayed on Win10
         messageMap->insert(notificationId, message);
@@ -144,7 +135,7 @@ bool SystemNotificationWindows::displayLoginRequestNotification(const QString &s
 
 bool SystemNotificationWindows::displayDomainSelectionNotification(const QString &domain, const QString &subdomain, QString &serviceName, QString message)
 {
-    if (IS_WIN10 && !isDoNotDisturbEnabled())
+    if (IS_WIN10_OR_ABOVE && !isDoNotDisturbEnabled())
     {
         // A button choice notification is displayed on Win10
         QStringList buttons;
@@ -166,9 +157,9 @@ bool SystemNotificationWindows::displayDomainSelectionNotification(const QString
 
 void SystemNotificationWindows::installSnoreToast()
 {
-    if (IS_WIN10)
+    if (IS_WIN10_OR_ABOVE)
     {
-        process->start(SNORETOAST_INSTALL);
+        process->start(SNORETOAST, {SNORETOAST_INSTALL});
     }
 }
 
@@ -201,7 +192,10 @@ bool SystemNotificationWindows::isDoNotDisturbEnabled() const
     QSettings settings(NOTIFICATIONS_SETTING_REGENTRY, QSettings::NativeFormat);
     bool isDoNotDisturb = !settings.value(DND_ENABLED_REGENTRY).isNull();
     QSettings toastSetting(TOAST_ENABLED_SETTING_REGPATH, QSettings::NativeFormat);
-    isDoNotDisturb |= !toastSetting.value(TOAST_ENABLED_REGENTRY).toBool();
+    if (toastSetting.contains(TOAST_ENABLED_REGENTRY))
+    {
+        isDoNotDisturb |= !toastSetting.value(TOAST_ENABLED_REGENTRY).toBool();
+    }
 
     if (!isDoNotDisturb)
     {

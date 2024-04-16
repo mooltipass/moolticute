@@ -26,6 +26,7 @@
 
 #ifdef Q_OS_WIN
 #include "SystemNotifications/SystemNotificationWindows.h"
+#include "windows.h"
 #endif
 
 #ifdef Q_OS_MAC
