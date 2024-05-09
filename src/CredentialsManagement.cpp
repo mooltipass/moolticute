@@ -680,6 +680,14 @@ void CredentialsManagement::saveChanges()
     emit wantSaveMemMode();
 }
 
+void CredentialsManagement::onMainWindowActivated()
+{
+    if (wsClient->get_memMgmtMode() && wsClient->isMPBLE())
+    {
+        onClipboardDataChanged();
+    }
+}
+
 void CredentialsManagement::keyPressEvent(QKeyEvent *event)
 {
     QWidget::keyPressEvent(event);
@@ -1995,6 +2003,17 @@ void CredentialsManagement::onClipboardDataChanged()
     QClipboard *clipboard = QGuiApplication::clipboard();
 
     QImage clipImage = clipboard->image();
+    static QImage lastImage;
+    if (clipImage == lastImage)
+    {
+        // Only process image from clipboard one time.
+        return;
+    }
+    else
+    {
+        lastImage = clipImage;
+    }
+
     if (!clipImage.isNull() && !m_processingQRImage)
     {
         m_processingQRImage = true;
