@@ -7827,8 +7827,15 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
             int keyAfterLogin = 0;
             int keyAfterPwd = 0;
             QString multipleDomains = "";
+            QString servicePwd = service;
             if (isBLE())
             {
+                multipleDomains = qjobject["multiple_domains"].toString();
+                // For multiple domain we need the add the first domain to service name for password save
+                if (!multipleDomains.isEmpty())
+                {
+                    servicePwd += Common::getFirstDomain(multipleDomains);
+                }
                 category = qjobject["category"].toInt();
                 keyAfterLogin = qjobject["key_after_login"].toInt();
                 keyAfterPwd = qjobject["key_after_pwd"].toInt();
@@ -7842,20 +7849,13 @@ void MPDevice::setMMCredentials(const QJsonArray &creds, bool noDelete,
 
                     if (!totpObject["totp_secret_key"].toString().isEmpty())
                     {
-                        bleImpl->createTOTPCredMessage(service, login, qjobject["totp"].toObject());
+                        bleImpl->createTOTPCredMessage(servicePwd, login, qjobject["totp"].toObject());
                     }
                 }
                 QJsonArray pointedToAddr = qjobject["pointed_to_child"].toArray();
                 for (qint32 j = 0; j < pointedToAddr.size(); j++) { pointedToAddrArray.append(pointedToAddr[j].toInt()); }
+            }
 
-                multipleDomains = qjobject["multiple_domains"].toString();
-            }
-            QString servicePwd = service;
-            // For multiple domain we need the add the first domain to service name for password save
-            if (!multipleDomains.isEmpty())
-            {
-                servicePwd += Common::getFirstDomain(multipleDomains);
-            }
             for (qint32 j = 0; j < addrArray.size(); j++) { nodeAddr.append(addrArray[j].toInt()); }
             qDebug() << "MMM Save: tackling " << login << " for service " << service << " at address " << nodeAddr.toHex();
 
