@@ -7,6 +7,8 @@ os:
 - osx
 language: cpp
 osx_image: xcode13.4
+git:
+  submodules: true
 
 before_install:
   - git fetch --tags && git fetch
