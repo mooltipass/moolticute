@@ -250,6 +250,13 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
         }
     });
 
+#ifdef Q_OS_MAC
+    // For Mac clipboard changed event is not working when app is in background,
+    // so need to check the clipboard content when window is activated.
+    connect(this, &MainWindow::mainWindowActivated,
+            ui->widgetCredentials, &CredentialsManagement::onMainWindowActivated);
+#endif
+
     ui->pushButtonExportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonImportFile->setStyleSheet(CSS_BLUE_BUTTON);
     ui->pushButtonSettingsReset->setStyleSheet(CSS_BLUE_BUTTON);
@@ -804,6 +811,13 @@ void MainWindow::changeEvent(QEvent *event)
     {
         ui->retranslateUi(this);
         retranslateUi();
+    }
+    if (event->type() == QEvent::ActivationChange)
+    {
+        if (isActiveWindow())
+        {
+            emit mainWindowActivated();
+        }
     }
     QMainWindow::changeEvent(event);
 }

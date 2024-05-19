@@ -28,6 +28,8 @@ public slots:
 private slots:
     void on_lineEditSecretKey_textChanged(const QString &arg1);
 
+    void on_pushButtonQR_clicked();
+
 private:
     Ui::TOTPCredential *ui;
 

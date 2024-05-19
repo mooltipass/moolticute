@@ -87,6 +87,7 @@ signals:
     void windowCloseRequested();
     void iconChangeRequested();
     void saveMMMChanges();
+    void mainWindowActivated();
 
 public slots:
     void wantImportDatabase();
