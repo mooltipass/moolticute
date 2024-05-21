@@ -68,6 +68,17 @@ There are packages in AUR both for udev rules and for the Moolticute:
   - [udev rules](https://aur.archlinux.org/packages/mooltipass-udev/)
   - [Moolticute](https://aur.archlinux.org/packages/moolticute/)
 
+##### Void Linux
+
+The udev rules are automatically updated as [this
+issue](https://github.com/mooltipass/mooltipass-udev/pull/3) describes
+```bash
+sudo xbps-install -S qt5-websockets-devel qt5-devel qt5-gui qt5-network qt5-widgets qt5-qmake
+curl https://raw.githubusercontent.com/mooltipass/mooltipass-udev/master/udev/69-mooltipass.rules | sudo tee /etc/udev/rules.d/69-mooltipass.rules && sudo sed -i 's/TAG+="uaccess"/GROUP="plugdev"/g' /etc/udev/rules.d/69-mooltipass.rules
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
 ##### Fedora Linux
 ```bash
 sudo dnf install gcc-c++ qt5 qt5-qtwebsockets qt5-qtwebsockets-devel qt5-qttools-devel systemd-devel
@@ -156,4 +167,3 @@ qmake-qt5 ../Moolticute.pro
 ### Licensing
 
 Moolticute is free software: you can redistribute it and/or modify it under the terms of the GNU Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
-
