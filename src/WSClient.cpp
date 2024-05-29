@@ -815,11 +815,25 @@ void WSClient::importCSVFile(const QList<QStringList> &fileData)
             continue;
         }
 
-        QJsonObject o;
-        o["service"] = ll[0];
-        o["login"] = ll[1];
-        o["password"] = ll[2];
-        creds.append(o);
+        QStringList serviceList;
+        if (ll[0].contains(','))
+        {
+            // Add support for multiple services in one CSV line
+            serviceList = ll[0].split(',');
+        }
+        else
+        {
+            serviceList = QStringList{ll[0]};
+        }
+
+        for (auto& service : serviceList)
+        {
+            QJsonObject o;
+            o["service"] = service;
+            o["login"] = ll[1];
+            o["password"] = ll[2];
+            creds.append(o);
+        }
     }
 
     sendJsonData({{ "msg", "import_csv" },
