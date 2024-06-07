@@ -108,6 +108,23 @@ services.udev.extraRules = '' # if not slip rules in manually
             '';
 ```
 
+##### Alpine
+First you'll need to download and install [QZXing](https://github.com/ftylitak/qzxing) first by doing `qmake`.
+The advice in that repo suggests to add the header files to the `Moolticute.pro` however this dosen't work.
+```
+doas apk add qt5-qtmultimedia-dev qt5-qtsystems-dev qt5-qttools-dev qt5-qtx11extras-dev qt5-qtwayland-dev acpi alpine-conf eudev eudev-doc eudev-rule-generator eudev-openrc linux-firmware cpufreqd pciutils util-linux
+doas rc-update add udev
+doas rc-update add acpid
+doas rc-update add cpufreqd
+doas setup-devd udev
+doas setup-devd dbus
+doas setup-devd elogind
+doas setup-devd polkit
+curl https://raw.githubusercontent.com/mooltipass/mooltipass-udev/master/udev/69-mooltipass.rules | doas tee /etc/udev/rules.d/69-mooltipass.rules
+doas udevadm control --reload-rules
+```
+Reboot, then make sure to add yourself to plugdev group, once done you may need to reboot again, check via `groups`.
+
 ##### Non systemd Linux
 The main [udev rules](https://github.com/mooltipass/mooltipass-udev)
 relies on integration between systemd, systemd-login and systemd-udevd
