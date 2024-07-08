@@ -16,7 +16,13 @@ Other clients can also connect and talk to the daemon (it uses a websocket conne
 It is completely cross platform, and runs on Linux (using native hidraw API), OS X (native IOKit API), and Windows (native HID API).
 
 ### Downloads
-Packages are build and available here: https://github.com/mooltipass/moolticute/releases
+Packages are build and available here: https://github.com/mooltipass/moolticute/releases  
+
+### Submodules
+When downloading this repository, make sure to download the submodules:
+```bash
+git clone https://github.com/mooltipass/moolticute.git --recurse-submodules
+```
 
 ### Dependencies
 
