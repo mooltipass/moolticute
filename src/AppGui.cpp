@@ -249,6 +249,7 @@ bool AppGui::initialize()
             needRestart = false;
         }
     });
+    qDebug() << "Started moolticutd(aemon)";
 
     connect(daemonProcess, &QProcess::started, [=]()
     {
