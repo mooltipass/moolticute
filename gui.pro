@@ -20,7 +20,12 @@ linux {
 
 include(src/QtAwesome/QtAwesome/QtAwesome.pri)
 include(src/QSimpleUpdater/QSimpleUpdater.pri)
-include(src/QZXing/src/QZXing.pri)
+
+CONFIG(use_system_qzxing) {
+    LIBS += -lQZXing
+} else {
+    include(src/QZXing/src/QZXing.pri)
+}
 
 greaterThan(QT_MAJOR_VERSION, 5) {
     include (src/qtcsv6/qtcsv.pri)
