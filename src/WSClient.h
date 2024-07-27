@@ -122,7 +122,7 @@ public:
     void sendBatteryRequest();
     void sendBleNameRequest();
     void sendCurrentCategory(int category);
-    void sendNiMHReconditioning(bool enableRestart);
+    void sendNiMHReconditioning(bool enableRestart, int ratedCapacity);
     void sendSecurityChallenge(QString str);
     void sendSetBleName(QString name);
     void sendSetSerialNumber(uint serialNum);

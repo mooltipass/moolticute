@@ -1400,7 +1400,8 @@ void WSServerCon::processMessageBLE(QJsonObject root, const MPDeviceProgressCb &
     {
         QJsonObject o = root["data"].toObject();
         auto enableRestart = o.value("enable_restart").toBool();
-        bleImpl->nihmReconditioning(enableRestart);
+        auto ratedCapacity= o.value("rated_capacity").toInt();
+        bleImpl->nihmReconditioning(enableRestart, ratedCapacity);
     }
     else if (root["msg"] == "request_security_challenge")
     {

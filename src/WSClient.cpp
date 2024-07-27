@@ -928,10 +928,11 @@ void WSClient::sendCurrentCategory(int category)
                   {"data", o}});
 }
 
-void WSClient::sendNiMHReconditioning(bool enableRestart)
+void WSClient::sendNiMHReconditioning(bool enableRestart, int ratedCapacity)
 {
     QJsonObject o;
     o["enable_restart"] = enableRestart;
+    o["rated_capacity"] = ratedCapacity;
     sendJsonData({{ "msg", "nimh_reconditioning" },
                   {"data", o}});
 }

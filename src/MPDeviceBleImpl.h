@@ -123,7 +123,7 @@ public:
     void readBatteryPercent(const QByteArray& statusData);
     void getBattery();
 
-    void nihmReconditioning(bool enableRestart);
+    void nihmReconditioning(bool enableRestart, int ratedCapacity);
     void getSecurityChallenge(const QString& key, const MessageHandlerCb &cb);
 
     void processDebugMsg(const QByteArray& data, bool& isDebugMsg);
@@ -252,6 +252,7 @@ private:
 
     bool m_enforceLayout = false;
     quint32 m_nimhResultSec = 0;
+    quint32 m_nimhRestartUnderSec = RECONDITION_RESTART_UNDER_SECS_STOCK;
 
     int m_miniFilePartCounter = 0;
 
@@ -290,8 +291,9 @@ private:
     static constexpr int SET_BLE_NAME_BUNDLE_VERSION = 9;
     static constexpr int WAKEUP_DEVICE_BUNDLE_VERSION = 10;
     static constexpr int POINTED_TO_ADDR_SIZE = 2;
-    static constexpr int PLATFORM_SERIAL_NUM_FIRST_BYTE = 16;
-    static constexpr int RECONDITION_RESTART_UNDER_SECS = 2500;
+    static constexpr int PLATFORM_SERIAL_NUM_FIRST_BYTE = 16;    
+    static constexpr int STOCK_BATTERY_CAPACITY_MAH = 300;
+    static constexpr int RECONDITION_RESTART_UNDER_SECS_STOCK = 2500;
     const QByteArray DEFAULT_BUNDLE_PASSWORD = "\x63\x44\x31\x91\x3a\xfd\x23\xff\xb3\xac\x93\x69\x22\x5b\xf3\xc0";
     const QString DEFAULT_BLE_NAME = "Mooltipass Mini BLE";
 };
