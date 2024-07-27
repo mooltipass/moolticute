@@ -2030,9 +2030,14 @@ bool MainWindow::validateSerialString(const QString &serialStr, uint &serialNum)
 
 void MainWindow::displayReconditionWaitScreen(double lastElapsedTime)
 {
+    /* FixMe: This should come from MPDeviceBLEImpl.cpp */
+    //RECONDITION_RESTART_UNDER_SECS_STOCK * 300 / ratedCapacity
+    auto ratedCapacityTime = 2500 * 300 / ui->exp_capacity->value();
+    auto currentCapacity = 2500 * lastElapsedTime / 300;
+
     QString lastElapsedText = lastElapsedTime > 0 ?
         QString("<p>Recondition restarted. Last elapsed time: %1 seconds (~ %2 mAh)</p><br><p>Need at least %3 seconds for rated %4 mAh capacity</p>")
-                .arg(lastElapsedTime).arg(0) : "";
+                .arg(lastElapsedTime).arg(currentCapacity).arg(ratedCapacityTime).arg(ui->exp_capacity->value()) : "";
     ui->labelWait->show();
     ui->labelWait->setText(tr("<html><!--nimh_recondition--><head/><body><p><span style=\"font-size:12pt; font-weight:600;\">NiMH Recondition is in progress.</span></p>%1<p>Please wait.</p></body></html>").arg(lastElapsedText));
     ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
