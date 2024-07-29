@@ -1229,10 +1229,14 @@ void MPDeviceBleImpl::getBattery()
     }
 }
 
-void MPDeviceBleImpl::nihmReconditioning(bool enableRestart)
+void MPDeviceBleImpl::nihmReconditioning(bool enableRestart, int ratedCapacity)
 {
     auto *jobs = new AsyncJobs("NiMH Reconditioning", mpDev);
     m_nimhResultSec = 0;
+
+    /* This is just proporional calculation */
+    m_nimhRestartUnderSec = RECONDITION_RESTART_UNDER_SECS_STOCK * 300 / ratedCapacity;
+    auto restartUnder = m_nimhRestartUnderSec;
 
     jobs->append(new MPCommandJob(mpDev, MPCmd::NIMH_RECONDITION, [this](const QByteArray &data, bool &)
     {
@@ -1255,12 +1259,12 @@ void MPDeviceBleImpl::nihmReconditioning(bool enableRestart)
         return true;
     }));
 
-    connect(jobs, &AsyncJobs::finished, [this, enableRestart](const QByteArray &data)
+    connect(jobs, &AsyncJobs::finished, [this, enableRestart, restartUnder, ratedCapacity](const QByteArray &data)
     {
         Q_UNUSED(data)
         qDebug() << "NiMH Reconditioning finished";
         bool restarted = false;
-        if (enableRestart && m_nimhResultSec < RECONDITION_RESTART_UNDER_SECS)
+        if (enableRestart && m_nimhResultSec < restartUnder)
         {
             restarted = true;
         }
@@ -1268,7 +1272,7 @@ void MPDeviceBleImpl::nihmReconditioning(bool enableRestart)
                               [this, restarted, result = m_nimhResultSec](){emit nimhReconditionFinished(true, QString::number(result), restarted);});
         if (restarted)
         {
-            nihmReconditioning(true);
+            nihmReconditioning(true, ratedCapacity);
         }
     });
 
