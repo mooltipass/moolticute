@@ -12,118 +12,118 @@
 <context>
     <name>AppGui</name>
     <message>
-        <location filename="../src/AppGui.cpp" line="130"/>
+        <location filename="../src/AppGui.cpp" line="131"/>
         <source>&amp;Show Moolticute Application</source>
         <translation>Moolticute 애플리케이션 보기(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="139"/>
+        <location filename="../src/AppGui.cpp" line="140"/>
         <source>&amp;Quit</source>
         <translation>종료(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="154"/>
-        <location filename="../src/AppGui.cpp" line="535"/>
+        <location filename="../src/AppGui.cpp" line="155"/>
+        <location filename="../src/AppGui.cpp" line="536"/>
         <source>&amp;Restart daemon</source>
         <translation>데몬 재시작(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="373"/>
+        <location filename="../src/AppGui.cpp" line="374"/>
         <source>No mooltipass connected.</source>
         <translation>연결된 mooltipass가 없음.</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="413"/>
+        <location filename="../src/AppGui.cpp" line="414"/>
         <source>%1 locked</source>
         <translation>%1 잠김</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="416"/>
+        <location filename="../src/AppGui.cpp" line="417"/>
         <source>%1 Unlocked</source>
         <translation>%1 잠금해제</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="419"/>
+        <location filename="../src/AppGui.cpp" line="420"/>
         <source>No card inserted in your %1</source>
         <translation>%1에 삽입된 카드가 없습니다</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="470"/>
+        <location filename="../src/AppGui.cpp" line="471"/>
         <source>&amp;Hide Moolticute App</source>
         <translation>Multicute 앱 숨김(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="482"/>
+        <location filename="../src/AppGui.cpp" line="483"/>
         <source>&amp;Show Moolticute App</source>
         <translation>Moolticute 앱 보여주기(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="533"/>
+        <location filename="../src/AppGui.cpp" line="534"/>
         <source>Restarting daemon...</source>
         <translation>데몬 재시작...</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="645"/>
+        <location filename="../src/AppGui.cpp" line="646"/>
         <source>%1 version has been released!</source>
         <translation>%1 버전이 릴리즈 되었습니다!</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="646"/>
+        <location filename="../src/AppGui.cpp" line="647"/>
         <source>Open MC client to download it.</source>
         <translation>MC 클라이언트를 열어 다운로드.</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="659"/>
+        <location filename="../src/AppGui.cpp" line="660"/>
         <source>Would you like to download the update now?</source>
         <translation>지금 업데이트를 다운로드하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="660"/>
+        <location filename="../src/AppGui.cpp" line="661"/>
         <source>Open changelog</source>
         <translation>변경 로그 열기</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="675"/>
+        <location filename="../src/AppGui.cpp" line="676"/>
         <source>Mooltipass Not Connected</source>
         <translation>Mooltipass 연결되지 않음</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="676"/>
+        <location filename="../src/AppGui.cpp" line="677"/>
         <source>Please Connect Your Mooltipass</source>
         <translation>Mooltipass를 연결하세요</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="680"/>
+        <location filename="../src/AppGui.cpp" line="681"/>
         <source>No Card in Mooltipass!</source>
         <translation>Mooltipass 카드가 없습니다!</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="681"/>
+        <location filename="../src/AppGui.cpp" line="682"/>
         <source>Please Insert Your Smartcard and Enter Your PIN</source>
         <translation>스마트카드를 삽입하고 비밀번호를 입력하세요</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="685"/>
+        <location filename="../src/AppGui.cpp" line="686"/>
         <source>Mooltipass in Management Mode!</source>
         <translation>관리모드에서 Mooltipass!</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="686"/>
+        <location filename="../src/AppGui.cpp" line="687"/>
         <source>Please leave management mode in the App</source>
         <translation>앱에서 관리 모드를 종료하세요</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="690"/>
+        <location filename="../src/AppGui.cpp" line="691"/>
         <source>Mooltipass Locked</source>
         <translation>Mooltipass 잠김</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="691"/>
+        <location filename="../src/AppGui.cpp" line="692"/>
         <source>Please Unlock Your Mooltipass</source>
         <translation>Mooltipass를 잠금 해제하세요</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="719"/>
+        <location filename="../src/AppGui.cpp" line="720"/>
         <source>Can&apos;t restart daemon, it was started by hand and not using this App.</source>
         <translation>데몬을 다시 시작할 수 없습니다. 이 앱을 사용하지 않고 수동으로 시작되었습니다.</translation>
     </message>
@@ -271,7 +271,7 @@
 <context>
     <name>CredentialModel</name>
     <message>
-        <location filename="../src/CredentialModel.h" line="73"/>
+        <location filename="../src/CredentialModel.h" line="75"/>
         <source>Default category</source>
         <translation>기본 카테고리</translation>
     </message>
@@ -284,151 +284,151 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="52"/>
-        <location filename="../src/CredentialsManagement.ui" line="507"/>
+        <location filename="../src/CredentialsManagement.ui" line="76"/>
+        <location filename="../src/CredentialsManagement.ui" line="505"/>
         <source>Login</source>
         <translation>로그인</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="74"/>
+        <location filename="../src/CredentialsManagement.ui" line="52"/>
         <source>Service or Site name</source>
         <translation>서비스 또는 사이트 이름</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="81"/>
+        <location filename="../src/CredentialsManagement.ui" line="69"/>
         <source>Password</source>
         <translation>비밀번호</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="94"/>
-        <location filename="../src/CredentialsManagement.ui" line="990"/>
-        <location filename="../src/CredentialsManagement.cpp" line="100"/>
+        <location filename="../src/CredentialsManagement.ui" line="89"/>
+        <location filename="../src/CredentialsManagement.ui" line="988"/>
+        <location filename="../src/CredentialsManagement.cpp" line="101"/>
         <source>Save</source>
         <translation>저장</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="163"/>
+        <location filename="../src/CredentialsManagement.ui" line="161"/>
         <source>Credentials Management Mode</source>
         <translation>자격 증명 관리 모드</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="170"/>
+        <location filename="../src/CredentialsManagement.ui" line="168"/>
         <source>Browsing through your credentials list requires your device to be in management mode. Click the button below to start the process.</source>
         <translation>자격증명 목록을 탐색하려면 디바이스가 관리 모드에 있어야 합니다. 아래 버튼을 클릭하여 프로세스를 시작하세요.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="186"/>
+        <location filename="../src/CredentialsManagement.ui" line="184"/>
         <source>Enter Credentials Management Mode</source>
         <translation>자격 증명 관리 모드로 들어가기</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="263"/>
+        <location filename="../src/CredentialsManagement.ui" line="261"/>
         <source>Filter credentials...</source>
         <translation>자격 증명 필터링...</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="295"/>
-        <location filename="../src/CredentialsManagement.cpp" line="1303"/>
+        <location filename="../src/CredentialsManagement.ui" line="293"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1321"/>
         <source>Expand All</source>
         <translation>모두 확장</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="328"/>
+        <location filename="../src/CredentialsManagement.ui" line="326"/>
         <source>Exit Linking</source>
         <translation>연결 종료</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="335"/>
+        <location filename="../src/CredentialsManagement.ui" line="333"/>
         <source>Link Credential</source>
         <translation>링크 자격 증명</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="401"/>
+        <location filename="../src/CredentialsManagement.ui" line="399"/>
         <source>No credential selected.</source>
         <translation>선택한 자격 증명이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="535"/>
+        <location filename="../src/CredentialsManagement.ui" line="533"/>
         <source>Password:</source>
         <translation>비밀번호:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="562"/>
+        <location filename="../src/CredentialsManagement.ui" line="560"/>
         <source>Description:</source>
         <translation>설명:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="592"/>
+        <location filename="../src/CredentialsManagement.ui" line="590"/>
         <source>Last Modified:</source>
         <translation>마지막으로 수정되었습니다:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="625"/>
+        <location filename="../src/CredentialsManagement.ui" line="623"/>
         <source>Last Accessed:</source>
         <translation>마지막으로 액세스한 시간:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="652"/>
+        <location filename="../src/CredentialsManagement.ui" line="650"/>
         <source>Category:</source>
         <translation>카테고리:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="667"/>
+        <location filename="../src/CredentialsManagement.ui" line="665"/>
         <source>Key After Login:</source>
         <translation>로그인 다음 키:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="682"/>
+        <location filename="../src/CredentialsManagement.ui" line="680"/>
         <source>Key After Password:</source>
         <translation>비밀번호 다음 키:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="723"/>
+        <location filename="../src/CredentialsManagement.ui" line="721"/>
         <source>TOTP Credential</source>
         <translation>TOTP 자격 증명</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="736"/>
+        <location filename="../src/CredentialsManagement.ui" line="734"/>
         <source>Delete TOTP</source>
         <translation>TOTP 삭제</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="812"/>
+        <location filename="../src/CredentialsManagement.ui" line="810"/>
         <source>Confirm changes</source>
         <translation>변경 사항 확인</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="887"/>
-        <location filename="../src/CredentialsManagement.cpp" line="65"/>
+        <location filename="../src/CredentialsManagement.ui" line="885"/>
+        <location filename="../src/CredentialsManagement.cpp" line="66"/>
         <source>Exit Credential Management</source>
         <translation>자격 증명 관리 종료</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="900"/>
+        <location filename="../src/CredentialsManagement.ui" line="898"/>
         <source>Save all changes</source>
         <translation>모든 변경 사항 저장</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="938"/>
-        <location filename="../src/CredentialsManagement.cpp" line="93"/>
+        <location filename="../src/CredentialsManagement.ui" line="936"/>
+        <location filename="../src/CredentialsManagement.cpp" line="94"/>
         <source>Category 4:</source>
         <translation>카테고리 4:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="948"/>
-        <location filename="../src/CredentialsManagement.cpp" line="92"/>
+        <location filename="../src/CredentialsManagement.ui" line="946"/>
+        <location filename="../src/CredentialsManagement.cpp" line="93"/>
         <source>Category 3:</source>
         <translation>카테고리 3:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="958"/>
-        <location filename="../src/CredentialsManagement.cpp" line="91"/>
+        <location filename="../src/CredentialsManagement.ui" line="956"/>
+        <location filename="../src/CredentialsManagement.cpp" line="92"/>
         <source>Category 2:</source>
         <translation>카테고리 2:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="968"/>
-        <location filename="../src/CredentialsManagement.cpp" line="90"/>
+        <location filename="../src/CredentialsManagement.ui" line="966"/>
+        <location filename="../src/CredentialsManagement.cpp" line="91"/>
         <source>Category 1:</source>
         <translation>카테고리 1:</translation>
     </message>
@@ -438,162 +438,194 @@
         <translation>다음 도메인이 유효하지 않거나 비공개입니다:&lt;b&gt;&lt;ul&gt;&lt;li&gt;%1&lt;/li&gt;&lt;/ul&gt;&lt;/b&gt;저장되지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="53"/>
+        <location filename="../src/CredentialsManagement.cpp" line="38"/>
+        <source>Confirm TOTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="54"/>
         <source>Discard all changes</source>
         <translation>모든 변경 사항 삭제</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="73"/>
+        <location filename="../src/CredentialsManagement.cpp" line="74"/>
         <source>Discard changes</source>
         <translation>변경 사항 삭제</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="82"/>
+        <location filename="../src/CredentialsManagement.cpp" line="83"/>
         <source>Edit Service Name</source>
         <translation>서비스 이름 편집</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="86"/>
+        <location filename="../src/CredentialsManagement.cpp" line="87"/>
         <source>There is a TOTP Credential for the service</source>
         <translation>서비스에 대한 TOTP 자격 증명이 있습니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="413"/>
+        <location filename="../src/CredentialsManagement.cpp" line="415"/>
         <source>Please Approve On Device</source>
         <translation>기기에서 승인해 주세요</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="454"/>
+        <location filename="../src/CredentialsManagement.cpp" line="456"/>
         <source>%1: New Login %2 added.</source>
         <translation>%1: 새로운 로그인으로  %2가 추가되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="456"/>
-        <location filename="../src/CredentialsManagement.cpp" line="519"/>
+        <location filename="../src/CredentialsManagement.cpp" line="458"/>
+        <location filename="../src/CredentialsManagement.cpp" line="528"/>
         <source>Failure</source>
         <translation>실패</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="456"/>
+        <location filename="../src/CredentialsManagement.cpp" line="458"/>
         <source>Couldn&apos;t Add This Credential: Please approve the request on the device.</source>
         <translation>이 자격 증명을 추가할 수 없습니다: 장치에서 요청을 승인해 주세요.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="511"/>
+        <location filename="../src/CredentialsManagement.cpp" line="520"/>
         <source>Password Query Was Denied</source>
         <translation>비밀번호 쿼리가 거부되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="519"/>
+        <location filename="../src/CredentialsManagement.cpp" line="528"/>
         <source>Unable to modify %1/%2</source>
         <translation>%1/%2을(를) 수정할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="644"/>
+        <location filename="../src/CredentialsManagement.cpp" line="654"/>
         <source>Discard Modifications ?</source>
         <translation>수정 사항 삭제 ?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="645"/>
+        <location filename="../src/CredentialsManagement.cpp" line="655"/>
         <source>You have modified %1/%2 - Do you want to discard the modifications ?</source>
         <translation>%1/%2를 수정했습니다 - 수정한 내용을 삭제하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="817"/>
+        <location filename="../src/CredentialsManagement.cpp" line="835"/>
         <source>Service already exists</source>
         <translation>서비스가 이미 존재합니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="833"/>
+        <location filename="../src/CredentialsManagement.cpp" line="851"/>
         <source>Login already exists</source>
         <translation>로그인이 이미 존재합니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="925"/>
+        <location filename="../src/CredentialsManagement.cpp" line="943"/>
         <source>Delete?</source>
         <translation>삭제하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="926"/>
+        <location filename="../src/CredentialsManagement.cpp" line="944"/>
         <source>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Delete credential &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</source>
         <translation>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;:&lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt; 자격 증명을 삭제하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1072"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1090"/>
         <source>Pointed to credential is deleted</source>
         <translation>가리키는 자격 증명이 삭제됩니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1082"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1100"/>
         <source>Setup TOTP Credential</source>
         <translation>TOTP 자격 증명 설정</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1286"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1304"/>
         <source>Text is too long, maximum length is %1</source>
         <translation>텍스트가 너무 깁니다. 최대 길이는 %1입니다.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1303"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1321"/>
         <source>Collapse All</source>
         <translation>모두 접기</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1425"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1443"/>
         <source>Not a favorite</source>
         <translation>즐겨찾기가 아님</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1431"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1449"/>
         <source>Set as favorite #%1</source>
         <translation>즐겨찾기로 설정 #%1</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1535"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1553"/>
         <source>Invalid domain</source>
         <translation>잘못된 도메인</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1638"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1630"/>
+        <source>Do you want to add TOTP for &lt;b&gt;%1&lt;/b&gt; service?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1648"/>
+        <source>There is TOTP saved for credential %1
+Do you want to overwrite TOTP information?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1652"/>
+        <source>Do you want to set TOTP information for %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1670"/>
+        <source>Do you want to create &lt;b&gt;%1&lt;/b&gt; login and add TOTP for &lt;b&gt;%2&lt;/b&gt; service?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1681"/>
+        <source>&lt;b&gt;%1&lt;/b&gt; service does not exist.
+Do you want to create service with &lt;b&gt;%2&lt;/b&gt; login and add TOTP for it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1767"/>
         <source>TOTP Secret key is going to be removed for the credential.
 Continue?</source>
         <translation>자격 증명에 대한 TOTP 비밀 키가 제거됩니다.
 계속하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1743"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1872"/>
         <source>%1 will use %2 password.
 Do you want to confirm?</source>
         <translation>%1에서 %2 암호를 사용합니다.
 확인하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1798"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1927"/>
         <source>Multiple Domains for %1</source>
         <translation>%1에 대한 여러 도메인</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1799"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1928"/>
         <source>Enter comma separated domain extensions:</source>
         <translation>쉼표로 구분된 도메인 확장명을 입력합니다:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1819"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1948"/>
         <source>Edit multiple domains</source>
         <translation>여러 도메인 편집</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1821"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1950"/>
         <source>Remove multiple domains</source>
         <translation>여러 도메인 제거</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1832"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1961"/>
         <source>Enable multiple domains</source>
         <translation>여러 도메인 사용</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1844"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1973"/>
         <source>Use other credential password</source>
         <translation>다른 자격 증명 비밀번호 사용</translation>
     </message>
@@ -1156,22 +1188,20 @@ Maximum allowed size is %2 bytes.</source>
 <context>
     <name>MacNotify</name>
     <message>
-        <location filename="../src/SystemNotifications/MacNotify.mm" line="103"/>
         <source>Choose</source>
-        <translation>선택</translation>
+        <translation type="vanished">선택</translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/MacNotify.mm" line="126"/>
         <source>Type your reply here</source>
-        <translation>여기에 답장을 입력하세요.</translation>
+        <translation type="vanished">여기에 답장을 입력하세요.</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <location filename="../src/MainWindow.ui" line="26"/>
-        <location filename="../src/MainWindow.cpp" line="1541"/>
-        <location filename="../src/MainWindow.cpp" line="1564"/>
+        <location filename="../src/MainWindow.cpp" line="1576"/>
+        <location filename="../src/MainWindow.cpp" line="1599"/>
         <source>Moolticute</source>
         <translation></translation>
     </message>
@@ -2019,8 +2049,8 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3731"/>
-        <location filename="../src/MainWindow.cpp" line="627"/>
-        <location filename="../src/MainWindow.cpp" line="2335"/>
+        <location filename="../src/MainWindow.cpp" line="635"/>
+        <location filename="../src/MainWindow.cpp" line="2370"/>
         <source>Security Challenge</source>
         <translation>보안 과제</translation>
     </message>
@@ -2279,7 +2309,7 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="5206"/>
-        <location filename="../src/MainWindow.cpp" line="2317"/>
+        <location filename="../src/MainWindow.cpp" line="2352"/>
         <source>NiMH Reconditioning</source>
         <translation>NiMH 리컨디셔닝</translation>
     </message>
@@ -2295,7 +2325,7 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="34"/>
-        <location filename="../src/MainWindow.cpp" line="392"/>
+        <location filename="../src/MainWindow.cpp" line="400"/>
         <source>None</source>
         <translation>없음</translation>
     </message>
@@ -2380,412 +2410,412 @@ Think twice before resetting a card.</source>
         <translation>메인 MCU 버전:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="303"/>
+        <location filename="../src/MainWindow.cpp" line="311"/>
         <source>Low Battery</source>
         <translation>배터리 부족</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="303"/>
+        <location filename="../src/MainWindow.cpp" line="311"/>
         <source>Battery is below %1%, please charge your Mooltipass.</source>
         <translation>배터리가 %1% 미만입니다. Mooltipass를 충전하세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="371"/>
+        <location filename="../src/MainWindow.cpp" line="379"/>
         <source>Very Low</source>
         <translation>매우 낮음</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="372"/>
+        <location filename="../src/MainWindow.cpp" line="380"/>
         <source>Low</source>
         <translation>낮음</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="373"/>
+        <location filename="../src/MainWindow.cpp" line="381"/>
         <source>Medium</source>
         <translation>보통</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="374"/>
+        <location filename="../src/MainWindow.cpp" line="382"/>
         <source>High</source>
         <translation>높음</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="379"/>
+        <location filename="../src/MainWindow.cpp" line="387"/>
         <source>No Inactivity</source>
         <translation>비활성 상태 없음</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="380"/>
+        <location filename="../src/MainWindow.cpp" line="388"/>
         <source>5 minutes</source>
         <translation>5분</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="381"/>
+        <location filename="../src/MainWindow.cpp" line="389"/>
         <source>10 minutes</source>
         <translation>10 분</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="382"/>
+        <location filename="../src/MainWindow.cpp" line="390"/>
         <source>15 minutes</source>
         <translation>15 분</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="383"/>
+        <location filename="../src/MainWindow.cpp" line="391"/>
         <source>30 minutes</source>
         <translation>30 분</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="385"/>
+        <location filename="../src/MainWindow.cpp" line="393"/>
         <source>0.5 second</source>
         <translation>0.5 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="386"/>
+        <location filename="../src/MainWindow.cpp" line="394"/>
         <source>1 second</source>
         <translation>1 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="387"/>
+        <location filename="../src/MainWindow.cpp" line="395"/>
         <source>2 seconds</source>
         <translation>2 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="388"/>
+        <location filename="../src/MainWindow.cpp" line="396"/>
         <source>3 seconds</source>
         <translation>3 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="389"/>
+        <location filename="../src/MainWindow.cpp" line="397"/>
         <source>4 seconds</source>
         <translation>4 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="390"/>
+        <location filename="../src/MainWindow.cpp" line="398"/>
         <source>5 seconds</source>
         <translation>5 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="393"/>
+        <location filename="../src/MainWindow.cpp" line="401"/>
         <source>Nyancat</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="395"/>
+        <location filename="../src/MainWindow.cpp" line="403"/>
         <source>Let moolticute decide</source>
         <translation>Moolticute가 결정합니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="396"/>
+        <location filename="../src/MainWindow.cpp" line="404"/>
         <source>Force subdomain support</source>
         <translation>하위 도메인 강제 지원</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="397"/>
+        <location filename="../src/MainWindow.cpp" line="405"/>
         <source>Force subdomain ignore</source>
         <translation>하위 도메인 강제 무시</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="411"/>
+        <location filename="../src/MainWindow.cpp" line="419"/>
         <source>&amp;File</source>
         <translation>파일(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="412"/>
+        <location filename="../src/MainWindow.cpp" line="420"/>
         <source>&amp;Quit</source>
         <translation>종료(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="420"/>
+        <location filename="../src/MainWindow.cpp" line="428"/>
         <source>Black</source>
         <translation>검정</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="421"/>
+        <location filename="../src/MainWindow.cpp" line="429"/>
         <source>White</source>
         <translation>흰색</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="421"/>
+        <location filename="../src/MainWindow.cpp" line="429"/>
         <source>_white</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="566"/>
+        <location filename="../src/MainWindow.cpp" line="574"/>
         <source>Fetching UID from device. This may take a few seconds...</source>
         <translation>장치에서 UID를 가져옵니다. 몇 초 정도 걸릴 수 있습니다...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="582"/>
+        <location filename="../src/MainWindow.cpp" line="590"/>
         <source>Either the device have been tempered with or the input key is invalid.</source>
         <translation>장치가 템퍼링되었거나 입력 키가 유효하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="586"/>
+        <location filename="../src/MainWindow.cpp" line="594"/>
         <source>Your device&apos;s UID is %1</source>
         <translation>장치의 UID는 %1입니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="628"/>
+        <location filename="../src/MainWindow.cpp" line="636"/>
         <source>Security Challenge Failed</source>
         <translation>보안 챌린지 실패</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="730"/>
-        <location filename="../src/MainWindow.cpp" line="1349"/>
-        <location filename="../src/MainWindow.cpp" line="1362"/>
-        <location filename="../src/MainWindow.cpp" line="1379"/>
-        <location filename="../src/MainWindow.cpp" line="1947"/>
-        <location filename="../src/MainWindow.cpp" line="2480"/>
+        <location filename="../src/MainWindow.cpp" line="738"/>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <location filename="../src/MainWindow.cpp" line="1414"/>
+        <location filename="../src/MainWindow.cpp" line="1982"/>
+        <location filename="../src/MainWindow.cpp" line="2515"/>
         <source>Disabled</source>
         <translation>비활성화</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="731"/>
+        <location filename="../src/MainWindow.cpp" line="739"/>
         <source>Password Only</source>
         <translation>비밀번호 전용</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="732"/>
+        <location filename="../src/MainWindow.cpp" line="740"/>
         <source>Login + Password</source>
         <translation>로그인 + 비밀번호</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="733"/>
+        <location filename="../src/MainWindow.cpp" line="741"/>
         <source>[Enter] + Password</source>
         <translation>[Enter] + 비밀번호</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="734"/>
+        <location filename="../src/MainWindow.cpp" line="742"/>
         <source>[Ctrl+Alt+Del] + Pass</source>
         <translation>[Ctrl+Alt+Del] + 패스</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="735"/>
+        <location filename="../src/MainWindow.cpp" line="743"/>
         <source>Password / [Win+L]</source>
         <translation>비밀번호 / [Win+L]</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="736"/>
+        <location filename="../src/MainWindow.cpp" line="744"/>
         <source>Login + Pass / [Win+L]</source>
         <translation>로그인 + 패스 / [Win+L]</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="737"/>
+        <location filename="../src/MainWindow.cpp" line="745"/>
         <source>[Enter] + Pass / [Win+L]</source>
         <translation>[Enter] + 패스 / [Win+L]</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="738"/>
+        <location filename="../src/MainWindow.cpp" line="746"/>
         <source>[Ctrl+Alt+Del] + Pass / [Win+L]</source>
         <translation>[Ctrl+Alt+Del] + 패스 / [Win+L]</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="782"/>
+        <location filename="../src/MainWindow.cpp" line="790"/>
         <source>Credentials have been modified.
 Do you want to save your changes?</source>
         <translation>자격 증명이 수정되었습니다.
 변경 사항을 저장하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="846"/>
+        <location filename="../src/MainWindow.cpp" line="861"/>
         <source>Device Bluetooth Name Changed</source>
         <translation>블루투스 이름 변경</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="847"/>
+        <location filename="../src/MainWindow.cpp" line="862"/>
         <source>Please disable and re-enable bluetooth for your changes to take effect</source>
         <translation>변경 사항을 적용하려면 블루투스를 비활성화했다가 다시 활성화하세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="956"/>
+        <location filename="../src/MainWindow.cpp" line="971"/>
         <source>Remove the card from the device to change this setting.</source>
         <translation>이 설정을 변경하려면 장치에서 카드를 제거합니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="979"/>
+        <location filename="../src/MainWindow.cpp" line="994"/>
         <source>%1Mb</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1126"/>
-        <location filename="../src/MainWindow.cpp" line="1277"/>
+        <location filename="../src/MainWindow.cpp" line="1161"/>
+        <location filename="../src/MainWindow.cpp" line="1312"/>
         <source>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치 확인 대기 중&lt;/span&gt;&lt;/p&gt;&lt;p&gt;기기에서 요청을 확인합니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1139"/>
+        <location filename="../src/MainWindow.cpp" line="1174"/>
         <source>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving Changes to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치에 변경 사항 저장&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1155"/>
+        <location filename="../src/MainWindow.cpp" line="1190"/>
         <source>Couldn&apos;t change all passwords, please approve prompts on the device</source>
         <translation>모든 비밀번호를 변경할 수 없습니다. 기기에서 메시지가 표시되면 승인해 주세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1159"/>
+        <location filename="../src/MainWindow.cpp" line="1194"/>
         <source>Couldn&apos;t save credentials, please contact the support team with moolticute&apos;s log</source>
         <translation>자격 증명을 저장할 수 없습니다. moolticute의 로그와 함께 지원팀에 문의하세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1161"/>
+        <location filename="../src/MainWindow.cpp" line="1196"/>
         <source>Failure</source>
         <translation>실패</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1175"/>
+        <location filename="../src/MainWindow.cpp" line="1210"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;기기에서 요청을 승인해 주세요&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1188"/>
+        <location filename="../src/MainWindow.cpp" line="1223"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;기기에서 요청을 승인해 주세요&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1246"/>
+        <location filename="../src/MainWindow.cpp" line="1281"/>
         <source>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;디바이스의 메모리에 변경 사항 저장&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1267"/>
+        <location filename="../src/MainWindow.cpp" line="1302"/>
         <source>&lt;html&gt;&lt;!--exit_fido_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--exit_fido_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;디바이스의 메모리에 변경 사항 저장&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1307"/>
+        <location filename="../src/MainWindow.cpp" line="1342"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Exporting Database from Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치에서 데이터베이스 내보내기&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1310"/>
+        <location filename="../src/MainWindow.cpp" line="1345"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Importing and Merging File to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치로 파일 가져오기 및 병합&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1328"/>
+        <location filename="../src/MainWindow.cpp" line="1363"/>
         <source>Disable autostart at boot?</source>
         <translation>부팅 시 자동 시작을 비활성화하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1330"/>
+        <location filename="../src/MainWindow.cpp" line="1365"/>
         <source>Enable autostart at boot?</source>
         <translation>부팅 시 자동 시작을 사용하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1349"/>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
         <source>Start Moolticute with the computer: %1</source>
         <translation>컴퓨터에서 Moolticute 시작: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1349"/>
-        <location filename="../src/MainWindow.cpp" line="1362"/>
-        <location filename="../src/MainWindow.cpp" line="1379"/>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <location filename="../src/MainWindow.cpp" line="1414"/>
         <source>Enabled</source>
         <translation>활성화됨</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1351"/>
-        <location filename="../src/MainWindow.cpp" line="1364"/>
-        <location filename="../src/MainWindow.cpp" line="1382"/>
+        <location filename="../src/MainWindow.cpp" line="1386"/>
+        <location filename="../src/MainWindow.cpp" line="1399"/>
+        <location filename="../src/MainWindow.cpp" line="1417"/>
         <source>Disable</source>
         <translation>비활성화</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1353"/>
-        <location filename="../src/MainWindow.cpp" line="1366"/>
-        <location filename="../src/MainWindow.cpp" line="1386"/>
+        <location filename="../src/MainWindow.cpp" line="1388"/>
+        <location filename="../src/MainWindow.cpp" line="1401"/>
+        <location filename="../src/MainWindow.cpp" line="1421"/>
         <source>Enable</source>
         <translation>활성화</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1362"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
         <source>Subdomain selection: %1</source>
         <translation>하위 도메인 선택: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1377"/>
+        <location filename="../src/MainWindow.cpp" line="1412"/>
         <source>Integration with &lt;a href=&quot;%1&quot;&gt;Have I Been Pwned&lt;/a&gt;: %2</source>
         <translation>&lt;a href=&quot;%1&quot;&gt;Have I Been Pwned&lt;/a&gt;와 통합: %2</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1483"/>
+        <location filename="../src/MainWindow.cpp" line="1518"/>
         <source>Select database export...</source>
         <translation>데이터베이스 내보내기 선택...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1492"/>
-        <location filename="../src/MainWindow.cpp" line="1513"/>
-        <location filename="../src/MainWindow.cpp" line="1536"/>
-        <location filename="../src/MainWindow.cpp" line="1568"/>
-        <location filename="../src/MainWindow.cpp" line="2066"/>
-        <location filename="../src/MainWindow.cpp" line="2086"/>
-        <location filename="../src/MainWindow.cpp" line="2119"/>
-        <location filename="../src/MainWindow.cpp" line="2123"/>
-        <location filename="../src/MainWindow.cpp" line="2131"/>
+        <location filename="../src/MainWindow.cpp" line="1527"/>
+        <location filename="../src/MainWindow.cpp" line="1548"/>
+        <location filename="../src/MainWindow.cpp" line="1571"/>
+        <location filename="../src/MainWindow.cpp" line="1603"/>
+        <location filename="../src/MainWindow.cpp" line="2101"/>
+        <location filename="../src/MainWindow.cpp" line="2121"/>
+        <location filename="../src/MainWindow.cpp" line="2154"/>
+        <location filename="../src/MainWindow.cpp" line="2158"/>
+        <location filename="../src/MainWindow.cpp" line="2166"/>
         <source>Error</source>
         <translation>에러</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1492"/>
-        <location filename="../src/MainWindow.cpp" line="2066"/>
+        <location filename="../src/MainWindow.cpp" line="1527"/>
+        <location filename="../src/MainWindow.cpp" line="2101"/>
         <source>Unable to read file %1</source>
         <translation>%1파일을 읽을 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1516"/>
+        <location filename="../src/MainWindow.cpp" line="1551"/>
         <source>Save database export...</source>
         <translation>데이터베이스 내보내기 저장...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1536"/>
+        <location filename="../src/MainWindow.cpp" line="1571"/>
         <source>Unable to write to file %1</source>
         <translation>%1파일에 쓸 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1541"/>
+        <location filename="../src/MainWindow.cpp" line="1576"/>
         <source>Successfully exported the database from your device.</source>
         <translation>장치에서 데이터베이스를 성공적으로 내보냈습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1564"/>
+        <location filename="../src/MainWindow.cpp" line="1599"/>
         <source>Successfully imported and merged database into the device.</source>
         <translation>데이터베이스를 장치로 성공적으로 가져와 병합했습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1579"/>
+        <location filename="../src/MainWindow.cpp" line="1614"/>
         <source>Do you want to start the integrity check of your device?</source>
         <translation>디바이스의 무결성 검사를 시작하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1590"/>
+        <location filename="../src/MainWindow.cpp" line="1625"/>
         <source>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치 확인 대기 중&lt;/span&gt;&lt;/p&gt;&lt;p&gt;기기에서 요청을 확인합니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1622"/>
+        <location filename="../src/MainWindow.cpp" line="1657"/>
         <source>Memory integrity check failed!</source>
         <translation>메모리 무결성 검사에 실패했습니다!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1628"/>
+        <location filename="../src/MainWindow.cpp" line="1663"/>
         <source>Memory integrity check done successfully!
 %1 of %2 credential slots used.</source>
         <translation>메모리 무결성 검사가 성공적으로 완료되었습니다!
 자격 증명 슬롯 %2개 중 %1개를 사용했습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1637"/>
+        <location filename="../src/MainWindow.cpp" line="1672"/>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translation>장치에 템퍼링한 사람이 없는지 확인하기 위해 장치의 UID를 가져올 수 있는 비밀번호를 요청할 수 있습니다.&lt;ol&gt;&lt;li&gt;장치 뒷면에서 일련번호를 가져옵니다.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;일련 번호와 주문 번호가 포함된 이메일&lt;/a&gt;로 비밀번호를 요청하세요.&lt;/li&gt;&lt;li&gt;받은 비밀번호를 입력하세요&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1645"/>
+        <location filename="../src/MainWindow.cpp" line="1680"/>
         <source>To be sure that no one has tampered with your device, you can request a challenge string and enter it below.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&amp;body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the challenge string.&lt;/li&gt;&lt;li&gt;Enter the string you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translation>다른 사람이 장치를 조작하지 않았는지 확인하기 위해 챌린지 문자열을 요청하고 아래에 입력할 수 있습니다.&lt;ol&gt;&lt;li&gt;장치 뒷면에서 일련 번호를 가져옵니다.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&amp;body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME&quot;&gt;일련 번호와 주문 번호가 포함된 이메일&lt;/a&gt;로 챌린지 문자열을 요청하세요.&lt;/li&gt;&lt;li&gt;당사에서 받은 문자열을 입력하세요&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1744"/>
+        <location filename="../src/MainWindow.cpp" line="1779"/>
         <source>An error occured when trying to go into Memory Management mode.
 
 %1</source>
@@ -2794,170 +2824,170 @@ Do you want to save your changes?</source>
 %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1757"/>
+        <location filename="../src/MainWindow.cpp" line="1792"/>
         <source>System default language</source>
         <translation>시스템 기본 언어</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1928"/>
+        <location filename="../src/MainWindow.cpp" line="1963"/>
         <source>Import Warning</source>
         <translation>가져오기 경고</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1929"/>
+        <location filename="../src/MainWindow.cpp" line="1964"/>
         <source>Files were not imported from mini backup.</source>
         <translation>미니 백업에서 파일을 가져오지 못했습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2000"/>
+        <location filename="../src/MainWindow.cpp" line="2035"/>
         <source>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;NiMH Recondition is in progress.&lt;/span&gt;&lt;/p&gt;%1&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;NiMH 리컨디셔닝이 진행 중입니다.&lt;/span&gt;&lt;/p&gt;%1&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2017"/>
+        <location filename="../src/MainWindow.cpp" line="2052"/>
         <source>Memory exports (*.bin)</source>
         <translation>메모리 내보내기(*.bin)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2048"/>
+        <location filename="../src/MainWindow.cpp" line="2083"/>
         <source>Reset card failed!</source>
         <translation>카드 재설정에 실패했습니다!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2050"/>
+        <location filename="../src/MainWindow.cpp" line="2085"/>
         <source>Reset card done successfully</source>
         <translation>카드 재설정이 성공적으로 완료되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2057"/>
+        <location filename="../src/MainWindow.cpp" line="2092"/>
         <source>Select CSV file to import...</source>
         <translation>가져올 CSV 파일 선택...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2086"/>
+        <location filename="../src/MainWindow.cpp" line="2121"/>
         <source>Nothing is read from %1</source>
         <translation>%1에서 읽은 내용이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2119"/>
+        <location filename="../src/MainWindow.cpp" line="2154"/>
         <source>Unable to import %1: Each row must contain exact 3 items. Some lines don&apos;t (lines number: %2)</source>
         <translation>%1을(를) 가져올 수 없습니다: 각 행에 정확히 3개의 항목이 포함되어야 합니다. 일부 행이 그렇지 않습니다(행 번호: %2).</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2123"/>
+        <location filename="../src/MainWindow.cpp" line="2158"/>
         <source>Unable to import %1: Each row must contain exact 3 items (more than 10 lines don&apos;t)</source>
         <translation>%1을(를) 가져올 수 없습니다: 각 행에 정확히 3개의 항목이 포함되어야 합니다(10줄 이상은 안 됨).</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2131"/>
+        <location filename="../src/MainWindow.cpp" line="2166"/>
         <source>Unable to import %1: Each row must contain exact 3 items using comma as a delimiter</source>
         <translation>%1을(를) 가져올 수 없습니다: 각 행은 쉼표를 구분 기호로 사용하여 정확히 3개의 항목을 포함해야 합니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2194"/>
+        <location filename="../src/MainWindow.cpp" line="2229"/>
         <source>Disable subdomain selection?</source>
         <translation>하위 도메인 선택을 비활성화하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2196"/>
+        <location filename="../src/MainWindow.cpp" line="2231"/>
         <source>Enable subdomain selection?</source>
         <translation>하위 도메인 선택을 사용하시나요?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2216"/>
+        <location filename="../src/MainWindow.cpp" line="2251"/>
         <source>Disable Have I Been Pwned check?</source>
         <translation>Have I Been Pwned 확인을 비활성화하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2220"/>
+        <location filename="../src/MainWindow.cpp" line="2255"/>
         <source>Enable Have I Been Pwned check?</source>
         <translation>Have I Been Pwned 확인을 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2318"/>
+        <location filename="../src/MainWindow.cpp" line="2353"/>
         <source>This procedure will take around 5 hours, please confirm</source>
         <translation>이 절차는 약 5시간 정도 소요되며, 다음 사항을 확인하시기 바랍니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2336"/>
+        <location filename="../src/MainWindow.cpp" line="2371"/>
         <source>This token is only used for debugging purposes</source>
         <translation>이 토큰은 디버깅 목적으로만 사용됩니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2338"/>
+        <location filename="../src/MainWindow.cpp" line="2373"/>
         <source>Waiting for Security Challenge result...</source>
         <translation>보안 챌린지 결과를 기다리는 중...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2355"/>
+        <location filename="../src/MainWindow.cpp" line="2390"/>
         <source>NiMH Recondition Finished</source>
         <translation>NiMH 리컨디셔닝 완료</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2356"/>
+        <location filename="../src/MainWindow.cpp" line="2391"/>
         <source>Recondition finished in %1 seconds</source>
         <translation>1초 후에 재조정 완료</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2365"/>
+        <location filename="../src/MainWindow.cpp" line="2400"/>
         <source>NiMH Recondition Error</source>
         <translation>NiMH 리컨디셔닝 오류</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2366"/>
+        <location filename="../src/MainWindow.cpp" line="2401"/>
         <source>Recondition finished with error</source>
         <translation>오류로 재조정 완료</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2397"/>
+        <location filename="../src/MainWindow.cpp" line="2432"/>
         <source>Confirm Reset Settings to Default</source>
         <translation>기본값으로 설정 재설정 확인</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2398"/>
+        <location filename="../src/MainWindow.cpp" line="2433"/>
         <source>Do you want to reset every settings value to device defaults?</source>
         <translation>모든 설정 값을 디바이스 기본값으로 초기화하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2505"/>
-        <location filename="../src/MainWindow.cpp" line="2519"/>
+        <location filename="../src/MainWindow.cpp" line="2540"/>
+        <location filename="../src/MainWindow.cpp" line="2554"/>
         <source>Incorrect Serial Number</source>
         <translation>잘못된 일련 번호</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2506"/>
+        <location filename="../src/MainWindow.cpp" line="2541"/>
         <source>It looks like your device serial number doesn&apos;t match the one present on your device&apos;s case.
 </source>
         <translation>장치 일련 번호가 장치 케이스에 표시된 번호와 일치하지 않는 것 같습니다.
 </translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2507"/>
+        <location filename="../src/MainWindow.cpp" line="2542"/>
         <source>Please reach out to support@themooltipass.com for the right code to enter below</source>
         <translation>아래에서 올바른 코드를 입력하려면 support@themooltipass.com 으로 문의하세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2520"/>
+        <location filename="../src/MainWindow.cpp" line="2555"/>
         <source>The entered serial number is incorrect!</source>
         <translation>입력한 일련번호가 올바르지 않습니다!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2527"/>
+        <location filename="../src/MainWindow.cpp" line="2562"/>
         <source>Serial number change</source>
         <translation>일련 번호 변경</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2533"/>
+        <location filename="../src/MainWindow.cpp" line="2568"/>
         <source>Set serial number successfully.</source>
         <translation>일련 번호를 성공적으로 설정했습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2538"/>
+        <location filename="../src/MainWindow.cpp" line="2573"/>
         <source>Serial number still does not match platform serial.</source>
         <translation>일련 번호가 여전히 플랫폼 일련 번호와 일치하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2543"/>
+        <location filename="../src/MainWindow.cpp" line="2578"/>
         <source>Set serial number failed.</source>
         <translation>일련 번호 설정에 실패했습니다.</translation>
     </message>
@@ -3623,22 +3653,22 @@ Proceed?</source>
 <context>
     <name>SystemNotificationWindows</name>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="131"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="122"/>
         <source>A credential without a login has been detected.</source>
         <translation>로그인하지 않은 자격 증명이 감지되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="131"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="122"/>
         <source>Login name for </source>
         <translation>로그인 이름 </translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="153"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="144"/>
         <source>Subdomain Detected!</source>
         <translation>하위 도메인이 감지되었습니다!</translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="153"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="144"/>
         <source>Choose the domain name:</source>
         <translation>도메인 이름을 선택합니다:</translation>
     </message>
@@ -3686,14 +3716,37 @@ Proceed?</source>
         <translation> 숫자</translation>
     </message>
     <message>
-        <location filename="../src/TOTPCredential.cpp" line="58"/>
+        <location filename="../src/TOTPCredential.ui" line="157"/>
+        <source>QR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.cpp" line="61"/>
         <source>Invalid Secret Key</source>
         <translation>잘못된 비밀 키</translation>
     </message>
     <message>
-        <location filename="../src/TOTPCredential.cpp" line="58"/>
+        <location filename="../src/TOTPCredential.cpp" line="61"/>
         <source>The entered Secret Key is not a valid Base32 string</source>
         <translation>입력한 비밀 키가 유효한 Base32 문자열이 아닙니다.</translation>
+    </message>
+</context>
+<context>
+    <name>TOTPReader</name>
+    <message>
+        <location filename="../src/utils/TOTPReader.cpp" line="15"/>
+        <source>TOTP QR issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/TOTPReader.cpp" line="34"/>
+        <source>Scan QR code (*.png *.jpg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/TOTPReader.cpp" line="58"/>
+        <source>&lt;b&gt;%1&lt;/b&gt; does not contain TOTP information.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
