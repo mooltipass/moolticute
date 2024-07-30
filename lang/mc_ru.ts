@@ -449,7 +449,7 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="458"/>
         <source>Couldn&apos;t Add This Credential: Please approve the request on the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось добавить учетные данные. Пожалуйста, одобрите запрос на устройстве.</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1090"/>
@@ -474,12 +474,12 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="35"/>
         <source>The following domains are invalid or private: &lt;b&gt;&lt;ul&gt;&lt;li&gt;%1&lt;/li&gt;&lt;/ul&gt;&lt;/b&gt;They are not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Эти домены были либо невалидными, либо частными: &lt;b&gt;&lt;ul&gt;&lt;li&gt;%1&lt;/li&gt;&lt;/ul&gt;&lt;/b&gt;Они не были сохранены.</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="38"/>
         <source>Confirm TOTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Подтвердите TOTP</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="83"/>
@@ -549,39 +549,41 @@
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1304"/>
         <source>Text is too long, maximum length is %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Текст слишком длинный, максимальная длина - %1</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1553"/>
         <source>Invalid domain</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильный домен</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1630"/>
         <source>Do you want to add TOTP for &lt;b&gt;%1&lt;/b&gt; service?</source>
-        <translation type="unfinished"></translation>
+        <translation>Хотите добавить TOTP для &lt;b&gt;%1&lt;/b&gt; сервиса?</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1648"/>
         <source>There is TOTP saved for credential %1
 Do you want to overwrite TOTP information?</source>
-        <translation type="unfinished"></translation>
+        <translation>TOTP для учетной записи %1 уже существует
+Хотите перезаписать данные TOTP?</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1652"/>
         <source>Do you want to set TOTP information for %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Хотите установить TOTP данные для %1?</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1670"/>
         <source>Do you want to create &lt;b&gt;%1&lt;/b&gt; login and add TOTP for &lt;b&gt;%2&lt;/b&gt; service?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы хотите задать логин &lt;b&gt;%1&lt;/b&gt; и TOTP для сервиса &lt;b&gt;%2&lt;/b&gt;?</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1681"/>
         <source>&lt;b&gt;%1&lt;/b&gt; service does not exist.
 Do you want to create service with &lt;b&gt;%2&lt;/b&gt; login and add TOTP for it?</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; сервис не существует.
+Хотите создать сервис с логиномм &lt;b&gt;%2&lt;/b&gt; и добавить для него TOTP?</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1767"/>
@@ -593,37 +595,38 @@ Continue?</source>
         <location filename="../src/CredentialsManagement.cpp" line="1872"/>
         <source>%1 will use %2 password.
 Do you want to confirm?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 будет использовать пароль от %2.
+Хотите продолжить?</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1927"/>
         <source>Multiple Domains for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Несколько доменов для %1</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1928"/>
         <source>Enter comma separated domain extensions:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите расширения домена через запятую:</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1948"/>
         <source>Edit multiple domains</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать несколько доменов</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1950"/>
         <source>Remove multiple domains</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить несколько доменов</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1961"/>
         <source>Enable multiple domains</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить обработку нескольких доменов</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1973"/>
         <source>Use other credential password</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать пароль от другого сервиса</translation>
     </message>
     <message>
         <location filename="../src/CredentialsManagement.cpp" line="1100"/>
@@ -2001,12 +2004,12 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="1880"/>
         <source>Only shows digits when pressing and scrolling</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать симполы только при нажатии и прокрутке</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1883"/>
         <source>Paranoid Pin Entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Параноидальный режим ввода PIN кода</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1890"/>
@@ -2026,72 +2029,72 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="1976"/>
         <source>When device connected through Bluetooth switch the device off on lock</source>
-        <translation type="unfinished"></translation>
+        <translation>При подключении по Bluetooth отключать устройство при блокировке</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1979"/>
         <source>Switch Off on Lock When Connected with Bluetooth</source>
-        <translation type="unfinished"></translation>
+        <translation>Выключать устройство при блокировке, когда используется Bluetooth</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1986"/>
         <source>Disable Bluetooth when a user card is removed from the device (improves battery life)</source>
-        <translation type="unfinished"></translation>
+        <translation>Выключать Bluetooth, когда карточка вынимается из устройства (увеличивает время работы от батареи)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1996"/>
         <source>Disable Bluetooth upon device lock (improves battery life)</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключатьб bluetooth при блокировке устройства (увеличивает время жизни от батареи)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2006"/>
         <source>Only enable it if you don&apos;t use your Mini BLE on the go</source>
-        <translation type="unfinished"></translation>
+        <translation>Рекомендуется включать если Mini BLE используется только стационарно</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2009"/>
         <source>Disable Battery Charging</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключить зарядку батареи</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2092"/>
         <source>Bluetooth</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2102"/>
         <source>Knock Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Обнаружение стука</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="3367"/>
         <source>Incorrect serial number</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильный серийный номер</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="4138"/>
         <source>Allow to use invalid or private TLDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешить использование неправильных или частных доменных имен</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="4158"/>
         <source>Disable TLD check</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключение проверки TLD</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="4442"/>
         <source>Lock device when screen is locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Блокировать устройство при блокировке экрана ПК</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="4462"/>
         <source>Enable Device Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить блокировку устройства</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="5019"/>
         <source>Visible ON DE&amp;MAND  (use SHIFT+F1 keyboard shortcut)</source>
-        <translation type="unfinished"></translation>
+        <translation>Видима по &amp;требованию (При нажатии SHIFT+F1)</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="5206"/>
@@ -2107,7 +2110,7 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="5256"/>
         <source>Continues until nominal capacity reached</source>
-        <translation type="unfinished"></translation>
+        <translation>До достижения номинальной емкости</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1830"/>
@@ -2500,7 +2503,7 @@ Do you want to save your changes?</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="42"/>
         <source>Bundle v%1 is available &lt;a href=&quot;https://www.themooltipass.com/updates/index.php?sn=%2&amp;bundlev=%3&quot;&gt;here&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Пакет ПО v%1 допупен для скачивания &lt;a href=&quot;https://www.themooltipass.com/updates/index.php?sn=%2&amp;bundlev=%3&quot;&gt;здесь&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="57"/>
@@ -2708,43 +2711,44 @@ Think twice before resetting a card.</source>
         <location filename="../src/MainWindow.cpp" line="2540"/>
         <location filename="../src/MainWindow.cpp" line="2554"/>
         <source>Incorrect Serial Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильный Серийный Номер</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2541"/>
         <source>It looks like your device serial number doesn&apos;t match the one present on your device&apos;s case.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Похоже, что серийный номер на корпусе устройствав не совпадает с тем, что есть в памяти.
+</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2542"/>
         <source>Please reach out to support@themooltipass.com for the right code to enter below</source>
-        <translation type="unfinished"></translation>
+        <translation>Обратитесь в службу поддержки по адресу support@themooltipass.com за правильным кодом и введите его ниже</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2555"/>
         <source>The entered serial number is incorrect!</source>
-        <translation type="unfinished"></translation>
+        <translation>Серийный номер введен неправильно!</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2562"/>
         <source>Serial number change</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменение Серийного Номера</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2568"/>
         <source>Set serial number successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Серийный номер установлен успешно.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2573"/>
         <source>Serial number still does not match platform serial.</source>
-        <translation type="unfinished"></translation>
+        <translation>Серийный номер все еще не совпадает с серийным номером платформы.</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2578"/>
         <source>Set serial number failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось выставить серийный номер.</translation>
     </message>
     <message>
         <source>Duplicated service detected, please contact support</source>
@@ -2876,7 +2880,7 @@ Think twice before resetting a card.</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="2035"/>
         <source>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;NiMH Recondition is in progress.&lt;/span&gt;&lt;/p&gt;%1&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Идёт восстановление емкости NiMH.&lt;/span&gt;&lt;/p&gt;%1&lt;p&gt;Пожалуйста, подождите.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2083"/>
@@ -3077,7 +3081,7 @@ Think twice before resetting a card.</source>
         <location filename="../src/NotesManagement.ui" line="240"/>
         <location filename="../src/NotesManagement.cpp" line="9"/>
         <source>Exit</source>
-        <translation type="unfinished">Выход</translation>
+        <translation>Выход</translation>
     </message>
     <message>
         <source>Discard</source>
@@ -3086,7 +3090,7 @@ Think twice before resetting a card.</source>
     <message>
         <location filename="../src/NotesManagement.cpp" line="10"/>
         <source>Discard Changes and Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Забыть изменения и выйти</translation>
     </message>
     <message>
         <location filename="../src/NotesManagement.cpp" line="31"/>
@@ -3282,7 +3286,7 @@ Continue?</source>
     <message>
         <location filename="../src/PasswordLineEdit.cpp" line="294"/>
         <source>Password copied to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль скопирован в буфер обмена</translation>
     </message>
     <message>
         <location filename="../src/PasswordLineEdit.cpp" line="400"/>
@@ -3803,7 +3807,7 @@ Proceed?</source>
     <message>
         <location filename="../src/TOTPCredential.ui" line="157"/>
         <source>QR</source>
-        <translation type="unfinished"></translation>
+        <translation>QR Код</translation>
     </message>
     <message>
         <location filename="../src/TOTPCredential.cpp" line="61"/>
@@ -3821,17 +3825,17 @@ Proceed?</source>
     <message>
         <location filename="../src/utils/TOTPReader.cpp" line="15"/>
         <source>TOTP QR issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Проблема с TOTP QR кодом</translation>
     </message>
     <message>
         <location filename="../src/utils/TOTPReader.cpp" line="34"/>
         <source>Scan QR code (*.png *.jpg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Сканировать QR код (*.png *.jpg)</translation>
     </message>
     <message>
         <location filename="../src/utils/TOTPReader.cpp" line="58"/>
         <source>&lt;b&gt;%1&lt;/b&gt; does not contain TOTP information.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; не содержит TOTP информации.</translation>
     </message>
 </context>
 <context>
