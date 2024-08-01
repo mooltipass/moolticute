@@ -36,6 +36,7 @@ greaterThan(QT_MAJOR_VERSION, 5) {
 SOURCES += src/main_gui.cpp \
     src/ClickableLabel.cpp \
     src/MainWindow.cpp \
+    src/NoScrollComboBox.cpp \
     src/NotesManagement.cpp \
     src/ParseDomain.cpp \
     src/Common.cpp \
@@ -90,6 +91,7 @@ SOURCES += src/main_gui.cpp \
 
 HEADERS  += src/MainWindow.h \
     src/ClickableLabel.h \
+    src/NoScrollComboBox.h \
     src/NotesManagement.h \
     src/ParseDomain.h \
     src/Common.h \
