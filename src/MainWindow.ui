@@ -625,7 +625,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxDeviceLang">
+                   <widget class="NoScrollComboBox" name="comboBoxDeviceLang">
                     <property name="minimumSize">
                      <size>
                       <width>120</width>
@@ -676,7 +676,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxUserLanguage">
+                   <widget class="NoScrollComboBox" name="comboBoxUserLanguage">
                     <property name="minimumSize">
                      <size>
                       <width>120</width>
@@ -727,7 +727,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxLang">
+                   <widget class="NoScrollComboBox" name="comboBoxLang">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -784,7 +784,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxBtLayout">
+                   <widget class="NoScrollComboBox" name="comboBoxBtLayout">
                     <property name="minimumSize">
                      <size>
                       <width>200</width>
@@ -845,7 +845,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxUsbLayout">
+                   <widget class="NoScrollComboBox" name="comboBoxUsbLayout">
                     <property name="minimumSize">
                      <size>
                       <width>200</width>
@@ -984,7 +984,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxLoginOutput">
+                   <widget class="NoScrollComboBox" name="comboBoxLoginOutput">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1049,7 +1049,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxPasswordOutput">
+                   <widget class="NoScrollComboBox" name="comboBoxPasswordOutput">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1258,7 +1258,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxInactivityTimer"/>
+                   <widget class="NoScrollComboBox" name="comboBoxInactivityTimer"/>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_53">
@@ -1311,7 +1311,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="lockUnlockModeComboBox">
+                   <widget class="NoScrollComboBox" name="lockUnlockModeComboBox">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1372,7 +1372,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxDelayBefUnlockLogin"/>
+                   <widget class="NoScrollComboBox" name="comboBoxDelayBefUnlockLogin"/>
                   </item>
                   <item>
                    <widget class="QLabel" name="label_delayBefUnlockUnit">
@@ -1423,7 +1423,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxMCSubdomainForceStatus"/>
+                   <widget class="NoScrollComboBox" name="comboBoxMCSubdomainForceStatus"/>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_59">
@@ -1493,7 +1493,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxKnock">
+                   <widget class="NoScrollComboBox" name="comboBoxKnock">
                     <property name="toolTip">
                      <string>How sensitive to vibration your device should be</string>
                     </property>
@@ -1558,7 +1558,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxScreenBrightness">
+                   <widget class="NoScrollComboBox" name="comboBoxScreenBrightness">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1606,7 +1606,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxBatteryScreenBrightness"/>
+                   <widget class="NoScrollComboBox" name="comboBoxBatteryScreenBrightness"/>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_44">
@@ -1647,7 +1647,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxUsbScreenBrightness"/>
+                   <widget class="NoScrollComboBox" name="comboBoxUsbScreenBrightness"/>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_38">
@@ -1694,7 +1694,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxInformationTimeDelay"/>
+                   <widget class="NoScrollComboBox" name="comboBoxInformationTimeDelay"/>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_55">
@@ -1738,7 +1738,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="comboBoxScreensaverId"/>
+                   <widget class="NoScrollComboBox" name="comboBoxScreensaverId"/>
                   </item>
                   <item>
                    <spacer name="horizontalSpacer_56">
@@ -3940,7 +3940,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                <x>0</x>
                <y>0</y>
                <width>646</width>
-               <height>874</height>
+               <height>885</height>
               </rect>
              </property>
              <property name="autoFillBackground">
@@ -3985,7 +3985,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBoxAppLang"/>
+                 <widget class="NoScrollComboBox" name="comboBoxAppLang"/>
                 </item>
                </layout>
               </item>
@@ -4602,7 +4602,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBoxBleCurrentCategory">
+                 <widget class="NoScrollComboBox" name="comboBoxBleCurrentCategory">
                   <property name="minimumSize">
                    <size>
                     <width>80</width>
@@ -4639,7 +4639,7 @@ Hint: keep your mouse positioned over an option to get more details.</string>
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBoxSystrayIcon"/>
+                 <widget class="NoScrollComboBox" name="comboBoxSystrayIcon"/>
                 </item>
                </layout>
               </item>
@@ -5384,6 +5384,12 @@ Hint: keep your mouse positioned over an option to get more details.</string>
    <class>ClickableLabel</class>
    <extends>QLabel</extends>
    <header>ClickableLabel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>NoScrollComboBox</class>
+   <extends>QComboBox</extends>
+   <header>NoScrollComboBox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
