@@ -12,118 +12,118 @@
 <context>
     <name>AppGui</name>
     <message>
-        <location filename="../src/AppGui.cpp" line="130"/>
+        <location filename="../src/AppGui.cpp" line="131"/>
         <source>&amp;Show Moolticute Application</source>
         <translation>&amp;Открыть Moolticute</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="139"/>
+        <location filename="../src/AppGui.cpp" line="140"/>
         <source>&amp;Quit</source>
         <translation>&amp;Выход</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="518"/>
+        <location filename="../src/AppGui.cpp" line="534"/>
         <source>Restarting daemon...</source>
         <translation>Перезапускаем сервис...</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="630"/>
+        <location filename="../src/AppGui.cpp" line="646"/>
         <source>%1 version has been released!</source>
         <translation>Вышла версия %1!</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="631"/>
+        <location filename="../src/AppGui.cpp" line="647"/>
         <source>Open MC client to download it.</source>
         <translation>Откройте Moolticute чтобы скачать.</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="644"/>
+        <location filename="../src/AppGui.cpp" line="660"/>
         <source>Would you like to download the update now?</source>
         <translation>Загрузить обновление сейчас?</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="645"/>
+        <location filename="../src/AppGui.cpp" line="661"/>
         <source>Open changelog</source>
         <translation>Окрыть список изменений</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="660"/>
+        <location filename="../src/AppGui.cpp" line="676"/>
         <source>Mooltipass Not Connected</source>
         <translation>Mooltipass Не Подключен</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="661"/>
+        <location filename="../src/AppGui.cpp" line="677"/>
         <source>Please Connect Your Mooltipass</source>
         <translation>Подключите Ваш Mooltipass</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="665"/>
+        <location filename="../src/AppGui.cpp" line="681"/>
         <source>No Card in Mooltipass!</source>
         <translation>В Mooltipass нет карточки!</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="666"/>
+        <location filename="../src/AppGui.cpp" line="682"/>
         <source>Please Insert Your Smartcard and Enter Your PIN</source>
         <translation>Пожалуйста, вставте смарт-карту и введите PIN код</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="670"/>
+        <location filename="../src/AppGui.cpp" line="686"/>
         <source>Mooltipass in Management Mode!</source>
         <translation>Mooltipass в режиме управления!</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="671"/>
+        <location filename="../src/AppGui.cpp" line="687"/>
         <source>Please leave management mode in the App</source>
         <translation>Пожалуйста, выйдите из режима управления в прилоложении</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="675"/>
+        <location filename="../src/AppGui.cpp" line="691"/>
         <source>Mooltipass Locked</source>
         <translation>Mooltipass заблокирован</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="676"/>
+        <location filename="../src/AppGui.cpp" line="692"/>
         <source>Please Unlock Your Mooltipass</source>
         <translation>Пожалуйста, разблокируйте Mooltipass</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="704"/>
+        <location filename="../src/AppGui.cpp" line="720"/>
         <source>Can&apos;t restart daemon, it was started by hand and not using this App.</source>
         <translation>Нельзя перезапустить сервис, т.к. он был запущен вручную, без использования данной программы.</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="358"/>
+        <location filename="../src/AppGui.cpp" line="374"/>
         <source>No mooltipass connected.</source>
         <translation>Mooltipass не подсоединен.</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="147"/>
-        <location filename="../src/AppGui.cpp" line="520"/>
+        <location filename="../src/AppGui.cpp" line="155"/>
+        <location filename="../src/AppGui.cpp" line="536"/>
         <source>&amp;Restart daemon</source>
         <translation>&amp;Перезапустить сервис</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="398"/>
+        <location filename="../src/AppGui.cpp" line="414"/>
         <source>%1 locked</source>
         <translation>%1 Заблокирован</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="401"/>
+        <location filename="../src/AppGui.cpp" line="417"/>
         <source>%1 Unlocked</source>
         <translation>%1 Разблокирован</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="404"/>
+        <location filename="../src/AppGui.cpp" line="420"/>
         <source>No card inserted in your %1</source>
         <translation>В Ваш %1 не вставлена карта</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="455"/>
+        <location filename="../src/AppGui.cpp" line="471"/>
         <source>&amp;Hide Moolticute App</source>
         <translation>&amp;Свернуть Moolticute</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="467"/>
+        <location filename="../src/AppGui.cpp" line="483"/>
         <source>&amp;Show Moolticute App</source>
         <translation>&amp;Открыть Moolticute</translation>
     </message>
@@ -137,7 +137,7 @@
     </message>
     <message>
         <location filename="../src/BleDev.ui" line="58"/>
-        <location filename="../src/BleDev.cpp" line="85"/>
+        <location filename="../src/BleDev.cpp" line="93"/>
         <source>BLE Developer Tab</source>
         <translation>Для разработчика</translation>
     </message>
@@ -158,19 +158,19 @@
     </message>
     <message>
         <location filename="../src/BleDev.ui" line="216"/>
-        <location filename="../src/BleDev.cpp" line="87"/>
+        <location filename="../src/BleDev.cpp" line="95"/>
         <source>Data Fetch</source>
         <translation>Получить данные</translation>
     </message>
     <message>
         <location filename="../src/BleDev.ui" line="250"/>
-        <location filename="../src/BleDev.cpp" line="88"/>
+        <location filename="../src/BleDev.cpp" line="96"/>
         <source>Storage file:</source>
         <translation>Файл:</translation>
     </message>
     <message>
         <location filename="../src/BleDev.ui" line="301"/>
-        <location filename="../src/BleDev.cpp" line="84"/>
+        <location filename="../src/BleDev.cpp" line="92"/>
         <source>Browse</source>
         <translation>Просмотр</translation>
     </message>
@@ -187,83 +187,83 @@
         <translation>Случайные данные</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="107"/>
+        <location filename="../src/BleDev.cpp" line="115"/>
         <source>Stop Fetch</source>
         <translation>Остановить получение</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="143"/>
-        <location filename="../src/BleDev.cpp" line="208"/>
+        <location filename="../src/BleDev.cpp" line="151"/>
+        <location filename="../src/BleDev.cpp" line="221"/>
         <source>Invalid bundle file is selected</source>
         <translation>Выбран некоррентный файл пакета</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="148"/>
+        <location filename="../src/BleDev.cpp" line="156"/>
         <source>The given bundle file name is not correct.</source>
         <translation>Введенное имя файла пакета содержит ошибку.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="155"/>
+        <location filename="../src/BleDev.cpp" line="163"/>
         <source>The device serial number is not correct in bundle filename.</source>
         <translation>Серийный номер устройства не совпадает с серийным номеров в пакете обновления.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="162"/>
+        <location filename="../src/BleDev.cpp" line="170"/>
         <source>The bundle version is not correct in bundle filename.</source>
         <translation>Версия пакета не является корректной в выбранном файле.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="176"/>
+        <location filename="../src/BleDev.cpp" line="184"/>
         <source>Battery too low for bundle upload</source>
         <translation>Батарея слишком сильно разряжена, загрузка пакета невозможна</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="177"/>
+        <location filename="../src/BleDev.cpp" line="185"/>
         <source>Please have your device connected through USB and fully charged</source>
         <translation>Пожалуйста, подключите устройство по USB и полностью зарядите</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="182"/>
+        <location filename="../src/BleDev.cpp" line="193"/>
         <source>Select bundle file</source>
         <translation>Выбор файла пакета</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="200"/>
+        <location filename="../src/BleDev.cpp" line="213"/>
         <source>Invalid path</source>
         <translation>Некорректный путь</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="201"/>
+        <location filename="../src/BleDev.cpp" line="214"/>
         <source>The choosen path for bundle is not a file.</source>
         <translation>Выбранный путь пакета не является файлом.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="209"/>
+        <location filename="../src/BleDev.cpp" line="222"/>
         <source>The given bundle file is not correct.</source>
         <translation>Выбранный файл пакета не является корректным.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="224"/>
+        <location filename="../src/BleDev.cpp" line="238"/>
         <source>Starting upload bundle file.</source>
         <translation>Начало загрузки пакета.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="236"/>
+        <location filename="../src/BleDev.cpp" line="250"/>
         <source>Upload Bundle Result</source>
         <translation>Результат загрузки пакета</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="241"/>
+        <location filename="../src/BleDev.cpp" line="255"/>
         <source>Upload bundle finished successfully.</source>
         <translation>Загрузка пакета успешно завершена.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="246"/>
+        <location filename="../src/BleDev.cpp" line="260"/>
         <source>Upload bundle finished with error.</source>
         <translation>Загрузка пакета завершена с ошибкой.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="263"/>
+        <location filename="../src/BleDev.cpp" line="277"/>
         <source>Select file to fetch data</source>
         <translation>Выберите файл, куда сохранить данные</translation>
     </message>
@@ -271,7 +271,7 @@
 <context>
     <name>CredentialModel</name>
     <message>
-        <location filename="../src/CredentialModel.h" line="72"/>
+        <location filename="../src/CredentialModel.h" line="75"/>
         <source>Default category</source>
         <translation>Категория по умолчанию</translation>
     </message>
@@ -284,105 +284,105 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="52"/>
-        <location filename="../src/CredentialsManagement.ui" line="513"/>
+        <location filename="../src/CredentialsManagement.ui" line="76"/>
+        <location filename="../src/CredentialsManagement.ui" line="505"/>
         <source>Login</source>
         <translation>Логин</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="80"/>
+        <location filename="../src/CredentialsManagement.ui" line="52"/>
         <source>Service or Site name</source>
         <translation>Имя сервиса или сайта</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="87"/>
+        <location filename="../src/CredentialsManagement.ui" line="69"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="100"/>
-        <location filename="../src/CredentialsManagement.ui" line="999"/>
-        <location filename="../src/CredentialsManagement.cpp" line="94"/>
+        <location filename="../src/CredentialsManagement.ui" line="89"/>
+        <location filename="../src/CredentialsManagement.ui" line="988"/>
+        <location filename="../src/CredentialsManagement.cpp" line="101"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="169"/>
+        <location filename="../src/CredentialsManagement.ui" line="161"/>
         <source>Credentials Management Mode</source>
         <translation>Управление учетными данными</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="176"/>
+        <location filename="../src/CredentialsManagement.ui" line="168"/>
         <source>Browsing through your credentials list requires your device to be in management mode. Click the button below to start the process.</source>
         <translation>Просмотр и изменение учетных данных требуют перехода в режим управления. Нажмите на кнопку ниже, чтобы начать процесс.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="192"/>
+        <location filename="../src/CredentialsManagement.ui" line="184"/>
         <source>Enter Credentials Management Mode</source>
         <translation>Войти в режим управления учетными данными</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="269"/>
+        <location filename="../src/CredentialsManagement.ui" line="261"/>
         <source>Filter credentials...</source>
         <translation>Отфильтровать...</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="301"/>
-        <location filename="../src/CredentialsManagement.cpp" line="1208"/>
+        <location filename="../src/CredentialsManagement.ui" line="293"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1321"/>
         <source>Expand All</source>
         <translation>Развернуть все</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="334"/>
+        <location filename="../src/CredentialsManagement.ui" line="326"/>
         <source>Exit Linking</source>
         <translation>Выйти из связывания</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="341"/>
+        <location filename="../src/CredentialsManagement.ui" line="333"/>
         <source>Link Credential</source>
         <translation>Связать учетные данные</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="407"/>
+        <location filename="../src/CredentialsManagement.ui" line="399"/>
         <source>No credential selected.</source>
         <translation>Запись не выбрана.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="541"/>
+        <location filename="../src/CredentialsManagement.ui" line="533"/>
         <source>Password:</source>
         <translation>Пароль:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="571"/>
+        <location filename="../src/CredentialsManagement.ui" line="560"/>
         <source>Description:</source>
         <translation>Описание:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="732"/>
+        <location filename="../src/CredentialsManagement.ui" line="721"/>
         <source>TOTP Credential</source>
         <translation>Учетные данные TOTP</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="947"/>
-        <location filename="../src/CredentialsManagement.cpp" line="87"/>
+        <location filename="../src/CredentialsManagement.ui" line="936"/>
+        <location filename="../src/CredentialsManagement.cpp" line="94"/>
         <source>Category 4:</source>
         <translation>Категория 4:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="957"/>
-        <location filename="../src/CredentialsManagement.cpp" line="86"/>
+        <location filename="../src/CredentialsManagement.ui" line="946"/>
+        <location filename="../src/CredentialsManagement.cpp" line="93"/>
         <source>Category 3:</source>
         <translation>Категория 3:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="967"/>
-        <location filename="../src/CredentialsManagement.cpp" line="85"/>
+        <location filename="../src/CredentialsManagement.ui" line="956"/>
+        <location filename="../src/CredentialsManagement.cpp" line="92"/>
         <source>Category 2:</source>
         <translation>Категория 2:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="977"/>
-        <location filename="../src/CredentialsManagement.cpp" line="84"/>
+        <location filename="../src/CredentialsManagement.ui" line="966"/>
+        <location filename="../src/CredentialsManagement.cpp" line="91"/>
         <source>Category 1:</source>
         <translation>Категория 1:</translation>
     </message>
@@ -391,160 +391,250 @@
         <translation type="obsolete">Дата создания:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="601"/>
+        <location filename="../src/CredentialsManagement.ui" line="590"/>
         <source>Last Modified:</source>
         <translation>Дата последнего изменения:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="634"/>
+        <location filename="../src/CredentialsManagement.ui" line="623"/>
         <source>Last Accessed:</source>
         <translation>Дата последнего использования:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="661"/>
+        <location filename="../src/CredentialsManagement.ui" line="650"/>
         <source>Category:</source>
         <translation>Категория:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="676"/>
+        <location filename="../src/CredentialsManagement.ui" line="665"/>
         <source>Key After Login:</source>
         <translation>Клавиша после ввода логина:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="691"/>
+        <location filename="../src/CredentialsManagement.ui" line="680"/>
         <source>Key After Password:</source>
         <translation>Клавиша после ввода пароля:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="745"/>
+        <location filename="../src/CredentialsManagement.ui" line="734"/>
         <source>Delete TOTP</source>
         <translation>Удалить TOTP</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="821"/>
+        <location filename="../src/CredentialsManagement.ui" line="810"/>
         <source>Confirm changes</source>
         <translation>Подтвердить изменения</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="896"/>
-        <location filename="../src/CredentialsManagement.cpp" line="59"/>
+        <location filename="../src/CredentialsManagement.ui" line="885"/>
+        <location filename="../src/CredentialsManagement.cpp" line="66"/>
         <source>Exit Credential Management</source>
         <translation>Выйти из режима управления учетными данными</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="909"/>
+        <location filename="../src/CredentialsManagement.ui" line="898"/>
         <source>Save all changes</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="47"/>
+        <location filename="../src/CredentialsManagement.cpp" line="54"/>
         <source>Discard all changes</source>
         <translation>Отменить все изменения</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="67"/>
+        <location filename="../src/CredentialsManagement.cpp" line="74"/>
         <source>Discard changes</source>
         <translation>Отменить изменения</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1025"/>
+        <location filename="../src/CredentialsManagement.cpp" line="458"/>
+        <source>Couldn&apos;t Add This Credential: Please approve the request on the device.</source>
+        <translation>Не удалось добавить учетные данные. Пожалуйста, одобрите запрос на устройстве.</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1090"/>
         <source>Pointed to credential is deleted</source>
         <translation>Указанные учетные данные удалены</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1324"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1443"/>
         <source>Not a favorite</source>
         <translation>Не в избранном</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1330"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1449"/>
         <source>Set as favorite #%1</source>
         <translation>Добавить в Избранное #%1</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="383"/>
+        <location filename="../src/CredentialsManagement.cpp" line="415"/>
         <source>Please Approve On Device</source>
         <translation>Пожалуйста, подтвердите на устройстве</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="76"/>
+        <location filename="../src/CredentialsManagement.cpp" line="35"/>
+        <source>The following domains are invalid or private: &lt;b&gt;&lt;ul&gt;&lt;li&gt;%1&lt;/li&gt;&lt;/ul&gt;&lt;/b&gt;They are not saved.</source>
+        <translation>Эти домены были либо невалидными, либо частными: &lt;b&gt;&lt;ul&gt;&lt;li&gt;%1&lt;/li&gt;&lt;/ul&gt;&lt;/b&gt;Они не были сохранены.</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="38"/>
+        <source>Confirm TOTP</source>
+        <translation>Подтвердите TOTP</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="83"/>
         <source>Edit Service Name</source>
         <translation>Редактировать имя сервиса</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="80"/>
+        <location filename="../src/CredentialsManagement.cpp" line="87"/>
         <source>There is a TOTP Credential for the service</source>
         <translation>Есть TOTP учетные данные для сервиса</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="424"/>
+        <location filename="../src/CredentialsManagement.cpp" line="456"/>
         <source>%1: New Login %2 added.</source>
         <translation>%1: Новый логин %2 добавлен.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="426"/>
-        <location filename="../src/CredentialsManagement.cpp" line="480"/>
+        <location filename="../src/CredentialsManagement.cpp" line="458"/>
+        <location filename="../src/CredentialsManagement.cpp" line="528"/>
         <source>Failure</source>
         <translation>Сбой</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="426"/>
         <source>Couldn&apos;t Add New Credential to Device</source>
-        <translation>Не удалось добавить новые учетные данные на устройство</translation>
+        <translation type="vanished">Не удалось добавить новые учетные данные на устройство</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="472"/>
+        <location filename="../src/CredentialsManagement.cpp" line="520"/>
         <source>Password Query Was Denied</source>
         <translation>На запрос пароля отказали</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="480"/>
+        <location filename="../src/CredentialsManagement.cpp" line="528"/>
         <source>Unable to modify %1/%2</source>
         <translation>Не удалось измменить %1/%2</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="600"/>
+        <location filename="../src/CredentialsManagement.cpp" line="654"/>
         <source>Discard Modifications ?</source>
         <translation>Отказаться от изменений?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="601"/>
+        <location filename="../src/CredentialsManagement.cpp" line="655"/>
         <source>You have modified %1/%2 - Do you want to discard the modifications ?</source>
         <translation>Вы изменили %1/%2 - Хотите отказаться от изменений?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="771"/>
+        <location filename="../src/CredentialsManagement.cpp" line="835"/>
         <source>Service already exists</source>
         <translation>Сервис уже существует</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="787"/>
+        <location filename="../src/CredentialsManagement.cpp" line="851"/>
         <source>Login already exists</source>
         <translation>Логин уже существует</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="878"/>
+        <location filename="../src/CredentialsManagement.cpp" line="943"/>
         <source>Delete?</source>
         <translation>Удалить?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="879"/>
+        <location filename="../src/CredentialsManagement.cpp" line="944"/>
         <source>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Delete credential &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</source>
         <translation>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Удалить учетные данные &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1474"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1304"/>
+        <source>Text is too long, maximum length is %1</source>
+        <translation>Текст слишком длинный, максимальная длина - %1</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1553"/>
+        <source>Invalid domain</source>
+        <translation>Неправильный домен</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1630"/>
+        <source>Do you want to add TOTP for &lt;b&gt;%1&lt;/b&gt; service?</source>
+        <translation>Хотите добавить TOTP для &lt;b&gt;%1&lt;/b&gt; сервиса?</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1648"/>
+        <source>There is TOTP saved for credential %1
+Do you want to overwrite TOTP information?</source>
+        <translation>TOTP для учетной записи %1 уже существует
+Хотите перезаписать данные TOTP?</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1652"/>
+        <source>Do you want to set TOTP information for %1?</source>
+        <translation>Хотите установить TOTP данные для %1?</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1670"/>
+        <source>Do you want to create &lt;b&gt;%1&lt;/b&gt; login and add TOTP for &lt;b&gt;%2&lt;/b&gt; service?</source>
+        <translation>Вы хотите задать логин &lt;b&gt;%1&lt;/b&gt; и TOTP для сервиса &lt;b&gt;%2&lt;/b&gt;?</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1681"/>
+        <source>&lt;b&gt;%1&lt;/b&gt; service does not exist.
+Do you want to create service with &lt;b&gt;%2&lt;/b&gt; login and add TOTP for it?</source>
+        <translation>&lt;b&gt;%1&lt;/b&gt; сервис не существует.
+Хотите создать сервис с логиномм &lt;b&gt;%2&lt;/b&gt; и добавить для него TOTP?</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1767"/>
         <source>TOTP Secret key is going to be removed for the credential.
 Continue?</source>
         <translation>Закрытый ключ TOTP будет удален для этих учетных данных.Продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1035"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1872"/>
+        <source>%1 will use %2 password.
+Do you want to confirm?</source>
+        <translation>%1 будет использовать пароль от %2.
+Хотите продолжить?</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1927"/>
+        <source>Multiple Domains for %1</source>
+        <translation>Несколько доменов для %1</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1928"/>
+        <source>Enter comma separated domain extensions:</source>
+        <translation>Введите расширения домена через запятую:</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1948"/>
+        <source>Edit multiple domains</source>
+        <translation>Редактировать несколько доменов</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1950"/>
+        <source>Remove multiple domains</source>
+        <translation>Удалить несколько доменов</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1961"/>
+        <source>Enable multiple domains</source>
+        <translation>Включить обработку нескольких доменов</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1973"/>
+        <source>Use other credential password</source>
+        <translation>Использовать пароль от другого сервиса</translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1100"/>
         <source>Setup TOTP Credential</source>
         <translation>Настройка TOTP</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1208"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1321"/>
         <source>Collapse All</source>
         <translation>Свернуть все</translation>
     </message>
@@ -618,33 +708,33 @@ Continue?</source>
 <context>
     <name>DbExportsRegistryController</name>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="100"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="101"/>
         <source>Be careful</source>
         <translation>Будте осторожны</translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="101"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="102"/>
         <source>It&apos;s always good to make a backup of your database. Are you sure you want to continue?</source>
         <translation>Резевное копирование базы данных всегда полезно. Уверены, что хотите продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="137"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="138"/>
         <source>Save database export...</source>
         <translation>Сохранить экспорт базы данных...</translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="133"/>
-        <location filename="../src/DbExportsRegistryController.cpp" line="164"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="134"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="165"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="112"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="113"/>
         <source>Do you want to backup your credentials now?</source>
         <translation>Хотите сделать резервную копию учетных данных сейчас?</translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="164"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="165"/>
         <source>Unable to write to file %1</source>
         <translation>Не могу записать в файл: %1</translation>
     </message>
@@ -858,22 +948,22 @@ Continue?</source>
         <translation>Сохранить и Выйти</translation>
     </message>
     <message>
-        <location filename="../src/FidoManagement.cpp" line="132"/>
+        <location filename="../src/FidoManagement.cpp" line="137"/>
         <source>Delete?</source>
         <translation>Удалить?</translation>
     </message>
     <message>
-        <location filename="../src/FidoManagement.cpp" line="133"/>
+        <location filename="../src/FidoManagement.cpp" line="138"/>
         <source>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Delete credential &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</source>
         <translation>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Удалить учетные данные &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</translation>
     </message>
     <message>
-        <location filename="../src/FidoManagement.cpp" line="176"/>
+        <location filename="../src/FidoManagement.cpp" line="181"/>
         <source>Fido2 Management Mode</source>
         <translation>Режим управления FIDO2</translation>
     </message>
     <message>
-        <location filename="../src/FidoManagement.cpp" line="177"/>
+        <location filename="../src/FidoManagement.cpp" line="182"/>
         <source>Deleting Fido2 Credential(s) Failed</source>
         <translation>Ошибка при удалении учетных данных FIDO2</translation>
     </message>
@@ -992,24 +1082,24 @@ Continue?</source>
         <translation>Откаазаться от удаления</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="451"/>
-        <location filename="../src/FilesManagement.cpp" line="531"/>
+        <location filename="../src/FilesManagement.cpp" line="457"/>
+        <location filename="../src/FilesManagement.cpp" line="537"/>
         <source>Save to file...</source>
         <translation>Сохранить в файл...</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="341"/>
+        <location filename="../src/FilesManagement.cpp" line="347"/>
         <source>No files in the device.</source>
         <translation>Нет файлов на устройстве.</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="345"/>
+        <location filename="../src/FilesManagement.cpp" line="351"/>
         <source>Please enter file management mode to list the files in your device.</source>
         <translation>Пожалуйста, перейдите в режим управления файлами на устройстве.</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="421"/>
-        <location filename="../src/FilesManagement.cpp" line="663"/>
+        <location filename="../src/FilesManagement.cpp" line="428"/>
+        <location filename="../src/FilesManagement.cpp" line="670"/>
         <source>Load file to device...</source>
         <translation>Загрузить файл на устройство...</translation>
     </message>
@@ -1021,48 +1111,48 @@ Continue?</source>
 Продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="371"/>
+        <location filename="../src/FilesManagement.cpp" line="377"/>
         <source>File Deleted</source>
         <translation>Файл удален</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="371"/>
+        <location filename="../src/FilesManagement.cpp" line="377"/>
         <source>&apos;%1&apos; file was deleted successfully!</source>
         <translation>Файл &apos;%1&apos; успешно удален!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="375"/>
-        <location filename="../src/FilesManagement.cpp" line="522"/>
-        <location filename="../src/FilesManagement.cpp" line="524"/>
-        <location filename="../src/FilesManagement.cpp" line="543"/>
-        <location filename="../src/FilesManagement.cpp" line="587"/>
-        <location filename="../src/FilesManagement.cpp" line="597"/>
-        <location filename="../src/FilesManagement.cpp" line="630"/>
+        <location filename="../src/FilesManagement.cpp" line="381"/>
+        <location filename="../src/FilesManagement.cpp" line="528"/>
+        <location filename="../src/FilesManagement.cpp" line="530"/>
+        <location filename="../src/FilesManagement.cpp" line="549"/>
+        <location filename="../src/FilesManagement.cpp" line="594"/>
+        <location filename="../src/FilesManagement.cpp" line="604"/>
+        <location filename="../src/FilesManagement.cpp" line="637"/>
         <source>Failure</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="375"/>
+        <location filename="../src/FilesManagement.cpp" line="381"/>
         <source>&apos;%1&apos; file delete failed!</source>
         <translation>Ошибка при удалении файла &apos;%1&apos;!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="522"/>
+        <location filename="../src/FilesManagement.cpp" line="528"/>
         <source>Data Fetch Denied for &apos;%1&apos;!</source>
         <translation>В получении данных для &apos;%1&apos; отказано!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="524"/>
+        <location filename="../src/FilesManagement.cpp" line="530"/>
         <source>Data Fetch Denied!</source>
         <translation>В получении данных отказано!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="543"/>
+        <location filename="../src/FilesManagement.cpp" line="549"/>
         <source>Unable to open file &apos;%1&apos; for write!</source>
         <translation>Не могу открыть файл &apos;%1&apos; для записи!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="588"/>
+        <location filename="../src/FilesManagement.cpp" line="595"/>
         <source>File &apos;%1&apos; is too big to be stored in the Mooltipass!
 
 Maximum allowed size is %2 bytes.</source>
@@ -1071,12 +1161,12 @@ Maximum allowed size is %2 bytes.</source>
 Максимальный размер файла %2 байт.</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="597"/>
+        <location filename="../src/FilesManagement.cpp" line="604"/>
         <source>Unable to open file &apos;%1&apos; for read!</source>
         <translation>Не могу открыть файл &apos;%1&apos; для чтения!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="630"/>
+        <location filename="../src/FilesManagement.cpp" line="637"/>
         <source>Unable to send data!</source>
         <translation>Невозможно отправить данные!</translation>
     </message>
@@ -1084,22 +1174,22 @@ Maximum allowed size is %2 bytes.</source>
 <context>
     <name>LockedPasswordLineEdit</name>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="299"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="312"/>
         <source>Link Password</source>
         <translation>Связать Пароль</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="300"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="313"/>
         <source>Remove Link Password</source>
         <translation>Удалить связанный пароль</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="330"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="343"/>
         <source>Password Locked</source>
         <translation>Пароль заблокирован</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="344"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="357"/>
         <source>Non-initialized password</source>
         <translation>Пароль не инициализирован</translation>
     </message>
@@ -1108,8 +1198,8 @@ Maximum allowed size is %2 bytes.</source>
     <name>MainWindow</name>
     <message>
         <location filename="../src/MainWindow.ui" line="26"/>
-        <location filename="../src/MainWindow.cpp" line="1511"/>
-        <location filename="../src/MainWindow.cpp" line="1533"/>
+        <location filename="../src/MainWindow.cpp" line="1576"/>
+        <location filename="../src/MainWindow.cpp" line="1599"/>
         <source>Moolticute</source>
         <translation></translation>
     </message>
@@ -1280,12 +1370,11 @@ Maximum allowed size is %2 bytes.</source>
         <translation>Мигать экраном, когда требуется ввод</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1850"/>
         <source>Lock device when computer sleeps or shuts down, if screen is locked, or user logs off</source>
-        <translation>Блокировать устройство, когда компьютер выключается, блокируется или пользователь выходит из системы</translation>
+        <translation type="vanished">Блокировать устройство, когда компьютер выключается, блокируется или пользователь выходит из системы</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1860"/>
+        <location filename="../src/MainWindow.ui" line="1850"/>
         <source>Do not erase characters when going back in the pin entering screen</source>
         <translation>Не стирать символы при переходе назад на этапе ввода PIN</translation>
     </message>
@@ -1305,7 +1394,7 @@ Maximum allowed size is %2 bytes.</source>
         <translation>Отображать хэш безопасности до и после разблокировки карты</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1883"/>
+        <location filename="../src/MainWindow.ui" line="1873"/>
         <source>Random Starting Pin</source>
         <translation>Случайный начальный PIN</translation>
     </message>
@@ -1375,339 +1464,335 @@ Maximum allowed size is %2 bytes.</source>
         <translation>Отключить устройство после отсоединения по Bluetooth</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1976"/>
         <source>Disable Bluetooth when a user card is removed from the device</source>
-        <translation>Отключать Bluetooth, когда пользователь вынул карту</translation>
+        <translation type="vanished">Отключать Bluetooth, когда пользователь вынул карту</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1986"/>
         <source>Disable Bluetooth upon device lock</source>
-        <translation>Отключать Bluetooth при блокировке устройства</translation>
+        <translation type="vanished">Отключать Bluetooth при блокировке устройства</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1996"/>
+        <location filename="../src/MainWindow.ui" line="2016"/>
         <source>Login Menu: Start with Last Accessed Service</source>
         <translation>Меню входа: Начинать с сервиса, к которому последний раз обращались</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2003"/>
+        <location filename="../src/MainWindow.ui" line="2023"/>
         <source>Sort Favorites by last used date</source>
         <translation>Сортировать избранное по времени обращения</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2006"/>
+        <location filename="../src/MainWindow.ui" line="2026"/>
         <source>Sort Favorites by Last Used Date</source>
         <translation>Сортировать избранное по времени обращения</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2013"/>
+        <location filename="../src/MainWindow.ui" line="2033"/>
         <source>Invert Login and Favorites Icons</source>
         <translation>Инвертировать значки Вход и Избранное</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2023"/>
+        <location filename="../src/MainWindow.ui" line="2043"/>
         <source>User Security Settings (Only changeable from device)</source>
         <translation>Опции пользовательской безопасности (Можно менять только на устройстве)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2029"/>
+        <location filename="../src/MainWindow.ui" line="2049"/>
         <source>Confirm to output each credential. Control this setting in the settings menu of the advanced menu</source>
         <translation>Подтверждение для ввода учетных данных. Контролировать поведение этой опции можно в меню настроек расширенного меню</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2032"/>
+        <location filename="../src/MainWindow.ui" line="2052"/>
         <source>Login Confirmation Prompt</source>
         <translation>Запрос подтверждения входа</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2039"/>
+        <location filename="../src/MainWindow.ui" line="2059"/>
         <source>Require PIN to enter management mode. Control this setting in the settings menu of the advanced menu</source>
         <translation>Требовать PIN для входа в режим управления. Управлять этой опцией можно в расширенных настройках</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2042"/>
+        <location filename="../src/MainWindow.ui" line="2062"/>
         <source>PIN for Management Mode</source>
         <translation>PIN для режима управления</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2049"/>
+        <location filename="../src/MainWindow.ui" line="2069"/>
         <source>Prompt to display credentials on screen during manual recall. Control this setting in the settings menu of the advanced menu</source>
         <translation>Показывать запрос на отображения данных на экране при ручном выборе. Управлять поведением этой опции можно в расширенных настройках</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2059"/>
+        <location filename="../src/MainWindow.ui" line="2079"/>
         <source>Switch menu modes by a long wheel press in the main menu</source>
         <translation>Переключать режимы меню долгим нажатием колесика</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2062"/>
+        <location filename="../src/MainWindow.ui" line="2082"/>
         <source>Advanced Menu</source>
         <translation>Расширенное меню</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2069"/>
+        <location filename="../src/MainWindow.ui" line="2089"/>
         <source>Use Bluetooth Menu to enable/disable the Mooltipass Bluetooth interface</source>
         <translation>Использовать меню Bluetooth для включения и выключения Bluetooth интерфейса</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2072"/>
         <source>Bluetooth Enabled</source>
-        <translation>Bluetooth включен</translation>
+        <translation type="vanished">Bluetooth включен</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2079"/>
+        <location filename="../src/MainWindow.ui" line="2099"/>
         <source>Knock detection can be enabled/disabled on the device.</source>
         <translation>Обнаружение стука можно включать и выключать на устройстве.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2082"/>
         <source>Knock Detection Disabled</source>
-        <translation>Обнаружение стука выключено</translation>
+        <translation type="vanished">Обнаружение стука выключено</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2185"/>
+        <location filename="../src/MainWindow.ui" line="2205"/>
         <source>Save to device</source>
         <translation>Сохранить на устройство</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2521"/>
+        <location filename="../src/MainWindow.ui" line="2541"/>
         <source>Export Database to File</source>
         <translation>Экспортировать базу данных в файл</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2568"/>
+        <location filename="../src/MainWindow.ui" line="2588"/>
         <source>Make a backup of your database on your local computer</source>
         <translation>Сохраните копию базы данных на локальный компьютер</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2925"/>
+        <location filename="../src/MainWindow.ui" line="2945"/>
         <source>Unlock Your Mooltipass Device</source>
         <translation>Разблокируйте Ваш Mooltipass</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3134"/>
+        <location filename="../src/MainWindow.ui" line="3154"/>
         <source>Moolticute (c) The Mooltipass Team</source>
         <translation>Moolticute (c) Команда проекта &apos;Mooltipass&apos;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3186"/>
+        <location filename="../src/MainWindow.ui" line="3206"/>
         <source>Check For Updates</source>
         <translation>Проверить наличие обновлений</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3223"/>
+        <location filename="../src/MainWindow.ui" line="3243"/>
         <source>Device Firmware Version:</source>
         <translation>Версия прошивка устройства:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3325"/>
+        <location filename="../src/MainWindow.ui" line="3439"/>
         <source>Aux MCU Version:</source>
         <translation>Версия прошивки AUX MCU:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3359"/>
+        <location filename="../src/MainWindow.ui" line="3473"/>
         <source>Main MCU Version:</source>
         <translation>Версия прошивки Main MCU:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3393"/>
+        <location filename="../src/MainWindow.ui" line="3507"/>
         <source>Bundle Version:</source>
         <translation>Версия пакета:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3764"/>
+        <location filename="../src/MainWindow.ui" line="3900"/>
         <source>Moolticute Settings</source>
         <translation>Настройки Moolticute</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3834"/>
+        <location filename="../src/MainWindow.ui" line="3970"/>
         <source>Application Language</source>
         <translation>Язык приложения</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3910"/>
+        <location filename="../src/MainWindow.ui" line="4046"/>
         <source>View Daemon Logs</source>
         <translation>Посмотреть логи сервиса</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3947"/>
+        <location filename="../src/MainWindow.ui" line="4169"/>
         <source>Start Moolticute SSH Agent Automatically</source>
         <translation>Запускать Moolticute SSH Agent автоматически</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3959"/>
-        <location filename="../src/MainWindow.ui" line="4002"/>
-        <location filename="../src/MainWindow.ui" line="4305"/>
-        <location filename="../src/MainWindow.ui" line="4416"/>
+        <location filename="../src/MainWindow.ui" line="4107"/>
+        <location filename="../src/MainWindow.ui" line="4181"/>
+        <location filename="../src/MainWindow.ui" line="4224"/>
+        <location filename="../src/MainWindow.ui" line="4553"/>
         <source>(Restart Needed)</source>
         <translation>(Требуется перезапуск)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3990"/>
+        <location filename="../src/MainWindow.ui" line="4212"/>
         <source>Moolticute SSH Arguments</source>
         <translation>Аргументы командной строки для Moolticute SSH</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4035"/>
+        <location filename="../src/MainWindow.ui" line="4257"/>
         <source>Restart Daemon with Debug Web Server (on port 8484)</source>
         <translation>Перезапустить службу с включенным отладочным веб-сервером (на порту 8484)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4055"/>
+        <location filename="../src/MainWindow.ui" line="4277"/>
         <source>Enable Daemon Web Server</source>
         <translation>Включить веб-сервер службы Moolticute</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4072"/>
+        <location filename="../src/MainWindow.ui" line="4374"/>
         <source>Manage Your Password Profiles</source>
         <translation>Управление профилями паролей</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4092"/>
+        <location filename="../src/MainWindow.ui" line="4394"/>
         <source>Password Profiles...</source>
         <translation>Профили паролей...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4109"/>
+        <location filename="../src/MainWindow.ui" line="4479"/>
         <source>Delayed Cancel Buttons to Prevent Mistakes</source>
         <translation>Задержка для кнопок отмены чтобы избежать ошибок</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4129"/>
+        <location filename="../src/MainWindow.ui" line="4499"/>
         <source>Enable Long Press Cancel Buttons</source>
         <translation>Включить долгое нажатие на кнопки отмены</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4140"/>
-        <location filename="../src/MainWindow.ui" line="4169"/>
+        <location filename="../src/MainWindow.ui" line="4584"/>
+        <location filename="../src/MainWindow.ui" line="4613"/>
         <source>when selected, you can set moolticute to set a given category upon device connection</source>
         <translation>когда выбрано, moolticute будет устанавливать определенную категорию при подключении устройства</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4143"/>
+        <location filename="../src/MainWindow.ui" line="4587"/>
         <source>Upon connection, force category:</source>
         <translation>При подключении, выбирать категорию:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4250"/>
+        <location filename="../src/MainWindow.ui" line="4288"/>
         <source>Integration with Have I Been Pwned: Enabled</source>
         <translation>Интеграция с сервисом &apos;Have I Been Pwned&apos;: Включена</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4293"/>
+        <location filename="../src/MainWindow.ui" line="4095"/>
         <source>Enable full developer log</source>
         <translation>Включить полный лог (для разработчиков)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4325"/>
+        <location filename="../src/MainWindow.ui" line="4127"/>
         <source>Enable Debug Log</source>
         <translation>Включить отладочный лог</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4336"/>
+        <location filename="../src/MainWindow.ui" line="4405"/>
         <source>Default Password Length</source>
         <translation>Длина пароля по умолчанию</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4373"/>
+        <location filename="../src/MainWindow.ui" line="4510"/>
         <source>Backup Notification Banner</source>
         <translation>Уведомление о резервном копировании</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4393"/>
+        <location filename="../src/MainWindow.ui" line="4530"/>
         <source>Enable Backup Notification</source>
         <translation>Включить уведомление о резервном копировании</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4404"/>
+        <location filename="../src/MainWindow.ui" line="4541"/>
         <source>Display Moolticute Tutorial</source>
         <translation>Отображать обучение при старте</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4436"/>
+        <location filename="../src/MainWindow.ui" line="4573"/>
         <source>Display tutorial</source>
         <translation>Отображать обучение</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4937"/>
+        <location filename="../src/MainWindow.ui" line="5039"/>
         <source>Reset card</source>
         <translation>Сброс карты</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4971"/>
+        <location filename="../src/MainWindow.ui" line="5073"/>
         <source>Erase Inserted Card</source>
         <translation>Сбросить карту в устройстве</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4738"/>
-        <location filename="../src/MainWindow.ui" line="4763"/>
-        <location filename="../src/MainWindow.ui" line="4981"/>
+        <location filename="../src/MainWindow.ui" line="4955"/>
+        <location filename="../src/MainWindow.ui" line="4980"/>
+        <location filename="../src/MainWindow.ui" line="5083"/>
         <source>?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4990"/>
+        <location filename="../src/MainWindow.ui" line="5092"/>
         <source>Reset Card</source>
         <translation>Сброс карты</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4709"/>
+        <location filename="../src/MainWindow.ui" line="4926"/>
         <source>CSV file import/export</source>
         <translation>Импорт/экспорт CSV файла</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4731"/>
+        <location filename="../src/MainWindow.ui" line="4948"/>
         <source>Import unencrypted passwords</source>
         <translation>Импортирование незашифрованных паролей</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4747"/>
+        <location filename="../src/MainWindow.ui" line="4964"/>
         <source>Import CSV</source>
         <translation>Импорт CSV</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4756"/>
+        <location filename="../src/MainWindow.ui" line="4973"/>
         <source>Export passwords unencrypted</source>
         <translation>Экспорт незашифрованных паролей</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4772"/>
+        <location filename="../src/MainWindow.ui" line="4989"/>
         <source>Export CSV</source>
         <translation>Экспорт CSV</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4835"/>
+        <location filename="../src/MainWindow.ui" line="5104"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4858"/>
+        <location filename="../src/MainWindow.ui" line="5127"/>
         <source>Get</source>
         <translation>Запросить</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4879"/>
+        <location filename="../src/MainWindow.ui" line="5148"/>
         <source>Number of available users:</source>
         <translation>Число доступных пользователей:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2630"/>
+        <location filename="../src/MainWindow.ui" line="2650"/>
         <source>Import Database from File</source>
         <translation>Импорт базы данных из файла</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2680"/>
+        <location filename="../src/MainWindow.ui" line="2700"/>
         <source>Restore your database from a file</source>
         <translation>Восстановить базу данных из файла</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2409"/>
-        <location filename="../src/MainWindow.ui" line="4524"/>
+        <location filename="../src/MainWindow.ui" line="2429"/>
+        <location filename="../src/MainWindow.ui" line="4728"/>
         <source>Integrity Check</source>
         <translation>Проверка целостности</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2459"/>
+        <location filename="../src/MainWindow.ui" line="2479"/>
         <source>Scan your device for errors and correct them automatically.</source>
         <translation>Сканирование устройства на предмет наличия ошибок и автоматическое их исправление.</translation>
     </message>
@@ -1917,6 +2002,16 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation>Отображать TOTP при входе на сайт</translation>
     </message>
     <message>
+        <location filename="../src/MainWindow.ui" line="1880"/>
+        <source>Only shows digits when pressing and scrolling</source>
+        <translation>Показывать симполы только при нажатии и прокрутке</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1883"/>
+        <source>Paranoid Pin Entry</source>
+        <translation>Параноидальный режим ввода PIN кода</translation>
+    </message>
+    <message>
         <location filename="../src/MainWindow.ui" line="1890"/>
         <source>Scroll wheel shortcuts for bluetooth actions</source>
         <translation>&quot;Горячие клавиши&quot; для управления Bluetooth при помощи колесика</translation>
@@ -1932,15 +2027,90 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation>Отображать обучение при следующем запуске Mooltipass</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5002"/>
-        <location filename="../src/MainWindow.cpp" line="2236"/>
+        <location filename="../src/MainWindow.ui" line="1976"/>
+        <source>When device connected through Bluetooth switch the device off on lock</source>
+        <translation>При подключении по Bluetooth отключать устройство при блокировке</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1979"/>
+        <source>Switch Off on Lock When Connected with Bluetooth</source>
+        <translation>Выключать устройство при блокировке, когда используется Bluetooth</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1986"/>
+        <source>Disable Bluetooth when a user card is removed from the device (improves battery life)</source>
+        <translation>Выключать Bluetooth, когда карточка вынимается из устройства (увеличивает время работы от батареи)</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1996"/>
+        <source>Disable Bluetooth upon device lock (improves battery life)</source>
+        <translation>Отключатьб bluetooth при блокировке устройства (увеличивает время жизни от батареи)</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="2006"/>
+        <source>Only enable it if you don&apos;t use your Mini BLE on the go</source>
+        <translation>Рекомендуется включать если Mini BLE используется только стационарно</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="2009"/>
+        <source>Disable Battery Charging</source>
+        <translation>Отключить зарядку батареи</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="2092"/>
+        <source>Bluetooth</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="2102"/>
+        <source>Knock Detection</source>
+        <translation>Обнаружение стука</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="3367"/>
+        <source>Incorrect serial number</source>
+        <translation>Неправильный серийный номер</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="4138"/>
+        <source>Allow to use invalid or private TLDs</source>
+        <translation>Разрешить использование неправильных или частных доменных имен</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="4158"/>
+        <source>Disable TLD check</source>
+        <translation>Отключение проверки TLD</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="4442"/>
+        <source>Lock device when screen is locked</source>
+        <translation>Блокировать устройство при блокировке экрана ПК</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="4462"/>
+        <source>Enable Device Lock</source>
+        <translation>Включить блокировку устройства</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="5019"/>
+        <source>Visible ON DE&amp;MAND  (use SHIFT+F1 keyboard shortcut)</source>
+        <translation>Видима по &amp;требованию (При нажатии SHIFT+F1)</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="5206"/>
+        <location filename="../src/MainWindow.cpp" line="2352"/>
         <source>NiMH Reconditioning</source>
         <translation>Восстановление емкости NiMH</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5019"/>
+        <location filename="../src/MainWindow.ui" line="5223"/>
         <source>Start NiMH Reconditioning</source>
         <translation>Начать процедуру</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="5256"/>
+        <source>Continues until nominal capacity reached</source>
+        <translation>До достижения номинальной емкости</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1830"/>
@@ -1958,7 +2128,7 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation>Мигать экраном, когда требуется действие</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1880"/>
+        <location filename="../src/MainWindow.ui" line="1870"/>
         <source>Random starting pin every time card unlock is needed</source>
         <translation>Случайный начальный PIN при каждой разблокировке карты</translation>
     </message>
@@ -1968,22 +2138,22 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation>Выберите действие блокировки/разблокировки, когда втыкается/удаляется карточка</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2598"/>
+        <location filename="../src/MainWindow.ui" line="2618"/>
         <source>Export To File</source>
         <translation>Экспорт в файл</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2696"/>
+        <location filename="../src/MainWindow.ui" line="2716"/>
         <source>Do Not Delete Credentials on Local DB</source>
         <translation>Не удалять данные из локально базы данных</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2723"/>
+        <location filename="../src/MainWindow.ui" line="2743"/>
         <source>Import From File</source>
         <translation>Импорт из Файла</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2489"/>
+        <location filename="../src/MainWindow.ui" line="2509"/>
         <source>Perform Integrity Check</source>
         <translation>Провести проверку целостности</translation>
     </message>
@@ -2008,17 +2178,17 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation>чувствительностью при определении стука</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1863"/>
+        <location filename="../src/MainWindow.ui" line="1853"/>
         <source>Display Pin on Back Pressed</source>
         <translation>Отображать PIN при нажатии &quot;назад&quot;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1870"/>
+        <location filename="../src/MainWindow.ui" line="1860"/>
         <source>Do not hide PIN when entering PIN</source>
         <translation>Не скрывать PIN при вводе</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1873"/>
+        <location filename="../src/MainWindow.ui" line="1863"/>
         <source>Display Full Pin on Entry</source>
         <translation>Отображать PIN при вводе</translation>
     </message>
@@ -2028,174 +2198,173 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation>Отключать устройство после отключения USB шнура</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1979"/>
+        <location filename="../src/MainWindow.ui" line="1989"/>
         <source>Disable BLE on Card Removed</source>
         <translation>Отключать Bluetooth при вынимании карты</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1989"/>
+        <location filename="../src/MainWindow.ui" line="1999"/>
         <source>Disable BLE on Device Lock</source>
         <translation>Отключать Bluetooth при блокировке устройства</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2052"/>
+        <location filename="../src/MainWindow.ui" line="2072"/>
         <source>Management Storage Confirmation Prompt</source>
         <translation>Подтверждение отображения учетных данных на устройстве</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2146"/>
+        <location filename="../src/MainWindow.ui" line="2166"/>
         <source>Reset default values</source>
         <translation>Сброс на настройки по умолчанию</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2172"/>
+        <location filename="../src/MainWindow.ui" line="2192"/>
         <source>Cancel Changes</source>
         <translation>Откатить изменения</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2285"/>
+        <location filename="../src/MainWindow.ui" line="2305"/>
         <source>Database Backup Monitoring</source>
         <translation>Мониторинг резервной копии базы данных</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2329"/>
+        <location filename="../src/MainWindow.ui" line="2349"/>
         <source>Keep your database backup synchronized with this mooltipass database.</source>
         <translation>Синхронизировать копию базы данных в устройстве с этим файлом.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2359"/>
+        <location filename="../src/MainWindow.ui" line="2379"/>
         <source>Backup file path</source>
         <translation>Имя файла резервной копии</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2829"/>
+        <location filename="../src/MainWindow.ui" line="2849"/>
         <source>Security Card is missing</source>
         <translation>Смарткарта отсутствует</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2836"/>
+        <location filename="../src/MainWindow.ui" line="2856"/>
         <source>No card has been found. If you have a card in your Mooltipass device, try to remove and insert the card again.</source>
         <translation>В устройстве отсутствует карта. Если она там на самом деле есть - попробуйте вытащить ее и вставить снова.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2932"/>
+        <location filename="../src/MainWindow.ui" line="2952"/>
         <source>The connected device is currently locked. Unlock it to modify settings and manage your credentials.</source>
         <translation>Подключенное устройство сейчас заблокировано. Разблокируйте его, чтобы внести изменения в настройки.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3011"/>
+        <location filename="../src/MainWindow.ui" line="3031"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Wait for device confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Ждите подтверждения на устройстве&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Подтвердите запрос на устройстве.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3061"/>
+        <location filename="../src/MainWindow.ui" line="3081"/>
         <source>Working</source>
         <translation>Работаю</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3147"/>
+        <location filename="../src/MainWindow.ui" line="3167"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;( https://github.com/mooltipass/moolticute )&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3166"/>
+        <location filename="../src/MainWindow.ui" line="3186"/>
         <source>Version: %1</source>
         <translation>Версия: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3257"/>
+        <location filename="../src/MainWindow.ui" line="3280"/>
         <source>Device Serial:</source>
         <translation>Серийный номер устройства:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3291"/>
+        <location filename="../src/MainWindow.ui" line="3405"/>
         <source>Device Memory:</source>
         <translation>Память устройства:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3459"/>
-        <location filename="../src/MainWindow.cpp" line="40"/>
+        <location filename="../src/MainWindow.ui" line="3585"/>
+        <location filename="../src/MainWindow.cpp" line="39"/>
         <source>User Manual</source>
         <translation>Руководство по эксплуатации (EN)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3482"/>
+        <location filename="../src/MainWindow.ui" line="3608"/>
         <source>UID Request</source>
         <translation>Запрос UID устройства</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3518"/>
-        <location filename="../src/MainWindow.ui" line="3625"/>
+        <location filename="../src/MainWindow.ui" line="3644"/>
+        <location filename="../src/MainWindow.ui" line="3761"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3525"/>
-        <location filename="../src/MainWindow.ui" line="3632"/>
+        <location filename="../src/MainWindow.ui" line="3651"/>
+        <location filename="../src/MainWindow.ui" line="3768"/>
         <source>Validate</source>
         <translation>Проверить</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3595"/>
-        <location filename="../src/MainWindow.cpp" line="615"/>
-        <location filename="../src/MainWindow.cpp" line="2259"/>
+        <location filename="../src/MainWindow.ui" line="3731"/>
+        <location filename="../src/MainWindow.cpp" line="635"/>
+        <location filename="../src/MainWindow.cpp" line="2370"/>
         <source>Security Challenge</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3867"/>
+        <location filename="../src/MainWindow.ui" line="4003"/>
         <source>Start Moolticute with the computer: Enabled</source>
         <translation>Запуск Moolticute вместе с компьютером: Включено</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3893"/>
-        <location filename="../src/MainWindow.ui" line="4239"/>
-        <location filename="../src/MainWindow.ui" line="4276"/>
+        <location filename="../src/MainWindow.ui" line="4029"/>
+        <location filename="../src/MainWindow.ui" line="4314"/>
+        <location filename="../src/MainWindow.ui" line="4357"/>
         <source>Change</source>
         <translation>Изменить</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3936"/>
+        <location filename="../src/MainWindow.ui" line="4072"/>
         <source>View</source>
         <translation>Просмотр</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3979"/>
+        <location filename="../src/MainWindow.ui" line="4201"/>
         <source>Autostart SSH Agent</source>
         <translation>Автоматически запускать SSH агент</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4180"/>
+        <location filename="../src/MainWindow.ui" line="4624"/>
         <source>Systray icon</source>
         <translation>Значок в системном трее</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4213"/>
+        <location filename="../src/MainWindow.ui" line="4331"/>
         <source>Subdomain selection: Enabled</source>
         <translation>Выбор поддомена: Включено</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4531"/>
+        <location filename="../src/MainWindow.ui" line="4735"/>
         <source>Now checking the integrity of your stored credentials. This may take a while. Please do not unplug your Mooltipass during the check.</source>
         <translation>Проверяем целостность сохраненных учетных данных на устройстве. Пожалуйста, не выдергивайте Ваш Mooltipass из компьютера во время проверки.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4571"/>
+        <location filename="../src/MainWindow.ui" line="4775"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4803"/>
+        <location filename="../src/MainWindow.ui" line="5007"/>
         <source>SSH Key Tab</source>
         <translation>Вкладка с ключами для SSH</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4815"/>
         <source>Visible ON DE&amp;MAND  (use CTRL+SHIFT+F1 keyboard shortcut)</source>
-        <translation>Видима по &amp;требованию (Используйте CTRL+SHIFT+F1)</translation>
+        <translation type="vanished">Видима по &amp;требованию (Используйте CTRL+SHIFT+F1)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4825"/>
+        <location filename="../src/MainWindow.ui" line="5029"/>
         <source>ALWA&amp;YS visible</source>
         <translation>Всегда &amp;видима</translation>
     </message>
@@ -2215,121 +2384,126 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation>Экспортировать незашифрованные пароли в CSV фаайл.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="360"/>
+        <location filename="../src/MainWindow.cpp" line="379"/>
         <source>Very Low</source>
         <translation>Очень низкая</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="361"/>
+        <location filename="../src/MainWindow.cpp" line="380"/>
         <source>Low</source>
         <translation>Низкая</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="362"/>
+        <location filename="../src/MainWindow.cpp" line="381"/>
         <source>Medium</source>
         <translation>Средняя</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="363"/>
+        <location filename="../src/MainWindow.cpp" line="382"/>
         <source>High</source>
         <translation>Высокая</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="36"/>
+        <location filename="../src/MainWindow.cpp" line="35"/>
         <source>Tab</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="37"/>
+        <location filename="../src/MainWindow.cpp" line="36"/>
         <source>Enter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="38"/>
+        <location filename="../src/MainWindow.cpp" line="37"/>
         <source>Space</source>
         <translation>Пробел</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="400"/>
+        <location filename="../src/MainWindow.cpp" line="419"/>
         <source>&amp;File</source>
         <translation>&amp;Файл</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="401"/>
+        <location filename="../src/MainWindow.cpp" line="420"/>
         <source>&amp;Quit</source>
         <translation>&amp;Выход</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="713"/>
-        <location filename="../src/MainWindow.cpp" line="1325"/>
-        <location filename="../src/MainWindow.cpp" line="1338"/>
-        <location filename="../src/MainWindow.cpp" line="1355"/>
-        <location filename="../src/MainWindow.cpp" line="1917"/>
-        <location filename="../src/MainWindow.cpp" line="2387"/>
+        <location filename="../src/MainWindow.cpp" line="738"/>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <location filename="../src/MainWindow.cpp" line="1414"/>
+        <location filename="../src/MainWindow.cpp" line="1982"/>
+        <location filename="../src/MainWindow.cpp" line="2515"/>
         <source>Disabled</source>
         <translation>Отключено</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="714"/>
+        <location filename="../src/MainWindow.cpp" line="739"/>
         <source>Password Only</source>
         <translation>Только пароль</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="715"/>
+        <location filename="../src/MainWindow.cpp" line="740"/>
         <source>Login + Password</source>
         <translation>Логин + Пароль</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="409"/>
+        <location filename="../src/MainWindow.cpp" line="428"/>
         <source>Black</source>
         <translation>Темный</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="410"/>
+        <location filename="../src/MainWindow.cpp" line="429"/>
         <source>White</source>
         <translation>Светлый</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="410"/>
+        <location filename="../src/MainWindow.cpp" line="429"/>
         <source>_white</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="554"/>
+        <location filename="../src/MainWindow.cpp" line="574"/>
         <source>Fetching UID from device. This may take a few seconds...</source>
         <translation>Запрашиваю UID у устройства, это займет несколько секунд...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="570"/>
+        <location filename="../src/MainWindow.cpp" line="590"/>
         <source>Either the device have been tempered with or the input key is invalid.</source>
         <translation>Либо кто-то вмешивался в устройство, либо введенный ключ не является корректным.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="574"/>
+        <location filename="../src/MainWindow.cpp" line="594"/>
         <source>Your device&apos;s UID is %1</source>
         <translation>UID Вашего устройства: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="765"/>
+        <location filename="../src/MainWindow.cpp" line="790"/>
         <source>Credentials have been modified.
 Do you want to save your changes?</source>
         <translation>Учетные данные изменены. Сохранить?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="939"/>
+        <location filename="../src/MainWindow.cpp" line="971"/>
         <source>Remove the card from the device to change this setting.</source>
         <translation>Удалите карту из устройства для изменения этой настройки.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="35"/>
-        <location filename="../src/MainWindow.cpp" line="381"/>
+        <location filename="../src/MainWindow.cpp" line="34"/>
+        <location filename="../src/MainWindow.cpp" line="400"/>
         <source>None</source>
         <translation>Отсутствует</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="39"/>
+        <location filename="../src/MainWindow.cpp" line="38"/>
         <source>Default Key</source>
         <translation>Клавиша по умолчанию</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="42"/>
+        <source>Bundle v%1 is available &lt;a href=&quot;https://www.themooltipass.com/updates/index.php?sn=%2&amp;bundlev=%3&quot;&gt;here&lt;/a&gt;</source>
+        <translation>Пакет ПО v%1 допупен для скачивания &lt;a href=&quot;https://www.themooltipass.com/updates/index.php?sn=%2&amp;bundlev=%3&quot;&gt;здесь&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="57"/>
@@ -2369,451 +2543,495 @@ Think twice before resetting a card.</source>
         <translation>Версия прошивки MAIN MCU:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="368"/>
+        <location filename="../src/MainWindow.cpp" line="387"/>
         <source>No Inactivity</source>
         <translation>Нет активности</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="372"/>
+        <location filename="../src/MainWindow.cpp" line="391"/>
         <source>30 minutes</source>
         <translation>30 минут</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="961"/>
+        <location filename="../src/MainWindow.cpp" line="994"/>
         <source>%1Mb</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1098"/>
-        <location filename="../src/MainWindow.cpp" line="1253"/>
+        <location filename="../src/MainWindow.cpp" line="1161"/>
+        <location filename="../src/MainWindow.cpp" line="1312"/>
         <source>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Ожидаю подтверждения на устройстве&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Подтвердите запрос на устройстве.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1111"/>
+        <location filename="../src/MainWindow.cpp" line="1174"/>
         <source>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving Changes to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Сохраняем настройки в устройство&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, подождите.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1137"/>
+        <location filename="../src/MainWindow.cpp" line="1196"/>
         <source>Failure</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1135"/>
+        <location filename="../src/MainWindow.cpp" line="1194"/>
         <source>Couldn&apos;t save credentials, please contact the support team with moolticute&apos;s log</source>
         <translation>Не удалось сохранить учетные данные. Пожалуйста, отправте лог moolticute разработчикам</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="43"/>
         <source>New bundle update available &lt;a href=&quot;https://www.themooltipass.com/updates/index.php?sn=%1&amp;bundlev=%2&quot;&gt;here.&lt;/a&gt;</source>
-        <translation>Вышел новый пакет обновления ПО. Скачать можно &lt;a href=&quot;https://www.themooltipass.com/updates/index.php?sn=%1&amp;bundlev=%2&quot;&gt;тут.&lt;/a&gt;</translation>
+        <translation type="vanished">Вышел новый пакет обновления ПО. Скачать можно &lt;a href=&quot;https://www.themooltipass.com/updates/index.php?sn=%1&amp;bundlev=%2&quot;&gt;тут.&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="299"/>
+        <location filename="../src/MainWindow.cpp" line="311"/>
         <source>Low Battery</source>
         <translation>Низкий заряд батареи</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="299"/>
+        <location filename="../src/MainWindow.cpp" line="311"/>
         <source>Battery is below %1%, please charge your Mooltipass.</source>
         <translation>Заряд батареи ниже %1%, пожалуйста зарядите Mooltipass.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="369"/>
+        <location filename="../src/MainWindow.cpp" line="388"/>
         <source>5 minutes</source>
         <translation>5 минут</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="370"/>
+        <location filename="../src/MainWindow.cpp" line="389"/>
         <source>10 minutes</source>
         <translation>10 минут</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="371"/>
+        <location filename="../src/MainWindow.cpp" line="390"/>
         <source>15 minutes</source>
         <translation>15 минут</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="374"/>
+        <location filename="../src/MainWindow.cpp" line="393"/>
         <source>0.5 second</source>
         <translation>0.5 секунды</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="375"/>
+        <location filename="../src/MainWindow.cpp" line="394"/>
         <source>1 second</source>
         <translation>1 секунда</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="376"/>
+        <location filename="../src/MainWindow.cpp" line="395"/>
         <source>2 seconds</source>
         <translation>2 секунды</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="377"/>
+        <location filename="../src/MainWindow.cpp" line="396"/>
         <source>3 seconds</source>
         <translation>3 секунды</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="378"/>
+        <location filename="../src/MainWindow.cpp" line="397"/>
         <source>4 seconds</source>
         <translation>4 секунды</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="379"/>
+        <location filename="../src/MainWindow.cpp" line="398"/>
         <source>5 seconds</source>
         <translation>5 секунд</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="382"/>
+        <location filename="../src/MainWindow.cpp" line="401"/>
         <source>Nyancat</source>
         <translation>НянКотэ</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="384"/>
+        <location filename="../src/MainWindow.cpp" line="403"/>
         <source>Let moolticute decide</source>
         <translation>Пусть выбирает Moolticute</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="385"/>
+        <location filename="../src/MainWindow.cpp" line="404"/>
         <source>Force subdomain support</source>
         <translation>Принудительно включить поддержку поддоменов</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="386"/>
+        <location filename="../src/MainWindow.cpp" line="405"/>
         <source>Force subdomain ignore</source>
         <translation>Принудительно игнорировать поддомены</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="616"/>
+        <location filename="../src/MainWindow.cpp" line="636"/>
         <source>Security Challenge Failed</source>
         <translation>Security Challenge завершен с ошибкой</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="716"/>
+        <location filename="../src/MainWindow.cpp" line="741"/>
         <source>[Enter] + Password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="717"/>
+        <location filename="../src/MainWindow.cpp" line="742"/>
         <source>[Ctrl+Alt+Del] + Pass</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="718"/>
+        <location filename="../src/MainWindow.cpp" line="743"/>
         <source>Password / [Win+L]</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="719"/>
+        <location filename="../src/MainWindow.cpp" line="744"/>
         <source>Login + Pass / [Win+L]</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="720"/>
+        <location filename="../src/MainWindow.cpp" line="745"/>
         <source>[Enter] + Pass / [Win+L]</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="721"/>
+        <location filename="../src/MainWindow.cpp" line="746"/>
         <source>[Ctrl+Alt+Del] + Pass / [Win+L]</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="829"/>
+        <location filename="../src/MainWindow.cpp" line="861"/>
         <source>Device Bluetooth Name Changed</source>
         <translation>Имя bluetooth устройства изменено</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="830"/>
+        <location filename="../src/MainWindow.cpp" line="862"/>
         <source>Please disable and re-enable bluetooth for your changes to take effect</source>
         <translation>Пожалуйста, выключите и снова включитет bluetooth для того, чтобы изменения вступили в силу</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1127"/>
+        <location filename="../src/MainWindow.cpp" line="1190"/>
         <source>Couldn&apos;t change all passwords, please approve prompts on the device</source>
         <translation>Не удалось изменить все паролт, пожалуйста согласитесь на запросы на устройстве</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1131"/>
-        <source>Duplicated service detected, please contact support</source>
-        <translation>Обнаружены дублирующиеся сервисы, пожалуйста обратитесь в поддержку</translation>
+        <location filename="../src/MainWindow.cpp" line="2540"/>
+        <location filename="../src/MainWindow.cpp" line="2554"/>
+        <source>Incorrect Serial Number</source>
+        <translation>Неправильный Серийный Номер</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1151"/>
+        <location filename="../src/MainWindow.cpp" line="2541"/>
+        <source>It looks like your device serial number doesn&apos;t match the one present on your device&apos;s case.
+</source>
+        <translation>Похоже, что серийный номер на корпусе устройствав не совпадает с тем, что есть в памяти.
+</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2542"/>
+        <source>Please reach out to support@themooltipass.com for the right code to enter below</source>
+        <translation>Обратитесь в службу поддержки по адресу support@themooltipass.com за правильным кодом и введите его ниже</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2555"/>
+        <source>The entered serial number is incorrect!</source>
+        <translation>Серийный номер введен неправильно!</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2562"/>
+        <source>Serial number change</source>
+        <translation>Изменение Серийного Номера</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2568"/>
+        <source>Set serial number successfully.</source>
+        <translation>Серийный номер установлен успешно.</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2573"/>
+        <source>Serial number still does not match platform serial.</source>
+        <translation>Серийный номер все еще не совпадает с серийным номером платформы.</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2578"/>
+        <source>Set serial number failed.</source>
+        <translation>Не удалось выставить серийный номер.</translation>
+    </message>
+    <message>
+        <source>Duplicated service detected, please contact support</source>
+        <translation type="vanished">Обнаружены дублирующиеся сервисы, пожалуйста обратитесь в поддержку</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1210"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Пожалуйста, подтвердите запрос на устройстве&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1164"/>
+        <location filename="../src/MainWindow.cpp" line="1223"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Подтвердите запрос на устройстве&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1222"/>
+        <location filename="../src/MainWindow.cpp" line="1281"/>
         <source>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Сохраняю изменения в память устройства&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, подождите.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1243"/>
+        <location filename="../src/MainWindow.cpp" line="1302"/>
         <source>&lt;html&gt;&lt;!--exit_fido_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--exit_fido_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Сохраняю изменения в память устройства&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, подождите.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1283"/>
+        <location filename="../src/MainWindow.cpp" line="1342"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Exporting Database from Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Экспортируется база данных с устройства&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, подождите.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1286"/>
+        <location filename="../src/MainWindow.cpp" line="1345"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Importing and Merging File to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Импортирование и слияния файла с базой в устройстве&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, подождите.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1304"/>
+        <location filename="../src/MainWindow.cpp" line="1363"/>
         <source>Disable autostart at boot?</source>
         <translation>Отключить автозапуск при старте системы?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1306"/>
+        <location filename="../src/MainWindow.cpp" line="1365"/>
         <source>Enable autostart at boot?</source>
         <translation>Включить автозапуск при старте системы?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1325"/>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
         <source>Start Moolticute with the computer: %1</source>
         <translation>Запускать Moolticute при загрузке ПК: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1325"/>
-        <location filename="../src/MainWindow.cpp" line="1338"/>
-        <location filename="../src/MainWindow.cpp" line="1355"/>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <location filename="../src/MainWindow.cpp" line="1414"/>
         <source>Enabled</source>
         <translation>Включено</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1327"/>
-        <location filename="../src/MainWindow.cpp" line="1340"/>
-        <location filename="../src/MainWindow.cpp" line="1358"/>
+        <location filename="../src/MainWindow.cpp" line="1386"/>
+        <location filename="../src/MainWindow.cpp" line="1399"/>
+        <location filename="../src/MainWindow.cpp" line="1417"/>
         <source>Disable</source>
         <translation>Отключить</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1329"/>
-        <location filename="../src/MainWindow.cpp" line="1342"/>
-        <location filename="../src/MainWindow.cpp" line="1362"/>
+        <location filename="../src/MainWindow.cpp" line="1388"/>
+        <location filename="../src/MainWindow.cpp" line="1401"/>
+        <location filename="../src/MainWindow.cpp" line="1421"/>
         <source>Enable</source>
         <translation>Включить</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1338"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
         <source>Subdomain selection: %1</source>
         <translation>Выбор поддомена: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1353"/>
+        <location filename="../src/MainWindow.cpp" line="1412"/>
         <source>Integration with &lt;a href=&quot;%1&quot;&gt;Have I Been Pwned&lt;/a&gt;: %2</source>
         <translation>Интеграция с сервисом &lt;a href=&quot;%1&quot;&gt;Have I Been Pwned&lt;/a&gt;: %2</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1453"/>
+        <location filename="../src/MainWindow.cpp" line="1518"/>
         <source>Select database export...</source>
         <translation>Выбрать файл экспорта базы данных...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1486"/>
+        <location filename="../src/MainWindow.cpp" line="1551"/>
         <source>Save database export...</source>
         <translation>Сохранить файл экспорта базы данных...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1511"/>
+        <location filename="../src/MainWindow.cpp" line="1576"/>
         <source>Successfully exported the database from your device.</source>
         <translation>База данных успешно экспортирована из устройства.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1539"/>
         <source>Duplicate service detected during import, please contact support</source>
-        <translation>При импорте службы найдет дубликат, свяжитесь с поддержкой</translation>
+        <translation type="vanished">При импорте службы найдет дубликат, свяжитесь с поддержкой</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1601"/>
+        <location filename="../src/MainWindow.cpp" line="1663"/>
         <source>Memory integrity check done successfully!
 %1 of %2 credential slots used.</source>
         <translation>Проверка целостности устройства успешно завершена. Используется %1 из %2 слотов для учетных данных.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1610"/>
+        <location filename="../src/MainWindow.cpp" line="1672"/>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translatorcomment>Yet another easter egg</translatorcomment>
         <translation>Чтобы убедиться, что ничьи &quot;шаловливые ручки&quot; не влезали в прошивку устройства, Вы можете запросить пароль для получения UID устройства.&lt;ol&gt;&lt;li&gt;Запишите серийный номер с задней крышки устройства.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Напишите нам письмо&lt;/a&gt;  с серийным номером устройства и запросите пароль.&lt;/li&gt;&lt;li&gt;Введите пароль, который получили от нас&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1618"/>
+        <location filename="../src/MainWindow.cpp" line="1680"/>
         <source>To be sure that no one has tampered with your device, you can request a challenge string and enter it below.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&amp;body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the challenge string.&lt;/li&gt;&lt;li&gt;Enter the string you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translatorcomment>Yet another easter egg</translatorcomment>
         <translation>Чтобы убедиться, что ничьи &quot;шаловливые ручки&quot; не влезали в прошивку устройства, Вы можете запросить пароль от нас и ввести ниже.&lt;ol&gt;&lt;li&gt;Запишите серийный номер с задней крышки устройства.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&amp;body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME&quot;&gt;Напишите нам письмо&lt;/a&gt; с серийным номером устройства и запросите пароль.&lt;/li&gt;&lt;li&gt;Введите пароль, который получили от нас&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1898"/>
+        <location filename="../src/MainWindow.cpp" line="1963"/>
         <source>Import Warning</source>
         <translation>Предупреждение импорта</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1899"/>
+        <location filename="../src/MainWindow.cpp" line="1964"/>
         <source>Files were not imported from mini backup.</source>
         <translation>Файлы не были импортированы из резервной копии mini.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1967"/>
+        <location filename="../src/MainWindow.cpp" line="2035"/>
+        <source>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;NiMH Recondition is in progress.&lt;/span&gt;&lt;/p&gt;%1&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Идёт восстановление емкости NiMH.&lt;/span&gt;&lt;/p&gt;%1&lt;p&gt;Пожалуйста, подождите.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2083"/>
         <source>Reset card failed!</source>
         <translation>Не удалось сбросить карту!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1969"/>
+        <location filename="../src/MainWindow.cpp" line="2085"/>
         <source>Reset card done successfully</source>
         <translation>Сброс карты выполнен успешно</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1976"/>
+        <location filename="../src/MainWindow.cpp" line="2092"/>
         <source>Select CSV file to import...</source>
         <translation>Выберите CSV файл для импорта...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2005"/>
+        <location filename="../src/MainWindow.cpp" line="2121"/>
         <source>Nothing is read from %1</source>
         <translation>Ничего не прочитано из %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2038"/>
+        <location filename="../src/MainWindow.cpp" line="2154"/>
         <source>Unable to import %1: Each row must contain exact 3 items. Some lines don&apos;t (lines number: %2)</source>
         <translation>Не могу импортировать %1: Каждая строка должна содержать 3 элемента. Для некоторых строк это не так (номера строк: %2)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2042"/>
+        <location filename="../src/MainWindow.cpp" line="2158"/>
         <source>Unable to import %1: Each row must contain exact 3 items (more than 10 lines don&apos;t)</source>
         <translation>Не могу импортировать %1: Каждая строка должна содержать 3 элемента. Для некоторых строк это не так (Таких строк более 10)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2050"/>
+        <location filename="../src/MainWindow.cpp" line="2166"/>
         <source>Unable to import %1: Each row must contain exact 3 items using comma as a delimiter</source>
         <translation>Не могу импортировать %1: Каждая строка должна содержать 3 элемента. Запятая должна быть разделительным элементом</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2113"/>
+        <location filename="../src/MainWindow.cpp" line="2229"/>
         <source>Disable subdomain selection?</source>
         <translation>Выключить выбор поддомена?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2115"/>
+        <location filename="../src/MainWindow.cpp" line="2231"/>
         <source>Enable subdomain selection?</source>
         <translation>Включить выбор поддомена?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2135"/>
+        <location filename="../src/MainWindow.cpp" line="2251"/>
         <source>Disable Have I Been Pwned check?</source>
         <translation>Отключить проверку &apos;Have I Been Pwned&apos;?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2139"/>
+        <location filename="../src/MainWindow.cpp" line="2255"/>
         <source>Enable Have I Been Pwned check?</source>
         <translation>Включить проверку &apos;Have I Been Pwned&apos;?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2237"/>
+        <location filename="../src/MainWindow.cpp" line="2353"/>
         <source>This procedure will take around 5 hours, please confirm</source>
         <translation>Процедура потребует около 5 часов, пожалуйста подтвердите</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2245"/>
         <source>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;NiMH Recondition is in progress.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Идет восстановление NiMH&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, подождите&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Идет восстановление NiMH&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, подождите&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2260"/>
+        <location filename="../src/MainWindow.cpp" line="2371"/>
         <source>This token is only used for debugging purposes</source>
         <translation>Этот токен используется только для целей отладки</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2262"/>
+        <location filename="../src/MainWindow.cpp" line="2373"/>
         <source>Waiting for Security Challenge result...</source>
         <translation>Ожидается результат Security Challenge...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2277"/>
+        <location filename="../src/MainWindow.cpp" line="2390"/>
         <source>NiMH Recondition Finished</source>
         <translation>Восстановление емкости NiMH завершено</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2278"/>
+        <location filename="../src/MainWindow.cpp" line="2391"/>
         <source>Recondition finished in %1 seconds</source>
         <translation>Восстановление емкости завершено за %1 секунд</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2282"/>
+        <location filename="../src/MainWindow.cpp" line="2400"/>
         <source>NiMH Recondition Error</source>
         <translation>Ошибка восстановления емкости NiMH</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2283"/>
+        <location filename="../src/MainWindow.cpp" line="2401"/>
         <source>Recondition finished with error</source>
         <translation>Восстановление батареи завершено с ошибкой</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2314"/>
+        <location filename="../src/MainWindow.cpp" line="2432"/>
         <source>Confirm Reset Settings to Default</source>
         <translation>Подтвердите сброс настроек на заводские</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2315"/>
+        <location filename="../src/MainWindow.cpp" line="2433"/>
         <source>Do you want to reset every settings value to device defaults?</source>
         <translation>Хотите сбросить все настройки устройства на заводские?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1462"/>
-        <location filename="../src/MainWindow.cpp" line="1483"/>
-        <location filename="../src/MainWindow.cpp" line="1506"/>
-        <location filename="../src/MainWindow.cpp" line="1541"/>
-        <location filename="../src/MainWindow.cpp" line="1985"/>
-        <location filename="../src/MainWindow.cpp" line="2005"/>
-        <location filename="../src/MainWindow.cpp" line="2038"/>
-        <location filename="../src/MainWindow.cpp" line="2042"/>
-        <location filename="../src/MainWindow.cpp" line="2050"/>
+        <location filename="../src/MainWindow.cpp" line="1527"/>
+        <location filename="../src/MainWindow.cpp" line="1548"/>
+        <location filename="../src/MainWindow.cpp" line="1571"/>
+        <location filename="../src/MainWindow.cpp" line="1603"/>
+        <location filename="../src/MainWindow.cpp" line="2101"/>
+        <location filename="../src/MainWindow.cpp" line="2121"/>
+        <location filename="../src/MainWindow.cpp" line="2154"/>
+        <location filename="../src/MainWindow.cpp" line="2158"/>
+        <location filename="../src/MainWindow.cpp" line="2166"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1462"/>
-        <location filename="../src/MainWindow.cpp" line="1985"/>
+        <location filename="../src/MainWindow.cpp" line="1527"/>
+        <location filename="../src/MainWindow.cpp" line="2101"/>
         <source>Unable to read file %1</source>
         <translation>Невозможно прочитать файл %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1506"/>
+        <location filename="../src/MainWindow.cpp" line="1571"/>
         <source>Unable to write to file %1</source>
         <translation>Невозможно записать файл %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1533"/>
+        <location filename="../src/MainWindow.cpp" line="1599"/>
         <source>Successfully imported and merged database into the device.</source>
         <translation>База данных успешно импортирована и совмещена с базой данных на устройстве.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1552"/>
+        <location filename="../src/MainWindow.cpp" line="1614"/>
         <source>Do you want to start the integrity check of your device?</source>
         <translation>Хотите начать проверку целостности устройства?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1563"/>
+        <location filename="../src/MainWindow.cpp" line="1625"/>
         <source>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Ожидаю подтверждения на устройстве&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Подтвердите запрос на устройстве.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1595"/>
+        <location filename="../src/MainWindow.cpp" line="1657"/>
         <source>Memory integrity check failed!</source>
         <translation>Проверка целостности устройства завершилась с ошибкой!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1717"/>
+        <location filename="../src/MainWindow.cpp" line="1779"/>
         <source>An error occured when trying to go into Memory Management mode.
 
 %1</source>
@@ -2822,12 +3040,12 @@ Think twice before resetting a card.</source>
 %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1730"/>
+        <location filename="../src/MainWindow.cpp" line="1792"/>
         <source>System default language</source>
         <translation>Язык системы по умолчанию</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1936"/>
+        <location filename="../src/MainWindow.cpp" line="2052"/>
         <source>Memory exports (*.bin)</source>
         <translation>Файл экспорта памяти устройства (*.bin)</translation>
     </message>
@@ -2855,69 +3073,79 @@ Think twice before resetting a card.</source>
         <translation>Добавить новую заметку</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.ui" line="221"/>
+        <location filename="../src/NotesManagement.ui" line="227"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.ui" line="234"/>
-        <source>Discard</source>
-        <translation>Забыть изменения</translation>
+        <location filename="../src/NotesManagement.ui" line="240"/>
+        <location filename="../src/NotesManagement.cpp" line="9"/>
+        <source>Exit</source>
+        <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="26"/>
+        <source>Discard</source>
+        <translation type="vanished">Забыть изменения</translation>
+    </message>
+    <message>
+        <location filename="../src/NotesManagement.cpp" line="10"/>
+        <source>Discard Changes and Exit</source>
+        <translation>Забыть изменения и выйти</translation>
+    </message>
+    <message>
+        <location filename="../src/NotesManagement.cpp" line="31"/>
         <source>Edit Note Name</source>
         <translation>Редактировать имя заметки</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="109"/>
+        <location filename="../src/NotesManagement.cpp" line="118"/>
         <source>The note &quot;%1&quot; is going to be removed from the device.
 Continue?</source>
         <translation>Заметкка &apos;%1&apos; будет удалена с устройства. Продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="172"/>
-        <location filename="../src/NotesManagement.cpp" line="291"/>
+        <location filename="../src/NotesManagement.cpp" line="181"/>
+        <location filename="../src/NotesManagement.cpp" line="305"/>
         <source>Failure</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="172"/>
+        <location filename="../src/NotesManagement.cpp" line="181"/>
         <source>Note Fetch Denied!</source>
         <translation>В получении заметки с устройства отказано!</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="225"/>
+        <location filename="../src/NotesManagement.cpp" line="237"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="225"/>
+        <location filename="../src/NotesManagement.cpp" line="237"/>
         <source>Saving note failed</source>
         <translation>Сохранение заметки не удалось</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="245"/>
+        <location filename="../src/NotesManagement.cpp" line="257"/>
         <source>Note Name cannot be empty.</source>
         <translation>Имя заметки не может быть пустым.</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="252"/>
+        <location filename="../src/NotesManagement.cpp" line="264"/>
         <source>Note Name already exists.</source>
         <translation>Такое имя заметки уже существует.</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="287"/>
+        <location filename="../src/NotesManagement.cpp" line="301"/>
         <source>Note Deleted</source>
         <translation>Заметка удалена</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="287"/>
+        <location filename="../src/NotesManagement.cpp" line="301"/>
         <source>&apos;%1&apos; note was deleted successfully!</source>
         <translation>Заметка &apos;%1&apos; удалена успешно!</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="291"/>
+        <location filename="../src/NotesManagement.cpp" line="305"/>
         <source>&apos;%1&apos; note delete failed!</source>
         <translation>Удаление заметки &apos;%1&apos; не удалось!</translation>
     </message>
@@ -3046,45 +3274,50 @@ Continue?</source>
         <translation>Обновить</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="196"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="200"/>
         <source>Password Profile:</source>
         <translation>Профиль пароля:</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="266"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="273"/>
         <source>Length: %1 </source>
         <translation>Длина: %1 </translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="387"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="294"/>
+        <source>Password copied to clipboard</source>
+        <translation>Пароль скопирован в буфер обмена</translation>
+    </message>
+    <message>
+        <location filename="../src/PasswordLineEdit.cpp" line="400"/>
         <source>Entropy: %1 bit</source>
         <translation>Энтропия: %1 бит</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="397"/>
-        <location filename="../src/PasswordLineEdit.cpp" line="402"/>
-        <location filename="../src/PasswordLineEdit.cpp" line="407"/>
-        <location filename="../src/PasswordLineEdit.cpp" line="412"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="410"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="415"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="420"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="425"/>
         <source>Password Quality: %1</source>
         <translation>Качество пароля: %1</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="397"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="410"/>
         <source>Poor</source>
         <translation>Очень плохое</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="402"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="415"/>
         <source>Weak</source>
         <translation>Плохое</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="407"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="420"/>
         <source>Good</source>
         <translation>Хорошее</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="412"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="425"/>
         <source>Excellent</source>
         <translation>Отличное</translation>
     </message>
@@ -3509,22 +3742,22 @@ Proceed?</source>
 <context>
     <name>SystemNotificationWindows</name>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="131"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="122"/>
         <source>A credential without a login has been detected.</source>
         <translation>Обнаружены учетные данные без логина.</translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="131"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="122"/>
         <source>Login name for </source>
         <translation>Логин для </translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="153"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="144"/>
         <source>Subdomain Detected!</source>
         <translation>ОБнаружен поддомен!</translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="153"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="144"/>
         <source>Choose the domain name:</source>
         <translation>Выберите имя домена:</translation>
     </message>
@@ -3572,14 +3805,37 @@ Proceed?</source>
         <translation> символов</translation>
     </message>
     <message>
-        <location filename="../src/TOTPCredential.cpp" line="58"/>
+        <location filename="../src/TOTPCredential.ui" line="157"/>
+        <source>QR</source>
+        <translation>QR Код</translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.cpp" line="61"/>
         <source>Invalid Secret Key</source>
         <translation>Неправильный секретный ключ</translation>
     </message>
     <message>
-        <location filename="../src/TOTPCredential.cpp" line="58"/>
+        <location filename="../src/TOTPCredential.cpp" line="61"/>
         <source>The entered Secret Key is not a valid Base32 string</source>
         <translation>Введенный секретный ключ не является корректной Base32 строкой</translation>
+    </message>
+</context>
+<context>
+    <name>TOTPReader</name>
+    <message>
+        <location filename="../src/utils/TOTPReader.cpp" line="15"/>
+        <source>TOTP QR issue</source>
+        <translation>Проблема с TOTP QR кодом</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/TOTPReader.cpp" line="34"/>
+        <source>Scan QR code (*.png *.jpg)</source>
+        <translation>Сканировать QR код (*.png *.jpg)</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/TOTPReader.cpp" line="58"/>
+        <source>&lt;b&gt;%1&lt;/b&gt; does not contain TOTP information.</source>
+        <translation>&lt;b&gt;%1&lt;/b&gt; не содержит TOTP информации.</translation>
     </message>
 </context>
 <context>
@@ -3686,42 +3942,42 @@ Proceed?</source>
 <context>
     <name>WSClient</name>
     <message>
-        <location filename="../src/WSClient.cpp" line="269"/>
+        <location filename="../src/WSClient.cpp" line="278"/>
         <source>Credentials Detected!</source>
         <translation>Обнаружены учетные данные!</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="269"/>
+        <location filename="../src/WSClient.cpp" line="278"/>
         <source>Please Approve their Storage on the Mooltipass</source>
         <translation>Дайте согласия на их сохранение на устройстве Mooltipass</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="467"/>
+        <location filename="../src/WSClient.cpp" line="476"/>
         <source>Device connected</source>
         <translation>Устройство подключено</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="467"/>
+        <location filename="../src/WSClient.cpp" line="476"/>
         <source>Disconnecting emulator from Moolticute</source>
         <translation>Эмулятор отключен от Moolticute</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="488"/>
+        <location filename="../src/WSClient.cpp" line="497"/>
         <source>Password Compromised</source>
         <translation>Пароль был скомпрометирован</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="509"/>
+        <location filename="../src/WSClient.cpp" line="518"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="509"/>
+        <location filename="../src/WSClient.cpp" line="518"/>
         <source>Set user category failed.</source>
         <translation>Установка пользовательской категории не удалась.</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.h" line="212"/>
+        <location filename="../src/WSClient.h" line="219"/>
         <source>this password has been compromised %1 times.</source>
         <translation>этот пароль был скомпрометирован %1 раз(а).</translation>
     </message>
@@ -3749,27 +4005,27 @@ Proceed?</source>
         <translation>Закрыть</translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="60"/>
+        <location filename="../src/WindowLog.cpp" line="61"/>
         <source>Save logs to file</source>
         <translation>Сохранить логи в файл</translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="80"/>
+        <location filename="../src/WindowLog.cpp" line="81"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="80"/>
+        <location filename="../src/WindowLog.cpp" line="81"/>
         <source>Unable to write to file %1</source>
         <translation>Не могу записать в файл: %1</translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="85"/>
+        <location filename="../src/WindowLog.cpp" line="86"/>
         <source>Moolticute</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="85"/>
+        <location filename="../src/WindowLog.cpp" line="86"/>
         <source>Successfully wrote logs to selected file.</source>
         <translation>Логи успешно записаны в выбранный файл.</translation>
     </message>

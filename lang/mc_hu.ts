@@ -12,119 +12,119 @@
 <context>
     <name>AppGui</name>
     <message>
-        <location filename="../src/AppGui.cpp" line="130"/>
+        <location filename="../src/AppGui.cpp" line="131"/>
         <source>&amp;Show Moolticute Application</source>
         <translation>&amp;A Moolticute applikáció megjelenítése</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="139"/>
+        <location filename="../src/AppGui.cpp" line="140"/>
         <source>&amp;Quit</source>
         <translation>&amp;Kilépés</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="147"/>
-        <location filename="../src/AppGui.cpp" line="520"/>
+        <location filename="../src/AppGui.cpp" line="155"/>
+        <location filename="../src/AppGui.cpp" line="536"/>
         <source>&amp;Restart daemon</source>
         <translation>&amp;Daemon újraindítása</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="358"/>
+        <location filename="../src/AppGui.cpp" line="374"/>
         <source>No mooltipass connected.</source>
         <translation>Nincs Mooltipass csatlakoztatva.</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="398"/>
+        <location filename="../src/AppGui.cpp" line="414"/>
         <source>%1 locked</source>
         <translation>%1 lezárva</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="401"/>
+        <location filename="../src/AppGui.cpp" line="417"/>
         <source>%1 Unlocked</source>
         <translation>%1 feloldva</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="404"/>
+        <location filename="../src/AppGui.cpp" line="420"/>
         <source>No card inserted in your %1</source>
         <translatorcomment>this needs a better context</translatorcomment>
         <translation>Nincs kártya beletéve a %1</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="455"/>
+        <location filename="../src/AppGui.cpp" line="471"/>
         <source>&amp;Hide Moolticute App</source>
         <translation>&amp;Moolticute App elrejtése</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="467"/>
+        <location filename="../src/AppGui.cpp" line="483"/>
         <source>&amp;Show Moolticute App</source>
         <translation>&amp;Mutazsd a Moolticute App-ot</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="518"/>
+        <location filename="../src/AppGui.cpp" line="534"/>
         <source>Restarting daemon...</source>
         <translation>Daemon újraindul...</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="630"/>
+        <location filename="../src/AppGui.cpp" line="646"/>
         <source>%1 version has been released!</source>
         <translation>%1 frissített verzió elérhető!</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="631"/>
+        <location filename="../src/AppGui.cpp" line="647"/>
         <source>Open MC client to download it.</source>
         <translation>Nyissa meg az MC klienset, hogy letölthesse a frissítéseket.</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="644"/>
+        <location filename="../src/AppGui.cpp" line="660"/>
         <source>Would you like to download the update now?</source>
         <translation>Le szerenté most tölteni a legújabb frissítéseket?</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="645"/>
+        <location filename="../src/AppGui.cpp" line="661"/>
         <source>Open changelog</source>
         <translation>Változások naplója</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="660"/>
+        <location filename="../src/AppGui.cpp" line="676"/>
         <source>Mooltipass Not Connected</source>
         <translation>Mooltipass nincs csatlakoztatva</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="661"/>
+        <location filename="../src/AppGui.cpp" line="677"/>
         <source>Please Connect Your Mooltipass</source>
         <translation>Kérem csatlakoztassa a Mooltipassot</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="665"/>
+        <location filename="../src/AppGui.cpp" line="681"/>
         <source>No Card in Mooltipass!</source>
         <translation>Nincs kártya a Mooltipassban!</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="666"/>
+        <location filename="../src/AppGui.cpp" line="682"/>
         <source>Please Insert Your Smartcard and Enter Your PIN</source>
         <translation>Kérem helyezze be a kártyát és tekerje be a PIN kódot</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="670"/>
+        <location filename="../src/AppGui.cpp" line="686"/>
         <source>Mooltipass in Management Mode!</source>
         <translation>A Mooltipass menedzsment módban van!</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="671"/>
+        <location filename="../src/AppGui.cpp" line="687"/>
         <source>Please leave management mode in the App</source>
         <translation>Kérem lépjen ki a menedzsdment módból az applikációban</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="675"/>
+        <location filename="../src/AppGui.cpp" line="691"/>
         <source>Mooltipass Locked</source>
         <translation>A mooltipass lezárva</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="676"/>
+        <location filename="../src/AppGui.cpp" line="692"/>
         <source>Please Unlock Your Mooltipass</source>
         <translation>Kérem oldja fel a Mooltipassot</translation>
     </message>
     <message>
-        <location filename="../src/AppGui.cpp" line="704"/>
+        <location filename="../src/AppGui.cpp" line="720"/>
         <source>Can&apos;t restart daemon, it was started by hand and not using this App.</source>
         <translation>A daemont nem lehet újra indítani mert kézzel volt elndiítva nem ezzel az appal.</translation>
     </message>
@@ -138,7 +138,7 @@
     </message>
     <message>
         <location filename="../src/BleDev.ui" line="58"/>
-        <location filename="../src/BleDev.cpp" line="85"/>
+        <location filename="../src/BleDev.cpp" line="93"/>
         <source>BLE Developer Tab</source>
         <translation type="unfinished"></translation>
     </message>
@@ -159,19 +159,19 @@
     </message>
     <message>
         <location filename="../src/BleDev.ui" line="216"/>
-        <location filename="../src/BleDev.cpp" line="87"/>
+        <location filename="../src/BleDev.cpp" line="95"/>
         <source>Data Fetch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/BleDev.ui" line="250"/>
-        <location filename="../src/BleDev.cpp" line="88"/>
+        <location filename="../src/BleDev.cpp" line="96"/>
         <source>Storage file:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/BleDev.ui" line="301"/>
-        <location filename="../src/BleDev.cpp" line="84"/>
+        <location filename="../src/BleDev.cpp" line="92"/>
         <source>Browse</source>
         <translation type="unfinished"></translation>
     </message>
@@ -188,83 +188,83 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="107"/>
+        <location filename="../src/BleDev.cpp" line="115"/>
         <source>Stop Fetch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="143"/>
-        <location filename="../src/BleDev.cpp" line="208"/>
+        <location filename="../src/BleDev.cpp" line="151"/>
+        <location filename="../src/BleDev.cpp" line="221"/>
         <source>Invalid bundle file is selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="148"/>
+        <location filename="../src/BleDev.cpp" line="156"/>
         <source>The given bundle file name is not correct.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="155"/>
+        <location filename="../src/BleDev.cpp" line="163"/>
         <source>The device serial number is not correct in bundle filename.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="162"/>
+        <location filename="../src/BleDev.cpp" line="170"/>
         <source>The bundle version is not correct in bundle filename.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="176"/>
+        <location filename="../src/BleDev.cpp" line="184"/>
         <source>Battery too low for bundle upload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="177"/>
+        <location filename="../src/BleDev.cpp" line="185"/>
         <source>Please have your device connected through USB and fully charged</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="182"/>
+        <location filename="../src/BleDev.cpp" line="193"/>
         <source>Select bundle file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="200"/>
+        <location filename="../src/BleDev.cpp" line="213"/>
         <source>Invalid path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="201"/>
+        <location filename="../src/BleDev.cpp" line="214"/>
         <source>The choosen path for bundle is not a file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="209"/>
+        <location filename="../src/BleDev.cpp" line="222"/>
         <source>The given bundle file is not correct.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="224"/>
+        <location filename="../src/BleDev.cpp" line="238"/>
         <source>Starting upload bundle file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="236"/>
+        <location filename="../src/BleDev.cpp" line="250"/>
         <source>Upload Bundle Result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="241"/>
+        <location filename="../src/BleDev.cpp" line="255"/>
         <source>Upload bundle finished successfully.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="246"/>
+        <location filename="../src/BleDev.cpp" line="260"/>
         <source>Upload bundle finished with error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="263"/>
+        <location filename="../src/BleDev.cpp" line="277"/>
         <source>Select file to fetch data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -272,7 +272,7 @@
 <context>
     <name>CredentialModel</name>
     <message>
-        <location filename="../src/CredentialModel.h" line="72"/>
+        <location filename="../src/CredentialModel.h" line="75"/>
         <source>Default category</source>
         <translation type="unfinished"></translation>
     </message>
@@ -293,25 +293,25 @@
         <translation type="vanished">KeretCím</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="52"/>
-        <location filename="../src/CredentialsManagement.ui" line="513"/>
+        <location filename="../src/CredentialsManagement.ui" line="76"/>
+        <location filename="../src/CredentialsManagement.ui" line="505"/>
         <source>Login</source>
         <translation>Felhasználónév</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="80"/>
+        <location filename="../src/CredentialsManagement.ui" line="52"/>
         <source>Service or Site name</source>
         <translation>Szolgáltatás vagy Webhely neve</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="87"/>
+        <location filename="../src/CredentialsManagement.ui" line="69"/>
         <source>Password</source>
         <translation>Jelszó</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="100"/>
-        <location filename="../src/CredentialsManagement.ui" line="999"/>
-        <location filename="../src/CredentialsManagement.cpp" line="94"/>
+        <location filename="../src/CredentialsManagement.ui" line="89"/>
+        <location filename="../src/CredentialsManagement.ui" line="988"/>
+        <location filename="../src/CredentialsManagement.cpp" line="101"/>
         <source>Save</source>
         <translation>Mentés</translation>
     </message>
@@ -320,138 +320,138 @@
         <translation type="vanished">Hitelesítő adat menedzsment</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="169"/>
+        <location filename="../src/CredentialsManagement.ui" line="161"/>
         <source>Credentials Management Mode</source>
         <translation>Hitelesítő Adat Menedzsment Mód</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="176"/>
+        <location filename="../src/CredentialsManagement.ui" line="168"/>
         <source>Browsing through your credentials list requires your device to be in management mode. Click the button below to start the process.</source>
         <translation>Ahhoz, hogy megtekintse a hitelesítő adatait, az eszköznek a menedzsment módban kell lennie. Klikkeljen a gombra alul, hogy elindítsa a procedúrát.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="192"/>
+        <location filename="../src/CredentialsManagement.ui" line="184"/>
         <source>Enter Credentials Management Mode</source>
         <translation>Belépés az Hitelesítő Adat Menedzsment Módba</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="269"/>
+        <location filename="../src/CredentialsManagement.ui" line="261"/>
         <source>Filter credentials...</source>
         <translation>Hitelesítő adatok szűrése...</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="301"/>
-        <location filename="../src/CredentialsManagement.cpp" line="1208"/>
+        <location filename="../src/CredentialsManagement.ui" line="293"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1321"/>
         <source>Expand All</source>
         <translation>Mind megnyitása</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="334"/>
+        <location filename="../src/CredentialsManagement.ui" line="326"/>
         <source>Exit Linking</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="341"/>
+        <location filename="../src/CredentialsManagement.ui" line="333"/>
         <source>Link Credential</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="407"/>
+        <location filename="../src/CredentialsManagement.ui" line="399"/>
         <source>No credential selected.</source>
         <translation>Nem lett hitelesítő adat kijelölve.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="541"/>
+        <location filename="../src/CredentialsManagement.ui" line="533"/>
         <source>Password:</source>
         <translation>Jelszó:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="571"/>
+        <location filename="../src/CredentialsManagement.ui" line="560"/>
         <source>Description:</source>
         <translation>Leírás:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="601"/>
+        <location filename="../src/CredentialsManagement.ui" line="590"/>
         <source>Last Modified:</source>
         <translation>Utoljára Módosítva:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="634"/>
+        <location filename="../src/CredentialsManagement.ui" line="623"/>
         <source>Last Accessed:</source>
         <translation>Utolsó Hozzáférés:</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="661"/>
+        <location filename="../src/CredentialsManagement.ui" line="650"/>
         <source>Category:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="676"/>
+        <location filename="../src/CredentialsManagement.ui" line="665"/>
         <source>Key After Login:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="691"/>
+        <location filename="../src/CredentialsManagement.ui" line="680"/>
         <source>Key After Password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="732"/>
+        <location filename="../src/CredentialsManagement.ui" line="721"/>
         <source>TOTP Credential</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="745"/>
+        <location filename="../src/CredentialsManagement.ui" line="734"/>
         <source>Delete TOTP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="821"/>
+        <location filename="../src/CredentialsManagement.ui" line="810"/>
         <source>Confirm changes</source>
         <translation>Módosítások megerősítése</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="896"/>
-        <location filename="../src/CredentialsManagement.cpp" line="59"/>
+        <location filename="../src/CredentialsManagement.ui" line="885"/>
+        <location filename="../src/CredentialsManagement.cpp" line="66"/>
         <source>Exit Credential Management</source>
         <translation>Lépjen ki a jelszó menedzsment módból</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="909"/>
+        <location filename="../src/CredentialsManagement.ui" line="898"/>
         <source>Save all changes</source>
         <translation>Összes módosítás mentése</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="947"/>
-        <location filename="../src/CredentialsManagement.cpp" line="87"/>
+        <location filename="../src/CredentialsManagement.ui" line="936"/>
+        <location filename="../src/CredentialsManagement.cpp" line="94"/>
         <source>Category 4:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="957"/>
-        <location filename="../src/CredentialsManagement.cpp" line="86"/>
+        <location filename="../src/CredentialsManagement.ui" line="946"/>
+        <location filename="../src/CredentialsManagement.cpp" line="93"/>
         <source>Category 3:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="967"/>
-        <location filename="../src/CredentialsManagement.cpp" line="85"/>
+        <location filename="../src/CredentialsManagement.ui" line="956"/>
+        <location filename="../src/CredentialsManagement.cpp" line="92"/>
         <source>Category 2:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.ui" line="977"/>
-        <location filename="../src/CredentialsManagement.cpp" line="84"/>
+        <location filename="../src/CredentialsManagement.ui" line="966"/>
+        <location filename="../src/CredentialsManagement.cpp" line="91"/>
         <source>Category 1:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="47"/>
+        <location filename="../src/CredentialsManagement.cpp" line="54"/>
         <source>Discard all changes</source>
         <translation>Összes módosítás törlése</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="67"/>
+        <location filename="../src/CredentialsManagement.cpp" line="74"/>
         <source>Discard changes</source>
         <translation>Módositások törlése</translation>
     </message>
@@ -460,85 +460,172 @@
         <translation type="vanished">Szolgáltatás Nevének Megváltoztatása</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1324"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1443"/>
         <source>Not a favorite</source>
         <translation>Nem kedvenc</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1330"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1449"/>
         <source>Set as favorite #%1</source>
         <translation>Beállítás kedvencként #%1</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="383"/>
+        <location filename="../src/CredentialsManagement.cpp" line="415"/>
         <source>Please Approve On Device</source>
         <translation>Kérem erősítse meg az eszközén</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="76"/>
+        <location filename="../src/CredentialsManagement.cpp" line="35"/>
+        <source>The following domains are invalid or private: &lt;b&gt;&lt;ul&gt;&lt;li&gt;%1&lt;/li&gt;&lt;/ul&gt;&lt;/b&gt;They are not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="38"/>
+        <source>Confirm TOTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="83"/>
         <source>Edit Service Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="80"/>
+        <location filename="../src/CredentialsManagement.cpp" line="87"/>
         <source>There is a TOTP Credential for the service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="424"/>
+        <location filename="../src/CredentialsManagement.cpp" line="456"/>
         <source>%1: New Login %2 added.</source>
         <translation>%1: Új login %2 hozzáadva.</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="426"/>
-        <location filename="../src/CredentialsManagement.cpp" line="480"/>
+        <location filename="../src/CredentialsManagement.cpp" line="458"/>
+        <location filename="../src/CredentialsManagement.cpp" line="528"/>
         <source>Failure</source>
         <translation>Hiba</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="426"/>
         <source>Couldn&apos;t Add New Credential to Device</source>
-        <translation>Nem lehetett új hitelesítő adatokat hozzáadni az eszközhöz</translation>
+        <translation type="vanished">Nem lehetett új hitelesítő adatokat hozzáadni az eszközhöz</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="472"/>
+        <location filename="../src/CredentialsManagement.cpp" line="458"/>
+        <source>Couldn&apos;t Add This Credential: Please approve the request on the device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="520"/>
         <source>Password Query Was Denied</source>
         <translation>Jelszó lekérdezés megtagadva</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="480"/>
+        <location filename="../src/CredentialsManagement.cpp" line="528"/>
         <source>Unable to modify %1/%2</source>
         <translation>Nem lehet %1/%2 -t módosítani</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="600"/>
+        <location filename="../src/CredentialsManagement.cpp" line="654"/>
         <source>Discard Modifications ?</source>
         <translation>Törli a módosításokat?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="601"/>
+        <location filename="../src/CredentialsManagement.cpp" line="655"/>
         <source>You have modified %1/%2 - Do you want to discard the modifications ?</source>
         <translation>Ön módosította a %1/%2 - El akarja vetni a módosításokat?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="771"/>
+        <location filename="../src/CredentialsManagement.cpp" line="835"/>
         <source>Service already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="787"/>
+        <location filename="../src/CredentialsManagement.cpp" line="851"/>
         <source>Login already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1025"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1090"/>
         <source>Pointed to credential is deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1474"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1304"/>
+        <source>Text is too long, maximum length is %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1553"/>
+        <source>Invalid domain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1630"/>
+        <source>Do you want to add TOTP for &lt;b&gt;%1&lt;/b&gt; service?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1648"/>
+        <source>There is TOTP saved for credential %1
+Do you want to overwrite TOTP information?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1652"/>
+        <source>Do you want to set TOTP information for %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1670"/>
+        <source>Do you want to create &lt;b&gt;%1&lt;/b&gt; login and add TOTP for &lt;b&gt;%2&lt;/b&gt; service?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1681"/>
+        <source>&lt;b&gt;%1&lt;/b&gt; service does not exist.
+Do you want to create service with &lt;b&gt;%2&lt;/b&gt; login and add TOTP for it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1767"/>
         <source>TOTP Secret key is going to be removed for the credential.
 Continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1872"/>
+        <source>%1 will use %2 password.
+Do you want to confirm?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1927"/>
+        <source>Multiple Domains for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1928"/>
+        <source>Enter comma separated domain extensions:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1948"/>
+        <source>Edit multiple domains</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1950"/>
+        <source>Remove multiple domains</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1961"/>
+        <source>Enable multiple domains</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/CredentialsManagement.cpp" line="1973"/>
+        <source>Use other credential password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -546,22 +633,22 @@ Continue?</source>
         <translation type="vanished">Szolgáltatás név már létezik</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="878"/>
+        <location filename="../src/CredentialsManagement.cpp" line="943"/>
         <source>Delete?</source>
         <translation>Törlés?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="879"/>
+        <location filename="../src/CredentialsManagement.cpp" line="944"/>
         <source>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Delete credential &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</source>
         <translation>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Adat Törlése &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1035"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1100"/>
         <source>Setup TOTP Credential</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/CredentialsManagement.cpp" line="1208"/>
+        <location filename="../src/CredentialsManagement.cpp" line="1321"/>
         <source>Collapse All</source>
         <translation>Mind összecsukása</translation>
     </message>
@@ -647,12 +734,12 @@ Continue?</source>
 <context>
     <name>DbExportsRegistryController</name>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="100"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="101"/>
         <source>Be careful</source>
         <translation>Legyen óvatos</translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="101"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="102"/>
         <source>It&apos;s always good to make a backup of your database. Are you sure you want to continue?</source>
         <translation>Jó dolog és fontos is, hogy az adatbázisunkról rendszeresen készítsünk biztonsági másolatot. Biztosan akarja folytatni?</translation>
     </message>
@@ -661,13 +748,13 @@ Continue?</source>
         <translation type="vanished">Egy ideje már nem készített biztonsági másolatot az adatbázisról. Szeretne most készíteni egyet? Nem tart olyan sokáig!</translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="137"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="138"/>
         <source>Save database export...</source>
         <translation>Exportált adatbázis elmentése...</translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="133"/>
-        <location filename="../src/DbExportsRegistryController.cpp" line="164"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="134"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="165"/>
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
@@ -676,12 +763,12 @@ Continue?</source>
         <translation type="vanished">Már egz ideje nem csinált biztonsági mentést. </translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="112"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="113"/>
         <source>Do you want to backup your credentials now?</source>
         <translation>Szeretne biztonsági mentést csinálni most?</translation>
     </message>
     <message>
-        <location filename="../src/DbExportsRegistryController.cpp" line="164"/>
+        <location filename="../src/DbExportsRegistryController.cpp" line="165"/>
         <source>Unable to write to file %1</source>
         <translation>Nem lehet a fájlt írni %1</translation>
     </message>
@@ -895,22 +982,22 @@ Continue?</source>
         <translation type="unfinished">Ment és Kilép</translation>
     </message>
     <message>
-        <location filename="../src/FidoManagement.cpp" line="132"/>
+        <location filename="../src/FidoManagement.cpp" line="137"/>
         <source>Delete?</source>
         <translation type="unfinished">Törlés?</translation>
     </message>
     <message>
-        <location filename="../src/FidoManagement.cpp" line="133"/>
+        <location filename="../src/FidoManagement.cpp" line="138"/>
         <source>&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Delete credential &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</source>
         <translation type="unfinished">&lt;i&gt;&lt;b&gt;%1&lt;/b&gt;&lt;/i&gt;: Adat Törlése &lt;i&gt;&lt;b&gt;%2&lt;/b&gt;&lt;/i&gt;?</translation>
     </message>
     <message>
-        <location filename="../src/FidoManagement.cpp" line="176"/>
+        <location filename="../src/FidoManagement.cpp" line="181"/>
         <source>Fido2 Management Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/FidoManagement.cpp" line="177"/>
+        <location filename="../src/FidoManagement.cpp" line="182"/>
         <source>Deleting Fido2 Credential(s) Failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1029,24 +1116,24 @@ Continue?</source>
         <translation>Törlések elvetése</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="451"/>
-        <location filename="../src/FilesManagement.cpp" line="531"/>
+        <location filename="../src/FilesManagement.cpp" line="457"/>
+        <location filename="../src/FilesManagement.cpp" line="537"/>
         <source>Save to file...</source>
         <translation>Fájlba mentés...</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="341"/>
+        <location filename="../src/FilesManagement.cpp" line="347"/>
         <source>No files in the device.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="345"/>
+        <location filename="../src/FilesManagement.cpp" line="351"/>
         <source>Please enter file management mode to list the files in your device.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="421"/>
-        <location filename="../src/FilesManagement.cpp" line="663"/>
+        <location filename="../src/FilesManagement.cpp" line="428"/>
+        <location filename="../src/FilesManagement.cpp" line="670"/>
         <source>Load file to device...</source>
         <translation>Fájl betöltése az eszközre...</translation>
     </message>
@@ -1058,49 +1145,49 @@ Continue?</source>
 Biztosan folytatja?</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="371"/>
+        <location filename="../src/FilesManagement.cpp" line="377"/>
         <source>File Deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="371"/>
+        <location filename="../src/FilesManagement.cpp" line="377"/>
         <source>&apos;%1&apos; file was deleted successfully!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="375"/>
-        <location filename="../src/FilesManagement.cpp" line="522"/>
-        <location filename="../src/FilesManagement.cpp" line="524"/>
-        <location filename="../src/FilesManagement.cpp" line="543"/>
-        <location filename="../src/FilesManagement.cpp" line="587"/>
-        <location filename="../src/FilesManagement.cpp" line="597"/>
-        <location filename="../src/FilesManagement.cpp" line="630"/>
+        <location filename="../src/FilesManagement.cpp" line="381"/>
+        <location filename="../src/FilesManagement.cpp" line="528"/>
+        <location filename="../src/FilesManagement.cpp" line="530"/>
+        <location filename="../src/FilesManagement.cpp" line="549"/>
+        <location filename="../src/FilesManagement.cpp" line="594"/>
+        <location filename="../src/FilesManagement.cpp" line="604"/>
+        <location filename="../src/FilesManagement.cpp" line="637"/>
         <source>Failure</source>
         <translation>Hiba</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="375"/>
+        <location filename="../src/FilesManagement.cpp" line="381"/>
         <source>&apos;%1&apos; file delete failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="522"/>
+        <location filename="../src/FilesManagement.cpp" line="528"/>
         <source>Data Fetch Denied for &apos;%1&apos;!</source>
         <translatorcomment>This is a very context heavy translation, I need to see an example for this to work.</translatorcomment>
         <translation>Adat elérés a &apos;%1&apos;  nevű fájlhoz elutasítva!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="524"/>
+        <location filename="../src/FilesManagement.cpp" line="530"/>
         <source>Data Fetch Denied!</source>
         <translation>Adat elérés elutasítva!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="543"/>
+        <location filename="../src/FilesManagement.cpp" line="549"/>
         <source>Unable to open file &apos;%1&apos; for write!</source>
         <translation>Nem lehet megynitni a(z) &apos;%1&apos; fájt írásra!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="588"/>
+        <location filename="../src/FilesManagement.cpp" line="595"/>
         <source>File &apos;%1&apos; is too big to be stored in the Mooltipass!
 
 Maximum allowed size is %2 bytes.</source>
@@ -1109,12 +1196,12 @@ Maximum allowed size is %2 bytes.</source>
 A maximum megengedett fájl méret %2 bájt.</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="597"/>
+        <location filename="../src/FilesManagement.cpp" line="604"/>
         <source>Unable to open file &apos;%1&apos; for read!</source>
         <translation>Nem lehet megynitni a(z) &apos;%1&apos; nevű fájlt olvasásra!</translation>
     </message>
     <message>
-        <location filename="../src/FilesManagement.cpp" line="630"/>
+        <location filename="../src/FilesManagement.cpp" line="637"/>
         <source>Unable to send data!</source>
         <translation>Nem lehet adatot küldeni!</translation>
     </message>
@@ -1122,22 +1209,22 @@ A maximum megengedett fájl méret %2 bájt.</translation>
 <context>
     <name>LockedPasswordLineEdit</name>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="299"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="312"/>
         <source>Link Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="300"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="313"/>
         <source>Remove Link Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="330"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="343"/>
         <source>Password Locked</source>
         <translation>Jelszó lezárva</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="344"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="357"/>
         <source>Non-initialized password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1146,8 +1233,8 @@ A maximum megengedett fájl méret %2 bájt.</translation>
     <name>MainWindow</name>
     <message>
         <location filename="../src/MainWindow.ui" line="26"/>
-        <location filename="../src/MainWindow.cpp" line="1511"/>
-        <location filename="../src/MainWindow.cpp" line="1533"/>
+        <location filename="../src/MainWindow.cpp" line="1576"/>
+        <location filename="../src/MainWindow.cpp" line="1599"/>
         <source>Moolticute</source>
         <translatorcomment>Multiaranyos :P</translatorcomment>
         <translation>Moolticute</translation>
@@ -1466,12 +1553,11 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation>Villogjon a képernyő mikor bevitelre van szükség</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1850"/>
         <source>Lock device when computer sleeps or shuts down, if screen is locked, or user logs off</source>
-        <translation>Zárja le az eszközt mikor alvó üzemmódban van a számítógép vagy mikor kikapcsol, ha a kijelzó zárva van vagy a felhasználó kilép a fiókból</translation>
+        <translation type="vanished">Zárja le az eszközt mikor alvó üzemmódban van a számítógép vagy mikor kikapcsol, ha a kijelzó zárva van vagy a felhasználó kilép a fiókból</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1860"/>
+        <location filename="../src/MainWindow.ui" line="1850"/>
         <source>Do not erase characters when going back in the pin entering screen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1491,12 +1577,12 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation>Mutassa a biztonsági hash-t kártya feloldása előtt és után is</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1880"/>
+        <location filename="../src/MainWindow.ui" line="1870"/>
         <source>Random starting pin every time card unlock is needed</source>
         <translation>Véletlenszerű kezdő pin minden alkalommal mikor kártya feoldása szükséges</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1883"/>
+        <location filename="../src/MainWindow.ui" line="1873"/>
         <source>Random Starting Pin</source>
         <translation>Véletlenszerű kezdő pinkód</translation>
     </message>
@@ -1532,18 +1618,28 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1863"/>
+        <location filename="../src/MainWindow.ui" line="1853"/>
         <source>Display Pin on Back Pressed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1870"/>
+        <location filename="../src/MainWindow.ui" line="1860"/>
         <source>Do not hide PIN when entering PIN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1873"/>
+        <location filename="../src/MainWindow.ui" line="1863"/>
         <source>Display Full Pin on Entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1880"/>
+        <source>Only shows digits when pressing and scrolling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1883"/>
+        <source>Paranoid Pin Entry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1592,73 +1688,98 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/MainWindow.ui" line="1976"/>
+        <source>When device connected through Bluetooth switch the device off on lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/MainWindow.ui" line="1979"/>
-        <source>Disable BLE on Card Removed</source>
+        <source>Switch Off on Lock When Connected with Bluetooth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1986"/>
+        <source>Disable Bluetooth when a user card is removed from the device (improves battery life)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="1989"/>
+        <source>Disable BLE on Card Removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1996"/>
+        <source>Disable Bluetooth upon device lock (improves battery life)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="1999"/>
         <source>Disable BLE on Device Lock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2023"/>
+        <location filename="../src/MainWindow.ui" line="2006"/>
+        <source>Only enable it if you don&apos;t use your Mini BLE on the go</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="2009"/>
+        <source>Disable Battery Charging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="2043"/>
         <source>User Security Settings (Only changeable from device)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2029"/>
+        <location filename="../src/MainWindow.ui" line="2049"/>
         <source>Confirm to output each credential. Control this setting in the settings menu of the advanced menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2032"/>
+        <location filename="../src/MainWindow.ui" line="2052"/>
         <source>Login Confirmation Prompt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2039"/>
+        <location filename="../src/MainWindow.ui" line="2059"/>
         <source>Require PIN to enter management mode. Control this setting in the settings menu of the advanced menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2042"/>
+        <location filename="../src/MainWindow.ui" line="2062"/>
         <source>PIN for Management Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2049"/>
+        <location filename="../src/MainWindow.ui" line="2069"/>
         <source>Prompt to display credentials on screen during manual recall. Control this setting in the settings menu of the advanced menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2059"/>
+        <location filename="../src/MainWindow.ui" line="2079"/>
         <source>Switch menu modes by a long wheel press in the main menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2062"/>
+        <location filename="../src/MainWindow.ui" line="2082"/>
         <source>Advanced Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2069"/>
+        <location filename="../src/MainWindow.ui" line="2089"/>
         <source>Use Bluetooth Menu to enable/disable the Mooltipass Bluetooth interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2072"/>
-        <source>Bluetooth Enabled</source>
+        <location filename="../src/MainWindow.ui" line="5256"/>
+        <source>Continues until nominal capacity reached</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2079"/>
+        <location filename="../src/MainWindow.ui" line="2099"/>
         <source>Knock detection can be enabled/disabled on the device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="2082"/>
-        <source>Knock Detection Disabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1666,17 +1787,17 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation type="vanished">Alapbeállítások visszaállítása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2185"/>
+        <location filename="../src/MainWindow.ui" line="2205"/>
         <source>Save to device</source>
         <translation>Eszközre mentés</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2521"/>
+        <location filename="../src/MainWindow.ui" line="2541"/>
         <source>Export Database to File</source>
         <translation>Exportája az adatbázist egy fájlba</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2568"/>
+        <location filename="../src/MainWindow.ui" line="2588"/>
         <source>Make a backup of your database on your local computer</source>
         <translation>Csinál egy biztonsági mentést az ön jelenlegi számítógépén</translation>
     </message>
@@ -1685,52 +1806,52 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation type="vanished">MooltiApp kompatibilis fájl generálása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2598"/>
+        <location filename="../src/MainWindow.ui" line="2618"/>
         <source>Export To File</source>
         <translation>Exportálás fájlba</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2630"/>
+        <location filename="../src/MainWindow.ui" line="2650"/>
         <source>Import Database from File</source>
         <translation>Adatbázis importálása fájlból</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2680"/>
+        <location filename="../src/MainWindow.ui" line="2700"/>
         <source>Restore your database from a file</source>
         <translation>Adatbázis visszaálítása fájlból</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2696"/>
+        <location filename="../src/MainWindow.ui" line="2716"/>
         <source>Do Not Delete Credentials on Local DB</source>
         <translation>Ne törölje a lokális hitelesítő adatokat az adatbázisban</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2723"/>
+        <location filename="../src/MainWindow.ui" line="2743"/>
         <source>Import From File</source>
         <translation>Fájlból való importálás</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3134"/>
+        <location filename="../src/MainWindow.ui" line="3154"/>
         <source>Moolticute (c) The Mooltipass Team</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3147"/>
+        <location filename="../src/MainWindow.ui" line="3167"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;( https://github.com/mooltipass/moolticute )&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3325"/>
+        <location filename="../src/MainWindow.ui" line="3439"/>
         <source>Aux MCU Version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3359"/>
+        <location filename="../src/MainWindow.ui" line="3473"/>
         <source>Main MCU Version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3393"/>
+        <location filename="../src/MainWindow.ui" line="3507"/>
         <source>Bundle Version:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1739,149 +1860,149 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/mooltipass/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/mooltipass/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4250"/>
+        <location filename="../src/MainWindow.ui" line="4288"/>
         <source>Integration with Have I Been Pwned: Enabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4293"/>
+        <location filename="../src/MainWindow.ui" line="4095"/>
         <source>Enable full developer log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4325"/>
+        <location filename="../src/MainWindow.ui" line="4127"/>
         <source>Enable Debug Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4336"/>
+        <location filename="../src/MainWindow.ui" line="4405"/>
         <source>Default Password Length</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4937"/>
+        <location filename="../src/MainWindow.ui" line="5039"/>
         <source>Reset card</source>
         <translation>Kártya visszaállítása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4971"/>
+        <location filename="../src/MainWindow.ui" line="5073"/>
         <source>Erase Inserted Card</source>
         <translation>Behelyezett kártya törlése</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4738"/>
-        <location filename="../src/MainWindow.ui" line="4763"/>
-        <location filename="../src/MainWindow.ui" line="4981"/>
+        <location filename="../src/MainWindow.ui" line="4955"/>
+        <location filename="../src/MainWindow.ui" line="4980"/>
+        <location filename="../src/MainWindow.ui" line="5083"/>
         <source>?</source>
         <translation>?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4990"/>
+        <location filename="../src/MainWindow.ui" line="5092"/>
         <source>Reset Card</source>
         <translation>Kártya Visszaállítása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4709"/>
+        <location filename="../src/MainWindow.ui" line="4926"/>
         <source>CSV file import/export</source>
         <translation>CSV fájl importálása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3459"/>
-        <location filename="../src/MainWindow.cpp" line="40"/>
+        <location filename="../src/MainWindow.ui" line="3585"/>
+        <location filename="../src/MainWindow.cpp" line="39"/>
         <source>User Manual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3595"/>
-        <location filename="../src/MainWindow.cpp" line="615"/>
-        <location filename="../src/MainWindow.cpp" line="2259"/>
+        <location filename="../src/MainWindow.ui" line="3731"/>
+        <location filename="../src/MainWindow.cpp" line="635"/>
+        <location filename="../src/MainWindow.cpp" line="2370"/>
         <source>Security Challenge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4140"/>
-        <location filename="../src/MainWindow.ui" line="4169"/>
+        <location filename="../src/MainWindow.ui" line="4584"/>
+        <location filename="../src/MainWindow.ui" line="4613"/>
         <source>when selected, you can set moolticute to set a given category upon device connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4143"/>
+        <location filename="../src/MainWindow.ui" line="4587"/>
         <source>Upon connection, force category:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4373"/>
+        <location filename="../src/MainWindow.ui" line="4510"/>
         <source>Backup Notification Banner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4393"/>
+        <location filename="../src/MainWindow.ui" line="4530"/>
         <source>Enable Backup Notification</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4404"/>
+        <location filename="../src/MainWindow.ui" line="4541"/>
         <source>Display Moolticute Tutorial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4436"/>
+        <location filename="../src/MainWindow.ui" line="4573"/>
         <source>Display tutorial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4731"/>
+        <location filename="../src/MainWindow.ui" line="4948"/>
         <source>Import unencrypted passwords</source>
         <translation>Titkosítatlan jelszavak importálása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4747"/>
+        <location filename="../src/MainWindow.ui" line="4964"/>
         <source>Import CSV</source>
         <translation>CSV Importálása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4756"/>
+        <location filename="../src/MainWindow.ui" line="4973"/>
         <source>Export passwords unencrypted</source>
         <translation>Titkosítatlan jelszavak exportálása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4772"/>
+        <location filename="../src/MainWindow.ui" line="4989"/>
         <source>Export CSV</source>
         <translation>CSV Explortálása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4835"/>
+        <location filename="../src/MainWindow.ui" line="5104"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4858"/>
+        <location filename="../src/MainWindow.ui" line="5127"/>
         <source>Get</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4879"/>
+        <location filename="../src/MainWindow.ui" line="5148"/>
         <source>Number of available users:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2409"/>
-        <location filename="../src/MainWindow.ui" line="4524"/>
+        <location filename="../src/MainWindow.ui" line="2429"/>
+        <location filename="../src/MainWindow.ui" line="4728"/>
         <source>Integrity Check</source>
         <translation>Integritás vizsgálat</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2459"/>
+        <location filename="../src/MainWindow.ui" line="2479"/>
         <source>Scan your device for errors and correct them automatically.</source>
         <translation>Keressen hibákat az eszközön és korrigálja azokat automatikusan.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2489"/>
+        <location filename="../src/MainWindow.ui" line="2509"/>
         <source>Perform Integrity Check</source>
         <translation>Integritás vizsgálat indítása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2285"/>
+        <location filename="../src/MainWindow.ui" line="2305"/>
         <source>Database Backup Monitoring</source>
         <translation>Adatbázis biztonsági mentés</translation>
     </message>
@@ -1989,99 +2110,129 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="1976"/>
-        <source>Disable Bluetooth when a user card is removed from the device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="1986"/>
-        <source>Disable Bluetooth upon device lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.ui" line="1996"/>
+        <location filename="../src/MainWindow.ui" line="2016"/>
         <source>Login Menu: Start with Last Accessed Service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2003"/>
+        <location filename="../src/MainWindow.ui" line="2023"/>
         <source>Sort Favorites by last used date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2006"/>
+        <location filename="../src/MainWindow.ui" line="2026"/>
         <source>Sort Favorites by Last Used Date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2013"/>
+        <location filename="../src/MainWindow.ui" line="2033"/>
         <source>Invert Login and Favorites Icons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2052"/>
+        <location filename="../src/MainWindow.ui" line="2072"/>
         <source>Management Storage Confirmation Prompt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2146"/>
+        <location filename="../src/MainWindow.ui" line="2092"/>
+        <source>Bluetooth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="2102"/>
+        <source>Knock Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="2166"/>
         <source>Reset default values</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2172"/>
+        <location filename="../src/MainWindow.ui" line="2192"/>
         <source>Cancel Changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2329"/>
+        <location filename="../src/MainWindow.ui" line="2349"/>
         <source>Keep your database backup synchronized with this mooltipass database.</source>
         <translation>Tartsa szinkronizálva a biztonsági másolatát ezzel a mooltipass adatbázissal.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2359"/>
+        <location filename="../src/MainWindow.ui" line="2379"/>
         <source>Backup file path</source>
         <translation>Biztonsági mentés fájlának helye</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2829"/>
+        <location filename="../src/MainWindow.ui" line="2849"/>
         <source>Security Card is missing</source>
         <translation>A biztonsági kártya hiányzik</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2836"/>
+        <location filename="../src/MainWindow.ui" line="2856"/>
         <source>No card has been found. If you have a card in your Mooltipass device, try to remove and insert the card again.</source>
         <translation>Nem található kártya az eszközben. Ha kártyát tett a Mooltipass ba akkor vegye ki és helyeze be újra az eszközbe.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2925"/>
+        <location filename="../src/MainWindow.ui" line="2945"/>
         <source>Unlock Your Mooltipass Device</source>
         <translation>Oldja fel a Mooltipass eszközét</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="2932"/>
+        <location filename="../src/MainWindow.ui" line="2952"/>
         <source>The connected device is currently locked. Unlock it to modify settings and manage your credentials.</source>
         <translation>A csatlakoztatott eszköz jelenleg le van zárva. Oldja fel, hogy módosíthassa a beállításokat és menedzselje a hitelesítő adatait.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3011"/>
+        <location filename="../src/MainWindow.ui" line="3031"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Wait for device confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Megerősítése vár&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Erősítse meg a kérést az eszközén.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3061"/>
+        <location filename="../src/MainWindow.ui" line="3081"/>
         <source>Working</source>
         <translatorcomment>Literally, is this about the process or a pop up window that says some progress?</translatorcomment>
         <translation>Elfoglalt</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5002"/>
-        <location filename="../src/MainWindow.cpp" line="2236"/>
-        <source>NiMH Reconditioning</source>
+        <location filename="../src/MainWindow.ui" line="3367"/>
+        <source>Incorrect serial number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="4138"/>
+        <source>Allow to use invalid or private TLDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="4158"/>
+        <source>Disable TLD check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="4442"/>
+        <source>Lock device when screen is locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="4462"/>
+        <source>Enable Device Lock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="5019"/>
+        <source>Visible ON DE&amp;MAND  (use SHIFT+F1 keyboard shortcut)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="5206"/>
+        <location filename="../src/MainWindow.cpp" line="2352"/>
+        <source>NiMH Reconditioning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="5223"/>
         <source>Start NiMH Reconditioning</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2090,44 +2241,44 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation type="vanished">Moolticute (c) Raoul Hecky</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3166"/>
+        <location filename="../src/MainWindow.ui" line="3186"/>
         <source>Version: %1</source>
         <translation>Verzió: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3186"/>
+        <location filename="../src/MainWindow.ui" line="3206"/>
         <source>Check For Updates</source>
         <translation>Frissítések keresése</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3223"/>
+        <location filename="../src/MainWindow.ui" line="3243"/>
         <source>Device Firmware Version:</source>
         <translation>Eszköz firmware verzió:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3257"/>
+        <location filename="../src/MainWindow.ui" line="3280"/>
         <source>Device Serial:</source>
         <translation>Eszköz széria száma:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3291"/>
+        <location filename="../src/MainWindow.ui" line="3405"/>
         <source>Device Memory:</source>
         <translation>Eszköz memória:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3482"/>
+        <location filename="../src/MainWindow.ui" line="3608"/>
         <source>UID Request</source>
         <translation>UID Lekérdezése</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3518"/>
-        <location filename="../src/MainWindow.ui" line="3625"/>
+        <location filename="../src/MainWindow.ui" line="3644"/>
+        <location filename="../src/MainWindow.ui" line="3761"/>
         <source>Password</source>
         <translation>Jelszó</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3525"/>
-        <location filename="../src/MainWindow.ui" line="3632"/>
+        <location filename="../src/MainWindow.ui" line="3651"/>
+        <location filename="../src/MainWindow.ui" line="3768"/>
         <source>Validate</source>
         <translation>Megerősít</translation>
     </message>
@@ -2136,87 +2287,87 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/raoulh/moolticute&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/raoulh/moolticute&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3764"/>
+        <location filename="../src/MainWindow.ui" line="3900"/>
         <source>Moolticute Settings</source>
         <translation>Moolticute Beállítások</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3834"/>
+        <location filename="../src/MainWindow.ui" line="3970"/>
         <source>Application Language</source>
         <translation>Megjelenítési Nyelv</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3867"/>
+        <location filename="../src/MainWindow.ui" line="4003"/>
         <source>Start Moolticute with the computer: Enabled</source>
         <translation>A Moolticute elindítása a számítógéppel: Bekapcsolva</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3893"/>
-        <location filename="../src/MainWindow.ui" line="4239"/>
-        <location filename="../src/MainWindow.ui" line="4276"/>
+        <location filename="../src/MainWindow.ui" line="4029"/>
+        <location filename="../src/MainWindow.ui" line="4314"/>
+        <location filename="../src/MainWindow.ui" line="4357"/>
         <source>Change</source>
         <translation>Módosítás</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3910"/>
+        <location filename="../src/MainWindow.ui" line="4046"/>
         <source>View Daemon Logs</source>
         <translation>Daemon Naplózás Megjelenítése</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3936"/>
+        <location filename="../src/MainWindow.ui" line="4072"/>
         <source>View</source>
         <translation>Megnéz</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3947"/>
+        <location filename="../src/MainWindow.ui" line="4169"/>
         <source>Start Moolticute SSH Agent Automatically</source>
         <translation>Moolticute SSH Agent-et automatikus elindítása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3959"/>
-        <location filename="../src/MainWindow.ui" line="4002"/>
-        <location filename="../src/MainWindow.ui" line="4305"/>
-        <location filename="../src/MainWindow.ui" line="4416"/>
+        <location filename="../src/MainWindow.ui" line="4107"/>
+        <location filename="../src/MainWindow.ui" line="4181"/>
+        <location filename="../src/MainWindow.ui" line="4224"/>
+        <location filename="../src/MainWindow.ui" line="4553"/>
         <source>(Restart Needed)</source>
         <translation>(Szükséges az Újraindítás)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3979"/>
+        <location filename="../src/MainWindow.ui" line="4201"/>
         <source>Autostart SSH Agent</source>
         <translation>SSH Agent automatikus indítása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3990"/>
+        <location filename="../src/MainWindow.ui" line="4212"/>
         <source>Moolticute SSH Arguments</source>
         <translation>Moolticute SSH Argumentum</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4035"/>
+        <location filename="../src/MainWindow.ui" line="4257"/>
         <source>Restart Daemon with Debug Web Server (on port 8484)</source>
         <translation>Daemon újraindítása hibakereső web szerverrel (a 8484-es porton)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4055"/>
+        <location filename="../src/MainWindow.ui" line="4277"/>
         <source>Enable Daemon Web Server</source>
         <translation>Daemon Web Szerver Elindítása</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4072"/>
+        <location filename="../src/MainWindow.ui" line="4374"/>
         <source>Manage Your Password Profiles</source>
         <translation>Menedzselje a Jelszó Profiljait</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4092"/>
+        <location filename="../src/MainWindow.ui" line="4394"/>
         <source>Password Profiles...</source>
         <translation>Jelszó Profilok...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4109"/>
+        <location filename="../src/MainWindow.ui" line="4479"/>
         <source>Delayed Cancel Buttons to Prevent Mistakes</source>
         <translation>Elhalasztott Mégsem Gomb a hibák megelőzése érdekében</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4129"/>
+        <location filename="../src/MainWindow.ui" line="4499"/>
         <source>Enable Long Press Cancel Buttons</source>
         <translation>Hosszan Tartott Mégsem Gomb Bekapcsolása</translation>
     </message>
@@ -2225,38 +2376,37 @@ Tipp: tartsa az egeret az opció fölött, hogy több információt kapjon arró
         <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A viselkedése ⌘+Q&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4180"/>
+        <location filename="../src/MainWindow.ui" line="4624"/>
         <source>Systray icon</source>
         <translation>Rendszertálca ikon</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4213"/>
+        <location filename="../src/MainWindow.ui" line="4331"/>
         <source>Subdomain selection: Enabled</source>
         <translation>Subdomain kijelölése: Bekapcsolva</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4531"/>
+        <location filename="../src/MainWindow.ui" line="4735"/>
         <source>Now checking the integrity of your stored credentials. This may take a while. Please do not unplug your Mooltipass during the check.</source>
         <translation>Most az ön hitelesítő adatainak az integritás ellenőrzése megy. Ez altarthat egy darabig.  Kérem ne húzza ki a kábelt és ne kapcsolja le a Mooltipassot a gépről.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4571"/>
+        <location filename="../src/MainWindow.ui" line="4775"/>
         <source>TextLabel</source>
         <translation>Szövegcímke</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4803"/>
+        <location filename="../src/MainWindow.ui" line="5007"/>
         <source>SSH Key Tab</source>
         <translation>SSH kulcs fül</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4815"/>
         <source>Visible ON DE&amp;MAND  (use CTRL+SHIFT+F1 keyboard shortcut)</source>
         <translatorcomment>I have no idea how to interpret the &amp;M command here</translatorcomment>
-        <translation>Látható KÉ&amp;RÉSRE  (hasznája a CTRL+SHIFT+F1 billenyű parancsot)</translation>
+        <translation type="vanished">Látható KÉ&amp;RÉSRE  (hasznája a CTRL+SHIFT+F1 billenyű parancsot)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4825"/>
+        <location filename="../src/MainWindow.ui" line="5029"/>
         <source>ALWA&amp;YS visible</source>
         <translatorcomment>wtf is this? &quot;ALWA&amp;YS visible&quot; lol?</translatorcomment>
         <translation>MIN&amp;DIG látszódik</translation>
@@ -2311,38 +2461,38 @@ Gondolja át újra mielőtt egy ismeretlen kártyát letöröl.</translation>
         <translation>Exportálja a kódolatlan formátumban a jelszavakat csak vesszővel szeparált érékeként text fáljba.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="360"/>
+        <location filename="../src/MainWindow.cpp" line="379"/>
         <source>Very Low</source>
         <translation>Nagyon Alacsony</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="361"/>
+        <location filename="../src/MainWindow.cpp" line="380"/>
         <source>Low</source>
         <translation>Alacsony</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="362"/>
+        <location filename="../src/MainWindow.cpp" line="381"/>
         <source>Medium</source>
         <translation>Közepes</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="363"/>
+        <location filename="../src/MainWindow.cpp" line="382"/>
         <source>High</source>
         <translation>Magas</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="36"/>
+        <location filename="../src/MainWindow.cpp" line="35"/>
         <source>Tab</source>
         <translation>Tab</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="37"/>
+        <location filename="../src/MainWindow.cpp" line="36"/>
         <source>Enter</source>
         <translatorcomment>Wait, is this about entering something or pressing literally the Enter?</translatorcomment>
         <translation>Enter</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="38"/>
+        <location filename="../src/MainWindow.cpp" line="37"/>
         <source>Space</source>
         <translation>Szóköz</translation>
     </message>
@@ -2355,32 +2505,32 @@ Gondolja át újra mielőtt egy ismeretlen kártyát letöröl.</translation>
         <translation type="vanished">Ablak elrejtése</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="400"/>
+        <location filename="../src/MainWindow.cpp" line="419"/>
         <source>&amp;File</source>
         <translation>&amp;Fálj</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="401"/>
+        <location filename="../src/MainWindow.cpp" line="420"/>
         <source>&amp;Quit</source>
         <translation>&amp;Kilépés</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="713"/>
-        <location filename="../src/MainWindow.cpp" line="1325"/>
-        <location filename="../src/MainWindow.cpp" line="1338"/>
-        <location filename="../src/MainWindow.cpp" line="1355"/>
-        <location filename="../src/MainWindow.cpp" line="1917"/>
-        <location filename="../src/MainWindow.cpp" line="2387"/>
+        <location filename="../src/MainWindow.cpp" line="738"/>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <location filename="../src/MainWindow.cpp" line="1414"/>
+        <location filename="../src/MainWindow.cpp" line="1982"/>
+        <location filename="../src/MainWindow.cpp" line="2515"/>
         <source>Disabled</source>
         <translation>Kikapcsolás</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="714"/>
+        <location filename="../src/MainWindow.cpp" line="739"/>
         <source>Password Only</source>
         <translation>Csak Jelszó</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="715"/>
+        <location filename="../src/MainWindow.cpp" line="740"/>
         <source>Login + Password</source>
         <translation>Login és Jelszó</translation>
     </message>
@@ -2405,57 +2555,62 @@ Gondolja át újra mielőtt egy ismeretlen kártyát letöröl.</translation>
         <translation type="vanished">Ctrl + Alt + Del / Win + L</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="409"/>
+        <location filename="../src/MainWindow.cpp" line="428"/>
         <source>Black</source>
         <translation>Fekete</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="410"/>
+        <location filename="../src/MainWindow.cpp" line="429"/>
         <source>White</source>
         <translation>Fehér</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="410"/>
+        <location filename="../src/MainWindow.cpp" line="429"/>
         <source>_white</source>
         <translation>_fehér</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="554"/>
+        <location filename="../src/MainWindow.cpp" line="574"/>
         <source>Fetching UID from device. This may take a few seconds...</source>
         <translation>UID azonosító lekérdezése folyamatban van. Ez eltarthat néhány másodpercig...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="570"/>
+        <location filename="../src/MainWindow.cpp" line="590"/>
         <source>Either the device have been tempered with or the input key is invalid.</source>
         <translatorcomment>I had to reverse sentence order to make sense of it.</translatorcomment>
         <translation>A megadott kulcs érvénytelen vagy az eszközt illetéktelenek módosították.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="574"/>
+        <location filename="../src/MainWindow.cpp" line="594"/>
         <source>Your device&apos;s UID is %1</source>
         <translation>Az eszköze UID-je : %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="765"/>
+        <location filename="../src/MainWindow.cpp" line="790"/>
         <source>Credentials have been modified.
 Do you want to save your changes?</source>
         <translation>Belépési azonosító változott.
 Elszerené menteni a változtatásokat?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="939"/>
+        <location filename="../src/MainWindow.cpp" line="971"/>
         <source>Remove the card from the device to change this setting.</source>
         <translation>Vegye ki a kártyát az eszközből ahhoz, hogy ezen beállítást módisíthassa.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="35"/>
-        <location filename="../src/MainWindow.cpp" line="381"/>
+        <location filename="../src/MainWindow.cpp" line="34"/>
+        <location filename="../src/MainWindow.cpp" line="400"/>
         <source>None</source>
         <translation>Semmi</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="39"/>
+        <location filename="../src/MainWindow.cpp" line="38"/>
         <source>Default Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="42"/>
+        <source>Bundle v%1 is available &lt;a href=&quot;https://www.themooltipass.com/updates/index.php?sn=%2&amp;bundlev=%3&quot;&gt;here&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2494,446 +2649,473 @@ Think twice before resetting a card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="368"/>
+        <location filename="../src/MainWindow.cpp" line="387"/>
         <source>No Inactivity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="372"/>
+        <location filename="../src/MainWindow.cpp" line="391"/>
         <source>30 minutes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="961"/>
+        <location filename="../src/MainWindow.cpp" line="994"/>
         <source>%1Mb</source>
         <translation>%1Mb</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1098"/>
-        <location filename="../src/MainWindow.cpp" line="1253"/>
+        <location filename="../src/MainWindow.cpp" line="1161"/>
+        <location filename="../src/MainWindow.cpp" line="1312"/>
         <source>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Eszköz megerősítésre vár&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Erősítse meg a kérést az eszközén.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1111"/>
+        <location filename="../src/MainWindow.cpp" line="1174"/>
         <source>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving Changes to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Folyamatban van a változtatások mentése az eszközre&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Kérem várjon.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1137"/>
+        <location filename="../src/MainWindow.cpp" line="1196"/>
         <source>Failure</source>
         <translation>Hiba</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1135"/>
+        <location filename="../src/MainWindow.cpp" line="1194"/>
         <source>Couldn&apos;t save credentials, please contact the support team with moolticute&apos;s log</source>
         <translation>Nem lehetett elmenteni a hitelesítő adatokat, kérem lépjek kapcsolatba a fejlesztő csapattal a moolticute logját csatolva</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="43"/>
-        <source>New bundle update available &lt;a href=&quot;https://www.themooltipass.com/updates/index.php?sn=%1&amp;bundlev=%2&quot;&gt;here.&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="299"/>
+        <location filename="../src/MainWindow.cpp" line="311"/>
         <source>Low Battery</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="299"/>
+        <location filename="../src/MainWindow.cpp" line="311"/>
         <source>Battery is below %1%, please charge your Mooltipass.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="369"/>
+        <location filename="../src/MainWindow.cpp" line="388"/>
         <source>5 minutes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="370"/>
+        <location filename="../src/MainWindow.cpp" line="389"/>
         <source>10 minutes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="371"/>
+        <location filename="../src/MainWindow.cpp" line="390"/>
         <source>15 minutes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="374"/>
+        <location filename="../src/MainWindow.cpp" line="393"/>
         <source>0.5 second</source>
         <translation type="unfinished">1 másodperc {0.5 ?}</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="375"/>
+        <location filename="../src/MainWindow.cpp" line="394"/>
         <source>1 second</source>
         <translation type="unfinished">1 másodperc</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="376"/>
+        <location filename="../src/MainWindow.cpp" line="395"/>
         <source>2 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="377"/>
+        <location filename="../src/MainWindow.cpp" line="396"/>
         <source>3 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="378"/>
+        <location filename="../src/MainWindow.cpp" line="397"/>
         <source>4 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="379"/>
+        <location filename="../src/MainWindow.cpp" line="398"/>
         <source>5 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="382"/>
+        <location filename="../src/MainWindow.cpp" line="401"/>
         <source>Nyancat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="384"/>
+        <location filename="../src/MainWindow.cpp" line="403"/>
         <source>Let moolticute decide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="385"/>
+        <location filename="../src/MainWindow.cpp" line="404"/>
         <source>Force subdomain support</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="386"/>
+        <location filename="../src/MainWindow.cpp" line="405"/>
         <source>Force subdomain ignore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="616"/>
+        <location filename="../src/MainWindow.cpp" line="636"/>
         <source>Security Challenge Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="716"/>
+        <location filename="../src/MainWindow.cpp" line="741"/>
         <source>[Enter] + Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="717"/>
+        <location filename="../src/MainWindow.cpp" line="742"/>
         <source>[Ctrl+Alt+Del] + Pass</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="718"/>
+        <location filename="../src/MainWindow.cpp" line="743"/>
         <source>Password / [Win+L]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="719"/>
+        <location filename="../src/MainWindow.cpp" line="744"/>
         <source>Login + Pass / [Win+L]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="720"/>
+        <location filename="../src/MainWindow.cpp" line="745"/>
         <source>[Enter] + Pass / [Win+L]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="721"/>
+        <location filename="../src/MainWindow.cpp" line="746"/>
         <source>[Ctrl+Alt+Del] + Pass / [Win+L]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="829"/>
+        <location filename="../src/MainWindow.cpp" line="861"/>
         <source>Device Bluetooth Name Changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="830"/>
+        <location filename="../src/MainWindow.cpp" line="862"/>
         <source>Please disable and re-enable bluetooth for your changes to take effect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1127"/>
+        <location filename="../src/MainWindow.cpp" line="1190"/>
         <source>Couldn&apos;t change all passwords, please approve prompts on the device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1131"/>
-        <source>Duplicated service detected, please contact support</source>
+        <location filename="../src/MainWindow.cpp" line="2540"/>
+        <location filename="../src/MainWindow.cpp" line="2554"/>
+        <source>Incorrect Serial Number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1151"/>
+        <location filename="../src/MainWindow.cpp" line="2541"/>
+        <source>It looks like your device serial number doesn&apos;t match the one present on your device&apos;s case.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2542"/>
+        <source>Please reach out to support@themooltipass.com for the right code to enter below</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2555"/>
+        <source>The entered serial number is incorrect!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2562"/>
+        <source>Serial number change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2568"/>
+        <source>Set serial number successfully.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2573"/>
+        <source>Serial number still does not match platform serial.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2578"/>
+        <source>Set serial number failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1210"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Kérem hitelesítse a kérést az eszközén&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1164"/>
+        <location filename="../src/MainWindow.cpp" line="1223"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Kérem hitelesítse a kérést az eszközén&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1222"/>
+        <location filename="../src/MainWindow.cpp" line="1281"/>
         <source>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Változtatások mentése az eszköz memóriájába&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Kérem várjon.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1243"/>
+        <location filename="../src/MainWindow.cpp" line="1302"/>
         <source>&lt;html&gt;&lt;!--exit_fido_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1283"/>
+        <location filename="../src/MainWindow.cpp" line="1342"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Exporting Database from Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Adatbázis exportálása az eszközről&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Kérem várjon.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1286"/>
+        <location filename="../src/MainWindow.cpp" line="1345"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Importing and Merging File to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Fájl importálása és egyesítése az eszközön&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Kérem várjon.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1304"/>
+        <location filename="../src/MainWindow.cpp" line="1363"/>
         <source>Disable autostart at boot?</source>
         <translation>Kikapcsolja az automatikus indítást bekapcsoláskor?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1306"/>
+        <location filename="../src/MainWindow.cpp" line="1365"/>
         <source>Enable autostart at boot?</source>
         <translation>Bekapcsolja az automatikus indítást bekapcsoláskor?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1325"/>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
         <source>Start Moolticute with the computer: %1</source>
         <translation>A Moolticute indítása rendszerindításakor: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1325"/>
-        <location filename="../src/MainWindow.cpp" line="1338"/>
-        <location filename="../src/MainWindow.cpp" line="1355"/>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <location filename="../src/MainWindow.cpp" line="1414"/>
         <source>Enabled</source>
         <translation>Bekapcsolva</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1327"/>
-        <location filename="../src/MainWindow.cpp" line="1340"/>
-        <location filename="../src/MainWindow.cpp" line="1358"/>
+        <location filename="../src/MainWindow.cpp" line="1386"/>
+        <location filename="../src/MainWindow.cpp" line="1399"/>
+        <location filename="../src/MainWindow.cpp" line="1417"/>
         <source>Disable</source>
         <translation>Kikapcsol</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1329"/>
-        <location filename="../src/MainWindow.cpp" line="1342"/>
-        <location filename="../src/MainWindow.cpp" line="1362"/>
+        <location filename="../src/MainWindow.cpp" line="1388"/>
+        <location filename="../src/MainWindow.cpp" line="1401"/>
+        <location filename="../src/MainWindow.cpp" line="1421"/>
         <source>Enable</source>
         <translation>Bekapcsol</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1338"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
         <source>Subdomain selection: %1</source>
         <translation>Subdomain kijelölés: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1353"/>
+        <location filename="../src/MainWindow.cpp" line="1412"/>
         <source>Integration with &lt;a href=&quot;%1&quot;&gt;Have I Been Pwned&lt;/a&gt;: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1453"/>
+        <location filename="../src/MainWindow.cpp" line="1518"/>
         <source>Select database export...</source>
         <translatorcomment>Selecting a database or something within a database to export?</translatorcomment>
         <translation>Jelölje ki az adatbázist exportálásra...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1462"/>
-        <location filename="../src/MainWindow.cpp" line="1483"/>
-        <location filename="../src/MainWindow.cpp" line="1506"/>
-        <location filename="../src/MainWindow.cpp" line="1541"/>
-        <location filename="../src/MainWindow.cpp" line="1985"/>
-        <location filename="../src/MainWindow.cpp" line="2005"/>
-        <location filename="../src/MainWindow.cpp" line="2038"/>
-        <location filename="../src/MainWindow.cpp" line="2042"/>
-        <location filename="../src/MainWindow.cpp" line="2050"/>
+        <location filename="../src/MainWindow.cpp" line="1527"/>
+        <location filename="../src/MainWindow.cpp" line="1548"/>
+        <location filename="../src/MainWindow.cpp" line="1571"/>
+        <location filename="../src/MainWindow.cpp" line="1603"/>
+        <location filename="../src/MainWindow.cpp" line="2101"/>
+        <location filename="../src/MainWindow.cpp" line="2121"/>
+        <location filename="../src/MainWindow.cpp" line="2154"/>
+        <location filename="../src/MainWindow.cpp" line="2158"/>
+        <location filename="../src/MainWindow.cpp" line="2166"/>
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1462"/>
-        <location filename="../src/MainWindow.cpp" line="1985"/>
+        <location filename="../src/MainWindow.cpp" line="1527"/>
+        <location filename="../src/MainWindow.cpp" line="2101"/>
         <source>Unable to read file %1</source>
         <translation>Nem lehet olvasni a %1 fájlt</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1486"/>
+        <location filename="../src/MainWindow.cpp" line="1551"/>
         <source>Save database export...</source>
         <translation>Exportált adatbázis elmentése...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1506"/>
+        <location filename="../src/MainWindow.cpp" line="1571"/>
         <source>Unable to write to file %1</source>
         <translation>Nem lehet a %1 nevű fájlra írni</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1511"/>
+        <location filename="../src/MainWindow.cpp" line="1576"/>
         <source>Successfully exported the database from your device.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1533"/>
+        <location filename="../src/MainWindow.cpp" line="1599"/>
         <source>Successfully imported and merged database into the device.</source>
         <translation>Az adatbázi importálása és eggyesítése az eszközön sikeresen megtörtént.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1539"/>
-        <source>Duplicate service detected during import, please contact support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="1552"/>
+        <location filename="../src/MainWindow.cpp" line="1614"/>
         <source>Do you want to start the integrity check of your device?</source>
         <translation>Szeretné elindítani az eszköz integritás vizsgálatát?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1563"/>
+        <location filename="../src/MainWindow.cpp" line="1625"/>
         <source>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Eszköz megerősítésre vár&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Kérem erősítse meg a kérelmet az eszközön.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1595"/>
+        <location filename="../src/MainWindow.cpp" line="1657"/>
         <source>Memory integrity check failed!</source>
         <translation>Memória integritás vizsgálata meghiúsult!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1601"/>
+        <location filename="../src/MainWindow.cpp" line="1663"/>
         <source>Memory integrity check done successfully!
 %1 of %2 credential slots used.</source>
         <translation>Memória integritás vizsgálat skieresen befejeződött!
 %1 a %2 jelszó tárhelyből már foglalt.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1610"/>
+        <location filename="../src/MainWindow.cpp" line="1672"/>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translation>Hogy megyőződjünk arról, hogy senki sem babrált az eszközével szállitás közben, ön kérhet a készitőtől egy egyedi eszökz azonositó jelszavat amelyel előhivhatja az eszköze UID-ját.&lt;ol&gt;&lt;li&gt;Készitse elő az eszköze széria számát a hátoldaláról.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Küldjön nekünk egy e-mail-t.&lt;/a&gt; az ön széria számával a jelszóért cserébe.&lt;/li&gt;&lt;li&gt;A kapott jelszavat irja be.&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1618"/>
+        <location filename="../src/MainWindow.cpp" line="1680"/>
         <source>To be sure that no one has tampered with your device, you can request a challenge string and enter it below.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&amp;body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the challenge string.&lt;/li&gt;&lt;li&gt;Enter the string you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1898"/>
+        <location filename="../src/MainWindow.cpp" line="1963"/>
         <source>Import Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1899"/>
+        <location filename="../src/MainWindow.cpp" line="1964"/>
         <source>Files were not imported from mini backup.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1967"/>
+        <location filename="../src/MainWindow.cpp" line="2035"/>
+        <source>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;NiMH Recondition is in progress.&lt;/span&gt;&lt;/p&gt;%1&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2083"/>
         <source>Reset card failed!</source>
         <translation>Kártya visszaállítás sikertelen!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1969"/>
+        <location filename="../src/MainWindow.cpp" line="2085"/>
         <source>Reset card done successfully</source>
         <translation>Kártya vissza állítás sikeres volt</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1976"/>
+        <location filename="../src/MainWindow.cpp" line="2092"/>
         <source>Select CSV file to import...</source>
         <translation>Jelölje ki a CSV fájlt importálásra...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2005"/>
+        <location filename="../src/MainWindow.cpp" line="2121"/>
         <source>Nothing is read from %1</source>
         <translation>Semmi nem lett beolvasva a %1 -tól</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2038"/>
+        <location filename="../src/MainWindow.cpp" line="2154"/>
         <source>Unable to import %1: Each row must contain exact 3 items. Some lines don&apos;t (lines number: %2)</source>
         <translation>Nem lehetséges importálni a %1: Minden sornak pontosan 3 elemet kell tartalmaznia. Néhány sor nem (ezen sorokban: %2)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2042"/>
+        <location filename="../src/MainWindow.cpp" line="2158"/>
         <source>Unable to import %1: Each row must contain exact 3 items (more than 10 lines don&apos;t)</source>
         <translation>Nem lehetséges importálni a %1: Minden sornak pontosan 3 elemet kell tartalmaznia. (több mint 10 sornak nincs ilyen)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2050"/>
+        <location filename="../src/MainWindow.cpp" line="2166"/>
         <source>Unable to import %1: Each row must contain exact 3 items using comma as a delimiter</source>
         <translation>Nem lehetséges importálni a %1: Minden sornak pontosan 3 elemet kell tartalmaznia és vesszőt kell használni a delimitálóként.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2113"/>
+        <location filename="../src/MainWindow.cpp" line="2229"/>
         <source>Disable subdomain selection?</source>
         <translation>Kikapcsolja a subdomain funkciót?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2115"/>
+        <location filename="../src/MainWindow.cpp" line="2231"/>
         <source>Enable subdomain selection?</source>
         <translation>Bekapcsolja a subdomain funkciót?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2135"/>
+        <location filename="../src/MainWindow.cpp" line="2251"/>
         <source>Disable Have I Been Pwned check?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2139"/>
+        <location filename="../src/MainWindow.cpp" line="2255"/>
         <source>Enable Have I Been Pwned check?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2237"/>
+        <location filename="../src/MainWindow.cpp" line="2353"/>
         <source>This procedure will take around 5 hours, please confirm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2245"/>
-        <source>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;NiMH Recondition is in progress.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/MainWindow.cpp" line="2260"/>
+        <location filename="../src/MainWindow.cpp" line="2371"/>
         <source>This token is only used for debugging purposes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2262"/>
+        <location filename="../src/MainWindow.cpp" line="2373"/>
         <source>Waiting for Security Challenge result...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2277"/>
+        <location filename="../src/MainWindow.cpp" line="2390"/>
         <source>NiMH Recondition Finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2278"/>
+        <location filename="../src/MainWindow.cpp" line="2391"/>
         <source>Recondition finished in %1 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2282"/>
+        <location filename="../src/MainWindow.cpp" line="2400"/>
         <source>NiMH Recondition Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2283"/>
+        <location filename="../src/MainWindow.cpp" line="2401"/>
         <source>Recondition finished with error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2314"/>
+        <location filename="../src/MainWindow.cpp" line="2432"/>
         <source>Confirm Reset Settings to Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2315"/>
+        <location filename="../src/MainWindow.cpp" line="2433"/>
         <source>Do you want to reset every settings value to device defaults?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2951,7 +3133,7 @@ Think twice before resetting a card.</source>
         <translation type="vanished">Memória Menedzsment Hiba</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1717"/>
+        <location filename="../src/MainWindow.cpp" line="1779"/>
         <source>An error occured when trying to go into Memory Management mode.
 
 %1</source>
@@ -2960,12 +3142,12 @@ Think twice before resetting a card.</source>
 %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1730"/>
+        <location filename="../src/MainWindow.cpp" line="1792"/>
         <source>System default language</source>
         <translation>Rendszer alapértelmezett nyelve</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1936"/>
+        <location filename="../src/MainWindow.cpp" line="2052"/>
         <source>Memory exports (*.bin)</source>
         <translatorcomment>I&apos;m not srue if I&apos;m supposed to rename technical terms here.</translatorcomment>
         <translation>Memória export (*.bin)</translation>
@@ -2994,69 +3176,75 @@ Think twice before resetting a card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.ui" line="221"/>
+        <location filename="../src/NotesManagement.ui" line="227"/>
         <source>Save</source>
         <translation type="unfinished">Mentés</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.ui" line="234"/>
-        <source>Discard</source>
+        <location filename="../src/NotesManagement.ui" line="240"/>
+        <location filename="../src/NotesManagement.cpp" line="9"/>
+        <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="26"/>
+        <location filename="../src/NotesManagement.cpp" line="10"/>
+        <source>Discard Changes and Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/NotesManagement.cpp" line="31"/>
         <source>Edit Note Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="109"/>
+        <location filename="../src/NotesManagement.cpp" line="118"/>
         <source>The note &quot;%1&quot; is going to be removed from the device.
 Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="172"/>
-        <location filename="../src/NotesManagement.cpp" line="291"/>
+        <location filename="../src/NotesManagement.cpp" line="181"/>
+        <location filename="../src/NotesManagement.cpp" line="305"/>
         <source>Failure</source>
         <translation type="unfinished">Hiba</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="172"/>
+        <location filename="../src/NotesManagement.cpp" line="181"/>
         <source>Note Fetch Denied!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="225"/>
+        <location filename="../src/NotesManagement.cpp" line="237"/>
         <source>Error</source>
         <translation type="unfinished">Hiba</translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="225"/>
+        <location filename="../src/NotesManagement.cpp" line="237"/>
         <source>Saving note failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="245"/>
+        <location filename="../src/NotesManagement.cpp" line="257"/>
         <source>Note Name cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="252"/>
+        <location filename="../src/NotesManagement.cpp" line="264"/>
         <source>Note Name already exists.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="287"/>
+        <location filename="../src/NotesManagement.cpp" line="301"/>
         <source>Note Deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="287"/>
+        <location filename="../src/NotesManagement.cpp" line="301"/>
         <source>&apos;%1&apos; note was deleted successfully!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/NotesManagement.cpp" line="291"/>
+        <location filename="../src/NotesManagement.cpp" line="305"/>
         <source>&apos;%1&apos; note delete failed!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3185,45 +3373,50 @@ Continue?</source>
         <translation>Újratölt</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="196"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="200"/>
         <source>Password Profile:</source>
         <translation>Jelszó Profil:</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="266"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="273"/>
         <source>Length: %1 </source>
         <translation>Hosszúság: %1 </translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="387"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="294"/>
+        <source>Password copied to clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/PasswordLineEdit.cpp" line="400"/>
         <source>Entropy: %1 bit</source>
         <translation>Entrópia: %1 bit</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="397"/>
-        <location filename="../src/PasswordLineEdit.cpp" line="402"/>
-        <location filename="../src/PasswordLineEdit.cpp" line="407"/>
-        <location filename="../src/PasswordLineEdit.cpp" line="412"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="410"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="415"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="420"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="425"/>
         <source>Password Quality: %1</source>
         <translation>Jelszó Minősége: %1</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="397"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="410"/>
         <source>Poor</source>
         <translation>Silány</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="402"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="415"/>
         <source>Weak</source>
         <translation>Gyenge</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="407"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="420"/>
         <source>Good</source>
         <translation>Jó</translation>
     </message>
     <message>
-        <location filename="../src/PasswordLineEdit.cpp" line="412"/>
+        <location filename="../src/PasswordLineEdit.cpp" line="425"/>
         <source>Excellent</source>
         <translation>Kiválló</translation>
     </message>
@@ -3654,22 +3847,22 @@ Biztosan folytatja?</translation>
 <context>
     <name>SystemNotificationWindows</name>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="131"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="122"/>
         <source>A credential without a login has been detected.</source>
         <translation>Felhasználónév nélküli jelszó észlelve.</translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="131"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="122"/>
         <source>Login name for </source>
         <translation>Bejelentkezésinév a 1% számára</translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="153"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="144"/>
         <source>Subdomain Detected!</source>
         <translation>Subdomain-t talált!</translation>
     </message>
     <message>
-        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="153"/>
+        <location filename="../src/SystemNotifications/SystemNotificationWindows.cpp" line="144"/>
         <source>Choose the domain name:</source>
         <translation>Válassza ki a domain nevet:</translation>
     </message>
@@ -3717,13 +3910,36 @@ Biztosan folytatja?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/TOTPCredential.cpp" line="58"/>
+        <location filename="../src/TOTPCredential.ui" line="157"/>
+        <source>QR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/TOTPCredential.cpp" line="61"/>
         <source>Invalid Secret Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/TOTPCredential.cpp" line="58"/>
+        <location filename="../src/TOTPCredential.cpp" line="61"/>
         <source>The entered Secret Key is not a valid Base32 string</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TOTPReader</name>
+    <message>
+        <location filename="../src/utils/TOTPReader.cpp" line="15"/>
+        <source>TOTP QR issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/TOTPReader.cpp" line="34"/>
+        <source>Scan QR code (*.png *.jpg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/TOTPReader.cpp" line="58"/>
+        <source>&lt;b&gt;%1&lt;/b&gt; does not contain TOTP information.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3833,42 +4049,42 @@ Biztosan folytatja?</translation>
 <context>
     <name>WSClient</name>
     <message>
-        <location filename="../src/WSClient.cpp" line="269"/>
+        <location filename="../src/WSClient.cpp" line="278"/>
         <source>Credentials Detected!</source>
         <translation>Azonosítók Érzékelve!</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="269"/>
+        <location filename="../src/WSClient.cpp" line="278"/>
         <source>Please Approve their Storage on the Mooltipass</source>
         <translation>Kérem engedélyezze a tárolását a Mooltipasson</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="467"/>
+        <location filename="../src/WSClient.cpp" line="476"/>
         <source>Device connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="467"/>
+        <location filename="../src/WSClient.cpp" line="476"/>
         <source>Disconnecting emulator from Moolticute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="488"/>
+        <location filename="../src/WSClient.cpp" line="497"/>
         <source>Password Compromised</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="509"/>
+        <location filename="../src/WSClient.cpp" line="518"/>
         <source>Error</source>
         <translation type="unfinished">Hiba</translation>
     </message>
     <message>
-        <location filename="../src/WSClient.cpp" line="509"/>
+        <location filename="../src/WSClient.cpp" line="518"/>
         <source>Set user category failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WSClient.h" line="212"/>
+        <location filename="../src/WSClient.h" line="219"/>
         <source>this password has been compromised %1 times.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3897,27 +4113,27 @@ Biztosan folytatja?</translation>
         <translation>Bezárás</translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="60"/>
+        <location filename="../src/WindowLog.cpp" line="61"/>
         <source>Save logs to file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="80"/>
+        <location filename="../src/WindowLog.cpp" line="81"/>
         <source>Error</source>
         <translation type="unfinished">Hiba</translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="80"/>
+        <location filename="../src/WindowLog.cpp" line="81"/>
         <source>Unable to write to file %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="85"/>
+        <location filename="../src/WindowLog.cpp" line="86"/>
         <source>Moolticute</source>
         <translation type="unfinished">Moolticute</translation>
     </message>
     <message>
-        <location filename="../src/WindowLog.cpp" line="85"/>
+        <location filename="../src/WindowLog.cpp" line="86"/>
         <source>Successfully wrote logs to selected file.</source>
         <translation type="unfinished"></translation>
     </message>
