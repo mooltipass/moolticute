@@ -89,11 +89,11 @@ TOTPReader::TOTPResult TOTPReader::processDecodedQR(const QString &res)
     TOTPResult totp;
     QUrl url(res);
 
-    if (url.scheme().compare("otpauth") != 0) {
+    if (url.scheme().compare(TOTP_URI) != 0) {
         return totp; /* Not valid scheme */
     }
 
-    if (url.host().compare("totp") != 0) {
+    if (url.host().compare(TOTP_HOST) != 0) {
         return totp; /* Not valid scheme */
     }
 
