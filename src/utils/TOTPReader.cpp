@@ -2,16 +2,17 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QUrl>
+#include <QUrlQuery>
 
 QZXing TOTPReader::m_decoder{};
 bool TOTPReader::m_qr_decoder_set = false;
 
-const QString TOTPReader::TOTP_URI_START = "otpauth://totp/";
-const QString TOTPReader::PARAMS_START = "?";
-const QString TOTPReader::PARAMS_SEPARATOR = "&";
-const QString TOTPReader::SECRET = "secret=";
-const QString TOTPReader::DIGITS = "digits=";
-const QString TOTPReader::PERIOD = "period=";
+const QString TOTPReader::TOTP_URI = "otpauth";
+const QString TOTPReader::TOTP_HOST = "totp";
+const QString TOTPReader::SECRET = "secret";
+const QString TOTPReader::DIGITS = "digits";
+const QString TOTPReader::PERIOD = "period";
 const QString TOTPReader::TOTP_QR_WARNING = tr("TOTP QR issue");
 
 void TOTPReader::setupDecoder()
@@ -86,58 +87,54 @@ TOTPReader::TOTPResult TOTPReader::processDecodedQR(const QString &res)
     // Format: otpauth://totp/Example:test@gmail.com?secret=XXX&issuer=Example&digits=8&period=60
     // Parsing service, login, secret, digits and period
     TOTPResult totp;
-    if (res.startsWith(TOTP_URI_START))
-    {
-        QString totp_uri = res.mid(TOTP_URI_START.size());
-        totp.service = totp_uri.left(totp_uri.indexOf(':')).toLower();
+    QUrl url(res);
 
-        totp_uri = totp_uri.mid(totp_uri.indexOf(':') + 1);
-        auto paramsStartIdx = totp_uri.indexOf(PARAMS_START);
-        totp.login = totp_uri.left(paramsStartIdx);
-        if (totp.login.startsWith('@'))
-        {
-            totp.login = totp.login.mid(1);
-        }
-
-        // Get parameters from totp uri
-        QString params = totp_uri.mid(paramsStartIdx + 1);
-        if (params.contains(SECRET))
-        {
-            totp.secret = getParam(params, SECRET);
-            totp.isValid = !totp.secret.isEmpty();
-        }
-        else
-        {
-            qWarning() << "TOTP QR does not contain secret";
-        }
-
-        if (params.contains(DIGITS))
-        {
-            totp.digits = getParam(params, DIGITS).toInt();
-        }
-        else if (totp.isValid)
-        {
-            totp.digits = DEFAULT_DIGITS;
-        }
-
-        if (params.contains(PERIOD))
-        {
-            totp.period = getParam(params, PERIOD).toInt();
-        }
-        else if (totp.isValid)
-        {
-            totp.period = DEFAULT_PERIOD;
-        }
+    if (url.scheme().compare(TOTP_URI) != 0) {
+        return totp; /* Not valid scheme */
     }
+
+    if (url.host().compare(TOTP_HOST) != 0) {
+        return totp; /* Not valid scheme */
+    }
+
+    QString path = url.path();
+    QString login;
+    QString service;
+
+    login = path.mid(path.indexOf(":")+1);
+
+    /* Paths start with /, so ditch the first character */
+    service = path.left(path.indexOf(":")).toLower();
+    if (service.startsWith('/'))
+        service = service.mid(1);
+
+    if (login.startsWith('@'))
+        login = login.mid(1);
+
+    QUrlQuery query(url.query());
+
+    qDebug() << query.queryItemValue(SECRET);
+    qDebug() << query.queryItemValue(DIGITS);
+    qDebug() << query.queryItemValue(PERIOD);
+
+    totp.period = DEFAULT_PERIOD;
+    totp.digits = DEFAULT_DIGITS;
+
+    totp.login = login;
+    totp.service = service;
+
+    totp.isValid = query.hasQueryItem(SECRET);
+
+    if (!totp.isValid)
+        return totp;
+
+    totp.secret = query.queryItemValue(SECRET);
+
+    if (query.hasQueryItem(PERIOD))
+        totp.period = query.queryItemValue(PERIOD).toInt();
+
+    if (query.hasQueryItem(DIGITS))
+        totp.period = query.queryItemValue(DIGITS).toInt();
+
     return totp;
-}
-
-QString TOTPReader::getParam(const QString &params, const QString &selectedParam)
-{
-    QString param_part = params.mid(params.indexOf(selectedParam) + selectedParam.size());
-    if(param_part.contains(PARAMS_SEPARATOR))
-    {
-        return param_part.left(param_part.indexOf(PARAMS_SEPARATOR));
-    }
-    return param_part;
 }
