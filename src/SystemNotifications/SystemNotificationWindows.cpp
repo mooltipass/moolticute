@@ -37,7 +37,8 @@ typedef NTSTATUS (NTAPI *PNTQUERYWNFSTATEDATA)(
     _Out_writes_bytes_to_opt_(*BufferSize, *BufferSize) PVOID Buffer,
     _Inout_ PULONG BufferSize);
 
-const QString SystemNotificationWindows::SNORETOAST= "SnoreToast.exe";
+const QString SystemNotificationWindows::SNORETOAST_EXE = "SnoreToast.exe";
+const QString SystemNotificationWindows::SNORETOAST= [](){ return findSnoreToast(QDir::currentPath()); }();
 const QString SystemNotificationWindows::SNORETOAST_INSTALL= "-install";
 const QString SystemNotificationWindows::NOTIFICATIONS_SETTING_REGENTRY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
 const QString SystemNotificationWindows::DND_ENABLED_REGENTRY = "NOC_GLOBAL_SETTING_TOASTS_ENABLED";
@@ -53,7 +54,6 @@ SystemNotificationWindows::SystemNotificationWindows(QObject *parent)
     process = new QProcess();
     notificationMap = new NotificationMap();
     messageMap = new MessageMap();
-    installSnoreToast();
 }
 
 SystemNotificationWindows::~SystemNotificationWindows()
@@ -153,6 +153,29 @@ bool SystemNotificationWindows::displayDomainSelectionNotification(const QString
         serviceName = dlg.getServiceName();
         return isSuccess;
     }
+}
+
+QString SystemNotificationWindows::findSnoreToast(QString path)
+{
+    QDirIterator it{path, QDirIterator::Subdirectories};
+    while (it.hasNext())
+    {
+        QString filename = it.next();
+        QFileInfo file{filename};
+
+        if (file.isDir())
+        {
+            continue;
+        }
+
+        if (file.fileName().contains(SNORETOAST_EXE, Qt::CaseInsensitive))
+        {
+            qDebug() << "SnoreToast path: " << file.absoluteFilePath();
+            return file.absoluteFilePath();
+        }
+    }
+    qWarning() << "SnoreToast is not available.";
+    return "";
 }
 
 void SystemNotificationWindows::installSnoreToast()
