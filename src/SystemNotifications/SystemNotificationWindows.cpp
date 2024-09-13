@@ -38,8 +38,8 @@ typedef NTSTATUS (NTAPI *PNTQUERYWNFSTATEDATA)(
     _Inout_ PULONG BufferSize);
 
 const QString SystemNotificationWindows::SNORETOAST_EXE = "SnoreToast.exe";
-const QString SystemNotificationWindows::SNORETOAST= [](){ return findSnoreToast(QDir::currentPath()); }();
 const QString SystemNotificationWindows::SNORETOAST_INSTALL= "-install";
+const QString SystemNotificationWindows::APP_ID = "Moolticute";
 const QString SystemNotificationWindows::NOTIFICATIONS_SETTING_REGENTRY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings";
 const QString SystemNotificationWindows::DND_ENABLED_REGENTRY = "NOC_GLOBAL_SETTING_TOASTS_ENABLED";
 const QString SystemNotificationWindows::TOAST_ENABLED_SETTING_REGPATH = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications";
@@ -101,7 +101,7 @@ void SystemNotificationWindows::createButtonChoiceNotification(const QString &ti
     notificationMap->insert(notificationId, proc);
     connect(proc, static_cast<CallbackType>(&QProcess::finished), this, &SystemNotificationWindows::callbackFunction);
     QStringList choiceArgs = { "-t", title, "-m", text, "-b", buttonString, "-id", QString::number(notificationId++), "-p", ICON, "-w"};
-    proc->start(SNORETOAST, choiceArgs);
+    proc->start(getSnoreToast(), choiceArgs);
 }
 
 void SystemNotificationWindows::createTextBoxNotification(const QString &title, const QString text)
@@ -110,7 +110,7 @@ void SystemNotificationWindows::createTextBoxNotification(const QString &title, 
     notificationMap->insert(notificationId, proc);
     QStringList textNotiArgs = { "-t", title, "-m", text, "-tb", "-id", QString::number(notificationId++), "-p", ICON, "-w"};
     connect(proc, static_cast<CallbackType>(&QProcess::finished), this, &SystemNotificationWindows::callbackFunction);
-    proc->start(SNORETOAST, textNotiArgs);
+    proc->start(getSnoreToast(), textNotiArgs);
 }
 
 bool SystemNotificationWindows::displayLoginRequestNotification(const QString &service, QString &loginName, QString message)
@@ -155,6 +155,12 @@ bool SystemNotificationWindows::displayDomainSelectionNotification(const QString
     }
 }
 
+QString SystemNotificationWindows::getSnoreToast()
+{
+    static const QString SNORE_TOAST = findSnoreToast(QDir::currentPath());
+    return SNORE_TOAST;
+}
+
 QString SystemNotificationWindows::findSnoreToast(QString path)
 {
     QDirIterator it{path, QDirIterator::Subdirectories};
@@ -182,7 +188,7 @@ void SystemNotificationWindows::installSnoreToast()
 {
     if (IS_WIN10_OR_ABOVE)
     {
-        process->start(SNORETOAST, {SNORETOAST_INSTALL});
+        process->start(getSnoreToast(), {SNORETOAST_INSTALL});
     }
 }
 

@@ -30,11 +30,12 @@ public:
     virtual bool displayLoginRequestNotification(const QString& service, QString &loginName, QString message) override;
     virtual bool displayDomainSelectionNotification(const QString& domain, const QString& subdomain, QString &serviceName, QString message) override;
 
+    static inline QString getSnoreToast();
     static QString findSnoreToast(QString path);
 
     const static QString SNORETOAST_EXE;
-    const static QString SNORETOAST;
     const static QString SNORETOAST_INSTALL;
+    const static QString APP_ID;
     const static QString NOTIFICATIONS_SETTING_REGENTRY;
     const static QString DND_ENABLED_REGENTRY;
     const static QString TOAST_ENABLED_SETTING_REGPATH;
