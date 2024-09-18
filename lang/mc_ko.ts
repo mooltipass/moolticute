@@ -193,7 +193,7 @@
     </message>
     <message>
         <location filename="../src/BleDev.cpp" line="151"/>
-        <location filename="../src/BleDev.cpp" line="221"/>
+        <location filename="../src/BleDev.cpp" line="222"/>
         <source>Invalid bundle file is selected</source>
         <translation>잘못된 번들 파일이 선택되었습니다.</translation>
     </message>
@@ -203,67 +203,67 @@
         <translation>지정된 번들 파일 이름이 올바르지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="163"/>
+        <location filename="../src/BleDev.cpp" line="164"/>
         <source>The device serial number is not correct in bundle filename.</source>
         <translation>번들 파일 이름에 장치 일련 번호가 올바르지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="170"/>
+        <location filename="../src/BleDev.cpp" line="171"/>
         <source>The bundle version is not correct in bundle filename.</source>
         <translation>번들 파일 이름에 번들 버전이 올바르지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="184"/>
+        <location filename="../src/BleDev.cpp" line="185"/>
         <source>Battery too low for bundle upload</source>
         <translation>배터리가 너무 부족하여 번들을 업로드할 수 없음</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="185"/>
+        <location filename="../src/BleDev.cpp" line="186"/>
         <source>Please have your device connected through USB and fully charged</source>
         <translation>장치를 USB로 연결하고 완전히 충전한 상태여야 합니다.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="193"/>
+        <location filename="../src/BleDev.cpp" line="194"/>
         <source>Select bundle file</source>
         <translation>번들 파일 선택</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="213"/>
+        <location filename="../src/BleDev.cpp" line="214"/>
         <source>Invalid path</source>
         <translation>잘못된 경로</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="214"/>
+        <location filename="../src/BleDev.cpp" line="215"/>
         <source>The choosen path for bundle is not a file.</source>
         <translation>번들에 대해 선택한 경로가 파일이 아닙니다.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="222"/>
+        <location filename="../src/BleDev.cpp" line="223"/>
         <source>The given bundle file is not correct.</source>
         <translation>지정된 번들 파일이 올바르지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="238"/>
+        <location filename="../src/BleDev.cpp" line="239"/>
         <source>Starting upload bundle file.</source>
         <translation>번들 파일 업로드 시작.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="250"/>
+        <location filename="../src/BleDev.cpp" line="251"/>
         <source>Upload Bundle Result</source>
         <translation>번들 결과 업로드</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="255"/>
+        <location filename="../src/BleDev.cpp" line="256"/>
         <source>Upload bundle finished successfully.</source>
         <translation>번들 업로드가 성공적으로 완료되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="260"/>
+        <location filename="../src/BleDev.cpp" line="261"/>
         <source>Upload bundle finished with error.</source>
         <translation>번들 업로드가 오류와 함께 완료되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/BleDev.cpp" line="277"/>
+        <location filename="../src/BleDev.cpp" line="278"/>
         <source>Select file to fetch data</source>
         <translation>데이터를 가져올 파일 선택</translation>
     </message>
@@ -1200,8 +1200,8 @@ Maximum allowed size is %2 bytes.</source>
     <name>MainWindow</name>
     <message>
         <location filename="../src/MainWindow.ui" line="26"/>
-        <location filename="../src/MainWindow.cpp" line="1576"/>
-        <location filename="../src/MainWindow.cpp" line="1599"/>
+        <location filename="../src/MainWindow.cpp" line="1585"/>
+        <location filename="../src/MainWindow.cpp" line="1608"/>
         <source>Moolticute</source>
         <translation></translation>
     </message>
@@ -1890,7 +1890,7 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="2429"/>
-        <location filename="../src/MainWindow.ui" line="4728"/>
+        <location filename="../src/MainWindow.ui" line="4744"/>
         <source>Integrity Check</source>
         <translation>무결성 검사</translation>
     </message>
@@ -2005,327 +2005,332 @@ Hint: keep your mouse positioned over an option to get more details.</source>
         <translation>잘못된 일련 번호</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3405"/>
+        <location filename="../src/MainWindow.ui" line="3386"/>
+        <source>Community Creation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="3421"/>
         <source>Device Memory:</source>
         <translation>장치 메모리:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3439"/>
+        <location filename="../src/MainWindow.ui" line="3455"/>
         <source>Aux MCU Version:</source>
         <translation>보조 MCU 버전:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3473"/>
+        <location filename="../src/MainWindow.ui" line="3489"/>
         <source>Main MCU Version:</source>
         <translation>메인 MCU 버전:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3507"/>
+        <location filename="../src/MainWindow.ui" line="3523"/>
         <source>Bundle Version:</source>
         <translation>번들 버전:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3585"/>
+        <location filename="../src/MainWindow.ui" line="3601"/>
         <location filename="../src/MainWindow.cpp" line="39"/>
         <source>User Manual</source>
         <translation>사용자 설명서</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3608"/>
+        <location filename="../src/MainWindow.ui" line="3624"/>
         <source>UID Request</source>
         <translation>UID 요청</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3644"/>
-        <location filename="../src/MainWindow.ui" line="3761"/>
+        <location filename="../src/MainWindow.ui" line="3660"/>
+        <location filename="../src/MainWindow.ui" line="3777"/>
         <source>Password</source>
         <translation>비밀번호</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3651"/>
-        <location filename="../src/MainWindow.ui" line="3768"/>
+        <location filename="../src/MainWindow.ui" line="3667"/>
+        <location filename="../src/MainWindow.ui" line="3784"/>
         <source>Validate</source>
         <translation>유효성 검사</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3731"/>
-        <location filename="../src/MainWindow.cpp" line="635"/>
-        <location filename="../src/MainWindow.cpp" line="2370"/>
+        <location filename="../src/MainWindow.ui" line="3747"/>
+        <location filename="../src/MainWindow.cpp" line="636"/>
+        <location filename="../src/MainWindow.cpp" line="2387"/>
         <source>Security Challenge</source>
         <translation>보안 과제</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3900"/>
+        <location filename="../src/MainWindow.ui" line="3916"/>
         <source>Moolticute Settings</source>
         <translation>Moolticute 설정</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="3970"/>
+        <location filename="../src/MainWindow.ui" line="3986"/>
         <source>Application Language</source>
         <translation>애플리케이션 언어</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4003"/>
+        <location filename="../src/MainWindow.ui" line="4019"/>
         <source>Start Moolticute with the computer: Enabled</source>
         <translation>컴퓨터로 Moolticute를 시작합니다: 활성화됨</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4029"/>
-        <location filename="../src/MainWindow.ui" line="4314"/>
-        <location filename="../src/MainWindow.ui" line="4357"/>
+        <location filename="../src/MainWindow.ui" line="4045"/>
+        <location filename="../src/MainWindow.ui" line="4330"/>
+        <location filename="../src/MainWindow.ui" line="4373"/>
         <source>Change</source>
         <translation>변경</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4046"/>
+        <location filename="../src/MainWindow.ui" line="4062"/>
         <source>View Daemon Logs</source>
         <translation>데몬 로그 보기</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4072"/>
+        <location filename="../src/MainWindow.ui" line="4088"/>
         <source>View</source>
         <translation>보기</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4095"/>
+        <location filename="../src/MainWindow.ui" line="4111"/>
         <source>Enable full developer log</source>
         <translation>전체 개발자 로그 사용</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4107"/>
-        <location filename="../src/MainWindow.ui" line="4181"/>
-        <location filename="../src/MainWindow.ui" line="4224"/>
-        <location filename="../src/MainWindow.ui" line="4553"/>
+        <location filename="../src/MainWindow.ui" line="4123"/>
+        <location filename="../src/MainWindow.ui" line="4197"/>
+        <location filename="../src/MainWindow.ui" line="4240"/>
+        <location filename="../src/MainWindow.ui" line="4569"/>
         <source>(Restart Needed)</source>
         <translation>(재시작 필요)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4127"/>
+        <location filename="../src/MainWindow.ui" line="4143"/>
         <source>Enable Debug Log</source>
         <translation>디버그 로그 활성화</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4138"/>
+        <location filename="../src/MainWindow.ui" line="4154"/>
         <source>Allow to use invalid or private TLDs</source>
         <translation>유효하지 않거나 비공개 TLD 사용 허용</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4158"/>
+        <location filename="../src/MainWindow.ui" line="4174"/>
         <source>Disable TLD check</source>
         <translation>TLD 확인 비활성화</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4169"/>
+        <location filename="../src/MainWindow.ui" line="4185"/>
         <source>Start Moolticute SSH Agent Automatically</source>
         <translation>Moolticute SSH 에이전트 자동 시작</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4201"/>
+        <location filename="../src/MainWindow.ui" line="4217"/>
         <source>Autostart SSH Agent</source>
         <translation>SSH 에이전트 자동 시작</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4212"/>
+        <location filename="../src/MainWindow.ui" line="4228"/>
         <source>Moolticute SSH Arguments</source>
         <translation>Moolticute SSH 인자</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4257"/>
+        <location filename="../src/MainWindow.ui" line="4273"/>
         <source>Restart Daemon with Debug Web Server (on port 8484)</source>
         <translation>디버그 웹 서버로 데몬 재시작(포트 8484에서)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4277"/>
+        <location filename="../src/MainWindow.ui" line="4293"/>
         <source>Enable Daemon Web Server</source>
         <translation>데몬 웹 서버 사용</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4288"/>
+        <location filename="../src/MainWindow.ui" line="4304"/>
         <source>Integration with Have I Been Pwned: Enabled</source>
         <translation>Have I Been Pwned와 통합: 활성화됨</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4331"/>
+        <location filename="../src/MainWindow.ui" line="4347"/>
         <source>Subdomain selection: Enabled</source>
         <translation>하위 도메인 선택: 활성화됨</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4374"/>
+        <location filename="../src/MainWindow.ui" line="4390"/>
         <source>Manage Your Password Profiles</source>
         <translation>비밀번호 프로필 관리</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4394"/>
+        <location filename="../src/MainWindow.ui" line="4410"/>
         <source>Password Profiles...</source>
         <translation>비밀번호 프로필...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4405"/>
+        <location filename="../src/MainWindow.ui" line="4421"/>
         <source>Default Password Length</source>
         <translation>기본 비밀번호 길이</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4442"/>
+        <location filename="../src/MainWindow.ui" line="4458"/>
         <source>Lock device when screen is locked</source>
         <translation>화면이 잠겨 있을 때 기기 잠금</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4462"/>
+        <location filename="../src/MainWindow.ui" line="4478"/>
         <source>Enable Device Lock</source>
         <translation>장치 잠금 사용</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4479"/>
+        <location filename="../src/MainWindow.ui" line="4495"/>
         <source>Delayed Cancel Buttons to Prevent Mistakes</source>
         <translation>실수를 방지하는 지연 취소 버튼</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4499"/>
+        <location filename="../src/MainWindow.ui" line="4515"/>
         <source>Enable Long Press Cancel Buttons</source>
         <translation>길게 누르기 취소 버튼 활성화</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4510"/>
+        <location filename="../src/MainWindow.ui" line="4526"/>
         <source>Backup Notification Banner</source>
         <translation>백업 알림 배너</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4530"/>
+        <location filename="../src/MainWindow.ui" line="4546"/>
         <source>Enable Backup Notification</source>
         <translation>백업 알림 사용</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4541"/>
+        <location filename="../src/MainWindow.ui" line="4557"/>
         <source>Display Moolticute Tutorial</source>
         <translation>Moolticute 튜토리얼 표시</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4573"/>
+        <location filename="../src/MainWindow.ui" line="4589"/>
         <source>Display tutorial</source>
         <translation>튜토리얼 표시</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4584"/>
-        <location filename="../src/MainWindow.ui" line="4613"/>
+        <location filename="../src/MainWindow.ui" line="4600"/>
+        <location filename="../src/MainWindow.ui" line="4629"/>
         <source>when selected, you can set moolticute to set a given category upon device connection</source>
         <translation>선택시 디바이스 연결 시 특정 카테고리를 설정하도록 moolticute를 설정할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4587"/>
+        <location filename="../src/MainWindow.ui" line="4603"/>
         <source>Upon connection, force category:</source>
         <translation>연결되면 카테고리를 강제 적용합니다:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4624"/>
+        <location filename="../src/MainWindow.ui" line="4640"/>
         <source>Systray icon</source>
         <translation>시스템트레이 아이콘</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4735"/>
+        <location filename="../src/MainWindow.ui" line="4751"/>
         <source>Now checking the integrity of your stored credentials. This may take a while. Please do not unplug your Mooltipass during the check.</source>
         <translation>이제 저장된 자격 증명의 무결성을 확인합니다. 시간이 걸릴 수 있습니다. 확인하는 동안 Mooltipass의 연결을 제거하지 마세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4775"/>
+        <location filename="../src/MainWindow.ui" line="4791"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4926"/>
+        <location filename="../src/MainWindow.ui" line="4942"/>
         <source>CSV file import/export</source>
         <translation>CSV 파일 가져오기/내보내기</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4948"/>
+        <location filename="../src/MainWindow.ui" line="4964"/>
         <source>Import unencrypted passwords</source>
         <translation>암호화되지 않은 비밀번호 가져오기</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4955"/>
-        <location filename="../src/MainWindow.ui" line="4980"/>
-        <location filename="../src/MainWindow.ui" line="5083"/>
+        <location filename="../src/MainWindow.ui" line="4971"/>
+        <location filename="../src/MainWindow.ui" line="4996"/>
+        <location filename="../src/MainWindow.ui" line="5099"/>
         <source>?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4964"/>
+        <location filename="../src/MainWindow.ui" line="4980"/>
         <source>Import CSV</source>
         <translation>CSV 가져오기</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4973"/>
+        <location filename="../src/MainWindow.ui" line="4989"/>
         <source>Export passwords unencrypted</source>
         <translation>암호화되지 않은 비밀번호 내보내기</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="4989"/>
+        <location filename="../src/MainWindow.ui" line="5005"/>
         <source>Export CSV</source>
         <translation>CSV 내보내기</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5007"/>
+        <location filename="../src/MainWindow.ui" line="5023"/>
         <source>SSH Key Tab</source>
         <translation>SSH 키 탭</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5019"/>
+        <location filename="../src/MainWindow.ui" line="5035"/>
         <source>Visible ON DE&amp;MAND  (use SHIFT+F1 keyboard shortcut)</source>
         <translation>주문형 표시(&amp;M)(단축키 SHIFT+F1 사용)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5029"/>
+        <location filename="../src/MainWindow.ui" line="5045"/>
         <source>ALWA&amp;YS visible</source>
         <translation>항상 표시(&amp;Y)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5039"/>
+        <location filename="../src/MainWindow.ui" line="5055"/>
         <source>Reset card</source>
         <translation>카드 재설정</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5073"/>
+        <location filename="../src/MainWindow.ui" line="5089"/>
         <source>Erase Inserted Card</source>
         <translation>삽입된 카드 지우기</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5092"/>
+        <location filename="../src/MainWindow.ui" line="5108"/>
         <source>Reset Card</source>
         <translation>카드 재설정</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5104"/>
+        <location filename="../src/MainWindow.ui" line="5120"/>
         <source>Information</source>
         <translation>정보</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5127"/>
+        <location filename="../src/MainWindow.ui" line="5143"/>
         <source>Get</source>
         <translation>가져오기</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5148"/>
+        <location filename="../src/MainWindow.ui" line="5164"/>
         <source>Number of available users:</source>
         <translation>사용 가능한 사용자 수:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5206"/>
-        <location filename="../src/MainWindow.cpp" line="2352"/>
+        <location filename="../src/MainWindow.ui" line="5222"/>
+        <location filename="../src/MainWindow.cpp" line="2369"/>
         <source>NiMH Reconditioning</source>
         <translation>NiMH 리컨디셔닝</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5223"/>
+        <location filename="../src/MainWindow.ui" line="5239"/>
         <source>Start NiMH Reconditioning</source>
         <translation>NiMH 리컨디셔닝 시작</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="5256"/>
+        <location filename="../src/MainWindow.ui" line="5272"/>
         <source>Continues until nominal capacity reached</source>
         <translation>공칭 용량에 도달할 때까지 계속 진행</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="34"/>
-        <location filename="../src/MainWindow.cpp" line="400"/>
+        <location filename="../src/MainWindow.cpp" line="401"/>
         <source>None</source>
         <translation>없음</translation>
     </message>
@@ -2410,412 +2415,417 @@ Think twice before resetting a card.</source>
         <translation>메인 MCU 버전:</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="311"/>
+        <location filename="../src/MainWindow.cpp" line="312"/>
         <source>Low Battery</source>
         <translation>배터리 부족</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="311"/>
+        <location filename="../src/MainWindow.cpp" line="312"/>
         <source>Battery is below %1%, please charge your Mooltipass.</source>
         <translation>배터리가 %1% 미만입니다. Mooltipass를 충전하세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="379"/>
+        <location filename="../src/MainWindow.cpp" line="380"/>
         <source>Very Low</source>
         <translation>매우 낮음</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="380"/>
+        <location filename="../src/MainWindow.cpp" line="381"/>
         <source>Low</source>
         <translation>낮음</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="381"/>
+        <location filename="../src/MainWindow.cpp" line="382"/>
         <source>Medium</source>
         <translation>보통</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="382"/>
+        <location filename="../src/MainWindow.cpp" line="383"/>
         <source>High</source>
         <translation>높음</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="387"/>
+        <location filename="../src/MainWindow.cpp" line="388"/>
         <source>No Inactivity</source>
         <translation>비활성 상태 없음</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="388"/>
+        <location filename="../src/MainWindow.cpp" line="389"/>
         <source>5 minutes</source>
         <translation>5분</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="389"/>
+        <location filename="../src/MainWindow.cpp" line="390"/>
         <source>10 minutes</source>
         <translation>10 분</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="390"/>
+        <location filename="../src/MainWindow.cpp" line="391"/>
         <source>15 minutes</source>
         <translation>15 분</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="391"/>
+        <location filename="../src/MainWindow.cpp" line="392"/>
         <source>30 minutes</source>
         <translation>30 분</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="393"/>
+        <location filename="../src/MainWindow.cpp" line="394"/>
         <source>0.5 second</source>
         <translation>0.5 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="394"/>
+        <location filename="../src/MainWindow.cpp" line="395"/>
         <source>1 second</source>
         <translation>1 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="395"/>
+        <location filename="../src/MainWindow.cpp" line="396"/>
         <source>2 seconds</source>
         <translation>2 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="396"/>
+        <location filename="../src/MainWindow.cpp" line="397"/>
         <source>3 seconds</source>
         <translation>3 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="397"/>
+        <location filename="../src/MainWindow.cpp" line="398"/>
         <source>4 seconds</source>
         <translation>4 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="398"/>
+        <location filename="../src/MainWindow.cpp" line="399"/>
         <source>5 seconds</source>
         <translation>5 초</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="401"/>
+        <location filename="../src/MainWindow.cpp" line="402"/>
         <source>Nyancat</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="403"/>
+        <location filename="../src/MainWindow.cpp" line="404"/>
         <source>Let moolticute decide</source>
         <translation>Moolticute가 결정합니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="404"/>
+        <location filename="../src/MainWindow.cpp" line="405"/>
         <source>Force subdomain support</source>
         <translation>하위 도메인 강제 지원</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="405"/>
+        <location filename="../src/MainWindow.cpp" line="406"/>
         <source>Force subdomain ignore</source>
         <translation>하위 도메인 강제 무시</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="419"/>
+        <location filename="../src/MainWindow.cpp" line="420"/>
         <source>&amp;File</source>
         <translation>파일(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="420"/>
+        <location filename="../src/MainWindow.cpp" line="421"/>
         <source>&amp;Quit</source>
         <translation>종료(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="428"/>
+        <location filename="../src/MainWindow.cpp" line="429"/>
         <source>Black</source>
         <translation>검정</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="429"/>
+        <location filename="../src/MainWindow.cpp" line="430"/>
         <source>White</source>
         <translation>흰색</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="429"/>
+        <location filename="../src/MainWindow.cpp" line="430"/>
         <source>_white</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="574"/>
+        <location filename="../src/MainWindow.cpp" line="575"/>
         <source>Fetching UID from device. This may take a few seconds...</source>
         <translation>장치에서 UID를 가져옵니다. 몇 초 정도 걸릴 수 있습니다...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="590"/>
+        <location filename="../src/MainWindow.cpp" line="591"/>
         <source>Either the device have been tempered with or the input key is invalid.</source>
         <translation>장치가 템퍼링되었거나 입력 키가 유효하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="594"/>
+        <location filename="../src/MainWindow.cpp" line="595"/>
         <source>Your device&apos;s UID is %1</source>
         <translation>장치의 UID는 %1입니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="636"/>
+        <location filename="../src/MainWindow.cpp" line="637"/>
         <source>Security Challenge Failed</source>
         <translation>보안 챌린지 실패</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="738"/>
-        <location filename="../src/MainWindow.cpp" line="1384"/>
-        <location filename="../src/MainWindow.cpp" line="1397"/>
-        <location filename="../src/MainWindow.cpp" line="1414"/>
-        <location filename="../src/MainWindow.cpp" line="1982"/>
-        <location filename="../src/MainWindow.cpp" line="2515"/>
+        <location filename="../src/MainWindow.cpp" line="739"/>
+        <location filename="../src/MainWindow.cpp" line="1393"/>
+        <location filename="../src/MainWindow.cpp" line="1406"/>
+        <location filename="../src/MainWindow.cpp" line="1423"/>
+        <location filename="../src/MainWindow.cpp" line="1999"/>
+        <location filename="../src/MainWindow.cpp" line="2532"/>
         <source>Disabled</source>
         <translation>비활성화</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="739"/>
+        <location filename="../src/MainWindow.cpp" line="740"/>
         <source>Password Only</source>
         <translation>비밀번호 전용</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="740"/>
+        <location filename="../src/MainWindow.cpp" line="741"/>
         <source>Login + Password</source>
         <translation>로그인 + 비밀번호</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="741"/>
+        <location filename="../src/MainWindow.cpp" line="742"/>
         <source>[Enter] + Password</source>
         <translation>[Enter] + 비밀번호</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="742"/>
+        <location filename="../src/MainWindow.cpp" line="743"/>
         <source>[Ctrl+Alt+Del] + Pass</source>
         <translation>[Ctrl+Alt+Del] + 패스</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="743"/>
+        <location filename="../src/MainWindow.cpp" line="744"/>
         <source>Password / [Win+L]</source>
         <translation>비밀번호 / [Win+L]</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="744"/>
+        <location filename="../src/MainWindow.cpp" line="745"/>
         <source>Login + Pass / [Win+L]</source>
         <translation>로그인 + 패스 / [Win+L]</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="745"/>
+        <location filename="../src/MainWindow.cpp" line="746"/>
         <source>[Enter] + Pass / [Win+L]</source>
         <translation>[Enter] + 패스 / [Win+L]</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="746"/>
+        <location filename="../src/MainWindow.cpp" line="747"/>
         <source>[Ctrl+Alt+Del] + Pass / [Win+L]</source>
         <translation>[Ctrl+Alt+Del] + 패스 / [Win+L]</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="790"/>
+        <location filename="../src/MainWindow.cpp" line="791"/>
         <source>Credentials have been modified.
 Do you want to save your changes?</source>
         <translation>자격 증명이 수정되었습니다.
 변경 사항을 저장하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="861"/>
+        <location filename="../src/MainWindow.cpp" line="862"/>
         <source>Device Bluetooth Name Changed</source>
         <translation>블루투스 이름 변경</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="862"/>
+        <location filename="../src/MainWindow.cpp" line="863"/>
         <source>Please disable and re-enable bluetooth for your changes to take effect</source>
         <translation>변경 사항을 적용하려면 블루투스를 비활성화했다가 다시 활성화하세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="971"/>
+        <location filename="../src/MainWindow.cpp" line="972"/>
         <source>Remove the card from the device to change this setting.</source>
         <translation>이 설정을 변경하려면 장치에서 카드를 제거합니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="994"/>
+        <location filename="../src/MainWindow.cpp" line="995"/>
         <source>%1Mb</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1161"/>
-        <location filename="../src/MainWindow.cpp" line="1312"/>
+        <location filename="../src/MainWindow.cpp" line="1170"/>
+        <location filename="../src/MainWindow.cpp" line="1321"/>
         <source>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--enter_credentials_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치 확인 대기 중&lt;/span&gt;&lt;/p&gt;&lt;p&gt;기기에서 요청을 확인합니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1174"/>
+        <location filename="../src/MainWindow.cpp" line="1183"/>
         <source>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving Changes to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--save_credentials_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치에 변경 사항 저장&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1190"/>
+        <location filename="../src/MainWindow.cpp" line="1199"/>
         <source>Couldn&apos;t change all passwords, please approve prompts on the device</source>
         <translation>모든 비밀번호를 변경할 수 없습니다. 기기에서 메시지가 표시되면 승인해 주세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1194"/>
+        <location filename="../src/MainWindow.cpp" line="1203"/>
         <source>Couldn&apos;t save credentials, please contact the support team with moolticute&apos;s log</source>
         <translation>자격 증명을 저장할 수 없습니다. moolticute의 로그와 함께 지원팀에 문의하세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1196"/>
+        <location filename="../src/MainWindow.cpp" line="1205"/>
         <source>Failure</source>
         <translation>실패</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1210"/>
+        <location filename="../src/MainWindow.cpp" line="1219"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;기기에서 요청을 승인해 주세요&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1223"/>
+        <location filename="../src/MainWindow.cpp" line="1232"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Please Approve Request On Device&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;기기에서 요청을 승인해 주세요&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1281"/>
+        <location filename="../src/MainWindow.cpp" line="1290"/>
         <source>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--exit_file_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;디바이스의 메모리에 변경 사항 저장&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1302"/>
+        <location filename="../src/MainWindow.cpp" line="1311"/>
         <source>&lt;html&gt;&lt;!--exit_fido_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Saving changes to device&apos;s memory&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--exit_fido_mgm_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;디바이스의 메모리에 변경 사항 저장&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1342"/>
+        <location filename="../src/MainWindow.cpp" line="1351"/>
         <source>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Exporting Database from Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--export_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치에서 데이터베이스 내보내기&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1345"/>
+        <location filename="../src/MainWindow.cpp" line="1354"/>
         <source>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Importing and Merging File to Device&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--import_db_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치로 파일 가져오기 및 병합&lt;/span&gt;&lt;/p&gt;&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1363"/>
+        <location filename="../src/MainWindow.cpp" line="1372"/>
         <source>Disable autostart at boot?</source>
         <translation>부팅 시 자동 시작을 비활성화하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1365"/>
+        <location filename="../src/MainWindow.cpp" line="1374"/>
         <source>Enable autostart at boot?</source>
         <translation>부팅 시 자동 시작을 사용하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1384"/>
+        <location filename="../src/MainWindow.cpp" line="1393"/>
         <source>Start Moolticute with the computer: %1</source>
         <translation>컴퓨터에서 Moolticute 시작: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1384"/>
-        <location filename="../src/MainWindow.cpp" line="1397"/>
-        <location filename="../src/MainWindow.cpp" line="1414"/>
+        <location filename="../src/MainWindow.cpp" line="1393"/>
+        <location filename="../src/MainWindow.cpp" line="1406"/>
+        <location filename="../src/MainWindow.cpp" line="1423"/>
         <source>Enabled</source>
         <translation>활성화됨</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1386"/>
-        <location filename="../src/MainWindow.cpp" line="1399"/>
-        <location filename="../src/MainWindow.cpp" line="1417"/>
+        <location filename="../src/MainWindow.cpp" line="1395"/>
+        <location filename="../src/MainWindow.cpp" line="1408"/>
+        <location filename="../src/MainWindow.cpp" line="1426"/>
         <source>Disable</source>
         <translation>비활성화</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1388"/>
-        <location filename="../src/MainWindow.cpp" line="1401"/>
-        <location filename="../src/MainWindow.cpp" line="1421"/>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <location filename="../src/MainWindow.cpp" line="1410"/>
+        <location filename="../src/MainWindow.cpp" line="1430"/>
         <source>Enable</source>
         <translation>활성화</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <location filename="../src/MainWindow.cpp" line="1406"/>
         <source>Subdomain selection: %1</source>
         <translation>하위 도메인 선택: %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1412"/>
+        <location filename="../src/MainWindow.cpp" line="1421"/>
         <source>Integration with &lt;a href=&quot;%1&quot;&gt;Have I Been Pwned&lt;/a&gt;: %2</source>
         <translation>&lt;a href=&quot;%1&quot;&gt;Have I Been Pwned&lt;/a&gt;와 통합: %2</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1518"/>
+        <location filename="../src/MainWindow.cpp" line="1527"/>
         <source>Select database export...</source>
         <translation>데이터베이스 내보내기 선택...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1527"/>
-        <location filename="../src/MainWindow.cpp" line="1548"/>
-        <location filename="../src/MainWindow.cpp" line="1571"/>
-        <location filename="../src/MainWindow.cpp" line="1603"/>
-        <location filename="../src/MainWindow.cpp" line="2101"/>
-        <location filename="../src/MainWindow.cpp" line="2121"/>
-        <location filename="../src/MainWindow.cpp" line="2154"/>
-        <location filename="../src/MainWindow.cpp" line="2158"/>
-        <location filename="../src/MainWindow.cpp" line="2166"/>
+        <location filename="../src/MainWindow.cpp" line="1536"/>
+        <location filename="../src/MainWindow.cpp" line="1557"/>
+        <location filename="../src/MainWindow.cpp" line="1580"/>
+        <location filename="../src/MainWindow.cpp" line="1612"/>
+        <location filename="../src/MainWindow.cpp" line="2118"/>
+        <location filename="../src/MainWindow.cpp" line="2138"/>
+        <location filename="../src/MainWindow.cpp" line="2171"/>
+        <location filename="../src/MainWindow.cpp" line="2175"/>
+        <location filename="../src/MainWindow.cpp" line="2183"/>
         <source>Error</source>
         <translation>에러</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1527"/>
-        <location filename="../src/MainWindow.cpp" line="2101"/>
+        <location filename="../src/MainWindow.cpp" line="1536"/>
+        <location filename="../src/MainWindow.cpp" line="2118"/>
         <source>Unable to read file %1</source>
         <translation>%1파일을 읽을 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1551"/>
+        <location filename="../src/MainWindow.cpp" line="1560"/>
         <source>Save database export...</source>
         <translation>데이터베이스 내보내기 저장...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1571"/>
+        <location filename="../src/MainWindow.cpp" line="1580"/>
         <source>Unable to write to file %1</source>
         <translation>%1파일에 쓸 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1576"/>
+        <location filename="../src/MainWindow.cpp" line="1585"/>
         <source>Successfully exported the database from your device.</source>
         <translation>장치에서 데이터베이스를 성공적으로 내보냈습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1599"/>
+        <location filename="../src/MainWindow.cpp" line="1608"/>
         <source>Successfully imported and merged database into the device.</source>
         <translation>데이터베이스를 장치로 성공적으로 가져와 병합했습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1614"/>
+        <location filename="../src/MainWindow.cpp" line="1623"/>
         <source>Do you want to start the integrity check of your device?</source>
         <translation>디바이스의 무결성 검사를 시작하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1625"/>
+        <location filename="../src/MainWindow.cpp" line="1634"/>
         <source>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;Waiting For Device Confirmation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Confirm the request on your device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--check_integrity_job--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;장치 확인 대기 중&lt;/span&gt;&lt;/p&gt;&lt;p&gt;기기에서 요청을 확인합니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1657"/>
+        <location filename="../src/MainWindow.cpp" line="1666"/>
         <source>Memory integrity check failed!</source>
         <translation>메모리 무결성 검사에 실패했습니다!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1663"/>
+        <location filename="../src/MainWindow.cpp" line="1672"/>
         <source>Memory integrity check done successfully!
 %1 of %2 credential slots used.</source>
         <translation>메모리 무결성 검사가 성공적으로 완료되었습니다!
 자격 증명 슬롯 %2개 중 %1개를 사용했습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1672"/>
+        <location filename="../src/MainWindow.cpp" line="1681"/>
         <source>To be sure that no one has tempered with your device, you can request a password which will allow you to fetch the UID of your device.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the password.&lt;/li&gt;&lt;li&gt;Enter the password you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translation>장치에 템퍼링한 사람이 없는지 확인하기 위해 장치의 UID를 가져올 수 있는 비밀번호를 요청할 수 있습니다.&lt;ol&gt;&lt;li&gt;장치 뒷면에서 일련번호를 가져옵니다.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=UID Request Code&amp;body=My serial number is %1 and my order number is: FILL IN YOUR ORDER NO&quot;&gt;일련 번호와 주문 번호가 포함된 이메일&lt;/a&gt;로 비밀번호를 요청하세요.&lt;/li&gt;&lt;li&gt;받은 비밀번호를 입력하세요&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1680"/>
+        <location filename="../src/MainWindow.cpp" line="1690"/>
         <source>To be sure that no one has tampered with your device, you can request a challenge string and enter it below.&lt;ol&gt;&lt;li&gt;Get the serial number from the back of your device.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&amp;body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME&quot;&gt;Send us an email&lt;/a&gt; with the serial number and your order number, requesting the challenge string.&lt;/li&gt;&lt;li&gt;Enter the string you received from us&lt;/li&gt;&lt;/ol&gt;</source>
         <translation>다른 사람이 장치를 조작하지 않았는지 확인하기 위해 챌린지 문자열을 요청하고 아래에 입력할 수 있습니다.&lt;ol&gt;&lt;li&gt;장치 뒷면에서 일련 번호를 가져옵니다.&lt;/li&gt;&lt;li&gt;&amp;shy;&lt;a href=&quot;mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&amp;body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME&quot;&gt;일련 번호와 주문 번호가 포함된 이메일&lt;/a&gt;로 챌린지 문자열을 요청하세요.&lt;/li&gt;&lt;li&gt;당사에서 받은 문자열을 입력하세요&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1779"/>
+        <location filename="../src/MainWindow.cpp" line="1695"/>
+        <source>Your device (serial number %1) is a community-made device in no way affiliated with the original mooltipass team!&lt;ol&gt;&lt;li&gt;Mooltipass is open-source and open-hardware, so anyone with enough skill can make one;&lt;/li&gt;&lt;li&gt;There&apos;s no way we can do a security challenge for your device, since we haven&apos;t made it and don&apos;t have the required data;&lt;/li&gt;&lt;li&gt;This menu is disabled to avoid any frustration and erroneous emails;&lt;/li&gt;&lt;/ol&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1796"/>
         <source>An error occured when trying to go into Memory Management mode.
 
 %1</source>
@@ -2824,170 +2834,170 @@ Do you want to save your changes?</source>
 %1</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1792"/>
+        <location filename="../src/MainWindow.cpp" line="1809"/>
         <source>System default language</source>
         <translation>시스템 기본 언어</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1963"/>
+        <location filename="../src/MainWindow.cpp" line="1980"/>
         <source>Import Warning</source>
         <translation>가져오기 경고</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1964"/>
+        <location filename="../src/MainWindow.cpp" line="1981"/>
         <source>Files were not imported from mini backup.</source>
         <translation>미니 백업에서 파일을 가져오지 못했습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2035"/>
+        <location filename="../src/MainWindow.cpp" line="2052"/>
         <source>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;NiMH Recondition is in progress.&lt;/span&gt;&lt;/p&gt;%1&lt;p&gt;Please wait.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;!--nimh_recondition--&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:12pt; font-weight:600;&quot;&gt;NiMH 리컨디셔닝이 진행 중입니다.&lt;/span&gt;&lt;/p&gt;%1&lt;p&gt;잠시만 기다려주세요.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2052"/>
+        <location filename="../src/MainWindow.cpp" line="2069"/>
         <source>Memory exports (*.bin)</source>
         <translation>메모리 내보내기(*.bin)</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2083"/>
+        <location filename="../src/MainWindow.cpp" line="2100"/>
         <source>Reset card failed!</source>
         <translation>카드 재설정에 실패했습니다!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2085"/>
+        <location filename="../src/MainWindow.cpp" line="2102"/>
         <source>Reset card done successfully</source>
         <translation>카드 재설정이 성공적으로 완료되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2092"/>
+        <location filename="../src/MainWindow.cpp" line="2109"/>
         <source>Select CSV file to import...</source>
         <translation>가져올 CSV 파일 선택...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2121"/>
+        <location filename="../src/MainWindow.cpp" line="2138"/>
         <source>Nothing is read from %1</source>
         <translation>%1에서 읽은 내용이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2154"/>
+        <location filename="../src/MainWindow.cpp" line="2171"/>
         <source>Unable to import %1: Each row must contain exact 3 items. Some lines don&apos;t (lines number: %2)</source>
         <translation>%1을(를) 가져올 수 없습니다: 각 행에 정확히 3개의 항목이 포함되어야 합니다. 일부 행이 그렇지 않습니다(행 번호: %2).</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2158"/>
+        <location filename="../src/MainWindow.cpp" line="2175"/>
         <source>Unable to import %1: Each row must contain exact 3 items (more than 10 lines don&apos;t)</source>
         <translation>%1을(를) 가져올 수 없습니다: 각 행에 정확히 3개의 항목이 포함되어야 합니다(10줄 이상은 안 됨).</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2166"/>
+        <location filename="../src/MainWindow.cpp" line="2183"/>
         <source>Unable to import %1: Each row must contain exact 3 items using comma as a delimiter</source>
         <translation>%1을(를) 가져올 수 없습니다: 각 행은 쉼표를 구분 기호로 사용하여 정확히 3개의 항목을 포함해야 합니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2229"/>
+        <location filename="../src/MainWindow.cpp" line="2246"/>
         <source>Disable subdomain selection?</source>
         <translation>하위 도메인 선택을 비활성화하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2231"/>
+        <location filename="../src/MainWindow.cpp" line="2248"/>
         <source>Enable subdomain selection?</source>
         <translation>하위 도메인 선택을 사용하시나요?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2251"/>
+        <location filename="../src/MainWindow.cpp" line="2268"/>
         <source>Disable Have I Been Pwned check?</source>
         <translation>Have I Been Pwned 확인을 비활성화하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2255"/>
+        <location filename="../src/MainWindow.cpp" line="2272"/>
         <source>Enable Have I Been Pwned check?</source>
         <translation>Have I Been Pwned 확인을 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2353"/>
+        <location filename="../src/MainWindow.cpp" line="2370"/>
         <source>This procedure will take around 5 hours, please confirm</source>
         <translation>이 절차는 약 5시간 정도 소요되며, 다음 사항을 확인하시기 바랍니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2371"/>
+        <location filename="../src/MainWindow.cpp" line="2388"/>
         <source>This token is only used for debugging purposes</source>
         <translation>이 토큰은 디버깅 목적으로만 사용됩니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2373"/>
+        <location filename="../src/MainWindow.cpp" line="2390"/>
         <source>Waiting for Security Challenge result...</source>
         <translation>보안 챌린지 결과를 기다리는 중...</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2390"/>
+        <location filename="../src/MainWindow.cpp" line="2407"/>
         <source>NiMH Recondition Finished</source>
         <translation>NiMH 리컨디셔닝 완료</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2391"/>
+        <location filename="../src/MainWindow.cpp" line="2408"/>
         <source>Recondition finished in %1 seconds</source>
         <translation>1초 후에 재조정 완료</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2400"/>
+        <location filename="../src/MainWindow.cpp" line="2417"/>
         <source>NiMH Recondition Error</source>
         <translation>NiMH 리컨디셔닝 오류</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2401"/>
+        <location filename="../src/MainWindow.cpp" line="2418"/>
         <source>Recondition finished with error</source>
         <translation>오류로 재조정 완료</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2432"/>
+        <location filename="../src/MainWindow.cpp" line="2449"/>
         <source>Confirm Reset Settings to Default</source>
         <translation>기본값으로 설정 재설정 확인</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2433"/>
+        <location filename="../src/MainWindow.cpp" line="2450"/>
         <source>Do you want to reset every settings value to device defaults?</source>
         <translation>모든 설정 값을 디바이스 기본값으로 초기화하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2540"/>
-        <location filename="../src/MainWindow.cpp" line="2554"/>
+        <location filename="../src/MainWindow.cpp" line="2557"/>
+        <location filename="../src/MainWindow.cpp" line="2571"/>
         <source>Incorrect Serial Number</source>
         <translation>잘못된 일련 번호</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2541"/>
+        <location filename="../src/MainWindow.cpp" line="2558"/>
         <source>It looks like your device serial number doesn&apos;t match the one present on your device&apos;s case.
 </source>
         <translation>장치 일련 번호가 장치 케이스에 표시된 번호와 일치하지 않는 것 같습니다.
 </translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2542"/>
+        <location filename="../src/MainWindow.cpp" line="2559"/>
         <source>Please reach out to support@themooltipass.com for the right code to enter below</source>
         <translation>아래에서 올바른 코드를 입력하려면 support@themooltipass.com 으로 문의하세요.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2555"/>
+        <location filename="../src/MainWindow.cpp" line="2572"/>
         <source>The entered serial number is incorrect!</source>
         <translation>입력한 일련번호가 올바르지 않습니다!</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2562"/>
+        <location filename="../src/MainWindow.cpp" line="2579"/>
         <source>Serial number change</source>
         <translation>일련 번호 변경</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2568"/>
+        <location filename="../src/MainWindow.cpp" line="2585"/>
         <source>Set serial number successfully.</source>
         <translation>일련 번호를 성공적으로 설정했습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2573"/>
+        <location filename="../src/MainWindow.cpp" line="2590"/>
         <source>Serial number still does not match platform serial.</source>
         <translation>일련 번호가 여전히 플랫폼 일련 번호와 일치하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="2578"/>
+        <location filename="../src/MainWindow.cpp" line="2595"/>
         <source>Set serial number failed.</source>
         <translation>일련 번호 설정에 실패했습니다.</translation>
     </message>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>946</width>
-    <height>632</height>
+    <height>1081</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -328,7 +328,7 @@ QWidget {background-color: #EFEFEF;}</string>
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>9</number>
+       <number>8</number>
       </property>
       <widget class="QWidget" name="pageNoDaemon">
        <layout class="QHBoxLayout" name="horizontalLayout_noDaemon1">
@@ -576,8 +576,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>770</width>
-             <height>882</height>
+             <width>932</width>
+             <height>1832</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -3372,6 +3372,22 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               </widget>
              </item>
              <item>
+              <widget class="QLabel" name="labelIsCommunityBuild">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <bold>true</bold>
+                 <underline>true</underline>
+                </font>
+               </property>
+               <property name="text">
+                <string>Community Creation</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <spacer name="horizontalSpacer_62">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -3939,8 +3955,8 @@ Hint: keep your mouse positioned over an option to get more details.</string>
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>646</width>
-               <height>885</height>
+               <width>524</width>
+               <height>704</height>
               </rect>
              </property>
              <property name="autoFillBackground">
