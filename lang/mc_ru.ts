@@ -2074,7 +2074,7 @@ Hint: keep your mouse positioned over an option to get more details.</source>
     <message>
         <location filename="../src/MainWindow.ui" line="3386"/>
         <source>Community Creation</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройство собрано сообществом</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="4154"/>
@@ -2715,7 +2715,7 @@ Think twice before resetting a card.</source>
     <message>
         <location filename="../src/MainWindow.cpp" line="1695"/>
         <source>Your device (serial number %1) is a community-made device in no way affiliated with the original mooltipass team!&lt;ol&gt;&lt;li&gt;Mooltipass is open-source and open-hardware, so anyone with enough skill can make one;&lt;/li&gt;&lt;li&gt;There&apos;s no way we can do a security challenge for your device, since we haven&apos;t made it and don&apos;t have the required data;&lt;/li&gt;&lt;li&gt;This menu is disabled to avoid any frustration and erroneous emails;&lt;/li&gt;&lt;/ol&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ваше устройство (серийный номер %1) создано кем-то из сообщества mooltipass и авторы никак не связаны с основной командой Mooltipass!&lt;ol&gt;&lt;li&gt; Mooltipass это проект с открытым исходным кодом и конструкторской документацией, потому его может собрать любой человек обладающий навыком;&lt;/li&gt;&lt;li&gt;Мы никак не можем провести проверку безопасности такого устройства, так как не мы его делали и у нас нет соответствующих данных;&lt;/li&gt;&lt;li&gt;Это меню отключено, чтобы никто по ошибке не отправил нам письма и не было недопонимания;&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2557"/>
