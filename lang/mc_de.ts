@@ -2171,7 +2171,7 @@ Tipp: Halten Sie die Maus über eine Option, um weitere Details zu erhalten.</tr
     <message>
         <location filename="../src/MainWindow.ui" line="3386"/>
         <source>Community Creation</source>
-        <translation type="unfinished"></translation>
+        <translation>Community-Erstellung</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="5272"/>
@@ -3140,7 +3140,8 @@ You will be prompted for import or export operations if any changes to your Mool
     <message>
         <location filename="../src/MainWindow.cpp" line="1695"/>
         <source>Your device (serial number %1) is a community-made device in no way affiliated with the original mooltipass team!&lt;ol&gt;&lt;li&gt;Mooltipass is open-source and open-hardware, so anyone with enough skill can make one;&lt;/li&gt;&lt;li&gt;There&apos;s no way we can do a security challenge for your device, since we haven&apos;t made it and don&apos;t have the required data;&lt;/li&gt;&lt;li&gt;This menu is disabled to avoid any frustration and erroneous emails;&lt;/li&gt;&lt;/ol&gt;</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Diese Gerät (Seriennummer %1) ist ein von der Community erstelltes Gerät und in keiner weise mit dem ursprünglichen Mooltipass-Team verbunden!&lt;ol&gt;&lt;li&gt;Mooltipass ist Open Source und Open Hardware, sodass jeder mit den nötigen Fähigkeiten eines erstellen kann;&lt;/li&gt;&lt;li&gt;Wir können auf keinen Fall einen Sicherheitstest für Ihr Gerät durchführen, da wir es nicht erstellt haben und nicht über die erforderlichen Daten verfügen;&lt;/li&gt;&lt;li&gt;Dieses Menü ist deaktiviert, um Frustration und fehlerhafte E-Mails zu vermeiden;&lt;/li&gt;&lt;/ol&gt;</translatorcomment>
+        <translation>Your device (serial number %1) is a community-made device in no way affiliated with the original mooltipass team!&lt;ol&gt;&lt;li&gt;Mooltipass is open-source and open-hardware, so anyone with enough skill can make one;&lt;/li&gt;&lt;li&gt;There&apos;s no way we can do a security challenge for your device, since we haven&apos;t made it and don&apos;t have the required data;&lt;/li&gt;&lt;li&gt;This menu is disabled to avoid any frustration and erroneous emails;&lt;/li&gt;&lt;/ol&gt;</translation>
     </message>
     <message>
         <location filename="../src/MainWindow.cpp" line="2370"/>
