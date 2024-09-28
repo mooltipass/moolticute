@@ -25,6 +25,7 @@
 #include "DbMasterController.h"
 #include "WindowLog.h"
 #include "SystemEventHandler.h"
+#include "DeviceConnectionChecker.h"
 
 #include <DbBackupsTrackerController.h>
 #include <QComboBox>
@@ -292,6 +293,7 @@ private:
     PasswordProfilesModel *m_passwordProfilesModel;
     DbMasterController *dbMasterController;
     void initHelpLabels();
+    DeviceConnectionChecker m_deviceConnectionChecker{};
 
     SystemEventHandler eventHandler;
 

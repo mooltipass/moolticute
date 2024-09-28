@@ -35,6 +35,7 @@ greaterThan(QT_MAJOR_VERSION, 5) {
 
 SOURCES += src/main_gui.cpp \
     src/ClickableLabel.cpp \
+    src/DeviceConnectionChecker.cpp \
     src/MainWindow.cpp \
     src/NoScrollComboBox.cpp \
     src/NotesManagement.cpp \
@@ -91,6 +92,7 @@ SOURCES += src/main_gui.cpp \
 
 HEADERS  += src/MainWindow.h \
     src/ClickableLabel.h \
+    src/DeviceConnectionChecker.h \
     src/NoScrollComboBox.h \
     src/NotesManagement.h \
     src/ParseDomain.h \

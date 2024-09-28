@@ -518,6 +518,11 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             QString bundleStr = QString::number(wsClient->get_bundleVersion());
             setSecurityChallengeText(serialStr, bundleStr);
             ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(Common::BLE_LATEST_BUNDLE_VERSION).arg(serial).arg(bundleStr));
+            if (m_deviceConnectionChecker.isNewDevice(serial))
+            {
+                qCritical() << "New device is detected";
+                // TODO handle layout
+            }
         }
         else
         {
