@@ -26,6 +26,7 @@
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
 #include "SettingsGuiHelper.h"
+#include "DeviceConnectionChecker.h"
 #include "DeviceDetector.h"
 #include "SystemNotifications/SystemNotification.h"
 
@@ -518,7 +519,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             QString bundleStr = QString::number(wsClient->get_bundleVersion());
             setSecurityChallengeText(serialStr, bundleStr);
             ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(Common::BLE_LATEST_BUNDLE_VERSION).arg(serial).arg(bundleStr));
-            if (m_deviceConnectionChecker.isNewDevice(serial))
+            if (DeviceConnectionChecker::instance().isNewDevice(serial))
             {
                 qCritical() << "New device is detected";
                 // TODO handle layout
@@ -1921,6 +1922,7 @@ void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)
     for (auto it = items.begin(); it != items.end(); ++it)
     {
         cb->addItem(it.key(), it.value().toInt());
+        // TODO trigger check for first connection
     }
     QSortFilterProxyModel* proxy = new QSortFilterProxyModel(cb);
     proxy->setSourceModel( cb->model());

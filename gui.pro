@@ -35,7 +35,7 @@ greaterThan(QT_MAJOR_VERSION, 5) {
 
 SOURCES += src/main_gui.cpp \
     src/ClickableLabel.cpp \
-    src/DeviceConnectionChecker.cpp \
+    src/utils/DeviceConnectionChecker.cpp \
     src/MainWindow.cpp \
     src/NoScrollComboBox.cpp \
     src/NotesManagement.cpp \
@@ -54,6 +54,7 @@ SOURCES += src/main_gui.cpp \
     src/PasswordLineEdit.cpp \
     src/CredentialsManagement.cpp \
     src/utils/GridLayoutUtil.cpp \
+    src/utils/KeyboardLayoutDetector.cpp \
     src/utils/TOTPReader.cpp \
     src/zxcvbn-c/zxcvbn.c \
     src/FilesManagement.cpp \
@@ -92,7 +93,7 @@ SOURCES += src/main_gui.cpp \
 
 HEADERS  += src/MainWindow.h \
     src/ClickableLabel.h \
-    src/DeviceConnectionChecker.h \
+    src/utils/DeviceConnectionChecker.h \
     src/NoScrollComboBox.h \
     src/NotesManagement.h \
     src/ParseDomain.h \
@@ -103,6 +104,7 @@ HEADERS  += src/MainWindow.h \
     src/WSClient.h \
     src/RotateSpinner.h \
     src/utils/GridLayoutUtil.h \
+    src/utils/KeyboardLayoutDetector.h \
     src/utils/TOTPReader.h \
     src/utils/qurltlds_p.h \
     src/version.h \

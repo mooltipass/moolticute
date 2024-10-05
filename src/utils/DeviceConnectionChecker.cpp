@@ -38,7 +38,8 @@ bool DeviceConnectionChecker::isNewDevice(quint32 serialNum)
         if (!wasConnected(serialStr))
         {
             firstConnection = true;
-            registerDevice(serialStr);
+            DeviceConnectionChecker::instance().registerDevice(serialStr);
+            m_layoutDetector.setCurrentLayout();
         }
     }
     return firstConnection;
