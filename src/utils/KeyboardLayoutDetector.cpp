@@ -3,7 +3,8 @@
 #include "windows.h"
 #include "winuser.h"
 
-KeyboardLayoutDetector::KeyboardLayoutDetector()
+KeyboardLayoutDetector::KeyboardLayoutDetector(QObject *parent)
+: QObject{parent}
 {
     fillKeyboardLayoutMap();
 }
@@ -73,4 +74,9 @@ void KeyboardLayoutDetector::setCurrentLayout()
         qWarning() << "There is no mapping for layout: " << layout << ". Not setting layout based on detected keyboard setting.";
     }
 
+}
+
+void KeyboardLayoutDetector::onNewDeviceDetected()
+{
+    setCurrentLayout();
 }

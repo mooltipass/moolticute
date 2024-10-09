@@ -33,6 +33,9 @@ public:
     bool wasConnected(const QString& serialNum);
     bool isNewDevice(quint32 serialNum);
 
+signals:
+    void newDeviceDetected();
+
 private:
     QString m_connectedDevicesIni;
     KeyboardLayoutDetector m_layoutDetector{};

@@ -485,6 +485,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             }
     );
 
+    connect(&DeviceConnectionChecker::instance(), &DeviceConnectionChecker::newDeviceDetected, &m_keyboardLayoutDetector, &KeyboardLayoutDetector::onNewDeviceDetected);
 
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
@@ -521,8 +522,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(Common::BLE_LATEST_BUNDLE_VERSION).arg(serial).arg(bundleStr));
             if (DeviceConnectionChecker::instance().isNewDevice(serial))
             {
-                qCritical() << "New device is detected";
-                // TODO handle layout
+                qDebug() << "New device is detected";
             }
         }
         else
