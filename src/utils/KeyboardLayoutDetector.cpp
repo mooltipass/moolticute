@@ -4,6 +4,9 @@
 #include "windows.h"
 #include "winuser.h"
 
+#include "DeviceConnectionChecker.h"
+#include "WSClient.h"
+
 KeyboardLayoutDetector::KeyboardLayoutDetector(QObject *parent)
 : QObject{parent}
 {
@@ -68,7 +71,24 @@ void KeyboardLayoutDetector::setCurrentLayout()
     QString layout = getKeyboardLayout();
     if (m_layoutMap.contains(layout))
     {
-        qCritical() << "Setting layout to: " << m_layoutMap[layout];
+        const auto layoutName = m_layoutMap[layout];
+        if (m_deviceLayouts.contains(layoutName))
+        {
+            const auto layoutId = m_deviceLayouts[layoutName];
+            if (m_wsClient != nullptr)
+            {
+                m_wsClient->sendChangedParam("keyboard_usb_layout", layoutId);
+                m_wsClient->sendChangedParam("keyboard_bt_layout", layoutId);
+            }
+            else
+            {
+                qCritical() << "WSClient is not available, layout is not set.";
+            }
+        }
+        else
+        {
+            qWarning() << "There is no device layout for: " << layoutName << ". Not setting layout based on detected keyboard setting.";
+        }
     }
     else
     {
@@ -99,16 +119,20 @@ void KeyboardLayoutDetector::reset()
     m_deviceLayouts.clear();
 }
 
+void KeyboardLayoutDetector::setWsClient(WSClient *wsClient)
+{
+    m_wsClient = wsClient;
+}
+
 void KeyboardLayoutDetector::onNewDeviceDetected()
 {
     if (m_labelsReceived)
     {
-        qCritical() << "Labels were received, setting current layout";
         setCurrentLayout();
     }
     else
     {
-        qCritical() << "Set layout after labels received flag to true";
+        // Labels are not fetched from device yet, need to wait it
         m_setLayoutAfterLabelsReceived = true;
     }
 }

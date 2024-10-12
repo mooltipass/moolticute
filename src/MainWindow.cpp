@@ -487,6 +487,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     );
 
     connect(&DeviceConnectionChecker::instance(), &DeviceConnectionChecker::newDeviceDetected, &m_keyboardLayoutDetector, &KeyboardLayoutDetector::onNewDeviceDetected);
+    m_keyboardLayoutDetector.setWsClient(wsClient);
 
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
