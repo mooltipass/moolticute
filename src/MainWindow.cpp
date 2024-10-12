@@ -480,6 +480,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 {
                     updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
                     updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
+                    m_keyboardLayoutDetector.setReceivedLayouts(layouts);
                 }
                 wsClient->settingsHelper()->resetSettings();
             }
@@ -1922,7 +1923,6 @@ void MainWindow::updateBLEComboboxItems(QComboBox *cb, const QJsonObject& items)
     for (auto it = items.begin(); it != items.end(); ++it)
     {
         cb->addItem(it.key(), it.value().toInt());
-        // TODO trigger check for first connection
     }
     QSortFilterProxyModel* proxy = new QSortFilterProxyModel(cb);
     proxy->setSourceModel( cb->model());
@@ -2311,6 +2311,7 @@ void MainWindow::onDeviceDisconnected()
         ui->pushButtonSettingsSetToDefault->setVisible(false);
         m_notesFetched = false;
         fillInitialCurrentCategories();
+        m_keyboardLayoutDetector.reset();
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");

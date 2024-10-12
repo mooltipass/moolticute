@@ -1,5 +1,6 @@
 #include "KeyboardLayoutDetector.h"
 #include <QDebug>
+#include <QJsonObject>
 #include "windows.h"
 #include "winuser.h"
 
@@ -76,7 +77,38 @@ void KeyboardLayoutDetector::setCurrentLayout()
 
 }
 
+void KeyboardLayoutDetector::setReceivedLayouts(const QJsonObject &layouts)
+{
+    for (auto it = layouts.begin(); it != layouts.end(); ++it)
+    {
+        m_deviceLayouts.insert(it.key(), it.value().toInt());
+    }
+
+    m_labelsReceived = true;
+
+    if (m_setLayoutAfterLabelsReceived)
+    {
+        setCurrentLayout();
+    }
+}
+
+void KeyboardLayoutDetector::reset()
+{
+    m_labelsReceived = false;
+    m_setLayoutAfterLabelsReceived = false;
+    m_deviceLayouts.clear();
+}
+
 void KeyboardLayoutDetector::onNewDeviceDetected()
 {
-    setCurrentLayout();
+    if (m_labelsReceived)
+    {
+        qCritical() << "Labels were received, setting current layout";
+        setCurrentLayout();
+    }
+    else
+    {
+        qCritical() << "Set layout after labels received flag to true";
+        m_setLayoutAfterLabelsReceived = true;
+    }
 }
