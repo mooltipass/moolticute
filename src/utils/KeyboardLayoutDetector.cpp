@@ -1,8 +1,15 @@
 #include "KeyboardLayoutDetector.h"
 #include <QDebug>
 #include <QJsonObject>
+
+#if defined(Q_OS_WIN)
 #include "windows.h"
 #include "winuser.h"
+#elif defined(Q_OS_LINUX)
+//TODO
+#elif defined(Q_OS_MAC)
+//TODO
+#endif
 
 #include "DeviceConnectionChecker.h"
 #include "WSClient.h"
@@ -15,10 +22,18 @@ KeyboardLayoutDetector::KeyboardLayoutDetector(QObject *parent)
 
 QString KeyboardLayoutDetector::getKeyboardLayout()
 {
+#if defined(Q_OS_WIN)
     WCHAR wide_layout_name[KL_NAMELENGTH * 2];
     GetKeyboardLayoutNameW(wide_layout_name);
     std::wstring ws(wide_layout_name);
     return QString::fromStdWString(ws);
+#elif defined(Q_OS_LINUX)
+    // TODO
+    return QString{};
+#elif defined(Q_OS_MAC)
+    //TODO
+    return QString{};
+#endif
 }
 
 void KeyboardLayoutDetector::fillKeyboardLayoutMap()
