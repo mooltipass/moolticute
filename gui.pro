@@ -10,6 +10,7 @@ INCLUDEPATH += $$PWD/src $$PWD/src/Settings $$PWD/src/utils
 
 mac {
     LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation
+    LIBS += -framework Carbon
 }
 win32 {
     LIBS += -luser32
