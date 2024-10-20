@@ -105,6 +105,7 @@ HEADERS  += src/MainWindow.h \
     src/WSClient.h \
     src/RotateSpinner.h \
     src/utils/GridLayoutUtil.h \
+    src/utils/IKeyboardLayoutDetector.h \
     src/utils/KeyboardLayoutDetector.h \
     src/utils/TOTPReader.h \
     src/utils/qurltlds_p.h \
@@ -160,8 +161,10 @@ mac {
     HEADERS += src/MacUtils.h \
         src/MacSystemEvents.h \
         src/SystemNotifications/SystemNotificationMac.h \
-        src/SystemNotifications/MacNotify.h
-    SOURCES += src/SystemNotifications/SystemNotificationMac.cpp
+        src/SystemNotifications/MacNotify.h \
+        src/utils/KeyboardLayoutDetectorMac.h
+    SOURCES += src/SystemNotifications/SystemNotificationMac.cpp \
+               src/utils/KeyboardLayoutDetectorMac.cpp
     OBJECTIVE_SOURCES += src/MacUtils.mm \
         src/MacSystemEvents.mm \
         src/SystemNotifications/MacNotify.mm
@@ -189,8 +192,10 @@ RESOURCES += \
 
 win32 {
     RC_FILE = win/windows_res.rc
-    HEADERS += src/SystemNotifications/SystemNotificationWindows.h
-    SOURCES += src/SystemNotifications/SystemNotificationWindows.cpp
+    HEADERS += src/SystemNotifications/SystemNotificationWindows.h \
+               src/utils/KeyboardLayoutDetectorWin.h
+    SOURCES += src/SystemNotifications/SystemNotificationWindows.cpp \
+               src/utils/KeyboardLayoutDetectorWin.cpp
 
     copydata.commands = $(COPY_FILE) $$shell_path($$PWD\\win\\snoretoast\\*) \"$$shell_path($$OUT_PWD)\"
     first.depends = $(first) copydata
@@ -207,10 +212,12 @@ mac {
 
 linux {
     HEADERS += src/SystemNotifications/SystemNotificationUnix.h \
-        src/SystemNotifications/SystemNotificationImageUnix.h
+        src/SystemNotifications/SystemNotificationImageUnix.h \
+        src/utils/KeyboardLayoutDetectorUnix.h
 
     SOURCES += src/SystemNotifications/SystemNotificationUnix.cpp \
-        src/SystemNotifications/SystemNotificationImageUnix.cpp
+        src/SystemNotifications/SystemNotificationImageUnix.cpp \
+        src/utils/KeyboardLayoutDetectorUnix.cpp
 }
 
 unix {
