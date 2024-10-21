@@ -261,6 +261,7 @@ void SettingsGuiHelper::updateParameters(const QJsonObject &data)
         val = data["value"].toBool();
     }
     m_settings->updateParam(m_settings->getParamId(param), val);
+    m_mw->checkSettingsChanged();
 }
 
 int SettingsGuiHelper::getLockUnlockMode() const
