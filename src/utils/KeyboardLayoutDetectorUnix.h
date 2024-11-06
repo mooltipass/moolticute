@@ -9,6 +9,8 @@ public:
     explicit KeyboardLayoutDetectorUnix(QObject *parent = nullptr);
     void fillKeyboardLayoutMap() override;
     QString getKeyboardLayout() override;
+
+    static const QString RESULT_REGEXP;
 };
 
 #endif // KEYBOARDLAYOUTDETECTORUNIX_H
