@@ -14,7 +14,6 @@ using KeyboardLayoutDetectorOS = KeyboardLayoutDetectorUnix;
 #elif defined(Q_OS_MAC)
 #include "KeyboardLayoutDetectorMac.h"
 using KeyboardLayoutDetectorOS = KeyboardLayoutDetectorMac;
-#elif defined(Q_OS_MAC)
 #endif
 
 class WSClient;
