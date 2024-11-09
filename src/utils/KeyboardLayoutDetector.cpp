@@ -8,6 +8,11 @@ KeyboardLayoutDetector::KeyboardLayoutDetector(QObject *parent)
     fillKeyboardLayoutMap();
 }
 
+/**
+ * @brief KeyboardLayoutDetector::setCurrentLayout
+ * Fetch current layout and check mapping for layouts available on device,
+ * if mapping exists than setting current layout to usb/bt layout.
+ */
 void KeyboardLayoutDetector::setCurrentLayout()
 {
     QString layout = getKeyboardLayout();
@@ -39,6 +44,11 @@ void KeyboardLayoutDetector::setCurrentLayout()
 
 }
 
+/**
+ * @brief KeyboardLayoutDetector::setReceivedLayouts
+ * Store received layouts from the device for mapping with OS layout
+ * @param layouts Received layouts from the device
+ */
 void KeyboardLayoutDetector::setReceivedLayouts(const QJsonObject &layouts)
 {
     for (auto it = layouts.begin(); it != layouts.end(); ++it)
@@ -51,6 +61,7 @@ void KeyboardLayoutDetector::setReceivedLayouts(const QJsonObject &layouts)
     if (m_setLayoutAfterLabelsReceived)
     {
         setCurrentLayout();
+        m_setLayoutAfterLabelsReceived = false;
     }
 }
 

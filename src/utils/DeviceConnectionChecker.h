@@ -40,6 +40,7 @@ private:
     QString m_connectedDevicesIni;
     KeyboardLayoutDetector m_layoutDetector{};
 
+    static const QString CONNECTED_DEVICES_FILE;
     static const QString CONNECTED_DEVICES_GROUP;
     static const QString SERIAL_NUMBER_STR;
 

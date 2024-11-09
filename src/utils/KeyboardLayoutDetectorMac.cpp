@@ -9,7 +9,7 @@ KeyboardLayoutDetectorMac::KeyboardLayoutDetectorMac(QObject *parent)
 
 /**
  * @brief KeyboardLayoutDetectorMac::fillKeyboardLayoutMap
- * Fills the mapping with Mac keyboard layout ids with layout names on BLE device
+ * Fills the mapping for Mac keyboard layout ids with layout names on BLE device
  */
 void KeyboardLayoutDetectorMac::fillKeyboardLayoutMap()
 {

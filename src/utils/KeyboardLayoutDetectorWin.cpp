@@ -8,6 +8,11 @@ KeyboardLayoutDetectorWin::KeyboardLayoutDetectorWin(QObject *parent)
 
 }
 
+/**
+ * @brief KeyboardLayoutDetectorWin::fillKeyboardLayoutMap
+ * Fills the mapping for Windows keyboard layout ids with layout names on BLE device
+ * Based on: https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-language-pack-default-values?view=windows-11
+ */
 void KeyboardLayoutDetectorWin::fillKeyboardLayoutMap()
 {
     m_layoutMap = {
@@ -53,6 +58,11 @@ void KeyboardLayoutDetectorWin::fillKeyboardLayoutMap()
     };
 }
 
+/**
+ * @brief KeyboardLayoutDetectorWin::getKeyboardLayout
+ * WinApi call for getting the current layout id
+ * @return Windows keyboard layout id (QString)
+ */
 QString KeyboardLayoutDetectorWin::getKeyboardLayout()
 {
     WCHAR wide_layout_name[KL_NAMELENGTH * 2];

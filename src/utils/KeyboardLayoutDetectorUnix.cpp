@@ -14,7 +14,7 @@ KeyboardLayoutDetectorUnix::KeyboardLayoutDetectorUnix(QObject *parent)
 
 /**
  * @brief KeyboardLayoutDetectorUnix::fillKeyboardLayoutMap
- * Fills the mapping with Unix keyboard layout ids with layout names on BLE device
+ * Fills the mapping for Unix keyboard layout ids with layout names on BLE device
  */
 void KeyboardLayoutDetectorUnix::fillKeyboardLayoutMap()
 {
