@@ -110,6 +110,7 @@ FilesManagement::FilesManagement(QWidget *parent) :
     ui->progressBarQuick->hide();
 
     ui->labelConfirmRequest->hide();
+    ui->labelConfirmRequestTop->hide();
 
     connect(ui->lineEditFilterFiles, &QLineEdit::textChanged, [=](const QString &t)
     {
@@ -561,6 +562,7 @@ void FilesManagement::updateProgress(int total, int curr)
     ui->progressBarTop->setValue(curr);
     ui->progressBarQuick->setMaximum(total);
     ui->progressBarQuick->setValue(curr);
+    ui->labelConfirmRequestTop->hide();
 }
 
 void FilesManagement::updateButtonsUI()
@@ -609,6 +611,8 @@ void FilesManagement::addUpdateFile(QString service, QString filename, QProgress
     pbar->setMinimum(0);
     pbar->setMaximum(0);
     pbar->setValue(0);
+    ui->labelConfirmRequestTop->show();
+
     pbar->show();
     updateButtonsUI();
 
@@ -628,6 +632,7 @@ void FilesManagement::dataFileSent(const QString &service, bool success)
     disconnect(wsClient, &WSClient::progressChanged, this, &FilesManagement::updateProgress);
     ui->progressBar->hide();
     ui->progressBarTop->hide();
+    ui->labelConfirmRequestTop->hide();
     updateButtonsUI();
     ui->lineEditFilename->clear();
     ui->addFileServiceInput->clear();
