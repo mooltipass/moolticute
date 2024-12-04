@@ -23,6 +23,7 @@
 #include "WSClient.h"
 #include <QtAwesome.h>
 #include "DbMasterController.h"
+#include "KeyboardLayoutDetector.h"
 #include "WindowLog.h"
 #include "SystemEventHandler.h"
 
@@ -292,6 +293,7 @@ private:
     PasswordProfilesModel *m_passwordProfilesModel;
     DbMasterController *dbMasterController;
     void initHelpLabels();
+    KeyboardLayoutDetector m_keyboardLayoutDetector{};
 
     SystemEventHandler eventHandler;
 

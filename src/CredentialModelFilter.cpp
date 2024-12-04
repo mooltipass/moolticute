@@ -1,7 +1,6 @@
 // Application
 #include "CredentialModelFilter.h"
 #include "CredentialModel.h"
-#include "ServiceItem.h"
 #include "LoginItem.h"
 
 CredentialModelFilter::CredentialModelFilter(QObject *parent) : QSortFilterProxyModel(parent)

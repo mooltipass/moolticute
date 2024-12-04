@@ -10,6 +10,7 @@ INCLUDEPATH += $$PWD/src $$PWD/src/Settings $$PWD/src/utils
 
 mac {
     LIBS += -framework ApplicationServices -framework IOKit -framework CoreFoundation -framework Cocoa -framework Foundation
+    LIBS += -framework Carbon
 }
 win32 {
     LIBS += -luser32
@@ -35,6 +36,7 @@ greaterThan(QT_MAJOR_VERSION, 5) {
 
 SOURCES += src/main_gui.cpp \
     src/ClickableLabel.cpp \
+    src/utils/DeviceConnectionChecker.cpp \
     src/MainWindow.cpp \
     src/NoScrollComboBox.cpp \
     src/NotesManagement.cpp \
@@ -53,6 +55,7 @@ SOURCES += src/main_gui.cpp \
     src/PasswordLineEdit.cpp \
     src/CredentialsManagement.cpp \
     src/utils/GridLayoutUtil.cpp \
+    src/utils/KeyboardLayoutDetector.cpp \
     src/utils/TOTPReader.cpp \
     src/zxcvbn-c/zxcvbn.c \
     src/FilesManagement.cpp \
@@ -91,6 +94,7 @@ SOURCES += src/main_gui.cpp \
 
 HEADERS  += src/MainWindow.h \
     src/ClickableLabel.h \
+    src/utils/DeviceConnectionChecker.h \
     src/NoScrollComboBox.h \
     src/NotesManagement.h \
     src/ParseDomain.h \
@@ -101,6 +105,8 @@ HEADERS  += src/MainWindow.h \
     src/WSClient.h \
     src/RotateSpinner.h \
     src/utils/GridLayoutUtil.h \
+    src/utils/IKeyboardLayoutDetector.h \
+    src/utils/KeyboardLayoutDetector.h \
     src/utils/TOTPReader.h \
     src/utils/qurltlds_p.h \
     src/version.h \
@@ -155,8 +161,10 @@ mac {
     HEADERS += src/MacUtils.h \
         src/MacSystemEvents.h \
         src/SystemNotifications/SystemNotificationMac.h \
-        src/SystemNotifications/MacNotify.h
-    SOURCES += src/SystemNotifications/SystemNotificationMac.cpp
+        src/SystemNotifications/MacNotify.h \
+        src/utils/KeyboardLayoutDetectorMac.h
+    SOURCES += src/SystemNotifications/SystemNotificationMac.cpp \
+               src/utils/KeyboardLayoutDetectorMac.cpp
     OBJECTIVE_SOURCES += src/MacUtils.mm \
         src/MacSystemEvents.mm \
         src/SystemNotifications/MacNotify.mm
@@ -184,8 +192,10 @@ RESOURCES += \
 
 win32 {
     RC_FILE = win/windows_res.rc
-    HEADERS += src/SystemNotifications/SystemNotificationWindows.h
-    SOURCES += src/SystemNotifications/SystemNotificationWindows.cpp
+    HEADERS += src/SystemNotifications/SystemNotificationWindows.h \
+               src/utils/KeyboardLayoutDetectorWin.h
+    SOURCES += src/SystemNotifications/SystemNotificationWindows.cpp \
+               src/utils/KeyboardLayoutDetectorWin.cpp
 
     copydata.commands = $(COPY_FILE) $$shell_path($$PWD\\win\\snoretoast\\*) \"$$shell_path($$OUT_PWD)\"
     first.depends = $(first) copydata
@@ -202,10 +212,12 @@ mac {
 
 linux {
     HEADERS += src/SystemNotifications/SystemNotificationUnix.h \
-        src/SystemNotifications/SystemNotificationImageUnix.h
+        src/SystemNotifications/SystemNotificationImageUnix.h \
+        src/utils/KeyboardLayoutDetectorUnix.h
 
     SOURCES += src/SystemNotifications/SystemNotificationUnix.cpp \
-        src/SystemNotifications/SystemNotificationImageUnix.cpp
+        src/SystemNotifications/SystemNotificationImageUnix.cpp \
+        src/utils/KeyboardLayoutDetectorUnix.cpp
 }
 
 unix {

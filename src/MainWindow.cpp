@@ -26,6 +26,7 @@
 #include "PassGenerationProfilesDialog.h"
 #include "PromptWidget.h"
 #include "SettingsGuiHelper.h"
+#include "DeviceConnectionChecker.h"
 #include "DeviceDetector.h"
 #include "SystemNotifications/SystemNotification.h"
 
@@ -479,11 +480,14 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
                 {
                     updateBLEComboboxItems(ui->comboBoxUsbLayout, layouts);
                     updateBLEComboboxItems(ui->comboBoxBtLayout, layouts);
+                    m_keyboardLayoutDetector.setReceivedLayouts(layouts);
                 }
                 wsClient->settingsHelper()->resetSettings();
             }
     );
 
+    connect(&DeviceConnectionChecker::instance(), &DeviceConnectionChecker::newDeviceDetected, &m_keyboardLayoutDetector, &KeyboardLayoutDetector::onNewDeviceDetected);
+    m_keyboardLayoutDetector.setWsClient(wsClient);
 
     //When device has new parameters, update the GUI
     connect(wsClient, &WSClient::mpHwVersionChanged, [=]()
@@ -518,6 +522,10 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
             QString bundleStr = QString::number(wsClient->get_bundleVersion());
             setSecurityChallengeText(serialStr, bundleStr);
             ui->labelBundleOutdatedText->setText(BUNDLE_OUTDATED_TEXT.arg(Common::BLE_LATEST_BUNDLE_VERSION).arg(serial).arg(bundleStr));
+            if (DeviceConnectionChecker::instance().isNewDevice(serial))
+            {
+                qDebug() << "New device is detected";
+            }
         }
         else
         {
@@ -2304,6 +2312,7 @@ void MainWindow::onDeviceDisconnected()
         ui->pushButtonSettingsSetToDefault->setVisible(false);
         m_notesFetched = false;
         fillInitialCurrentCategories();
+        m_keyboardLayoutDetector.reset();
     }
     ui->groupBox_UserSettings->hide();
     wsClient->set_cardId("");
