@@ -347,6 +347,7 @@ private:
     static constexpr int MAC_DEFAULT_HEIGHT = 500;
 #endif
     static constexpr int STARTING_NOT_FLASHED_SERIAL = 2000;
+    static constexpr int STARTING_COMMUNITY_SERIAL = 100000;
 };
 
 #endif // MAINWINDOW_H
