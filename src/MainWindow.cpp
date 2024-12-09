@@ -132,6 +132,7 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     ui->labelAboutMainMCU->setText(tr("Main MCU version:"));
 
     ui->widgetNotFlashedWarning->hide();
+    ui->labelIsCommunityBuild->hide();
     ui->labelNotFlashedWarningIcon->setPixmap(AppGui::qtAwesome()->icon(fa::warning).pixmap(QSize(20, 20)));
     ui->labelSerialNumberIncorrect->setStyleSheet("QLabel {color: blue;}");
     connect(ui->labelSerialNumberIncorrect, &ClickableLabel::clicked, this, &MainWindow::onIncorrectSerialNumberClicked);
@@ -1007,13 +1008,21 @@ void MainWindow::updateSerialInfos() {
         ui->label_UserManual->setText(MANUAL_STRING.arg(wsClient->isMPBLE() ? BLE_MANUAL_URL : MINI_MANUAL_URL));
         ui->label_UserManual->show();
         if (wsClient->isMPBLE() && wsClient->get_hwSerial() > STARTING_NOT_FLASHED_SERIAL &&
-                wsClient->get_hwSerial() == wsClient->get_platformSerial())
+                wsClient->get_hwSerial() == wsClient->get_platformSerial() &&
+                wsClient->get_hwSerial() < STARTING_COMMUNITY_SERIAL)
         {
             ui->widgetNotFlashedWarning->show();
         }
         else
         {
             ui->widgetNotFlashedWarning->hide();
+        }
+        if (wsClient->get_hwSerial() >= STARTING_COMMUNITY_SERIAL) {
+            ui->labelIsCommunityBuild->show();
+            ui->groupBoxSecurityChallenge->setEnabled(false);
+        } else {
+            ui->labelIsCommunityBuild->hide();
+            ui->groupBoxSecurityChallenge->setEnabled(true);
         }
     }
     else
@@ -1685,10 +1694,18 @@ void MainWindow::setUIDRequestInstructionsWithId(const QString & id)
 
 void MainWindow::setSecurityChallengeText(const QString &id, const QString &bundleVersion)
 {
-    ui->labelSecurityChallenge->setText(tr("To be sure that no one has tampered with your device, you can request a challenge string and enter it below.<ol>"
-                                    "<li>Get the serial number from the back of your device.</li>"
-                                    "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME\">Send us an email</a> with the serial number and your order number, requesting the challenge string.</li>"
-                                    "<li>Enter the string you received from us</li></ol>").arg(id).arg(bundleVersion));
+    if (id.toInt() < STARTING_COMMUNITY_SERIAL) {
+        ui->labelSecurityChallenge->setText(tr("To be sure that no one has tampered with your device, you can request a challenge string and enter it below.<ol>"
+                                        "<li>Get the serial number from the back of your device.</li>"
+                                        "<li>&shy;<a href=\"mailto:support@themooltipass.com?subject=Security Challenge Token and Response Request&body=My serial number is %1, my bundle number is %2 and my order number is: FILL ME\">Send us an email</a> with the serial number and your order number, requesting the challenge string.</li>"
+                                        "<li>Enter the string you received from us</li></ol>").arg(id).arg(bundleVersion));
+     } else {
+        ui->labelSecurityChallenge->setText(tr("Your device (serial number %1) is a community-made device in no way affiliated with the original mooltipass team!<ol>"
+                                        "<li>Mooltipass is open-source and open-hardware, so anyone with enough skill can make one;</li>"
+                                        "<li>There's no way we can do a security challenge for your device, since we haven't made it and don't have the required data;</li>"
+                                        "<li>This menu is disabled to avoid any frustration and erroneous emails;</li>"
+                                        "</ol>").arg(id));
+    }
 }
 
 void MainWindow::enableCredentialsManagement(bool enable)
