@@ -74,11 +74,18 @@ QString KeyboardLayoutDetectorUnix::getKeyboardLayout()
     if (!out.isEmpty())
     {
         const RegExp rx(RESULT_REGEXP);
+#if QT_VERSION < 0x060000
+        if (rx.indexIn(out) != -1)
+        {
+            return rx.cap(1);
+        }
+#else
         auto match = rx.match(out);
         if (match.hasMatch())
         {
             return match.captured(1);
         }
+#endif
     }
 
     qWarning() << "Keyboard layout was not fetched successfully";
