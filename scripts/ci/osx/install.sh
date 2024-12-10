@@ -3,6 +3,7 @@ set -ev
 
 echo "install.sh"
 
+brew install `brew outdated`
 brew install jq lftp
 brew uninstall wget
 brew install wget
