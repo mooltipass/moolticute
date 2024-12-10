@@ -3,7 +3,7 @@ set -ev
 
 echo "install.sh"
 
-brew uninstall openssl@1.1
+brew uninstall --ignore-dependencies openssl@1.1
 brew install openssl@3
 brew install jq lftp
 brew uninstall wget
