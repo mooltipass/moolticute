@@ -157,7 +157,7 @@ bool BleDev::checkBundleFilePassword(const QFileInfo& fileInfo, QString &passwor
             return false;
         }
         const auto serial = fileParts[SERIAL_FILE_PART].toUInt();
-        if (!skipDeviceChecks && wsClient->get_hwSerial() != serial)
+        if (!skipDeviceChecks && (wsClient->get_hwSerial() !=0) && (wsClient->get_hwSerial() != serial))
         {
             QMessageBox::warning(this, INVALID_BUNDLE_TEXT,
                                  tr("The device serial number is not correct in bundle filename."));
