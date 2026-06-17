@@ -48,6 +48,8 @@ cd moolticute
 
 See [documentation/macos_apple_silicon.md](documentation/macos_apple_silicon.md) for details.
 
+**Community Apple Silicon builds** (unsigned): [GitHub Releases](https://github.com/poitee/moolticute/releases) on the `poitee/moolticute` fork.
+
 ##### Linux
  - Requires the qt-dbus module
  - Requires to install [udev rule](https://github.com/mooltipass/mooltipass-udev) for it

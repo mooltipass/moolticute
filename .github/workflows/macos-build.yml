@@ -2,7 +2,7 @@ name: macOS build
 
 on:
   push:
-    branches: [master]
+    branches: [master, feature/apple-silicon-macos]
     tags: ['v*']
   pull_request:
     branches: [master]
