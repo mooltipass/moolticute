@@ -35,6 +35,19 @@ git clone https://github.com/mooltipass/moolticute.git --recurse-submodules
    - qt-network
    - qt-websockets
 
+##### macOS (Apple Silicon)
+
+Official release DMGs are currently built for Intel (`x86_64`). To run natively on Apple Silicon without Rosetta, build from source:
+
+```bash
+brew install qt go
+git clone --recurse-submodules https://github.com/mooltipass/moolticute.git
+cd moolticute
+./scripts/macos/build-local.sh --package
+```
+
+See [documentation/macos_apple_silicon.md](documentation/macos_apple_silicon.md) for details.
+
 ##### Linux
  - Requires the qt-dbus module
  - Requires to install [udev rule](https://github.com/mooltipass/mooltipass-udev) for it

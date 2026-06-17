@@ -1,0 +1,31 @@
+name: macOS build
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: brew install qt go
+
+      - name: Build
+        run: ./scripts/macos/build-local.sh
+
+      - name: Verify architecture
+        run: |
+          file build/Moolticute.app/Contents/MacOS/moolticute
+          lipo -info build/Moolticute.app/Contents/MacOS/moolticute
+
+      - name: Run tests
+        working-directory: build
+        run: ./tests/tests
