@@ -4,7 +4,7 @@ services:
 dist: trusty
 os:
 - linux
-- osx
+# - osx (travis-ci doesn't support osx builds anymore)
 language: cpp
 osx_image: xcode13.4
 git:
