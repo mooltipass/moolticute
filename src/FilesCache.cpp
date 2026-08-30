@@ -156,8 +156,12 @@ bool FilesCache::setCardCPZ(QByteArray cardCPZ)
     m_filePath = dataDir.absoluteFilePath(fileName);
 
     qint64 m_key = 0;
+    // The shift must stay 32-bit and wrap at 32 ((i*8) & 31) to derive the
+    // same key historical x86 builds produced: shifting a 32-bit value by
+    // >= 32 is undefined behaviour that x86 silently wrapped, while on
+    // arm64 the compiler turns it into a trap (crash on Apple Silicon).
     for (int i = 0;i < std::min(8, static_cast<int>(cardCPZ.size()));i++)
-        m_key += (static_cast<unsigned int>(cardCPZ[i]) & 0xFF) << (i * 8);
+        m_key += (static_cast<unsigned int>(cardCPZ[i]) & 0xFF) << ((i * 8) & 31);
 
     m_simpleCrypt.setKey(m_key);
     m_simpleCrypt.setIntegrityProtectionMode(SimpleCrypt::ProtectionHash);

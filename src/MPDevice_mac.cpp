@@ -29,12 +29,22 @@ void _read_report_callback(void *context,
                            uint8_t *report,
                            CFIndex report_length)
 {
-    Q_UNUSED(result);
     Q_UNUSED(sender);
     Q_UNUSED(report_type);
     Q_UNUSED(report_id);
 
     MPDevice_mac *dev = reinterpret_cast<MPDevice_mac *>(context);
+
+    // IOKit invokes this callback with an error result (and meaningless
+    // buffer/length) when the device drops mid-read, e.g. while the BLE
+    // device re-enumerates its interfaces. Never feed that to the parser.
+    if (result != kIOReturnSuccess || !report || report_length <= 0)
+    {
+        qWarning() << "Ignoring errored HID input report, result:" << result
+                   << "length:" << static_cast<qint64>(report_length);
+        return;
+    }
+
     QByteArray data((const char *)report, report_length);
     if (dev->isBT())
     {
