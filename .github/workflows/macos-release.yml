@@ -1,0 +1,69 @@
+name: macOS release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. v1.04.0-arm64)'
+        required: true
+        default: 'v1.04.0-arm64'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: brew install qt go
+
+      - name: Build and package app
+        run: |
+          ./scripts/macos/build-local.sh --package
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ./scripts/macos/package-release.sh "${{ github.event.inputs.version }}"
+          else
+            ./scripts/macos/package-release.sh "${GITHUB_REF_NAME}"
+          fi
+
+      - name: Run tests
+        working-directory: build
+        run: ./tests/tests
+
+      - name: Verify native architecture
+        run: |
+          file build/Moolticute.app/Contents/MacOS/moolticute
+          lipo -info build/Moolticute.app/Contents/MacOS/moolticute
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}
+          name: Moolticute macOS Apple Silicon (${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }})
+          body: |
+            Native **arm64** Moolticute build for Apple Silicon Macs (no Rosetta required).
+
+            ### Install
+            1. Download `Moolticute-*-macos-arm64.dmg` or `.zip`
+            2. Open the DMG and drag **Moolticute** to Applications
+            3. On first launch, right-click → **Open** if macOS blocks an unsigned app
+
+            ### Includes
+            - Moolticute GUI + `moolticuted` daemon
+            - `mc-agent` and `mc-cli` (arm64)
+
+            Built from commit ${{ github.sha }}.
+          files: |
+            build/Moolticute-*-macos-*.dmg
+            build/Moolticute-*-macos-*.zip
+          draft: false
+          prerelease: true
