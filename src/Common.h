@@ -54,6 +54,7 @@
 #define MP_DATA_HEADER_SIZE      4
 
 #define MOOLTICUTE_DAEMON_PORT  30035
+#define MOOLTICUTE_DAEMON_ADDR  QHostAddress::LocalHostIPv6
 
 //Max file size for standard data file
 #define MP_MAX_FILE_SIZE        1024 * 10

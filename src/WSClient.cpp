@@ -21,7 +21,6 @@
 #include "SettingsGuiHelper.h"
 #include "DeviceDetector.h"
 
-#define WS_URI                      "ws://localhost"
 #define QUERY_RANDOM_NUMBER_TIME    10 * 60 * 1000 //10 min
 
 WSClient::WSClient(QObject *parent):
@@ -59,8 +58,17 @@ void WSClient::openWebsocket()
                 this, SLOT(onWsError()));
     }
 
-    QString url = QString("%1:%2").arg(WS_URI).arg(MOOLTICUTE_DAEMON_PORT);
-    wsocket->open(url);
+    // Unfortunately a nummeric IPv6 address needs some additional '[..]' brackets around
+    // it before putting it into a URL; whereas an IPv4 address does not. So we need to
+    // construct this through a URL - rather than just string concatenation.
+    //
+    QUrl qurl = QUrl();
+    qurl.setScheme("ws");
+    qurl.setHost(QHostAddress(MOOLTICUTE_DAEMON_ADDR).toString());
+    qurl.setPort(MOOLTICUTE_DAEMON_PORT);
+
+    wsocket->open(qurl);
+    qDebug() << "openWebsocket open(" << qurl.toString() << ")";
 }
 
 void WSClient::closeWebsocket()
@@ -86,8 +94,11 @@ void WSClient::onWsConnected()
 {
     qDebug() << "Websocket connected";
     connect(wsocket, &QWebSocket::textMessageReceived, this, &WSClient::onTextMessageReceived);
+    qDebug() << "queryRandomNumbers()";
     queryRandomNumbers();
+    qDebug() << "emit  wsConnected()";
     emit wsConnected();
+    qDebug() << "done onWsConnected()";
 }
 
 bool WSClient::isConnected() const
