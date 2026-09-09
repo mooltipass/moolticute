@@ -67,8 +67,6 @@ public:
 private:
     ParseDomain();
 
-    //! True if domain is a known public suffix (exact, wildcard or exception rule from the
-    //! vendored Public Suffix List, see src/utils/public_suffix_list.dat)
     static bool qIsEffectiveTLD(const QString &domain);
 
     // Rules parsed from the vendored Public Suffix List (src/utils/public_suffix_list.dat),
