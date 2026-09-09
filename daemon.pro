@@ -131,8 +131,7 @@ HEADERS  += \
     src/Settings/DeviceSettings.h \
     src/Settings/DeviceSettingsMini.h \
     src/Settings/DeviceSettingsBLE.h \
-    src/Mooltipass/MPBLEFreeAddressProvider.h \
-    src/utils/qurltlds_p.h
+    src/Mooltipass/MPBLEFreeAddressProvider.h
 
 DISTFILES += \
     src/http-parser/CONTRIBUTIONS \
@@ -162,7 +161,8 @@ DISTFILES += \
     data/debug/README.md
 
 RESOURCES += \
-    data/data_debug.qrc
+    data/data_debug.qrc \
+    src/utils/publicsuffix.qrc
 
 unix {
     # INSTALL RULES

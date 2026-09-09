@@ -78,7 +78,9 @@ HEADERS += \
     TestCredentialModel.h \
     TestCredentialModelFilter.h \
     TestDbExportsRegistry.h \
-    TestParseDomain.h \
-    ../src/utils/qurltlds_p.h \
+    TestParseDomain.h
+
+RESOURCES += \
+    ../src/utils/publicsuffix.qrc
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"

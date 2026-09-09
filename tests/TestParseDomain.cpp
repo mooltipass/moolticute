@@ -85,9 +85,9 @@ void TestParseDomain::test_URLs_data()
 
     // valid URL, valid TLD, but no domain part- cannot be a website
 
-    QTest::newRow("only TLD co.uk") << "http://co.uk/some/article"
+    QTest::newRow("only TLD blogspot") << "http://blogspot.be/some/article"
         << true << true << false
-        << ".co.uk" << "" << "" << (-1);
+        << ".blogspot.be" << "" << "" << (-1);
 
     QTest::newRow("only TLD amazon") << "http://s3.amazonaws.com/"
         << true << true << false
@@ -155,9 +155,9 @@ void TestParseDomain::test_URLs_data()
 
 
     // valid URL, valid (long) TLD
-    QTest::newRow("long TLD: co.uk") << "https://daniel.brown.co.uk/article/01.html"
+    QTest::newRow("long TLD: blogspot") << "https://daniel.brown.blogspot.be/article/01.html"
         << true << true << true
-        << ".co.uk" << "brown" << "daniel" << (-1);
+        << ".blogspot.be" << "brown" << "daniel" << (-1);
 
     QTest::newRow("long TLD: Amazon AWS") << "https://machine-1234.s3.amazonaws.com/some/url"
         << true << true << true
