@@ -32,6 +32,7 @@
 #define PARSEDOMAIN_H
 
 #include <QDebug>
+#include <QSet>
 #include <QUrl>
 
 class ParseDomain
@@ -66,19 +67,17 @@ public:
 private:
     ParseDomain();
 
-#if QT_VERSION >= 0x051000
-    enum TLDMatchType {
-        ExactMatch,
-        SuffixMatch,
-        ExceptionMatch,
+    static bool qIsEffectiveTLD(const QString &domain);
+
+    // Rules parsed from the vendored Public Suffix List (src/utils/public_suffix_list.dat),
+    // split by rule type. See https://publicsuffix.org/list/ for the rule format.
+    struct TLDRules {
+        QSet<QString> exact;
+        QSet<QString> wildcard;   // "*.bar.com" stored as "bar.com"
+        QSet<QString> exception;  // "!foo.bar.com" stored as "foo.bar.com"
     };
 
-    /**
-     * Functions from qtldurl.cpp
-     */
-    static bool containsTLDEntry(QStringView entry, TLDMatchType match);
-    static bool qIsEffectiveTLD(const QString &domain);
-#endif
+    static const TLDRules &tldRules();
 
     QUrl _url;
     bool _isWebsite;

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/utils">
+        <file>public_suffix_list.dat</file>
+    </qresource>
+</RCC>

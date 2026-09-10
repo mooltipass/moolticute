@@ -108,7 +108,6 @@ HEADERS  += src/MainWindow.h \
     src/utils/IKeyboardLayoutDetector.h \
     src/utils/KeyboardLayoutDetector.h \
     src/utils/TOTPReader.h \
-    src/utils/qurltlds_p.h \
     src/version.h \
     src/AppGui.h \
     src/DaemonMenuAction.h \
@@ -188,7 +187,8 @@ FORMS    += src/MainWindow.ui \
 
 RESOURCES += \
     img/images.qrc \
-    lang.qrc
+    lang.qrc \
+    src/utils/publicsuffix.qrc
 
 win32 {
     RC_FILE = win/windows_res.rc
