@@ -5414,9 +5414,13 @@ quint64 MPDevice::getUInt64EncryptionKey()
 quint64 MPDevice::getUInt64EncryptionKeyOld()
 {
     qint64 key = 0;
+    // This legacy key derivation must reproduce what historical x86 builds
+    // computed: the 32-bit shift by >= 32 was undefined behaviour that x86
+    // silently wrapped ((i*8) & 31), while on arm64 the compiler turns the
+    // unmasked form into a trap (crash on Apple Silicon).
     for (int i = 0; i < std::min(8, static_cast<int>(m_cardCPZ.size())) ; i++)
     {
-        key += (static_cast<unsigned int>(m_cardCPZ[i]) & 0xFF) << (i*8);
+        key += (static_cast<unsigned int>(m_cardCPZ[i]) & 0xFF) << ((i*8) & 31);
     }
 
     return key;
