@@ -8,6 +8,7 @@ set -ev
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/../funcs.sh
+source $SCRIPTDIR/env.sh
 
 VERSION="$(get_version .)"
 
@@ -17,7 +18,8 @@ if [ "$(git rev-list -n 1 $VERSION)" != "$(git rev-parse HEAD)"  ]; then
     exit 0
 fi
 
-QTDIR="/Users/travis/Qt/6.2.4/macos"
+detect_qtdir
+MACDEPLOYQT_BIN="$(macdeployqt_bin)"
 APP=Moolticute
 # this directory name will also be shown in the title when the DMG is mounted
 TEMPDIR=build/$APP
@@ -37,15 +39,13 @@ cat build/$APP.app/Contents/Info.plist
 # Copy daemon to bundle
 cp build/moolticuted build/$APP.app/Contents/MacOS/
 
-#Get 3rd party tools
+# Bundle architecture-matching CLI tools
 mkdir -p build/$APP.app/Contents/MacOS/cli
-wget_retry https://calaos.fr/mooltipass/tools/macos/mc-agent -O build/$APP.app/Contents/MacOS/cli/mc-agent
-wget_retry https://calaos.fr/mooltipass/tools/macos/mc-cli -O build/$APP.app/Contents/MacOS/cli/mc-cli
-chmod +x build/$APP.app/Contents/MacOS/cli/mc-agent build/$APP.app/Contents/MacOS/cli/mc-cli
+bundle_mc_cli_tools build/$APP.app/Contents/MacOS/cli
 
 # use macdeployqt to deploy the application
 echo "Calling macdeployqt"
-$QTDIR/bin/macdeployqt build/$APP.app
+$MACDEPLOYQT_BIN build/$APP.app
 if [ "$?" -ne "0" ]; then
     echo "Failed to run macdeployqt"
     exit 1
